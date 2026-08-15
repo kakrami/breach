@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.13.0</title>
+<title>Punch World v1.14.0</title>
 <style>
 :root{
   --bg:#05090e;--panel:#0a121af4;--panel-strong:#0f1a24;--panel-soft:#071018ee;--line:#ffffff1d;
@@ -58,6 +58,8 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
 .pause{background:radial-gradient(circle at 50% 20%,#10283abb,#020508e8);backdrop-filter:blur(10px)}.pause-card{width:min(430px,94vw);border-color:#5fdcff2d;background:linear-gradient(155deg,#0e1d29f7,#060d14fa);box-shadow:0 34px 100px #000e,0 0 60px #00bfff10}.pause-actions{grid-template-columns:repeat(3,1fr)}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}.pause-team{box-shadow:0 0 20px color-mix(in srgb,var(--team) 20%,transparent)}
 @media (max-height:470px) and (orientation:landscape){.menu{padding:calc(var(--safe-top) + 3px) calc(var(--safe-right) + 5px) calc(var(--safe-bottom) + 3px) calc(var(--safe-left) + 5px)}.menu-shell{gap:4px}.menu-header{padding:4px 6px}.brand-copy .sub{display:none}.panel{padding:5px;gap:3px}.god-toggle{min-height:32px;padding:3px 5px}.god-icon{width:25px;height:25px}.god-copy small{display:none}.menu-footer{padding:3px 5px}.controls-note span{padding:2px 4px}.pause-card{padding:8px}}
 
+
+.admin-panel{position:fixed;inset:0;z-index:55;display:grid;place-items:center;padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 8px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 8px);background:#010408e8;backdrop-filter:blur(11px);overflow:hidden}.admin-shell{width:min(920px,98vw);height:min(430px,96vh);min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:6px;padding:9px;border:1px solid #5fdcff36;border-radius:14px;background:linear-gradient(155deg,#0e1d29fa,#050b11fd);box-shadow:0 34px 110px #000e,0 0 70px #23cfff0e}.admin-head{display:flex;align-items:start;justify-content:space-between;gap:10px;padding:2px 2px 7px;border-bottom:1px solid #ffffff14}.admin-head h2{margin:1px 0 0;font-size:18px;text-transform:uppercase;letter-spacing:.065em}.admin-sub{margin-top:3px;color:var(--muted);font-size:8px;font-weight:800}.admin-tabs{display:grid;grid-template-columns:1fr 1fr;gap:5px}.admin-tab{height:28px;border-radius:7px;border:1px solid #ffffff1a;background:#ffffff07;color:#8195a8;font-size:8px;font-weight:1000;letter-spacing:.14em;cursor:pointer}.admin-tab.active{color:#eafdff;border-color:#5fdcff66;background:#45d5ff18;box-shadow:inset 0 -2px #5fdcff}.admin-page{min-height:0;display:grid;align-items:stretch;overflow:hidden}.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-content:center}.setting,.weapon-settings-card label{display:grid;gap:3px;color:#8fa3b6;font-size:7px;font-weight:950;text-transform:uppercase;letter-spacing:.07em}.setting input,.weapon-settings-card input{width:100%;height:31px;border:1px solid #ffffff20;border-radius:7px;background:#02070ccf;color:#fff;padding:0 8px;outline:none;font-size:11px;font-weight:900;user-select:text;-webkit-user-select:text}.setting input:focus,.weapon-settings-card input:focus{border-color:#5fdcff77;box-shadow:0 0 0 2px #5fdcff12}.weapon-settings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:0}.weapon-settings-card{min-height:0;display:grid;grid-template-columns:1fr 1fr;align-content:center;gap:5px;padding:7px;border:1px solid #ffffff16;border-radius:9px;background:#ffffff05}.weapon-settings-card>strong{grid-column:1/-1;font-size:9px;letter-spacing:.11em;color:#ffd1a2}.weapon-settings-card.assault>strong{color:#ffe18d}.weapon-settings-card.sniper>strong{color:#b8efff}.weapon-settings-card small{grid-column:1/-1;color:#8296a8;font-size:6.5px;font-weight:800;line-height:1.25}.admin-foot{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;padding-top:6px;border-top:1px solid #ffffff12}.admin-status{min-width:0;color:#899caf;font-size:7.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-status.ok{color:#8ceca9}.admin-status.error{color:#ff8996}.pause.admin-mode .pause-actions{grid-template-columns:repeat(4,1fr)}.pause-admin-badge{color:#8fe7ff!important;border-color:#5fdcff55!important}.hide.admin-panel{display:none!important}@media(max-height:410px) and (orientation:landscape){.admin-shell{height:100%;max-height:100%;padding:6px;gap:4px}.admin-head{padding-bottom:4px}.admin-head h2{font-size:14px}.admin-sub{display:none}.admin-tab{height:24px}.settings-grid,.weapon-settings-grid{gap:4px}.setting,.weapon-settings-card label{gap:2px;font-size:6.3px}.setting input,.weapon-settings-card input{height:26px;font-size:9px}.weapon-settings-card{padding:5px;gap:3px}.weapon-settings-card small{font-size:5.8px}.admin-foot{padding-top:4px}.admin-foot .btn{min-height:26px}}
 </style>
 </head>
 <body>
@@ -77,6 +79,7 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
     <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H4v16h6M14 8l4 4-4 4M8 12h10"/></symbol>
     <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5v-3l-2.2-.7a7 7 0 0 0-.7-1.6l1.1-2-2.1-2.1-2 1.1a7 7 0 0 0-1.6-.7L10.5 2h-3l-.7 2.2a7 7 0 0 0-1.6.7l-2-1.1L1.1 5.9l1.1 2a7 7 0 0 0-.7 1.6L0 10.5v3l2.2.7a7 7 0 0 0 .7 1.6l-1.1 2 2.1 2.1 2-1.1a7 7 0 0 0 1.6.7l.7 2.2h3l.7-2.2a7 7 0 0 0 1.6-.7l2 1.1 2.1-2.1-1.1-2a7 7 0 0 0 .7-1.6L19 13.5Z" transform="translate(2.5 0) scale(.8)"/></symbol>
   </defs>
 </svg>
 <canvas id="game" draggable="false" aria-label="Punch World gameplay"></canvas>
@@ -154,10 +157,41 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
     <div class="pause-actions">
       <button id="resumeBtn" class="btn primary resume"><svg class="ui-icon"><use href="#i-play"/></svg><span>Resume</span></button>
       <button id="pauseGodBtn" class="btn"><svg class="ui-icon"><use href="#i-shield"/></svg><span id="pauseGodText">God Off</span></button>
+      <button id="adminBtn" class="btn hide"><svg class="ui-icon"><use href="#i-settings"/></svg><span>Admin</span></button>
       <button id="copyBtn" class="btn"><svg class="ui-icon"><use href="#i-copy"/></svg><span>Invite</span></button>
       <button id="fullBtn" class="btn"><svg class="ui-icon"><use href="#i-full"/></svg><span>Fullscreen</span></button>
       <button id="leaveBtn" class="btn danger leave"><svg class="ui-icon"><use href="#i-exit"/></svg><span>Leave World</span></button>
     </div>
+  </div>
+</section>
+
+<section id="adminPanel" class="admin-panel hide" aria-label="World admin settings">
+  <div class="admin-shell">
+    <header class="admin-head">
+      <div><div class="eyebrow">WORLD ADMIN // LIVE RULES</div><h2>Admin Settings</h2><div class="admin-sub">Changes sync live to every player and bot. Combat values are enforced by the server.</div></div>
+      <button id="adminCloseBtn" class="btn icon-btn" title="Close admin settings" aria-label="Close admin settings">×</button>
+    </header>
+    <div class="admin-tabs" role="tablist"><button class="admin-tab active" data-admin-tab="general">WORLD</button><button class="admin-tab" data-admin-tab="weapons">WEAPONS</button></div>
+    <div id="adminGeneral" class="admin-page">
+      <div class="settings-grid">
+        <label class="setting"><span>Run Speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label>
+        <label class="setting"><span>ADS Walk Speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label>
+        <label class="setting"><span>Jump Height</span><input id="setJumpHeight" type="number" min="0.4" max="5" step="0.1"></label>
+        <label class="setting"><span>Gravity</span><input id="setGravity" type="number" min="8" max="40" step="1"></label>
+        <label class="setting"><span>Punch Damage</span><input id="setPunchDamage" type="number" min="5" max="100" step="1"></label>
+        <label class="setting"><span>Regen Delay (s)</span><input id="setRegenDelay" type="number" min="0" max="15" step="0.5"></label>
+        <label class="setting"><span>Regen / Second</span><input id="setRegenRate" type="number" min="0" max="30" step="0.5"></label>
+        <label class="setting"><span>Respawn Delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label>
+      </div>
+    </div>
+    <div id="adminWeapons" class="admin-page hide">
+      <div class="weapon-settings-grid">
+        <section class="weapon-settings-card"><strong>PISTOL</strong><label>Damage<input id="setPistolDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setPistolSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setPistolReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setPistolCooldown" type="number" min="50" max="2500" step="5"></label></section>
+        <section class="weapon-settings-card assault"><strong>ASSAULT RIFLE</strong><label>Damage<input id="setAssaultDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setAssaultSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setAssaultReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setAssaultCooldown" type="number" min="50" max="2500" step="5"></label></section>
+        <section class="weapon-settings-card sniper"><strong>SNIPER</strong><label>Damage / Power<input id="setSniperDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setSniperSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setSniperReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setSniperCooldown" type="number" min="50" max="2500" step="5"></label><small>Penetration uses remaining damage power. Each target consumes its current HP.</small></section>
+      </div>
+    </div>
+    <footer class="admin-foot"><div id="adminStatus" class="admin-status">Only the world creator can change these rules.</div><button id="adminResetBtn" class="btn">Defaults</button><button id="adminSaveBtn" class="btn primary">Apply Rules</button></footer>
   </div>
 </section>
 
@@ -166,22 +200,29 @@ import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.185.1/
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.13.0';
+const APP_VERSION = '1.14.0';
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
 const MAX_BOTS = 8;
 const WEAPON_ORDER = ['pistol','assault','sniper'];
+const DEFAULT_WORLD_SETTINGS = {
+  movement:{runSpeed:8.4,walkSpeed:4.6,jumpHeight:1.6,gravity:23},
+  combat:{punchDamage:25,regenDelayMs:5000,regenPerSecond:8,respawnMs:2800},
+  weapons:{
+    pistol:{damage:34,speed:42,reloadMs:475,cooldownMs:190},
+    assault:{damage:26,speed:82,reloadMs:650,cooldownMs:105},
+    sniper:{damage:120,speed:180,reloadMs:1100,cooldownMs:950}
+  }
+};
 const WEAPON_SPECS = {
-  pistol: { name:'PISTOL', short:'PST', mag:12, reloadMs:475, cooldown:.19, bulletSpeed:42, adsFov:54 },
-  assault: { name:'ASSAULT RIFLE', short:'AR', mag:12, reloadMs:650, cooldown:.105, bulletSpeed:82, adsFov:46 },
-  sniper: { name:'SNIPER', short:'SNP', mag:12, reloadMs:1100, cooldown:.95, bulletSpeed:180, adsFov:18 },
+  pistol: { name:'PISTOL', short:'PST', mag:12, damage:34, reloadMs:475, cooldown:.19, bulletSpeed:42, adsFov:54 },
+  assault: { name:'ASSAULT RIFLE', short:'AR', mag:12, damage:26, reloadMs:650, cooldown:.105, bulletSpeed:82, adsFov:46 },
+  sniper: { name:'SNIPER', short:'SNP', mag:12, damage:120, reloadMs:1100, cooldown:.95, bulletSpeed:180, adsFov:18 },
 };
 const TEAM_COLORS = { blue:'#46a7ff', red:'#ff5c6c' };
 const STATE_INTERVAL = 50;
-const WALK_SPEED = 4.6;
-const RUN_SPEED = 8.4;
-const JUMP_SPEED = 8.6;
-const GRAVITY = 23;
+let worldSettings=cloneSettings(DEFAULT_WORLD_SETTINGS);
+let WALK_SPEED=4.6,RUN_SPEED=8.4,GRAVITY=23,JUMP_SPEED=Math.sqrt(2*GRAVITY*1.6);
 const PLAYER_HEIGHT = 1.7;
 const PLAYER_RADIUS = 0.38;
 const ARENA_LIMIT = 120;
@@ -230,7 +271,7 @@ updateBotTeamSelection();
 let scene, camera, renderer, clock, leftFist, rightFist, pistolGroup, pistolFlash, assaultGroup, assaultFlash, sniperGroup, sniperFlash;
 let hudScene, hudCamera, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0;
 let gameActive = false, paused = false, socket = null, reconnectTimer = null, reconnectAttempt = 0;
-let currentRoom = '', myName = '', myTeam = 'blue', selfColor = TEAM_COLORS.blue, godMode = false;
+let currentRoom = '', myName = '', myTeam = 'blue', selfColor = TEAM_COLORS.blue, godMode = false, isWorldAdmin = false;
 let hp = 100, wastedUntil = 0, currentWeapon = 'pistol', ammo = {pistol:12,assault:12,sniper:12}, reloadUntil = 0, reloadWeapon = '';
 let fireMode=localStorage.getItem('punchWorldFireMode')==='auto'?'auto':'semi',fireHeld=false;
 let adsWanted=false,adsBlend=0,baseFov=70,lastWastedBy='',lastWastedWeapon='';
@@ -278,6 +319,19 @@ function normalizeCode(v){ return String(v||'').toUpperCase().replace(/[^A-HJ-NP
 function setStatus(text, tone=''){ menuStatus.textContent=text; menuStatus.className=`status ${tone}`; }
 function apiToWs(base){ return base.replace(/^https:/,'wss:').replace(/^http:/,'ws:'); }
 function safeName(){ return (nameInput.value||'Player').replace(/[<>]/g,'').trim().slice(0,18) || 'Player'; }
+function cloneSettings(v){return JSON.parse(JSON.stringify(v));}
+function clampNum(v,min,max,fallback){const n=Number(v);return Math.max(min,Math.min(max,Number.isFinite(n)?n:fallback));}
+function normalizeWorldSettingsClient(value){
+  const v=value&&typeof value==='object'?value:{},mv=v.movement||{},cv=v.combat||{},wv=v.weapons||{};
+  const weapon=(name)=>{const d=DEFAULT_WORLD_SETTINGS.weapons[name],x=wv[name]||{};return{damage:clampNum(x.damage,1,400,d.damage),speed:clampNum(x.speed,10,400,d.speed),reloadMs:Math.round(clampNum(x.reloadMs,100,5000,d.reloadMs)),cooldownMs:Math.round(clampNum(x.cooldownMs,50,2500,d.cooldownMs))}};
+  return{movement:{runSpeed:clampNum(mv.runSpeed,3,16,8.4),walkSpeed:clampNum(mv.walkSpeed,1.5,9,4.6),jumpHeight:clampNum(mv.jumpHeight,.4,5,1.6),gravity:clampNum(mv.gravity,8,40,23)},combat:{punchDamage:clampNum(cv.punchDamage,5,100,25),regenDelayMs:Math.round(clampNum(cv.regenDelayMs,0,15000,5000)),regenPerSecond:clampNum(cv.regenPerSecond,0,30,8),respawnMs:Math.round(clampNum(cv.respawnMs,1000,10000,2800))},weapons:{pistol:weapon('pistol'),assault:weapon('assault'),sniper:weapon('sniper')}};
+}
+function applyWorldSettings(value){
+  worldSettings=normalizeWorldSettingsClient(value);WALK_SPEED=worldSettings.movement.walkSpeed;RUN_SPEED=worldSettings.movement.runSpeed;GRAVITY=worldSettings.movement.gravity;JUMP_SPEED=Math.sqrt(2*GRAVITY*worldSettings.movement.jumpHeight);
+  for(const name of WEAPON_ORDER){const w=worldSettings.weapons[name],spec=WEAPON_SPECS[name];spec.damage=w.damage;spec.bulletSpeed=w.speed;spec.reloadMs=w.reloadMs;spec.cooldown=w.cooldownMs/1000;}
+  syncPauseContext();
+}
+function aimSensitivityScale(){if(!adsWanted)return 1;return currentWeapon==='sniper'?.28:.62;}
 function applyTeamSelection(team,persist=true){
   selectedTeam=team==='red'?'red':'blue';
   document.documentElement.style.setProperty('--team',TEAM_COLORS[selectedTeam]);
@@ -308,6 +362,7 @@ function syncPauseContext(){
   const badge=$('pauseTeamBadge');if(badge){badge.textContent=`${myTeam.toUpperCase()} TEAM`;badge.style.color=TEAM_COLORS[myTeam];badge.style.borderColor=`${TEAM_COLORS[myTeam]}88`;badge.style.background=`${TEAM_COLORS[myTeam]}22`;}
   if($('pauseRoom'))$('pauseRoom').textContent=`Room ${currentRoom||'----'}`;
   if($('pauseLoadout'))$('pauseLoadout').textContent=`${WEAPON_SPECS[currentWeapon].name} · ${Math.max(0,Math.floor(ammo[currentWeapon]||0))} rounds`;
+  const adminBtn=$('adminBtn');if(adminBtn)adminBtn.classList.toggle('hide',!isWorldAdmin);pause.classList.toggle('admin-mode',!!isWorldAdmin);
   syncGodUI();
 }
 
@@ -506,6 +561,11 @@ function bindUI(){
   $('resumeBtn').addEventListener('click', resumeFromGesture);
   $('copyBtn').addEventListener('click', copyInvite);
   $('pauseGodBtn').addEventListener('click',()=>toggleGodMode(true));
+  $('adminBtn').addEventListener('click',openAdminPanel);
+  $('adminCloseBtn').addEventListener('click',closeAdminPanel);
+  $('adminSaveBtn').addEventListener('click',saveAdminSettings);
+  $('adminResetBtn').addEventListener('click',()=>populateAdminSettings(DEFAULT_WORLD_SETTINGS));
+  for(const tab of document.querySelectorAll('[data-admin-tab]'))tab.addEventListener('click',()=>switchAdminTab(tab.dataset.adminTab));
   $('fullBtn').addEventListener('click', toggleFullscreen);
   $('leaveBtn').addEventListener('click', leaveWorld);
 
@@ -525,7 +585,7 @@ function bindUI(){
 
   document.addEventListener('mousemove', e => {
     if(document.pointerLockElement!==canvas || !gameActive || paused || hp<=0) return;
-    yaw -= e.movementX*.0023; pitch -= e.movementY*.0020; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
+    const sens=aimSensitivityScale();yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
   });
   document.addEventListener('pointerlockchange', () => {
     if(gameActive && !isTouch && !paused && document.pointerLockElement!==canvas) openPause();
@@ -694,7 +754,7 @@ function requestPointerLockNow(){
   try{canvas.requestPointerLock();}catch{}
 }
 
-async function resumeFromGesture(){
+async function resumeFromGesture(){$('adminPanel').classList.add('hide');
   if(!gameActive||!isLandscape())return;
   ensureAudio();
   if(!isTouch) requestPointerLockNow();
@@ -778,7 +838,7 @@ function onCanvasPointerMove(e){
   if(role==='joy'){updateJoy(p.x,p.y,hudLayout||computeHudLayout());return;}
   if(role==='look' && e.pointerId===look.pointer && hp>0){
     const dx=p.x-look.x,dy=p.y-look.y;look.x=p.x;look.y=p.y;
-    yaw-=dx*.006;pitch-=dy*.0052;pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
+    const sens=aimSensitivityScale();yaw-=dx*.006*sens;pitch-=dy*.0052*sens;pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
   }
 }
 
@@ -866,7 +926,7 @@ function send(payload){if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.s
 
 function handleMessage(m){
   if(m.t==='welcome'){
-    currentRoom=m.code;myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;selectedGod=godMode;localStorage.setItem('punchWorldGodMode',godMode?'1':'0');syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';syncLocalWeaponModel();
+    currentRoom=m.code;isWorldAdmin=!!m.isAdmin;applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;selectedGod=godMode;localStorage.setItem('punchWorldGodMode',godMode?'1':'0');syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';syncLocalWeaponModel();
     position.set(m.self.x||0,m.self.y??terrainHeight(m.self.x||0,m.self.z||0),m.self.z||0);yaw=m.self.yaw||0;pitch=m.self.pitch||0;
     clearRemotes();for(const p of m.players||[])upsertRemote(p,true);for(const b of m.bots||[])upsertRemote(b,true);
     enterGame();updateHealth();updatePlayerCount();return;
@@ -883,6 +943,8 @@ function handleMessage(m){
   if(m.t==='god'){if(m.id===clientId){godMode=!!m.enabled;selectedGod=godMode;localStorage.setItem('punchWorldGodMode',godMode?'1':'0');syncGodUI();}else{const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}return;}
   if(m.t==='blocked'){handleBlocked(m);return;}
   if(m.t==='kill'){handleKill(m);return;}
+  if(m.t==='settings'){applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);if(!$('adminPanel').classList.contains('hide')){populateAdminSettings(worldSettings);setAdminStatus('Rules applied to the world.','ok');}showToast('WORLD RULES UPDATED');return;}
+  if(m.t==='notice'){showToast(m.text||'Server notice');if(!$('adminPanel').classList.contains('hide'))setAdminStatus(m.text||'Server notice',m.tone==='error'?'error':'');return;}
   if(m.t==='health'){if(m.id===clientId){hp=Math.max(0,Math.min(100,Number(m.hp)||0));updateHealth();}else{const r=remotes.get(m.id);if(r)r.hp=Math.max(0,Math.min(100,Number(m.hp)||0));}return;}
   if(m.t==='hit'){handleHit(m);return;}
   if(m.t==='respawn'){handleRespawn(m.player);return;}
@@ -898,10 +960,22 @@ function enterGame(){
   if(!isTouch && document.pointerLockElement!==canvas)showToast('Click the game to capture mouse');
 }
 function leaveWorld(){
-  gameActive=false;paused=false;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left world')}catch{}}socket=null;currentRoom='';
+  gameActive=false;paused=false;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left world')}catch{}}socket=null;currentRoom='';isWorldAdmin=false;applyWorldSettings(DEFAULT_WORLD_SETTINGS);$('adminPanel').classList.add('hide');
   document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();keys.clear();hp=100;wastedUntil=0;godMode=selectedGod;syncGodUI();currentWeapon='pistol';ammo={pistol:12,assault:12,sniper:12};reloadUntil=0;reloadWeapon='';fireHeld=false;killFeed.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshWorlds();startIntroMusic();
 }
+
+const ADMIN_FIELDS={
+  runSpeed:'setRunSpeed',walkSpeed:'setWalkSpeed',jumpHeight:'setJumpHeight',gravity:'setGravity',punchDamage:'setPunchDamage',regenDelay:'setRegenDelay',regenRate:'setRegenRate',respawnDelay:'setRespawnDelay',
+  pistolDamage:'setPistolDamage',pistolSpeed:'setPistolSpeed',pistolReload:'setPistolReload',pistolCooldown:'setPistolCooldown',assaultDamage:'setAssaultDamage',assaultSpeed:'setAssaultSpeed',assaultReload:'setAssaultReload',assaultCooldown:'setAssaultCooldown',sniperDamage:'setSniperDamage',sniperSpeed:'setSniperSpeed',sniperReload:'setSniperReload',sniperCooldown:'setSniperCooldown'
+};
+function setAdminStatus(text,tone=''){const el=$('adminStatus');el.textContent=text;el.className=`admin-status ${tone}`;}
+function switchAdminTab(tab){const weapons=tab==='weapons';$('adminGeneral').classList.toggle('hide',weapons);$('adminWeapons').classList.toggle('hide',!weapons);for(const b of document.querySelectorAll('[data-admin-tab]'))b.classList.toggle('active',b.dataset.adminTab===tab);}
+function populateAdminSettings(value){const x=normalizeWorldSettingsClient(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setPunchDamage').value=x.combat.punchDamage;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=w.reloadMs;$(`set${cap}Cooldown`).value=w.cooldownMs;}}
+function collectAdminSettings(){return normalizeWorldSettingsClient({movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{punchDamage:$('setPunchDamage').value,regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000},weapons:{pistol:{damage:$('setPistolDamage').value,speed:$('setPistolSpeed').value,reloadMs:$('setPistolReload').value,cooldownMs:$('setPistolCooldown').value},assault:{damage:$('setAssaultDamage').value,speed:$('setAssaultSpeed').value,reloadMs:$('setAssaultReload').value,cooldownMs:$('setAssaultCooldown').value},sniper:{damage:$('setSniperDamage').value,speed:$('setSniperSpeed').value,reloadMs:$('setSniperReload').value,cooldownMs:$('setSniperCooldown').value}}});}
+function openAdminPanel(){if(!isWorldAdmin){showToast('ADMIN ACCESS REQUIRED');return;}populateAdminSettings(worldSettings);switchAdminTab('general');setAdminStatus('Only the world creator can change these rules.');$('adminPanel').classList.remove('hide');}
+function closeAdminPanel(){$('adminPanel').classList.add('hide');}
+function saveAdminSettings(){if(!isWorldAdmin||socket?.readyState!==WebSocket.OPEN){setAdminStatus('Admin connection unavailable.','error');return;}const next=collectAdminSettings();setAdminStatus('Applying rules…');send({t:'adminSettings',settings:next});}
 
 function openPause(){if(!gameActive||paused)return;paused=true;keys.clear();resetTouchInput();setAim(false);syncPauseContext();pause.classList.remove('hide');if(document.pointerLockElement)document.exitPointerLock?.();}
 async function copyInvite(){
@@ -993,12 +1067,12 @@ function handleShot(m){
   if(!m?.id||bullets.has(m.id))return;
   const color=m.weapon==='sniper'?0xb8efff:m.weapon==='assault'?0xffd37d:(m.ownerId===clientId?0xfff1a8:(remotes.get(m.ownerId)?.bot?0xff9b6b:0xffd27a));
   const radius=m.weapon==='sniper'?.045:m.weapon==='assault'?.05:.055;const mesh=new THREE.Mesh(new THREE.SphereGeometry(radius,8,6),new THREE.MeshBasicMaterial({color}));mesh.position.set(m.x,m.y,m.z);scene.add(mesh);
-  bullets.set(m.id,{mesh,v:new THREE.Vector3(m.vx,m.vy,m.vz),born:performance.now()});
+  bullets.set(m.id,{mesh,v:new THREE.Vector3(m.vx,m.vy,m.vz),born:performance.now(),lifetimeMs:Number(m.lifetimeMs)||3600});
   if(m.ownerId===clientId){const w=m.weapon||currentWeapon;ammo[w]=Math.max(0,(ammo[w]||0)-1);if(ammo[w]===0&&!reloadUntil){reloadWeapon=w;reloadUntil=Date.now()+WEAPON_SPECS[w].reloadMs;}if(w==='sniper')sniperFlash.material.opacity=1;else if(w==='assault')assaultFlash.material.opacity=1;else pistolFlash.material.opacity=1;}
 }
 function removeBullet(id){const b=bullets.get(id);if(!b)return;scene.remove(b.mesh);b.mesh.geometry.dispose();b.mesh.material.dispose();bullets.delete(id);}
 function clearBullets(){for(const id of [...bullets.keys()])removeBullet(id);}
-function updateBullets(dt){for(const [id,b] of bullets){b.mesh.position.addScaledVector(b.v,dt);if(performance.now()-b.born>3400)removeBullet(id);}}
+function updateBullets(dt){for(const [id,b] of bullets){b.mesh.position.addScaledVector(b.v,dt);if(performance.now()-b.born>b.lifetimeMs+250)removeBullet(id);}}
 
 function animate(){
   requestAnimationFrame(animate);
