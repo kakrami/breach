@@ -8,14 +8,15 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.15.3</title>
+<title>Punch World v1.15.4</title>
 <style>
 :root{
   --bg:#05090e;--panel:#0a121af4;--panel-strong:#0f1a24;--panel-soft:#071018ee;--line:#ffffff1d;
   --text:#f7fbff;--muted:#92a4b7;--accent:#5fdcff;--accent2:#54a8ff;--danger:#ff6070;--ok:#72e59a;
   --blue:#4baaff;--red:#ff6172;--team:#4baaff;
   --safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);
-  --safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px)
+  --safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);
+  --vv-width:100vw;--vv-height:100vh
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;touch-action:none;overscroll-behavior:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
@@ -38,10 +39,6 @@ h1{margin:0;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing
 .create-row{display:grid;grid-template-columns:minmax(110px,.48fr) minmax(140px,.52fr);gap:6px}.join-row{display:grid;grid-template-columns:1fr auto;gap:6px}.world-section{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);gap:5px}.section-title{display:flex;justify-content:space-between;align-items:center;font-size:8px;font-weight:1000;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.world-list{min-height:0;display:grid;align-content:start;gap:5px;overflow:hidden}.world{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;align-items:center;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(180deg,#ffffff08,#ffffff04)}.world-code{font-weight:1000;letter-spacing:.14em;font-size:11px}.world-meta{font-size:8px;color:var(--muted);font-weight:800;line-height:1.15}.team-counts{display:flex;gap:4px;margin-top:3px}.team-chip{padding:1px 5px;border-radius:999px;font-size:7px;font-weight:1000;border:1px solid #ffffff16}.team-chip.blue{color:#acd6ff;background:#46a7ff13}.team-chip.red{color:#ffb6bd;background:#ff5c6c13}.empty{padding:12px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:9px;font-size:10px}
 .menu-footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 9px;border:1px solid var(--line);border-radius:10px;background:#071018e9}.status{min-height:14px;color:var(--muted);font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.status.error{color:#ff8d99}.status.ok{color:#91f0ad}.controls-note{font-size:7.5px;color:#8497aa;font-weight:800;text-align:right;line-height:1.3;white-space:nowrap}.controls-note b{color:#dce6ef}
 .pause{position:fixed;inset:0;z-index:35;display:grid;place-items:center;padding:calc(var(--safe-top) + 12px) calc(var(--safe-right) + 12px) calc(var(--safe-bottom) + 12px) calc(var(--safe-left) + 12px);background:#010408d6;backdrop-filter:blur(8px);overflow:hidden}.pause-card{width:min(380px,92vw);max-height:100%;padding:14px;border-radius:15px;background:linear-gradient(180deg,#0f1b26,#071019);border:1px solid var(--line);display:grid;gap:8px;box-shadow:0 26px 80px #000d,inset 0 1px #ffffff0b;overflow:hidden}.pause-head{display:flex;justify-content:space-between;align-items:start;gap:9px;padding-bottom:8px;border-bottom:1px solid #ffffff13}.pause-head h2{margin:0;font-size:18px;text-transform:uppercase;letter-spacing:.06em}.pause-context{display:grid;gap:2px;margin-top:3px;color:var(--muted);font-size:9px;font-weight:800}.pause-team{padding:4px 7px;border-radius:999px;background:#46a7ff1d;border:1px solid #46a7ff70;color:var(--team);font-size:8px;font-weight:1000;letter-spacing:.08em}.pause-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}
-@media (orientation:landscape) and (max-height:500px){
-  .menu{padding:calc(var(--safe-top) + 5px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 5px) calc(var(--safe-left) + 6px)}.menu-shell{gap:5px}.menu-header{padding:5px 7px;border-radius:9px}.logo{width:29px;height:29px;flex-basis:29px;border-radius:8px;font-size:15px}.menu-header h1{font-size:16px}.brand-version{margin-top:2px}.sub{display:none}.header-actions{gap:4px}.icon-btn{width:30px!important;min-width:30px!important;height:30px;min-height:30px!important}.menu-grid{grid-template-columns:minmax(240px,.8fr) minmax(310px,1.2fr);gap:5px}.panel{padding:6px;gap:4px;border-radius:9px}.panel-title{padding-bottom:3px}.panel-title strong{font-size:8px}.panel-title span{font-size:7px}.input{height:28px;font-size:10px;padding:0 7px}.label,.bot-team-label,.bot-total,.team-summary{font-size:7px}.team-option{min-height:35px;padding:4px 6px}.team-swatch{height:21px}.team-copy strong{font-size:8px}.team-copy small{font-size:7px}.btn{min-height:28px;font-size:9px;padding:0 8px}.world{padding:4px 6px}.world-code{font-size:9px}.world-meta{font-size:7px}.menu-footer{padding:4px 6px}.status{font-size:8px}.controls-note{font-size:6.5px}.pause-card{padding:9px;gap:5px}.pause-head{padding-bottom:5px}.pause-head h2{font-size:15px}
-}
-@media (max-width:760px) and (orientation:portrait){.menu-grid{grid-template-columns:1fr}.controls-note{display:none}}
 
 /* v1.13 professional visual system */
 .svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}.ui-icon,.mini-icon,.brand-icon{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ui-icon{width:18px;height:18px}.mini-icon{width:12px;height:12px}.brand-icon{width:100%;height:100%;stroke-width:1.6}.brand-icon .cut,.ui-icon .cut{fill:currentColor;stroke:none}
@@ -56,27 +53,25 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
 .world{position:relative;overflow:hidden;border-color:#ffffff18}.world::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:#53d9ff80}.world .btn{min-width:58px}.team-chip{letter-spacing:.03em}
 .menu-footer{border-color:#ffffff18;background:linear-gradient(90deg,#061019ee,#081521ee)}.controls-note{display:flex;gap:7px;align-items:center;justify-content:flex-end;white-space:normal}.controls-note span{padding:3px 6px;border:1px solid #ffffff13;border-radius:5px;background:#ffffff05;color:#91a5b8;font-size:7px;font-weight:900}
 .pause{background:radial-gradient(circle at 50% 20%,#10283abb,#020508e8);backdrop-filter:blur(10px)}.pause-card{width:min(430px,94vw);border-color:#5fdcff2d;background:linear-gradient(155deg,#0e1d29f7,#060d14fa);box-shadow:0 34px 100px #000e,0 0 60px #00bfff10}.pause-actions{grid-template-columns:repeat(3,1fr)}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}.pause-team{box-shadow:0 0 20px color-mix(in srgb,var(--team) 20%,transparent)}
-@media (max-height:470px) and (orientation:landscape){.menu{padding:calc(var(--safe-top) + 3px) calc(var(--safe-right) + 5px) calc(var(--safe-bottom) + 3px) calc(var(--safe-left) + 5px)}.menu-shell{gap:4px}.menu-header{padding:4px 6px}.brand-copy .sub{display:none}.panel{padding:5px;gap:3px}.god-toggle{min-height:32px;padding:3px 5px}.god-icon{width:25px;height:25px}.god-copy small{display:none}.menu-footer{padding:3px 5px}.controls-note span{padding:2px 4px}.pause-card{padding:8px}}
 
+.admin-panel{position:fixed;inset:0;z-index:55;display:grid;place-items:center;padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 8px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 8px);background:#010408e8;backdrop-filter:blur(11px);overflow:hidden}.admin-shell{width:min(920px,98vw);height:min(430px,96vh);min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:6px;padding:9px;border:1px solid #5fdcff36;border-radius:14px;background:linear-gradient(155deg,#0e1d29fa,#050b11fd);box-shadow:0 34px 110px #000e,0 0 70px #23cfff0e}.admin-head{display:flex;align-items:start;justify-content:space-between;gap:10px;padding:2px 2px 7px;border-bottom:1px solid #ffffff14}.admin-head h2{margin:1px 0 0;font-size:18px;text-transform:uppercase;letter-spacing:.065em}.admin-sub{margin-top:3px;color:var(--muted);font-size:8px;font-weight:800}.admin-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.admin-tab{height:28px;border-radius:7px;border:1px solid #ffffff1a;background:#ffffff07;color:#8195a8;font-size:8px;font-weight:1000;letter-spacing:.14em;cursor:pointer}.admin-tab.active{color:#eafdff;border-color:#5fdcff66;background:#45d5ff18;box-shadow:inset 0 -2px #5fdcff}.admin-page{min-height:0;display:grid;align-items:stretch;overflow:hidden}.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-content:center}.setting,.weapon-settings-card label{display:grid;gap:3px;color:#8fa3b6;font-size:7px;font-weight:950;text-transform:uppercase;letter-spacing:.07em}.setting input,.weapon-settings-card input{width:100%;height:31px;border:1px solid #ffffff20;border-radius:7px;background:#02070ccf;color:#fff;padding:0 8px;outline:none;font-size:11px;font-weight:900;user-select:text;-webkit-user-select:text}.setting input:focus,.weapon-settings-card input:focus{border-color:#5fdcff77;box-shadow:0 0 0 2px #5fdcff12}.weapon-settings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:0}.weapon-settings-card{min-height:0;display:grid;grid-template-columns:1fr 1fr;align-content:center;gap:5px;padding:7px;border:1px solid #ffffff16;border-radius:9px;background:#ffffff05}.weapon-settings-card>strong{grid-column:1/-1;font-size:9px;letter-spacing:.11em;color:#ffd1a2}.weapon-settings-card.assault>strong{color:#ffe18d}.weapon-settings-card.sniper>strong{color:#b8efff}.weapon-settings-card small{grid-column:1/-1;color:#8296a8;font-size:6.5px;font-weight:800;line-height:1.25}.admin-foot{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;padding-top:6px;border-top:1px solid #ffffff12}.admin-status{min-width:0;color:#899caf;font-size:7.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-status.ok{color:#8ceca9}.admin-status.error{color:#ff8996}.pause.admin-mode .pause-actions{grid-template-columns:repeat(4,1fr)}.pause-admin-badge{color:#8fe7ff!important;border-color:#5fdcff55!important}.hide.admin-panel{display:none!important}.admin-head{padding-bottom:4px}.admin-head h2{font-size:14px}.admin-sub{display:none}.admin-tab{height:24px}.settings-grid,.weapon-settings-grid{gap:4px}.setting,.weapon-settings-card label{gap:2px;font-size:6.3px}.setting input,.weapon-settings-card input{height:26px;font-size:9px}.weapon-settings-card{padding:5px;gap:3px}.weapon-settings-card small{font-size:5.8px}.admin-foot{padding-top:4px}.admin-foot .btn{min-height:26px}}
 
-.admin-panel{position:fixed;inset:0;z-index:55;display:grid;place-items:center;padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 8px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 8px);background:#010408e8;backdrop-filter:blur(11px);overflow:hidden}.admin-shell{width:min(920px,98vw);height:min(430px,96vh);min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:6px;padding:9px;border:1px solid #5fdcff36;border-radius:14px;background:linear-gradient(155deg,#0e1d29fa,#050b11fd);box-shadow:0 34px 110px #000e,0 0 70px #23cfff0e}.admin-head{display:flex;align-items:start;justify-content:space-between;gap:10px;padding:2px 2px 7px;border-bottom:1px solid #ffffff14}.admin-head h2{margin:1px 0 0;font-size:18px;text-transform:uppercase;letter-spacing:.065em}.admin-sub{margin-top:3px;color:var(--muted);font-size:8px;font-weight:800}.admin-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.admin-tab{height:28px;border-radius:7px;border:1px solid #ffffff1a;background:#ffffff07;color:#8195a8;font-size:8px;font-weight:1000;letter-spacing:.14em;cursor:pointer}.admin-tab.active{color:#eafdff;border-color:#5fdcff66;background:#45d5ff18;box-shadow:inset 0 -2px #5fdcff}.admin-page{min-height:0;display:grid;align-items:stretch;overflow:hidden}.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-content:center}.setting,.weapon-settings-card label{display:grid;gap:3px;color:#8fa3b6;font-size:7px;font-weight:950;text-transform:uppercase;letter-spacing:.07em}.setting input,.weapon-settings-card input{width:100%;height:31px;border:1px solid #ffffff20;border-radius:7px;background:#02070ccf;color:#fff;padding:0 8px;outline:none;font-size:11px;font-weight:900;user-select:text;-webkit-user-select:text}.setting input:focus,.weapon-settings-card input:focus{border-color:#5fdcff77;box-shadow:0 0 0 2px #5fdcff12}.weapon-settings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:0}.weapon-settings-card{min-height:0;display:grid;grid-template-columns:1fr 1fr;align-content:center;gap:5px;padding:7px;border:1px solid #ffffff16;border-radius:9px;background:#ffffff05}.weapon-settings-card>strong{grid-column:1/-1;font-size:9px;letter-spacing:.11em;color:#ffd1a2}.weapon-settings-card.assault>strong{color:#ffe18d}.weapon-settings-card.sniper>strong{color:#b8efff}.weapon-settings-card small{grid-column:1/-1;color:#8296a8;font-size:6.5px;font-weight:800;line-height:1.25}.admin-foot{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;padding-top:6px;border-top:1px solid #ffffff12}.admin-status{min-width:0;color:#899caf;font-size:7.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-status.ok{color:#8ceca9}.admin-status.error{color:#ff8996}.pause.admin-mode .pause-actions{grid-template-columns:repeat(4,1fr)}.pause-admin-badge{color:#8fe7ff!important;border-color:#5fdcff55!important}.hide.admin-panel{display:none!important}@media(max-height:410px) and (orientation:landscape){.admin-shell{height:100%;max-height:100%;padding:6px;gap:4px}.admin-head{padding-bottom:4px}.admin-head h2{font-size:14px}.admin-sub{display:none}.admin-tab{height:24px}.settings-grid,.weapon-settings-grid{gap:4px}.setting,.weapon-settings-card label{gap:2px;font-size:6.3px}.setting input,.weapon-settings-card input{height:26px;font-size:9px}.weapon-settings-card{padding:5px;gap:3px}.weapon-settings-card small{font-size:5.8px}.admin-foot{padding-top:4px}.admin-foot .btn{min-height:26px}}
-
-/* v1.15.3 integrated layout baseline */
-.menu-grid{grid-template-columns:minmax(260px,.82fr) minmax(330px,1.18fr);grid-template-rows:auto minmax(0,1fr);align-items:stretch}
-.operator-panel{grid-column:1/-1;align-content:start}.operator-row{display:grid;grid-template-columns:minmax(145px,.72fr) minmax(250px,1.15fr) minmax(150px,.62fr);gap:8px;align-items:end;min-height:0}.operator-row .field{gap:4px}.operator-god{align-self:end;min-height:38px}.operator-team .team-summary{min-height:10px}
-.create-panel{grid-column:1;grid-row:2;grid-template-rows:auto auto auto;align-content:start}.join-panel{grid-column:2;grid-row:2}.bot-config-grid{display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:6px;align-items:end}.bot-team-label.neutral::before{background:#8fa3b6;box-shadow:0 0 9px #8fa3b666}.create-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(126px,.72fr);gap:7px;align-items:end;margin-top:auto}.create-footer .bot-total{text-align:left;align-self:center}.create-footer .action-btn{width:100%}
-.admin-shell{height:min(292px,96vh);transition:height .16s ease}.admin-shell[data-page="weapons"]{height:min(318px,96vh)}.admin-shell[data-page="bots"]{height:min(274px,96vh)}.admin-page{align-content:start}.settings-grid{align-content:start}.weapon-settings-grid{align-items:start;align-content:start}.weapon-settings-card{align-content:start}.bot-admin-grid{align-content:start;grid-template-columns:repeat(3,minmax(0,1fr))}.bot-admin-grid .setting:last-child{grid-column:1/-1}.bot-admin-grid #botDifficultyHelp{min-height:34px!important;justify-content:center;text-align:center}.admin-foot{align-self:end}
-@media (max-width:800px) and (orientation:landscape){.pause-actions,.pause.admin-mode .pause-actions{grid-template-columns:repeat(2,1fr)}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}}
-@media (max-height:470px) and (orientation:landscape){
-  .menu-shell{grid-template-rows:auto minmax(0,1fr) auto}.menu-grid{grid-template-columns:minmax(245px,.8fr) minmax(300px,1.2fr);grid-template-rows:auto minmax(0,1fr)}
-  .operator-panel{padding:4px 5px}.operator-panel .panel-title{padding-bottom:2px}.operator-row{grid-template-columns:minmax(130px,.7fr) minmax(235px,1.2fr) minmax(128px,.58fr);gap:5px}.operator-row .label{font-size:6.5px}.operator-team .team-summary{display:none}.operator-god{min-height:29px;padding:2px 5px;grid-template-columns:23px 1fr auto;gap:5px}.operator-god .god-icon{width:23px;height:23px}.operator-god .god-copy small{display:none}
-  .create-panel,.join-panel{padding:5px;gap:4px}.bot-config-grid{gap:4px}.bot-team-field{gap:2px}.bot-team-label{font-size:6.5px}.create-footer{gap:5px}.create-footer .action-btn{min-height:28px}.create-footer .bot-total{font-size:6.8px}.world-section{gap:3px}.world-list{gap:3px}.controls-note{display:none}.menu-footer{grid-template-columns:1fr}.status{text-align:left}
-  .admin-shell{height:min(286px,96vh)}.admin-shell[data-page="weapons"]{height:min(304px,96vh)}.admin-shell[data-page="bots"]{height:min(270px,96vh)}.admin-page{align-content:start}.settings-grid{align-content:start}.weapon-settings-grid{align-items:start}.weapon-settings-card{align-content:start}
-}
-@media (max-height:375px) and (orientation:landscape){
-  .menu-header{padding:3px 6px}.logo{width:27px;height:27px;flex-basis:27px}.menu-header h1{font-size:15px}.menu-grid{gap:4px}.operator-panel,.create-panel,.join-panel{padding:4px}.panel-title{padding-bottom:2px}.operator-row{gap:4px}.team-option{min-height:30px;padding:3px 5px}.team-swatch{height:18px}.input{height:26px}.btn{min-height:26px}.operator-god{min-height:27px}.operator-god .god-icon{width:21px;height:21px}.create-footer .action-btn{min-height:26px}.menu-footer{padding:2px 5px}.pause-card{width:min(460px,96vw)}
-}
-@media (max-width:690px) and (orientation:landscape){.operator-row{grid-template-columns:minmax(115px,.68fr) minmax(220px,1.25fr) minmax(110px,.58fr)}.god-copy strong{font-size:8px}.god-state{font-size:7px}.menu-grid{grid-template-columns:minmax(225px,.8fr) minmax(275px,1.2fr)}}
+/* v1.15.4 fluid visual-viewport layout */
+#game,.boot,.menu,.pause,.admin-panel{position:fixed!important;inset:auto!important;left:0!important;top:0!important;width:var(--vv-width)!important;height:var(--vv-height)!important;right:auto!important;bottom:auto!important}
+.boot,.menu,.pause,.admin-panel{overflow:hidden}
+.menu{padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px)}
+.menu-shell{width:min(1120px,100%);height:auto;max-height:100%;min-height:0;display:grid;grid-template-rows:auto auto auto;gap:6px;transform-origin:center center}
+.menu-header{padding:6px 8px;border-radius:10px}.logo{width:32px;height:32px;flex-basis:32px;border-radius:9px}.menu-header h1{font-size:18px}.brand-version{margin-top:2px}.sub{font-size:8px}.header-actions{gap:4px}.icon-btn{width:32px!important;min-width:32px!important;height:32px;min-height:32px!important}
+.menu-grid{min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto;gap:6px;align-items:start}
+.operator-panel,.create-panel,.join-panel{grid-column:auto;grid-row:auto;min-width:0;align-content:start}.panel{min-width:0;padding:7px;gap:5px;border-radius:10px;overflow:hidden}.panel-title{padding-bottom:4px}.panel-title strong{font-size:8px}.panel-title span{display:none}
+.operator-row{display:grid;grid-template-columns:1fr;gap:5px;align-items:stretch;min-height:0}.operator-row .field{gap:3px}.operator-god{min-height:32px;padding:3px 6px;grid-template-columns:26px 1fr auto;gap:6px}.operator-god .god-icon{width:25px;height:25px}.operator-god .god-copy small{display:none}.operator-team .team-summary{display:none}
+.team-option{min-height:33px;padding:4px 6px}.team-swatch{height:20px}.team-copy strong{font-size:8px}.team-copy small{font-size:6.5px}.team-picker{gap:4px}.input{height:28px;font-size:10px;padding:0 7px}.label,.bot-team-label,.bot-total,.team-summary{font-size:7px}.btn{min-height:28px;font-size:9px;padding:0 8px}
+.create-panel{grid-template-rows:auto auto auto}.bot-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;align-items:end}.bot-config-grid .bot-team-field:last-child{grid-column:1/-1}.bot-team-field{gap:2px}.bot-team-label.neutral::before{background:#8fa3b6;box-shadow:0 0 9px #8fa3b666}.create-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(104px,.78fr);gap:5px;align-items:center;margin-top:auto}.create-footer .bot-total{text-align:left}.create-footer .action-btn{width:100%;min-height:30px}
+.join-row{gap:4px}.world-section{gap:3px}.world-list{gap:3px;overflow:hidden}.world{grid-template-columns:minmax(0,1fr) auto auto;gap:5px;padding:4px 5px}.world-code{font-size:9px}.world-meta{font-size:6.8px;line-height:1.1}.team-counts{gap:3px;margin-top:2px}.team-chip{padding:1px 4px;font-size:6px}.world .btn{min-width:28px!important;width:28px!important;height:28px;min-height:28px!important;padding:0!important}.empty{padding:8px;font-size:8px}
+.menu-footer{grid-template-columns:minmax(0,1fr) auto;gap:6px;padding:3px 6px}.status{min-height:12px;font-size:8px}.controls-note{gap:4px}.controls-note span{padding:2px 4px;font-size:6.2px}.touch .controls-note{display:none}.touch .menu-footer{grid-template-columns:1fr}
+.pause{padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px)}.pause-card{width:min(430px,100%);height:auto;max-height:100%;padding:9px;gap:6px;transform-origin:center center;overflow:hidden}.pause-head{padding-bottom:5px}.pause-head h2{font-size:15px}.pause-actions,.pause.admin-mode .pause-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}
+.admin-panel{padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px)}.admin-shell{width:min(920px,100%);height:auto!important;max-height:100%;min-height:0;display:grid;grid-template-rows:auto auto auto auto;gap:5px;padding:7px;transform-origin:center center}.admin-head{padding:1px 1px 5px}.admin-head h2{font-size:15px}.admin-sub{font-size:7px}.admin-tabs{gap:4px}.admin-tab{height:25px}.admin-page{min-height:0;display:grid;align-content:start;overflow:hidden}.settings-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;align-content:start}.setting,.weapon-settings-card label{gap:2px;font-size:6.5px}.setting input,.weapon-settings-card input{height:27px;font-size:9px;padding:0 6px}.weapon-settings-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;align-items:start}.weapon-settings-card{align-content:start;padding:5px;gap:3px}.weapon-settings-card>strong{font-size:8px}.weapon-settings-card small{font-size:5.8px}.bot-admin-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-content:start}.bot-admin-grid .setting:last-child{grid-column:1/-1}.bot-admin-grid #botDifficultyHelp{min-height:28px!important;justify-content:center;text-align:center}.admin-foot{align-self:end;padding-top:4px}.admin-foot .btn{min-height:26px}
+.ui-fit-emergency .sub,.ui-fit-emergency .controls-note,.ui-fit-emergency .admin-sub,.ui-fit-emergency .weapon-settings-card small{display:none!important}.ui-fit-emergency .panel{padding:5px;gap:3px}.ui-fit-emergency .menu-shell{gap:4px}.ui-fit-emergency .menu-grid{gap:4px}.ui-fit-emergency .team-option{min-height:29px}.ui-fit-emergency .input{height:25px}.ui-fit-emergency .btn{min-height:25px}
 </style>
 </head>
 <body>
@@ -228,7 +223,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.3';
+const APP_VERSION = '1.15.4';
 const PROTOCOL_VERSION = 13;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
@@ -265,6 +260,7 @@ const canvas = $('game');
 document.querySelectorAll('[data-app-version]').forEach(el => { el.textContent = `Version ${APP_VERSION}`; });
 
 const isTouch = matchMedia('(hover:none), (pointer:coarse)').matches;
+document.documentElement.classList.toggle('touch',isTouch);
 const isIPhone = /iPhone|iPod/i.test(navigator.userAgent);
 const isStandaloneApp = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
 const iPhoneSafariTab = () => isIPhone && !isStandaloneApp();
@@ -334,8 +330,19 @@ const NATURAL_OBSTACLES = [
 ];
 const killFeed = [];
 let hudLayout = null;
-let viewW = Math.max(1, document.documentElement.clientWidth || window.innerWidth || 1), viewH = Math.max(1, document.documentElement.clientHeight || window.innerHeight || 1);
+let viewW = Math.max(1, window.visualViewport?.width || window.innerWidth || document.documentElement.clientWidth || 1), viewH = Math.max(1, window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 1);
+let viewportMetrics={w:viewW,h:viewH};
 let experienceEntered = false, orientationBlocked = false;
+
+function syncVisualViewportMetrics(){
+  const vv=window.visualViewport;
+  const w=Math.max(1,Math.round(vv?.width || window.innerWidth || document.documentElement.clientWidth || 1));
+  const h=Math.max(1,Math.round(vv?.height || window.innerHeight || document.documentElement.clientHeight || 1));
+  viewportMetrics={w,h};
+  const root=document.documentElement;root.style.setProperty('--vv-width',`${w}px`);root.style.setProperty('--vv-height',`${h}px`);
+  return viewportMetrics;
+}
+syncVisualViewportMetrics();
 
 syncGodUI();
 syncMusicUI();
@@ -387,6 +394,7 @@ async function ensureThreeEngine(userRetry=false){
 }
 
 bindUI();
+scheduleViewportSync();
 refreshWorlds();
 setInterval(() => { if (!gameActive) refreshWorlds(); }, 7000);
 ensureThreeEngine(false);
@@ -617,6 +625,7 @@ function bindUI(){
   addEventListener('resize', scheduleViewportSync);
   addEventListener('orientationchange', scheduleViewportSync);
   window.visualViewport?.addEventListener('resize', scheduleViewportSync);
+  window.visualViewport?.addEventListener('scroll', scheduleViewportSync);
   document.addEventListener('fullscreenchange', onFullscreenChange);
   document.addEventListener('webkitfullscreenchange', onFullscreenChange);
   const orientationQuery=matchMedia('(orientation: portrait)');
@@ -709,17 +718,30 @@ function isEditableTarget(target){
   return !!target && (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target.isContentEditable);
 }
 function isLandscape(){ const v=getViewSize(); return v.w>v.h; }
-function getViewSize(){
-  const r=canvas.getBoundingClientRect();
-  const w=Math.max(1,Math.round(r.width || document.documentElement.clientWidth || window.visualViewport?.width || viewW));
-  const h=Math.max(1,Math.round(r.height || document.documentElement.clientHeight || window.visualViewport?.height || viewH));
-  return {w,h};
+function getViewSize(){const v=viewportMetrics||syncVisualViewportMetrics();return {w:v.w,h:v.h};}
+function overlayAvailableSize(parent){const r=parent.getBoundingClientRect(),cs=getComputedStyle(parent),px=v=>parseFloat(v)||0;return{w:Math.max(1,r.width-px(cs.paddingLeft)-px(cs.paddingRight)),h:Math.max(1,r.height-px(cs.paddingTop)-px(cs.paddingBottom))};}
+function fitOverlayElement(el,minScale=.5){
+  if(!el||el.closest('.hide')||getComputedStyle(el).display==='none')return 1;
+  el.style.zoom='1';el.style.transform='';
+  const parent=el.parentElement;if(!parent)return 1;
+  const avail=overlayAvailableSize(parent),needW=Math.max(el.scrollWidth,el.offsetWidth),needH=Math.max(el.scrollHeight,el.offsetHeight);
+  let scale=Math.min(1,avail.w/Math.max(1,needW),avail.h/Math.max(1,needH));
+  scale=Math.max(minScale,Math.min(1,scale));
+  if(scale<.997){if(CSS.supports?.('zoom','0.9'))el.style.zoom=scale.toFixed(4);else{el.style.transform=`scale(${scale})`;el.style.transformOrigin='center center';}}
+  el.dataset.fitScale=scale.toFixed(3);return scale;
+}
+function fitResponsiveOverlays(){
+  document.documentElement.classList.remove('ui-fit-emergency');
+  const targets=[[$('.menu-shell'),.52],[$('.pause-card'),.58],[$('.admin-shell'),.50],[document.querySelector('.boot:not(.hide) .boot-card'),.55]];
+  let smallest=1;for(const [el,min] of targets)if(el)smallest=Math.min(smallest,fitOverlayElement(el,min));
+  if(smallest<.72){document.documentElement.classList.add('ui-fit-emergency');for(const [el,min] of targets)if(el)fitOverlayElement(el,min);}
 }
 async function enterExperience(){
   ensureAudio();
   if(iPhoneSafariTab()){
     $('iosInstallHint')?.classList.remove('hide');
     $('enterBtn').classList.add('hide');
+    scheduleViewportSync();
     return;
   }
   if(!engineReady){
@@ -976,6 +998,7 @@ function renderWorlds(rooms){
     const btn=document.createElement('button');btn.className='btn icon-btn';btn.title=`Join ${room.code}`;btn.setAttribute('aria-label',`Join ${room.code}`);btn.innerHTML='<svg class="ui-icon"><use href="#i-enter"/></svg>';btn.addEventListener('click',()=>joinWorld(room.code));
     row.append(left,meta,btn);worldList.append(row);
   }
+  requestAnimationFrame(fitResponsiveOverlays);
 }
 
 async function createWorld(){
@@ -1067,14 +1090,14 @@ function populateAdminBots(value){const x=normalizeBotConfig(value);$('setBlueBo
 function collectAdminBots(){return normalizeBotConfig({blueBots:$('setBlueBots').value,redBots:$('setRedBots').value,difficulty:$('setBotDifficulty').value});}
 function syncBotRoster(list){const incoming=new Set((list||[]).map(b=>b.id));for(const [id,r] of remotes){if(r.bot&&!incoming.has(id))removeRemote(id);}for(const b of list||[])upsertRemote(b,true);updatePlayerCount();}
 function setAdminStatus(text,tone=''){const el=$('adminStatus');el.textContent=text;el.className=`admin-status ${tone}`;}
-function switchAdminTab(tab){const weapons=tab==='weapons',bots=tab==='bots';$('adminGeneral').classList.toggle('hide',weapons||bots);$('adminWeapons').classList.toggle('hide',!weapons);$('adminBots').classList.toggle('hide',!bots);const shell=document.querySelector('.admin-shell');if(shell)shell.dataset.page=weapons?'weapons':bots?'bots':'general';for(const b of document.querySelectorAll('[data-admin-tab]'))b.classList.toggle('active',b.dataset.adminTab===tab);}
+function switchAdminTab(tab){const weapons=tab==='weapons',bots=tab==='bots';$('adminGeneral').classList.toggle('hide',weapons||bots);$('adminWeapons').classList.toggle('hide',!weapons);$('adminBots').classList.toggle('hide',!bots);const shell=document.querySelector('.admin-shell');if(shell)shell.dataset.page=weapons?'weapons':bots?'bots':'general';for(const b of document.querySelectorAll('[data-admin-tab]'))b.classList.toggle('active',b.dataset.adminTab===tab);requestAnimationFrame(fitResponsiveOverlays);}
 function populateAdminSettings(value){const x=normalizeWorldSettingsClient(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=w.reloadMs;$(`set${cap}Cooldown`).value=w.cooldownMs;}}
 function collectAdminSettings(){return normalizeWorldSettingsClient({movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000},weapons:{pistol:{damage:$('setPistolDamage').value,speed:$('setPistolSpeed').value,reloadMs:$('setPistolReload').value,cooldownMs:$('setPistolCooldown').value},assault:{damage:$('setAssaultDamage').value,speed:$('setAssaultSpeed').value,reloadMs:$('setAssaultReload').value,cooldownMs:$('setAssaultCooldown').value},sniper:{damage:$('setSniperDamage').value,speed:$('setSniperSpeed').value,reloadMs:$('setSniperReload').value,cooldownMs:$('setSniperCooldown').value}}});}
-function openAdminPanel(){if(!isWorldAdmin){showToast('ADMIN ACCESS REQUIRED');return;}populateAdminSettings(worldSettings);populateAdminBots(botConfig);switchAdminTab('general');setAdminStatus('Only the world creator can change these rules.');$('adminPanel').classList.remove('hide');}
+function openAdminPanel(){if(!isWorldAdmin){showToast('ADMIN ACCESS REQUIRED');return;}populateAdminSettings(worldSettings);populateAdminBots(botConfig);switchAdminTab('general');setAdminStatus('Only the world creator can change these rules.');$('adminPanel').classList.remove('hide');requestAnimationFrame(fitResponsiveOverlays);}
 function closeAdminPanel(){$('adminPanel').classList.add('hide');}
 function saveAdminSettings(){if(!isWorldAdmin||socket?.readyState!==WebSocket.OPEN){setAdminStatus('Admin connection unavailable.','error');return;}const next=collectAdminSettings(),bots=collectAdminBots();if(bots.blueBots+bots.redBots>MAX_BOTS){setAdminStatus(`Maximum ${MAX_BOTS} bots per world.`,'error');return;}populateAdminSettings(next);populateAdminBots(bots);setAdminStatus('Applying validated rules…');send({t:'adminSettings',settings:next});send({t:'adminBots',...bots});}
 
-function openPause(){if(!gameActive||paused)return;paused=true;keys.clear();resetTouchInput();setAim(false);syncPauseContext();pause.classList.remove('hide');if(document.pointerLockElement)document.exitPointerLock?.();}
+function openPause(){if(!gameActive||paused)return;paused=true;keys.clear();resetTouchInput();setAim(false);syncPauseContext();pause.classList.remove('hide');requestAnimationFrame(fitResponsiveOverlays);if(document.pointerLockElement)document.exitPointerLock?.();}
 async function copyInvite(){
   const url=new URL(location.href);url.searchParams.set('room',currentRoom);try{await navigator.clipboard.writeText(url.toString());showToast('Invite copied');}catch{showToast(`Room code: ${currentRoom}`);}
 }
@@ -1249,10 +1272,10 @@ function normalizeAngle(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math
 let resizeRaf=0;
 function scheduleViewportSync(){
   cancelAnimationFrame(resizeRaf);
-  resizeRaf=requestAnimationFrame(()=>requestAnimationFrame(()=>{onResize();applyExperienceGate();}));
+  resizeRaf=requestAnimationFrame(()=>requestAnimationFrame(()=>{syncVisualViewportMetrics();onResize();applyExperienceGate();requestAnimationFrame(fitResponsiveOverlays);}));
 }
 function onResize(){
-  const v=getViewSize();viewW=v.w;viewH=v.h;
+  const v=syncVisualViewportMetrics();viewW=v.w;viewH=v.h;
   if(!camera || !renderer){return;}
   const aspect=viewW/viewH;
   camera.aspect=aspect;
