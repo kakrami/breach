@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.12.0</title>
+<title>Punch World v1.13.0</title>
 <style>
 :root{
   --bg:#05090e;--panel:#0a121af4;--panel-strong:#0f1a24;--panel-soft:#071018ee;--line:#ffffff1d;
@@ -42,18 +42,53 @@ h1{margin:0;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing
   .menu{padding:calc(var(--safe-top) + 5px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 5px) calc(var(--safe-left) + 6px)}.menu-shell{gap:5px}.menu-header{padding:5px 7px;border-radius:9px}.logo{width:29px;height:29px;flex-basis:29px;border-radius:8px;font-size:15px}.menu-header h1{font-size:16px}.brand-version{margin-top:2px}.sub{display:none}.header-actions{gap:4px}.icon-btn{width:30px!important;min-width:30px!important;height:30px;min-height:30px!important}.menu-grid{grid-template-columns:minmax(240px,.8fr) minmax(310px,1.2fr);gap:5px}.panel{padding:6px;gap:4px;border-radius:9px}.panel-title{padding-bottom:3px}.panel-title strong{font-size:8px}.panel-title span{font-size:7px}.input{height:28px;font-size:10px;padding:0 7px}.label,.bot-team-label,.bot-total,.team-summary{font-size:7px}.team-option{min-height:35px;padding:4px 6px}.team-swatch{height:21px}.team-copy strong{font-size:8px}.team-copy small{font-size:7px}.btn{min-height:28px;font-size:9px;padding:0 8px}.world{padding:4px 6px}.world-code{font-size:9px}.world-meta{font-size:7px}.menu-footer{padding:4px 6px}.status{font-size:8px}.controls-note{font-size:6.5px}.pause-card{padding:9px;gap:5px}.pause-head{padding-bottom:5px}.pause-head h2{font-size:15px}
 }
 @media (max-width:760px) and (orientation:portrait){.menu-grid{grid-template-columns:1fr}.controls-note{display:none}}
+
+/* v1.13 professional visual system */
+.svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}.ui-icon,.mini-icon,.brand-icon{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ui-icon{width:18px;height:18px}.mini-icon{width:12px;height:12px}.brand-icon{width:100%;height:100%;stroke-width:1.6}.brand-icon .cut,.ui-icon .cut{fill:currentColor;stroke:none}
+html,body,#game{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-user-drag:none!important}#game{touch-action:none!important;isolation:isolate}
+.boot,.menu{background:#03080d;isolation:isolate}.boot::before,.menu::before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 20% 15%,#00b7ff2e,transparent 34%),radial-gradient(circle at 83% 72%,#ff3b6b1d,transparent 32%),linear-gradient(135deg,#07131e 0%,#020508 65%)}.boot::after,.menu::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.3;background-image:linear-gradient(#5fdcff0b 1px,transparent 1px),linear-gradient(90deg,#5fdcff0b 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000,transparent 92%);animation:gridDrift 16s linear infinite}@keyframes gridDrift{to{background-position:68px 34px}}
+.boot-card{position:relative;overflow:hidden;border:1px solid #66dcff38;background:linear-gradient(160deg,#0d1e2cf5,#071019f8 58%,#08101af8);box-shadow:0 36px 120px #000e,0 0 70px #00baff12,inset 0 1px #ffffff10}.boot-card::before{content:"";position:absolute;left:-30%;right:-30%;top:0;height:2px;background:linear-gradient(90deg,transparent,#62e8ff,transparent);animation:sweep 2.8s ease-in-out infinite}@keyframes sweep{0%,100%{transform:translateX(-20%);opacity:.2}50%{transform:translateX(20%);opacity:1}}.boot-emblem{width:72px;height:72px;margin:auto;padding:14px;border-radius:20px;color:#76e8ff;background:linear-gradient(145deg,#69e6ff25,#ffffff08);border:1px solid #72e8ff55;box-shadow:0 0 40px #00bfff28,inset 0 1px #ffffff1a}.eyebrow{font-size:8px;font-weight:1000;letter-spacing:.22em;color:#6fdfff;text-transform:uppercase}.hero-action{min-height:52px!important;font-size:12px!important;letter-spacing:.12em;justify-content:center}.hero-action .ui-icon{width:20px;height:20px}.boot-card h1{font-size:34px;text-shadow:0 0 30px #47d6ff22}
+.menu-shell{width:min(1120px,100%)}.menu-header{position:relative;overflow:hidden;border-color:#61dcff2b;background:linear-gradient(115deg,#102334f5,#08131df5 64%,#101323f5)}.menu-header::after{content:"";position:absolute;right:18%;top:-80px;width:220px;height:160px;background:#29c8ff10;transform:rotate(25deg);filter:blur(15px);pointer-events:none}.logo{padding:7px;color:#6fe2ff;border-color:#6fe2ff55;background:linear-gradient(145deg,#66dfff25,#ffffff06);box-shadow:0 0 28px #00bfff1c}.brand-copy h1{font-size:23px;text-shadow:0 0 24px #43d5ff1c}.header-actions{z-index:1}.icon-btn{display:grid!important;place-items:center!important}.icon-btn .ui-icon{width:17px;height:17px}
+.panel{position:relative;border-color:#ffffff1b;background:linear-gradient(155deg,#0b1721f2,#060d14f5);box-shadow:0 16px 48px #0008,inset 0 1px #ffffff08}.panel::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:2px;border-radius:2px;background:linear-gradient(#5edfff00,#5edfff88,#5edfff00);opacity:.55}.panel-title strong{display:flex;align-items:center;gap:6px;color:#dff8ff}.panel-title .mini-icon,.label .mini-icon{display:inline-block;vertical-align:-2px;margin-right:4px;color:#67dcff}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.025em}.btn.primary{background:linear-gradient(135deg,#1fa2d8,#2266bf);border-color:#7be8ff70;box-shadow:0 8px 24px #008cc52c,inset 0 1px #ffffff28}.btn.primary:hover{background:linear-gradient(135deg,#29b5ec,#2876d5)}.btn.danger{background:linear-gradient(135deg,#9e2939,#681d2a)}.action-btn{min-height:39px}.icon-label{min-width:76px}.input{border-color:#ffffff22;background:linear-gradient(180deg,#02070c,#061019);box-shadow:inset 0 0 0 1px #0007,inset 0 1px #ffffff07}.input:focus{border-color:#64dfff9c;box-shadow:0 0 0 2px #3fd9ff16,0 0 22px #20bfff0d}
+.team-option{position:relative;overflow:hidden;grid-template-columns:8px 1fr;border-color:#ffffff1d;background:linear-gradient(145deg,#ffffff08,#ffffff03)}.team-option[aria-pressed="true"]::after{content:"";position:absolute;inset:auto -20% -18px 20%;height:36px;background:var(--team);opacity:.09;filter:blur(12px)}.team-option.blue[aria-pressed="true"]{--team:#46a7ff}.team-option.red[aria-pressed="true"]{--team:#ff5c6c}
+.god-toggle{width:100%;min-height:42px;padding:6px 8px;border-radius:9px;border:1px solid #ffffff1d;background:linear-gradient(135deg,#ffffff07,#ffffff03);color:var(--text);display:grid;grid-template-columns:31px 1fr auto;align-items:center;gap:8px;text-align:left;cursor:pointer}.god-toggle:hover{border-color:#ffe17b52}.god-toggle[aria-pressed="true"]{border-color:#ffe17b8f;background:linear-gradient(135deg,#f5c94f1e,#fff3a407);box-shadow:0 0 26px #ffd75012}.god-icon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#9cacbc;background:#ffffff09}.god-toggle[aria-pressed="true"] .god-icon{color:#ffe27b;background:#ffda5320;box-shadow:0 0 18px #ffd54a20}.god-copy{display:grid;gap:1px}.god-copy strong{font-size:9px}.god-copy small{font-size:7px;color:var(--muted);font-weight:800}.god-state{font-size:8px;font-weight:1000;letter-spacing:.12em;color:#8091a2}.god-toggle[aria-pressed="true"] .god-state{color:#ffe27b}
+.world{position:relative;overflow:hidden;border-color:#ffffff18}.world::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:#53d9ff80}.world .btn{min-width:58px}.team-chip{letter-spacing:.03em}
+.menu-footer{border-color:#ffffff18;background:linear-gradient(90deg,#061019ee,#081521ee)}.controls-note{display:flex;gap:7px;align-items:center;justify-content:flex-end;white-space:normal}.controls-note span{padding:3px 6px;border:1px solid #ffffff13;border-radius:5px;background:#ffffff05;color:#91a5b8;font-size:7px;font-weight:900}
+.pause{background:radial-gradient(circle at 50% 20%,#10283abb,#020508e8);backdrop-filter:blur(10px)}.pause-card{width:min(430px,94vw);border-color:#5fdcff2d;background:linear-gradient(155deg,#0e1d29f7,#060d14fa);box-shadow:0 34px 100px #000e,0 0 60px #00bfff10}.pause-actions{grid-template-columns:repeat(3,1fr)}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}.pause-team{box-shadow:0 0 20px color-mix(in srgb,var(--team) 20%,transparent)}
+@media (max-height:470px) and (orientation:landscape){.menu{padding:calc(var(--safe-top) + 3px) calc(var(--safe-right) + 5px) calc(var(--safe-bottom) + 3px) calc(var(--safe-left) + 5px)}.menu-shell{gap:4px}.menu-header{padding:4px 6px}.brand-copy .sub{display:none}.panel{padding:5px;gap:3px}.god-toggle{min-height:32px;padding:3px 5px}.god-icon{width:25px;height:25px}.god-copy small{display:none}.menu-footer{padding:3px 5px}.controls-note span{padding:2px 4px}.pause-card{padding:8px}}
+
 </style>
 </head>
 <body>
-<canvas id="game"></canvas>
+<svg class="svg-sprite" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="i-mark" viewBox="0 0 24 24"><path d="M12 2 21 7v10l-9 5-9-5V7l9-5Z"/><path d="M8.2 14.5 10.8 6l2.1 5H17l-5.2 7 .9-3.5H8.2Z" class="cut"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5Z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 1 0-2 5"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 5 5m0-5-5 5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-enter" viewBox="0 0 24 24"><path d="M14 5h5v14h-5M11 8l4 4-4 4M4 12h11"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v6c0 5-3.2 8-8 9-4.8-1-8-4-8-9V6l8-3Z"/><path d="m9 12 2 2 4-5" class="cut"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="11" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M9 16h6"/></symbol>
+    <symbol id="i-team" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-4 2-6 6-6s6 2 6 6M14 15c4 0 7 1.7 7 5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
+    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H4v16h6M14 8l4 4-4 4M8 12h10"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+  </defs>
+</svg>
+<canvas id="game" draggable="false" aria-label="Punch World gameplay"></canvas>
 
 <section id="boot" class="boot">
   <div class="boot-card">
-    <div class="rotate-icon">✊</div>
+    <div class="boot-emblem"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
+    <div class="eyebrow">ONLINE COMBAT SANDBOX</div>
     <h1>Punch World</h1>
     <div class="version" data-app-version></div>
-    <p>Landscape-only. Fullscreen is configured automatically for your device.</p>
-    <button id="enterBtn" class="btn primary">Enter Game</button>
+    <p>Fast team combat across a living terrain. Landscape optimized.</p>
+    <button id="enterBtn" class="btn primary hero-action"><svg class="ui-icon"><use href="#i-play"/></svg><span>ENTER ARENA</span></button>
     <div id="iosInstallHint" class="hide" style="display:grid;gap:9px;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff08">
       <b style="text-align:center">iPhone Safari Fullscreen</b>
       <span style="font-size:13px;line-height:1.45;color:var(--muted)">Safari on iPhone does not provide webpage fullscreen for the game canvas. For the full-screen app experience: tap <b style="color:var(--text)">Share</b> → <b style="color:var(--text)">Add to Home Screen</b>, keep <b style="color:var(--text)">Open as Web App</b> enabled, then launch Punch World from the Home Screen.</span>
@@ -74,13 +109,13 @@ h1{margin:0;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing
 <section id="menu" class="menu hide">
   <div class="menu-shell">
     <header class="menu-header">
-      <div class="brand"><div class="logo">✊</div><div class="brand-copy"><h1>Punch World</h1><div class="version brand-version" data-app-version></div><p class="sub">Competitive team sandbox · three-weapon loadout · projectile combat</p></div></div>
-      <div class="header-actions"><button id="menuFullBtn" class="btn icon-btn" title="Fullscreen">⛶</button><button id="refreshBtn" class="btn icon-btn" title="Refresh worlds">↻</button></div>
+      <div class="brand"><div class="logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div><div class="brand-copy"><div class="eyebrow">ARENA NETWORK // LIVE</div><h1>Punch World</h1><div class="version brand-version" data-app-version></div><p class="sub">Team sandbox · projectile combat · no rounds · no limits</p></div></div>
+      <div class="header-actions"><button id="musicBtn" class="btn icon-btn" title="Toggle intro music" aria-label="Toggle intro music"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button><button id="menuFullBtn" class="btn icon-btn" title="Fullscreen" aria-label="Fullscreen"><svg class="ui-icon"><use href="#i-full"/></svg></button><button id="refreshBtn" class="btn icon-btn" title="Refresh worlds" aria-label="Refresh worlds"><svg class="ui-icon"><use href="#i-refresh"/></svg></button></div>
     </header>
 
     <div class="menu-grid">
       <section class="panel">
-        <div class="panel-title"><strong>Operator</strong><span>Choose before joining</span></div>
+        <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-team"/></svg> Operator</strong><span>Choose before joining</span></div>
         <div class="field"><label class="label" for="nameInput">Player name</label><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></div>
         <div class="field">
           <span class="label">Team</span>
@@ -90,32 +125,39 @@ h1{margin:0;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing
           </div>
           <div id="teamSummary" class="team-summary"></div>
         </div>
+        <button id="godToggle" type="button" class="god-toggle" aria-pressed="false" title="God Mode: invincible to all damage"><span class="god-icon"><svg class="ui-icon"><use href="#i-shield"/></svg></span><span class="god-copy"><strong>God Mode</strong><small>Invincible</small></span><span id="godState" class="god-state">OFF</span></button>
         <div class="field">
-          <span class="label">Bot teams</span>
+          <span class="label"><svg class="mini-icon"><use href="#i-bot"/></svg> Bot teams</span>
           <div class="bot-team-grid">
             <label class="bot-team-field blue"><span class="bot-team-label">Blue bots</span><select id="blueBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
             <label class="bot-team-field red"><span class="bot-team-label">Red bots</span><select id="redBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
           </div>
           <div id="botTotal" class="bot-total">2 / 8 bots</div>
         </div>
-        <button id="createBtn" class="btn primary">Create World</button>
+        <button id="createBtn" class="btn primary action-btn"><svg class="ui-icon"><use href="#i-plus"/></svg><span>Create World</span></button>
       </section>
 
       <section class="panel">
-        <div class="panel-title"><strong>Join World</strong><span>Open sandbox · up to 8 players</span></div>
-        <div class="field"><label class="label" for="codeInput">Room code</label><div class="join-row"><input id="codeInput" class="input" maxlength="4" autocapitalize="characters" placeholder="ABCD"><button id="joinBtn" class="btn primary">Join</button></div></div>
+        <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-enter"/></svg> Join World</strong><span>Open sandbox · up to 8 players</span></div>
+        <div class="field"><label class="label" for="codeInput">Room code</label><div class="join-row"><input id="codeInput" class="input" maxlength="4" autocapitalize="characters" placeholder="ABCD"><button id="joinBtn" class="btn primary icon-label"><svg class="ui-icon"><use href="#i-enter"/></svg><span>Join</span></button></div></div>
         <div class="world-section"><div class="section-title"><span>Active worlds</span><span id="worldCount"></span></div><div id="worldList" class="world-list"><div class="empty">Loading worlds…</div></div></div>
       </section>
     </div>
 
-    <footer class="menu-footer"><div id="menuStatus" class="status">Ready.</div><div class="controls-note"><b>PC</b> WASD · LMB Fire · RMB ADS · B Fire Mode · F Melee · R Reload · 1/2/3 or Q Weapon · Space Jump · Tab Scoreboard · Esc/M Menu<br><b>Mobile</b> Drag anywhere to look except controls · Run · ADS Walk · Fire · Aim · Jump · Melee · Reload · Weapon</div></footer>
+    <footer class="menu-footer"><div id="menuStatus" class="status">Ready.</div><div class="controls-note"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>R RELOAD</span><span>1·2·3 WEAPONS</span><span>TAB SCORE</span></div></footer>
   </div>
 </section>
 
 <section id="pause" class="pause hide">
   <div class="pause-card">
-    <div class="pause-head"><div><h2>World Menu</h2><div class="version brand-version" data-app-version></div><div class="pause-context"><span id="pauseRoom">Room ----</span><span id="pauseLoadout">Pistol · 12 rounds</span></div></div><span id="pauseTeamBadge" class="pause-team">BLUE TEAM</span></div>
-    <div class="pause-actions"><button id="resumeBtn" class="btn primary resume">Resume</button><button id="copyBtn" class="btn">Copy Invite</button><button id="fullBtn" class="btn">Fullscreen</button><button id="leaveBtn" class="btn danger leave">Leave World</button></div>
+    <div class="pause-head"><div><div class="eyebrow">SESSION CONTROL</div><h2>World Menu</h2><div class="version brand-version" data-app-version></div><div class="pause-context"><span id="pauseRoom">Room ----</span><span id="pauseLoadout">Pistol · 12 rounds</span></div></div><span id="pauseTeamBadge" class="pause-team">BLUE TEAM</span></div>
+    <div class="pause-actions">
+      <button id="resumeBtn" class="btn primary resume"><svg class="ui-icon"><use href="#i-play"/></svg><span>Resume</span></button>
+      <button id="pauseGodBtn" class="btn"><svg class="ui-icon"><use href="#i-shield"/></svg><span id="pauseGodText">God Off</span></button>
+      <button id="copyBtn" class="btn"><svg class="ui-icon"><use href="#i-copy"/></svg><span>Invite</span></button>
+      <button id="fullBtn" class="btn"><svg class="ui-icon"><use href="#i-full"/></svg><span>Fullscreen</span></button>
+      <button id="leaveBtn" class="btn danger leave"><svg class="ui-icon"><use href="#i-exit"/></svg><span>Leave World</span></button>
+    </div>
   </div>
 </section>
 
@@ -124,7 +166,7 @@ import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.185.1/
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.12.0';
+const APP_VERSION = '1.13.0';
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
 const MAX_BOTS = 8;
@@ -161,9 +203,13 @@ nameInput.value = localStorage.getItem('punchWorldName') || `Player${Math.floor(
 blueBotCount.value=localStorage.getItem('punchWorldBlueBots')||'1';
 redBotCount.value=localStorage.getItem('punchWorldRedBots')||'1';
 let selectedTeam=localStorage.getItem('punchWorldTeam')==='red'?'red':'blue';
+let selectedGod=localStorage.getItem('punchWorldGodMode')==='1';
+let musicEnabled=localStorage.getItem('punchWorldMusic')!=='0';
 const requestedRoom = new URL(location.href).searchParams.get('room');
 if (requestedRoom) codeInput.value = normalizeCode(requestedRoom);
 applyTeamSelection(selectedTeam,false);
+syncGodUI();
+syncMusicUI();
 
 function selectedBotTeams(){
   const blue=Math.max(0,Math.min(MAX_BOTS,Number(blueBotCount.value)||0));
@@ -184,14 +230,14 @@ updateBotTeamSelection();
 let scene, camera, renderer, clock, leftFist, rightFist, pistolGroup, pistolFlash, assaultGroup, assaultFlash, sniperGroup, sniperFlash;
 let hudScene, hudCamera, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0;
 let gameActive = false, paused = false, socket = null, reconnectTimer = null, reconnectAttempt = 0;
-let currentRoom = '', myName = '', myTeam = 'blue', selfColor = TEAM_COLORS.blue;
+let currentRoom = '', myName = '', myTeam = 'blue', selfColor = TEAM_COLORS.blue, godMode = false;
 let hp = 100, wastedUntil = 0, currentWeapon = 'pistol', ammo = {pistol:12,assault:12,sniper:12}, reloadUntil = 0, reloadWeapon = '';
 let fireMode=localStorage.getItem('punchWorldFireMode')==='auto'?'auto':'semi',fireHeld=false;
 let adsWanted=false,adsBlend=0,baseFov=70,lastWastedBy='',lastWastedWeapon='';
 let myStats={kills:0,deaths:0},scoreboardOpen=false,scoreboardScroll=0,scoreboardDrag=null,scoreboardPanel=null,killConfirmUntil=0,killConfirmName='',killConfirmWeapon='';
 let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0;
 let onGround = true, punchTime = 99, fireTime = 99, localPunchCooldown = 0, localFireCooldown = 0, lastStateSent = 0, lastPing = 0;
-let audioCtx = null;
+let audioCtx = null, musicTimer = null, musicStep = 0, musicNextAt = 0, musicGain = null;
 let toastText = '', toastUntil = 0, hurtUntil = 0, hitUntil = 0;
 const position = new THREE.Vector3(0,0,0);
 const keys = new Set();
@@ -239,10 +285,30 @@ function applyTeamSelection(team,persist=true){
   const summary=$('teamSummary');if(summary)summary.innerHTML=`<b>${selectedTeam==='red'?'Red':'Blue'} Team</b> selected · teammates are protected from friendly fire`;
   if(persist)localStorage.setItem('punchWorldTeam',selectedTeam);
 }
+function syncGodUI(){
+  const btn=$('godToggle'),state=$('godState'),pauseBtn=$('pauseGodBtn'),pauseText=$('pauseGodText');
+  if(btn){btn.setAttribute('aria-pressed',String(selectedGod));btn.title=selectedGod?'God Mode enabled: invincible to all damage':'God Mode disabled';}
+  if(state)state.textContent=selectedGod?'ON':'OFF';
+  if(pauseBtn)pauseBtn.classList.toggle('god-active',!!godMode);
+  if(pauseText)pauseText.textContent=godMode?'God On':'God Off';
+}
+function toggleGodMode(live=false){
+  const next=!(live?godMode:selectedGod);
+  selectedGod=next;localStorage.setItem('punchWorldGodMode',next?'1':'0');
+  if(gameActive&&socket?.readyState===WebSocket.OPEN){godMode=next;send({t:'god',enabled:next});showToast(next?'GOD MODE ENABLED':'GOD MODE DISABLED');}
+  else godMode=next;
+  syncGodUI();
+}
+function syncMusicUI(){
+  const use=$('musicIconUse'),btn=$('musicBtn');if(use)use.setAttribute('href',musicEnabled?'#i-sound':'#i-mute');if(btn)btn.title=musicEnabled?'Mute intro music':'Enable intro music';
+}
+function toggleIntroMusic(){musicEnabled=!musicEnabled;localStorage.setItem('punchWorldMusic',musicEnabled?'1':'0');syncMusicUI();if(musicEnabled&&!gameActive&&experienceEntered&&!orientationBlocked)startIntroMusic();else stopIntroMusic();}
+
 function syncPauseContext(){
   const badge=$('pauseTeamBadge');if(badge){badge.textContent=`${myTeam.toUpperCase()} TEAM`;badge.style.color=TEAM_COLORS[myTeam];badge.style.borderColor=`${TEAM_COLORS[myTeam]}88`;badge.style.background=`${TEAM_COLORS[myTeam]}22`;}
   if($('pauseRoom'))$('pauseRoom').textContent=`Room ${currentRoom||'----'}`;
   if($('pauseLoadout'))$('pauseLoadout').textContent=`${WEAPON_SPECS[currentWeapon].name} · ${Math.max(0,Math.floor(ammo[currentWeapon]||0))} rounds`;
+  syncGodUI();
 }
 
 
@@ -431,12 +497,15 @@ function bindUI(){
   for(const btn of teamButtons)btn.addEventListener('click',()=>applyTeamSelection(btn.dataset.teamChoice));
   $('createBtn').addEventListener('click', createWorld);
   $('refreshBtn').addEventListener('click', refreshWorlds);
+  $('musicBtn').addEventListener('click',()=>{ensureAudio();toggleIntroMusic();});
+  $('godToggle').addEventListener('click',()=>toggleGodMode(false));
   $('menuFullBtn').addEventListener('click', toggleFullscreen);
   $('joinBtn').addEventListener('click', () => joinWorld(normalizeCode(codeInput.value)));
   codeInput.addEventListener('blur', () => { codeInput.value = normalizeCode(codeInput.value); });
   codeInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); joinWorld(normalizeCode(codeInput.value)); } });
   $('resumeBtn').addEventListener('click', resumeFromGesture);
   $('copyBtn').addEventListener('click', copyInvite);
+  $('pauseGodBtn').addEventListener('click',()=>toggleGodMode(true));
   $('fullBtn').addEventListener('click', toggleFullscreen);
   $('leaveBtn').addEventListener('click', leaveWorld);
 
@@ -446,6 +515,13 @@ function bindUI(){
   canvas.addEventListener('pointerup', onCanvasPointerEnd, {passive:false});
   canvas.addEventListener('pointercancel', onCanvasPointerEnd, {passive:false});
   canvas.addEventListener('lostpointercapture', onCanvasPointerEnd);
+  const suppressCanvasNativeTouch=e=>{if(gameActive&&!paused){e.preventDefault();const sel=window.getSelection?.();if(sel&&!sel.isCollapsed)sel.removeAllRanges();}};
+  for(const type of ['touchstart','touchmove','touchend','touchcancel'])canvas.addEventListener(type,suppressCanvasNativeTouch,{passive:false,capture:true});
+  const suppressNativeUI=e=>{if(!isEditableTarget(e.target)){e.preventDefault();const sel=window.getSelection?.();if(sel)sel.removeAllRanges();}};
+  document.addEventListener('contextmenu',suppressNativeUI,{capture:true});
+  document.addEventListener('gesturestart',suppressNativeUI,{passive:false,capture:true});
+  document.addEventListener('gesturechange',suppressNativeUI,{passive:false,capture:true});
+  document.addEventListener('gestureend',suppressNativeUI,{passive:false,capture:true});
 
   document.addEventListener('mousemove', e => {
     if(document.pointerLockElement!==canvas || !gameActive || paused || hp<=0) return;
@@ -470,7 +546,7 @@ function bindUI(){
     if((e.code==='Escape' || e.code==='KeyM') && !e.repeat) { if(scoreboardOpen){scoreboardOpen=false;} else openPause(); }
   });
   document.addEventListener('keyup', e => { if(!isEditableTarget(e.target)) keys.delete(e.code); });
-  document.addEventListener('visibilitychange', () => { if(document.hidden) { keys.clear(); resetTouchInput(); setAim(false); } });
+  document.addEventListener('visibilitychange', () => { if(document.hidden) { keys.clear(); resetTouchInput(); setAim(false); stopIntroMusic(); } else if(!gameActive&&experienceEntered&&!orientationBlocked) startIntroMusic(); });
   document.addEventListener('mouseup',e=>{if(e.button===0)fireHeld=false;});
   document.addEventListener('selectstart',e=>{if(!isEditableTarget(e.target))e.preventDefault();});
   document.addEventListener('dragstart',e=>e.preventDefault());
@@ -499,12 +575,14 @@ async function enterExperience(){
   await lockLandscape();
   scheduleViewportSync();
   setTimeout(scheduleViewportSync,120);
+  setTimeout(()=>{if(!gameActive&&!orientationBlocked)startIntroMusic();},160);
 }
 function continueInSafari(){
   experienceEntered=true;
   $('iosInstallHint')?.classList.add('hide');
   scheduleViewportSync();
   setTimeout(scheduleViewportSync,80);
+  setTimeout(()=>{if(!gameActive&&!orientationBlocked)startIntroMusic();},120);
 }
 function beginGameplayFromGesture(){
   ensureAudio();
@@ -574,14 +652,12 @@ function syncFullscreenUI(){
   const active=isFullscreenActive(),supported=fullscreenSupported(),standalone=isStandaloneApp(),iphoneTab=iPhoneSafariTab();
   const pauseBtn=$('fullBtn'),menuBtn=$('menuFullBtn');
   if(pauseBtn){
-    if(standalone){pauseBtn.textContent='App Mode';pauseBtn.disabled=true;pauseBtn.title='Already running as a Home Screen web app.';}
-    else if(iphoneTab){pauseBtn.textContent='Home Screen Fullscreen';pauseBtn.disabled=false;pauseBtn.title='Use Add to Home Screen for fullscreen on iPhone Safari.';}
-    else{pauseBtn.textContent=active?'Exit Fullscreen':'Enter Fullscreen';pauseBtn.disabled=!active&&!supported;pauseBtn.title=!active&&!supported?'Fullscreen is not supported by this browser session.':'';}
+    const label=pauseBtn.querySelector('span');
+    if(standalone){if(label)label.textContent='App Mode';pauseBtn.disabled=true;pauseBtn.title='Already running as a Home Screen web app.';}
+    else if(iphoneTab){if(label)label.textContent='Home Screen';pauseBtn.disabled=false;pauseBtn.title='Use Add to Home Screen for fullscreen on iPhone Safari.';}
+    else{if(label)label.textContent=active?'Exit Fullscreen':'Fullscreen';pauseBtn.disabled=!active&&!supported;pauseBtn.title=!active&&!supported?'Fullscreen is not supported by this browser session.':active?'Exit Fullscreen':'Enter Fullscreen';}
   }
-  if(menuBtn){
-    menuBtn.textContent=standalone?'⌂':'⛶';menuBtn.disabled=standalone||(!iphoneTab&&!active&&!supported);
-    menuBtn.title=standalone?'Running as Home Screen app':iphoneTab?'Full-screen instructions':active?'Exit Fullscreen':'Enter Fullscreen';
-  }
+  if(menuBtn){menuBtn.disabled=standalone||(!iphoneTab&&!active&&!supported);menuBtn.classList.toggle('active',active||standalone);menuBtn.title=standalone?'Running as Home Screen app':iphoneTab?'Full-screen instructions':active?'Exit Fullscreen':'Enter Fullscreen';}
 }
 function onFullscreenChange(){
   syncFullscreenUI();
@@ -610,7 +686,7 @@ function applyExperienceGate(){
     return;
   }
   rotateGate.classList.add('hide');boot.classList.add('hide');
-  if(!gameActive){menu.classList.remove('hide');pause.classList.add('hide');}
+  if(!gameActive){menu.classList.remove('hide');pause.classList.add('hide');startIntroMusic();}
   syncFullscreenUI();
 }
 function requestPointerLockNow(){
@@ -746,7 +822,7 @@ function renderWorlds(rooms){
     const row=document.createElement('div');row.className='world';
     const left=document.createElement('div');const blue=Number(room.blue)||0,red=Number(room.red)||0,blueBots=Number(room.blueBots)||0,redBots=Number(room.redBots)||0;left.innerHTML=`<div class="world-code">${room.code}</div><div class="world-meta">Bots · Blue ${blueBots} · Red ${redBots} · friendly fire off</div><div class="team-counts"><span class="team-chip blue">BLUE ${blue}</span><span class="team-chip red">RED ${red}</span></div>`;
     const meta=document.createElement('div');meta.className='world-meta';meta.textContent=`${room.players}/${room.maxPlayers||MAX_PLAYERS}`;
-    const btn=document.createElement('button');btn.className='btn';btn.textContent='Join';btn.addEventListener('click',()=>joinWorld(room.code));
+    const btn=document.createElement('button');btn.className='btn icon-btn';btn.title=`Join ${room.code}`;btn.setAttribute('aria-label',`Join ${room.code}`);btn.innerHTML='<svg class="ui-icon"><use href="#i-enter"/></svg>';btn.addEventListener('click',()=>joinWorld(room.code));
     row.append(left,meta,btn);worldList.append(row);
   }
 }
@@ -755,7 +831,7 @@ async function createWorld(){
   if(!updateBotTeamSelection()){setStatus(`Maximum ${MAX_BOTS} bots per world.`,'error');return;}
   beginGameplayFromGesture();
   const bots=selectedBotTeams();
-  myName=safeName();myTeam=selectedTeam;localStorage.setItem('punchWorldName',myName);localStorage.setItem('punchWorldBlueBots',String(bots.blue));localStorage.setItem('punchWorldRedBots',String(bots.red));localStorage.setItem('punchWorldTeam',myTeam);setStatus('Creating world…');disableMenu(true);
+  myName=safeName();myTeam=selectedTeam;godMode=selectedGod;localStorage.setItem('punchWorldName',myName);localStorage.setItem('punchWorldBlueBots',String(bots.blue));localStorage.setItem('punchWorldRedBots',String(bots.red));localStorage.setItem('punchWorldTeam',myTeam);setStatus('Creating world…');disableMenu(true);
   try{
     const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({client:clientId,name:myName,blueBots:bots.blue,redBots:bots.red}),cache:'no-store'});
     const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not create world.');
@@ -765,14 +841,14 @@ async function createWorld(){
 function joinWorld(code){
   if(code.length!==ROOM_CODE_LENGTH){setStatus('Enter a 4-character room code.','error');return;}
   beginGameplayFromGesture();
-  myName=safeName();myTeam=selectedTeam;localStorage.setItem('punchWorldName',myName);localStorage.setItem('punchWorldTeam',myTeam);setStatus(`Joining ${code}…`);disableMenu(true);connectWorld(code);
+  myName=safeName();myTeam=selectedTeam;godMode=selectedGod;localStorage.setItem('punchWorldName',myName);localStorage.setItem('punchWorldTeam',myTeam);setStatus(`Joining ${code}…`);disableMenu(true);connectWorld(code);
 }
-function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
+function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
 
 function connectWorld(code, reconnecting=false){
   clearTimeout(reconnectTimer);currentRoom=normalizeCode(code);if(!currentRoom)return;
   if(socket){try{socket.close(1000,'Replacing connection')}catch{}}
-  const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?client=${encodeURIComponent(clientId)}&name=${encodeURIComponent(myName||safeName())}&team=${encodeURIComponent(myTeam)}`;
+  const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?client=${encodeURIComponent(clientId)}&name=${encodeURIComponent(myName||safeName())}&team=${encodeURIComponent(myTeam)}&god=${selectedGod?1:0}`;
   try{socket=new WebSocket(url);}catch{if(!gameActive&&!reconnecting){document.exitPointerLock?.();disableMenu(false);setStatus('Could not open multiplayer connection.','error');}else scheduleReconnect();return;}
   socket.addEventListener('open',()=>{reconnectAttempt=0;if(reconnecting)showToast('Reconnected');});
   socket.addEventListener('message',e=>{try{handleMessage(JSON.parse(e.data))}catch{}});
@@ -790,7 +866,7 @@ function send(payload){if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.s
 
 function handleMessage(m){
   if(m.t==='welcome'){
-    currentRoom=m.code;myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';syncLocalWeaponModel();
+    currentRoom=m.code;myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;selectedGod=godMode;localStorage.setItem('punchWorldGodMode',godMode?'1':'0');syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';syncLocalWeaponModel();
     position.set(m.self.x||0,m.self.y??terrainHeight(m.self.x||0,m.self.z||0),m.self.z||0);yaw=m.self.yaw||0;pitch=m.self.pitch||0;
     clearRemotes();for(const p of m.players||[])upsertRemote(p,true);for(const b of m.bots||[])upsertRemote(b,true);
     enterGame();updateHealth();updatePlayerCount();return;
@@ -804,6 +880,8 @@ function handleMessage(m){
   if(m.t==='bulletEnd'){removeBullet(m.id);return;}
   if(m.t==='loadout'){currentWeapon=m.weapon||currentWeapon;ammo=normalizeClientAmmo(m.ammo);reloadUntil=m.reloadAt||0;reloadWeapon=m.reloadWeapon||'';syncLocalWeaponModel();return;}
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';syncRemoteWeapon(r);}return;}
+  if(m.t==='god'){if(m.id===clientId){godMode=!!m.enabled;selectedGod=godMode;localStorage.setItem('punchWorldGodMode',godMode?'1':'0');syncGodUI();}else{const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}return;}
+  if(m.t==='blocked'){handleBlocked(m);return;}
   if(m.t==='kill'){handleKill(m);return;}
   if(m.t==='health'){if(m.id===clientId){hp=Math.max(0,Math.min(100,Number(m.hp)||0));updateHealth();}else{const r=remotes.get(m.id);if(r)r.hp=Math.max(0,Math.min(100,Number(m.hp)||0));}return;}
   if(m.t==='hit'){handleHit(m);return;}
@@ -811,6 +889,7 @@ function handleMessage(m){
 }
 
 function enterGame(){
+  stopIntroMusic();
   gameActive=true;paused=false;menu.classList.add('hide');pause.classList.add('hide');
   applyExperienceGate();
   syncPauseContext();disableMenu(false);setStatus('Ready.');
@@ -820,8 +899,8 @@ function enterGame(){
 }
 function leaveWorld(){
   gameActive=false;paused=false;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left world')}catch{}}socket=null;currentRoom='';
-  document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();keys.clear();hp=100;wastedUntil=0;currentWeapon='pistol';ammo={pistol:12,assault:12,sniper:12};reloadUntil=0;reloadWeapon='';fireHeld=false;killFeed.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
-  const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshWorlds();
+  document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();keys.clear();hp=100;wastedUntil=0;godMode=selectedGod;syncGodUI();currentWeapon='pistol';ammo={pistol:12,assault:12,sniper:12};reloadUntil=0;reloadWeapon='';fireHeld=false;killFeed.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
+  const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshWorlds();startIntroMusic();
 }
 
 function openPause(){if(!gameActive||paused)return;paused=true;keys.clear();resetTouchInput();setAim(false);syncPauseContext();pause.classList.remove('hide');if(document.pointerLockElement)document.exitPointerLock?.();}
@@ -842,9 +921,9 @@ function makeRemote(player){
   const pistol=new THREE.Mesh(new THREE.BoxGeometry(.13,.10,.38),gunMat);pistol.position.set(.45,1.08,-.25);
   const assault=new THREE.Mesh(new THREE.BoxGeometry(.13,.11,.66),gunMat.clone());assault.position.set(.45,1.09,-.38);assault.visible=false;
   const sniper=new THREE.Mesh(new THREE.BoxGeometry(.12,.10,.82),gunMat.clone());sniper.position.set(.45,1.10,-.45);sniper.visible=false;
-  const fire=createDeathFire();group.add(body,head,armL,armR,pistol,assault,sniper,fire);group.position.set(player.x||0,player.y||0,player.z||0);scene.add(group);
+  const fire=createDeathFire();const godRing=new THREE.Mesh(new THREE.TorusGeometry(.42,.035,6,28),new THREE.MeshBasicMaterial({color:0xffdd67,transparent:true,opacity:.9}));godRing.rotation.x=Math.PI/2;godRing.position.y=2.03;godRing.visible=!!player.godMode;group.add(body,head,armL,armR,pistol,assault,sniper,fire,godRing);group.position.set(player.x||0,player.y||0,player.z||0);scene.add(group);
   const tag=makeNameTag(player.bot?`[BOT] ${player.name||'Bot'}`:(player.name||'Player'),TEAM_COLORS[team]);tag.position.set(0,2.18,0);group.add(tag);
-  const remote={id:player.id,name:player.name||'Player',color:TEAM_COLORS[team],team,bot:!!player.bot,weapon:player.weapon||'pistol',group,target:new THREE.Vector3(player.x||0,player.y||0,player.z||0),targetYaw:player.yaw||0,hp:player.hp??100,kills:Number(player.kills)||0,deaths:Number(player.deaths)||0,punch:99,armL,armR,body,head,pistol,assault,sniper,fire,lastSeen:performance.now()};fire.visible=remote.hp<=0;
+  const remote={id:player.id,name:player.name||'Player',color:TEAM_COLORS[team],team,bot:!!player.bot,weapon:player.weapon||'pistol',group,target:new THREE.Vector3(player.x||0,player.y||0,player.z||0),targetYaw:player.yaw||0,hp:player.hp??100,kills:Number(player.kills)||0,deaths:Number(player.deaths)||0,punch:99,armL,armR,body,head,pistol,assault,sniper,fire,godRing,godMode:!!player.godMode,lastSeen:performance.now()};fire.visible=remote.hp<=0;
   syncRemoteWeapon(remote);return remote;
 }
 function createDeathFire(){const g=new THREE.Group();const mats=[new THREE.MeshBasicMaterial({color:0xff5a18,transparent:true,opacity:.78}),new THREE.MeshBasicMaterial({color:0xffc63a,transparent:true,opacity:.72})];for(let i=0;i<7;i++){const m=new THREE.Mesh(new THREE.ConeGeometry(.13,.55,6),mats[i%2].clone());m.position.set((i%3-1)*.22,.35+(i%4)*.28,(i%2?-.18:.18));m.rotation.z=(i%2?.18:-.18);m.userData.phase=i*.73;g.add(m);}g.visible=false;return g;}
@@ -852,11 +931,15 @@ function makeNameTag(name,color){
   const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(5,10,15,.78)';x.beginPath();x.roundRect(24,16,464,96,28);x.fill();x.strokeStyle=color;x.lineWidth=6;x.stroke();x.fillStyle='#fff';x.font='800 48px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(name,256,64);
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:true}));sprite.scale.set(2.2,.55,1);return sprite;
 }
-function upsertRemote(player,instant=false){if(!player?.id||player.id===clientId)return;let r=remotes.get(player.id);if(!r){r=makeRemote(player);remotes.set(player.id,r);}r.name=player.name||r.name;r.bot=!!player.bot;r.team=player.team||r.team;r.color=TEAM_COLORS[r.team]||r.color;r.weapon=player.weapon||r.weapon;r.hp=player.hp??r.hp;if(r.fire)r.fire.visible=r.hp<=0;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;syncRemoteWeapon(r);r.target.set(player.x||0,player.y||0,player.z||0);r.targetYaw=player.yaw||0;if(instant){r.group.position.copy(r.target);r.group.rotation.y=r.targetYaw;}}
+function upsertRemote(player,instant=false){if(!player?.id||player.id===clientId)return;let r=remotes.get(player.id);if(!r){r=makeRemote(player);remotes.set(player.id,r);}r.name=player.name||r.name;r.bot=!!player.bot;r.team=player.team||r.team;r.color=TEAM_COLORS[r.team]||r.color;r.weapon=player.weapon||r.weapon;r.hp=player.hp??r.hp;if(r.fire)r.fire.visible=r.hp<=0;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;if(r.godRing)r.godRing.visible=!!r.godMode;syncRemoteWeapon(r);r.target.set(player.x||0,player.y||0,player.z||0);r.targetYaw=player.yaw||0;if(instant){r.group.position.copy(r.target);r.group.rotation.y=r.targetYaw;}}
 function removeRemote(id){const r=remotes.get(id);if(!r)return;scene.remove(r.group);r.group.traverse(o=>{if(o.geometry)o.geometry.dispose?.();if(o.material){if(o.material.map)o.material.map.dispose?.();o.material.dispose?.();}});remotes.delete(id);}
 function clearRemotes(){for(const id of [...remotes.keys()])removeRemote(id);}
 function updatePlayerCount(){syncPauseContext();}
 
+function handleBlocked(m){
+  if(m.attacker===clientId){hitUntil=performance.now()+180;soundShield();showToast('BLOCKED');}
+  if(m.target===clientId){hurtUntil=performance.now()+220;soundShield();showToast('GOD MODE');}
+}
 function handleHit(m){
   const targetRemote=remotes.get(m.target);if(targetRemote){targetRemote.hp=m.hp;if(targetRemote.fire)targetRemote.fire.visible=!!m.wasted;flashRemote(targetRemote);}
   if(m.attacker===clientId){showHitmarker(true);soundHitmarker(m.weapon||'pistol');}
@@ -960,7 +1043,7 @@ function updateRemoteVisuals(dt){
   for(const r of remotes.values()){
     r.group.position.lerp(r.target,Math.min(1,dt*12));
     let d=normalizeAngle(r.targetYaw-r.group.rotation.y);r.group.rotation.y+=d*Math.min(1,dt*12);
-    r.punch+=dt;if(r.punch<.28){const t=Math.sin((r.punch/.28)*Math.PI);r.armL.rotation.x=-1.15*t;r.armL.position.z=-.38*t;}else{r.armL.rotation.x=0;r.armL.position.z=0;}if(r.fire?.visible){const tm=performance.now()*.005;for(const f of r.fire.children){const p=f.userData.phase||0;f.scale.y=.72+.42*(.5+.5*Math.sin(tm+p));f.position.y=.32+((tm*.17+p)%1.15);f.material.opacity=.48+.34*(.5+.5*Math.sin(tm*1.4+p));}}
+    r.punch+=dt;if(r.punch<.28){const t=Math.sin((r.punch/.28)*Math.PI);r.armL.rotation.x=-1.15*t;r.armL.position.z=-.38*t;}else{r.armL.rotation.x=0;r.armL.position.z=0;}if(r.fire?.visible){const tm=performance.now()*.005;for(const f of r.fire.children){const p=f.userData.phase||0;f.scale.y=.72+.42*(.5+.5*Math.sin(tm+p));f.position.y=.32+((tm*.17+p)%1.15);f.material.opacity=.48+.34*(.5+.5*Math.sin(tm*1.4+p));}}if(r.godRing?.visible){r.godRing.rotation.z+=dt*1.8;r.godRing.material.opacity=.66+.24*Math.sin(performance.now()*.004+r.group.position.x);}
   }
 }
 function updateAim(dt){
@@ -1043,6 +1126,7 @@ function computeHudLayout(){
     map:{x:viewW-safe.right-margin-mapSize,y:safe.top+margin,w:mapSize,h:mapSize},
     kill:{x:safe.left+margin,y:safe.top+margin,w:compact?206:270,h:compact?82:118},
     team:{x:teamX,y:teamY,w:teamW,h:teamH},
+    god:{x:teamX-30,y:teamY,w:24,h:teamH},
     menu:{x:teamX+teamW+6,y:teamY,w:menuW,h:menuH},
     weapon:{x:viewW-safe.right-margin-weaponW,y:viewH-bottom-weaponH-(isTouch?fireR*3.75+8:0),w:weaponW,h:weaponH},
     joy:{x:safe.left+margin+joyR,y:viewH-bottom-joyR,r:joyR},
@@ -1062,7 +1146,7 @@ function drawHud(now){
   const missingHealth=Math.max(0,Math.min(1,(100-hp)/100)),hurtPulse=now<hurtUntil?Math.max(0,(hurtUntil-now)/650):0,damageAlpha=Math.min(.62,missingHealth*.38+hurtPulse*.28);
   if(damageAlpha>.01){const g=c.createRadialGradient(w/2,h/2,Math.min(w,h)*.13,w/2,h/2,Math.max(w,h)*.72);g.addColorStop(0,'rgba(255,18,40,0)');g.addColorStop(.72,`rgba(255,18,40,${damageAlpha*.22})`);g.addColorStop(1,`rgba(210,0,25,${damageAlpha})`);c.fillStyle=g;c.fillRect(0,0,w,h);}
   if(scoped)drawScopeMask(c,w,h);else{drawKillFeed(c,L.kill,now);drawMiniMap(c,L.map);drawTeamBar(c,L.team);}
-  drawMenuButton(c,L.menu);drawWeapon(c,L.weapon);
+  if(godMode)drawGodBadge(c,L.god,now);drawMenuButton(c,L.menu);drawWeapon(c,L.weapon);
   if(scoped)drawScopeReticle(c,w,h,now<hitUntil);else drawCrosshair(c,w/2,h/2,now<hitUntil,adsBlend);
   if(isTouch)drawTouchControls(c,L,now);else drawDesktopHint(c,L);
   drawVersion(c,L);
@@ -1073,12 +1157,12 @@ function drawHud(now){
   hudTexture.needsUpdate=true;
 }
 function allCombatStats(){
-  const rows=[{id:clientId,name:myName||safeName(),team:myTeam,bot:false,kills:myStats.kills||0,deaths:myStats.deaths||0}];
-  for(const r of remotes.values())rows.push({id:r.id,name:r.name,team:r.team,bot:r.bot,kills:r.kills||0,deaths:r.deaths||0});
+  const rows=[{id:clientId,name:myName||safeName(),team:myTeam,bot:false,godMode,kills:myStats.kills||0,deaths:myStats.deaths||0}];
+  for(const r of remotes.values())rows.push({id:r.id,name:r.name,team:r.team,bot:r.bot,godMode:!!r.godMode,kills:r.kills||0,deaths:r.deaths||0});
   return rows.sort((a,b)=>a.team.localeCompare(b.team)||(b.kills-a.kills)||(a.deaths-b.deaths)||a.name.localeCompare(b.name));
 }
 function teamWasteTotals(){let blue=0,red=0;for(const p of allCombatStats()){if(p.team==='red')red+=p.kills;else blue+=p.kills;}return{blue,red};}
-function drawTeamBar(c,r){const t=teamWasteTotals();roundRect(c,r.x,r.y,r.w,r.h,8,scoreboardOpen?'rgba(14,25,34,.96)':'rgba(5,14,21,.82)','rgba(255,255,255,.18)');const mid=r.x+r.w/2;c.fillStyle='rgba(70,167,255,.18)';c.fillRect(r.x+1,r.y+1,r.w/2-1,r.h-2);c.fillStyle='rgba(255,92,108,.18)';c.fillRect(mid,r.y+1,r.w/2-1,r.h-2);c.font='1000 10px system-ui';c.textAlign='center';c.fillStyle='#bfe0ff';c.fillText(`BLUE ${t.blue}`,r.x+r.w*.25,r.y+r.h/2);c.fillStyle='#ffbcc3';c.fillText(`RED ${t.red}`,r.x+r.w*.75,r.y+r.h/2);c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1;c.beginPath();c.moveTo(mid,r.y+6);c.lineTo(mid,r.y+r.h-6);c.stroke();}
+function drawTeamBar(c,r){const t=teamWasteTotals();roundRect(c,r.x,r.y,r.w,r.h,8,scoreboardOpen?'rgba(14,25,34,.96)':'rgba(5,14,21,.84)','rgba(255,255,255,.18)');const mid=r.x+r.w/2;c.fillStyle='rgba(70,167,255,.21)';c.fillRect(r.x+1,r.y+1,r.w/2-1,r.h-2);c.fillStyle='rgba(255,92,108,.21)';c.fillRect(mid,r.y+1,r.w/2-1,r.h-2);c.font='1000 10px system-ui';c.textAlign='center';c.fillStyle='#c9e7ff';c.fillText(`◆  ${t.blue}`,r.x+r.w*.25,r.y+r.h/2);c.fillStyle='#ffc7cd';c.fillText(`${t.red}  ◆`,r.x+r.w*.75,r.y+r.h/2);c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1;c.beginPath();c.moveTo(mid,r.y+6);c.lineTo(mid,r.y+r.h-6);c.stroke();}
 function toggleScoreboard(){if(!gameActive||paused)return;scoreboardOpen=!scoreboardOpen;scoreboardDrag=null;if(scoreboardOpen){scoreboardScroll=0;touchRoles.clear();joy.pointer=null;joy.x=joy.y=0;look.pointer=null;fireHeld=false;}}
 function drawScoreboard(c,L){
   const rows=allCombatStats(),w=Math.min(viewW-L.safe.left-L.safe.right-28,L.compact?500:620),rowH=L.compact?24:27,headH=43,maxH=viewH-L.safe.top-L.safe.bottom-34;
@@ -1090,7 +1174,7 @@ function drawScoreboard(c,L){
   roundRect(c,x+w-40,y+6,28,25,7,'rgba(255,255,255,.08)','rgba(255,255,255,.14)');c.fillStyle='#fff';c.font='1000 13px system-ui';c.textAlign='center';c.fillText('×',x+w-26,y+18.5);
   const nameX=x+14,kX=x+w-112,dX=x+w-67,kdX=x+w-18;c.fillStyle='#718393';c.font='900 8px system-ui';c.textAlign='right';c.fillText('W',kX,y+35);c.fillText('D',dX,y+35);c.fillText('K/D',kdX,y+35);
   c.save();c.beginPath();c.rect(x+7,bodyTop,w-14,bodyH);c.clip();let ry=bodyTop-scoreboardScroll;
-  for(const p of rows){if(ry+rowH>=bodyTop&&ry<=bodyTop+bodyH){const self=p.id===clientId;if(self){c.fillStyle='rgba(255,255,255,.06)';c.fillRect(x+7,ry,w-14,rowH-1);}c.fillStyle=TEAM_COLORS[p.team]||'#fff';c.fillRect(x+8,ry+5,3,rowH-10);c.textAlign='left';c.font=`${self?'1000':'850'} 10px system-ui`;c.fillStyle=self?'#fff':'#d6e0e8';c.fillText(`${p.bot?'[BOT] ':''}${p.name}`,nameX,ry+rowH/2);c.textAlign='right';c.fillStyle='#fff';c.fillText(String(p.kills),kX,ry+rowH/2);c.fillStyle='#b9c5cf';c.fillText(String(p.deaths),dX,ry+rowH/2);c.fillText(p.deaths?(p.kills/p.deaths).toFixed(2):p.kills?String(p.kills):'0.00',kdX,ry+rowH/2);}ry+=rowH;}c.restore();
+  for(const p of rows){if(ry+rowH>=bodyTop&&ry<=bodyTop+bodyH){const self=p.id===clientId;if(self){c.fillStyle='rgba(255,255,255,.06)';c.fillRect(x+7,ry,w-14,rowH-1);}c.fillStyle=TEAM_COLORS[p.team]||'#fff';c.fillRect(x+8,ry+5,3,rowH-10);c.textAlign='left';c.font=`${self?'1000':'850'} 10px system-ui`;c.fillStyle=self?'#fff':'#d6e0e8';c.fillText(`${p.godMode?'◆ ':''}${p.bot?'[BOT] ':''}${p.name}`,nameX,ry+rowH/2);c.textAlign='right';c.fillStyle='#fff';c.fillText(String(p.kills),kX,ry+rowH/2);c.fillStyle='#b9c5cf';c.fillText(String(p.deaths),dX,ry+rowH/2);c.fillText(p.deaths?(p.kills/p.deaths).toFixed(2):p.kills?String(p.kills):'0.00',kdX,ry+rowH/2);}ry+=rowH;}c.restore();
   if(maxScroll>0){const trackY=bodyTop+3,trackH=bodyH-6,thumbH=Math.max(24,trackH*(bodyH/contentH)),thumbY=trackY+(trackH-thumbH)*(scoreboardScroll/maxScroll);roundRect(c,x+w-6,trackY,2,trackH,1,'rgba(255,255,255,.08)');roundRect(c,x+w-7,thumbY,4,thumbH,2,'rgba(255,255,255,.35)');}
 }
 function drawDeathFlames(c,w,h,now){c.save();const base=h+8;for(let i=0;i<16;i++){const x=(i+.5)/16*w+Math.sin(now*.003+i)*8,flame=34+24*(.5+.5*Math.sin(now*.006+i*.9));const g=c.createLinearGradient(x,base-flame,x,base);g.addColorStop(0,'rgba(255,224,70,0)');g.addColorStop(.35,'rgba(255,177,30,.55)');g.addColorStop(1,'rgba(235,45,5,.78)');c.fillStyle=g;c.beginPath();c.moveTo(x-18,base);c.quadraticCurveTo(x-10,base-flame*.45,x,base-flame);c.quadraticCurveTo(x+10,base-flame*.45,x+18,base);c.closePath();c.fill();}c.restore();}
@@ -1107,21 +1191,51 @@ function handleKill(m){
 }
 function addKillFeed(m){if(!m?.attacker||!m?.victim)return;killFeed.unshift({attacker:m.attacker,victim:m.victim,weapon:m.weapon||'pistol',until:performance.now()+6500});if(killFeed.length>6)killFeed.length=6;}
 function drawKillFeed(c,r,now){while(killFeed.length&&killFeed[killFeed.length-1].until<now)killFeed.pop();let y=r.y;for(const item of killFeed){const h=21,weapon=item.weapon==='punch'?'FST':(WEAPON_SPECS[item.weapon]?.short||'PST');roundRect(c,r.x,y,r.w,h,6,'rgba(5,14,21,.73)','rgba(255,255,255,.09)');c.font='900 9px system-ui';c.textAlign='left';const attacker=item.attacker.name||'Player',victim=item.victim.name||'Player';c.fillStyle=TEAM_COLORS[item.attacker.team]||'#fff';c.fillText(attacker,r.x+7,y+h/2);const aw=c.measureText(attacker).width;c.fillStyle='#aebbc8';c.fillText(`  ${weapon}  `,r.x+9+aw,y+h/2);const ww=c.measureText(`  ${weapon}  `).width;c.fillStyle=TEAM_COLORS[item.victim.team]||'#fff';c.fillText(victim,r.x+11+aw+ww,y+h/2);y+=h+4;if(y>r.y+r.h-20)break;}}
+function drawGodBadge(c,r,now){const pulse=.55+.45*Math.sin(now*.005);roundRect(c,r.x,r.y,r.w,r.h,8,`rgba(255,214,76,${.12+.08*pulse})`,'rgba(255,226,126,.48)');const cx=r.x+r.w/2,cy=r.y+r.h/2;c.save();c.translate(cx,cy);c.strokeStyle='#ffe27b';c.lineWidth=1.5;c.beginPath();c.moveTo(0,-7);c.lineTo(6,-4);c.lineTo(5,3);c.quadraticCurveTo(3,7,0,8);c.quadraticCurveTo(-3,7,-5,3);c.lineTo(-6,-4);c.closePath();c.stroke();c.beginPath();c.moveTo(-2,0);c.lineTo(0,2);c.lineTo(3,-3);c.stroke();c.restore();}
 function drawMenuButton(c,r){roundRect(c,r.x,r.y,r.w,r.h,8,'rgba(5,14,21,.84)','rgba(255,255,255,.18)');c.fillStyle='#fff';c.textAlign='center';c.font='1000 17px system-ui';c.fillText('☰',r.x+r.w/2,r.y+r.h/2+1);}
 function drawCrosshair(c,x,y,hit,ads=0){const shrink=1-ads*.5,d=6*shrink,g=4*shrink;c.strokeStyle=hit?'#fff':'rgba(255,255,255,.82)';c.lineWidth=hit?2.4:1.8;c.beginPath();c.moveTo(x-d-g,y);c.lineTo(x-g,y);c.moveTo(x+d+g,y);c.lineTo(x+g,y);c.moveTo(x,y-d-g);c.lineTo(x,y-g);c.moveTo(x,y+d+g);c.lineTo(x,y+g);c.stroke();if(ads>.45){c.beginPath();c.arc(x,y,1.25,0,Math.PI*2);c.fillStyle=hit?'#fff':'rgba(255,255,255,.9)';c.fill();}}
 function drawScopeMask(c,w,h){const r=Math.min(w,h)*.43,cx=w/2,cy=h/2;c.save();c.beginPath();c.rect(0,0,w,h);c.arc(cx,cy,r,0,Math.PI*2,true);c.fillStyle='rgba(0,0,0,.94)';c.fill('evenodd');c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=2;c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.stroke();c.restore();}
 function drawScopeReticle(c,w,h,hit){const r=Math.min(w,h)*.43,cx=w/2,cy=h/2;c.save();c.beginPath();c.arc(cx,cy,r-2,0,Math.PI*2);c.clip();c.strokeStyle=hit?'#fff':'rgba(20,20,20,.86)';c.lineWidth=1.2;c.beginPath();c.moveTo(cx-r,cy);c.lineTo(cx+r,cy);c.moveTo(cx,cy-r);c.lineTo(cx,cy+r);c.stroke();c.fillStyle=hit?'#fff':'rgba(15,15,15,.92)';c.beginPath();c.arc(cx,cy,2,0,Math.PI*2);c.fill();for(let i=1;i<=4;i++){const off=i*18;c.beginPath();c.moveTo(cx-5,cy+off);c.lineTo(cx+5,cy+off);c.stroke();}c.restore();}
-function drawTouchControls(c,L,now){const j=L.joy;c.beginPath();c.arc(j.x,j.y,j.r,0,Math.PI*2);c.fillStyle='rgba(5,14,21,.34)';c.fill();c.strokeStyle='rgba(255,255,255,.20)';c.stroke();const max=j.r*.46,sx=j.x+joy.x*max,sy=j.y+joy.y*max;c.beginPath();c.arc(sx,sy,j.r*.39,0,Math.PI*2);c.fillStyle='rgba(255,255,255,.16)';c.fill();c.strokeStyle='rgba(255,255,255,.26)';c.stroke();drawRoundControl(c,L.fire,'FIRE',now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.aim,'AIM',adsWanted,'aim');drawRoundControl(c,L.jump,'JUMP',now<touchVisual.jumpUntil,'jump');drawRoundControl(c,L.punch,'FIST',now<touchVisual.punchUntil,'punch');drawRoundControl(c,L.reload,'R',now<touchVisual.reloadUntil||!!reloadUntil,'reload');drawRoundControl(c,L.swap,'WEAP',now<touchVisual.swapUntil,'swap');drawRoundControl(c,L.mode,fireMode==='auto'?'AUTO':'SEMI',now<touchVisual.modeUntil||fireMode==='auto','mode');}
-function drawRoundControl(c,b,label,active,type){c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);const hot=type==='fire',aim=type==='aim';c.fillStyle=active?(aim?'rgba(87,212,255,.56)':hot?'rgba(255,124,64,.66)':'rgba(100,205,255,.46)'):(hot?'rgba(115,42,25,.50)':'rgba(5,14,21,.56)');c.fill();c.strokeStyle=aim&&active?'rgba(120,225,255,.85)':hot?'rgba(255,160,120,.52)':'rgba(255,255,255,.23)';c.lineWidth=1.4;c.stroke();c.fillStyle='#fff';c.textAlign='center';c.font=`900 ${Math.max(8,b.r*.25)}px system-ui`;c.fillText(label,b.x,b.y+1);}
+function drawTouchControls(c,L,now){
+  const j=L.joy;c.beginPath();c.arc(j.x,j.y,j.r,0,Math.PI*2);c.fillStyle='rgba(5,14,21,.38)';c.fill();c.strokeStyle='rgba(110,221,255,.24)';c.lineWidth=1.2;c.stroke();const max=j.r*.46,sx=j.x+joy.x*max,sy=j.y+joy.y*max;c.beginPath();c.arc(sx,sy,j.r*.39,0,Math.PI*2);c.fillStyle='rgba(105,219,255,.17)';c.fill();c.strokeStyle='rgba(160,235,255,.28)';c.stroke();
+  drawRoundControl(c,L.fire,now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.aim,adsWanted,'aim');drawRoundControl(c,L.jump,now<touchVisual.jumpUntil,'jump');drawRoundControl(c,L.punch,now<touchVisual.punchUntil,'punch');drawRoundControl(c,L.reload,now<touchVisual.reloadUntil||!!reloadUntil,'reload');drawRoundControl(c,L.swap,now<touchVisual.swapUntil,'swap');drawRoundControl(c,L.mode,now<touchVisual.modeUntil||fireMode==='auto','mode');
+}
+function drawRoundControl(c,b,active,type){
+  c.save();c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);const hot=type==='fire',aim=type==='aim';c.fillStyle=active?(aim?'rgba(72,210,255,.58)':hot?'rgba(255,107,52,.70)':'rgba(80,196,255,.48)'):(hot?'rgba(112,38,22,.54)':'rgba(4,13,20,.60)');c.fill();c.strokeStyle=aim&&active?'rgba(125,230,255,.92)':hot?'rgba(255,166,125,.58)':'rgba(180,228,248,.24)';c.lineWidth=1.5;c.stroke();drawControlIcon(c,b.x,b.y,b.r,type,active);c.restore();
+}
+function drawControlIcon(c,x,y,r,type,active){
+  const q=Math.max(8,r*.44);c.strokeStyle=active?'#fff':'rgba(241,250,255,.92)';c.fillStyle=c.strokeStyle;c.lineWidth=Math.max(1.4,r*.06);c.lineCap='round';c.lineJoin='round';c.beginPath();
+  if(type==='fire'){c.arc(x,y,q*.38,0,Math.PI*2);c.moveTo(x-q*.72,y);c.lineTo(x-q*.40,y);c.moveTo(x+q*.40,y);c.lineTo(x+q*.72,y);c.moveTo(x,y-q*.72);c.lineTo(x,y-q*.40);c.moveTo(x,y+q*.40);c.lineTo(x,y+q*.72);c.stroke();c.beginPath();c.arc(x,y,q*.10,0,Math.PI*2);c.fill();}
+  else if(type==='aim'){c.arc(x,y,q*.55,0,Math.PI*2);c.moveTo(x-q*.82,y);c.lineTo(x-q*.38,y);c.moveTo(x+q*.38,y);c.lineTo(x+q*.82,y);c.moveTo(x,y-q*.82);c.lineTo(x,y-q*.38);c.moveTo(x,y+q*.38);c.lineTo(x,y+q*.82);c.stroke();}
+  else if(type==='jump'){c.moveTo(x-q*.55,y+q*.35);c.lineTo(x,y-q*.45);c.lineTo(x+q*.55,y+q*.35);c.stroke();c.beginPath();c.moveTo(x,y-q*.45);c.lineTo(x,y+q*.52);c.stroke();}
+  else if(type==='punch'){c.roundRect(x-q*.48,y-q*.15,q*.96,q*.60,q*.18);c.stroke();for(let i=-1;i<=1;i++){c.beginPath();c.moveTo(x+i*q*.26,y-q*.15);c.lineTo(x+i*q*.26,y-q*.48);c.stroke();}c.beginPath();c.moveTo(x-q*.48,y+q*.1);c.lineTo(x-q*.70,y-q*.08);c.stroke();}
+  else if(type==='reload'){c.arc(x,y,q*.55,-.45,Math.PI*1.42);c.stroke();c.beginPath();c.moveTo(x+q*.48,y-q*.45);c.lineTo(x+q*.70,y-q*.28);c.lineTo(x+q*.42,y-q*.18);c.stroke();}
+  else if(type==='swap'){c.moveTo(x-q*.62,y-q*.22);c.lineTo(x+q*.45,y-q*.22);c.lineTo(x+q*.25,y-q*.42);c.moveTo(x+q*.62,y+q*.22);c.lineTo(x-q*.45,y+q*.22);c.lineTo(x-q*.25,y+q*.42);c.stroke();}
+  else if(type==='mode'){const n=fireMode==='auto'?3:1;for(let i=0;i<n;i++){const yy=y+(i-(n-1)/2)*q*.34;c.beginPath();c.moveTo(x-q*.46,yy);c.lineTo(x+q*.35,yy);c.stroke();c.beginPath();c.moveTo(x+q*.35,yy);c.lineTo(x+q*.55,yy-q*.12);c.lineTo(x+q*.55,yy+q*.12);c.closePath();c.fill();}}
+}
 function drawDesktopHint(c,L){c.font='800 9px system-ui';c.textAlign='left';c.fillStyle='rgba(255,255,255,.66)';const text=document.pointerLockElement===canvas?'LMB FIRE · RMB ADS · B FIRE MODE · F MELEE · R RELOAD · 1/2/3/Q WEAPON · TAB SCORE':'CLICK GAME TO CAPTURE MOUSE';c.fillText(text,L.safe.left+12,viewH-L.safe.bottom-12);}
 function drawVersion(c,L){c.font='800 8px system-ui';c.textAlign='center';c.fillStyle='rgba(255,255,255,.46)';c.fillText(`PUNCH WORLD v${APP_VERSION}`,viewW/2,viewH-L.safe.bottom-9);}
 
 function roundRect(c,x,y,w,h,r,fill,stroke){if(w<=0||h<=0)return;c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
 function pill(c,x,y,w,h){const r=h/2;c.beginPath();c.roundRect(x,y,Math.max(0,w),h,r);}
 
+function chipToneAt(freq,start,duration,volume=.018,type='square'){
+  const a=audioCtx;if(!a||!musicEnabled)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,start);g.gain.setValueAtTime(.0001,start);g.gain.linearRampToValueAtTime(volume,start+.008);g.gain.setValueAtTime(volume,start+Math.max(.012,duration-.018));g.gain.exponentialRampToValueAtTime(.0001,start+duration);o.connect(g).connect(musicGain||a.destination);o.start(start);o.stop(start+duration+.02);
+}
+function scheduleIntroMusic(){
+  const a=audioCtx;if(!a||!musicEnabled||gameActive||document.hidden)return;const stepDur=60/138/2;
+  const lead=[659,0,784,880,784,659,587,0,523,0,587,659,784,659,587,523];
+  const bass=[131,131,147,147,110,110,123,123];
+  while(musicNextAt<a.currentTime+.24){const i=musicStep%16,n=lead[i];if(n)chipToneAt(n,musicNextAt,stepDur*.72,.013,'square');if(i%2===0)chipToneAt(bass[Math.floor(i/2)%bass.length],musicNextAt,stepDur*1.7,.016,'square');if(i%4===0)chipToneAt(55,musicNextAt,.045,.018,'square');musicStep++;musicNextAt+=stepDur;}
+}
+function startIntroMusic(){
+  if(!musicEnabled||gameActive||!experienceEntered||orientationBlocked)return;const a=ensureAudio();if(!a||musicTimer)return;if(!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}musicStep=0;musicNextAt=a.currentTime+.04;scheduleIntroMusic();musicTimer=setInterval(scheduleIntroMusic,90);
+}
+function stopIntroMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}musicNextAt=0;}
+
 function ensureAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C();}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx;}
 function tone(freq,duration,type='sine',volume=.03,slide=0){const a=ensureAudio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,a.currentTime);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),a.currentTime+duration);g.gain.setValueAtTime(volume,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+duration);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+duration);}
-function soundSwing(){tone(150,.08,'sawtooth',.018,-60)}function soundShot(weapon='pistol'){if(weapon==='sniper'){tone(95,.11,'square',.055,-45);setTimeout(()=>tone(55,.10,'square',.024,-15),38)}else if(weapon==='assault'){tone(132,.045,'square',.038,-72);setTimeout(()=>tone(68,.035,'square',.014,-18),18)}else{tone(160,.055,'square',.035,-100);setTimeout(()=>tone(75,.04,'square',.018,-20),24)}}function soundReload(){tone(480,.04,'square',.012,-80);setTimeout(()=>tone(620,.045,'square',.01,-90),120)}function soundHitmarker(){tone(1180,.035,'square',.026,-250);setTimeout(()=>tone(820,.028,'square',.018,-120),28)}function soundKill(){tone(620,.055,'square',.03,180);setTimeout(()=>tone(980,.08,'square',.038,260),58)}function soundHurt(){tone(120,.13,'sawtooth',.025,-70)}function soundJump(){tone(210,.09,'sine',.016,80)}
+function soundSwing(){tone(150,.08,'sawtooth',.018,-60)}function soundShot(weapon='pistol'){if(weapon==='sniper'){tone(95,.11,'square',.055,-45);setTimeout(()=>tone(55,.10,'square',.024,-15),38)}else if(weapon==='assault'){tone(132,.045,'square',.038,-72);setTimeout(()=>tone(68,.035,'square',.014,-18),18)}else{tone(160,.055,'square',.035,-100);setTimeout(()=>tone(75,.04,'square',.018,-20),24)}}function soundReload(){tone(480,.04,'square',.012,-80);setTimeout(()=>tone(620,.045,'square',.01,-90),120)}function soundHitmarker(){tone(1180,.035,'square',.026,-250);setTimeout(()=>tone(820,.028,'square',.018,-120),28)}function soundKill(){tone(620,.055,'square',.03,180);setTimeout(()=>tone(980,.08,'square',.038,260),58)}function soundShield(){tone(420,.045,'square',.024,520);setTimeout(()=>tone(820,.07,'square',.02,-120),34)}function soundHurt(){tone(120,.13,'sawtooth',.025,-70)}function soundJump(){tone(210,.09,'sine',.016,80)}
 
 document.addEventListener('pointerdown',ensureAudio,{once:true});
 </script>
