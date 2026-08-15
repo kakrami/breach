@@ -223,7 +223,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.4';
+const APP_VERSION = '1.15.5';
 const PROTOCOL_VERSION = 13;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
@@ -347,21 +347,46 @@ syncVisualViewportMetrics();
 syncGodUI();
 syncMusicUI();
 
-const THREE_SOURCES = [
-  'https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js',
-  'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.185.1/three.module.js',
-  'https://unpkg.com/three@0.185.1/build/three.module.js'
+const ENGINE_MODULE_URL = './vendor/three.module.min.js';
+const ENGINE_CORE_SOURCES = [
+  `${ONLINE_API}/engine/three.core.min.js`,
+  'https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.core.min.js',
+  'https://unpkg.com/three@0.185.1/build/three.core.min.js'
 ];
-let engineReady=false, engineLoadPromise=null, engineInitialized=false;
+let engineReady=false, engineLoadPromise=null, engineInitialized=false, engineModuleSourcePromise=null;
 
 function setEngineStatus(text,tone=''){
   const el=$('engineStatus'); if(el){el.textContent=text;el.className=`engine-status ${tone}`;}
 }
 function setEnterLabel(text){const span=$('enterBtn')?.querySelector('span');if(span)span.textContent=text;}
-async function importWithTimeout(url,ms=4500){
-  let timer;
-  try{return await Promise.race([import(url),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Engine source timed out')),ms);})]);}
-  finally{clearTimeout(timer);}
+async function fetchTextWithTimeout(url,ms=3500){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(new DOMException('Engine request timed out','TimeoutError')),ms);
+  try{
+    const response=await fetch(url,{signal:controller.signal,cache:'force-cache'});
+    if(!response.ok)throw new Error(`Engine request failed (${response.status})`);
+    return await response.text();
+  }finally{clearTimeout(timer);}
+}
+function localEngineModuleSource(){
+  if(!engineModuleSourcePromise){
+    engineModuleSourcePromise=fetchTextWithTimeout(ENGINE_MODULE_URL,2500).then(source=>{
+      if(!source.includes('./three.core.min.js'))throw new Error('Bundled 3D module is invalid');
+      return source;
+    }).catch(error=>{engineModuleSourcePromise=null;throw error;});
+  }
+  return engineModuleSourcePromise;
+}
+async function importBundledThree(moduleSource,coreSource){
+  const coreBlob=URL.createObjectURL(new Blob([coreSource],{type:'text/javascript'}));
+  const patched=moduleSource.replaceAll('./three.core.min.js',coreBlob);
+  if(patched===moduleSource){URL.revokeObjectURL(coreBlob);throw new Error('3D module dependency could not be linked');}
+  const moduleBlob=URL.createObjectURL(new Blob([patched],{type:'text/javascript'}));
+  try{return await import(moduleBlob);}
+  finally{
+    // Module evaluation has completed at this point; the graph remains resident after revocation.
+    URL.revokeObjectURL(moduleBlob);URL.revokeObjectURL(coreBlob);
+  }
 }
 async function ensureThreeEngine(userRetry=false){
   if(engineReady)return true;
@@ -370,11 +395,21 @@ async function ensureThreeEngine(userRetry=false){
   engineLoadPromise=(async()=>{
     if(enter)enter.disabled=true;
     setEnterLabel('LOADING');
-    let lastError=null;
-    for(let i=0;i<THREE_SOURCES.length;i++){
-      setEngineStatus(`LOADING 3D ENGINE · SOURCE ${i+1}/${THREE_SOURCES.length}`);
+    let moduleSource,lastError=null;
+    try{
+      setEngineStatus('LOADING 3D ENGINE · LOCAL MODULE');
+      moduleSource=await localEngineModuleSource();
+    }catch(error){
+      console.error('Bundled Three.js module is missing or unreadable.',error);
+      setEngineStatus('3D ENGINE FILE MISSING · REDEPLOY CLIENT','error');
+      setEnterLabel('RETRY ENGINE');
+      return false;
+    }
+    for(let i=0;i<ENGINE_CORE_SOURCES.length;i++){
+      setEngineStatus(i===0?'LOADING 3D ENGINE · GAME SERVER':`LOADING 3D ENGINE · FALLBACK ${i}/${ENGINE_CORE_SOURCES.length-1}`);
       try{
-        const mod=await importWithTimeout(THREE_SOURCES[i]);
+        const coreSource=await fetchTextWithTimeout(ENGINE_CORE_SOURCES[i],i===0?3200:2600);
+        const mod=await importBundledThree(moduleSource,coreSource);
         if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Invalid Three.js module');
         THREE=mod;
         position=new THREE.Vector3(0,0,0);
@@ -383,10 +418,10 @@ async function ensureThreeEngine(userRetry=false){
         setEngineStatus('3D ENGINE READY','ready');
         setEnterLabel('ENTER ARENA');
         return true;
-      }catch(error){lastError=error;console.warn(`Three.js source ${i+1} failed`,error);}
+      }catch(error){lastError=error;console.warn(`3D engine core source ${i+1} failed`,error);}
     }
-    console.error('Punch World could not load its 3D engine.',lastError);
-    setEngineStatus('3D ENGINE UNAVAILABLE · CHECK CONNECTION AND RETRY','error');
+    console.error('Punch World could not initialize its 3D engine.',lastError);
+    setEngineStatus('3D ENGINE UNAVAILABLE · TAP RETRY','error');
     setEnterLabel('RETRY ENGINE');
     return false;
   })().finally(()=>{engineLoadPromise=null;if(enter)enter.disabled=false;});
