@@ -1,0 +1,10 @@
+{
+  "name": "Punch World",
+  "short_name": "Punch World",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "landscape",
+  "background_color": "#0b1118",
+  "theme_color": "#0b1118"
+}
