@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.14.1</title>
+<title>Punch World v1.14.2</title>
 <style>
 :root{
   --bg:#05090e;--panel:#0a121af4;--panel-strong:#0f1a24;--panel-soft:#071018ee;--line:#ffffff1d;
@@ -47,7 +47,7 @@ h1{margin:0;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing
 .svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}.ui-icon,.mini-icon,.brand-icon{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ui-icon{width:18px;height:18px}.mini-icon{width:12px;height:12px}.brand-icon{width:100%;height:100%;stroke-width:1.6}.brand-icon .cut,.ui-icon .cut{fill:currentColor;stroke:none}
 html,body,#game{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-user-drag:none!important}#game{touch-action:none!important;isolation:isolate}
 .boot,.menu{background:#03080d;isolation:isolate}.boot::before,.menu::before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 20% 15%,#00b7ff2e,transparent 34%),radial-gradient(circle at 83% 72%,#ff3b6b1d,transparent 32%),linear-gradient(135deg,#07131e 0%,#020508 65%)}.boot::after,.menu::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.3;background-image:linear-gradient(#5fdcff0b 1px,transparent 1px),linear-gradient(90deg,#5fdcff0b 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000,transparent 92%);animation:gridDrift 16s linear infinite}@keyframes gridDrift{to{background-position:68px 34px}}
-.boot-card{position:relative;overflow:hidden;border:1px solid #66dcff38;background:linear-gradient(160deg,#0d1e2cf5,#071019f8 58%,#08101af8);box-shadow:0 36px 120px #000e,0 0 70px #00baff12,inset 0 1px #ffffff10}.boot-card::before{content:"";position:absolute;left:-30%;right:-30%;top:0;height:2px;background:linear-gradient(90deg,transparent,#62e8ff,transparent);animation:sweep 2.8s ease-in-out infinite}@keyframes sweep{0%,100%{transform:translateX(-20%);opacity:.2}50%{transform:translateX(20%);opacity:1}}.boot-emblem{width:72px;height:72px;margin:auto;padding:14px;border-radius:20px;color:#76e8ff;background:linear-gradient(145deg,#69e6ff25,#ffffff08);border:1px solid #72e8ff55;box-shadow:0 0 40px #00bfff28,inset 0 1px #ffffff1a}.eyebrow{font-size:8px;font-weight:1000;letter-spacing:.22em;color:#6fdfff;text-transform:uppercase}.hero-action{min-height:52px!important;font-size:12px!important;letter-spacing:.12em;justify-content:center}.hero-action .ui-icon{width:20px;height:20px}.boot-card h1{font-size:34px;text-shadow:0 0 30px #47d6ff22}
+.boot-card{position:relative;overflow:hidden;border:1px solid #66dcff38;background:linear-gradient(160deg,#0d1e2cf5,#071019f8 58%,#08101af8);box-shadow:0 36px 120px #000e,0 0 70px #00baff12,inset 0 1px #ffffff10}.boot-card::before{content:"";position:absolute;left:-30%;right:-30%;top:0;height:2px;background:linear-gradient(90deg,transparent,#62e8ff,transparent);animation:sweep 2.8s ease-in-out infinite}@keyframes sweep{0%,100%{transform:translateX(-20%);opacity:.2}50%{transform:translateX(20%);opacity:1}}.boot-emblem{width:72px;height:72px;margin:auto;padding:14px;border-radius:20px;color:#76e8ff;background:linear-gradient(145deg,#69e6ff25,#ffffff08);border:1px solid #72e8ff55;box-shadow:0 0 40px #00bfff28,inset 0 1px #ffffff1a}.eyebrow{font-size:8px;font-weight:1000;letter-spacing:.22em;color:#6fdfff;text-transform:uppercase}.hero-action{min-height:52px!important;font-size:12px!important;letter-spacing:.12em;justify-content:center}.hero-action .ui-icon{width:20px;height:20px}.boot-card h1{font-size:34px;text-shadow:0 0 30px #47d6ff22}.engine-status{min-height:14px;font-size:7.5px;font-weight:950;letter-spacing:.13em;color:#7f95a9;text-transform:uppercase}.engine-status.ready{color:#77e8a4}.engine-status.error{color:#ff8795}.hero-action:disabled{opacity:.55;cursor:wait;filter:saturate(.55)}
 .menu-shell{width:min(1120px,100%)}.menu-header{position:relative;overflow:hidden;border-color:#61dcff2b;background:linear-gradient(115deg,#102334f5,#08131df5 64%,#101323f5)}.menu-header::after{content:"";position:absolute;right:18%;top:-80px;width:220px;height:160px;background:#29c8ff10;transform:rotate(25deg);filter:blur(15px);pointer-events:none}.logo{padding:7px;color:#6fe2ff;border-color:#6fe2ff55;background:linear-gradient(145deg,#66dfff25,#ffffff06);box-shadow:0 0 28px #00bfff1c}.brand-copy h1{font-size:23px;text-shadow:0 0 24px #43d5ff1c}.header-actions{z-index:1}.icon-btn{display:grid!important;place-items:center!important}.icon-btn .ui-icon{width:17px;height:17px}
 .panel{position:relative;border-color:#ffffff1b;background:linear-gradient(155deg,#0b1721f2,#060d14f5);box-shadow:0 16px 48px #0008,inset 0 1px #ffffff08}.panel::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:2px;border-radius:2px;background:linear-gradient(#5edfff00,#5edfff88,#5edfff00);opacity:.55}.panel-title strong{display:flex;align-items:center;gap:6px;color:#dff8ff}.panel-title .mini-icon,.label .mini-icon{display:inline-block;vertical-align:-2px;margin-right:4px;color:#67dcff}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.025em}.btn.primary{background:linear-gradient(135deg,#1fa2d8,#2266bf);border-color:#7be8ff70;box-shadow:0 8px 24px #008cc52c,inset 0 1px #ffffff28}.btn.primary:hover{background:linear-gradient(135deg,#29b5ec,#2876d5)}.btn.danger{background:linear-gradient(135deg,#9e2939,#681d2a)}.action-btn{min-height:39px}.icon-label{min-width:76px}.input{border-color:#ffffff22;background:linear-gradient(180deg,#02070c,#061019);box-shadow:inset 0 0 0 1px #0007,inset 0 1px #ffffff07}.input:focus{border-color:#64dfff9c;box-shadow:0 0 0 2px #3fd9ff16,0 0 22px #20bfff0d}
@@ -92,6 +92,7 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
     <div class="version" data-app-version></div>
     <p>Fast team combat across a living terrain. Landscape optimized.</p>
     <button id="enterBtn" class="btn primary hero-action"><svg class="ui-icon"><use href="#i-play"/></svg><span>ENTER ARENA</span></button>
+    <div id="engineStatus" class="engine-status" role="status" aria-live="polite">LOADING 3D ENGINE</div>
     <div id="iosInstallHint" class="hide" style="display:grid;gap:9px;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff08">
       <b style="text-align:center">iPhone Safari Fullscreen</b>
       <span style="font-size:13px;line-height:1.45;color:var(--muted)">Safari on iPhone does not provide webpage fullscreen for the game canvas. For the full-screen app experience: tap <b style="color:var(--text)">Share</b> → <b style="color:var(--text)">Add to Home Screen</b>, keep <b style="color:var(--text)">Open as Web App</b> enabled, then launch Punch World from the Home Screen.</span>
@@ -196,11 +197,11 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
 </section>
 
 <script type="module">
-import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.185.1/three.module.js';
+let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.14.1';
+const APP_VERSION = '1.14.2';
 const PROTOCOL_VERSION = 12;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
@@ -250,8 +251,6 @@ let musicEnabled=localStorage.getItem('punchWorldMusic')!=='0';
 const requestedRoom = new URL(location.href).searchParams.get('room');
 if (requestedRoom) codeInput.value = normalizeCode(requestedRoom);
 applyTeamSelection(selectedTeam,false);
-syncGodUI();
-syncMusicUI();
 
 function selectedBotTeams(){
   const blue=Math.max(0,Math.min(MAX_BOTS,Number(blueBotCount.value)||0));
@@ -281,7 +280,7 @@ let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0;
 let onGround = true, punchTime = 99, fireTime = 99, localPunchCooldown = 0, localFireCooldown = 0, lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0;
 let audioCtx = null, musicTimer = null, musicStep = 0, musicNextAt = 0, musicGain = null;
 let toastText = '', toastUntil = 0, hurtUntil = 0, hitUntil = 0;
-const position = new THREE.Vector3(0,0,0);
+let position = null;
 const keys = new Set();
 const remotes = new Map();
 const bullets = new Map();
@@ -305,11 +304,59 @@ let hudLayout = null;
 let viewW = Math.max(1, document.documentElement.clientWidth || window.innerWidth || 1), viewH = Math.max(1, document.documentElement.clientHeight || window.innerHeight || 1);
 let experienceEntered = false, orientationBlocked = false;
 
-init3D();
+syncGodUI();
+syncMusicUI();
+
+const THREE_SOURCES = [
+  'https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.module.js',
+  'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.185.1/three.module.js',
+  'https://unpkg.com/three@0.185.1/build/three.module.js'
+];
+let engineReady=false, engineLoadPromise=null, engineInitialized=false;
+
+function setEngineStatus(text,tone=''){
+  const el=$('engineStatus'); if(el){el.textContent=text;el.className=`engine-status ${tone}`;}
+}
+function setEnterLabel(text){const span=$('enterBtn')?.querySelector('span');if(span)span.textContent=text;}
+async function importWithTimeout(url,ms=4500){
+  let timer;
+  try{return await Promise.race([import(url),new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Engine source timed out')),ms);})]);}
+  finally{clearTimeout(timer);}
+}
+async function ensureThreeEngine(userRetry=false){
+  if(engineReady)return true;
+  if(engineLoadPromise)return engineLoadPromise;
+  const enter=$('enterBtn');
+  engineLoadPromise=(async()=>{
+    if(enter)enter.disabled=true;
+    setEnterLabel('LOADING');
+    let lastError=null;
+    for(let i=0;i<THREE_SOURCES.length;i++){
+      setEngineStatus(`LOADING 3D ENGINE · SOURCE ${i+1}/${THREE_SOURCES.length}`);
+      try{
+        const mod=await importWithTimeout(THREE_SOURCES[i]);
+        if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Invalid Three.js module');
+        THREE=mod;
+        position=new THREE.Vector3(0,0,0);
+        if(!engineInitialized){init3D();engineInitialized=true;onResize();}
+        engineReady=true;
+        setEngineStatus('3D ENGINE READY','ready');
+        setEnterLabel('ENTER ARENA');
+        return true;
+      }catch(error){lastError=error;console.warn(`Three.js source ${i+1} failed`,error);}
+    }
+    console.error('Punch World could not load its 3D engine.',lastError);
+    setEngineStatus('3D ENGINE UNAVAILABLE · CHECK CONNECTION AND RETRY','error');
+    setEnterLabel('RETRY ENGINE');
+    return false;
+  })().finally(()=>{engineLoadPromise=null;if(enter)enter.disabled=false;});
+  return engineLoadPromise;
+}
+
 bindUI();
-onResize();
 refreshWorlds();
 setInterval(() => { if (!gameActive) refreshWorlds(); }, 7000);
+ensureThreeEngine(false);
 
 function getClientId(){
   let id = localStorage.getItem('punchWorldClient');
@@ -639,6 +686,10 @@ async function enterExperience(){
     $('enterBtn').classList.add('hide');
     return;
   }
+  if(!engineReady){
+    if(await ensureThreeEngine(true))setEngineStatus('3D ENGINE READY · TAP ENTER','ready');
+    return;
+  }
   experienceEntered=true;
   if(!isStandaloneApp()) await requestFullscreenNow();
   await lockLandscape();
@@ -646,7 +697,8 @@ async function enterExperience(){
   setTimeout(scheduleViewportSync,120);
   setTimeout(()=>{if(!gameActive&&!orientationBlocked)startIntroMusic();},160);
 }
-function continueInSafari(){
+async function continueInSafari(){
+  if(!(await ensureThreeEngine(true)))return;
   experienceEntered=true;
   $('iosInstallHint')?.classList.add('hide');
   scheduleViewportSync();
@@ -1166,6 +1218,7 @@ function scheduleViewportSync(){
 }
 function onResize(){
   const v=getViewSize();viewW=v.w;viewH=v.h;
+  if(!camera || !renderer){return;}
   const aspect=viewW/viewH;
   camera.aspect=aspect;
   const maxHorizontalFov=104*Math.PI/180;
