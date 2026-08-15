@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.3.0</title>
+<title>Punch World v1.4.0</title>
 <style>
 :root{
   --bg:#0b1118;--panel:#111b26ee;--panel2:#0b131dcc;--line:#ffffff20;--text:#f4f7fb;--muted:#9fb0c2;
@@ -55,8 +55,13 @@ h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing
     <div class="rotate-icon">✊</div>
     <h1>Punch World</h1>
     <div class="version" data-app-version></div>
-    <p>Landscape-only. Enter Game requests fullscreen when your browser supports it.</p>
+    <p>Landscape-only. Fullscreen is configured automatically for your device.</p>
     <button id="enterBtn" class="btn primary">Enter Game</button>
+    <div id="iosInstallHint" class="hide" style="display:grid;gap:9px;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff08">
+      <b style="text-align:center">iPhone Safari Fullscreen</b>
+      <span style="font-size:13px;line-height:1.45;color:var(--muted)">Safari on iPhone does not provide webpage fullscreen for the game canvas. For the full-screen app experience: tap <b style="color:var(--text)">Share</b> → <b style="color:var(--text)">Add to Home Screen</b>, keep <b style="color:var(--text)">Open as Web App</b> enabled, then launch Punch World from the Home Screen.</span>
+      <button id="continueSafariBtn" class="btn">Continue in Safari</button>
+    </div>
   </div>
 </section>
 
@@ -95,7 +100,7 @@ h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing
     </div>
 
     <div id="menuStatus" class="status">Ready.</div>
-    <div class="tips"><b>Desktop:</b> WASD move · mouse look · Space jump · click punch · Shift sprint · Esc/M menu<br><b>Phone:</b> landscape only · fullscreen optional after entry · left stick move · drag to look · Jump · Punch</div>
+    <div class="tips"><b>Desktop:</b> WASD move · mouse look · Space jump · click punch · Shift sprint · Esc/M menu<br><b>Phone:</b> landscape only · left stick move · drag to look · Jump · Punch<br><b>iPhone Safari:</b> launch from Home Screen for the full-screen app experience.</div>
   </div>
 </section>
 
@@ -108,7 +113,7 @@ import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.185.1/
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.3.0';
+const APP_VERSION = '1.4.0';
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
 const STATE_INTERVAL = 50;
@@ -128,6 +133,9 @@ const canvas = $('game');
 document.querySelectorAll('[data-app-version]').forEach(el => { el.textContent = `Version ${APP_VERSION}`; });
 
 const isTouch = matchMedia('(hover:none), (pointer:coarse)').matches;
+const isIPhone = /iPhone|iPod/i.test(navigator.userAgent);
+const isStandaloneApp = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
+const iPhoneSafariTab = () => isIPhone && !isStandaloneApp();
 const clientId = getClientId();
 nameInput.value = localStorage.getItem('punchWorldName') || `Player${Math.floor(Math.random()*90+10)}`;
 const requestedRoom = new URL(location.href).searchParams.get('room');
@@ -244,6 +252,7 @@ function bindUI(){
   screen.orientation?.addEventListener?.('change', scheduleViewportSync);
 
   $('enterBtn').addEventListener('click', enterExperience);
+  $('continueSafariBtn')?.addEventListener('click', continueInSafari);
   $('rotateFullBtn').addEventListener('click', restoreLandscapeFromGesture);
   $('createBtn').addEventListener('click', createWorld);
   $('refreshBtn').addEventListener('click', refreshWorlds);
@@ -293,12 +302,22 @@ function getViewSize(){
 }
 async function enterExperience(){
   ensureAudio();
+  if(iPhoneSafariTab()){
+    $('iosInstallHint')?.classList.remove('hide');
+    $('enterBtn').classList.add('hide');
+    return;
+  }
   experienceEntered=true;
-  const fullscreenResult=await requestFullscreenNow();
+  if(!isStandaloneApp()) await requestFullscreenNow();
   await lockLandscape();
-  if(fullscreenResult==='unsupported') setStatus('Browser fullscreen is unavailable here. Landscape still works; on iPhone, Add to Home Screen provides an app-style view.');
   scheduleViewportSync();
   setTimeout(scheduleViewportSync,120);
+}
+function continueInSafari(){
+  experienceEntered=true;
+  $('iosInstallHint')?.classList.add('hide');
+  scheduleViewportSync();
+  setTimeout(scheduleViewportSync,80);
 }
 function beginGameplayFromGesture(){
   ensureAudio();
@@ -309,6 +328,9 @@ function fullscreenElement(){
 }
 function isFullscreenActive(){ return !!fullscreenElement(); }
 function fullscreenSupported(){
+  if(iPhoneSafariTab() || isStandaloneApp()) return false;
+  const enabled = document.fullscreenEnabled ?? document.webkitFullscreenEnabled;
+  if(enabled === false) return false;
   return !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
 }
 async function requestFullscreenNow(){
@@ -343,6 +365,16 @@ async function exitFullscreenNow(){
 }
 async function toggleFullscreen(){
   ensureAudio();
+  if(iPhoneSafariTab()){
+    experienceEntered=false;
+    boot.classList.remove('hide');
+    menu.classList.add('hide');
+    pause.classList.add('hide');
+    $('iosInstallHint')?.classList.remove('hide');
+    $('enterBtn').classList.add('hide');
+    return;
+  }
+  if(isStandaloneApp()) return;
   if(isFullscreenActive()) await exitFullscreenNow();
   else{
     await requestFullscreenNow();
@@ -354,10 +386,23 @@ async function toggleFullscreen(){
 function syncFullscreenUI(){
   const active=isFullscreenActive();
   const supported=fullscreenSupported();
-  const label=active?'Exit Fullscreen':'Enter Fullscreen';
+  const standalone=isStandaloneApp();
+  const iphoneTab=iPhoneSafariTab();
   for(const id of ['fullBtn','menuFullBtn']){
     const btn=$(id); if(!btn) continue;
-    btn.textContent=label;
+    if(standalone){
+      btn.textContent='App Mode';
+      btn.disabled=true;
+      btn.title='Already running as a Home Screen web app.';
+      continue;
+    }
+    if(iphoneTab){
+      btn.textContent='Home Screen Fullscreen';
+      btn.disabled=false;
+      btn.title='Use Add to Home Screen for fullscreen on iPhone Safari.';
+      continue;
+    }
+    btn.textContent=active?'Exit Fullscreen':'Enter Fullscreen';
     btn.disabled=!active&&!supported;
     btn.title=!active&&!supported?'Fullscreen is not supported by this browser session.':'';
   }
