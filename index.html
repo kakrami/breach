@@ -223,7 +223,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.5';
+const APP_VERSION = '1.15.6';
 const PROTOCOL_VERSION = 13;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
@@ -333,6 +333,7 @@ let hudLayout = null;
 let viewW = Math.max(1, window.visualViewport?.width || window.innerWidth || document.documentElement.clientWidth || 1), viewH = Math.max(1, window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 1);
 let viewportMetrics={w:viewW,h:viewH};
 let experienceEntered = false, orientationBlocked = false;
+let resizeRaf=0;
 
 function syncVisualViewportMetrics(){
   const vv=window.visualViewport;
@@ -348,82 +349,38 @@ syncGodUI();
 syncMusicUI();
 
 const ENGINE_MODULE_URL = './vendor/three.module.min.js';
-const ENGINE_CORE_SOURCES = [
-  `${ONLINE_API}/engine/three.core.min.js`,
-  'https://cdn.jsdelivr.net/npm/three@0.185.1/build/three.core.min.js',
-  'https://unpkg.com/three@0.185.1/build/three.core.min.js'
-];
-let engineReady=false, engineLoadPromise=null, engineInitialized=false, engineModuleSourcePromise=null;
+let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 function setEngineStatus(text,tone=''){
   const el=$('engineStatus'); if(el){el.textContent=text;el.className=`engine-status ${tone}`;}
 }
 function setEnterLabel(text){const span=$('enterBtn')?.querySelector('span');if(span)span.textContent=text;}
-async function fetchTextWithTimeout(url,ms=3500){
-  const controller=new AbortController();
-  const timer=setTimeout(()=>controller.abort(new DOMException('Engine request timed out','TimeoutError')),ms);
-  try{
-    const response=await fetch(url,{signal:controller.signal,cache:'force-cache'});
-    if(!response.ok)throw new Error(`Engine request failed (${response.status})`);
-    return await response.text();
-  }finally{clearTimeout(timer);}
-}
-function localEngineModuleSource(){
-  if(!engineModuleSourcePromise){
-    engineModuleSourcePromise=fetchTextWithTimeout(ENGINE_MODULE_URL,2500).then(source=>{
-      if(!source.includes('./three.core.min.js'))throw new Error('Bundled 3D module is invalid');
-      return source;
-    }).catch(error=>{engineModuleSourcePromise=null;throw error;});
-  }
-  return engineModuleSourcePromise;
-}
-async function importBundledThree(moduleSource,coreSource){
-  const coreBlob=URL.createObjectURL(new Blob([coreSource],{type:'text/javascript'}));
-  const patched=moduleSource.replaceAll('./three.core.min.js',coreBlob);
-  if(patched===moduleSource){URL.revokeObjectURL(coreBlob);throw new Error('3D module dependency could not be linked');}
-  const moduleBlob=URL.createObjectURL(new Blob([patched],{type:'text/javascript'}));
-  try{return await import(moduleBlob);}
-  finally{
-    // Module evaluation has completed at this point; the graph remains resident after revocation.
-    URL.revokeObjectURL(moduleBlob);URL.revokeObjectURL(coreBlob);
-  }
-}
-async function ensureThreeEngine(userRetry=false){
+async function ensureThreeEngine(){
   if(engineReady)return true;
   if(engineLoadPromise)return engineLoadPromise;
   const enter=$('enterBtn');
   engineLoadPromise=(async()=>{
     if(enter)enter.disabled=true;
     setEnterLabel('LOADING');
-    let moduleSource,lastError=null;
     try{
-      setEngineStatus('LOADING 3D ENGINE · LOCAL MODULE');
-      moduleSource=await localEngineModuleSource();
+      setEngineStatus('LOADING 3D ENGINE · LOCAL FILES');
+      const mod=await import(ENGINE_MODULE_URL);
+      if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
+      THREE=mod;
+      position=new THREE.Vector3(0,0,0);
+      setEngineStatus('STARTING 3D ENGINE');
+      if(!engineInitialized){init3D();engineInitialized=true;onResize();}
+      engineReady=true;
+      setEngineStatus('3D ENGINE READY','ready');
+      setEnterLabel('ENTER ARENA');
+      return true;
     }catch(error){
-      console.error('Bundled Three.js module is missing or unreadable.',error);
-      setEngineStatus('3D ENGINE FILE MISSING · REDEPLOY CLIENT','error');
+      console.error('Punch World could not initialize its bundled 3D engine.',error);
+      const webglError=/webgl|context/i.test(String(error?.message||error));
+      setEngineStatus(webglError?'WEBGL2 UNAVAILABLE · ENABLE HARDWARE ACCELERATION':'3D ENGINE FILE ERROR · REDEPLOY CLIENT','error');
       setEnterLabel('RETRY ENGINE');
       return false;
     }
-    for(let i=0;i<ENGINE_CORE_SOURCES.length;i++){
-      setEngineStatus(i===0?'LOADING 3D ENGINE · GAME SERVER':`LOADING 3D ENGINE · FALLBACK ${i}/${ENGINE_CORE_SOURCES.length-1}`);
-      try{
-        const coreSource=await fetchTextWithTimeout(ENGINE_CORE_SOURCES[i],i===0?3200:2600);
-        const mod=await importBundledThree(moduleSource,coreSource);
-        if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Invalid Three.js module');
-        THREE=mod;
-        position=new THREE.Vector3(0,0,0);
-        if(!engineInitialized){init3D();engineInitialized=true;onResize();}
-        engineReady=true;
-        setEngineStatus('3D ENGINE READY','ready');
-        setEnterLabel('ENTER ARENA');
-        return true;
-      }catch(error){lastError=error;console.warn(`3D engine core source ${i+1} failed`,error);}
-    }
-    console.error('Punch World could not initialize its 3D engine.',lastError);
-    setEngineStatus('3D ENGINE UNAVAILABLE · TAP RETRY','error');
-    setEnterLabel('RETRY ENGINE');
-    return false;
   })().finally(()=>{engineLoadPromise=null;if(enter)enter.disabled=false;});
   return engineLoadPromise;
 }
@@ -436,7 +393,14 @@ ensureThreeEngine(false);
 
 function getClientId(){
   let id = localStorage.getItem('punchWorldClient');
-  if (!id) { id = crypto.randomUUID().replace(/-/g,'').slice(0,24); localStorage.setItem('punchWorldClient', id); }
+  if (!id) {
+    const cryptoApi=globalThis.crypto;
+    if(typeof cryptoApi?.randomUUID==='function')id=cryptoApi.randomUUID().replace(/-/g,'').slice(0,24);
+    else if(typeof cryptoApi?.getRandomValues==='function'){
+      const bytes=new Uint8Array(12);cryptoApi.getRandomValues(bytes);id=[...bytes].map(value=>value.toString(16).padStart(2,'0')).join('');
+    }else id=`${Date.now().toString(36)}${Math.random().toString(36).slice(2)}`.replace(/[^a-z0-9]/gi,'').padEnd(24,'0').slice(0,24);
+    localStorage.setItem('punchWorldClient', id);
+  }
   return id;
 }
 function normalizeCode(v){ return String(v||'').toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g,'').slice(0,ROOM_CODE_LENGTH); }
@@ -1304,7 +1268,6 @@ function updateWeaponView(dt){
 }
 function normalizeAngle(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;return a;}
 
-let resizeRaf=0;
 function scheduleViewportSync(){
   cancelAnimationFrame(resizeRaf);
   resizeRaf=requestAnimationFrame(()=>requestAnimationFrame(()=>{syncVisualViewportMetrics();onResize();applyExperienceGate();requestAnimationFrame(fitResponsiveOverlays);}));
