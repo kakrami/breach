@@ -4,7 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#0b1118">
-<title>Punch World v1.2</title>
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="manifest" href="manifest.webmanifest">
+<title>Punch World v1.3.0</title>
 <style>
 :root{
   --bg:#0b1118;--panel:#111b26ee;--panel2:#0b131dcc;--line:#ffffff20;--text:#f4f7fb;--muted:#9fb0c2;
@@ -13,13 +17,15 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;touch-action:none;overscroll-behavior:none}
 button,input{font:inherit}
+input{touch-action:manipulation;user-select:text;-webkit-user-select:text}
+.menu,.world-list{touch-action:pan-y}
 button{border:0;color:inherit}
 .hide{display:none!important}
-#game{position:fixed;left:0;top:0;width:100vw;height:100vh;width:100dvw;height:100dvh;display:block;background:#8ec9e8}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block;background:#8ec9e8}
 
 /* Landscape/fullscreen entry gate */
 .boot{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:calc(var(--safe-top) + 18px) calc(var(--safe-right) + 18px) calc(var(--safe-bottom) + 18px) calc(var(--safe-left) + 18px);background:radial-gradient(circle at 50% 0,#20384f,#091017 58%,#05080c);text-align:center}
-.boot-card{width:min(460px,94vw);display:grid;gap:14px;padding:20px;border-radius:22px;background:linear-gradient(180deg,#132131f5,#0a111bf5);border:1px solid var(--line);box-shadow:0 24px 80px #000a}.boot-card h1{font-size:30px}.boot-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;font-weight:700}.boot-card .btn{min-height:50px;font-size:16px}.rotate-icon{font-size:42px;line-height:1}
+.boot-card{width:min(460px,94vw);display:grid;gap:14px;padding:20px;border-radius:22px;background:linear-gradient(180deg,#132131f5,#0a111bf5);border:1px solid var(--line);box-shadow:0 24px 80px #000a}.boot-card h1{font-size:30px}.boot-card p{margin:0;color:var(--muted);font-size:13px;line-height:1.5;font-weight:700}.boot-card .btn{min-height:50px;font-size:16px}.rotate-icon{font-size:42px;line-height:1}.version{font-size:11px;color:var(--muted);font-weight:900;letter-spacing:.08em;text-transform:uppercase}.brand-copy{min-width:0}.brand-version{margin-top:5px}
 /* Menu */
 .menu{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:calc(var(--safe-top) + 18px) 16px calc(var(--safe-bottom) + 18px);background:radial-gradient(circle at 50% 0,#20384f,#091017 58%,#05080c);overflow:auto}
 .card{width:min(520px,100%);background:linear-gradient(180deg,#132131f5,#0a111bf5);border:1px solid var(--line);border-radius:22px;padding:18px;box-shadow:0 24px 80px #000a,inset 0 1px #ffffff15;display:grid;gap:14px}
@@ -30,7 +36,7 @@ h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing
 .row{display:flex;gap:8px;align-items:center}.row>*{min-width:0}.grow{flex:1}
 .btn{min-height:42px;padding:0 14px;border-radius:12px;background:linear-gradient(180deg,#ffffff1e,#ffffff0d);border:1px solid #ffffff25;font-weight:900;cursor:pointer;box-shadow:inset 0 1px #ffffff1a,0 5px 14px #0004}.btn:active{transform:translateY(1px)}
 .btn.primary{background:linear-gradient(180deg,#38bde968,#167ba554);border-color:#6ee1ff66}.btn.danger{background:linear-gradient(180deg,#ff5d6c55,#9d24343d);border-color:#ff839055}.btn:disabled{opacity:.45;cursor:not-allowed}
-.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}.section{display:grid;gap:8px;padding-top:4px}.section-title{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.section{display:grid;gap:8px;padding-top:4px}.section-title{display:flex;justify-content:space-between;align-items:center;font-size:12px;font-weight:1000;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
 .world-list{display:grid;gap:6px;max-height:180px;overflow:auto}.world{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:12px;background:#ffffff08}.world-code{font-weight:1000;letter-spacing:.12em}.world-meta{font-size:12px;color:var(--muted);font-weight:800}.empty{padding:16px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px;font-size:13px}
 .status{min-height:20px;color:var(--muted);font-size:12px;font-weight:800}.status.error{color:#ff8d99}.status.ok{color:#91f0ad}
 .tips{font-size:12px;color:var(--muted);line-height:1.5;border-top:1px solid var(--line);padding-top:12px}.tips b{color:var(--text)}
@@ -38,7 +44,7 @@ h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing
 /* Pause */
 .pause{position:fixed;inset:0;z-index:25;display:grid;place-items:center;padding:20px;background:#02070cb8;backdrop-filter:blur(5px)}.pause-card{width:min(350px,90vw);padding:16px;border-radius:18px;background:#101a25;border:1px solid var(--line);display:grid;gap:8px;box-shadow:0 20px 70px #000b;text-align:center}.pause-card h2{margin:2px 0 6px}.pause-card p{margin:0 0 6px;color:var(--muted);font-size:12px}
 
-@media (orientation:landscape) and (max-height:620px){.menu{padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 9px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 9px);place-items:center}.card{width:min(820px,96vw);grid-template-columns:1fr 1fr;align-items:start;gap:9px;padding:11px;border-radius:16px}.brand,.tips,.status{grid-column:1/-1}.brand h1{font-size:24px}.logo{width:40px;height:40px}.actions{grid-template-columns:1fr 1fr}.world-list{max-height:96px}.input{height:40px}.btn{min-height:38px}.tips{padding-top:8px;line-height:1.35}}
+@media (orientation:landscape) and (max-height:620px){.menu{padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 9px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 9px);place-items:center}.card{width:min(820px,96vw);grid-template-columns:1fr 1fr;align-items:start;gap:9px;padding:11px;border-radius:16px}.brand,.tips,.status{grid-column:1/-1}.brand h1{font-size:24px}.logo{width:40px;height:40px}.actions{grid-template-columns:repeat(3,1fr)}.world-list{max-height:96px}.input{height:40px}.btn{min-height:38px}.tips{padding-top:8px;line-height:1.35}}
 </style>
 </head>
 <body>
@@ -48,8 +54,9 @@ h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing
   <div class="boot-card">
     <div class="rotate-icon">✊</div>
     <h1>Punch World</h1>
-    <p>Landscape-only. Entering requests fullscreen before the menu opens.</p>
-    <button id="enterBtn" class="btn primary">Enter Fullscreen</button>
+    <div class="version" data-app-version></div>
+    <p>Landscape-only. Enter Game requests fullscreen when your browser supports it.</p>
+    <button id="enterBtn" class="btn primary">Enter Game</button>
   </div>
 </section>
 
@@ -58,13 +65,13 @@ h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing
     <div class="rotate-icon">↻</div>
     <h1>Landscape Required</h1>
     <p id="rotateText">Rotate your device to landscape to continue.</p>
-    <button id="rotateFullBtn" class="btn primary">Fullscreen + Landscape</button>
+    <button id="rotateFullBtn" class="btn primary">Try Landscape</button>
   </div>
 </section>
 
 <section id="menu" class="menu hide">
   <div class="card">
-    <div class="brand"><div class="logo">✊</div><div><h1>Punch World</h1><p class="sub">First-person multiplayer sandbox. Jump, punch, get back up.</p></div></div>
+    <div class="brand"><div class="logo">✊</div><div class="brand-copy"><h1>Punch World</h1><div class="version brand-version" data-app-version></div><p class="sub">First-person multiplayer sandbox. Jump, punch, get back up.</p></div></div>
 
     <div class="field">
       <label class="label" for="nameInput">Your name</label>
@@ -73,6 +80,7 @@ h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing
 
     <div class="actions">
       <button id="createBtn" class="btn primary">Create World</button>
+      <button id="menuFullBtn" class="btn">Fullscreen</button>
       <button id="refreshBtn" class="btn">Refresh Worlds</button>
     </div>
 
@@ -87,12 +95,12 @@ h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing
     </div>
 
     <div id="menuStatus" class="status">Ready.</div>
-    <div class="tips"><b>Desktop:</b> WASD move · mouse look · Space jump · click punch · Shift sprint · Esc/M menu<br><b>Phone:</b> landscape only · fullscreen · left stick move · drag to look · Jump · Punch</div>
+    <div class="tips"><b>Desktop:</b> WASD move · mouse look · Space jump · click punch · Shift sprint · Esc/M menu<br><b>Phone:</b> landscape only · fullscreen optional after entry · left stick move · drag to look · Jump · Punch</div>
   </div>
 </section>
 
 <section id="pause" class="pause hide">
-  <div class="pause-card"><h2>World Menu</h2><p id="pauseRoom">Room ----</p><button id="resumeBtn" class="btn primary">Resume</button><button id="copyBtn" class="btn">Copy Invite</button><button id="fullBtn" class="btn">Re-enter Fullscreen</button><button id="leaveBtn" class="btn danger">Leave World</button></div>
+  <div class="pause-card"><h2>World Menu</h2><div class="version" data-app-version></div><p id="pauseRoom">Room ----</p><button id="resumeBtn" class="btn primary">Resume</button><button id="copyBtn" class="btn">Copy Invite</button><button id="fullBtn" class="btn">Fullscreen</button><button id="leaveBtn" class="btn danger">Leave World</button></div>
 </section>
 
 <script type="module">
@@ -100,6 +108,7 @@ import * as THREE from 'https://cdnjs.cloudflare.com/ajax/libs/three.js/0.185.1/
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
+const APP_VERSION = '1.3.0';
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
 const STATE_INTERVAL = 50;
@@ -116,6 +125,7 @@ const boot = $('boot'), rotateGate = $('rotateGate'), menu = $('menu'), pause = 
 const nameInput = $('nameInput'), codeInput = $('codeInput'), menuStatus = $('menuStatus');
 const worldList = $('worldList'), worldCount = $('worldCount');
 const canvas = $('game');
+document.querySelectorAll('[data-app-version]').forEach(el => { el.textContent = `Version ${APP_VERSION}`; });
 
 const isTouch = matchMedia('(hover:none), (pointer:coarse)').matches;
 const clientId = getClientId();
@@ -143,7 +153,7 @@ const touchRoles = new Map();
 const touchVisual = { jumpUntil:0, punchUntil:0 };
 let hudLayout = null;
 let viewW = Math.max(1, document.documentElement.clientWidth || window.innerWidth || 1), viewH = Math.max(1, document.documentElement.clientHeight || window.innerHeight || 1);
-let experienceEntered = false, orientationBlocked = false, fullscreenGrantedOnce = false;
+let experienceEntered = false, orientationBlocked = false;
 
 init3D();
 bindUI();
@@ -209,6 +219,7 @@ function init3D(){
   leftFist.rotation.set(-.18,.1,.08); rightFist.rotation.set(-.18,-.1,-.08);
   camera.add(leftFist,rightFist); scene.add(camera);
 
+  syncFullscreenUI();
   animate();
 }
 
@@ -224,9 +235,9 @@ function addBox(x,y,z,w,h,d,mat,collidable){
 function bindUI(){
   addEventListener('resize', scheduleViewportSync);
   addEventListener('orientationchange', scheduleViewportSync);
-  visualViewport?.addEventListener('resize', scheduleViewportSync);
-  document.addEventListener('fullscreenchange', scheduleViewportSync);
-  document.addEventListener('webkitfullscreenchange', scheduleViewportSync);
+  window.visualViewport?.addEventListener('resize', scheduleViewportSync);
+  document.addEventListener('fullscreenchange', onFullscreenChange);
+  document.addEventListener('webkitfullscreenchange', onFullscreenChange);
   const orientationQuery=matchMedia('(orientation: portrait)');
   orientationQuery.addEventListener?.('change', scheduleViewportSync);
   orientationQuery.addListener?.(scheduleViewportSync);
@@ -236,6 +247,7 @@ function bindUI(){
   $('rotateFullBtn').addEventListener('click', restoreLandscapeFromGesture);
   $('createBtn').addEventListener('click', createWorld);
   $('refreshBtn').addEventListener('click', refreshWorlds);
+  $('menuFullBtn').addEventListener('click', toggleFullscreen);
   $('joinBtn').addEventListener('click', () => joinWorld(normalizeCode(codeInput.value)));
   codeInput.addEventListener('blur', () => { codeInput.value = normalizeCode(codeInput.value); });
   codeInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); joinWorld(normalizeCode(codeInput.value)); } });
@@ -275,35 +287,84 @@ function isEditableTarget(target){
 function isLandscape(){ const v=getViewSize(); return v.w>v.h; }
 function getViewSize(){
   const r=canvas.getBoundingClientRect();
-  const w=Math.max(1,Math.round(r.width || document.documentElement.clientWidth || visualViewport?.width || viewW));
-  const h=Math.max(1,Math.round(r.height || document.documentElement.clientHeight || visualViewport?.height || viewH));
+  const w=Math.max(1,Math.round(r.width || document.documentElement.clientWidth || window.visualViewport?.width || viewW));
+  const h=Math.max(1,Math.round(r.height || document.documentElement.clientHeight || window.visualViewport?.height || viewH));
   return {w,h};
 }
 async function enterExperience(){
   ensureAudio();
   experienceEntered=true;
-  await requestFullscreenNow();
+  const fullscreenResult=await requestFullscreenNow();
   await lockLandscape();
+  if(fullscreenResult==='unsupported') setStatus('Browser fullscreen is unavailable here. Landscape still works; on iPhone, Add to Home Screen provides an app-style view.');
   scheduleViewportSync();
   setTimeout(scheduleViewportSync,120);
 }
-function beginImmersiveFromGesture(){
+function beginGameplayFromGesture(){
   ensureAudio();
-  if(isTouch){ requestFullscreenNow(); lockLandscape(); }
-  else requestPointerLockNow();
+  if(!isTouch) requestPointerLockNow();
 }
-function isFullscreenActive(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); }
+function fullscreenElement(){
+  return document.fullscreenElement || document.webkitFullscreenElement || document.webkitCurrentFullScreenElement || null;
+}
+function isFullscreenActive(){ return !!fullscreenElement(); }
+function fullscreenSupported(){
+  return !!(document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen);
+}
 async function requestFullscreenNow(){
-  if(isFullscreenActive()){ fullscreenGrantedOnce=true; return true; }
+  if(isFullscreenActive()){ syncFullscreenUI(); return 'active'; }
   const el=document.documentElement;
+  const fn=el.requestFullscreen || el.webkitRequestFullscreen;
+  if(!fn){ syncFullscreenUI(); return 'unsupported'; }
   try{
-    const fn=el.requestFullscreen||el.webkitRequestFullscreen;
-    if(!fn)return false;
     const result=fn.call(el);
     if(result?.then) await result;
-    fullscreenGrantedOnce=true;
+    syncFullscreenUI();
+    return isFullscreenActive() ? 'entered' : 'requested';
+  }catch{
+    syncFullscreenUI();
+    return 'denied';
+  }
+}
+async function exitFullscreenNow(){
+  if(!isFullscreenActive()){ syncFullscreenUI(); return true; }
+  const fn=document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen;
+  if(!fn){ syncFullscreenUI(); return false; }
+  try{
+    const result=fn.call(document);
+    if(result?.then) await result;
+    try{ screen.orientation?.unlock?.(); }catch{}
+    syncFullscreenUI();
     return true;
-  }catch{return false;}
+  }catch{
+    syncFullscreenUI();
+    return false;
+  }
+}
+async function toggleFullscreen(){
+  ensureAudio();
+  if(isFullscreenActive()) await exitFullscreenNow();
+  else{
+    await requestFullscreenNow();
+    await lockLandscape();
+  }
+  scheduleViewportSync();
+  setTimeout(scheduleViewportSync,100);
+}
+function syncFullscreenUI(){
+  const active=isFullscreenActive();
+  const supported=fullscreenSupported();
+  const label=active?'Exit Fullscreen':'Enter Fullscreen';
+  for(const id of ['fullBtn','menuFullBtn']){
+    const btn=$(id); if(!btn) continue;
+    btn.textContent=label;
+    btn.disabled=!active&&!supported;
+    btn.title=!active&&!supported?'Fullscreen is not supported by this browser session.':'';
+  }
+}
+function onFullscreenChange(){
+  syncFullscreenUI();
+  scheduleViewportSync();
 }
 async function lockLandscape(){
   if(!isTouch || !screen.orientation?.lock) return false;
@@ -311,7 +372,7 @@ async function lockLandscape(){
 }
 async function restoreLandscapeFromGesture(){
   ensureAudio();
-  await requestFullscreenNow();
+  if(!isFullscreenActive() && fullscreenSupported()) await requestFullscreenNow();
   await lockLandscape();
   scheduleViewportSync();
   setTimeout(scheduleViewportSync,100);
@@ -319,22 +380,17 @@ async function restoreLandscapeFromGesture(){
 function applyExperienceGate(){
   if(!experienceEntered)return;
   const landscape=viewW>viewH;
-  const fullscreenLost=fullscreenGrantedOnce&&!isFullscreenActive();
-  orientationBlocked=!landscape||fullscreenLost;
+  orientationBlocked=!landscape;
   if(orientationBlocked){
     if(gameActive&&!paused)openPause();
     boot.classList.add('hide');menu.classList.add('hide');rotateGate.classList.remove('hide');
-    if(!landscape){
-      $('rotateText').textContent=isTouch?'Rotate your device to landscape to continue.':'Use a landscape-shaped browser window to continue.';
-      $('rotateFullBtn').textContent='Fullscreen + Landscape';
-    }else{
-      $('rotateText').textContent='Fullscreen is required to continue.';
-      $('rotateFullBtn').textContent='Re-enter Fullscreen';
-    }
+    $('rotateText').textContent=isTouch?'Rotate your device to landscape to continue.':'Use a landscape-shaped browser window to continue.';
+    $('rotateFullBtn').textContent='Try Landscape';
     return;
   }
   rotateGate.classList.add('hide');boot.classList.add('hide');
   if(!gameActive){menu.classList.remove('hide');pause.classList.add('hide');}
+  syncFullscreenUI();
 }
 function requestPointerLockNow(){
   if(isTouch || document.pointerLockElement===canvas || !canvas.requestPointerLock)return;
@@ -343,7 +399,8 @@ function requestPointerLockNow(){
 
 async function resumeFromGesture(){
   if(!gameActive||!isLandscape())return;
-  if(isTouch) await restoreLandscapeFromGesture(); else requestPointerLockNow();
+  ensureAudio();
+  if(!isTouch) requestPointerLockNow();
   paused=false;
   pause.classList.add('hide');
   resetTouchInput();
@@ -447,7 +504,7 @@ function renderWorlds(rooms){
 }
 
 async function createWorld(){
-  beginImmersiveFromGesture();
+  beginGameplayFromGesture();
   myName=safeName();localStorage.setItem('punchWorldName',myName);setStatus('Creating world…');disableMenu(true);
   try{
     const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({client:clientId,name:myName}),cache:'no-store'});
@@ -457,7 +514,7 @@ async function createWorld(){
 }
 function joinWorld(code){
   if(code.length!==ROOM_CODE_LENGTH){setStatus('Enter a 4-character room code.','error');return;}
-  beginImmersiveFromGesture();
+  beginGameplayFromGesture();
   myName=safeName();localStorage.setItem('punchWorldName',myName);setStatus(`Joining ${code}…`);disableMenu(true);connectWorld(code);
 }
 function disableMenu(disabled){$('createBtn').disabled=disabled;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;}
@@ -513,9 +570,6 @@ function leaveWorld(){
 function openPause(){if(!gameActive||paused)return;paused=true;keys.clear();resetTouchInput();pause.classList.remove('hide');if(document.pointerLockElement)document.exitPointerLock?.();}
 async function copyInvite(){
   const url=new URL(location.href);url.searchParams.set('room',currentRoom);try{await navigator.clipboard.writeText(url.toString());showToast('Invite copied');}catch{showToast(`Room code: ${currentRoom}`);}
-}
-async function toggleFullscreen(){
-  await restoreLandscapeFromGesture();
 }
 
 function makeRemote(player){
@@ -686,6 +740,7 @@ function drawHud(now){
   drawMenuButton(c,L.menu);
   drawCrosshair(c,w/2,h/2,now<hitUntil);
   if(isTouch){drawTouchControls(c,L,now);}else{drawDesktopHint(c,L,now);}
+  drawVersion(c,L);
 
   if(toastText&&now<toastUntil){
     c.font='800 12px system-ui';const tw=Math.min(w-30,c.measureText(toastText).width+24),tx=(w-tw)/2,ty=L.menu.y+L.menu.h+10;
@@ -733,6 +788,7 @@ function drawTouchControls(c,L,now){
 }
 function drawRoundControl(c,b,label,active,punch){c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);c.fillStyle=active?(punch?'rgba(255,124,64,.66)':'rgba(100,205,255,.48)'):(punch?'rgba(120,43,25,.52)':'rgba(5,14,21,.58)');c.fill();c.strokeStyle=punch?'rgba(255,160,120,.56)':'rgba(255,255,255,.25)';c.lineWidth=1.5;c.stroke();c.fillStyle='#fff';c.textAlign='center';c.font=`900 ${Math.max(9,b.r*.25)}px system-ui`;c.fillText(label,b.x,b.y+1);}
 function drawDesktopHint(c,L){c.font='800 10px system-ui';c.textAlign='left';c.fillStyle='rgba(255,255,255,.76)';const text=document.pointerLockElement===canvas?'Esc or M · menu':'Click game · capture mouse';c.fillText(text,L.safe.left+12,viewH-L.safe.bottom-14);}
+function drawVersion(c,L){c.font='800 9px system-ui';c.textAlign='center';c.fillStyle='rgba(255,255,255,.58)';c.fillText(`v${APP_VERSION}`,viewW/2,viewH-L.safe.bottom-10);}
 
 function roundRect(c,x,y,w,h,r,fill,stroke){if(w<=0||h<=0)return;c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
 function pill(c,x,y,w,h){const r=h/2;c.beginPath();c.roundRect(x,y,Math.max(0,w),h,r);}
