@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.15.19</title>
+<title>Punch World v1.15.20</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -166,8 +166,8 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.19';
-const PROTOCOL_VERSION = 23;
+const APP_VERSION = '1.15.20';
+const PROTOCOL_VERSION = 24;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
 const MAX_BOTS = 8;
@@ -1356,23 +1356,28 @@ function computeHudLayout(){
   const safe=safeInsets(),landscape=viewW>viewH,compact=isTouch&&landscape&&viewH<=520,margin=compact?8:12;
   const mapSize=compact?96:(isTouch?112:140),menuW=compact?36:42,menuH=compact?32:36;
   const teamW=compact?188:(isTouch?230:270),teamH=compact?30:34,joyR=compact?54:(isTouch?62:0);
-  const fireR=compact?37:43,leftFireR=compact?31:36,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=compact?20:23,equipR=compact?22:26;
+  const fireR=compact?37:43,leftFireR=compact?32:37,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=compact?20:23,equipR=compact?23:27;
   const bottom=safe.bottom+margin,weaponW=compact?190:(isTouch?220:250),weaponH=compact?62:68;
-  const healthW=compact?158:(isTouch?180:210),healthH=compact?48:54;
   const killW=compact?220:(isTouch?252:300),killH=compact?70:(isTouch?104:128);
   const teamX=(viewW-teamW)/2,teamY=safe.top+margin,moveBoundary=viewW*MOBILE_MOVE_ZONE_RATIO;
   const defaultJoyX=Math.max(safe.left+joyR+margin,Math.min(moveBoundary-joyR-margin,safe.left+joyR+margin));
   const defaultJoyY=viewH-bottom-joyR;
   const joyX=joy.pointer!=null&&joy.centerX?joy.centerX:defaultJoyX,joyY=joy.pointer!=null&&joy.centerY?joy.centerY:defaultJoyY;
-  // Left-thumb actions sit immediately to the right of the movement zone. That
-  // preserves the full left 35% as a floating-stick surface while keeping throw
-  // controls on the left half of the display.
-  const leftActionX=Math.min(viewW-safe.right-leftFireR-8,moveBoundary+Math.max(leftFireR,equipR)+10);
-  const actionMid=Math.max(safe.top+95,Math.min(viewH-bottom-88,viewH*.56));
-  const leftGap=compact?8:10;
-  const leftFireY=actionMid-leftFireR-equipR-leftGap,flashY=actionMid,stickyY=actionMid+equipR*2+leftGap;
-  // The right 65% remains an uninterrupted look surface except for this compact
-  // action cluster at the outer edge.
+
+  // Left-hand actions stay INSIDE the 35% movement side instead of sitting on
+  // the center divide. FIRE is upper-left for the index finger; equipment sits
+  // farther in and lower for the thumb while leaving the bottom-left stick area
+  // open. Button hit-testing runs before joystick placement, so these remain
+  // reliable even though the rest of the left 35% is a floating-stick surface.
+  const leftSpan=Math.max(120,moveBoundary-safe.left);
+  const leftFireX=Math.max(safe.left+leftFireR+8,Math.min(moveBoundary-leftFireR-10,safe.left+leftSpan*.30));
+  const equipX=Math.max(safe.left+equipR+8,Math.min(moveBoundary-equipR-10,safe.left+leftSpan*.63));
+  const leftFireY=Math.max(safe.top+leftFireR+52,Math.min(viewH-bottom-leftFireR-90,viewH*.43));
+  const flashY=Math.max(safe.top+equipR+86,Math.min(viewH-bottom-equipR-76,viewH*.59));
+  const stickyY=Math.max(flashY+equipR*2+9,Math.min(viewH-bottom-equipR-8,viewH*.75));
+
+  // The right 65% is the look surface. Its action cluster hugs the outer edge
+  // so the center/right-middle remains free for broad aiming swipes.
   const fireX=viewW-safe.right-margin-fireR,fireY=viewH-bottom-fireR;
   const aimX=fireX-fireR-aimR-11,aimY=fireY;
   const jumpX=fireX,jumpY=fireY-fireR-jumpR-11;
@@ -1386,12 +1391,11 @@ function computeHudLayout(){
     team:{x:teamX,y:teamY,w:teamW,h:teamH},
     god:{x:teamX-31,y:teamY,w:25,h:teamH},
     menu:{x:teamX+teamW+7,y:teamY,w:menuW,h:menuH},
-    health:{x:safe.left+margin,y:isTouch?safe.top+margin+killH+7:viewH-bottom-healthH,w:healthW,h:healthH},
     weapon:{x:viewW-safe.right-margin-weaponW,y:viewH-bottom-weaponH-weaponLift,w:weaponW,h:weaponH},
     joy:{x:joyX,y:joyY,r:joyR},
-    leftFire:{x:leftActionX,y:leftFireY,r:leftFireR},
-    flash:{x:leftActionX,y:flashY,r:equipR},
-    sticky:{x:leftActionX,y:stickyY,r:equipR},
+    leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},
+    flash:{x:equipX,y:flashY,r:equipR},
+    sticky:{x:equipX,y:stickyY,r:equipR},
     fire:{x:fireX,y:fireY,r:fireR},
     aim:{x:aimX,y:aimY,r:aimR},
     jump:{x:jumpX,y:jumpY,r:jumpR},
@@ -1400,6 +1404,7 @@ function computeHudLayout(){
     mode:{x:modeX,y:modeY,r:modeR}
   };
 }
+
 function drawHud(now){
   if(now-hudLastDraw<32)return;hudLastDraw=now;hudLayout=computeHudLayout();
   const c=hudCtx,s=hudScale,w=viewW,h=viewH,L=hudLayout,scoped=sniperScopeActive();
@@ -1409,7 +1414,6 @@ function drawHud(now){
   if(damageAlpha>.01){const g=c.createRadialGradient(w/2,h/2,Math.min(w,h)*.10,w/2,h/2,Math.max(w,h)*.72);g.addColorStop(0,'rgba(255,18,40,0)');g.addColorStop(.58,`rgba(255,18,40,${damageAlpha*.12})`);g.addColorStop(.82,`rgba(185,0,22,${damageAlpha*.42})`);g.addColorStop(1,`rgba(125,0,16,${damageAlpha})`);c.fillStyle=g;c.fillRect(0,0,w,h);}
   drawBloodSplatter(c,w,h,now,missingHealth);
   if(scoped)drawScopeMask(c,w,h);else{drawKillFeed(c,L.kill,now);drawMiniMap(c,L.map);drawTeamBar(c,L.team);}
-  drawHealthStatus(c,L.health,now);
   if(godMode)drawGodBadge(c,L.god,now);drawMenuButton(c,L.menu);drawWeapon(c,L.weapon);
   const headshotHit=now<headshotUntil;
   if(scoped)drawScopeReticle(c,w,h,now<hitUntil,headshotHit);else drawWeaponCrosshair(c,w/2,h/2,currentWeapon,now<hitUntil,adsBlend,headshotHit);
@@ -1461,20 +1465,6 @@ function drawKillConfirm(c,w,h,now){const remain=Math.max(0,Math.min(1,(killConf
 function queueAnnouncer(title,subtitle='',duration=1500,priority=1){const item={title:String(title||''),subtitle:String(subtitle||''),duration,priority};if(!item.title)return;if(announcerCurrent&&priority>announcerCurrent.priority){announcerQueue.unshift(announcerCurrent);announcerCurrent=null;}announcerQueue.push(item);announcerQueue.sort((a,b)=>b.priority-a.priority);}
 function drawAnnouncer(c,w,h,now){if(announcerCurrent&&now>=announcerCurrent.until)announcerCurrent=null;if(!announcerCurrent&&announcerQueue.length){const next=announcerQueue.shift();announcerCurrent={...next,start:now,until:now+next.duration};soundAnnouncer(next.priority); }if(!announcerCurrent)return;const a=announcerCurrent,life=(now-a.start)/a.duration,fade=Math.min(1,life*6,(1-life)*5),scale=1+Math.max(0,.12-life*.45);c.save();c.translate(w/2,Math.max(62,h*.28));c.scale(scale,scale);c.globalAlpha=Math.max(0,fade);c.textAlign='center';c.shadowColor='rgba(0,0,0,.75)';c.shadowBlur=10;c.fillStyle='#fff';c.font=`1000 ${Math.max(20,Math.min(32,h*.065))}px system-ui`;c.fillText(a.title,0,0);if(a.subtitle){c.fillStyle='#f0c96a';c.font=`900 ${Math.max(10,Math.min(14,h*.032))}px system-ui`;c.fillText(a.subtitle,0,25);}c.restore();}
 function weaponLabel(w){return WEAPON_SPECS[w]?.name||'PISTOL';}
-function drawHealthStatus(c,r,now){
-  const health=Math.max(0,Math.min(100,Math.round(hp))),pct=health/100;
-  const critical=health<=30,warn=health<=60;
-  const accent=critical?'#ff5f70':warn?'#ffc95f':'#66e5a0';
-  roundRect(c,r.x,r.y,r.w,r.h,10,'rgba(4,12,18,.90)','rgba(255,255,255,.15)');
-  c.fillStyle=accent;c.fillRect(r.x,r.y,3,r.h);
-  c.textAlign='left';c.fillStyle='rgba(220,232,241,.62)';c.font='900 7px system-ui';c.fillText('HEALTH',r.x+11,r.y+11);
-  c.fillStyle='#fff';c.font=`1000 ${r.h<=48?20:23}px system-ui`;c.fillText(String(health),r.x+10,r.y+r.h*.53);
-  c.fillStyle='rgba(213,225,235,.60)';c.font='900 7px system-ui';c.fillText('HP',r.x+58,r.y+r.h*.53+1);
-  c.textAlign='right';c.fillStyle='#aebdca';c.font='850 7px system-ui';c.fillText(`${myStats.kills||0} W  /  ${myStats.deaths||0} D`,r.x+r.w-10,r.y+11);
-  const bx=r.x+10,by=r.y+r.h-10,bw=r.w-20,bh=4;roundRect(c,bx,by,bw,bh,2,'rgba(255,255,255,.09)');
-  if(pct>0)roundRect(c,bx,by,bw*pct,bh,2,accent);
-  if(critical&&health>0&&Math.sin(now*.012)>0){c.strokeStyle='rgba(255,95,112,.48)';c.lineWidth=1;c.beginPath();c.roundRect(r.x+.5,r.y+.5,r.w-1,r.h-1,10);c.stroke();}
-}
 function drawWeapon(c,r){
   const spec=WEAPON_SPECS[currentWeapon],count=Math.max(0,Math.floor(ammo[currentWeapon]||0)),slot=WEAPON_ORDER.indexOf(currentWeapon)+1,unlimited=!!godMode;
   const accent=currentWeapon==='sniper'?'#8ddfff':currentWeapon==='shotgun'?'#ff9d5c':currentWeapon==='assault'?'#ffd166':'#ffad66';
@@ -1558,7 +1548,7 @@ function drawControlIcon(c,x,y,r,type,active){
   else if(type==='flash'||type==='sticky'){c.beginPath();c.arc(x,y,q*.48,0,Math.PI*2);c.stroke();if(type==='sticky'){c.beginPath();c.moveTo(x-q*.16,y-q*.56);c.lineTo(x+q*.20,y-q*.82);c.stroke();}else{c.beginPath();c.moveTo(x-q*.55,y-q*.10);c.lineTo(x+q*.55,y-q*.10);c.moveTo(x,y-q*.62);c.lineTo(x,y+q*.42);c.stroke();}}
   else if(type==='mode'){const n=fireMode==='auto'?3:1;for(let i=0;i<n;i++){const yy=y+(i-(n-1)/2)*q*.34;c.beginPath();c.moveTo(x-q*.46,yy);c.lineTo(x+q*.35,yy);c.stroke();c.beginPath();c.moveTo(x+q*.35,yy);c.lineTo(x+q*.55,yy-q*.12);c.lineTo(x+q*.55,yy+q*.12);c.closePath();c.fill();}}
 }
-function drawDesktopHint(c,L){c.font='800 9px system-ui';c.textAlign='left';c.fillStyle='rgba(255,255,255,.66)';const text=document.pointerLockElement===canvas?'LMB FIRE · RMB ADS/ZOOM · B FIRE MODE · R RELOAD · 1/2/3/4/Q WEAPON · F FLASH · G STICKY · TAB SCORE':'CLICK GAME TO CAPTURE MOUSE';c.fillText(text,L.safe.left+12,Math.max(L.safe.top+12,L.health.y-10));}
+function drawDesktopHint(c,L){c.font='800 9px system-ui';c.textAlign='left';c.fillStyle='rgba(255,255,255,.66)';const text=document.pointerLockElement===canvas?'LMB FIRE · RMB ADS/ZOOM · B FIRE MODE · R RELOAD · 1/2/3/4/Q WEAPON · F FLASH · G STICKY · TAB SCORE':'CLICK GAME TO CAPTURE MOUSE';c.fillText(text,L.safe.left+12,viewH-L.safe.bottom-12);}
 function drawVersion(c,L){c.font='800 8px system-ui';c.textAlign='center';c.fillStyle='rgba(255,255,255,.38)';c.fillText(`PUNCH WORLD v${APP_VERSION}`,viewW/2,viewH-L.safe.bottom-9);}
 
 function roundRect(c,x,y,w,h,r,fill,stroke){if(w<=0||h<=0)return;c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
