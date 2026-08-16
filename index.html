@@ -8,71 +8,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.15.4</title>
-<style>
-:root{
-  --bg:#05090e;--panel:#0a121af4;--panel-strong:#0f1a24;--panel-soft:#071018ee;--line:#ffffff1d;
-  --text:#f7fbff;--muted:#92a4b7;--accent:#5fdcff;--accent2:#54a8ff;--danger:#ff6070;--ok:#72e59a;
-  --blue:#4baaff;--red:#ff6172;--team:#4baaff;
-  --safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);
-  --safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);
-  --vv-width:100vw;--vv-height:100vh
-}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}
-html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;touch-action:none;overscroll-behavior:none;text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
-button,input,select{font:inherit}button{border:0;color:inherit}input,select{touch-action:manipulation;-webkit-touch-callout:none;user-select:none;-webkit-user-select:none}.hide{display:none!important}
-#game{position:fixed;inset:0;width:100%;height:100%;display:block;background:#90cbe7;outline:0}
-
-.boot{position:fixed;inset:0;z-index:60;display:grid;place-items:center;padding:calc(var(--safe-top) + 14px) calc(var(--safe-right) + 14px) calc(var(--safe-bottom) + 14px) calc(var(--safe-left) + 14px);background:radial-gradient(circle at 50% -20%,#173e58 0,#09131d 42%,#03070b 100%);text-align:center;overflow:hidden}
-.boot-card{width:min(450px,94vw);display:grid;gap:12px;padding:20px;border-radius:18px;background:linear-gradient(180deg,#101c27f8,#071019fa);border:1px solid #ffffff1f;box-shadow:0 28px 90px #000c,inset 0 1px #ffffff0d}.boot-card h1{margin:0;font-size:30px;line-height:1;text-transform:uppercase;letter-spacing:.07em}.boot-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.45;font-weight:700}.boot-card .btn{min-height:48px}.rotate-icon{font-size:40px;line-height:1}.version{font-size:9px;color:#7f95a9;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.brand-version{margin-top:4px}
-
-.menu{position:fixed;inset:0;z-index:30;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:radial-gradient(circle at 52% -30%,#1b4057 0,#07131d 42%,#03070b 100%);overflow:hidden}
-.menu-shell{width:min(1040px,100%);height:min(720px,100%);min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:8px}
-.menu-header{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(180deg,#101e2af7,#08121bf7);box-shadow:0 16px 50px #0008,inset 0 1px #ffffff0b}
-.brand{display:flex;align-items:center;gap:10px;min-width:0;flex:1}.brand-copy{min-width:0}.logo{width:38px;height:38px;flex:0 0 38px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(150deg,#65ddff38,#ffffff08);border:1px solid #78e5ff4a;font-size:19px;font-weight:1000;box-shadow:0 8px 24px #0b7fa522}
-h1{margin:0;font-size:22px;line-height:1;text-transform:uppercase;letter-spacing:.065em}.sub{margin:4px 0 0;color:var(--muted);font-size:10px;font-weight:750;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.header-actions{display:flex;gap:6px}.icon-btn{min-width:38px!important;width:38px;padding:0!important}
-.menu-grid{min-height:0;display:grid;grid-template-columns:minmax(270px,.82fr) minmax(360px,1.18fr);gap:8px;align-items:stretch}.panel{min-height:0;display:grid;align-content:start;gap:7px;padding:10px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(180deg,#0d1822f4,#07111af4);box-shadow:0 12px 40px #0005,inset 0 1px #ffffff09;overflow:hidden}.panel-title{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:6px;border-bottom:1px solid #ffffff12}.panel-title strong{font-size:10px;text-transform:uppercase;letter-spacing:.14em}.panel-title span{font-size:8px;color:var(--muted);font-weight:800}
-.field{display:grid;gap:4px}.label{font-size:8px;font-weight:950;text-transform:uppercase;letter-spacing:.13em;color:#8fa2b6}.input{height:34px;border-radius:8px;border:1px solid #ffffff1f;background:#02070cad;color:var(--text);padding:0 10px;outline:none;font-weight:800;font-size:12px;box-shadow:inset 0 1px #ffffff06}.input:focus{border-color:#62dbff77;box-shadow:0 0 0 2px #59d8ff12}
-.bot-team-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}.bot-team-field{display:grid;gap:3px}.bot-team-label{display:flex;align-items:center;gap:5px;font-size:8px;font-weight:900}.bot-team-label::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--bot-team-color);box-shadow:0 0 9px var(--bot-team-color)}.bot-team-field.blue{--bot-team-color:var(--blue)}.bot-team-field.red{--bot-team-color:var(--red)}.bot-total{font-size:8px;color:var(--muted);font-weight:850;text-align:right;min-height:10px}.bot-total.error{color:#ff8d98}.row{display:flex;gap:6px;align-items:center}.row>*{min-width:0}.grow{flex:1}
-.btn{min-height:34px;padding:0 11px;border-radius:8px;background:linear-gradient(180deg,#ffffff18,#ffffff0a);border:1px solid #ffffff22;font-weight:900;font-size:11px;cursor:pointer;box-shadow:inset 0 1px #ffffff13,0 4px 12px #0003;transition:transform .08s ease,border-color .12s ease,background .12s ease,opacity .12s ease}.btn:hover{border-color:#ffffff3b;background:linear-gradient(180deg,#ffffff20,#ffffff0d)}.btn:active{transform:translateY(1px)}.btn.primary{background:linear-gradient(180deg,#39c9f066,#137fae52);border-color:#75e6ff63;box-shadow:inset 0 1px #ffffff1a,0 6px 18px #0a98c21b}.btn.danger{background:linear-gradient(180deg,#ff65734b,#9d243438);border-color:#ff83905a}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.team-picker{display:grid;grid-template-columns:1fr 1fr;gap:6px}.team-option{min-height:46px;padding:6px 8px;border-radius:9px;border:1px solid #ffffff1b;background:#ffffff06;display:grid;grid-template-columns:7px 1fr;column-gap:7px;align-items:center;text-align:left;cursor:pointer}.team-swatch{width:7px;height:28px;border-radius:999px;background:var(--blue);box-shadow:0 0 12px #46a7ff45}.team-option.red .team-swatch{background:var(--red);box-shadow:0 0 12px #ff5c6c45}.team-copy{display:grid;gap:1px}.team-copy strong{font-size:10px}.team-copy small{font-size:8px;color:var(--muted);font-weight:800}.team-option.blue[aria-pressed="true"]{background:#46a7ff20;border-color:#46a7ff8d;box-shadow:0 0 0 1px #46a7ff14}.team-option.red[aria-pressed="true"]{background:#ff5c6c20;border-color:#ff5c6c8d;box-shadow:0 0 0 1px #ff5c6c14}.team-summary{font-size:8px;color:var(--muted);font-weight:800;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.team-summary b{color:var(--team)}
-.create-row{display:grid;grid-template-columns:minmax(110px,.48fr) minmax(140px,.52fr);gap:6px}.join-row{display:grid;grid-template-columns:1fr auto;gap:6px}.world-section{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);gap:5px}.section-title{display:flex;justify-content:space-between;align-items:center;font-size:8px;font-weight:1000;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}.world-list{min-height:0;display:grid;align-content:start;gap:5px;overflow:hidden}.world{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:7px;align-items:center;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:linear-gradient(180deg,#ffffff08,#ffffff04)}.world-code{font-weight:1000;letter-spacing:.14em;font-size:11px}.world-meta{font-size:8px;color:var(--muted);font-weight:800;line-height:1.15}.team-counts{display:flex;gap:4px;margin-top:3px}.team-chip{padding:1px 5px;border-radius:999px;font-size:7px;font-weight:1000;border:1px solid #ffffff16}.team-chip.blue{color:#acd6ff;background:#46a7ff13}.team-chip.red{color:#ffb6bd;background:#ff5c6c13}.empty{padding:12px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:9px;font-size:10px}
-.menu-footer{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;align-items:center;padding:6px 9px;border:1px solid var(--line);border-radius:10px;background:#071018e9}.status{min-height:14px;color:var(--muted);font-size:9px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.status.error{color:#ff8d99}.status.ok{color:#91f0ad}.controls-note{font-size:7.5px;color:#8497aa;font-weight:800;text-align:right;line-height:1.3;white-space:nowrap}.controls-note b{color:#dce6ef}
-.pause{position:fixed;inset:0;z-index:35;display:grid;place-items:center;padding:calc(var(--safe-top) + 12px) calc(var(--safe-right) + 12px) calc(var(--safe-bottom) + 12px) calc(var(--safe-left) + 12px);background:#010408d6;backdrop-filter:blur(8px);overflow:hidden}.pause-card{width:min(380px,92vw);max-height:100%;padding:14px;border-radius:15px;background:linear-gradient(180deg,#0f1b26,#071019);border:1px solid var(--line);display:grid;gap:8px;box-shadow:0 26px 80px #000d,inset 0 1px #ffffff0b;overflow:hidden}.pause-head{display:flex;justify-content:space-between;align-items:start;gap:9px;padding-bottom:8px;border-bottom:1px solid #ffffff13}.pause-head h2{margin:0;font-size:18px;text-transform:uppercase;letter-spacing:.06em}.pause-context{display:grid;gap:2px;margin-top:3px;color:var(--muted);font-size:9px;font-weight:800}.pause-team{padding:4px 7px;border-radius:999px;background:#46a7ff1d;border:1px solid #46a7ff70;color:var(--team);font-size:8px;font-weight:1000;letter-spacing:.08em}.pause-actions{display:grid;grid-template-columns:1fr 1fr;gap:6px}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}
-
-/* v1.13 professional visual system */
-.svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}.ui-icon,.mini-icon,.brand-icon{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ui-icon{width:18px;height:18px}.mini-icon{width:12px;height:12px}.brand-icon{width:100%;height:100%;stroke-width:1.6}.brand-icon .cut,.ui-icon .cut{fill:currentColor;stroke:none}
-html,body,#game{-webkit-user-select:none!important;user-select:none!important;-webkit-touch-callout:none!important;-webkit-user-drag:none!important}#game{touch-action:none!important;isolation:isolate}
-.boot,.menu{background:#03080d;isolation:isolate}.boot::before,.menu::before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 20% 15%,#00b7ff2e,transparent 34%),radial-gradient(circle at 83% 72%,#ff3b6b1d,transparent 32%),linear-gradient(135deg,#07131e 0%,#020508 65%)}.boot::after,.menu::after{content:"";position:absolute;inset:0;z-index:-1;opacity:.3;background-image:linear-gradient(#5fdcff0b 1px,transparent 1px),linear-gradient(90deg,#5fdcff0b 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,#000,transparent 92%);animation:gridDrift 16s linear infinite}@keyframes gridDrift{to{background-position:68px 34px}}
-.boot-card{position:relative;overflow:hidden;border:1px solid #66dcff38;background:linear-gradient(160deg,#0d1e2cf5,#071019f8 58%,#08101af8);box-shadow:0 36px 120px #000e,0 0 70px #00baff12,inset 0 1px #ffffff10}.boot-card::before{content:"";position:absolute;left:-30%;right:-30%;top:0;height:2px;background:linear-gradient(90deg,transparent,#62e8ff,transparent);animation:sweep 2.8s ease-in-out infinite}@keyframes sweep{0%,100%{transform:translateX(-20%);opacity:.2}50%{transform:translateX(20%);opacity:1}}.boot-emblem{width:72px;height:72px;margin:auto;padding:14px;border-radius:20px;color:#76e8ff;background:linear-gradient(145deg,#69e6ff25,#ffffff08);border:1px solid #72e8ff55;box-shadow:0 0 40px #00bfff28,inset 0 1px #ffffff1a}.eyebrow{font-size:8px;font-weight:1000;letter-spacing:.22em;color:#6fdfff;text-transform:uppercase}.hero-action{min-height:52px!important;font-size:12px!important;letter-spacing:.12em;justify-content:center}.hero-action .ui-icon{width:20px;height:20px}.boot-card h1{font-size:34px;text-shadow:0 0 30px #47d6ff22}.engine-status{min-height:14px;font-size:7.5px;font-weight:950;letter-spacing:.13em;color:#7f95a9;text-transform:uppercase}.engine-status.ready{color:#77e8a4}.engine-status.error{color:#ff8795}.hero-action:disabled{opacity:.55;cursor:wait;filter:saturate(.55)}
-.menu-shell{width:min(1120px,100%)}.menu-header{position:relative;overflow:hidden;border-color:#61dcff2b;background:linear-gradient(115deg,#102334f5,#08131df5 64%,#101323f5)}.menu-header::after{content:"";position:absolute;right:18%;top:-80px;width:220px;height:160px;background:#29c8ff10;transform:rotate(25deg);filter:blur(15px);pointer-events:none}.logo{padding:7px;color:#6fe2ff;border-color:#6fe2ff55;background:linear-gradient(145deg,#66dfff25,#ffffff06);box-shadow:0 0 28px #00bfff1c}.brand-copy h1{font-size:23px;text-shadow:0 0 24px #43d5ff1c}.header-actions{z-index:1}.icon-btn{display:grid!important;place-items:center!important}.icon-btn .ui-icon{width:17px;height:17px}
-.panel{position:relative;border-color:#ffffff1b;background:linear-gradient(155deg,#0b1721f2,#060d14f5);box-shadow:0 16px 48px #0008,inset 0 1px #ffffff08}.panel::before{content:"";position:absolute;left:0;top:16px;bottom:16px;width:2px;border-radius:2px;background:linear-gradient(#5edfff00,#5edfff88,#5edfff00);opacity:.55}.panel-title strong{display:flex;align-items:center;gap:6px;color:#dff8ff}.panel-title .mini-icon,.label .mini-icon{display:inline-block;vertical-align:-2px;margin-right:4px;color:#67dcff}
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;letter-spacing:.025em}.btn.primary{background:linear-gradient(135deg,#1fa2d8,#2266bf);border-color:#7be8ff70;box-shadow:0 8px 24px #008cc52c,inset 0 1px #ffffff28}.btn.primary:hover{background:linear-gradient(135deg,#29b5ec,#2876d5)}.btn.danger{background:linear-gradient(135deg,#9e2939,#681d2a)}.action-btn{min-height:39px}.icon-label{min-width:76px}.input{border-color:#ffffff22;background:linear-gradient(180deg,#02070c,#061019);box-shadow:inset 0 0 0 1px #0007,inset 0 1px #ffffff07}.input:focus{border-color:#64dfff9c;box-shadow:0 0 0 2px #3fd9ff16,0 0 22px #20bfff0d}
-.team-option{position:relative;overflow:hidden;grid-template-columns:8px 1fr;border-color:#ffffff1d;background:linear-gradient(145deg,#ffffff08,#ffffff03)}.team-option[aria-pressed="true"]::after{content:"";position:absolute;inset:auto -20% -18px 20%;height:36px;background:var(--team);opacity:.09;filter:blur(12px)}.team-option.blue[aria-pressed="true"]{--team:#46a7ff}.team-option.red[aria-pressed="true"]{--team:#ff5c6c}
-.god-toggle{width:100%;min-height:42px;padding:6px 8px;border-radius:9px;border:1px solid #ffffff1d;background:linear-gradient(135deg,#ffffff07,#ffffff03);color:var(--text);display:grid;grid-template-columns:31px 1fr auto;align-items:center;gap:8px;text-align:left;cursor:pointer}.god-toggle:hover{border-color:#ffe17b52}.god-toggle[aria-pressed="true"]{border-color:#ffe17b8f;background:linear-gradient(135deg,#f5c94f1e,#fff3a407);box-shadow:0 0 26px #ffd75012}.god-icon{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;color:#9cacbc;background:#ffffff09}.god-toggle[aria-pressed="true"] .god-icon{color:#ffe27b;background:#ffda5320;box-shadow:0 0 18px #ffd54a20}.god-copy{display:grid;gap:1px}.god-copy strong{font-size:9px}.god-copy small{font-size:7px;color:var(--muted);font-weight:800}.god-state{font-size:8px;font-weight:1000;letter-spacing:.12em;color:#8091a2}.god-toggle[aria-pressed="true"] .god-state{color:#ffe27b}
-.world{position:relative;overflow:hidden;border-color:#ffffff18}.world::before{content:"";position:absolute;left:0;top:0;bottom:0;width:2px;background:#53d9ff80}.world .btn{min-width:58px}.team-chip{letter-spacing:.03em}
-.menu-footer{border-color:#ffffff18;background:linear-gradient(90deg,#061019ee,#081521ee)}.controls-note{display:flex;gap:7px;align-items:center;justify-content:flex-end;white-space:normal}.controls-note span{padding:3px 6px;border:1px solid #ffffff13;border-radius:5px;background:#ffffff05;color:#91a5b8;font-size:7px;font-weight:900}
-.pause{background:radial-gradient(circle at 50% 20%,#10283abb,#020508e8);backdrop-filter:blur(10px)}.pause-card{width:min(430px,94vw);border-color:#5fdcff2d;background:linear-gradient(155deg,#0e1d29f7,#060d14fa);box-shadow:0 34px 100px #000e,0 0 60px #00bfff10}.pause-actions{grid-template-columns:repeat(3,1fr)}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}.pause-team{box-shadow:0 0 20px color-mix(in srgb,var(--team) 20%,transparent)}
-
-.admin-panel{position:fixed;inset:0;z-index:55;display:grid;place-items:center;padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 8px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 8px);background:#010408e8;backdrop-filter:blur(11px);overflow:hidden}.admin-shell{width:min(920px,98vw);height:min(430px,96vh);min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:6px;padding:9px;border:1px solid #5fdcff36;border-radius:14px;background:linear-gradient(155deg,#0e1d29fa,#050b11fd);box-shadow:0 34px 110px #000e,0 0 70px #23cfff0e}.admin-head{display:flex;align-items:start;justify-content:space-between;gap:10px;padding:2px 2px 7px;border-bottom:1px solid #ffffff14}.admin-head h2{margin:1px 0 0;font-size:18px;text-transform:uppercase;letter-spacing:.065em}.admin-sub{margin-top:3px;color:var(--muted);font-size:8px;font-weight:800}.admin-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}.admin-tab{height:28px;border-radius:7px;border:1px solid #ffffff1a;background:#ffffff07;color:#8195a8;font-size:8px;font-weight:1000;letter-spacing:.14em;cursor:pointer}.admin-tab.active{color:#eafdff;border-color:#5fdcff66;background:#45d5ff18;box-shadow:inset 0 -2px #5fdcff}.admin-page{min-height:0;display:grid;align-items:stretch;overflow:hidden}.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;align-content:center}.setting,.weapon-settings-card label{display:grid;gap:3px;color:#8fa3b6;font-size:7px;font-weight:950;text-transform:uppercase;letter-spacing:.07em}.setting input,.weapon-settings-card input{width:100%;height:31px;border:1px solid #ffffff20;border-radius:7px;background:#02070ccf;color:#fff;padding:0 8px;outline:none;font-size:11px;font-weight:900;user-select:text;-webkit-user-select:text}.setting input:focus,.weapon-settings-card input:focus{border-color:#5fdcff77;box-shadow:0 0 0 2px #5fdcff12}.weapon-settings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;min-height:0}.weapon-settings-card{min-height:0;display:grid;grid-template-columns:1fr 1fr;align-content:center;gap:5px;padding:7px;border:1px solid #ffffff16;border-radius:9px;background:#ffffff05}.weapon-settings-card>strong{grid-column:1/-1;font-size:9px;letter-spacing:.11em;color:#ffd1a2}.weapon-settings-card.assault>strong{color:#ffe18d}.weapon-settings-card.sniper>strong{color:#b8efff}.weapon-settings-card small{grid-column:1/-1;color:#8296a8;font-size:6.5px;font-weight:800;line-height:1.25}.admin-foot{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:6px;align-items:center;padding-top:6px;border-top:1px solid #ffffff12}.admin-status{min-width:0;color:#899caf;font-size:7.5px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.admin-status.ok{color:#8ceca9}.admin-status.error{color:#ff8996}.pause.admin-mode .pause-actions{grid-template-columns:repeat(4,1fr)}.pause-admin-badge{color:#8fe7ff!important;border-color:#5fdcff55!important}.hide.admin-panel{display:none!important}.admin-head{padding-bottom:4px}.admin-head h2{font-size:14px}.admin-sub{display:none}.admin-tab{height:24px}.settings-grid,.weapon-settings-grid{gap:4px}.setting,.weapon-settings-card label{gap:2px;font-size:6.3px}.setting input,.weapon-settings-card input{height:26px;font-size:9px}.weapon-settings-card{padding:5px;gap:3px}.weapon-settings-card small{font-size:5.8px}.admin-foot{padding-top:4px}.admin-foot .btn{min-height:26px}}
-
-/* v1.15.4 fluid visual-viewport layout */
-#game,.boot,.menu,.pause,.admin-panel{position:fixed!important;inset:auto!important;left:0!important;top:0!important;width:var(--vv-width)!important;height:var(--vv-height)!important;right:auto!important;bottom:auto!important}
-.boot,.menu,.pause,.admin-panel{overflow:hidden}
-.menu{padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px)}
-.menu-shell{width:min(1120px,100%);height:auto;max-height:100%;min-height:0;display:grid;grid-template-rows:auto auto auto;gap:6px;transform-origin:center center}
-.menu-header{padding:6px 8px;border-radius:10px}.logo{width:32px;height:32px;flex-basis:32px;border-radius:9px}.menu-header h1{font-size:18px}.brand-version{margin-top:2px}.sub{font-size:8px}.header-actions{gap:4px}.icon-btn{width:32px!important;min-width:32px!important;height:32px;min-height:32px!important}
-.menu-grid{min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:auto;gap:6px;align-items:start}
-.operator-panel,.create-panel,.join-panel{grid-column:auto;grid-row:auto;min-width:0;align-content:start}.panel{min-width:0;padding:7px;gap:5px;border-radius:10px;overflow:hidden}.panel-title{padding-bottom:4px}.panel-title strong{font-size:8px}.panel-title span{display:none}
-.operator-row{display:grid;grid-template-columns:1fr;gap:5px;align-items:stretch;min-height:0}.operator-row .field{gap:3px}.operator-god{min-height:32px;padding:3px 6px;grid-template-columns:26px 1fr auto;gap:6px}.operator-god .god-icon{width:25px;height:25px}.operator-god .god-copy small{display:none}.operator-team .team-summary{display:none}
-.team-option{min-height:33px;padding:4px 6px}.team-swatch{height:20px}.team-copy strong{font-size:8px}.team-copy small{font-size:6.5px}.team-picker{gap:4px}.input{height:28px;font-size:10px;padding:0 7px}.label,.bot-team-label,.bot-total,.team-summary{font-size:7px}.btn{min-height:28px;font-size:9px;padding:0 8px}
-.create-panel{grid-template-rows:auto auto auto}.bot-config-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px;align-items:end}.bot-config-grid .bot-team-field:last-child{grid-column:1/-1}.bot-team-field{gap:2px}.bot-team-label.neutral::before{background:#8fa3b6;box-shadow:0 0 9px #8fa3b666}.create-footer{display:grid;grid-template-columns:minmax(0,1fr) minmax(104px,.78fr);gap:5px;align-items:center;margin-top:auto}.create-footer .bot-total{text-align:left}.create-footer .action-btn{width:100%;min-height:30px}
-.join-row{gap:4px}.world-section{gap:3px}.world-list{gap:3px;overflow:hidden}.world{grid-template-columns:minmax(0,1fr) auto auto;gap:5px;padding:4px 5px}.world-code{font-size:9px}.world-meta{font-size:6.8px;line-height:1.1}.team-counts{gap:3px;margin-top:2px}.team-chip{padding:1px 4px;font-size:6px}.world .btn{min-width:28px!important;width:28px!important;height:28px;min-height:28px!important;padding:0!important}.empty{padding:8px;font-size:8px}
-.menu-footer{grid-template-columns:minmax(0,1fr) auto;gap:6px;padding:3px 6px}.status{min-height:12px;font-size:8px}.controls-note{gap:4px}.controls-note span{padding:2px 4px;font-size:6.2px}.touch .controls-note{display:none}.touch .menu-footer{grid-template-columns:1fr}
-.pause{padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px)}.pause-card{width:min(430px,100%);height:auto;max-height:100%;padding:9px;gap:6px;transform-origin:center center;overflow:hidden}.pause-head{padding-bottom:5px}.pause-head h2{font-size:15px}.pause-actions,.pause.admin-mode .pause-actions{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.pause-actions .resume,.pause-actions .leave{grid-column:1/-1}
-.admin-panel{padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 6px)}.admin-shell{width:min(920px,100%);height:auto!important;max-height:100%;min-height:0;display:grid;grid-template-rows:auto auto auto auto;gap:5px;padding:7px;transform-origin:center center}.admin-head{padding:1px 1px 5px}.admin-head h2{font-size:15px}.admin-sub{font-size:7px}.admin-tabs{gap:4px}.admin-tab{height:25px}.admin-page{min-height:0;display:grid;align-content:start;overflow:hidden}.settings-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;align-content:start}.setting,.weapon-settings-card label{gap:2px;font-size:6.5px}.setting input,.weapon-settings-card input{height:27px;font-size:9px;padding:0 6px}.weapon-settings-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;align-items:start}.weapon-settings-card{align-content:start;padding:5px;gap:3px}.weapon-settings-card>strong{font-size:8px}.weapon-settings-card small{font-size:5.8px}.bot-admin-grid{grid-template-columns:repeat(3,minmax(0,1fr));align-content:start}.bot-admin-grid .setting:last-child{grid-column:1/-1}.bot-admin-grid #botDifficultyHelp{min-height:28px!important;justify-content:center;text-align:center}.admin-foot{align-self:end;padding-top:4px}.admin-foot .btn{min-height:26px}
-.ui-fit-emergency .sub,.ui-fit-emergency .controls-note,.ui-fit-emergency .admin-sub,.ui-fit-emergency .weapon-settings-card small{display:none!important}.ui-fit-emergency .panel{padding:5px;gap:3px}.ui-fit-emergency .menu-shell{gap:4px}.ui-fit-emergency .menu-grid{gap:4px}.ui-fit-emergency .team-option{min-height:29px}.ui-fit-emergency .input{height:25px}.ui-fit-emergency .btn{min-height:25px}
-</style>
+<title>Punch World v1.15.7</title>
+<link rel="stylesheet" href="ui.css">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -105,9 +42,9 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
     <p>Fast team combat across a living terrain. Landscape optimized.</p>
     <button id="enterBtn" class="btn primary hero-action"><svg class="ui-icon"><use href="#i-play"/></svg><span>ENTER ARENA</span></button>
     <div id="engineStatus" class="engine-status" role="status" aria-live="polite">LOADING 3D ENGINE</div>
-    <div id="iosInstallHint" class="hide" style="display:grid;gap:9px;text-align:left;padding:12px;border:1px solid var(--line);border-radius:12px;background:#ffffff08">
-      <b style="text-align:center">iPhone Safari Fullscreen</b>
-      <span style="font-size:13px;line-height:1.45;color:var(--muted)">Safari on iPhone does not provide webpage fullscreen for the game canvas. For the full-screen app experience: tap <b style="color:var(--text)">Share</b> → <b style="color:var(--text)">Add to Home Screen</b>, keep <b style="color:var(--text)">Open as Web App</b> enabled, then launch Punch World from the Home Screen.</span>
+    <div id="iosInstallHint" class="ios-install-hint hide">
+      <b>iPhone Safari Fullscreen</b>
+      <span>Safari on iPhone does not provide webpage fullscreen for the game canvas. For the full-screen app experience: tap <b>Share</b> → <b>Add to Home Screen</b>, keep <b>Open as Web App</b> enabled, then launch Punch World from the Home Screen.</span>
       <button id="continueSafariBtn" class="btn">Continue in Safari</button>
     </div>
   </div>
@@ -159,11 +96,11 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
       <section class="panel join-panel">
         <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-enter"/></svg> Join World</strong><span>Open sandbox · up to 8 players</span></div>
         <div class="field"><label class="label" for="codeInput">Room code</label><div class="join-row"><input id="codeInput" class="input" maxlength="4" autocapitalize="characters" placeholder="ABCD"><button id="joinBtn" class="btn primary icon-label"><svg class="ui-icon"><use href="#i-enter"/></svg><span>Join</span></button></div></div>
-        <div class="world-section"><div class="section-title"><span>Active worlds</span><span id="worldCount"></span></div><div id="worldList" class="world-list"><div class="empty">Loading worlds…</div></div></div>
+        <div class="world-section"><div class="section-title"><span>Active worlds</span><span id="worldCount"></span></div><div id="worldList" class="world-list" aria-live="polite"><div class="empty">Loading worlds…</div></div></div>
       </section>
     </div>
 
-    <footer class="menu-footer"><div id="menuStatus" class="status">Ready.</div><div class="controls-note"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>R RELOAD</span><span>1·2·3 WEAPONS</span><span>TAB SCORE</span></div></footer>
+    <footer class="menu-footer"><div id="menuStatus" class="status" role="status" aria-live="polite">Ready.</div><div class="controls-note" aria-label="Desktop controls"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>R RELOAD</span><span>1·2·3 WEAPONS</span><span>TAB SCORE</span></div></footer>
   </div>
 </section>
 
@@ -187,8 +124,8 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
       <div><div class="eyebrow">WORLD ADMIN // LIVE RULES</div><h2>Admin Settings</h2><div class="admin-sub">Changes sync live to every player and bot. World, weapon and bot rules are server-authoritative.</div></div>
       <button id="adminCloseBtn" class="btn icon-btn" title="Close admin settings" aria-label="Close admin settings">×</button>
     </header>
-    <div class="admin-tabs" role="tablist"><button class="admin-tab active" data-admin-tab="general">WORLD</button><button class="admin-tab" data-admin-tab="weapons">WEAPONS</button><button class="admin-tab" data-admin-tab="bots">BOTS</button></div>
-    <div id="adminGeneral" class="admin-page">
+    <div class="admin-tabs" role="tablist" aria-label="Admin settings sections"><button id="adminTabGeneral" class="admin-tab active" type="button" role="tab" aria-selected="true" aria-controls="adminGeneral" data-admin-tab="general">WORLD</button><button id="adminTabWeapons" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="adminWeapons" data-admin-tab="weapons">WEAPONS</button><button id="adminTabBots" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="adminBots" data-admin-tab="bots">BOTS</button></div>
+    <div id="adminGeneral" class="admin-page" role="tabpanel" aria-labelledby="adminTabGeneral">
       <div class="settings-grid">
         <label class="setting"><span>Run Speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label>
         <label class="setting"><span>ADS Walk Speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label>
@@ -199,22 +136,22 @@ html,body,#game{-webkit-user-select:none!important;user-select:none!important;-w
         <label class="setting"><span>Respawn Delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label>
       </div>
     </div>
-    <div id="adminWeapons" class="admin-page hide">
+    <div id="adminWeapons" class="admin-page hide" role="tabpanel" aria-labelledby="adminTabWeapons">
       <div class="weapon-settings-grid">
         <section class="weapon-settings-card"><strong>PISTOL</strong><label>Damage<input id="setPistolDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setPistolSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setPistolReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setPistolCooldown" type="number" min="50" max="2500" step="5"></label></section>
         <section class="weapon-settings-card assault"><strong>ASSAULT RIFLE</strong><label>Damage<input id="setAssaultDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setAssaultSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setAssaultReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setAssaultCooldown" type="number" min="50" max="2500" step="5"></label></section>
         <section class="weapon-settings-card sniper"><strong>SNIPER</strong><label>Damage / Power<input id="setSniperDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setSniperSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setSniperReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setSniperCooldown" type="number" min="50" max="2500" step="5"></label><small>Penetration uses remaining damage power. Each target consumes its current HP.</small></section>
       </div>
     </div>
-    <div id="adminBots" class="admin-page hide">
+    <div id="adminBots" class="admin-page hide" role="tabpanel" aria-labelledby="adminTabBots">
       <div class="settings-grid bot-admin-grid">
         <label class="setting"><span>Blue Bots</span><input id="setBlueBots" type="number" min="0" max="8" step="1"></label>
         <label class="setting"><span>Red Bots</span><input id="setRedBots" type="number" min="0" max="8" step="1"></label>
         <label class="setting"><span>Difficulty</span><select id="setBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
-        <div class="setting"><span>Difficulty Effect</span><div id="botDifficultyHelp" class="input" style="display:flex;align-items:center;height:auto;min-height:31px;color:#9fb3c5">Normal aim, reaction and movement.</div></div>
+        <div class="setting"><span>Difficulty Effect</span><div id="botDifficultyHelp" class="input difficulty-help">Normal aim, reaction and movement.</div></div>
       </div>
     </div>
-    <footer class="admin-foot"><div id="adminStatus" class="admin-status">Only the world creator can change these rules.</div><button id="adminResetBtn" class="btn">Defaults</button><button id="adminSaveBtn" class="btn primary">Apply Rules</button></footer>
+    <footer class="admin-foot"><div id="adminStatus" class="admin-status" role="status" aria-live="polite">Only the world creator can change these rules.</div><button id="adminResetBtn" class="btn">Defaults</button><button id="adminSaveBtn" class="btn primary">Apply Rules</button></footer>
   </div>
 </section>
 
@@ -223,7 +160,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.6';
+const APP_VERSION = '1.15.7';
 const PROTOCOL_VERSION = 13;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
@@ -651,7 +588,16 @@ function bindUI(){
   $('adminCloseBtn').addEventListener('click',closeAdminPanel);
   $('adminSaveBtn').addEventListener('click',saveAdminSettings);
   $('adminResetBtn').addEventListener('click',()=>{populateAdminSettings(DEFAULT_WORLD_SETTINGS);populateAdminBots({blueBots:1,redBots:1,difficulty:'normal'});});
-  for(const tab of document.querySelectorAll('[data-admin-tab]'))tab.addEventListener('click',()=>switchAdminTab(tab.dataset.adminTab));
+  const adminTabs=[...document.querySelectorAll('[data-admin-tab]')];
+  for(const tab of adminTabs){
+    tab.addEventListener('click',()=>switchAdminTab(tab.dataset.adminTab));
+    tab.addEventListener('keydown',e=>{
+      if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+      e.preventDefault();
+      const current=adminTabs.indexOf(tab),next=e.key==='Home'?0:e.key==='End'?adminTabs.length-1:(current+(e.key==='ArrowRight'?1:-1)+adminTabs.length)%adminTabs.length;
+      adminTabs[next].focus();switchAdminTab(adminTabs[next].dataset.adminTab);
+    });
+  }
   $('setBotDifficulty').addEventListener('change',()=>{$('botDifficultyHelp').textContent=botDifficultyDescription($('setBotDifficulty').value);});
   $('fullBtn').addEventListener('click', toggleFullscreen);
   $('leaveBtn').addEventListener('click', leaveWorld);
@@ -718,22 +664,14 @@ function isEditableTarget(target){
 }
 function isLandscape(){ const v=getViewSize(); return v.w>v.h; }
 function getViewSize(){const v=viewportMetrics||syncVisualViewportMetrics();return {w:v.w,h:v.h};}
-function overlayAvailableSize(parent){const r=parent.getBoundingClientRect(),cs=getComputedStyle(parent),px=v=>parseFloat(v)||0;return{w:Math.max(1,r.width-px(cs.paddingLeft)-px(cs.paddingRight)),h:Math.max(1,r.height-px(cs.paddingTop)-px(cs.paddingBottom))};}
-function fitOverlayElement(el,minScale=.5){
-  if(!el||el.closest('.hide')||getComputedStyle(el).display==='none')return 1;
-  el.style.zoom='1';el.style.transform='';
-  const parent=el.parentElement;if(!parent)return 1;
-  const avail=overlayAvailableSize(parent),needW=Math.max(el.scrollWidth,el.offsetWidth),needH=Math.max(el.scrollHeight,el.offsetHeight);
-  let scale=Math.min(1,avail.w/Math.max(1,needW),avail.h/Math.max(1,needH));
-  scale=Math.max(minScale,Math.min(1,scale));
-  if(scale<.997){if(CSS.supports?.('zoom','0.9'))el.style.zoom=scale.toFixed(4);else{el.style.transform=`scale(${scale})`;el.style.transformOrigin='center center';}}
-  el.dataset.fitScale=scale.toFixed(3);return scale;
-}
 function fitResponsiveOverlays(){
-  document.documentElement.classList.remove('ui-fit-emergency');
-  const targets=[[$('.menu-shell'),.52],[$('.pause-card'),.58],[$('.admin-shell'),.50],[document.querySelector('.boot:not(.hide) .boot-card'),.55]];
-  let smallest=1;for(const [el,min] of targets)if(el)smallest=Math.min(smallest,fitOverlayElement(el,min));
-  if(smallest<.72){document.documentElement.classList.add('ui-fit-emergency');for(const [el,min] of targets)if(el)fitOverlayElement(el,min);}
+  for(const el of [$('.menu-shell'),$('.pause-card'),$('.admin-shell'),document.querySelector('.boot:not(.hide) .boot-card')]){
+    if(!el)continue;
+    el.style.removeProperty('zoom');
+    el.style.removeProperty('transform');
+    el.style.removeProperty('transform-origin');
+    delete el.dataset.fitScale;
+  }
 }
 async function enterExperience(){
   ensureAudio();
@@ -986,8 +924,8 @@ async function refreshWorlds(){
   }catch(err){ if(!gameActive){worldList.innerHTML='<div class="empty">Multiplayer server unavailable.</div>';worldCount.textContent='';} }
 }
 function renderWorlds(rooms){
-  const visible=rooms.slice(0,3);
-  worldCount.textContent=rooms.length?`${rooms.length} live${rooms.length>visible.length?' · showing 3':''}`:'';
+  const visible=rooms;
+  worldCount.textContent=rooms.length?`${rooms.length} live`:'';
   if(!rooms.length){worldList.innerHTML='<div class="empty">No active worlds. Create one.</div>';return;}
   worldList.innerHTML='';
   for(const room of visible){
@@ -1089,7 +1027,7 @@ function populateAdminBots(value){const x=normalizeBotConfig(value);$('setBlueBo
 function collectAdminBots(){return normalizeBotConfig({blueBots:$('setBlueBots').value,redBots:$('setRedBots').value,difficulty:$('setBotDifficulty').value});}
 function syncBotRoster(list){const incoming=new Set((list||[]).map(b=>b.id));for(const [id,r] of remotes){if(r.bot&&!incoming.has(id))removeRemote(id);}for(const b of list||[])upsertRemote(b,true);updatePlayerCount();}
 function setAdminStatus(text,tone=''){const el=$('adminStatus');el.textContent=text;el.className=`admin-status ${tone}`;}
-function switchAdminTab(tab){const weapons=tab==='weapons',bots=tab==='bots';$('adminGeneral').classList.toggle('hide',weapons||bots);$('adminWeapons').classList.toggle('hide',!weapons);$('adminBots').classList.toggle('hide',!bots);const shell=document.querySelector('.admin-shell');if(shell)shell.dataset.page=weapons?'weapons':bots?'bots':'general';for(const b of document.querySelectorAll('[data-admin-tab]'))b.classList.toggle('active',b.dataset.adminTab===tab);requestAnimationFrame(fitResponsiveOverlays);}
+function switchAdminTab(tab){const weapons=tab==='weapons',bots=tab==='bots';$('adminGeneral').classList.toggle('hide',weapons||bots);$('adminWeapons').classList.toggle('hide',!weapons);$('adminBots').classList.toggle('hide',!bots);const shell=document.querySelector('.admin-shell');if(shell)shell.dataset.page=weapons?'weapons':bots?'bots':'general';for(const b of document.querySelectorAll('[data-admin-tab]')){const active=b.dataset.adminTab===tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;}requestAnimationFrame(fitResponsiveOverlays);}
 function populateAdminSettings(value){const x=normalizeWorldSettingsClient(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=w.reloadMs;$(`set${cap}Cooldown`).value=w.cooldownMs;}}
 function collectAdminSettings(){return normalizeWorldSettingsClient({movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000},weapons:{pistol:{damage:$('setPistolDamage').value,speed:$('setPistolSpeed').value,reloadMs:$('setPistolReload').value,cooldownMs:$('setPistolCooldown').value},assault:{damage:$('setAssaultDamage').value,speed:$('setAssaultSpeed').value,reloadMs:$('setAssaultReload').value,cooldownMs:$('setAssaultCooldown').value},sniper:{damage:$('setSniperDamage').value,speed:$('setSniperSpeed').value,reloadMs:$('setSniperReload').value,cooldownMs:$('setSniperCooldown').value}}});}
 function openAdminPanel(){if(!isWorldAdmin){showToast('ADMIN ACCESS REQUIRED');return;}populateAdminSettings(worldSettings);populateAdminBots(botConfig);switchAdminTab('general');setAdminStatus('Only the world creator can change these rules.');$('adminPanel').classList.remove('hide');requestAnimationFrame(fitResponsiveOverlays);}
