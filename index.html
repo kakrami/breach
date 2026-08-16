@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.15.17</title>
+<title>Punch World v1.15.18</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -157,12 +157,17 @@
 </section>
 
 <script type="module">
+import {
+  PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
+  terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, MAX_STEP_HEIGHT, makeBuildingGeometry
+} from './world-geometry.js';
+
 let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.17';
-const PROTOCOL_VERSION = 21;
+const APP_VERSION = '1.15.18';
+const PROTOCOL_VERSION = 22;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
 const MAX_BOTS = 8;
@@ -188,9 +193,6 @@ const TEAM_COLORS = { blue:'#46a7ff', red:'#ff5c6c' };
 const STATE_INTERVAL = 50;
 let worldSettings=cloneSettings(DEFAULT_WORLD_SETTINGS);
 let WALK_SPEED=4.6,RUN_SPEED=8.4,GRAVITY=23,JUMP_SPEED=Math.sqrt(2*GRAVITY*1.6);
-const PLAYER_HEIGHT = 1.7;
-const PLAYER_RADIUS = 0.38;
-const ARENA_LIMIT = 120;
 const LONG_SHOT_DISTANCE = 30;
 
 const $ = (id) => document.getElementById(id);
@@ -260,51 +262,24 @@ const bullets = new Map();
 const throwables = new Map();
 const obstacleBoxes = [];
 const OBSTACLE_CELL_SIZE = 8;
+const OBSTACLE_CELL_HEIGHT = 3;
 const obstacleGrid = new Map();
-function obstacleGridKey(cx,cz){return `${cx},${cz}`;}
+function obstacleGridKey(cx,cy,cz){return `${cx},${cy},${cz}`;}
 function registerObstacle(b){
   obstacleBoxes.push(b);
   const minX=b.type==='box'?b.minX:b.x-b.r,maxX=b.type==='box'?b.maxX:b.x+b.r,minZ=b.type==='box'?b.minZ:b.z-b.r,maxZ=b.type==='box'?b.maxZ:b.z+b.r;
-  const minCX=Math.floor(minX/OBSTACLE_CELL_SIZE),maxCX=Math.floor(maxX/OBSTACLE_CELL_SIZE),minCZ=Math.floor(minZ/OBSTACLE_CELL_SIZE),maxCZ=Math.floor(maxZ/OBSTACLE_CELL_SIZE);
-  for(let cx=minCX;cx<=maxCX;cx++)for(let cz=minCZ;cz<=maxCZ;cz++){const key=obstacleGridKey(cx,cz);let list=obstacleGrid.get(key);if(!list){list=[];obstacleGrid.set(key,list);}list.push(b);}
+  const minCX=Math.floor(minX/OBSTACLE_CELL_SIZE),maxCX=Math.floor(maxX/OBSTACLE_CELL_SIZE),minCY=Math.floor(b.minY/OBSTACLE_CELL_HEIGHT),maxCY=Math.floor(b.maxY/OBSTACLE_CELL_HEIGHT),minCZ=Math.floor(minZ/OBSTACLE_CELL_SIZE),maxCZ=Math.floor(maxZ/OBSTACLE_CELL_SIZE);
+  for(let cx=minCX;cx<=maxCX;cx++)for(let cy=minCY;cy<=maxCY;cy++)for(let cz=minCZ;cz<=maxCZ;cz++){const key=obstacleGridKey(cx,cy,cz);let list=obstacleGrid.get(key);if(!list){list=[];obstacleGrid.set(key,list);}list.push(b);}
   return b;
 }
-function nearbyObstacles(x,z){return obstacleGrid.get(obstacleGridKey(Math.floor(x/OBSTACLE_CELL_SIZE),Math.floor(z/OBSTACLE_CELL_SIZE)))||[];}
+function nearbyObstacles(x,z,y){const minCY=Math.floor(y/OBSTACLE_CELL_HEIGHT),maxCY=Math.floor((y+PLAYER_HEIGHT*.92)/OBSTACLE_CELL_HEIGHT),cx=Math.floor(x/OBSTACLE_CELL_SIZE),cz=Math.floor(z/OBSTACLE_CELL_SIZE),out=[],seen=new Set();for(let cy=minCY;cy<=maxCY;cy++){const list=obstacleGrid.get(obstacleGridKey(cx,cy,cz));if(!list)continue;for(const b of list)if(!seen.has(b)){seen.add(b);out.push(b);}}return out;}
 const mapObstacles = [];
 const joy = { x:0, y:0, pointer:null, centerX:0, centerY:0 };
 const look = { pointer:null, x:0, y:0 };
 const touchRoles = new Map();
 const fireTouchPointers = new Set();
 const touchVisual = { jumpUntil:0, fireUntil:0, reloadUntil:0, swapUntil:0, modeUntil:0, flashUntil:0, stickyUntil:0 };
-const NATURAL_OBSTACLES = [
-  {type:'tree',x:-72,z:-28,r:.75,h:7.5},{type:'tree',x:-58,z:56,r:.82,h:8.2},{type:'tree',x:-38,z:72,r:.70,h:7.0},{type:'tree',x:-18,z:-78,r:.78,h:7.8},
-  {type:'tree',x:16,z:72,r:.76,h:8.0},{type:'tree',x:34,z:-66,r:.82,h:8.4},{type:'tree',x:62,z:58,r:.75,h:7.6},{type:'tree',x:74,z:-30,r:.86,h:8.6},
-  {type:'tree',x:-80,z:18,r:.72,h:7.2},{type:'tree',x:82,z:16,r:.78,h:8.0},{type:'tree',x:-48,z:-66,r:.76,h:7.7},{type:'tree',x:50,z:76,r:.72,h:7.4},
-  {type:'bush',x:-62,z:-6,r:1.7,h:1.5},{type:'bush',x:-31,z:51,r:1.9,h:1.6},{type:'bush',x:-12,z:-34,r:1.6,h:1.4},{type:'bush',x:10,z:31,r:1.8,h:1.5},
-  {type:'bush',x:31,z:-45,r:1.7,h:1.5},{type:'bush',x:57,z:23,r:1.9,h:1.6},{type:'bush',x:76,z:-58,r:1.6,h:1.4},{type:'bush',x:-78,z:62,r:1.8,h:1.5},
-  {type:'rock',x:-54,z:20,r:2.2,h:2.7},{type:'rock',x:-22,z:16,r:1.8,h:2.2},{type:'rock',x:15,z:-58,r:2.1,h:2.5},{type:'rock',x:44,z:54,r:2.3,h:2.8},
-  {type:'rock',x:68,z:-4,r:1.9,h:2.3},{type:'rock',x:-70,z:-52,r:2.0,h:2.4},{type:'rock',x:8,z:82,r:1.8,h:2.1},{type:'rock',x:86,z:46,r:2.1,h:2.6}
 
-];
-const STATIC_BOXES=[
-  {x:0,z:0,w:8,d:8,h:3.2},{x:-24,z:-14,w:12,d:5,h:3.0},{x:28,z:19,w:11,d:6,h:3.8},{x:-42,z:34,w:7,d:13,h:4.2},
-  {x:46,z:-36,w:9,d:9,h:3.4},{x:6,z:48,w:14,d:5,h:2.8},{x:-8,z:-52,w:6,d:15,h:3.1}
-];
-const BUILDINGS=[
-  {x:-8,z:28,w:18,d:14,floorH:3.25,balcony:4.2,stairDir:1,levels:2},
-  {x:63,z:-54,w:16,d:12,floorH:3.15,balcony:3.8,stairDir:-1,levels:2},
-  {x:-70,z:42,w:14,d:11,floorH:3.05,balcony:3.4,stairDir:1,levels:2},
-  {x:68,z:38,w:20,d:16,floorH:3.15,balcony:4.0,stairDir:1,levels:4,tall:true},
-  {x:-62,z:-38,w:18,d:14,floorH:3.10,balcony:3.8,stairDir:-1,levels:5,tall:true}
-];
-const PYRAMIDS=[{x:-34,z:-40,base:12,h:8},{x:38,z:42,base:14,h:10},{x:52,z:4,base:11,h:7},{x:-55,z:2,base:13,h:9},{x:18,z:-24,base:9,h:6}];
-const TERRAIN_FOUNDATIONS=[
-  ...PYRAMIDS.map(p=>{const flat=p.base/Math.sqrt(2)+2;return{x:p.x,z:p.z,flat,blend:flat+4};}),
-  ...STATIC_BOXES.map(o=>{const flat=Math.hypot(o.w,o.d)/2+1.8;return{x:o.x,z:o.z,flat,blend:flat+4};}),
-  ...BUILDINGS.map(b=>{const flat=Math.hypot(b.w,b.d)/2+2;return{x:b.x,z:b.z,flat,blend:flat+4.5};})
-];
-const walkableSurfaces=[];
-const horizontalSolids=[];
 const killFeed = [];
 let hudLayout = null;
 let viewW = Math.max(1, window.visualViewport?.width || window.innerWidth || document.documentElement.clientWidth || 1), viewH = Math.max(1, window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 1);
@@ -532,29 +507,7 @@ function init3D(){
   animate();
 }
 
-function rawTerrainHeight(x,z){
-  const rolling=.55+1.15*Math.sin(x*.031)*Math.cos(z*.027)+.72*Math.sin((x+z)*.021)+.48*Math.cos((x-z)*.018);
-  const westRidge=8.8*Math.exp(-((x+62)**2)/1150)*Math.exp(-((z-20)**2)/6200);
-  const northHill=10.5*Math.exp(-((x-34)**2+(z-68)**2)/1450);
-  const southHill=7.2*Math.exp(-((x+20)**2+(z+67)**2)/1200);
-  const eastRise=6.5*Math.exp(-((x-78)**2+(z+10)**2)/1750);
-  const centerKnoll=4.4*Math.exp(-((x-8)**2+(z-4)**2)/900);
-  const valley=4.0*Math.exp(-((x+12)**2+(z-34)**2)/1050);
-  return THREE.MathUtils.clamp(rolling+westRidge+northHill+southHill+eastRise+centerKnoll-valley,-2.4,13.8);
-}
-function terrainHeight(x,z){
-  let h=rawTerrainHeight(x,z);
-  for(const f of TERRAIN_FOUNDATIONS){
-    const d=Math.hypot(x-f.x,z-f.z);if(d>=f.blend)continue;
-    const center=rawTerrainHeight(f.x,f.z);
-    if(d<=f.flat){h=center;continue;}
-    const t=THREE.MathUtils.clamp((d-f.flat)/Math.max(.001,f.blend-f.flat),0,1),blend=t*t*(3-2*t);
-    h=THREE.MathUtils.lerp(center,h,blend);
-  }
-  return h;
-}
-function terrainMinAround(x,z,r){let min=terrainHeight(x,z);for(let i=0;i<10;i++){const a=i*Math.PI*2/10;min=Math.min(min,terrainHeight(x+Math.cos(a)*r,z+Math.sin(a)*r));}return min;}
-function naturalGroundBase(type,x,z,r){const footprint=type==='tree'?r:type==='bush'?r*.95:r*.9,burial=type==='tree'?.14:type==='bush'?.10:.20;return terrainMinAround(x,z,footprint)-burial;}
+
 function addTerrain(){
   const size=244,segments=128;
   const geo=new THREE.PlaneGeometry(size,size,segments,segments),pos=geo.attributes.position;
@@ -601,100 +554,30 @@ function addBoundaryWalls(mat){
 }
 function addBox(x,y,z,w,h,d,mat,collidable){
   const base=terrainHeight(x,z)+y;const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);mesh.position.set(x,base+h/2,z);mesh.castShadow=!isTouch;mesh.receiveShadow=!isTouch;scene.add(mesh);
-  if(collidable){registerObstacle({type:'box',x,z,w,d,minX:x-w/2-PLAYER_RADIUS,maxX:x+w/2+PLAYER_RADIUS,minZ:z-d/2-PLAYER_RADIUS,maxZ:z+d/2+PLAYER_RADIUS,minY:base,maxY:base+h});mapObstacles.push({type:'box',x,z,w,d});}
+  if(collidable){registerObstacle({type:'box',x,z,w,d,minX:x-w/2-PLAYER_RADIUS,maxX:x+w/2+PLAYER_RADIUS,minZ:z-d/2-PLAYER_RADIUS,maxZ:z+d/2+PLAYER_RADIUS,minY:base,maxY:base+h,supportTop:true});mapObstacles.push({type:'box',x,z,w,d});}
   return mesh;
 }
-function addStructureBox(b,x,y,z,w,h,d,mat,collidable=true,map=false){const base=terrainHeight(b.x,b.z)+y;const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);mesh.position.set(x,base+h/2,z);mesh.castShadow=!isTouch;mesh.receiveShadow=!isTouch;scene.add(mesh);if(collidable)registerObstacle({type:'box',x,z,w,d,minX:x-w/2-PLAYER_RADIUS,maxX:x+w/2+PLAYER_RADIUS,minZ:z-d/2-PLAYER_RADIUS,maxZ:z+d/2+PLAYER_RADIUS,minY:base,maxY:base+h});if(map)mapObstacles.push({type:'box',x:b.x,z:b.z,w:b.w,d:b.d});return mesh;}
 function addPyramid(x,z,base,h,mat){
   const radius=base/Math.sqrt(2),ground=terrainHeight(x,z);const mesh=new THREE.Mesh(new THREE.ConeGeometry(radius,h,4,1),mat);mesh.position.set(x,ground+h/2-.05,z);mesh.rotation.y=Math.PI/4;mesh.castShadow=!isTouch;mesh.receiveShadow=!isTouch;scene.add(mesh);
-  walkableSurfaces.push({type:'pyramid',x,z,base,h,baseY:ground});mapObstacles.push({type:'pyramid',x,z,base});return mesh;
+  mapObstacles.push({type:'pyramid',x,z,base});return mesh;
 }
 function addRoundObstacle(type,x,z,r,h,base=naturalGroundBase(type,x,z,r)){registerObstacle({type:'round',x,z,r:r+PLAYER_RADIUS,minY:base,maxY:base+h+.18});mapObstacles.push({type,x,z,r,h});}
 function addTree(x,z,r,h,trunkMat,leafMat){const base=naturalGroundBase('tree',x,z,r),g=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(r*.72,r,h*.64,8),trunkMat);trunk.position.y=h*.32;const crown1=new THREE.Mesh(new THREE.ConeGeometry(r*3.0,h*.48,9),leafMat);crown1.position.y=h*.62;const crown2=new THREE.Mesh(new THREE.ConeGeometry(r*2.35,h*.40,9),leafMat);crown2.position.y=h*.83;g.add(trunk,crown1,crown2);g.traverse(o=>{if(o.isMesh){o.castShadow=!isTouch;o.receiveShadow=!isTouch;}});g.position.set(x,base,z);scene.add(g);addRoundObstacle('tree',x,z,r,h,base);return g;}
 function addBush(x,z,r,h,mat){const base=naturalGroundBase('bush',x,z,r),g=new THREE.Group();for(const [ox,oz,s] of [[0,0,1],[-.55,0,.72],[.55,.08,.68],[0,.48,.63]]){const m=new THREE.Mesh(new THREE.SphereGeometry(r*s*.72,8,6),mat);m.scale.y=.62;m.position.set(ox*r*.45,h*.42,oz*r*.45);g.add(m);}g.position.set(x,base,z);scene.add(g);addRoundObstacle('bush',x,z,r,h,base);return g;}
 function addRock(x,z,r,h,mat){const base=naturalGroundBase('rock',x,z,r),m=new THREE.Mesh(new THREE.DodecahedronGeometry(r,0),mat);m.scale.set(1,h/(r*2),.82);m.position.set(x,base+h*.46,z);m.rotation.set(.18,.4,.12);scene.add(m);addRoundObstacle('rock',x,z,r,h,base);return m;}
-function buildingPlan(b) {
-  const wallT=.36,stairW=2.35,stairLen=Math.min(7,b.w*.44),stairZ=b.z+b.d*.24;
-  const innerW=b.w-.18,innerD=b.d-.18,innerL=b.x-innerW/2,innerR=b.x+innerW/2,innerMinZ=b.z-innerD/2,innerMaxZ=b.z+innerD/2;
-  const holeW=Math.min(stairLen+.16,innerW-.8),holeD=Math.min(stairW+.18,innerD-.8),holeL=b.x-holeW/2,holeR=b.x+holeW/2,holeMinZ=stairZ-holeD/2,holeMaxZ=stairZ+holeD/2;
-  const panels=[
-    {x1:innerL,x2:holeL,z1:innerMinZ,z2:innerMaxZ},
-    {x1:holeR,x2:innerR,z1:innerMinZ,z2:innerMaxZ},
-    {x1:holeL,x2:holeR,z1:innerMinZ,z2:holeMinZ},
-    {x1:holeL,x2:holeR,z1:holeMaxZ,z2:innerMaxZ}
-  ].filter(p=>p.x2-p.x1>.12&&p.z2-p.z1>.12).map(p=>({x:(p.x1+p.x2)/2,z:(p.z1+p.z2)/2,w:p.x2-p.x1,d:p.z2-p.z1}));
-  const front=b.z-b.d/2,balconyOverlap=.92,balconyD=b.balcony+balconyOverlap,balconyZ=front-b.balcony/2+balconyOverlap/2,balconyOutsideZ=front-b.balcony/2;
-  const lowX=b.x-b.stairDir*stairLen/2,highX=b.x+b.stairDir*stairLen/2;
-  return{wallT,stairW,stairLen,stairZ,innerW,innerD,holeW,holeD,holeL,holeR,holeMinZ,holeMaxZ,lowX,highX,panels,front,balconyOverlap,balconyD,balconyZ,balconyOutsideZ};
-}
-function buildingWallOpenings(b,level,side){
-  const windowBottom=.78,windowTop=Math.min(b.floorH-.38,2.62),windows=[];
-  if(side==='front'||side==='back'){
-    const center=b.w*.285;
-    windows.push({u:-center,w:2.05,bottom:windowBottom,top:windowTop,kind:'window'});
-    windows.push({u:center,w:2.05,bottom:windowBottom,top:windowTop,kind:'window'});
-    if(side==='front')windows.push({u:0,w:level===0?2.4:2.25,bottom:0,top:Math.min(b.floorH-.38,2.5),kind:'door'});
-  }else{
-    const count=b.d>=13?2:1;
-    if(count===1)windows.push({u:0,w:2.1,bottom:windowBottom,top:windowTop,kind:'window'});
-    else for(const sign of [-1,1])windows.push({u:sign*b.d*.22,w:1.9,bottom:windowBottom,top:windowTop,kind:'window'});
-  }
-  return windows;
-}
-function splitWall(length,height,openings){
-  const half=length/2,xs=[-half,half],ys=[0,height],safe=[];
-  for(const opening of openings){const left=THREE.MathUtils.clamp(opening.u-opening.w/2,-half,half),right=THREE.MathUtils.clamp(opening.u+opening.w/2,-half,half),bottom=THREE.MathUtils.clamp(opening.bottom,0,height),top=THREE.MathUtils.clamp(opening.top,0,height);if(right-left<=.02||top-bottom<=.02)continue;safe.push({...opening,left,right,bottom,top});xs.push(left,right);ys.push(bottom,top);}
-  const uniq=values=>[...new Set(values.map(v=>Math.round(v*10000)/10000))].sort((a,b)=>a-b),ux=uniq(xs),uy=uniq(ys),rects=[];
-  for(let xi=0;xi<ux.length-1;xi++)for(let yi=0;yi<uy.length-1;yi++){const left=ux[xi],right=ux[xi+1],bottom=uy[yi],top=uy[yi+1];if(right-left<=.02||top-bottom<=.02)continue;const midU=(left+right)/2,midY=(bottom+top)/2;if(safe.some(o=>midU>o.left&&midU<o.right&&midY>o.bottom&&midY<o.top))continue;rects.push({left,right,bottom,top});}
-  const eq=(a,b)=>Math.abs(a-b)<.001;let changed=true;
-  while(changed){changed=false;outer:for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const a=rects[i],b=rects[j];if(eq(a.bottom,b.bottom)&&eq(a.top,b.top)&&(eq(a.right,b.left)||eq(b.right,a.left))){rects[i]={left:Math.min(a.left,b.left),right:Math.max(a.right,b.right),bottom:a.bottom,top:a.top};rects.splice(j,1);changed=true;break outer;}if(eq(a.left,b.left)&&eq(a.right,b.right)&&(eq(a.top,b.bottom)||eq(b.top,a.bottom))){rects[i]={left:a.left,right:a.right,bottom:Math.min(a.bottom,b.bottom),top:Math.max(a.top,b.top)};rects.splice(j,1);changed=true;break outer;}}}
-  return rects.map(r=>({u:(r.left+r.right)/2,y:r.bottom,w:r.right-r.left,h:r.top-r.bottom}));
-}
-function addOpeningFrameX(b,z,level,opening,mat){
-  const y=level*b.floorH,bars=.095,depth=.07,h=opening.top-opening.bottom;
-  addStructureBox(b,b.x+opening.u-opening.w/2,y+opening.bottom,z,bars,h,depth,mat,false);
-  addStructureBox(b,b.x+opening.u+opening.w/2,y+opening.bottom,z,bars,h,depth,mat,false);
-  addStructureBox(b,b.x+opening.u,y+opening.top-bars,z,opening.w,bars,depth,mat,false);
-  if(opening.kind==='window')addStructureBox(b,b.x+opening.u,y+opening.bottom,z,opening.w,bars,depth,mat,false);
-}
-function addOpeningFrameZ(b,x,level,opening,mat){
-  const y=level*b.floorH,bars=.095,depth=.07,h=opening.top-opening.bottom;
-  addStructureBox(b,x,y+opening.bottom,b.z+opening.u-opening.w/2,depth,h,bars,mat,false);
-  addStructureBox(b,x,y+opening.bottom,b.z+opening.u+opening.w/2,depth,h,bars,mat,false);
-  addStructureBox(b,x,y+opening.top-bars,b.z+opening.u,depth,bars,opening.w,mat,false);
-  if(opening.kind==='window')addStructureBox(b,x,y+opening.bottom,b.z+opening.u,depth,bars,opening.w,mat,false);
+function addBuildingPart(part,materials){
+  const h=part.topY-part.bottomY,mat=part.role==='wall'?materials.wall:part.role==='trim'?materials.trim:part.role==='rail'||part.role==='roof'||part.role==='stairSide'?materials.trim:materials.floor;
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(part.w,h,part.d),mat);mesh.position.set(part.x,(part.bottomY+part.topY)/2,part.z);mesh.castShadow=!isTouch;mesh.receiveShadow=!isTouch;scene.add(mesh);
+  if(part.playerSolid){registerObstacle({type:'box',x:part.x,z:part.z,w:part.w,d:part.d,minX:part.x-part.w/2-PLAYER_RADIUS,maxX:part.x+part.w/2+PLAYER_RADIUS,minZ:part.z-part.d/2-PLAYER_RADIUS,maxZ:part.z+part.d/2+PLAYER_RADIUS,minY:part.bottomY,maxY:part.topY,supportTop:part.supportTop});}
+  return mesh;
 }
 function addBuilding(b){
-  const levels=Math.max(2,Math.min(6,Math.floor(b.levels||2)));
   const wall=new THREE.MeshStandardMaterial({color:b.tall?0x929aa0:0xa8adb0,roughness:.9}),trim=new THREE.MeshStandardMaterial({color:b.tall?0x39444d:0x4f5961,roughness:.75}),floor=new THREE.MeshStandardMaterial({color:0x6d7478,roughness:.95});
-  const plan=buildingPlan(b),t=plan.wallT,base=terrainHeight(b.x,b.z);
-  const addWallX=(z,level,side)=>{const openings=buildingWallOpenings(b,level,side);for(const cell of splitWall(b.w,b.floorH,openings))addStructureBox(b,b.x+cell.u,level*b.floorH+cell.y,z,cell.w+.015,cell.h+.015,t,wall,true);for(const opening of openings)addOpeningFrameX(b,z+(side==='front'?-.012:.012),level,opening,trim);};
-  const addWallZ=(x,level,side)=>{const openings=buildingWallOpenings(b,level,side);for(const cell of splitWall(b.d,b.floorH,openings))addStructureBox(b,x,level*b.floorH+cell.y,b.z+cell.u,t,cell.h+.015,cell.w+.015,wall,true);for(const opening of openings)addOpeningFrameZ(b,x+(side==='left'?-.012:.012),level,opening,trim);};
-  for(let level=0;level<levels;level++){
-    addWallX(b.z-b.d/2+t/2,level,'front');addWallX(b.z+b.d/2-t/2,level,'back');addWallZ(b.x-b.w/2+t/2,level,'left');addWallZ(b.x+b.w/2-t/2,level,'right');
-  }
-  for(let floorLevel=1;floorLevel<levels;floorLevel++){
-    const floorY=floorLevel*b.floorH;
-    for(const panel of plan.panels){addStructureBox(b,panel.x,floorY-.18,panel.z,panel.w+.03,.18,panel.d+.03,floor,false);walkableSurfaces.push({type:'rect',x:panel.x,z:panel.z,w:panel.w,d:panel.d,y:base+floorY});horizontalSolids.push({x:panel.x,z:panel.z,w:panel.w,d:panel.d,bottomY:base+floorY-.18,topY:base+floorY});}
-    addStructureBox(b,b.x,floorY-.18,plan.balconyZ,b.w*.56,.18,plan.balconyD,floor,false);walkableSurfaces.push({type:'rect',x:b.x,z:plan.balconyZ,w:b.w*.56,d:plan.balconyD,y:base+floorY});horizontalSolids.push({x:b.x,z:plan.balconyZ,w:b.w*.56,d:plan.balconyD,bottomY:base+floorY-.18,topY:base+floorY});
-    const railY=floorY+.08,outerZ=plan.front-b.balcony+.06;
-    addStructureBox(b,b.x,railY,outerZ,b.w*.56,.82,.14,trim,true);addStructureBox(b,b.x-b.w*.28,railY,plan.balconyOutsideZ,.14,.82,b.balcony,trim,true);addStructureBox(b,b.x+b.w*.28,railY,plan.balconyOutsideZ,.14,.82,b.balcony,trim,true);
-  }
-  addStructureBox(b,b.x,b.floorH*levels-.20,b.z,b.w+.04,.20,b.d+.04,trim,false);const roofY=base+b.floorH*levels;walkableSurfaces.push({type:'rect',x:b.x,z:b.z,w:b.w,d:b.d,y:roofY});horizontalSolids.push({x:b.x,z:b.z,w:b.w,d:b.d,bottomY:roofY-.20,topY:roofY});
-  if(b.tall){const parapetY=b.floorH*levels;addStructureBox(b,b.x,parapetY,b.z-b.d/2+.10,b.w,.55,.20,trim,true);addStructureBox(b,b.x,parapetY,b.z+b.d/2-.10,b.w,.55,.20,trim,true);addStructureBox(b,b.x-b.w/2+.10,parapetY,b.z,.20,.55,b.d,trim,true);addStructureBox(b,b.x+b.w/2-.10,parapetY,b.z,.20,.55,b.d,trim,true);}
-  const steps=10,stepLen=plan.stairLen/steps;
-  for(let flight=0;flight<levels-1;flight++){
-    const dir=b.stairDir*(flight%2===0?1:-1),lowX=b.x-dir*plan.stairLen/2,highX=b.x+dir*plan.stairLen/2,yBase=flight*b.floorH;
-    for(let i=0;i<steps;i++){const p=(i+1)/steps,mid=(i+.5)/steps,h=b.floorH*p,x=lowX+(highX-lowX)*mid;addStructureBox(b,x,yBase,plan.stairZ,stepLen+.06,h,plan.stairW,floor,false);for(const side of [-1,1])addStructureBox(b,x,yBase,plan.stairZ+side*(plan.stairW/2-.06),stepLen+.06,h+.62,.14,trim,true);}
-    walkableSurfaces.push({type:'ramp',x1:lowX,x2:highX,z:plan.stairZ,w:plan.stairW-.16,y0:base+yBase,y1:base+(flight+1)*b.floorH});
-    const stairRailY=(flight+1)*b.floorH+.05;addStructureBox(b,b.x,stairRailY,plan.holeMinZ+.04,plan.holeW,.76,.12,trim,true);addStructureBox(b,b.x,stairRailY,plan.holeMaxZ-.04,plan.holeW,.76,.12,trim,true);addStructureBox(b,lowX,stairRailY,plan.stairZ,.12,.76,plan.holeD,trim,true);
-  }
+  const geometry=makeBuildingGeometry(b),materials={wall,trim,floor};
+  for(const part of geometry.parts)addBuildingPart(part,materials);
   mapObstacles.push({type:'box',x:b.x,z:b.z,w:b.w,d:b.d});
 }
-function pyramidSurfaceHeight(p,x,z){const dx=Math.abs(x-p.x),dz=Math.abs(z-p.z),half=p.base/2;if(dx>half||dz>half)return null;return p.baseY+p.h*(1-Math.max(dx,dz)/half);}
-function worldSupportHeight(x,z,currentY=terrainHeight(x,z)){let best=terrainHeight(x,z),limit=currentY+.62;for(const w of walkableSurfaces){let y=null;if(w.type==='pyramid')y=pyramidSurfaceHeight(w,x,z);else if(w.type==='rect'){if(Math.abs(x-w.x)<=w.w/2&&Math.abs(z-w.z)<=w.d/2)y=w.y;}else if(w.type==='ramp'){if(Math.abs(z-w.z)<=w.w/2){const lo=Math.min(w.x1,w.x2),hi=Math.max(w.x1,w.x2);if(x>=lo&&x<=hi){const t=(x-w.x1)/(w.x2-w.x1);y=THREE.MathUtils.lerp(w.y0,w.y1,t);}}}if(y!=null&&y<=limit&&y>best)best=y;}return best;}
-function resolveCeilingCollision(previousY,nextY,x,z){if(nextY<=previousY)return{y:nextY,hit:false};const oldHead=previousY+PLAYER_HEIGHT,newHead=nextY+PLAYER_HEIGHT;let resolved=nextY,hit=false;for(const s of horizontalSolids){if(Math.abs(x-s.x)>s.w/2-0.02||Math.abs(z-s.z)>s.d/2-0.02)continue;if(oldHead<=s.bottomY+.025&&newHead>=s.bottomY-.025){resolved=Math.min(resolved,s.bottomY-PLAYER_HEIGHT-.012);hit=true;}}return{y:resolved,hit};}
-function remoteActorBlocked(x,z,y,fromX,fromZ){for(const r of remotes.values()){if(!r||r.hp<=0)continue;const rp=r.group?.position||r.target;if(!rp)continue;if(y+PLAYER_HEIGHT-.08<=rp.y||y>=rp.y+PLAYER_HEIGHT-.08)continue;const minDist=PLAYER_RADIUS*2+.02,newDist=Math.hypot(x-rp.x,z-rp.z),oldDist=Math.hypot(fromX-rp.x,fromZ-rp.z);if(newDist<minDist&&(oldDist>=minDist||newDist<oldDist-.002))return true;}return false;}
+function remoteActorBlocked(x,z,y,fromX,fromZ){for(const r of remotes.values()){if(!r||r.hp<=0)continue;const rp=r.target||r.group?.position;if(!rp)continue;if(y+PLAYER_HEIGHT-.08<=rp.y||y>=rp.y+PLAYER_HEIGHT-.08)continue;const minDist=PLAYER_RADIUS*2+.02,newDist=Math.hypot(x-rp.x,z-rp.z),oldDist=Math.hypot(fromX-rp.x,fromZ-rp.z);if(newDist<minDist&&(oldDist>=minDist||newDist<oldDist-.002))return true;}return false;}
 
 
 function bindUI(){
@@ -1364,7 +1247,7 @@ function moveHorizontal(dx,dz){
   const midX=position.x,midZ=position.z;let nz=THREE.MathUtils.clamp(position.z+dz,-ARENA_LIMIT,ARENA_LIMIT);if(!blocked(position.x,nz,position.y)&&!remoteActorBlocked(position.x,nz,position.y,midX,midZ))position.z=nz;
   if(onGround)position.y=worldSupportHeight(position.x,position.z,position.y);
 }
-function blocked(x,z,y=position?.y??terrainHeight(x,z)){for(const b of nearbyObstacles(x,z)){const vertical=y+PLAYER_HEIGHT*.92>b.minY&&y<b.maxY-.04;if(!vertical)continue;if(b.type==='box'){if(x>b.minX&&x<b.maxX&&z>b.minZ&&z<b.maxZ)return true;}else if(Math.hypot(x-b.x,z-b.z)<b.r)return true;}return false;}
+function blocked(x,z,y=position?.y??terrainHeight(x,z)){for(const b of nearbyObstacles(x,z,y)){const vertical=y+PLAYER_HEIGHT*.92>b.minY&&y<b.maxY-.04;if(!vertical)continue;if(b.supportTop&&b.maxY<=y+MAX_STEP_HEIGHT)continue;if(b.type==='box'){if(x>b.minX&&x<b.maxX&&z>b.minZ&&z<b.maxZ)return true;}else if(Math.hypot(x-b.x,z-b.z)<b.r)return true;}return false;}
 function round3(n){return Math.round(n*1000)/1000;}
 
 function updateRemoteVisuals(dt){
