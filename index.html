@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.15.13</title>
+<title>Punch World v1.15.14</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -161,8 +161,8 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.13';
-const PROTOCOL_VERSION = 17;
+const APP_VERSION = '1.15.14';
+const PROTOCOL_VERSION = 18;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
 const MAX_BOTS = 8;
@@ -598,29 +598,84 @@ function addRoundObstacle(type,x,z,r,h,base=naturalGroundBase(type,x,z,r)){obsta
 function addTree(x,z,r,h,trunkMat,leafMat){const base=naturalGroundBase('tree',x,z,r),g=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(r*.72,r,h*.64,8),trunkMat);trunk.position.y=h*.32;const crown1=new THREE.Mesh(new THREE.ConeGeometry(r*3.0,h*.48,9),leafMat);crown1.position.y=h*.62;const crown2=new THREE.Mesh(new THREE.ConeGeometry(r*2.35,h*.40,9),leafMat);crown2.position.y=h*.83;g.add(trunk,crown1,crown2);g.traverse(o=>{if(o.isMesh){o.castShadow=!isTouch;o.receiveShadow=!isTouch;}});g.position.set(x,base,z);scene.add(g);addRoundObstacle('tree',x,z,r,h,base);return g;}
 function addBush(x,z,r,h,mat){const base=naturalGroundBase('bush',x,z,r),g=new THREE.Group();for(const [ox,oz,s] of [[0,0,1],[-.55,0,.72],[.55,.08,.68],[0,.48,.63]]){const m=new THREE.Mesh(new THREE.SphereGeometry(r*s*.72,8,6),mat);m.scale.y=.62;m.position.set(ox*r*.45,h*.42,oz*r*.45);g.add(m);}g.position.set(x,base,z);scene.add(g);addRoundObstacle('bush',x,z,r,h,base);return g;}
 function addRock(x,z,r,h,mat){const base=naturalGroundBase('rock',x,z,r),m=new THREE.Mesh(new THREE.DodecahedronGeometry(r,0),mat);m.scale.set(1,h/(r*2),.82);m.position.set(x,base+h*.46,z);m.rotation.set(.18,.4,.12);scene.add(m);addRoundObstacle('rock',x,z,r,h,base);return m;}
-function buildingPlan(b){
-  const stairW=2.2,stairLen=Math.min(7,b.w*.44),stairZ=b.z+b.d*.25;
-  const innerW=b.w-.7,innerD=b.d-.7,innerL=b.x-innerW/2,innerR=b.x+innerW/2,innerMinZ=b.z-innerD/2,innerMaxZ=b.z+innerD/2;
-  const holeW=Math.min(stairLen+.35,innerW-1),holeD=Math.min(stairW+.35,innerD-1),holeL=b.x-holeW/2,holeR=b.x+holeW/2,holeMinZ=stairZ-holeD/2,holeMaxZ=stairZ+holeD/2;
+function buildingPlan(b) {
+  const wallT=.36,stairW=2.35,stairLen=Math.min(7,b.w*.44),stairZ=b.z+b.d*.24;
+  const innerW=b.w-.18,innerD=b.d-.18,innerL=b.x-innerW/2,innerR=b.x+innerW/2,innerMinZ=b.z-innerD/2,innerMaxZ=b.z+innerD/2;
+  const holeW=Math.min(stairLen+.16,innerW-.8),holeD=Math.min(stairW+.18,innerD-.8),holeL=b.x-holeW/2,holeR=b.x+holeW/2,holeMinZ=stairZ-holeD/2,holeMaxZ=stairZ+holeD/2;
   const panels=[
     {x1:innerL,x2:holeL,z1:innerMinZ,z2:innerMaxZ},
     {x1:holeR,x2:innerR,z1:innerMinZ,z2:innerMaxZ},
     {x1:holeL,x2:holeR,z1:innerMinZ,z2:holeMinZ},
     {x1:holeL,x2:holeR,z1:holeMaxZ,z2:innerMaxZ}
   ].filter(p=>p.x2-p.x1>.12&&p.z2-p.z1>.12).map(p=>({x:(p.x1+p.x2)/2,z:(p.z1+p.z2)/2,w:p.x2-p.x1,d:p.z2-p.z1}));
-  const front=b.z-b.d/2,balconyOverlap=.78,balconyD=b.balcony+balconyOverlap,balconyZ=front-b.balcony/2+balconyOverlap/2,balconyOutsideZ=front-b.balcony/2;
-  return{stairW,stairLen,stairZ,panels,front,balconyOverlap,balconyD,balconyZ,balconyOutsideZ};
+  const front=b.z-b.d/2,balconyOverlap=.92,balconyD=b.balcony+balconyOverlap,balconyZ=front-b.balcony/2+balconyOverlap/2,balconyOutsideZ=front-b.balcony/2;
+  const lowX=b.x-b.stairDir*stairLen/2,highX=b.x+b.stairDir*stairLen/2;
+  return{wallT,stairW,stairLen,stairZ,innerW,innerD,holeW,holeD,holeL,holeR,holeMinZ,holeMaxZ,lowX,highX,panels,front,balconyOverlap,balconyD,balconyZ,balconyOutsideZ};
+}
+function buildingWallOpenings(b,level,side){
+  const windowBottom=.78,windowTop=Math.min(b.floorH-.38,2.62),windows=[];
+  if(side==='front'||side==='back'){
+    const center=b.w*.285;
+    windows.push({u:-center,w:2.05,bottom:windowBottom,top:windowTop,kind:'window'});
+    windows.push({u:center,w:2.05,bottom:windowBottom,top:windowTop,kind:'window'});
+    if(side==='front')windows.push({u:0,w:level===0?2.4:2.25,bottom:0,top:Math.min(b.floorH-.38,2.5),kind:'door'});
+  }else{
+    const count=b.d>=13?2:1;
+    if(count===1)windows.push({u:0,w:2.1,bottom:windowBottom,top:windowTop,kind:'window'});
+    else for(const sign of [-1,1])windows.push({u:sign*b.d*.22,w:1.9,bottom:windowBottom,top:windowTop,kind:'window'});
+  }
+  return windows;
+}
+function splitWall(length,height,openings){
+  const half=length/2,xs=[-half,half],ys=[0,height],safe=[];
+  for(const opening of openings){const left=THREE.MathUtils.clamp(opening.u-opening.w/2,-half,half),right=THREE.MathUtils.clamp(opening.u+opening.w/2,-half,half),bottom=THREE.MathUtils.clamp(opening.bottom,0,height),top=THREE.MathUtils.clamp(opening.top,0,height);if(right-left<=.02||top-bottom<=.02)continue;safe.push({...opening,left,right,bottom,top});xs.push(left,right);ys.push(bottom,top);}
+  const uniq=values=>[...new Set(values.map(v=>Math.round(v*10000)/10000))].sort((a,b)=>a-b),ux=uniq(xs),uy=uniq(ys),cells=[];
+  for(let xi=0;xi<ux.length-1;xi++)for(let yi=0;yi<uy.length-1;yi++){const left=ux[xi],right=ux[xi+1],bottom=uy[yi],top=uy[yi+1];if(right-left<=.02||top-bottom<=.02)continue;const midU=(left+right)/2,midY=(bottom+top)/2;if(safe.some(o=>midU>o.left&&midU<o.right&&midY>o.bottom&&midY<o.top))continue;cells.push({u:midU,y:bottom,w:right-left,h:top-bottom});}
+  return cells;
+}
+function addOpeningFrameX(b,z,level,opening,mat){
+  const y=level*b.floorH,bars=.095,depth=.07,h=opening.top-opening.bottom;
+  addStructureBox(b,b.x+opening.u-opening.w/2,y+opening.bottom,z,bars,h,depth,mat,false);
+  addStructureBox(b,b.x+opening.u+opening.w/2,y+opening.bottom,z,bars,h,depth,mat,false);
+  addStructureBox(b,b.x+opening.u,y+opening.top-bars,z,opening.w,bars,depth,mat,false);
+  if(opening.kind==='window')addStructureBox(b,b.x+opening.u,y+opening.bottom,z,opening.w,bars,depth,mat,false);
+}
+function addOpeningFrameZ(b,x,level,opening,mat){
+  const y=level*b.floorH,bars=.095,depth=.07,h=opening.top-opening.bottom;
+  addStructureBox(b,x,y+opening.bottom,b.z+opening.u-opening.w/2,depth,h,bars,mat,false);
+  addStructureBox(b,x,y+opening.bottom,b.z+opening.u+opening.w/2,depth,h,bars,mat,false);
+  addStructureBox(b,x,y+opening.top-bars,b.z+opening.u,depth,bars,opening.w,mat,false);
+  if(opening.kind==='window')addStructureBox(b,x,y+opening.bottom,b.z+opening.u,depth,bars,opening.w,mat,false);
 }
 function addBuilding(b){
-  const wall=new THREE.MeshStandardMaterial({color:0x9da5a8,roughness:.88}),trim=new THREE.MeshStandardMaterial({color:0x5b646b,roughness:.72}),floor=new THREE.MeshStandardMaterial({color:0x6d7478,roughness:.95}),glass=new THREE.MeshStandardMaterial({color:0x5d91a8,roughness:.35,metalness:.12,transparent:true,opacity:.55});
-  const t=.34,door=2.35,side=(b.w-door)/2,plan=buildingPlan(b),base=terrainHeight(b.x,b.z);
-  for(let level=0;level<2;level++){const y=level*b.floorH;addStructureBox(b,b.x-side/2-door/2,y,b.z-b.d/2+t/2,side,2.55,t,wall);addStructureBox(b,b.x+side/2+door/2,y,b.z-b.d/2+t/2,side,2.55,t,wall);addStructureBox(b,b.x,y+2.55,b.z-b.d/2+t/2,door,.70,t,wall);addStructureBox(b,b.x,y,b.z+b.d/2-t/2,b.w,3.25,t,wall);addStructureBox(b,b.x-b.w/2+t/2,y,b.z,t,3.25,b.d,wall);addStructureBox(b,b.x+b.w/2-t/2,y,b.z,t,3.25,b.d,wall);
-    for(const sx of [-1,1]){const wx=b.x+sx*b.w*.25;const pane=new THREE.Mesh(new THREE.BoxGeometry(1.65,1.15,.05),glass);pane.position.set(wx,base+y+1.55,b.z-b.d/2-.03);scene.add(pane);} }
-  for(const p of plan.panels){addStructureBox(b,p.x,b.floorH-.18,p.z,p.w,.18,p.d,floor,false);walkableSurfaces.push({type:'rect',x:p.x,z:p.z,w:p.w,d:p.d,y:base+b.floorH});}
-  addStructureBox(b,b.x,b.floorH-.16,plan.balconyZ,b.w*.52,.16,plan.balconyD,floor,false);walkableSurfaces.push({type:'rect',x:b.x,z:plan.balconyZ,w:b.w*.52,d:plan.balconyD,y:base+b.floorH});
-  addStructureBox(b,b.x,b.floorH*2-.16,b.z,b.w+.1,.18,b.d+.1,trim,false);
-  const railY=b.floorH+.15,outerZ=plan.front-b.balcony+.08;addStructureBox(b,b.x,railY,outerZ,b.w*.52,.78,.12,trim,true);addStructureBox(b,b.x-b.w*.26,railY,plan.balconyOutsideZ,.12,.78,b.balcony,trim,true);addStructureBox(b,b.x+b.w*.26,railY,plan.balconyOutsideZ,.12,.78,b.balcony,trim,true);
-  for(let i=0;i<8;i++){const p=(i+1)/8,h=b.floorH*p,x=b.x+b.stairDir*(-plan.stairLen/2+plan.stairLen*p);addStructureBox(b,x,0,plan.stairZ,plan.stairLen/8+.08,h,plan.stairW,floor,false);}walkableSurfaces.push({type:'ramp',x1:b.x-b.stairDir*plan.stairLen/2,x2:b.x+b.stairDir*plan.stairLen/2,z:plan.stairZ,w:plan.stairW,y0:base,y1:base+b.floorH});
+  const wall=new THREE.MeshStandardMaterial({color:0xa8adb0,roughness:.9}),trim=new THREE.MeshStandardMaterial({color:0x4f5961,roughness:.75}),floor=new THREE.MeshStandardMaterial({color:0x6d7478,roughness:.95});
+  const plan=buildingPlan(b),t=plan.wallT,base=terrainHeight(b.x,b.z);
+  const addWallX=(z,level,side)=>{const openings=buildingWallOpenings(b,level,side);for(const cell of splitWall(b.w,b.floorH,openings))addStructureBox(b,b.x+cell.u,level*b.floorH+cell.y,z,cell.w+.015,cell.h+.015,t,wall,true);for(const opening of openings)addOpeningFrameX(b,z+(side==='front'?-.012:.012),level,opening,trim);};
+  const addWallZ=(x,level,side)=>{const openings=buildingWallOpenings(b,level,side);for(const cell of splitWall(b.d,b.floorH,openings))addStructureBox(b,x,level*b.floorH+cell.y,b.z+cell.u,t,cell.h+.015,cell.w+.015,wall,true);for(const opening of openings)addOpeningFrameZ(b,x+(side==='left'?-.012:.012),level,opening,trim);};
+  for(let level=0;level<2;level++){
+    addWallX(b.z-b.d/2+t/2,level,'front');
+    addWallX(b.z+b.d/2-t/2,level,'back');
+    addWallZ(b.x-b.w/2+t/2,level,'left');
+    addWallZ(b.x+b.w/2-t/2,level,'right');
+  }
+  for(const panel of plan.panels){addStructureBox(b,panel.x,b.floorH-.18,panel.z,panel.w+.03,.18,panel.d+.03,floor,false);walkableSurfaces.push({type:'rect',x:panel.x,z:panel.z,w:panel.w,d:panel.d,y:base+b.floorH});}
+  addStructureBox(b,b.x,b.floorH-.18,plan.balconyZ,b.w*.56,.18,plan.balconyD,floor,false);walkableSurfaces.push({type:'rect',x:b.x,z:plan.balconyZ,w:b.w*.56,d:plan.balconyD,y:base+b.floorH});
+  addStructureBox(b,b.x,b.floorH*2-.20,b.z,b.w+.04,.20,b.d+.04,trim,false);
+  const railY=b.floorH+.08,outerZ=plan.front-b.balcony+.06;
+  addStructureBox(b,b.x,railY,outerZ,b.w*.56,.82,.14,trim,true);
+  addStructureBox(b,b.x-b.w*.28,railY,plan.balconyOutsideZ,.14,.82,b.balcony,trim,true);
+  addStructureBox(b,b.x+b.w*.28,railY,plan.balconyOutsideZ,.14,.82,b.balcony,trim,true);
+  const steps=10,stepLen=plan.stairLen/steps;
+  for(let i=0;i<steps;i++){
+    const p=(i+1)/steps,mid=(i+.5)/steps,h=b.floorH*p,x=plan.lowX+(plan.highX-plan.lowX)*mid;
+    addStructureBox(b,x,0,plan.stairZ,stepLen+.06,h,plan.stairW,floor,false);
+    for(const side of [-1,1])addStructureBox(b,x,0,plan.stairZ+side*(plan.stairW/2-.06),stepLen+.06,h+.62,.14,trim,true);
+  }
+  walkableSurfaces.push({type:'ramp',x1:plan.lowX,x2:plan.highX,z:plan.stairZ,w:plan.stairW-.16,y0:base,y1:base+b.floorH});
+  const stairRailY=b.floorH+.05;
+  addStructureBox(b,b.x,stairRailY,plan.holeMinZ+.04,plan.holeW,.76,.12,trim,true);
+  addStructureBox(b,b.x,stairRailY,plan.holeMaxZ-.04,plan.holeW,.76,.12,trim,true);
+  addStructureBox(b,plan.lowX,stairRailY,plan.stairZ,.12,.76,plan.holeD,trim,true);
   mapObstacles.push({type:'box',x:b.x,z:b.z,w:b.w,d:b.d});
 }
 function pyramidSurfaceHeight(p,x,z){const dx=Math.abs(x-p.x),dz=Math.abs(z-p.z),half=p.base/2;if(dx>half||dz>half)return null;return p.baseY+p.h*(1-Math.max(dx,dz)/half);}
