@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.15.20</title>
+<title>Punch World v1.15.21</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -166,8 +166,8 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.20';
-const PROTOCOL_VERSION = 24;
+const APP_VERSION = '1.15.21';
+const PROTOCOL_VERSION = 25;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
 const MAX_BOTS = 8;
@@ -1255,9 +1255,19 @@ function updateMovement(dt){
   if(position.y<=ground||(wasGround&&verticalVelocity<=0&&position.y<ground+.3)){position.y=ground;verticalVelocity=0;onGround=true;if(!wasGround)landingKick=1;}else onGround=false;
 }
 function moveHorizontal(dx,dz){
-  const startX=position.x,startZ=position.z;let nx=THREE.MathUtils.clamp(position.x+dx,-ARENA_LIMIT,ARENA_LIMIT);if(!blocked(nx,position.z,position.y)&&!remoteActorBlocked(nx,position.z,position.y,startX,startZ))position.x=nx;
-  const midX=position.x,midZ=position.z;let nz=THREE.MathUtils.clamp(position.z+dz,-ARENA_LIMIT,ARENA_LIMIT);if(!blocked(position.x,nz,position.y)&&!remoteActorBlocked(position.x,nz,position.y,midX,midZ))position.z=nz;
-  if(onGround)position.y=worldSupportHeight(position.x,position.z,position.y);
+  // Sweep movement in short increments. A single slow frame must never skip
+  // multiple stair treads or outrun the maximum legal step height.
+  const distance=Math.hypot(dx,dz),steps=Math.max(1,Math.ceil(distance/.16)),sx=dx/steps,sz=dz/steps;
+  for(let i=0;i<steps;i++){
+    const startX=position.x,startZ=position.z;
+    const nx=THREE.MathUtils.clamp(position.x+sx,-ARENA_LIMIT,ARENA_LIMIT);
+    if(!blocked(nx,position.z,position.y)&&!remoteActorBlocked(nx,position.z,position.y,startX,startZ))position.x=nx;
+    if(onGround)position.y=worldSupportHeight(position.x,position.z,position.y);
+    const midX=position.x,midZ=position.z;
+    const nz=THREE.MathUtils.clamp(position.z+sz,-ARENA_LIMIT,ARENA_LIMIT);
+    if(!blocked(position.x,nz,position.y)&&!remoteActorBlocked(position.x,nz,position.y,midX,midZ))position.z=nz;
+    if(onGround)position.y=worldSupportHeight(position.x,position.z,position.y);
+  }
 }
 function blocked(x,z,y=position?.y??terrainHeight(x,z)){for(const b of nearbyObstacles(x,z,y)){const vertical=y+PLAYER_HEIGHT*.92>b.minY&&y<b.maxY-.04;if(!vertical)continue;if(b.supportTop&&b.maxY<=y+MAX_STEP_HEIGHT)continue;if(b.type==='box'){if(x>b.minX&&x<b.maxX&&z>b.minZ&&z<b.maxZ)return true;}else if(Math.hypot(x-b.x,z-b.z)<b.r)return true;}return false;}
 function round3(n){return Math.round(n*1000)/1000;}
