@@ -314,7 +314,8 @@ select:focus-visible,
   position: relative;
   width: min(470px, 100%);
   max-height: 100%;
-  overflow: auto;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: grid;
   gap: 12px;
   padding: 22px;
@@ -685,6 +686,8 @@ select:focus-visible,
   white-space: nowrap;
 }
 
+.team-short { display: none; }
+
 .team-copy small {
   overflow: hidden;
   color: var(--muted);
@@ -858,6 +861,7 @@ select:focus-visible,
 
 .world {
   position: relative;
+  min-height: 44px;
   min-width: 0;
   overflow: hidden;
   display: grid;
@@ -1374,7 +1378,7 @@ select:focus-visible,
   .join-row { gap: 5px; }
   .world-section { gap: 4px; }
   .world-list { gap: 4px; }
-  .world { gap: 5px; padding: 5px 6px; }
+  .world { min-height: 42px; gap: 5px; padding: 5px 6px; }
   .world-code { font-size: 10px; }
   .world-meta { font-size: 7.5px; }
   .team-counts { margin-top: 2px; }
@@ -1444,6 +1448,15 @@ select:focus-visible,
   .pause-actions, .pause.admin-mode .pause-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .admin-sub { display: none; }
   .weapon-settings-card label { font-size: 7px; letter-spacing: .05em; }
+}
+
+@media (max-width: 620px) and (orientation: landscape) {
+  .team-long { display: none; }
+  .team-short { display: inline; }
+  .team-copy strong { font-size: 8px; }
+  .team-option { gap: 4px; padding-inline: 5px; }
+  .team-swatch { width: 7px; flex-basis: 7px; }
+  .world { min-height: 42px; }
 }
 
 @media (max-height: 390px) and (orientation: landscape) {
