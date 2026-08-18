@@ -1565,3 +1565,44 @@ select:focus-visible,
     transition-duration: .001ms !important;
   }
 }
+
+/* v1.15.24 player administration */
+.admin-tabs { grid-template-columns: repeat(4, 1fr); }
+.admin-player-list {
+  width: 100%;
+  display: grid;
+  gap: 7px;
+  align-content: start;
+}
+.admin-player-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 9px 10px;
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 10px;
+  background: rgba(255,255,255,.035);
+}
+.admin-player-identity {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.admin-player-identity > div { min-width: 0; display: grid; gap: 2px; }
+.admin-player-identity strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 11px; }
+.admin-player-identity small { color: var(--muted); font-size: 7.5px; font-weight: 800; letter-spacing: .08em; }
+.admin-team-dot { width: 9px; height: 9px; flex: 0 0 9px; border-radius: 50%; box-shadow: 0 0 12px currentColor; }
+.admin-team-dot.blue { color: #46a7ff; background: #46a7ff; }
+.admin-team-dot.red { color: #ff5c6c; background: #ff5c6c; }
+.admin-player-actions { display: flex; gap: 6px; align-items: center; }
+.admin-mini { min-height: 30px; padding: 5px 9px; font-size: 8px; white-space: nowrap; }
+.admin-mini.active { border-color: rgba(95,220,255,.48); background: rgba(69,213,255,.13); color: #eafdff; }
+.admin-mini:disabled { opacity: .48; cursor: default; }
+
+@media (max-width: 760px) and (orientation: landscape) {
+  .admin-player-row { padding: 6px 7px; gap: 6px; }
+  .admin-player-actions { gap: 4px; }
+  .admin-mini { min-height: 27px; padding: 4px 7px; font-size: 7px; }
+}
