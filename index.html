@@ -7,8 +7,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="preconnect" href="https://opengameart.org">
+<link rel="dns-prefetch" href="//opengameart.org">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.5</title>
+<title>Breachline v1.16.6</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -198,7 +200,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.16.5';
+const APP_VERSION = '1.16.6';
 const PROTOCOL_VERSION = 31;
 const ROOM_CODE_LENGTH = 4;
 const MAX_BOTS = 8;
@@ -234,7 +236,10 @@ const SOUND_DEFS = Object.freeze([
   {id:'shotAssault',category:'WEAPONS',label:'Assault Rifle Fire'},
   {id:'shotShotgun',category:'WEAPONS',label:'Shotgun Fire'},
   {id:'shotSniper',category:'WEAPONS',label:'Sniper Fire'},
-  {id:'reload',category:'WEAPONS',label:'Reload'},
+  {id:'reloadPistol',category:'WEAPONS',label:'Pistol Reload'},
+  {id:'reloadAssault',category:'WEAPONS',label:'Assault Rifle Reload'},
+  {id:'reloadShotgun',category:'WEAPONS',label:'Shotgun Reload'},
+  {id:'reloadSniper',category:'WEAPONS',label:'Sniper Reload'},
   {id:'hitmarker',category:'COMBAT',label:'Hitmarker'},
   {id:'headshot',category:'COMBAT',label:'Headshot'},
   {id:'kill',category:'COMBAT',label:'Elimination Confirm'},
@@ -250,37 +255,57 @@ const SOUND_DEFS = Object.freeze([
   {id:'flashDetonate',category:'TACTICAL',label:'Flash Detonation'},
   {id:'stickyDetonate',category:'TACTICAL',label:'Semtex Explosion'},
 ]);
-// Lightweight CC0 sampled defaults. These are deliberately few and reused so real
-// recorded transients improve the FPS feel without adding a large startup payload.
+// Every built-in cue owns a distinct CC0 source asset. High-frequency combat sounds
+// are warmed first; the rest are staggered into idle time so audio never blocks play.
 const DEFAULT_SAMPLE_ASSETS = Object.freeze({
-  gunshot:Object.freeze({
-    url:'https://opengameart.org/sites/default/files/gunshot_0.mp3',
-    pool:6, source:'Basic Sound Effects · n4 · CC0', bytes:42803
-  }),
-  reload:Object.freeze({
-    url:'https://opengameart.org/sites/default/files/gun_reload_lock_or_click_sound.mp3',
-    pool:2, source:'Gun reload, lock or click sound · pauliuw · CC0', bytes:18125
-  }),
-  explosion:Object.freeze({
-    url:'https://opengameart.org/sites/default/files/explosion_5.ogg',
-    pool:3, source:'Rpg Sound Effect Pack · Delta12 Studio · CC0', bytes:25805
-  }),
-  hurt:Object.freeze({
-    url:'https://opengameart.org/sites/default/files/hurt_1.ogg',
-    pool:2, source:'Rpg Sound Effect Pack · Delta12 Studio · CC0', bytes:14541
-  }),
+  introMusic:Object.freeze({url:'https://opengameart.org/sites/default/files/Psycho%20Punch_1.ogg',pool:1,source:'Psycho Punch · KiluaBoy · CC0',bytes:453900}),
+  pistolShot:Object.freeze({url:'https://opengameart.org/sites/default/files/gunshot_0.mp3',pool:6,source:'Basic Sound Effects · n4 · CC0',bytes:42803}),
+  assaultShot:Object.freeze({url:'https://opengameart.org/sites/default/files/gunfire_sfx.wav',pool:7,source:'Random gunfire SFX · iamoneabe · CC0',bytes:353500}),
+  shotgunShot:Object.freeze({url:'https://opengameart.org/sites/default/files/explosion_0.mp3',pool:4,source:'Basic Sound Effects · n4 · CC0',bytes:122300}),
+  sniperShot:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_gunshot1.wav',pool:4,source:'Various Sound Effects · Spring Spring · CC0',bytes:306800}),
+  pistolReload:Object.freeze({url:'https://opengameart.org/sites/default/files/gunreload1.wav',pool:2,source:'Gun reload sounds · SpringySpringo · CC0',bytes:278600}),
+  assaultReload:Object.freeze({url:'https://opengameart.org/sites/default/files/assaultriflereload1_0.wav',pool:2,source:'Gun reload sounds · SpringySpringo · CC0',bytes:274500}),
+  shotgunReload:Object.freeze({url:'https://opengameart.org/sites/default/files/shotguncock_0.wav',pool:2,source:'Gun reload sounds · SpringySpringo · CC0',bytes:83600}),
+  sniperReload:Object.freeze({url:'https://opengameart.org/sites/default/files/clipload2.wav',pool:2,source:'Gun Reload Sound Effects · BMacZero · CC0',bytes:18500}),
+  hitmarker:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_bullethit.wav',pool:5,source:'Various Sound Effects · Spring Spring · CC0',bytes:64500}),
+  headshot:Object.freeze({url:'https://opengameart.org/sites/default/files/bell1_0.mp3',pool:3,source:'Basic Sound Effects · n4 · CC0',bytes:61600}),
+  kill:Object.freeze({url:'https://opengameart.org/sites/default/files/success_0.mp3',pool:3,source:'Basic Sound Effects · n4 · CC0',bytes:49100}),
+  announcer:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_npc_message.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:29100}),
+  shield:Object.freeze({url:'https://opengameart.org/sites/default/files/vibrophone1_0.mp3',pool:2,source:'Basic Sound Effects · n4 · CC0',bytes:142100}),
+  hurt:Object.freeze({url:'https://opengameart.org/sites/default/files/hurt_01_0.mp3',pool:3,source:'Hurt Sound Effects · EZduzziteh · CC0',bytes:7100}),
+  jump:Object.freeze({url:'https://opengameart.org/sites/default/files/jump.flac',pool:2,source:'Jump and Run and Stand · mieki256 · CC0',bytes:15500}),
+  flashThrow:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_throw1.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:86400}),
+  stickyThrow:Object.freeze({url:'https://opengameart.org/sites/default/files/cannonball_tap.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:188200}),
+  flashImpact:Object.freeze({url:'https://opengameart.org/sites/default/files/clink1_0.wav',pool:3,source:'Metal Impact Sounds · BMacZero · CC0',bytes:27700}),
+  stickyImpact:Object.freeze({url:'https://opengameart.org/sites/default/files/thud2.wav',pool:3,source:'Metal Impact Sounds · BMacZero · CC0',bytes:51200}),
+  semtexBeep:Object.freeze({url:'https://opengameart.org/sites/default/files/beep.ogg',pool:3,source:'Beep Sound · Test User · CC0',bytes:5700}),
+  flashDetonate:Object.freeze({url:'https://opengameart.org/sites/default/files/flash_bang.wav',pool:3,source:'flash bang sound · teeeece · CC0',bytes:563000}),
+  stickyDetonate:Object.freeze({url:'https://opengameart.org/sites/default/files/explosion_5.ogg',pool:3,source:'Rpg Sound Effect Pack · Delta12 Studio · CC0',bytes:25805}),
 });
 const DEFAULT_SAMPLE_CUES = Object.freeze({
-  shotPistol:Object.freeze({asset:'gunshot',gain:.72,rate:1.08}),
-  shotAssault:Object.freeze({asset:'gunshot',gain:.58,rate:1.24}),
-  shotShotgun:Object.freeze({asset:'gunshot',gain:.88,rate:.72}),
-  shotSniper:Object.freeze({asset:'gunshot',gain:.92,rate:.84}),
-  reload:Object.freeze({asset:'reload',gain:.72,rate:1}),
-  hurt:Object.freeze({asset:'hurt',gain:.72,rate:1}),
-  flashImpact:Object.freeze({asset:'reload',gain:.24,rate:1.42}),
-  stickyImpact:Object.freeze({asset:'reload',gain:.30,rate:.78}),
-  flashDetonate:Object.freeze({asset:'gunshot',gain:.70,rate:1.38}),
-  stickyDetonate:Object.freeze({asset:'explosion',gain:.95,rate:.94}),
+  introMusic:Object.freeze({asset:'introMusic',gain:.56,rate:1,loop:true}),
+  shotPistol:Object.freeze({asset:'pistolShot',gain:.72,rate:1}),
+  shotAssault:Object.freeze({asset:'assaultShot',gain:.60,rate:1}),
+  shotShotgun:Object.freeze({asset:'shotgunShot',gain:.80,rate:.92}),
+  shotSniper:Object.freeze({asset:'sniperShot',gain:.88,rate:.94}),
+  reloadPistol:Object.freeze({asset:'pistolReload',gain:.58,rate:1}),
+  reloadAssault:Object.freeze({asset:'assaultReload',gain:.58,rate:1}),
+  reloadShotgun:Object.freeze({asset:'shotgunReload',gain:.70,rate:1}),
+  reloadSniper:Object.freeze({asset:'sniperReload',gain:.72,rate:1}),
+  hitmarker:Object.freeze({asset:'hitmarker',gain:.30,rate:1.22}),
+  headshot:Object.freeze({asset:'headshot',gain:.34,rate:1.18}),
+  kill:Object.freeze({asset:'kill',gain:.34,rate:1.06}),
+  announcer:Object.freeze({asset:'announcer',gain:.34,rate:1}),
+  shield:Object.freeze({asset:'shield',gain:.36,rate:1}),
+  hurt:Object.freeze({asset:'hurt',gain:.64,rate:1}),
+  jump:Object.freeze({asset:'jump',gain:.34,rate:1}),
+  flashThrow:Object.freeze({asset:'flashThrow',gain:.36,rate:1.08}),
+  stickyThrow:Object.freeze({asset:'stickyThrow',gain:.38,rate:.96}),
+  flashImpact:Object.freeze({asset:'flashImpact',gain:.34,rate:1.08}),
+  stickyImpact:Object.freeze({asset:'stickyImpact',gain:.42,rate:.92}),
+  semtexBeep:Object.freeze({asset:'semtexBeep',gain:.36,rate:1}),
+  flashDetonate:Object.freeze({asset:'flashDetonate',gain:.80,rate:1}),
+  stickyDetonate:Object.freeze({asset:'stickyDetonate',gain:.90,rate:1}),
 });
 const DEFAULT_SAMPLE_TOTAL_BYTES=Object.values(DEFAULT_SAMPLE_ASSETS).reduce((sum,a)=>sum+a.bytes,0);
 let worldSettings=cloneSettings(DEFAULT_WORLD_SETTINGS);
@@ -343,7 +368,7 @@ let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0;
 let onGround = true, fireTime = 99, localFireCooldown = 0, lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0;
 let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true}, queuedFireUntil=0, serverFireRetryAt=0, localEquipmentCooldownUntil=0;
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0;
-let audioCtx = null, musicTimer = null, musicStep = 0, musicNextAt = 0, musicGain = null, customMusicSource = null, sfxGain = null;
+let audioCtx = null, musicGain = null, customMusicSource = null, defaultMusicElement = null, defaultMusicPending = false, sfxGain = null;
 let soundVolume=Math.max(0,Math.min(1,Number(localStorage.getItem('breachlineSoundVolume')??.85))),soundDbPromise=null,soundLoadPromise=null,soundHydratePromise=null,pendingSoundUploadId='',soundPreviewSource=null;
 const customSoundRecords=new Map(),customSoundBuffers=new Map(),soundDecodeFailures=new Set();
 const defaultSamplePools=new Map(),defaultSampleFailures=new Set();
@@ -546,12 +571,12 @@ function hydrateCustomSoundBuffers(){
   soundHydratePromise=(async()=>{await initLocalSounds();const jobs=[];for(const [id,row] of customSoundRecords){if(customSoundBuffers.has(id)||soundDecodeFailures.has(id))continue;jobs.push(decodeSoundBlob(row.blob).then(buffer=>customSoundBuffers.set(id,buffer)).catch(err=>{soundDecodeFailures.add(id);console.warn(`Could not decode custom sound ${id}:`,err);}));}if(jobs.length)await Promise.all(jobs);})().finally(()=>{soundHydratePromise=null;});
   return soundHydratePromise;
 }
-function setSoundVolume(value){soundVolume=Math.max(0,Math.min(1,Number(value)||0));localStorage.setItem('breachlineSoundVolume',String(soundVolume));if(sfxGain)sfxGain.gain.value=soundVolume;const range=$('soundVolumeRange'),label=$('soundVolumeValue');if(range)range.value=String(Math.round(soundVolume*100));if(label)label.textContent=`${Math.round(soundVolume*100)}%`;}
+function setSoundVolume(value){soundVolume=Math.max(0,Math.min(1,Number(value)||0));localStorage.setItem('breachlineSoundVolume',String(soundVolume));if(sfxGain)sfxGain.gain.value=soundVolume;const range=$('soundVolumeRange'),label=$('soundVolumeValue');if(range)range.value=String(Math.round(soundVolume*100));if(label)label.textContent=`${Math.round(soundVolume*100)}%`;if(defaultMusicElement){const cue=getDefaultSampleCue('introMusic');defaultMusicElement.volume=Math.max(0,Math.min(1,soundVolume*(cue?.gain||.56)));}}
 function renderSoundSettings(){
   const list=$('soundSettingsList');if(!list)return;
   const groups=new Map();for(const def of SOUND_DEFS){if(!groups.has(def.category))groups.set(def.category,[]);groups.get(def.category).push(def);}
-  list.innerHTML=[...groups.entries()].map(([category,defs])=>`<section class="sound-group"><div class="sound-group-title">${category}</div><div class="sound-group-grid">${defs.map(def=>{const rec=customSoundRecords.get(def.id),custom=!!rec,sampled=!!DEFAULT_SAMPLE_CUES[def.id],defaultLabel=sampled?'CC0 sampled default':'Procedural default',defaultTitle=sampled?DEFAULT_SAMPLE_ASSETS[DEFAULT_SAMPLE_CUES[def.id].asset].source:'Built-in procedural sound';return `<div class="sound-row" data-sound-id="${def.id}"><div class="sound-copy"><strong>${def.label}</strong><small title="${custom?escapeHtml(rec.name):escapeHtml(defaultTitle)}">${custom?escapeHtml(rec.name):defaultLabel}</small></div><span class="sound-state ${custom?'custom':''}">${custom?'CUSTOM':'DEFAULT'}</span><div class="sound-actions"><button class="btn icon-btn sound-preview" data-sound-action="preview" title="Preview ${def.label}" aria-label="Preview ${def.label}"><svg class="ui-icon"><use href="#i-play"/></svg></button><button class="btn sound-upload" data-sound-action="upload"><svg class="ui-icon"><use href="#i-upload"/></svg><span>${custom?'Replace':'Upload'}</span></button><button class="btn icon-btn sound-reset" data-sound-action="reset" title="Restore default ${def.label}" aria-label="Restore default ${def.label}" ${custom?'':'disabled'}><svg class="ui-icon"><use href="#i-reset"/></svg></button></div></div>`;}).join('')}</div></section>`).join('');
-  const customCount=customSoundRecords.size;setSoundSettingsStatus(customCount?`${customCount} custom sound${customCount===1?'':'s'} active on this device.`:`Default audio active · ${Math.round(DEFAULT_SAMPLE_TOTAL_BYTES/1024)} KB CC0 sample set + procedural cues.`,customCount?'ok':'');setSoundVolume(soundVolume);
+  list.innerHTML=[...groups.entries()].map(([category,defs])=>`<section class="sound-group"><div class="sound-group-title">${category}</div><div class="sound-group-grid">${defs.map(def=>{const rec=customSoundRecords.get(def.id),custom=!!rec,cue=DEFAULT_SAMPLE_CUES[def.id],asset=cue&&DEFAULT_SAMPLE_ASSETS[cue.asset],defaultLabel='CC0 audio default',defaultTitle=asset?.source||'CC0 default audio';return `<div class="sound-row" data-sound-id="${def.id}"><div class="sound-copy"><strong>${def.label}</strong><small title="${custom?escapeHtml(rec.name):escapeHtml(defaultTitle)}">${custom?escapeHtml(rec.name):defaultLabel}</small></div><span class="sound-state ${custom?'custom':''}">${custom?'CUSTOM':'DEFAULT'}</span><div class="sound-actions"><button class="btn icon-btn sound-preview" data-sound-action="preview" title="Preview ${def.label}" aria-label="Preview ${def.label}"><svg class="ui-icon"><use href="#i-play"/></svg></button><button class="btn sound-upload" data-sound-action="upload"><svg class="ui-icon"><use href="#i-upload"/></svg><span>${custom?'Replace':'Upload'}</span></button><button class="btn icon-btn sound-reset" data-sound-action="reset" title="Restore default ${def.label}" aria-label="Restore default ${def.label}" ${custom?'':'disabled'}><svg class="ui-icon"><use href="#i-reset"/></svg></button></div></div>`;}).join('')}</div></section>`).join('');
+  const customCount=customSoundRecords.size;setSoundSettingsStatus(customCount?`${customCount} custom sound${customCount===1?'':'s'} active on this device.`:`Default audio active · ${SOUND_DEFS.length} distinct CC0 cues · ${(DEFAULT_SAMPLE_TOTAL_BYTES/1024/1024).toFixed(1)} MB source set, loaded asynchronously.`,customCount?'ok':'');setSoundVolume(soundVolume);
 }
 function openSettingsPanel(){ensureAudio();initLocalSounds().then(hydrateCustomSoundBuffers);renderSoundSettings();$('settingsPanel').classList.remove('hide');fitResponsiveOverlays();}
 function closeSettingsPanel(){pendingSoundUploadId='';$('soundFileInput').value='';$('settingsPanel').classList.add('hide');stopSoundPreview();}
@@ -567,7 +592,7 @@ function buildDefaultSamplePool(assetKey){
   const asset=DEFAULT_SAMPLE_ASSETS[assetKey];if(!asset||defaultSampleFailures.has(assetKey))return null;
   const nodes=[];
   for(let i=0;i<asset.pool;i++){
-    const el=new Audio();el.preload='auto';el.src=asset.url;el.playsInline=true;
+    const el=new Audio();el.preload=i===0?'auto':'metadata';el.src=asset.url;el.playsInline=true;el.crossOrigin=null;
     try{el.preservesPitch=false;el.webkitPreservesPitch=false;el.mozPreservesPitch=false;}catch{}
     nodes.push(el);
   }
@@ -575,41 +600,45 @@ function buildDefaultSamplePool(assetKey){
   const first=nodes[0];
   pool.readyPromise=new Promise(resolve=>{
     let settled=false;
-    const done=ok=>{if(settled)return;settled=true;pool.status=ok?'ready':'failed';if(!ok)defaultSampleFailures.add(assetKey);resolve(ok);};
+    const done=ok=>{if(settled)return;settled=true;pool.status=ok?'ready':'failed';if(!ok)defaultSampleFailures.add(assetKey);if(ok&&nodes.length>1){nodes.slice(1).forEach((el,i)=>setTimeout(()=>{try{el.preload='auto';el.load();}catch{}},20+i*24));}resolve(ok);};
     if(first.readyState>=2){done(true);return;}
     first.addEventListener('canplay',()=>done(true),{once:true});
     first.addEventListener('error',()=>done(false),{once:true});
-    setTimeout(()=>done(first.readyState>=2),3500);
+    setTimeout(()=>done(first.readyState>=2),5000);
   });
   defaultSamplePools.set(assetKey,pool);
-  for(const el of nodes){try{el.load();}catch{}}
+  try{first.load();}catch{}
   return pool;
 }
+function warmDefaultSampleCue(id){const cue=getDefaultSampleCue(id);if(cue)buildDefaultSamplePool(cue.asset);}
 function warmDefaultSamples(){
   if(defaultSamplesWarmStarted)return;defaultSamplesWarmStarted=true;
-  // Network/decode work is asynchronous and never awaited by gameplay. Four tiny
-  // assets (~99 KB total) are reused across all sampled cues.
-  for(const key of Object.keys(DEFAULT_SAMPLE_ASSETS))buildDefaultSamplePool(key);
+  // Start only the latency-sensitive set immediately. Remaining distinct defaults
+  // are staggered into idle time to avoid a large burst of network/decode work.
+  const immediate=['introMusic','shotPistol','shotAssault','shotShotgun','shotSniper','hitmarker','hurt','jump','semtexBeep'];
+  const deferred=SOUND_DEFS.map(x=>x.id).filter(id=>!immediate.includes(id));
+  immediate.forEach(warmDefaultSampleCue);
+  const schedule=(fn,delay)=>{if('requestIdleCallback'in window)requestIdleCallback(fn,{timeout:delay+900});else setTimeout(fn,delay);};
+  deferred.forEach((id,i)=>schedule(()=>warmDefaultSampleCue(id),250+i*120));
 }
 function playDefaultSample(id,volume=1,override={}){
   const cue=getDefaultSampleCue(id);if(!cue)return null;
   const pool=buildDefaultSamplePool(cue.asset);if(!pool||pool.status!=='ready')return null;
   const el=pool.nodes[pool.cursor++%pool.nodes.length];
   try{
-    el.pause();el.currentTime=0;
+    el.pause();el.currentTime=0;el.loop=!!(override.loop??cue.loop);
     el.playbackRate=Math.max(.5,Math.min(2,Number(override.rate??cue.rate)||1));
     el.volume=Math.max(0,Math.min(1,soundVolume*(Number(volume)||0)*(Number(override.gain??cue.gain)||1)));
     const started=el.play();if(started?.catch)started.catch(()=>{});
     return el;
   }catch{return null;}
 }
-async function waitForSampledDefault(id,timeoutMs=1400){
+async function waitForSampledDefault(id,timeoutMs=1800){
   const cue=getDefaultSampleCue(id);if(!cue)return false;const pool=buildDefaultSamplePool(cue.asset);if(!pool)return false;if(pool.status==='ready')return true;if(pool.status==='failed')return false;
   return await Promise.race([pool.readyPromise,new Promise(resolve=>setTimeout(()=>resolve(false),timeoutMs))]);
 }
 function playCustomSound(id,volume=1,options={}){const buffer=customSoundBuffers.get(id);if(!buffer)return null;const a=ensureAudio();if(!a)return null;if(options.music&&!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}const source=a.createBufferSource(),gain=a.createGain();source.buffer=buffer;source.loop=!!options.loop;if(options.playbackRate)source.playbackRate.value=options.playbackRate;gain.gain.value=Math.max(0,Math.min(1,Number(volume)||0));source.connect(gain).connect(options.music?musicGain:(sfxGain||a.destination));source.start();if(options.maxDuration)setTimeout(()=>{try{source.stop();}catch{}},options.maxDuration*1000);return source;}
-function previewSound(id){ensureAudio();hydrateCustomSoundBuffers().then(async()=>{stopSoundPreview();const custom=playCustomSound(id,1,{music:id==='introMusic',maxDuration:2.5});if(custom){soundPreviewSource=custom;custom.onended=()=>{if(soundPreviewSource===custom)soundPreviewSource=null;};return;}if(hasSampledDefault(id)){await waitForSampledDefault(id);const sampled=playDefaultSample(id,1);if(sampled){soundPreviewSource=sampled;sampled.onended=()=>{if(soundPreviewSource===sampled)soundPreviewSource=null;};return;}}previewDefaultSound(id);});}
-function previewDefaultSound(id){switch(id){case'introMusic':tone(659,.11,'square',.018);setTimeout(()=>tone(784,.12,'square',.016),120);break;case'shotPistol':soundShot('pistol');break;case'shotAssault':soundShot('assault');break;case'shotShotgun':soundShot('shotgun');break;case'shotSniper':soundShot('sniper');break;case'reload':soundReload();break;case'hitmarker':soundHitmarker();break;case'headshot':soundHeadshot();break;case'kill':soundKill();break;case'announcer':soundAnnouncer(3);break;case'shield':soundShield();break;case'hurt':soundHurt();break;case'jump':soundJump();break;case'flashThrow':soundThrowableThrow('flash');break;case'stickyThrow':soundThrowableThrow('sticky');break;case'flashImpact':soundThrowableImpact('flash',{x:position?.x||0,y:(position?.y||0)+1,z:position?.z||0});break;case'stickyImpact':soundThrowableImpact('sticky',{x:position?.x||0,y:(position?.y||0)+1,z:position?.z||0});break;case'semtexBeep':{const fake={root:{position:position?.clone?.()||{x:0,y:0,z:0}}};soundSemtexBeep(fake,500);}break;case'flashDetonate':soundTacticalDetonation('flash',{x:position?.x||0,y:(position?.y||0)+1,z:position?.z||0});break;case'stickyDetonate':soundTacticalDetonation('sticky',{x:position?.x||0,y:(position?.y||0)+1,z:position?.z||0});break;}}
+function previewSound(id){ensureAudio();hydrateCustomSoundBuffers().then(async()=>{stopSoundPreview();const custom=playCustomSound(id,1,{music:id==='introMusic',maxDuration:2.5});if(custom){soundPreviewSource=custom;custom.onended=()=>{if(soundPreviewSource===custom)soundPreviewSource=null;};return;}const ok=await waitForSampledDefault(id,4000);const sampled=ok?playDefaultSample(id,1,{loop:false}):null;if(sampled){soundPreviewSource=sampled;sampled.onended=()=>{if(soundPreviewSource===sampled)soundPreviewSource=null;};if(id==='introMusic')setTimeout(()=>{if(soundPreviewSource===sampled)stopSoundPreview();},2500);return;}const def=SOUND_DEFS.find(x=>x.id===id);setSoundSettingsStatus(`${def?.label||'Default sound'} could not load. Check the connection and try again.`,'error');});}
 
 function init3D(){
   scene = new THREE.Scene();
@@ -1430,7 +1459,7 @@ function doReload(){
   if((ammo[currentWeapon]||0)>=spec.mag)return;
   if(reloadPendingUntil>performance.now())return;
   if(reloadUntil){requestCombatSync();return;}
-  setAim(false);reloadPendingUntil=performance.now()+650;send({t:'reload',weapon:currentWeapon,seq:++combatSeq});soundReload();
+  setAim(false);reloadPendingUntil=performance.now()+650;send({t:'reload',weapon:currentWeapon,seq:++combatSeq});soundReload(currentWeapon);
 }
 function nextWeapon(weapon){const i=WEAPON_ORDER.indexOf(weapon);return WEAPON_ORDER[(i+1+WEAPON_ORDER.length)%WEAPON_ORDER.length];}
 function switchWeapon(weapon){
@@ -1920,49 +1949,42 @@ function drawVersion(c,L){c.font='800 8px system-ui';c.textAlign='center';c.fill
 
 function roundRect(c,x,y,w,h,r,fill,stroke){if(w<=0||h<=0)return;c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
 
-function chipToneAt(freq,start,duration,volume=.018,type='square'){
-  const a=audioCtx;if(!a||!musicEnabled)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,start);g.gain.setValueAtTime(.0001,start);g.gain.linearRampToValueAtTime(volume,start+.008);g.gain.setValueAtTime(volume,start+Math.max(.012,duration-.018));g.gain.exponentialRampToValueAtTime(.0001,start+duration);o.connect(g).connect(musicGain||a.destination);o.start(start);o.stop(start+duration+.02);
-}
-function scheduleIntroMusic(){
-  const a=audioCtx;if(!a||!musicEnabled||gameActive||document.hidden||customMusicSource)return;const stepDur=60/138/2;
-  const lead=[659,0,784,880,784,659,587,0,523,0,587,659,784,659,587,523];
-  const bass=[131,131,147,147,110,110,123,123];
-  while(musicNextAt<a.currentTime+.24){const i=musicStep%16,n=lead[i];if(n)chipToneAt(n,musicNextAt,stepDur*.72,.013,'square');if(i%2===0)chipToneAt(bass[Math.floor(i/2)%bass.length],musicNextAt,stepDur*1.7,.016,'square');if(i%4===0)chipToneAt(55,musicNextAt,.045,.018,'square');musicStep++;musicNextAt+=stepDur;}
-}
 function startIntroMusic(){
-  if(!musicEnabled||gameActive||!experienceEntered||orientationBlocked)return;const a=ensureAudio();if(!a)return;if(!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}if(customSoundRecords.has('introMusic')&&!customSoundBuffers.has('introMusic')){hydrateCustomSoundBuffers().then(()=>{if(musicEnabled&&!gameActive&&!customMusicSource)startIntroMusic();});return;}if(customSoundBuffers.has('introMusic')){if(customMusicSource)return;customMusicSource=playCustomSound('introMusic',1,{music:true,loop:true});if(customMusicSource)customMusicSource.onended=()=>{customMusicSource=null;};return;}if(musicTimer)return;musicStep=0;musicNextAt=a.currentTime+.04;scheduleIntroMusic();musicTimer=setInterval(scheduleIntroMusic,90);
+  if(!musicEnabled||gameActive||!experienceEntered||orientationBlocked)return;
+  const a=ensureAudio();if(!a)return;
+  if(!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}
+  if(customSoundRecords.has('introMusic')&&!customSoundBuffers.has('introMusic')){hydrateCustomSoundBuffers().then(()=>{if(musicEnabled&&!gameActive&&!customMusicSource&&!defaultMusicElement&&!defaultMusicPending)startIntroMusic();});return;}
+  if(customSoundBuffers.has('introMusic')){if(customMusicSource)return;customMusicSource=playCustomSound('introMusic',1,{music:true,loop:true});if(customMusicSource)customMusicSource.onended=()=>{customMusicSource=null;};return;}
+  if(defaultMusicElement||defaultMusicPending)return;
+  const sampled=playDefaultSample('introMusic',1,{loop:true});
+  if(sampled){defaultMusicElement=sampled;sampled.onended=()=>{if(defaultMusicElement===sampled)defaultMusicElement=null;};return;}
+  defaultMusicPending=true;
+  waitForSampledDefault('introMusic',5000).then(ok=>{
+    defaultMusicPending=false;
+    if(!ok||!musicEnabled||gameActive||customMusicSource||defaultMusicElement)return;
+    const el=playDefaultSample('introMusic',1,{loop:true});
+    if(el){defaultMusicElement=el;el.onended=()=>{if(defaultMusicElement===el)defaultMusicElement=null;};}
+  });
 }
-function stopIntroMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}if(customMusicSource){try{customMusicSource.stop();}catch{}customMusicSource=null;}musicNextAt=0;}
+function stopIntroMusic(){defaultMusicPending=false;if(customMusicSource){try{customMusicSource.stop();}catch{}customMusicSource=null;}if(defaultMusicElement){try{defaultMusicElement.pause();defaultMusicElement.currentTime=0;}catch{}defaultMusicElement=null;}}
 
 function ensureAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C){audioCtx=new C();sfxGain=audioCtx.createGain();sfxGain.gain.value=soundVolume;sfxGain.connect(audioCtx.destination);}}if(audioCtx?.state==='suspended')audioCtx.resume();if(audioCtx&&[...customSoundRecords.keys()].some(id=>!customSoundBuffers.has(id)&&!soundDecodeFailures.has(id)))queueMicrotask(hydrateCustomSoundBuffers);return audioCtx;}
-function tone(freq,duration,type='sine',volume=.03,slide=0){const a=ensureAudio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,a.currentTime);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),a.currentTime+duration);g.gain.setValueAtTime(volume,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+duration);o.connect(g).connect(sfxGain||a.destination);o.start();o.stop(a.currentTime+duration);}
-function soundShot(weapon='pistol'){
-  const id=weapon==='shotgun'?'shotShotgun':weapon==='sniper'?'shotSniper':weapon==='assault'?'shotAssault':'shotPistol';if(playCustomSound(id))return;
-  const sampled=playDefaultSample(id);
-  // A tiny procedural body keeps one compact recorded transient sounding distinct
-  // across all four weapons without shipping four large gunshot files.
-  if(sampled){if(weapon==='shotgun')tone(72,.085,'sine',.022,-22);else if(weapon==='sniper')tone(82,.075,'sine',.019,-28);else if(weapon==='assault')tone(112,.032,'sine',.009,-34);else tone(145,.038,'sine',.010,-44);return;}
-  if(weapon==='shotgun'){tone(88,.10,'square',.065,-35);setTimeout(()=>tone(52,.12,'sawtooth',.03,-18),24)}else if(weapon==='sniper'){tone(95,.11,'square',.055,-45);setTimeout(()=>tone(55,.10,'square',.024,-15),38)}else if(weapon==='assault'){tone(132,.045,'square',.038,-72);setTimeout(()=>tone(68,.035,'square',.014,-18),18)}else{tone(160,.055,'square',.035,-100);setTimeout(()=>tone(75,.04,'square',.018,-20),24)}
-}
-function soundReload(){if(playCustomSound('reload'))return;if(playDefaultSample('reload'))return;tone(480,.04,'square',.012,-80);setTimeout(()=>tone(620,.045,'square',.01,-90),120)}
-function soundHitmarker(){if(playCustomSound('hitmarker'))return;tone(1180,.035,'square',.026,-250);setTimeout(()=>tone(820,.028,'square',.018,-120),28)}
-function soundHeadshot(){if(playCustomSound('headshot'))return;tone(1480,.04,'square',.032,-160);setTimeout(()=>tone(1040,.055,'square',.024,210),34)}
-function soundKill(){if(playCustomSound('kill'))return;tone(620,.055,'square',.03,180);setTimeout(()=>tone(980,.08,'square',.038,260),58)}
-function soundAnnouncer(priority=1){if(playCustomSound('announcer'))return;tone(priority>=5?520:440,.065,'square',.022,160);setTimeout(()=>tone(priority>=5?840:690,.09,'square',.025,240),60)}
-function soundShield(){if(playCustomSound('shield'))return;tone(420,.045,'square',.024,520);setTimeout(()=>tone(820,.07,'square',.02,-120),34)}
-function soundHurt(){if(playCustomSound('hurt'))return;if(playDefaultSample('hurt'))return;tone(120,.13,'sawtooth',.025,-70)}
-function soundJump(){if(playCustomSound('jump'))return;tone(210,.09,'sine',.016,80)}
-function soundThrowableThrow(kind='flash'){const id=kind==='sticky'?'stickyThrow':'flashThrow';if(playCustomSound(id))return;tone(kind==='sticky'?310:520,.045,'square',.018,-90);setTimeout(()=>tone(kind==='sticky'?185:760,.04,'square',.012,-60),55);}
-function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;const id=kind==='sticky'?'stickyImpact':'flashImpact';if(playCustomSound(id,v))return;if(playDefaultSample(id,v))return;if(kind==='sticky'){tone(155,.045,'square',.025*v,-35);setTimeout(()=>tone(720,.028,'square',.010*v,-180),34);}else{tone(410,.025,'square',.014*v,-140);}}
+function soundShot(weapon='pistol'){const id=weapon==='shotgun'?'shotShotgun':weapon==='sniper'?'shotSniper':weapon==='assault'?'shotAssault':'shotPistol';if(playCustomSound(id))return;playDefaultSample(id);}
+function reloadSoundId(weapon=currentWeapon){return weapon==='shotgun'?'reloadShotgun':weapon==='sniper'?'reloadSniper':weapon==='assault'?'reloadAssault':'reloadPistol';}
+function soundReload(weapon=currentWeapon){const id=reloadSoundId(weapon);if(playCustomSound(id))return;playDefaultSample(id);}
+function soundHitmarker(){if(playCustomSound('hitmarker'))return;playDefaultSample('hitmarker');}
+function soundHeadshot(){if(playCustomSound('headshot'))return;playDefaultSample('headshot');}
+function soundKill(){if(playCustomSound('kill'))return;playDefaultSample('kill');}
+function soundAnnouncer(priority=1){if(playCustomSound('announcer'))return;playDefaultSample('announcer',1,{rate:priority>=5?1.08:1});}
+function soundShield(){if(playCustomSound('shield'))return;playDefaultSample('shield');}
+function soundHurt(){if(playCustomSound('hurt'))return;playDefaultSample('hurt');}
+function soundJump(){if(playCustomSound('jump'))return;playDefaultSample('jump');}
+function soundThrowableThrow(kind='flash'){const id=kind==='sticky'?'stickyThrow':'flashThrow';if(playCustomSound(id))return;playDefaultSample(id);}
+function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;const id=kind==='sticky'?'stickyImpact':'flashImpact';if(playCustomSound(id,v))return;playDefaultSample(id,v);}
 function semtexDistanceVolume(g,max=42){if(!position||!g?.root)return 0;const p=g.root.position,d=Math.hypot(p.x-position.x,p.y-(position.y+1),p.z-position.z);return Math.max(0,1-d/max);}
-function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;if(playCustomSound('semtexBeep',v))return;const urgent=remainingMs<650,toneA=urgent?1220:980;tone(toneA,.032,'square',.018*v,urgent?120:70);}
+function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;if(playCustomSound('semtexBeep',v))return;playDefaultSample('semtexBeep',v,{rate:remainingMs<650?1.20:1});}
 function tacticalDistanceVolume(m,max=48){if(!position||!m)return .02;const d=Math.hypot((Number(m.x)||0)-position.x,(Number(m.y)||0)-(position.y+1),(Number(m.z)||0)-position.z);return Math.max(0,1-d/max);}
-function soundTacticalDetonation(kind,m){
-  const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;const flash=kind==='flash'||kind==='stun',id=flash?'flashDetonate':'stickyDetonate';if(playCustomSound(id,v))return;
-  const sampled=playDefaultSample(id,v);
-  if(flash){if(sampled){setTimeout(()=>tone(1860,.16,'sine',.020*v,520),16);setTimeout(()=>tone(2440,.38,'sine',.009*v,-860),88);return;}tone(92,.075,'square',.072*v,-45);setTimeout(()=>tone(1680,.13,'sine',.028*v,620),18);setTimeout(()=>tone(2350,.42,'sine',.012*v,-900),92);}
-  else{if(sampled){tone(52,.11,'sine',.020*v,-12);return;}tone(62,.12,'sawtooth',.085*v,-24);setTimeout(()=>tone(110,.09,'square',.040*v,-55),24);setTimeout(()=>tone(42,.18,'sine',.032*v,-8),52);}
-}
+function soundTacticalDetonation(kind,m){const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;const flash=kind==='flash'||kind==='stun',id=flash?'flashDetonate':'stickyDetonate';if(playCustomSound(id,v))return;playDefaultSample(id,v);}
 initLocalSounds();
 document.addEventListener('pointerdown',ensureAudio,{once:true});
 </script>

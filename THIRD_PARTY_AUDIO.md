@@ -1,18 +1,33 @@
-# Breachline default audio provenance
+# Breachline default audio sources
 
-Breachline v1.16.5 uses a deliberately small CC0 sample set for realistic high-value FPS cues. Attribution is not required by CC0, but provenance is kept here for maintainability. Other default cues remain original procedural Web Audio sounds.
+Breachline v1.16.6 uses distinct Creative Commons Zero (CC0) audio sources for every built-in sound cue. The files are streamed asynchronously from OpenGameArt and cached by the browser; gameplay never waits for a sound to load. There is no synthesized legacy default path: each built-in cue routes to its own listed CC0 source. Local user-uploaded overrides remain device-only and always take priority.
 
-## CC0 sampled defaults
+Attribution is not required for CC0, but source provenance is kept here for maintenance.
 
-- **Gunshot transient** — `gunshot_0.mp3` from **Basic Sound Effects** by **n4**, OpenGameArt. License: **CC0 1.0**. Used as the recorded transient for pistol, assault rifle, shotgun, sniper, and flash detonation, with per-cue playback-rate/gain shaping.
-  Source page: https://opengameart.org/content/basic-sound-effects
-- **Weapon reload / mechanical impact** — `gun_reload_lock_or_click_sound.mp3` by **pauliuw**, OpenGameArt. License: **CC0 1.0**. Used for reload and low-volume tactical impact variants.
-  Source page: https://opengameart.org/content/gun-reload-lock-or-click-sound
-- **Explosion** — `explosion_5.ogg` from **Rpg Sound Effect Pack** by **Delta12 Studio**, OpenGameArt. License: **CC0 1.0**. Used for Semtex detonation.
-  Source page: https://opengameart.org/content/rpg-sound-effect-pack
-- **Hurt** — `hurt_1.ogg` from **Rpg Sound Effect Pack** by **Delta12 Studio**, OpenGameArt. License: **CC0 1.0**. Used for damage taken.
-  Source page: https://opengameart.org/content/rpg-sound-effect-pack
+| Breachline cue | Source | Creator | License |
+|---|---|---|---|
+| Intro music | Psycho Punch / Loop / FPS / Shoot 'em up | KiluaBoy | CC0 |
+| Pistol fire | Basic Sound Effects – gunshot | n4 | CC0 |
+| Assault rifle fire | Random gunfire SFX | iamoneabe | CC0 |
+| Shotgun fire | Basic Sound Effects – explosion | n4 | CC0 |
+| Sniper fire | Various Sound Effects – snd_gunshot1 | Spring Spring | CC0 |
+| Pistol reload | Gun reload sounds – gunreload1 | SpringySpringo | CC0 |
+| Assault rifle reload | Gun reload sounds – assaultriflereload1 | SpringySpringo | CC0 |
+| Shotgun reload | Gun reload sounds – shotguncock | SpringySpringo | CC0 |
+| Sniper reload | Gun Reload Sound Effects – clipload2 | BMacZero | CC0 |
+| Hitmarker | Various Sound Effects – snd_bullethit | Spring Spring | CC0 |
+| Headshot | Basic Sound Effects – bell1 | n4 | CC0 |
+| Elimination confirm | Basic Sound Effects – success | n4 | CC0 |
+| Announcer cue | Various Sound Effects – snd_npc_message | Spring Spring | CC0 |
+| God / shield | Basic Sound Effects – vibrophone1 | n4 | CC0 |
+| Damage taken | Hurt Sound Effects – hurt_01 | EZduzziteh | CC0 |
+| Jump | Jump and Run and Stand – jump | mieki256 | CC0 |
+| Flash throw | Various Sound Effects – snd_throw1 | Spring Spring | CC0 |
+| Semtex throw | Various Sound Effects – cannonball_tap | Spring Spring | CC0 |
+| Flash impact | Metal Impact Sounds – clink1 | BMacZero | CC0 |
+| Semtex impact | Metal Impact Sounds – thud2 | BMacZero | CC0 |
+| Semtex beep | Beep Sound – beep | Test User | CC0 |
+| Flash detonation | flash bang sound | teeeece | CC0 |
+| Semtex explosion | Rpg Sound Effect Pack – explosion_5 | Delta12 Studio | CC0 |
 
-## Performance policy
-
-The four source files total about 99 KB. They are loaded asynchronously only after the player enters the experience, reused through small fixed audio pools, and never awaited in the combat path. If a remote sample is unavailable, Breachline immediately falls back to its built-in procedural cue. User-uploaded local sounds always take priority over both.
+Source site: OpenGameArt.org.
