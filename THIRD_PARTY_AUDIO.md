@@ -1,6 +1,6 @@
 # Breachline default audio sources
 
-Breachline v1.16.7 uses CC0 audio for its built-in sound cues. Default files are loaded asynchronously and cached by the browser; the large firearm recordings are loaded only for the weapon being equipped instead of warming every gun at startup. Local user-uploaded overrides remain device-only and take priority.
+Breachline v1.16.8 uses CC0 audio for its built-in sound cues. Default files are loaded asynchronously and cached by the browser; the large firearm recordings are loaded only for the weapon being equipped instead of warming every gun at startup. Local user-uploaded overrides remain device-only and take priority.
 
 Attribution is not required for CC0, but source provenance is kept here for maintenance.
 
@@ -35,3 +35,14 @@ Attribution is not required for CC0, but source provenance is kept here for main
 | Semtex explosion | Rpg Sound Effect Pack – explosion_5 | Delta12 Studio | CC0 |
 
 Primary source sites: GitHub mirror of the Free Firearms SFX Library and OpenGameArt.org.
+
+
+## v1.16.8 audio mapping changes
+
+- Pistol fire now uses the prior Mosin Nagant / sniper recording.
+- Sniper fire now uses the prior 1911 / pistol recording.
+- Shotgun fire now uses the prior AR-15 / assault-rifle recording.
+- Assault-rifle fire now uses the prior Mossberg / shotgun recording.
+- Semtex throw intentionally uses the same built-in throw asset as Flash. A local Semtex Throw override can still replace it independently.
+- Headshot default is a bundled one-word `Headshot` announcement generated specifically for Breachline and stored at `audio/headshot-announcer.ogg`.
+- Elimination confirmation now uses `snd_enemyscream.wav` from Spring Spring's **Various Sound Effects** on OpenGameArt, released under CC0: https://opengameart.org/content/various-sound-effects-0

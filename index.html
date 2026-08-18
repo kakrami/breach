@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.7</title>
+<title>Breachline v1.16.8</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -200,7 +200,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.16.7';
+const APP_VERSION = '1.16.8';
 const PROTOCOL_VERSION = 31;
 const ROOM_CODE_LENGTH = 4;
 const MAX_BOTS = 8;
@@ -242,8 +242,8 @@ const SOUND_DEFS = Object.freeze([
   {id:'shotgunPump',category:'WEAPONS',label:'Shotgun Pump Action'},
   {id:'reloadSniper',category:'WEAPONS',label:'Sniper Reload'},
   {id:'hitmarker',category:'COMBAT',label:'Hitmarker'},
-  {id:'headshot',category:'COMBAT',label:'Headshot'},
-  {id:'kill',category:'COMBAT',label:'Elimination Confirm'},
+  {id:'headshot',category:'COMBAT',label:'Headshot Announcement'},
+  {id:'kill',category:'COMBAT',label:'Death Scream'},
   {id:'announcer',category:'COMBAT',label:'Announcer Cue'},
   {id:'shield',category:'COMBAT',label:'God / Shield'},
   {id:'hurt',category:'COMBAT',label:'Damage Taken'},
@@ -259,7 +259,8 @@ const SOUND_DEFS = Object.freeze([
   {id:'flashDetonate',category:'TACTICAL',label:'Flash Detonation'},
   {id:'stickyDetonate',category:'TACTICAL',label:'Semtex Explosion'},
 ]);
-// Every built-in cue owns a distinct CC0 source asset. High-frequency combat sounds
+// Built-in cues use explicit default assets. Semtex throw intentionally shares the Flash
+// throw default; local per-cue overrides remain independent. High-frequency combat sounds
 // are warmed first; the rest are staggered into idle time so audio never blocks play.
 const DEFAULT_SAMPLE_ASSETS = Object.freeze({
   introMusic:Object.freeze({url:'https://opengameart.org/sites/default/files/Psycho%20Punch_1.ogg',pool:1,source:'Psycho Punch · KiluaBoy · CC0',bytes:453900}),
@@ -273,8 +274,8 @@ const DEFAULT_SAMPLE_ASSETS = Object.freeze({
   shotgunPump:Object.freeze({url:'https://opengameart.org/sites/default/files/shotguncock_0.wav',pool:2,source:'Gun reload sounds · SpringySpringo · CC0',bytes:83600}),
   sniperReload:Object.freeze({url:'https://opengameart.org/sites/default/files/clipload2.wav',pool:2,source:'Gun Reload Sound Effects · BMacZero · CC0',bytes:18500}),
   hitmarker:Object.freeze({url:'https://opengameart.org/sites/default/files/skill_hit.mp3',pool:6,source:'Skill hit · pauliuw · CC0',bytes:18600}),
-  headshot:Object.freeze({url:'https://opengameart.org/sites/default/files/bell1_0.mp3',pool:3,source:'Basic Sound Effects · n4 · CC0',bytes:61600}),
-  kill:Object.freeze({url:'https://opengameart.org/sites/default/files/success_0.mp3',pool:3,source:'Basic Sound Effects · n4 · CC0',bytes:49100}),
+  headshot:Object.freeze({url:'audio/headshot-announcer.ogg',pool:2,source:'Breachline Headshot Announcer · generated/bundled',bytes:8280}),
+  kill:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_enemyscream.wav',pool:3,source:'Various Sound Effects · Spring Spring · snd_enemyscream.wav · CC0',bytes:378061}),
   announcer:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_npc_message.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:29100}),
   shield:Object.freeze({url:'https://opengameart.org/sites/default/files/vibrophone1_0.mp3',pool:2,source:'Basic Sound Effects · n4 · CC0',bytes:142100}),
   hurt:Object.freeze({url:'https://opengameart.org/sites/default/files/hurt_01_0.mp3',pool:3,source:'Hurt Sound Effects · EZduzziteh · CC0',bytes:7100}),
@@ -283,7 +284,6 @@ const DEFAULT_SAMPLE_ASSETS = Object.freeze({
   footstepRight:Object.freeze({url:'https://opengameart.org/sites/default/files/02-footstep.ogg',pool:3,source:'Footsteps · GboxMikeFozzy · CC0',bytes:10500}),
   land:Object.freeze({url:'https://opengameart.org/sites/default/files/jumpland48000.mp3',pool:2,source:'Jump Landing Sound · MentalSanityOff · CC0',bytes:3600}),
   flashThrow:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_throw1.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:86400}),
-  stickyThrow:Object.freeze({url:'https://opengameart.org/sites/default/files/cannonball_tap.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:188200}),
   flashImpact:Object.freeze({url:'https://opengameart.org/sites/default/files/clink1_0.wav',pool:3,source:'Metal Impact Sounds · BMacZero · CC0',bytes:27700}),
   stickyImpact:Object.freeze({url:'https://opengameart.org/sites/default/files/thud2.wav',pool:3,source:'Metal Impact Sounds · BMacZero · CC0',bytes:51200}),
   semtexBeep:Object.freeze({url:'https://opengameart.org/sites/default/files/beep.ogg',pool:3,source:'Beep Sound · CC0',bytes:5700}),
@@ -292,18 +292,18 @@ const DEFAULT_SAMPLE_ASSETS = Object.freeze({
 });
 const DEFAULT_SAMPLE_CUES = Object.freeze({
   introMusic:Object.freeze({asset:'introMusic',gain:.56,rate:1,loop:true}),
-  shotPistol:Object.freeze({asset:'pistolShot',gain:.66,rate:1}),
-  shotAssault:Object.freeze({asset:'assaultShot',gain:.56,rate:1}),
-  shotShotgun:Object.freeze({asset:'shotgunShot',gain:.72,rate:1}),
-  shotSniper:Object.freeze({asset:'sniperShot',gain:.78,rate:1}),
+  shotPistol:Object.freeze({asset:'sniperShot',gain:.66,rate:1}),
+  shotAssault:Object.freeze({asset:'shotgunShot',gain:.56,rate:1}),
+  shotShotgun:Object.freeze({asset:'assaultShot',gain:.72,rate:1}),
+  shotSniper:Object.freeze({asset:'pistolShot',gain:.78,rate:1}),
   reloadPistol:Object.freeze({asset:'pistolReload',gain:.52,rate:1}),
   reloadAssault:Object.freeze({asset:'assaultReload',gain:.50,rate:1}),
   reloadShotgun:Object.freeze({asset:'shotgunReload',gain:.55,rate:.96}),
   shotgunPump:Object.freeze({asset:'shotgunPump',gain:.66,rate:1}),
   reloadSniper:Object.freeze({asset:'sniperReload',gain:.62,rate:1}),
   hitmarker:Object.freeze({asset:'hitmarker',gain:.30,rate:1.08}),
-  headshot:Object.freeze({asset:'headshot',gain:.34,rate:1.18}),
-  kill:Object.freeze({asset:'kill',gain:.34,rate:1.06}),
+  headshot:Object.freeze({asset:'headshot',gain:.56,rate:1}),
+  kill:Object.freeze({asset:'kill',gain:.48,rate:1}),
   announcer:Object.freeze({asset:'announcer',gain:.34,rate:1}),
   shield:Object.freeze({asset:'shield',gain:.36,rate:1}),
   hurt:Object.freeze({asset:'hurt',gain:.64,rate:1}),
@@ -312,7 +312,7 @@ const DEFAULT_SAMPLE_CUES = Object.freeze({
   footstepRight:Object.freeze({asset:'footstepRight',gain:.28,rate:.98}),
   land:Object.freeze({asset:'land',gain:.52,rate:1}),
   flashThrow:Object.freeze({asset:'flashThrow',gain:.36,rate:1.08}),
-  stickyThrow:Object.freeze({asset:'stickyThrow',gain:.38,rate:.96}),
+  stickyThrow:Object.freeze({asset:'flashThrow',gain:.36,rate:1.08}),
   flashImpact:Object.freeze({asset:'flashImpact',gain:.34,rate:1.08}),
   stickyImpact:Object.freeze({asset:'stickyImpact',gain:.42,rate:.92}),
   semtexBeep:Object.freeze({asset:'semtexBeep',gain:.36,rate:1}),
