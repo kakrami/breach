@@ -8,27 +8,30 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.2</title>
+<title>Breachline v1.16.5</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
   <defs>
     <symbol id="i-mark" viewBox="0 0 24 24"><path d="M5 4h8.5c3.2 0 5.5 1.7 5.5 4.4 0 1.9-1 3.2-2.8 4 2.2.7 3.3 2.1 3.3 4.1 0 2.8-2.4 4.5-6.1 4.5H5V4Z"/><path d="M9 8h4.1c1.2 0 1.9.5 1.9 1.4 0 .9-.7 1.5-1.9 1.5H9V8Zm0 6.5h4.6c1.3 0 2 .5 2 1.5s-.7 1.5-2 1.5H9v-3Z" class="cut"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5v14l11-7L8 5Z"/></symbol>
-    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 7v5h-5"/><path d="M19 12a7 7 0 1 0-2 5"/></symbol>
-    <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></symbol>
-    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></symbol>
-    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path d="m17 9 5 5m0-5-5 5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 6 9 6-9 6V6Z"/></symbol>
+    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M19 11a7.5 7.5 0 1 0 .2 3"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/></symbol>
+    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M5 9v6h4l4.5 3.5v-13L9 9H5Z"/><path d="M16.5 9.2a4 4 0 0 1 0 5.6M19 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
+    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M5 9v6h4l4.5 3.5v-13L9 9H5Z"/><path d="m17 9 4 4m0-4-4 4"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-    <symbol id="i-enter" viewBox="0 0 24 24"><path d="M14 5h5v14h-5M11 8l4 4-4 4M4 12h11"/></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 20 6v6c0 5-3.2 8-8 9-4.8-1-8-4-8-9V6l8-3Z"/><path d="m9 12 2 2 4-5" class="cut"/></symbol>
-    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="5" y="7" width="14" height="11" rx="3"/><path d="M12 3v4M8 12h.01M16 12h.01M9 16h6"/></symbol>
-    <symbol id="i-team" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><circle cx="17" cy="10" r="2.5"/><path d="M3 20c0-4 2-6 6-6s6 2 6 6M14 15c4 0 7 1.7 7 5"/></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/></symbol>
-    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H4v16h6M14 8l4 4-4 4M8 12h10"/></symbol>
-    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
-    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 13.5v-3l-2.2-.7a7 7 0 0 0-.7-1.6l1.1-2-2.1-2.1-2 1.1a7 7 0 0 0-1.6-.7L10.5 2h-3l-.7 2.2a7 7 0 0 0-1.6.7l-2-1.1L1.1 5.9l1.1 2a7 7 0 0 0-.7 1.6L0 10.5v3l2.2.7a7 7 0 0 0 .7 1.6l-1.1 2 2.1 2.1 2-1.1a7 7 0 0 0 1.6.7l.7 2.2h3l.7-2.2a7 7 0 0 0 1.6-.7l2 1.1 2.1-2.1-1.1-2a7 7 0 0 0 .7-1.6L19 13.5Z" transform="translate(2.5 0) scale(.8)"/></symbol>
+    <symbol id="i-enter" viewBox="0 0 24 24"><path d="M13 5h6v14h-6"/><path d="m10 8 4 4-4 4M4 12h10"/></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-2.8 7.5-7 9-4.2-1.5-7-4.5-7-9V6l7-2.5Z"/><path d="m9.2 12 1.8 1.8 3.9-4.4"/></symbol>
+    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="5" y="7.5" width="14" height="10.5" rx="3"/><path d="M12 4v3.5M8.5 12h.01M15.5 12h.01M9 15h6"/></symbol>
+    <symbol id="i-team" viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="2.8"/><circle cx="16.5" cy="9.5" r="2.3"/><path d="M3.5 20c.2-3.8 1.9-5.8 5-5.8s4.9 2 5.1 5.8M14 15.5c3.8 0 6 1.5 6.5 4.5"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5v16h5"/><path d="m14 8 4 4-4 4M8 12h10"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.5 1.5M16.5 16.5 18 18M18 6l-1.5 1.5M7.5 16.5 6 18"/><circle cx="12" cy="12" r="7"/></symbol>
+    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V5M8 9l4-4 4 4"/><path d="M5 14v5h14v-5"/></symbol>
+    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M5 8V4m0 0h4M5 4l3.2 3.2A7 7 0 1 1 5 13"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></symbol>
   </defs>
 </svg>
 <canvas id="game" draggable="false" aria-label="Breachline gameplay"></canvas>
@@ -63,7 +66,7 @@
   <div class="menu-shell">
     <header class="menu-header">
       <div class="brand"><div class="logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div><div class="brand-copy"><div class="eyebrow">LIVE COMBAT NETWORK</div><h1>Breachline</h1><div class="version brand-version" data-app-version></div><p class="sub">Tactical team combat · persistent live sessions · instant deployment</p></div></div>
-      <div class="header-actions"><button id="musicBtn" class="btn icon-btn" title="Toggle intro music" aria-label="Toggle intro music"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button><button id="menuFullBtn" class="btn icon-btn" title="Fullscreen" aria-label="Fullscreen"><svg class="ui-icon"><use href="#i-full"/></svg></button><button id="refreshBtn" class="btn icon-btn" title="Refresh matches" aria-label="Refresh matches"><svg class="ui-icon"><use href="#i-refresh"/></svg></button></div>
+      <div class="header-actions"><button id="musicBtn" class="btn icon-btn" title="Toggle intro music" aria-label="Toggle intro music"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button><button id="settingsBtn" class="btn icon-btn" title="Audio settings" aria-label="Audio settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button><button id="menuFullBtn" class="btn icon-btn" title="Fullscreen" aria-label="Fullscreen"><svg class="ui-icon"><use href="#i-full"/></svg></button><button id="refreshBtn" class="btn icon-btn" title="Refresh matches" aria-label="Refresh matches"><svg class="ui-icon"><use href="#i-refresh"/></svg></button></div>
     </header>
 
     <div class="menu-grid">
@@ -120,6 +123,7 @@
       <div class="pause-group-title">SESSION</div>
       <div class="pause-session-actions">
         <button id="copyBtn" class="btn"><svg class="ui-icon"><use href="#i-copy"/></svg><span>Invite</span></button>
+        <button id="pauseSettingsBtn" class="btn"><svg class="ui-icon"><use href="#i-settings"/></svg><span>Audio</span></button>
         <button id="fullBtn" class="btn"><svg class="ui-icon"><use href="#i-full"/></svg><span>Fullscreen</span></button>
         <button id="leaveBtn" class="btn danger"><svg class="ui-icon"><use href="#i-exit"/></svg><span>Leave</span></button>
       </div>
@@ -127,11 +131,27 @@
   </div>
 </section>
 
+<section id="settingsPanel" class="settings-panel hide" aria-label="Local audio settings">
+  <div class="settings-shell">
+    <header class="settings-head">
+      <div><div class="eyebrow">LOCAL SETTINGS</div><h2>Audio</h2><div class="settings-sub">Replace any game cue with an audio file stored only on this browser/device.</div></div>
+      <button id="settingsCloseBtn" class="btn icon-btn" title="Close audio settings" aria-label="Close audio settings"><svg class="ui-icon"><use href="#i-close"/></svg></button>
+    </header>
+    <div class="settings-toolbar">
+      <label class="volume-setting" for="soundVolumeRange"><span>Game sound volume</span><input id="soundVolumeRange" type="range" min="0" max="100" step="1"><b id="soundVolumeValue">85%</b></label>
+      <div class="local-only-badge">LOCAL ONLY · NOT UPLOADED</div>
+    </div>
+    <div id="soundSettingsList" class="sound-settings-list" aria-live="polite"></div>
+    <footer class="settings-foot"><div id="soundSettingsStatus" class="settings-status" role="status" aria-live="polite">Default sounds active.</div><button id="soundResetAllBtn" class="btn"><svg class="ui-icon"><use href="#i-reset"/></svg><span>Reset All</span></button></footer>
+  </div>
+  <input id="soundFileInput" class="hide" type="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.aac,.webm">
+</section>
+
 <section id="adminPanel" class="admin-panel hide" aria-label="Match admin settings">
   <div class="admin-shell" data-page="general">
     <header class="admin-head">
       <div><div class="eyebrow">MATCH CONTROL // LIVE RULES</div><h2>Match Control</h2><div class="admin-sub">Changes apply live to the current match. Combat rules remain server-authoritative.</div></div>
-      <button id="adminCloseBtn" class="btn icon-btn" title="Close admin settings" aria-label="Close admin settings">×</button>
+      <button id="adminCloseBtn" class="btn icon-btn" title="Close admin settings" aria-label="Close admin settings"><svg class="ui-icon"><use href="#i-close"/></svg></button>
     </header>
     <div class="admin-tabs" role="tablist" aria-label="Admin settings sections"><button id="adminTabGeneral" class="admin-tab active" type="button" role="tab" aria-selected="true" aria-controls="adminGeneral" data-admin-tab="general">MATCH</button><button id="adminTabWeapons" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="adminWeapons" data-admin-tab="weapons">WEAPONS</button><button id="adminTabBots" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="adminBots" data-admin-tab="bots">BOTS</button><button id="adminTabPlayers" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="adminPlayers" data-admin-tab="players">PLAYERS</button></div>
     <div id="adminGeneral" class="admin-page" role="tabpanel" aria-labelledby="adminTabGeneral">
@@ -178,7 +198,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.16.2';
+const APP_VERSION = '1.16.5';
 const PROTOCOL_VERSION = 31;
 const ROOM_CODE_LENGTH = 4;
 const MAX_BOTS = 8;
@@ -208,6 +228,61 @@ const IDLE_STATE_INTERVAL = 250;
 const TACTICAL_THROW_SPEED = 23.5;
 const TACTICAL_THROW_LOFT = 6.4;
 const TACTICAL_GRAVITY = 18;
+const SOUND_DEFS = Object.freeze([
+  {id:'introMusic',category:'MUSIC',label:'Intro Music'},
+  {id:'shotPistol',category:'WEAPONS',label:'Pistol Fire'},
+  {id:'shotAssault',category:'WEAPONS',label:'Assault Rifle Fire'},
+  {id:'shotShotgun',category:'WEAPONS',label:'Shotgun Fire'},
+  {id:'shotSniper',category:'WEAPONS',label:'Sniper Fire'},
+  {id:'reload',category:'WEAPONS',label:'Reload'},
+  {id:'hitmarker',category:'COMBAT',label:'Hitmarker'},
+  {id:'headshot',category:'COMBAT',label:'Headshot'},
+  {id:'kill',category:'COMBAT',label:'Elimination Confirm'},
+  {id:'announcer',category:'COMBAT',label:'Announcer Cue'},
+  {id:'shield',category:'COMBAT',label:'God / Shield'},
+  {id:'hurt',category:'COMBAT',label:'Damage Taken'},
+  {id:'jump',category:'MOVEMENT',label:'Jump'},
+  {id:'flashThrow',category:'TACTICAL',label:'Flash Throw'},
+  {id:'stickyThrow',category:'TACTICAL',label:'Semtex Throw'},
+  {id:'flashImpact',category:'TACTICAL',label:'Flash Impact'},
+  {id:'stickyImpact',category:'TACTICAL',label:'Semtex Stick / Impact'},
+  {id:'semtexBeep',category:'TACTICAL',label:'Semtex Beep'},
+  {id:'flashDetonate',category:'TACTICAL',label:'Flash Detonation'},
+  {id:'stickyDetonate',category:'TACTICAL',label:'Semtex Explosion'},
+]);
+// Lightweight CC0 sampled defaults. These are deliberately few and reused so real
+// recorded transients improve the FPS feel without adding a large startup payload.
+const DEFAULT_SAMPLE_ASSETS = Object.freeze({
+  gunshot:Object.freeze({
+    url:'https://opengameart.org/sites/default/files/gunshot_0.mp3',
+    pool:6, source:'Basic Sound Effects · n4 · CC0', bytes:42803
+  }),
+  reload:Object.freeze({
+    url:'https://opengameart.org/sites/default/files/gun_reload_lock_or_click_sound.mp3',
+    pool:2, source:'Gun reload, lock or click sound · pauliuw · CC0', bytes:18125
+  }),
+  explosion:Object.freeze({
+    url:'https://opengameart.org/sites/default/files/explosion_5.ogg',
+    pool:3, source:'Rpg Sound Effect Pack · Delta12 Studio · CC0', bytes:25805
+  }),
+  hurt:Object.freeze({
+    url:'https://opengameart.org/sites/default/files/hurt_1.ogg',
+    pool:2, source:'Rpg Sound Effect Pack · Delta12 Studio · CC0', bytes:14541
+  }),
+});
+const DEFAULT_SAMPLE_CUES = Object.freeze({
+  shotPistol:Object.freeze({asset:'gunshot',gain:.72,rate:1.08}),
+  shotAssault:Object.freeze({asset:'gunshot',gain:.58,rate:1.24}),
+  shotShotgun:Object.freeze({asset:'gunshot',gain:.88,rate:.72}),
+  shotSniper:Object.freeze({asset:'gunshot',gain:.92,rate:.84}),
+  reload:Object.freeze({asset:'reload',gain:.72,rate:1}),
+  hurt:Object.freeze({asset:'hurt',gain:.72,rate:1}),
+  flashImpact:Object.freeze({asset:'reload',gain:.24,rate:1.42}),
+  stickyImpact:Object.freeze({asset:'reload',gain:.30,rate:.78}),
+  flashDetonate:Object.freeze({asset:'gunshot',gain:.70,rate:1.38}),
+  stickyDetonate:Object.freeze({asset:'explosion',gain:.95,rate:.94}),
+});
+const DEFAULT_SAMPLE_TOTAL_BYTES=Object.values(DEFAULT_SAMPLE_ASSETS).reduce((sum,a)=>sum+a.bytes,0);
 let worldSettings=cloneSettings(DEFAULT_WORLD_SETTINGS);
 let WALK_SPEED=DEFAULT_WORLD_SETTINGS.movement.walkSpeed,RUN_SPEED=DEFAULT_WORLD_SETTINGS.movement.runSpeed,GRAVITY=DEFAULT_WORLD_SETTINGS.movement.gravity,JUMP_SPEED=Math.sqrt(2*GRAVITY*DEFAULT_WORLD_SETTINGS.movement.jumpHeight);
 const LONG_SHOT_DISTANCE = 30;
@@ -268,7 +343,11 @@ let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0;
 let onGround = true, fireTime = 99, localFireCooldown = 0, lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0;
 let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true}, queuedFireUntil=0, serverFireRetryAt=0, localEquipmentCooldownUntil=0;
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0;
-let audioCtx = null, musicTimer = null, musicStep = 0, musicNextAt = 0, musicGain = null;
+let audioCtx = null, musicTimer = null, musicStep = 0, musicNextAt = 0, musicGain = null, customMusicSource = null, sfxGain = null;
+let soundVolume=Math.max(0,Math.min(1,Number(localStorage.getItem('breachlineSoundVolume')??.85))),soundDbPromise=null,soundLoadPromise=null,soundHydratePromise=null,pendingSoundUploadId='',soundPreviewSource=null;
+const customSoundRecords=new Map(),customSoundBuffers=new Map(),soundDecodeFailures=new Set();
+const defaultSamplePools=new Map(),defaultSampleFailures=new Set();
+let defaultSamplesWarmStarted=false;
 let toastText = '', toastUntil = 0, hurtUntil = 0, hitUntil = 0;
 let botConfig={blueBots:Number(blueBotCount.value)||1,redBots:Number(redBotCount.value)||1,difficulty:botDifficulty.value||'normal'};
 const bloodSplats=[];
@@ -442,6 +521,95 @@ function syncPauseContext(){
   syncGodUI();
 }
 
+
+const SOUND_DB_NAME='breachline-local-audio',SOUND_DB_STORE='sounds';
+function setSoundSettingsStatus(text,tone=''){const el=$('soundSettingsStatus');if(!el)return;el.textContent=text;el.className=`settings-status ${tone}`;}
+function openSoundDb(){
+  if(soundDbPromise)return soundDbPromise;
+  soundDbPromise=new Promise((resolve,reject)=>{
+    if(!('indexedDB'in window)){reject(new Error('Local audio storage is not supported by this browser.'));return;}
+    const req=indexedDB.open(SOUND_DB_NAME,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(SOUND_DB_STORE))db.createObjectStore(SOUND_DB_STORE,{keyPath:'id'});};
+    req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error||new Error('Unable to open local audio storage.'));
+  });
+  return soundDbPromise;
+}
+function soundStoreRequest(mode,work){return openSoundDb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(SOUND_DB_STORE,mode),store=tx.objectStore(SOUND_DB_STORE);let result;try{result=work(store);}catch(err){reject(err);return;}tx.oncomplete=()=>resolve(result?.result);tx.onerror=()=>reject(tx.error||new Error('Local audio storage failed.'));tx.onabort=()=>reject(tx.error||new Error('Local audio storage was cancelled.'));}));}
+async function initLocalSounds(){
+  if(soundLoadPromise)return soundLoadPromise;
+  soundLoadPromise=(async()=>{try{const rows=await soundStoreRequest('readonly',store=>store.getAll())||[];for(const row of rows){if(row?.id&&row?.blob instanceof Blob)customSoundRecords.set(row.id,row);}renderSoundSettings();if(audioCtx&&customSoundRecords.size)queueMicrotask(hydrateCustomSoundBuffers);}catch(err){console.warn('Local audio storage unavailable:',err);setSoundSettingsStatus('Local sound storage unavailable on this browser.','error');}})();
+  return soundLoadPromise;
+}
+async function decodeSoundBlob(blob){const a=ensureAudio();if(!a)throw new Error('Audio is not available.');const copy=await blob.arrayBuffer();return await a.decodeAudioData(copy.slice(0));}
+function hydrateCustomSoundBuffers(){
+  if(soundHydratePromise)return soundHydratePromise;
+  soundHydratePromise=(async()=>{await initLocalSounds();const jobs=[];for(const [id,row] of customSoundRecords){if(customSoundBuffers.has(id)||soundDecodeFailures.has(id))continue;jobs.push(decodeSoundBlob(row.blob).then(buffer=>customSoundBuffers.set(id,buffer)).catch(err=>{soundDecodeFailures.add(id);console.warn(`Could not decode custom sound ${id}:`,err);}));}if(jobs.length)await Promise.all(jobs);})().finally(()=>{soundHydratePromise=null;});
+  return soundHydratePromise;
+}
+function setSoundVolume(value){soundVolume=Math.max(0,Math.min(1,Number(value)||0));localStorage.setItem('breachlineSoundVolume',String(soundVolume));if(sfxGain)sfxGain.gain.value=soundVolume;const range=$('soundVolumeRange'),label=$('soundVolumeValue');if(range)range.value=String(Math.round(soundVolume*100));if(label)label.textContent=`${Math.round(soundVolume*100)}%`;}
+function renderSoundSettings(){
+  const list=$('soundSettingsList');if(!list)return;
+  const groups=new Map();for(const def of SOUND_DEFS){if(!groups.has(def.category))groups.set(def.category,[]);groups.get(def.category).push(def);}
+  list.innerHTML=[...groups.entries()].map(([category,defs])=>`<section class="sound-group"><div class="sound-group-title">${category}</div><div class="sound-group-grid">${defs.map(def=>{const rec=customSoundRecords.get(def.id),custom=!!rec,sampled=!!DEFAULT_SAMPLE_CUES[def.id],defaultLabel=sampled?'CC0 sampled default':'Procedural default',defaultTitle=sampled?DEFAULT_SAMPLE_ASSETS[DEFAULT_SAMPLE_CUES[def.id].asset].source:'Built-in procedural sound';return `<div class="sound-row" data-sound-id="${def.id}"><div class="sound-copy"><strong>${def.label}</strong><small title="${custom?escapeHtml(rec.name):escapeHtml(defaultTitle)}">${custom?escapeHtml(rec.name):defaultLabel}</small></div><span class="sound-state ${custom?'custom':''}">${custom?'CUSTOM':'DEFAULT'}</span><div class="sound-actions"><button class="btn icon-btn sound-preview" data-sound-action="preview" title="Preview ${def.label}" aria-label="Preview ${def.label}"><svg class="ui-icon"><use href="#i-play"/></svg></button><button class="btn sound-upload" data-sound-action="upload"><svg class="ui-icon"><use href="#i-upload"/></svg><span>${custom?'Replace':'Upload'}</span></button><button class="btn icon-btn sound-reset" data-sound-action="reset" title="Restore default ${def.label}" aria-label="Restore default ${def.label}" ${custom?'':'disabled'}><svg class="ui-icon"><use href="#i-reset"/></svg></button></div></div>`;}).join('')}</div></section>`).join('');
+  const customCount=customSoundRecords.size;setSoundSettingsStatus(customCount?`${customCount} custom sound${customCount===1?'':'s'} active on this device.`:`Default audio active · ${Math.round(DEFAULT_SAMPLE_TOTAL_BYTES/1024)} KB CC0 sample set + procedural cues.`,customCount?'ok':'');setSoundVolume(soundVolume);
+}
+function openSettingsPanel(){ensureAudio();initLocalSounds().then(hydrateCustomSoundBuffers);renderSoundSettings();$('settingsPanel').classList.remove('hide');fitResponsiveOverlays();}
+function closeSettingsPanel(){pendingSoundUploadId='';$('soundFileInput').value='';$('settingsPanel').classList.add('hide');stopSoundPreview();}
+function handleSoundSettingsClick(e){const action=e.target.closest('[data-sound-action]');if(!action)return;const row=action.closest('[data-sound-id]'),id=row?.dataset.soundId;if(!id)return;if(action.dataset.soundAction==='preview')previewSound(id);else if(action.dataset.soundAction==='upload'){pendingSoundUploadId=id;const input=$('soundFileInput');input.value='';input.click();}else if(action.dataset.soundAction==='reset')resetCustomSound(id);}
+async function handleSoundFileSelected(e){const file=e.target.files?.[0],id=pendingSoundUploadId;pendingSoundUploadId='';if(!file||!id)return;const def=SOUND_DEFS.find(x=>x.id===id);setSoundSettingsStatus(`Checking ${file.name}…`);try{const buffer=await decodeSoundBlob(file);const record={id,name:file.name,type:file.type||'audio',size:file.size,updatedAt:Date.now(),blob:file};await soundStoreRequest('readwrite',store=>store.put(record));customSoundRecords.set(id,record);customSoundBuffers.set(id,buffer);soundDecodeFailures.delete(id);if(id==='introMusic'&&musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();setSoundSettingsStatus(`${def?.label||'Sound'} replaced with ${file.name}.`,'ok');previewSound(id);}catch(err){console.error(err);setSoundSettingsStatus(`Could not use ${file.name}. Choose a browser-supported audio file.`,'error');}finally{e.target.value='';}}
+async function resetCustomSound(id){if(!customSoundRecords.has(id))return;try{await soundStoreRequest('readwrite',store=>store.delete(id));customSoundRecords.delete(id);customSoundBuffers.delete(id);soundDecodeFailures.delete(id);if(id==='introMusic'&&musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();}catch(err){setSoundSettingsStatus('Could not reset that sound.','error');}}
+async function resetAllCustomSounds(){if(!customSoundRecords.size)return;try{await soundStoreRequest('readwrite',store=>store.clear());customSoundRecords.clear();customSoundBuffers.clear();soundDecodeFailures.clear();stopSoundPreview();if(musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();setSoundSettingsStatus('All sounds restored to built-in defaults.','ok');}catch(err){setSoundSettingsStatus('Could not reset local sounds.','error');}}
+function stopSoundPreview(){if(soundPreviewSource){try{if(typeof soundPreviewSource.stop==='function')soundPreviewSource.stop();else if(typeof soundPreviewSource.pause==='function'){soundPreviewSource.pause();soundPreviewSource.currentTime=0;}}catch{}soundPreviewSource=null;}}
+function getDefaultSampleCue(id){return DEFAULT_SAMPLE_CUES[id]||null;}
+function hasSampledDefault(id){return !!getDefaultSampleCue(id);}
+function buildDefaultSamplePool(assetKey){
+  if(defaultSamplePools.has(assetKey))return defaultSamplePools.get(assetKey);
+  const asset=DEFAULT_SAMPLE_ASSETS[assetKey];if(!asset||defaultSampleFailures.has(assetKey))return null;
+  const nodes=[];
+  for(let i=0;i<asset.pool;i++){
+    const el=new Audio();el.preload='auto';el.src=asset.url;el.playsInline=true;
+    try{el.preservesPitch=false;el.webkitPreservesPitch=false;el.mozPreservesPitch=false;}catch{}
+    nodes.push(el);
+  }
+  const pool={assetKey,nodes,cursor:0,status:'loading',readyPromise:null};
+  const first=nodes[0];
+  pool.readyPromise=new Promise(resolve=>{
+    let settled=false;
+    const done=ok=>{if(settled)return;settled=true;pool.status=ok?'ready':'failed';if(!ok)defaultSampleFailures.add(assetKey);resolve(ok);};
+    if(first.readyState>=2){done(true);return;}
+    first.addEventListener('canplay',()=>done(true),{once:true});
+    first.addEventListener('error',()=>done(false),{once:true});
+    setTimeout(()=>done(first.readyState>=2),3500);
+  });
+  defaultSamplePools.set(assetKey,pool);
+  for(const el of nodes){try{el.load();}catch{}}
+  return pool;
+}
+function warmDefaultSamples(){
+  if(defaultSamplesWarmStarted)return;defaultSamplesWarmStarted=true;
+  // Network/decode work is asynchronous and never awaited by gameplay. Four tiny
+  // assets (~99 KB total) are reused across all sampled cues.
+  for(const key of Object.keys(DEFAULT_SAMPLE_ASSETS))buildDefaultSamplePool(key);
+}
+function playDefaultSample(id,volume=1,override={}){
+  const cue=getDefaultSampleCue(id);if(!cue)return null;
+  const pool=buildDefaultSamplePool(cue.asset);if(!pool||pool.status!=='ready')return null;
+  const el=pool.nodes[pool.cursor++%pool.nodes.length];
+  try{
+    el.pause();el.currentTime=0;
+    el.playbackRate=Math.max(.5,Math.min(2,Number(override.rate??cue.rate)||1));
+    el.volume=Math.max(0,Math.min(1,soundVolume*(Number(volume)||0)*(Number(override.gain??cue.gain)||1)));
+    const started=el.play();if(started?.catch)started.catch(()=>{});
+    return el;
+  }catch{return null;}
+}
+async function waitForSampledDefault(id,timeoutMs=1400){
+  const cue=getDefaultSampleCue(id);if(!cue)return false;const pool=buildDefaultSamplePool(cue.asset);if(!pool)return false;if(pool.status==='ready')return true;if(pool.status==='failed')return false;
+  return await Promise.race([pool.readyPromise,new Promise(resolve=>setTimeout(()=>resolve(false),timeoutMs))]);
+}
+function playCustomSound(id,volume=1,options={}){const buffer=customSoundBuffers.get(id);if(!buffer)return null;const a=ensureAudio();if(!a)return null;if(options.music&&!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}const source=a.createBufferSource(),gain=a.createGain();source.buffer=buffer;source.loop=!!options.loop;if(options.playbackRate)source.playbackRate.value=options.playbackRate;gain.gain.value=Math.max(0,Math.min(1,Number(volume)||0));source.connect(gain).connect(options.music?musicGain:(sfxGain||a.destination));source.start();if(options.maxDuration)setTimeout(()=>{try{source.stop();}catch{}},options.maxDuration*1000);return source;}
+function previewSound(id){ensureAudio();hydrateCustomSoundBuffers().then(async()=>{stopSoundPreview();const custom=playCustomSound(id,1,{music:id==='introMusic',maxDuration:2.5});if(custom){soundPreviewSource=custom;custom.onended=()=>{if(soundPreviewSource===custom)soundPreviewSource=null;};return;}if(hasSampledDefault(id)){await waitForSampledDefault(id);const sampled=playDefaultSample(id,1);if(sampled){soundPreviewSource=sampled;sampled.onended=()=>{if(soundPreviewSource===sampled)soundPreviewSource=null;};return;}}previewDefaultSound(id);});}
+function previewDefaultSound(id){switch(id){case'introMusic':tone(659,.11,'square',.018);setTimeout(()=>tone(784,.12,'square',.016),120);break;case'shotPistol':soundShot('pistol');break;case'shotAssault':soundShot('assault');break;case'shotShotgun':soundShot('shotgun');break;case'shotSniper':soundShot('sniper');break;case'reload':soundReload();break;case'hitmarker':soundHitmarker();break;case'headshot':soundHeadshot();break;case'kill':soundKill();break;case'announcer':soundAnnouncer(3);break;case'shield':soundShield();break;case'hurt':soundHurt();break;case'jump':soundJump();break;case'flashThrow':soundThrowableThrow('flash');break;case'stickyThrow':soundThrowableThrow('sticky');break;case'flashImpact':soundThrowableImpact('flash',{x:position?.x||0,y:(position?.y||0)+1,z:position?.z||0});break;case'stickyImpact':soundThrowableImpact('sticky',{x:position?.x||0,y:(position?.y||0)+1,z:position?.z||0});break;case'semtexBeep':{const fake={root:{position:position?.clone?.()||{x:0,y:0,z:0}}};soundSemtexBeep(fake,500);}break;case'flashDetonate':soundTacticalDetonation('flash',{x:position?.x||0,y:(position?.y||0)+1,z:position?.z||0});break;case'stickyDetonate':soundTacticalDetonation('sticky',{x:position?.x||0,y:(position?.y||0)+1,z:position?.z||0});break;}}
 
 function init3D(){
   scene = new THREE.Scene();
@@ -632,6 +800,13 @@ function bindUI(){
   $('createBtn').addEventListener('click', createWorld);
   $('refreshBtn').addEventListener('click', refreshWorlds);
   $('musicBtn').addEventListener('click',()=>{ensureAudio();toggleIntroMusic();});
+  $('settingsBtn').addEventListener('click',openSettingsPanel);
+  $('pauseSettingsBtn').addEventListener('click',openSettingsPanel);
+  $('settingsCloseBtn').addEventListener('click',closeSettingsPanel);
+  $('soundResetAllBtn').addEventListener('click',resetAllCustomSounds);
+  $('soundFileInput').addEventListener('change',handleSoundFileSelected);
+  $('soundSettingsList').addEventListener('click',handleSoundSettingsClick);
+  $('soundVolumeRange').addEventListener('input',e=>setSoundVolume(Number(e.target.value)/100));
   $('godToggle').addEventListener('click',()=>toggleGodMode(false));
   $('menuFullBtn').addEventListener('click', toggleFullscreen);
   $('joinBtn').addEventListener('click', () => joinWorld(normalizeCode(codeInput.value)));
@@ -681,6 +856,7 @@ function bindUI(){
     if(gameActive && !isTouch && !paused && document.pointerLockElement!==canvas) openPause();
   });
   document.addEventListener('keydown', e => {
+    if(e.code==='Escape'&&!$('settingsPanel').classList.contains('hide')){e.preventDefault();closeSettingsPanel();return;}
     if(!gameActive || orientationBlocked || isEditableTarget(e.target)) return;
     if(e.code==='KeyM' && !e.repeat){
       e.preventDefault();
@@ -730,7 +906,7 @@ function isEditableTarget(target){
 function isLandscape(){ const v=getViewSize(); return v.w>v.h; }
 function getViewSize(){const v=viewportMetrics||syncVisualViewportMetrics();return {w:v.w,h:v.h};}
 function fitResponsiveOverlays(){
-  for(const el of [document.querySelector('.menu-shell'),document.querySelector('.pause-card'),document.querySelector('.admin-shell'),document.querySelector('.boot:not(.hide) .boot-card')]){
+  for(const el of [document.querySelector('.menu-shell'),document.querySelector('.pause-card'),document.querySelector('.settings-shell'),document.querySelector('.admin-shell'),document.querySelector('.boot:not(.hide) .boot-card')]){
     if(!el)continue;
     el.style.removeProperty('zoom');
     el.style.removeProperty('transform');
@@ -739,7 +915,7 @@ function fitResponsiveOverlays(){
   }
 }
 async function enterExperience(){
-  ensureAudio();
+  ensureAudio();warmDefaultSamples();
   if(iPhoneSafariTab()){
     $('iosInstallHint')?.classList.remove('hide');
     $('enterBtn').classList.add('hide');
@@ -758,6 +934,7 @@ async function enterExperience(){
   setTimeout(()=>{if(!gameActive&&!orientationBlocked)startIntroMusic();},160);
 }
 async function continueInSafari(){
+  ensureAudio();warmDefaultSamples();
   if(!(await ensureThreeEngine(true)))return;
   experienceEntered=true;
   $('iosInstallHint')?.classList.add('hide');
@@ -766,7 +943,7 @@ async function continueInSafari(){
   setTimeout(()=>{if(!gameActive&&!orientationBlocked)startIntroMusic();},120);
 }
 function beginGameplayFromGesture(){
-  ensureAudio();
+  ensureAudio();warmDefaultSamples();
   if(!isTouch) requestPointerLockNow();
 }
 function fullscreenElement(){
@@ -1360,12 +1537,12 @@ function spawnThrowableVisual(m){
   const cap=new THREE.Mesh(new THREE.CylinderGeometry(.045,.055,.075,8),new THREE.MeshStandardMaterial({color:0x252a2c,roughness:.55,metalness:.7}));cap.position.y=.13;root.add(cap);
   let indicator=null;if(!flash){indicator=new THREE.Mesh(new THREE.SphereGeometry(.025,6,5),new THREE.MeshBasicMaterial({color:0xff4b29,transparent:true,opacity:1}));indicator.position.set(.10,.04,.07);root.add(indicator);}
   root.position.set(m.x,m.y,m.z);scene.add(root);
-  const at=Number(m.at)||serverNow();throwables.set(m.id,{root,mesh:root,body,indicator,kind:m.kind,ownerId:m.ownerId,target:new THREE.Vector3(m.x,m.y,m.z),snapshotPos:new THREE.Vector3(m.x,m.y,m.z),snapshotVel:new THREE.Vector3(m.vx||0,m.vy||0,m.vz||0),snapshotAt:at,born:performance.now(),stuck:!!m.stuck});
+  const at=Number(m.at)||serverNow(),fuseAt=Number(m.fuseAt)||at+(m.kind==='sticky'?1850:1650);throwables.set(m.id,{root,mesh:root,body,indicator,kind:m.kind,ownerId:m.ownerId,target:new THREE.Vector3(m.x,m.y,m.z),snapshotPos:new THREE.Vector3(m.x,m.y,m.z),snapshotVel:new THREE.Vector3(m.vx||0,m.vy||0,m.vz||0),snapshotAt:at,fuseAt,nextBeepAt:m.kind==='sticky'?at+170:0,born:performance.now(),stuck:!!m.stuck});
   if(m.ownerId===clientId)soundThrowableThrow(m.kind);
 }
 function updateThrowableVisual(m){
   const g=throwables.get(m.id);if(!g)return;
-  g.snapshotPos.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);g.target.copy(g.snapshotPos);g.snapshotAt=Number(m.at)||serverNow();g.stuck=!!m.stuck;
+  g.snapshotPos.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);g.target.copy(g.snapshotPos);g.snapshotAt=Number(m.at)||serverNow();if(Number.isFinite(Number(m.fuseAt)))g.fuseAt=Number(m.fuseAt);g.stuck=!!m.stuck;
   if(g.stuck)g.snapshotVel.set(0,0,0);else g.snapshotVel.set(Number(m.vx)||0,Number(m.vy)||0,Number(m.vz)||0);
 }
 function handleThrowableImpact(m){soundThrowableImpact(m.kind||'flash',m);updateThrowableVisual(m);}
@@ -1379,7 +1556,8 @@ function updateThrowables(dt){
     g.target.set(px,py,pz);const error=g.root.position.distanceTo(g.target);
     if(error>2.5)g.root.position.copy(g.target);else g.root.position.lerp(g.target,1-Math.exp(-dt*18));
     if(!g.stuck){g.root.rotation.x+=dt*7;g.root.rotation.z+=dt*5;}
-    if(g.indicator){const pulse=.45+.55*Math.sin((now-g.born)*.018);g.indicator.scale.setScalar(.72+pulse*.55);g.indicator.material.opacity=.65+pulse*.35;}
+    if(g.kind==='sticky'&&Number.isFinite(g.fuseAt)&&srv>=g.nextBeepAt&&srv<g.fuseAt-45){const remaining=Math.max(0,g.fuseAt-srv);soundSemtexBeep(g,remaining);const interval=remaining>1200?340:remaining>700?235:135;g.nextBeepAt=srv+interval;}
+    if(g.indicator){const remaining=Number.isFinite(g.fuseAt)?Math.max(0,g.fuseAt-srv):900,pulseRate=remaining<650?.035:.020,pulse=.45+.55*Math.sin((now-g.born)*pulseRate);g.indicator.scale.setScalar(.72+pulse*.55);g.indicator.material.opacity=.65+pulse*.35;}
   }
 }
 
@@ -1537,7 +1715,7 @@ function computeHudLayout(){
   const mapSize=compact?96:(isTouch?112:140),menuW=compact?36:42,menuH=compact?32:36;
   const teamW=compact?188:(isTouch?230:270),teamH=compact?30:34,joyR=compact?54:(isTouch?62:0);
   const fireR=compact?37:43,leftFireR=compact?32:37,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=compact?20:23,equipR=compact?23:27;
-  const bottom=safe.bottom+margin,weaponW=compact?190:(isTouch?220:250),weaponH=compact?62:68;
+  const bottom=safe.bottom+margin,weaponW=compact?158:(isTouch?174:198),weaponH=compact?50:(isTouch?54:58);
   const killW=compact?220:(isTouch?252:300),killH=compact?70:(isTouch?104:128);
   const teamX=(viewW-teamW)/2,teamY=safe.top+margin,moveBoundary=viewW*MOBILE_MOVE_ZONE_RATIO;
   const defaultJoyX=Math.max(safe.left+joyR+margin,Math.min(moveBoundary-joyR-margin,safe.left+joyR+margin));
@@ -1644,19 +1822,19 @@ function queueAnnouncer(title,subtitle='',duration=1500,priority=1){const item={
 function drawAnnouncer(c,w,h,now){if(announcerCurrent&&now>=announcerCurrent.until)announcerCurrent=null;if(!announcerCurrent&&announcerQueue.length){const next=announcerQueue.shift();announcerCurrent={...next,start:now,until:now+next.duration};soundAnnouncer(next.priority); }if(!announcerCurrent)return;const a=announcerCurrent,life=(now-a.start)/a.duration,fade=Math.min(1,life*6,(1-life)*5),scale=1+Math.max(0,.12-life*.45);c.save();c.translate(w/2,Math.max(62,h*.28));c.scale(scale,scale);c.globalAlpha=Math.max(0,fade);c.textAlign='center';c.shadowColor='rgba(0,0,0,.75)';c.shadowBlur=10;c.fillStyle='#fff';c.font=`1000 ${Math.max(20,Math.min(32,h*.065))}px system-ui`;c.fillText(a.title,0,0);if(a.subtitle){c.fillStyle=HUD_ACCENT;c.font=`900 ${Math.max(10,Math.min(14,h*.032))}px system-ui`;c.fillText(a.subtitle,0,25);}c.restore();}
 function weaponLabel(w){return WEAPON_SPECS[w]?.name||'PISTOL';}
 function drawWeapon(c,r){
-  const spec=WEAPON_SPECS[currentWeapon],count=Math.max(0,Math.floor(ammo[currentWeapon]||0)),slot=WEAPON_ORDER.indexOf(currentWeapon)+1,unlimited=!!godMode;
+  const spec=WEAPON_SPECS[currentWeapon],count=Math.max(0,Math.floor(ammo[currentWeapon]||0)),unlimited=!!godMode;
   const accent=currentWeapon==='sniper'?'#8edcff':currentWeapon==='shotgun'?'#ffad69':currentWeapon==='assault'?HUD_ACCENT:'#f4f6f7';
-  roundRect(c,r.x,r.y,r.w,r.h,9,HUD_SURFACE,HUD_LINE);
-  c.fillStyle=accent;c.fillRect(r.x,r.y,3,r.h);
-  c.textAlign='left';c.fillStyle='#68727b';c.font='900 7px system-ui';c.fillText(`0${slot}`,r.x+11,r.y+13);
-  c.fillStyle='#fff';c.font='1000 10px system-ui';c.fillText(spec.name,r.x+11,r.y+27);
-  c.fillStyle=HUD_MUTED;c.font='800 7px system-ui';c.fillText(`${fireMode.toUpperCase()} · ${currentWeapon==='sniper'?sniperZoomLabel():(adsWanted?'ADS':'HIP')}`,r.x+11,r.y+40);
-  c.textAlign='right';c.fillStyle=unlimited?HUD_ACCENT:count<=3?'#ff747d':'#fff';c.font=`1000 ${r.h<=62?27:30}px system-ui`;c.fillText(unlimited?'∞':String(count),r.x+r.w-34,r.y+24);
-  c.fillStyle='#657079';c.font='900 8px system-ui';c.fillText(unlimited?'∞':`/ ${spec.mag}`,r.x+r.w-10,r.y+27);
-  const bx=r.x+11,by=r.y+r.h-10,bw=r.w-22,bh=3;roundRect(c,bx,by,bw,bh,2,'rgba(255,255,255,.09)');
-  if(unlimited){roundRect(c,bx,by,bw,bh,2,HUD_ACCENT);c.fillStyle=HUD_ACCENT;c.font='800 7px system-ui';c.textAlign='left';c.fillText('UNLIMITED',r.x+11,r.y+r.h-20);}
-  else if(reloadUntil){const total=WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs,remain=Math.max(0,reloadUntil-serverNow()),q=Math.max(0,Math.min(1,1-remain/total));roundRect(c,bx,by,bw*q,bh,2,HUD_ACCENT);c.fillStyle=HUD_ACCENT;c.font='900 7px system-ui';c.textAlign='left';c.fillText('RELOADING',r.x+11,r.y+r.h-20);}
-  else{roundRect(c,bx,by,bw*(count/spec.mag),bh,2,accent);c.fillStyle='#69747d';c.font='800 7px system-ui';c.textAlign='left';c.fillText(count<=3&&count>0?'LOW AMMO':'READY',r.x+11,r.y+r.h-20);}
+  roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);
+  c.fillStyle=accent;c.fillRect(r.x,r.y,2.5,r.h);
+  const left=r.x+10,top=r.y+11,right=r.x+r.w-9;
+  c.textAlign='left';c.fillStyle='#fff';c.font=`1000 ${r.w<170?8.5:9.5}px system-ui`;c.fillText(spec.name,left,top);
+  c.fillStyle=HUD_MUTED;c.font='850 6.5px system-ui';c.fillText(`${fireMode.toUpperCase()} · ${currentWeapon==='sniper'?sniperZoomLabel():(adsWanted?'ADS':'HIP')}`,left,top+13);
+  c.textAlign='right';c.fillStyle=unlimited?HUD_ACCENT:count<=3?'#ff747d':'#fff';c.font=`1000 ${r.h<=50?22:24}px system-ui`;c.fillText(unlimited?'∞':String(count),right-23,top+6);
+  c.fillStyle='#69747d';c.font='900 7px system-ui';c.fillText(unlimited?'∞':`/ ${spec.mag}`,right,top+8);
+  const bx=left,by=r.y+r.h-7,bw=r.w-19,bh=2.5;roundRect(c,bx,by,bw,bh,2,'rgba(255,255,255,.09)');
+  if(unlimited)roundRect(c,bx,by,bw,bh,2,HUD_ACCENT);
+  else if(reloadUntil){const total=WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs,remain=Math.max(0,reloadUntil-serverNow()),q=Math.max(0,Math.min(1,1-remain/total));roundRect(c,bx,by,bw*q,bh,2,HUD_ACCENT);c.fillStyle=HUD_ACCENT;c.font='900 6.5px system-ui';c.textAlign='left';c.fillText('RELOADING',left,by-7);}
+  else roundRect(c,bx,by,bw*(count/spec.mag),bh,2,accent);
 }
 function minimapDotColor(rmt){return !rmt.bot&&rmt.team===myTeam?'#62ef86':(TEAM_COLORS[rmt.team]||rmt.color||'#fff');}
 function drawMiniMap(c,r){roundRect(c,r.x,r.y,r.w,r.h,9,HUD_SURFACE,HUD_LINE);const pad=8,ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;c.save();c.beginPath();c.rect(ix,iy,iw,ih);c.clip();c.fillStyle='rgba(190,202,194,.18)';c.fillRect(ix,iy,iw,ih);const terrainCells=12,cellW=iw/terrainCells,cellH=ih/terrainCells;for(let gy=0;gy<terrainCells;gy++)for(let gx=0;gx<terrainCells;gx++){const wx=-ARENA_LIMIT+(gx+.5)/terrainCells*ARENA_LIMIT*2,wz=-ARENA_LIMIT+(gy+.5)/terrainCells*ARENA_LIMIT*2,h=terrainHeight(wx,wz),t=Math.max(0,Math.min(1,(h+2.4)/16.2));c.fillStyle=`rgba(${Math.round(72+88*t)},${Math.round(102+55*t)},${Math.round(70+38*t)},${.18+.28*t})`;c.fillRect(ix+gx*cellW,iy+gy*cellH,cellW+.5,cellH+.5);}c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1;c.strokeRect(ix+.5,iy+.5,iw-1,ih-1);const toX=x=>ix+(x+ARENA_LIMIT)/(ARENA_LIMIT*2)*iw,toY=z=>iy+(z+ARENA_LIMIT)/(ARENA_LIMIT*2)*ih;c.fillStyle='rgba(210,216,220,.34)';for(const b of mapObstacles){if(b.type==='box'){const x1=toX(b.x-b.w/2),x2=toX(b.x+b.w/2),y1=toY(b.z-b.d/2),y2=toY(b.z+b.d/2);c.fillRect(x1,y1,x2-x1,y2-y1);}else if(b.type==='pyramid'){const px=toX(b.x),py=toY(b.z),rr=b.base/(ARENA_LIMIT*2)*iw*.55;c.beginPath();c.moveTo(px,py-rr);c.lineTo(px+rr,py+rr);c.lineTo(px-rr,py+rr);c.closePath();c.fill();}else{const px=toX(b.x),py=toY(b.z),rr=Math.max(1.3,(b.r||1)/(ARENA_LIMIT*2)*iw*1.6);c.beginPath();c.arc(px,py,rr,0,Math.PI*2);c.fillStyle=b.type==='tree'?'rgba(48,105,56,.72)':b.type==='bush'?'rgba(73,124,66,.58)':'rgba(156,160,158,.60)';c.fill();c.fillStyle='rgba(210,216,220,.34)';}}for(const rmt of remotes.values()){const px=toX(rmt.group.position.x),py=toY(rmt.group.position.z);c.beginPath();c.arc(px,py,3.4,0,Math.PI*2);const humanTeammate=!rmt.bot&&rmt.team===myTeam;c.fillStyle=minimapDotColor(rmt);c.fill();if(rmt.team===myTeam){c.strokeStyle=humanTeammate?'#d8ffe3':'#fff';c.lineWidth=1;c.stroke();}}const px=toX(position.x),py=toY(position.z);c.save();c.translate(px,py);c.rotate(-yaw);c.beginPath();c.moveTo(0,-6);c.lineTo(4.5,5);c.lineTo(0,3);c.lineTo(-4.5,5);c.closePath();c.fillStyle=selfColor;c.fill();c.strokeStyle='#fff';c.lineWidth=1.2;c.stroke();c.restore();c.restore();c.fillStyle='#fff';c.font=`900 ${r.w<110?8:9}px system-ui`;c.textAlign='left';c.fillText(currentRoom||'----',r.x+9,r.y+r.h-8);c.textAlign='right';c.fillStyle='#c7d3dd';const humanCount=[...remotes.values()].filter(v=>!v.bot).length+1,botTotal=[...remotes.values()].filter(v=>v.bot).length;c.fillText(`${humanCount}P · ${botTotal}B`,r.x+r.w-9,r.y+r.h-8);}
@@ -1686,7 +1864,7 @@ function drawKillFeed(c,r,now){
   }
 }
 function drawGodBadge(c,r,now){const pulse=.6+.4*Math.sin(now*.005);roundRect(c,r.x,r.y,r.w,r.h,8,`rgba(215,255,88,${.10+.04*pulse})`,'rgba(215,255,88,.44)');const cx=r.x+r.w/2,cy=r.y+r.h/2;c.save();c.translate(cx,cy);c.strokeStyle=HUD_ACCENT;c.lineWidth=1.5;c.beginPath();c.moveTo(0,-7);c.lineTo(6,-4);c.lineTo(5,3);c.quadraticCurveTo(3,7,0,8);c.quadraticCurveTo(-3,7,-5,3);c.lineTo(-6,-4);c.closePath();c.stroke();c.beginPath();c.moveTo(-2,0);c.lineTo(0,2);c.lineTo(3,-3);c.stroke();c.restore();}
-function drawMenuButton(c,r){roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);c.fillStyle='#fff';c.textAlign='center';c.font='1000 17px system-ui';c.fillText('☰',r.x+r.w/2,r.y+r.h/2+1);}
+function drawMenuButton(c,r){roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);const cx=r.x+r.w/2,cy=r.y+r.h/2;c.save();c.strokeStyle='rgba(245,249,252,.92)';c.lineWidth=1.8;c.lineCap='round';for(const off of [-5,0,5]){c.beginPath();c.moveTo(cx-7,cy+off);c.lineTo(cx+7,cy+off);c.stroke();}c.restore();}
 function drawWeaponCrosshair(c,x,y,weapon,hit,ads=0,headshot=false){const color=headshot?'#ffd36d':hit?'#fff':'rgba(255,255,255,.86)',move=Math.min(1,localMoveAmount||0),kick=Math.max(0,1-fireTime/.18),tight=1-ads*.55;c.save();c.strokeStyle=color;c.fillStyle=color;c.lineWidth=hit?2.35:1.65;c.lineCap='round';
   if(weapon==='shotgun'){const r=(12+move*5+kick*4)*tight+5;c.beginPath();for(let i=0;i<4;i++){const a=i*Math.PI/2-.28;c.arc(x,y,r,a,a+.56);}c.stroke();c.beginPath();c.arc(x,y,1.5,0,Math.PI*2);c.fill();}
   else if(weapon==='assault'){const gap=(4+move*4+kick*3)*tight+1.5,len=7*tight+2;c.beginPath();c.moveTo(x-gap-len,y);c.lineTo(x-gap,y);c.moveTo(x+gap,y);c.lineTo(x+gap+len,y);c.moveTo(x,y-gap-len);c.lineTo(x,y-gap);c.moveTo(x,y+gap);c.lineTo(x,y+gap+len);c.stroke();c.beginPath();c.arc(x,y,1.35,0,Math.PI*2);c.fill();}
@@ -1716,14 +1894,26 @@ function drawRoundControl(c,b,active,type){
   c.textAlign='center';c.fillStyle=active?'#fff':'rgba(230,243,249,.68)';c.font=`900 ${Math.max(6.5,Math.min(8,b.r*.22))}px system-ui`;c.fillText(label,b.x,b.y+b.r*.56);c.restore();
 }
 function drawControlIcon(c,x,y,r,type,active){
-  const q=Math.max(8,r*.44);c.strokeStyle=active?'#fff':'rgba(241,250,255,.92)';c.fillStyle=c.strokeStyle;c.lineWidth=Math.max(1.4,r*.06);c.lineCap='round';c.lineJoin='round';c.beginPath();
-  if(type==='fire'){c.arc(x,y,q*.38,0,Math.PI*2);c.moveTo(x-q*.72,y);c.lineTo(x-q*.40,y);c.moveTo(x+q*.40,y);c.lineTo(x+q*.72,y);c.moveTo(x,y-q*.72);c.lineTo(x,y-q*.40);c.moveTo(x,y+q*.40);c.lineTo(x,y+q*.72);c.stroke();c.beginPath();c.arc(x,y,q*.10,0,Math.PI*2);c.fill();}
-  else if(type==='aim'){c.arc(x,y,q*.55,0,Math.PI*2);c.moveTo(x-q*.82,y);c.lineTo(x-q*.38,y);c.moveTo(x+q*.38,y);c.lineTo(x+q*.82,y);c.moveTo(x,y-q*.82);c.lineTo(x,y-q*.38);c.moveTo(x,y+q*.38);c.lineTo(x,y+q*.82);c.stroke();}
-  else if(type==='jump'){c.moveTo(x-q*.55,y+q*.35);c.lineTo(x,y-q*.45);c.lineTo(x+q*.55,y+q*.35);c.stroke();c.beginPath();c.moveTo(x,y-q*.45);c.lineTo(x,y+q*.52);c.stroke();}
-  else if(type==='reload'){c.arc(x,y,q*.55,-.45,Math.PI*1.42);c.stroke();c.beginPath();c.moveTo(x+q*.48,y-q*.45);c.lineTo(x+q*.70,y-q*.28);c.lineTo(x+q*.42,y-q*.18);c.stroke();}
-  else if(type==='swap'){c.moveTo(x-q*.62,y-q*.22);c.lineTo(x+q*.45,y-q*.22);c.lineTo(x+q*.25,y-q*.42);c.moveTo(x+q*.62,y+q*.22);c.lineTo(x-q*.45,y+q*.22);c.lineTo(x-q*.25,y+q*.42);c.stroke();}
-  else if(type==='flash'||type==='sticky'){c.beginPath();c.arc(x,y,q*.48,0,Math.PI*2);c.stroke();if(type==='sticky'){c.beginPath();c.moveTo(x-q*.16,y-q*.56);c.lineTo(x+q*.20,y-q*.82);c.stroke();}else{c.beginPath();c.moveTo(x-q*.55,y-q*.10);c.lineTo(x+q*.55,y-q*.10);c.moveTo(x,y-q*.62);c.lineTo(x,y+q*.42);c.stroke();}}
-  else if(type==='mode'){const n=fireMode==='auto'?3:1;for(let i=0;i<n;i++){const yy=y+(i-(n-1)/2)*q*.34;c.beginPath();c.moveTo(x-q*.46,yy);c.lineTo(x+q*.35,yy);c.stroke();c.beginPath();c.moveTo(x+q*.35,yy);c.lineTo(x+q*.55,yy-q*.12);c.lineTo(x+q*.55,yy+q*.12);c.closePath();c.fill();}}
+  const q=Math.max(8,r*.44),ink=active?'#fff':'rgba(241,250,255,.92)';
+  c.save();c.strokeStyle=ink;c.fillStyle=ink;c.lineWidth=Math.max(1.35,r*.055);c.lineCap='round';c.lineJoin='round';
+  if(type==='fire'){
+    const a=q*.63,g=q*.24;c.beginPath();c.moveTo(x-a,y-g);c.lineTo(x-a,y-a);c.lineTo(x-g,y-a);c.moveTo(x+g,y-a);c.lineTo(x+a,y-a);c.lineTo(x+a,y-g);c.moveTo(x+a,y+g);c.lineTo(x+a,y+a);c.lineTo(x+g,y+a);c.moveTo(x-g,y+a);c.lineTo(x-a,y+a);c.lineTo(x-a,y+g);c.stroke();c.beginPath();c.arc(x,y,q*.105,0,Math.PI*2);c.fill();
+  }else if(type==='aim'){
+    const a=q*.68,g=q*.22;c.beginPath();c.moveTo(x-a,y-g);c.lineTo(x-a,y-a);c.lineTo(x-g,y-a);c.moveTo(x+g,y-a);c.lineTo(x+a,y-a);c.lineTo(x+a,y-g);c.moveTo(x+a,y+g);c.lineTo(x+a,y+a);c.lineTo(x+g,y+a);c.moveTo(x-g,y+a);c.lineTo(x-a,y+a);c.lineTo(x-a,y+g);c.stroke();c.beginPath();c.arc(x,y,q*.18,0,Math.PI*2);c.stroke();
+  }else if(type==='jump'){
+    c.beginPath();c.moveTo(x-q*.55,y+q*.25);c.lineTo(x,y-q*.48);c.lineTo(x+q*.55,y+q*.25);c.stroke();c.beginPath();c.moveTo(x-q*.52,y+q*.56);c.lineTo(x+q*.52,y+q*.56);c.stroke();
+  }else if(type==='reload'){
+    c.beginPath();c.arc(x,y,q*.56,-.7,Math.PI*1.45);c.stroke();c.beginPath();c.moveTo(x+q*.42,y-q*.46);c.lineTo(x+q*.72,y-q*.42);c.lineTo(x+q*.58,y-q*.14);c.stroke();
+  }else if(type==='swap'){
+    c.beginPath();c.moveTo(x-q*.66,y-q*.26);c.lineTo(x+q*.43,y-q*.26);c.lineTo(x+q*.20,y-q*.49);c.moveTo(x+q*.66,y+q*.26);c.lineTo(x-q*.43,y+q*.26);c.lineTo(x-q*.20,y+q*.49);c.stroke();
+  }else if(type==='flash'){
+    c.beginPath();c.roundRect(x-q*.38,y-q*.45,q*.76,q*.78,q*.18);c.stroke();c.beginPath();c.moveTo(x-q*.10,y-q*.55);c.lineTo(x+q*.18,y-q*.72);c.lineTo(x+q*.34,y-q*.60);c.stroke();for(const a of [-.9,0,.9]){const sx=x+Math.sin(a)*q*.66,sy=y+Math.cos(a)*q*.66;c.beginPath();c.moveTo(sx,sy);c.lineTo(x+Math.sin(a)*q*.84,y+Math.cos(a)*q*.84);c.stroke();}
+  }else if(type==='sticky'){
+    c.beginPath();c.arc(x,y,q*.50,0,Math.PI*2);c.stroke();c.beginPath();c.arc(x,y,q*.15,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(x-q*.12,y-q*.55);c.lineTo(x+q*.18,y-q*.76);c.lineTo(x+q*.34,y-q*.62);c.stroke();
+  }else if(type==='mode'){
+    const n=fireMode==='auto'?3:1;for(let i=0;i<n;i++){const yy=y+(i-(n-1)/2)*q*.33;c.beginPath();c.roundRect(x-q*.50,yy-q*.085,q*.82,q*.17,q*.085);c.fill();c.beginPath();c.moveTo(x+q*.35,yy);c.lineTo(x+q*.58,yy);c.stroke();}
+  }
+  c.restore();
 }
 function drawDesktopHint(c,L){c.font='800 9px system-ui';c.textAlign='left';c.fillStyle='rgba(255,255,255,.66)';const text=document.pointerLockElement===canvas?'LMB FIRE · RMB ADS/ZOOM · B FIRE MODE · R RELOAD · 1/2/3/4/Q WEAPON · F FLASH · G STICKY · TAB SCORE':'CLICK GAME TO CAPTURE MOUSE';c.fillText(text,L.safe.left+12,viewH-L.safe.bottom-12);}
 function drawVersion(c,L){c.font='800 8px system-ui';c.textAlign='center';c.fillStyle='rgba(255,255,255,.38)';c.fillText(`BREACHLINE v${APP_VERSION}`,viewW/2,viewH-L.safe.bottom-9);}
@@ -1734,24 +1924,46 @@ function chipToneAt(freq,start,duration,volume=.018,type='square'){
   const a=audioCtx;if(!a||!musicEnabled)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,start);g.gain.setValueAtTime(.0001,start);g.gain.linearRampToValueAtTime(volume,start+.008);g.gain.setValueAtTime(volume,start+Math.max(.012,duration-.018));g.gain.exponentialRampToValueAtTime(.0001,start+duration);o.connect(g).connect(musicGain||a.destination);o.start(start);o.stop(start+duration+.02);
 }
 function scheduleIntroMusic(){
-  const a=audioCtx;if(!a||!musicEnabled||gameActive||document.hidden)return;const stepDur=60/138/2;
+  const a=audioCtx;if(!a||!musicEnabled||gameActive||document.hidden||customMusicSource)return;const stepDur=60/138/2;
   const lead=[659,0,784,880,784,659,587,0,523,0,587,659,784,659,587,523];
   const bass=[131,131,147,147,110,110,123,123];
   while(musicNextAt<a.currentTime+.24){const i=musicStep%16,n=lead[i];if(n)chipToneAt(n,musicNextAt,stepDur*.72,.013,'square');if(i%2===0)chipToneAt(bass[Math.floor(i/2)%bass.length],musicNextAt,stepDur*1.7,.016,'square');if(i%4===0)chipToneAt(55,musicNextAt,.045,.018,'square');musicStep++;musicNextAt+=stepDur;}
 }
 function startIntroMusic(){
-  if(!musicEnabled||gameActive||!experienceEntered||orientationBlocked)return;const a=ensureAudio();if(!a||musicTimer)return;if(!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}musicStep=0;musicNextAt=a.currentTime+.04;scheduleIntroMusic();musicTimer=setInterval(scheduleIntroMusic,90);
+  if(!musicEnabled||gameActive||!experienceEntered||orientationBlocked)return;const a=ensureAudio();if(!a)return;if(!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}if(customSoundRecords.has('introMusic')&&!customSoundBuffers.has('introMusic')){hydrateCustomSoundBuffers().then(()=>{if(musicEnabled&&!gameActive&&!customMusicSource)startIntroMusic();});return;}if(customSoundBuffers.has('introMusic')){if(customMusicSource)return;customMusicSource=playCustomSound('introMusic',1,{music:true,loop:true});if(customMusicSource)customMusicSource.onended=()=>{customMusicSource=null;};return;}if(musicTimer)return;musicStep=0;musicNextAt=a.currentTime+.04;scheduleIntroMusic();musicTimer=setInterval(scheduleIntroMusic,90);
 }
-function stopIntroMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}musicNextAt=0;}
+function stopIntroMusic(){if(musicTimer){clearInterval(musicTimer);musicTimer=null;}if(customMusicSource){try{customMusicSource.stop();}catch{}customMusicSource=null;}musicNextAt=0;}
 
-function ensureAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)audioCtx=new C();}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx;}
-function tone(freq,duration,type='sine',volume=.03,slide=0){const a=ensureAudio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,a.currentTime);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),a.currentTime+duration);g.gain.setValueAtTime(volume,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+duration);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+duration);}
-function soundShot(weapon='pistol'){if(weapon==='shotgun'){tone(88,.10,'square',.065,-35);setTimeout(()=>tone(52,.12,'sawtooth',.03,-18),24)}else if(weapon==='sniper'){tone(95,.11,'square',.055,-45);setTimeout(()=>tone(55,.10,'square',.024,-15),38)}else if(weapon==='assault'){tone(132,.045,'square',.038,-72);setTimeout(()=>tone(68,.035,'square',.014,-18),18)}else{tone(160,.055,'square',.035,-100);setTimeout(()=>tone(75,.04,'square',.018,-20),24)}}function soundReload(){tone(480,.04,'square',.012,-80);setTimeout(()=>tone(620,.045,'square',.01,-90),120)}function soundHitmarker(){tone(1180,.035,'square',.026,-250);setTimeout(()=>tone(820,.028,'square',.018,-120),28)}function soundHeadshot(){tone(1480,.04,'square',.032,-160);setTimeout(()=>tone(1040,.055,'square',.024,210),34)}function soundKill(){tone(620,.055,'square',.03,180);setTimeout(()=>tone(980,.08,'square',.038,260),58)}function soundAnnouncer(priority=1){tone(priority>=5?520:440,.065,'square',.022,160);setTimeout(()=>tone(priority>=5?840:690,.09,'square',.025,240),60)}function soundShield(){tone(420,.045,'square',.024,520);setTimeout(()=>tone(820,.07,'square',.02,-120),34)}function soundHurt(){tone(120,.13,'sawtooth',.025,-70)}function soundJump(){tone(210,.09,'sine',.016,80)}
-function soundThrowableThrow(kind='flash'){tone(kind==='sticky'?310:520,.045,'square',.018,-90);setTimeout(()=>tone(kind==='sticky'?185:760,.04,'square',.012,-60),55);}
-function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;if(kind==='sticky'){tone(155,.045,'square',.025*v,-35);setTimeout(()=>tone(720,.028,'square',.010*v,-180),34);}else{tone(410,.025,'square',.014*v,-140);}}
+function ensureAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C){audioCtx=new C();sfxGain=audioCtx.createGain();sfxGain.gain.value=soundVolume;sfxGain.connect(audioCtx.destination);}}if(audioCtx?.state==='suspended')audioCtx.resume();if(audioCtx&&[...customSoundRecords.keys()].some(id=>!customSoundBuffers.has(id)&&!soundDecodeFailures.has(id)))queueMicrotask(hydrateCustomSoundBuffers);return audioCtx;}
+function tone(freq,duration,type='sine',volume=.03,slide=0){const a=ensureAudio();if(!a)return;const o=a.createOscillator(),g=a.createGain();o.type=type;o.frequency.setValueAtTime(freq,a.currentTime);if(slide)o.frequency.exponentialRampToValueAtTime(Math.max(30,freq+slide),a.currentTime+duration);g.gain.setValueAtTime(volume,a.currentTime);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+duration);o.connect(g).connect(sfxGain||a.destination);o.start();o.stop(a.currentTime+duration);}
+function soundShot(weapon='pistol'){
+  const id=weapon==='shotgun'?'shotShotgun':weapon==='sniper'?'shotSniper':weapon==='assault'?'shotAssault':'shotPistol';if(playCustomSound(id))return;
+  const sampled=playDefaultSample(id);
+  // A tiny procedural body keeps one compact recorded transient sounding distinct
+  // across all four weapons without shipping four large gunshot files.
+  if(sampled){if(weapon==='shotgun')tone(72,.085,'sine',.022,-22);else if(weapon==='sniper')tone(82,.075,'sine',.019,-28);else if(weapon==='assault')tone(112,.032,'sine',.009,-34);else tone(145,.038,'sine',.010,-44);return;}
+  if(weapon==='shotgun'){tone(88,.10,'square',.065,-35);setTimeout(()=>tone(52,.12,'sawtooth',.03,-18),24)}else if(weapon==='sniper'){tone(95,.11,'square',.055,-45);setTimeout(()=>tone(55,.10,'square',.024,-15),38)}else if(weapon==='assault'){tone(132,.045,'square',.038,-72);setTimeout(()=>tone(68,.035,'square',.014,-18),18)}else{tone(160,.055,'square',.035,-100);setTimeout(()=>tone(75,.04,'square',.018,-20),24)}
+}
+function soundReload(){if(playCustomSound('reload'))return;if(playDefaultSample('reload'))return;tone(480,.04,'square',.012,-80);setTimeout(()=>tone(620,.045,'square',.01,-90),120)}
+function soundHitmarker(){if(playCustomSound('hitmarker'))return;tone(1180,.035,'square',.026,-250);setTimeout(()=>tone(820,.028,'square',.018,-120),28)}
+function soundHeadshot(){if(playCustomSound('headshot'))return;tone(1480,.04,'square',.032,-160);setTimeout(()=>tone(1040,.055,'square',.024,210),34)}
+function soundKill(){if(playCustomSound('kill'))return;tone(620,.055,'square',.03,180);setTimeout(()=>tone(980,.08,'square',.038,260),58)}
+function soundAnnouncer(priority=1){if(playCustomSound('announcer'))return;tone(priority>=5?520:440,.065,'square',.022,160);setTimeout(()=>tone(priority>=5?840:690,.09,'square',.025,240),60)}
+function soundShield(){if(playCustomSound('shield'))return;tone(420,.045,'square',.024,520);setTimeout(()=>tone(820,.07,'square',.02,-120),34)}
+function soundHurt(){if(playCustomSound('hurt'))return;if(playDefaultSample('hurt'))return;tone(120,.13,'sawtooth',.025,-70)}
+function soundJump(){if(playCustomSound('jump'))return;tone(210,.09,'sine',.016,80)}
+function soundThrowableThrow(kind='flash'){const id=kind==='sticky'?'stickyThrow':'flashThrow';if(playCustomSound(id))return;tone(kind==='sticky'?310:520,.045,'square',.018,-90);setTimeout(()=>tone(kind==='sticky'?185:760,.04,'square',.012,-60),55);}
+function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;const id=kind==='sticky'?'stickyImpact':'flashImpact';if(playCustomSound(id,v))return;if(playDefaultSample(id,v))return;if(kind==='sticky'){tone(155,.045,'square',.025*v,-35);setTimeout(()=>tone(720,.028,'square',.010*v,-180),34);}else{tone(410,.025,'square',.014*v,-140);}}
+function semtexDistanceVolume(g,max=42){if(!position||!g?.root)return 0;const p=g.root.position,d=Math.hypot(p.x-position.x,p.y-(position.y+1),p.z-position.z);return Math.max(0,1-d/max);}
+function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;if(playCustomSound('semtexBeep',v))return;const urgent=remainingMs<650,toneA=urgent?1220:980;tone(toneA,.032,'square',.018*v,urgent?120:70);}
 function tacticalDistanceVolume(m,max=48){if(!position||!m)return .02;const d=Math.hypot((Number(m.x)||0)-position.x,(Number(m.y)||0)-(position.y+1),(Number(m.z)||0)-position.z);return Math.max(0,1-d/max);}
-function soundTacticalDetonation(kind,m){const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;if(kind==='flash'||kind==='stun'){tone(92,.075,'square',.072*v,-45);setTimeout(()=>tone(1680,.13,'sine',.028*v,620),18);setTimeout(()=>tone(2350,.42,'sine',.012*v,-900),92);}else{tone(62,.12,'sawtooth',.085*v,-24);setTimeout(()=>tone(110,.09,'square',.040*v,-55),24);setTimeout(()=>tone(42,.18,'sine',.032*v,-8),52);}}
-
+function soundTacticalDetonation(kind,m){
+  const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;const flash=kind==='flash'||kind==='stun',id=flash?'flashDetonate':'stickyDetonate';if(playCustomSound(id,v))return;
+  const sampled=playDefaultSample(id,v);
+  if(flash){if(sampled){setTimeout(()=>tone(1860,.16,'sine',.020*v,520),16);setTimeout(()=>tone(2440,.38,'sine',.009*v,-860),88);return;}tone(92,.075,'square',.072*v,-45);setTimeout(()=>tone(1680,.13,'sine',.028*v,620),18);setTimeout(()=>tone(2350,.42,'sine',.012*v,-900),92);}
+  else{if(sampled){tone(52,.11,'sine',.020*v,-12);return;}tone(62,.12,'sawtooth',.085*v,-24);setTimeout(()=>tone(110,.09,'square',.040*v,-55),24);setTimeout(()=>tone(42,.18,'sine',.032*v,-8),52);}
+}
+initLocalSounds();
 document.addEventListener('pointerdown',ensureAudio,{once:true});
 </script>
 </body>
