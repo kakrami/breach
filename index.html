@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Punch World v1.15.24</title>
+<title>Punch World v1.15.25</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -106,16 +106,33 @@
 
 <section id="pause" class="pause hide">
   <div class="pause-card">
-    <div class="pause-head"><div><div class="eyebrow">SESSION CONTROL</div><h2>World Menu</h2><div class="version brand-version" data-app-version></div><div class="pause-context"><span id="pauseRoom">Room ----</span><span id="pauseLoadout">Pistol · 12 rounds</span></div></div><span id="pauseTeamBadge" class="pause-team">BLUE TEAM</span></div>
-    <div class="pause-actions">
-      <button id="resumeBtn" class="btn primary resume"><svg class="ui-icon"><use href="#i-play"/></svg><span>Resume</span></button>
-      <button id="pauseGodBtn" class="btn"><svg class="ui-icon"><use href="#i-shield"/></svg><span id="pauseGodText">God Off</span></button>
-      <button id="teamSwitchBtn" class="btn"><svg class="ui-icon"><use href="#i-team"/></svg><span id="teamSwitchText">Switch Team</span></button>
-      <button id="adminBtn" class="btn hide"><svg class="ui-icon"><use href="#i-settings"/></svg><span>Admin</span></button>
-      <button id="copyBtn" class="btn"><svg class="ui-icon"><use href="#i-copy"/></svg><span>Invite</span></button>
-      <button id="fullBtn" class="btn"><svg class="ui-icon"><use href="#i-full"/></svg><span>Fullscreen</span></button>
-      <button id="leaveBtn" class="btn danger leave"><svg class="ui-icon"><use href="#i-exit"/></svg><span>Leave World</span></button>
-    </div>
+    <div class="pause-head"><div><div class="eyebrow">SESSION CONTROL</div><h2>World Menu</h2><div class="version brand-version" data-app-version></div><div class="pause-context"><span id="pauseRoom">Room ----</span><span id="pauseLoadout">Pistol · 12 rounds</span></div></div><div class="pause-head-tools"><span id="pauseTeamBadge" class="pause-team">BLUE TEAM</span><button id="adminBtn" class="pause-admin-chip hide"><svg class="ui-icon"><use href="#i-settings"/></svg><span>Admin</span></button></div></div>
+
+    <button id="resumeBtn" class="btn primary pause-resume"><svg class="ui-icon"><use href="#i-play"/></svg><span>Resume Game</span></button>
+
+    <section class="pause-section" aria-label="Player settings">
+      <div class="pause-section-head"><span>PLAYER</span><small>Changes apply immediately</small></div>
+      <div class="pause-setting-row pause-team-row">
+        <div class="pause-setting-copy"><span class="pause-setting-icon"><svg class="ui-icon"><use href="#i-team"/></svg></span><div><strong>Team</strong><small>Changing teams respawns you</small></div></div>
+        <div id="pauseTeamPicker" class="pause-team-picker" role="radiogroup" aria-label="Change team">
+          <button type="button" class="pause-team-choice blue" data-pause-team="blue" aria-pressed="true"><span class="pause-team-dot"></span>Blue</button>
+          <button type="button" class="pause-team-choice red" data-pause-team="red" aria-pressed="false"><span class="pause-team-dot"></span>Red</button>
+        </div>
+      </div>
+      <div class="pause-setting-row">
+        <div class="pause-setting-copy"><span class="pause-setting-icon"><svg class="ui-icon"><use href="#i-shield"/></svg></span><div><strong>God Mode</strong><small>Invincible + unlimited ammo and equipment</small></div></div>
+        <button id="pauseGodBtn" type="button" class="pause-switch" aria-pressed="false" aria-label="Toggle God Mode"><span id="pauseGodText">OFF</span><span class="pause-switch-track"><span></span></span></button>
+      </div>
+    </section>
+
+    <section class="pause-section pause-session-section" aria-label="Session actions">
+      <div class="pause-section-head"><span>SESSION</span><small>World utilities</small></div>
+      <div class="pause-utility-grid">
+        <button id="copyBtn" class="btn"><svg class="ui-icon"><use href="#i-copy"/></svg><span>Invite</span></button>
+        <button id="fullBtn" class="btn"><svg class="ui-icon"><use href="#i-full"/></svg><span>Fullscreen</span></button>
+        <button id="leaveBtn" class="btn danger"><svg class="ui-icon"><use href="#i-exit"/></svg><span>Leave</span></button>
+      </div>
+    </section>
   </div>
 </section>
 
@@ -154,6 +171,7 @@
       </div>
     </div>
     <div id="adminPlayers" class="admin-page hide" role="tabpanel" aria-labelledby="adminTabPlayers">
+      <div class="admin-player-toolbar"><div><strong>Connected Players</strong><small>God Mode and admin access apply instantly.</small></div><span id="adminPlayerCount" class="admin-player-count">0 PLAYERS</span></div>
       <div id="adminPlayerList" class="admin-player-list"></div>
     </div>
     <footer class="admin-foot"><div id="adminStatus" class="admin-status" role="status" aria-live="polite">Admins can change world rules and manage connected players.</div><button id="adminResetBtn" class="btn">Defaults</button><button id="adminSaveBtn" class="btn primary">Apply Rules</button></footer>
@@ -170,7 +188,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.15.24';
+const APP_VERSION = '1.15.25';
 const PROTOCOL_VERSION = 27;
 const ROOM_CODE_LENGTH = 4;
 const MAX_PLAYERS = 8;
@@ -397,8 +415,8 @@ function syncGodUI(){
   const btn=$('godToggle'),state=$('godState'),pauseBtn=$('pauseGodBtn'),pauseText=$('pauseGodText');
   if(btn){btn.setAttribute('aria-pressed',String(selectedGod));btn.title=selectedGod?'God Mode enabled: invincible + unlimited ammo and equipment':'God Mode disabled';}
   if(state)state.textContent=selectedGod?'ON':'OFF';
-  if(pauseBtn)pauseBtn.classList.toggle('god-active',!!godMode);
-  if(pauseText)pauseText.textContent=godMode?'God On':'God Off';
+  if(pauseBtn){pauseBtn.classList.toggle('active',!!godMode);pauseBtn.setAttribute('aria-pressed',String(!!godMode));}
+  if(pauseText)pauseText.textContent=godMode?'ON':'OFF';
 }
 function toggleGodMode(live=false){
   const next=!(live?godMode:selectedGod);
@@ -416,8 +434,8 @@ function syncPauseContext(){
   const badge=$('pauseTeamBadge');if(badge){badge.textContent=`${myTeam.toUpperCase()} TEAM`;badge.style.color=TEAM_COLORS[myTeam];badge.style.borderColor=`${TEAM_COLORS[myTeam]}88`;badge.style.background=`${TEAM_COLORS[myTeam]}22`;}
   if($('pauseRoom'))$('pauseRoom').textContent=`Room ${currentRoom||'----'}`;
   if($('pauseLoadout'))$('pauseLoadout').textContent=`${WEAPON_SPECS[currentWeapon].name} · ${Math.max(0,Math.floor(ammo[currentWeapon]||0))} rounds`;
-  const adminBtn=$('adminBtn');if(adminBtn)adminBtn.classList.toggle('hide',!isWorldAdmin);pause.classList.toggle('admin-mode',!!isWorldAdmin);
-  const teamText=$('teamSwitchText');if(teamText)teamText.textContent=`Join ${myTeam==='blue'?'Red':'Blue'} Team`;
+  const adminBtn=$('adminBtn');if(adminBtn)adminBtn.classList.toggle('hide',!isWorldAdmin);
+  for(const btn of document.querySelectorAll('[data-pause-team]')){const active=btn.dataset.pauseTeam===myTeam;btn.setAttribute('aria-pressed',String(active));btn.classList.toggle('active',active);}
   syncGodUI();
 }
 
@@ -619,7 +637,7 @@ function bindUI(){
   $('resumeBtn').addEventListener('click', resumeFromGesture);
   $('copyBtn').addEventListener('click', copyInvite);
   $('pauseGodBtn').addEventListener('click',()=>toggleGodMode(true));
-  $('teamSwitchBtn').addEventListener('click',()=>requestTeamChange(myTeam==='blue'?'red':'blue'));
+  for(const btn of document.querySelectorAll('[data-pause-team]'))btn.addEventListener('click',()=>requestTeamChange(btn.dataset.pauseTeam));
   $('adminBtn').addEventListener('click',openAdminPanel);
   $('adminCloseBtn').addEventListener('click',closeAdminPanel);
   $('adminSaveBtn').addEventListener('click',saveAdminSettings);
@@ -709,7 +727,7 @@ function isEditableTarget(target){
 function isLandscape(){ const v=getViewSize(); return v.w>v.h; }
 function getViewSize(){const v=viewportMetrics||syncVisualViewportMetrics();return {w:v.w,h:v.h};}
 function fitResponsiveOverlays(){
-  for(const el of [$('.menu-shell'),$('.pause-card'),$('.admin-shell'),document.querySelector('.boot:not(.hide) .boot-card')]){
+  for(const el of [document.querySelector('.menu-shell'),document.querySelector('.pause-card'),document.querySelector('.admin-shell'),document.querySelector('.boot:not(.hide) .boot-card')]){
     if(!el)continue;
     el.style.removeProperty('zoom');
     el.style.removeProperty('transform');
@@ -888,8 +906,8 @@ function onCanvasPointerDown(e){
     if(pointInCircle(p.x,p.y,layout.leftFire)){
       touchRoles.set(e.pointerId,'fire');fireTouchPointers.add(e.pointerId);touchVisual.fireUntil=performance.now()+150;fireHeld=true;doFire();return;
     }
-    if(pointInCircle(p.x,p.y,layout.flash)){touchRoles.set(e.pointerId,'equipment');touchVisual.flashUntil=performance.now()+160;beginEquipmentAim('flash',e.pointerId);return;}
-    if(pointInCircle(p.x,p.y,layout.sticky)){touchRoles.set(e.pointerId,'equipment');touchVisual.stickyUntil=performance.now()+160;beginEquipmentAim('sticky',e.pointerId);return;}
+    if(pointInRect(p.x,p.y,layout.flash)){touchRoles.set(e.pointerId,'equipment');touchVisual.flashUntil=performance.now()+160;beginEquipmentAim('flash',e.pointerId);return;}
+    if(pointInRect(p.x,p.y,layout.sticky)){touchRoles.set(e.pointerId,'equipment');touchVisual.stickyUntil=performance.now()+160;beginEquipmentAim('sticky',e.pointerId);return;}
     if(pointInCircle(p.x,p.y,layout.fire)){
       touchRoles.set(e.pointerId,'fire');fireTouchPointers.add(e.pointerId);touchVisual.fireUntil=performance.now()+150;fireHeld=true;doFire();return;
     }
@@ -1100,7 +1118,16 @@ function switchAdminTab(tab){const weapons=tab==='weapons',bots=tab==='bots',pla
 function populateAdminSettings(value){const x=normalizeWorldSettingsClient(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=w.reloadMs;$(`set${cap}Cooldown`).value=w.cooldownMs;}}
 function collectAdminSettings(){return normalizeWorldSettingsClient({movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000},weapons:{pistol:{damage:$('setPistolDamage').value,speed:$('setPistolSpeed').value,reloadMs:$('setPistolReload').value,cooldownMs:$('setPistolCooldown').value},assault:{damage:$('setAssaultDamage').value,speed:$('setAssaultSpeed').value,reloadMs:$('setAssaultReload').value,cooldownMs:$('setAssaultCooldown').value},shotgun:{damage:$('setShotgunDamage').value,speed:$('setShotgunSpeed').value,reloadMs:$('setShotgunReload').value,cooldownMs:$('setShotgunCooldown').value},sniper:{damage:$('setSniperDamage').value,speed:$('setSniperSpeed').value,reloadMs:$('setSniperReload').value,cooldownMs:$('setSniperCooldown').value}}});}
 function adminPlayerSnapshot(){const list=[{id:clientId,name:myName||'You',team:myTeam,godMode,admin:isWorldAdmin,self:true},...Array.from(remotes.values()).filter(r=>!r.bot).map(r=>({id:r.id,name:r.name,team:r.team,godMode:!!r.godMode,admin:!!r.admin,self:false}))];return list;}
-function renderAdminPlayers(){const root=$('adminPlayerList');if(!root)return;const rows=adminPlayerSnapshot();root.innerHTML='';for(const pl of rows){const row=document.createElement('div');row.className='admin-player-row';const owner=pl.id===worldOwnerId;row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${pl.team}"></span><div><strong>${escapeHtml(pl.name)}${pl.self?' (You)':''}</strong><small>${owner?'WORLD OWNER':pl.admin?'ADMIN':'PLAYER'} · ${String(pl.team||'blue').toUpperCase()}</small></div></div><div class="admin-player-actions"><button class="btn admin-mini ${pl.godMode?'active':''}" data-admin-god="${pl.id}">${pl.godMode?'God On':'God Off'}</button><button class="btn admin-mini ${pl.admin?'active':''}" data-admin-role="${pl.id}" ${owner?'disabled title="World owner cannot be demoted"':''}>${pl.admin?'Admin':'Make Admin'}</button></div>`;root.appendChild(row);}for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{if(btn.disabled)return;const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});}
+function renderAdminPlayers(){
+  const root=$('adminPlayerList');if(!root)return;const rows=adminPlayerSnapshot();root.innerHTML='';const count=$('adminPlayerCount');if(count)count.textContent=`${rows.length} PLAYER${rows.length===1?'':'S'}`;
+  for(const pl of rows){
+    const row=document.createElement('div');row.className='admin-player-row';const owner=pl.id===worldOwnerId,role=owner?'OWNER':pl.admin?'ADMIN':'PLAYER';
+    row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${pl.team}"></span><div class="admin-player-name"><strong>${escapeHtml(pl.name)}${pl.self?' <em>YOU</em>':''}</strong><div class="admin-player-badges"><span class="admin-role-badge ${owner?'owner':pl.admin?'admin':''}">${role}</span><span class="admin-team-badge ${pl.team}">${String(pl.team||'blue').toUpperCase()}</span></div></div></div><div class="admin-player-actions"><button type="button" class="admin-player-toggle ${pl.godMode?'active':''}" data-admin-god="${pl.id}" aria-pressed="${pl.godMode}"><span class="admin-toggle-label"><svg class="ui-icon"><use href="#i-shield"/></svg><span>God Mode</span></span><span class="admin-toggle-switch"><span></span></span></button><button type="button" class="admin-player-toggle ${pl.admin?'active':''}" data-admin-role="${pl.id}" aria-pressed="${pl.admin}" ${owner?'disabled title="World owner cannot be demoted"':''}><span class="admin-toggle-label"><svg class="ui-icon"><use href="#i-settings"/></svg><span>Admin</span></span><span class="admin-toggle-switch"><span></span></span></button></div>`;
+    root.appendChild(row);
+  }
+  for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});
+  for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{if(btn.disabled)return;const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});
+}
 function requestTeamChange(team){if(!gameActive||socket?.readyState!==WebSocket.OPEN)return;const next=team==='red'?'red':'blue';if(next===myTeam)return;resetTouchInput();send({t:'team',team:next});pause.classList.add('hide');paused=false;clock?.getDelta?.();if(!isTouch)requestPointerLockNow();}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function applyRemoteTeamVisual(r,team){if(!r)return;const next=team==='red'?'red':'blue';r.team=next;r.color=TEAM_COLORS[next];if(r.body?.material?.color)r.body.material.color.set(TEAM_COLORS[next]);if(r.tag){r.group.remove(r.tag);r.tag.material?.map?.dispose?.();r.tag.material?.dispose?.();r.tag=makeNameTag(r.bot?`[BOT] ${r.name}`:r.name,TEAM_COLORS[next]);r.tag.position.set(0,2.18,0);r.group.add(r.tag);}}
@@ -1436,7 +1463,7 @@ function computeHudLayout(){
   const safe=safeInsets(),landscape=viewW>viewH,compact=isTouch&&landscape&&viewH<=520,margin=compact?8:12;
   const mapSize=compact?96:(isTouch?112:140),menuW=compact?36:42,menuH=compact?32:36;
   const teamW=compact?188:(isTouch?230:270),teamH=compact?30:34,joyR=compact?54:(isTouch?62:0);
-  const fireR=compact?37:43,leftFireR=compact?32:37,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=compact?20:23,equipR=compact?23:27;
+  const fireR=compact?37:43,leftFireR=compact?34:39,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=compact?20:23,equipW=compact?82:94,equipH=compact?40:46;
   const bottom=safe.bottom+margin,weaponW=compact?190:(isTouch?220:250),weaponH=compact?62:68;
   const killW=compact?220:(isTouch?252:300),killH=compact?70:(isTouch?104:128);
   const teamX=(viewW-teamW)/2,teamY=safe.top+margin,moveBoundary=viewW*MOBILE_MOVE_ZONE_RATIO;
@@ -1444,17 +1471,16 @@ function computeHudLayout(){
   const defaultJoyY=viewH-bottom-joyR;
   const joyX=joy.pointer!=null&&joy.centerX?joy.centerX:defaultJoyX,joyY=joy.pointer!=null&&joy.centerY?joy.centerY:defaultJoyY;
 
-  // Left-hand actions stay INSIDE the 35% movement side instead of sitting on
-  // the center divide. FIRE is upper-left for the index finger; equipment sits
-  // farther in and lower for the thumb while leaving the bottom-left stick area
-  // open. Button hit-testing runs before joystick placement, so these remain
-  // reliable even though the rest of the left 35% is a floating-stick surface.
+  // Left-hand combat controls form one deliberate cluster around the natural
+  // left-thumb resting area. The floating joystick keeps the outer-left lane;
+  // equipment sits immediately to its right so Flash/Sticky can be held while
+  // the right thumb continues aiming. FIRE stays above the cluster and is large.
   const leftSpan=Math.max(120,moveBoundary-safe.left);
-  const leftFireX=Math.max(safe.left+leftFireR+8,Math.min(moveBoundary-leftFireR-10,safe.left+leftSpan*.30));
-  const equipX=Math.max(safe.left+equipR+8,Math.min(moveBoundary-equipR-10,safe.left+leftSpan*.63));
-  const leftFireY=Math.max(safe.top+leftFireR+52,Math.min(viewH-bottom-leftFireR-90,viewH*.43));
-  const flashY=Math.max(safe.top+equipR+86,Math.min(viewH-bottom-equipR-76,viewH*.59));
-  const stickyY=Math.max(flashY+equipR*2+9,Math.min(viewH-bottom-equipR-8,viewH*.75));
+  const leftFireX=Math.max(safe.left+leftFireR+10,Math.min(moveBoundary-leftFireR-12,safe.left+leftSpan*.30));
+  const leftFireY=Math.max(safe.top+leftFireR+52,Math.min(viewH-bottom-leftFireR-equipH*2-28,viewH*.43));
+  const equipX=Math.max(safe.left+joyR*1.65,Math.min(moveBoundary-equipW-8,moveBoundary-equipW-8));
+  const stickyY=viewH-bottom-equipH;
+  const flashY=stickyY-equipH-7;
 
   // The right 65% is the look surface. Its action cluster hugs the outer edge
   // so the center/right-middle remains free for broad aiming swipes.
@@ -1474,8 +1500,8 @@ function computeHudLayout(){
     weapon:{x:viewW-safe.right-margin-weaponW,y:viewH-bottom-weaponH-weaponLift,w:weaponW,h:weaponH},
     joy:{x:joyX,y:joyY,r:joyR},
     leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},
-    flash:{x:equipX,y:flashY,r:equipR},
-    sticky:{x:equipX,y:stickyY,r:equipR},
+    flash:{x:equipX,y:flashY,w:equipW,h:equipH},
+    sticky:{x:equipX,y:stickyY,w:equipW,h:equipH},
     fire:{x:fireX,y:fireY,r:fireR},
     aim:{x:aimX,y:aimY,r:aimR},
     jump:{x:jumpX,y:jumpY,r:jumpR},
@@ -1608,15 +1634,24 @@ function drawTouchControls(c,L,now){
     c.fillStyle='rgba(220,242,250,.62)';c.font='900 7px system-ui';c.textAlign='center';c.fillText('MOVE',j.x,j.y+j.r*.70);
   }
   c.restore();
-  drawRoundControl(c,L.leftFire,now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.flash,equipmentAim.kind==='flash'||now<touchVisual.flashUntil,'flash');drawRoundControl(c,L.sticky,equipmentAim.kind==='sticky'||now<touchVisual.stickyUntil,'sticky');drawRoundControl(c,L.fire,now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.aim,adsWanted,'aim');drawRoundControl(c,L.jump,now<touchVisual.jumpUntil,'jump');drawRoundControl(c,L.reload,now<touchVisual.reloadUntil||!!reloadUntil,'reload');drawRoundControl(c,L.swap,now<touchVisual.swapUntil,'swap');drawRoundControl(c,L.mode,now<touchVisual.modeUntil||fireMode==='auto','mode');
+  drawRoundControl(c,L.leftFire,now<touchVisual.fireUntil,'fire');drawEquipmentControl(c,L.flash,equipmentAim.kind==='flash'||now<touchVisual.flashUntil,'flash');drawEquipmentControl(c,L.sticky,equipmentAim.kind==='sticky'||now<touchVisual.stickyUntil,'sticky');drawRoundControl(c,L.fire,now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.aim,adsWanted,'aim');drawRoundControl(c,L.jump,now<touchVisual.jumpUntil,'jump');drawRoundControl(c,L.reload,now<touchVisual.reloadUntil||!!reloadUntil,'reload');drawRoundControl(c,L.swap,now<touchVisual.swapUntil,'swap');drawRoundControl(c,L.mode,now<touchVisual.modeUntil||fireMode==='auto','mode');
+}
+function drawEquipmentControl(c,b,active,type){
+  const aiming=equipmentAim.kind===type,charge=aiming?equipmentCharge():0,count=godMode?'∞':Math.max(0,equipment[type]||0),flash=type==='flash';
+  c.save();roundRect(c,b.x,b.y,b.w,b.h,11,active?(flash?'rgba(102,206,241,.28)':'rgba(255,132,55,.26)'):'rgba(3,12,18,.72)',active?(flash?'rgba(175,238,255,.72)':'rgba(255,174,103,.72)'):'rgba(185,228,245,.24)');
+  const iconX=b.x+18,cy=b.y+b.h/2;drawControlIcon(c,iconX,cy,Math.min(27,b.h*.64),type,active);
+  c.textAlign='left';c.fillStyle=active?'#fff':'rgba(236,247,252,.82)';c.font='900 8px system-ui';c.fillText(flash?'FLASH':'STICKY',b.x+35,b.y+b.h*.36);
+  c.fillStyle=aiming?'#fff':'rgba(163,190,205,.82)';c.font='800 6.5px system-ui';c.fillText(aiming?'RELEASE TO THROW':'HOLD + AIM',b.x+35,b.y+b.h*.66);
+  const badgeR=9,bx=b.x+b.w-13,by=b.y+13;c.beginPath();c.arc(bx,by,badgeR,0,Math.PI*2);c.fillStyle=godMode?'rgba(255,215,75,.18)':'rgba(0,0,0,.30)';c.fill();c.strokeStyle=godMode?'rgba(255,225,126,.55)':'rgba(255,255,255,.16)';c.stroke();c.fillStyle=godMode?'#ffe27b':'#fff';c.textAlign='center';c.font='900 7px system-ui';c.fillText(String(count),bx,by+.4);
+  if(aiming){const barX=b.x+8,barY=b.y+b.h-4,barW=b.w-16;c.fillStyle='rgba(255,255,255,.10)';c.fillRect(barX,barY,barW,2);c.fillStyle=flash?'#b9efff':'#ffad63';c.fillRect(barX,barY,barW*charge,2);}
+  c.restore();
 }
 function drawRoundControl(c,b,active,type){
   c.save();c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);const hot=type==='fire',aim=type==='aim';
   c.fillStyle=active?(aim?'rgba(72,210,255,.62)':hot?'rgba(255,103,52,.76)':'rgba(76,190,235,.54)'):(hot?'rgba(92,34,23,.60)':'rgba(3,12,18,.64)');c.fill();
   c.strokeStyle=aim&&active?'rgba(134,233,255,.96)':hot?'rgba(255,168,126,.68)':'rgba(185,228,245,.27)';c.lineWidth=active?2:1.5;c.stroke();
-  if((type==='flash'||type==='sticky')&&equipmentAim.kind===type){const charge=equipmentCharge();c.beginPath();c.arc(b.x,b.y,b.r+4,-Math.PI/2,-Math.PI/2+Math.PI*2*charge);c.strokeStyle=type==='flash'?'#dff7ff':'#ffb25f';c.lineWidth=3;c.stroke();}
   drawControlIcon(c,b.x,b.y-b.r*.08,b.r,type,active);
-  const label=type==='fire'?'FIRE':type==='aim'?(currentWeapon==='sniper'?(adsWanted?(sniperZoomLevel===1?'8X NEXT':'EXIT 8X'):'4X ADS'):'ADS'):type==='jump'?'JUMP':type==='reload'?'R':type==='swap'?'SWAP':type==='flash'?(equipmentAim.kind==='flash'?'RELEASE':`FLASH ${godMode?'∞':equipment.flash}`):type==='sticky'?(equipmentAim.kind==='sticky'?'RELEASE':`STICKY ${godMode?'∞':equipment.sticky}`):fireMode.toUpperCase();
+  const label=type==='fire'?'FIRE':type==='aim'?(currentWeapon==='sniper'?(adsWanted?(sniperZoomLevel===1?'8X NEXT':'EXIT 8X'):'4X ADS'):'ADS'):type==='jump'?'JUMP':type==='reload'?'R':type==='swap'?'SWAP':fireMode.toUpperCase();
   c.textAlign='center';c.fillStyle=active?'#fff':'rgba(230,243,249,.68)';c.font=`900 ${Math.max(6.5,Math.min(8,b.r*.22))}px system-ui`;c.fillText(label,b.x,b.y+b.r*.56);c.restore();
 }
 function drawControlIcon(c,x,y,r,type,active){

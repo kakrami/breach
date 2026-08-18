@@ -1,13 +1,13 @@
 {
-  "name": "Punch World v1.15.24",
+  "name": "Punch World v1.15.25",
   "short_name": "Punch World",
   "id": "./",
   "start_url": "./",
   "scope": "./",
-  "display": "fullscreen",
+  "display": "standalone",
   "display_override": [
-    "fullscreen",
-    "standalone"
+    "standalone",
+    "browser"
   ],
   "orientation": "landscape",
   "background_color": "#0b1118",
