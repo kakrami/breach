@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.6</title>
+<title>Breachline v1.16.7</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -200,7 +200,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.16.6';
+const APP_VERSION = '1.16.7';
 const PROTOCOL_VERSION = 31;
 const ROOM_CODE_LENGTH = 4;
 const MAX_BOTS = 8;
@@ -238,7 +238,8 @@ const SOUND_DEFS = Object.freeze([
   {id:'shotSniper',category:'WEAPONS',label:'Sniper Fire'},
   {id:'reloadPistol',category:'WEAPONS',label:'Pistol Reload'},
   {id:'reloadAssault',category:'WEAPONS',label:'Assault Rifle Reload'},
-  {id:'reloadShotgun',category:'WEAPONS',label:'Shotgun Reload'},
+  {id:'reloadShotgun',category:'WEAPONS',label:'Shotgun Shell Load'},
+  {id:'shotgunPump',category:'WEAPONS',label:'Shotgun Pump Action'},
   {id:'reloadSniper',category:'WEAPONS',label:'Sniper Reload'},
   {id:'hitmarker',category:'COMBAT',label:'Hitmarker'},
   {id:'headshot',category:'COMBAT',label:'Headshot'},
@@ -247,6 +248,9 @@ const SOUND_DEFS = Object.freeze([
   {id:'shield',category:'COMBAT',label:'God / Shield'},
   {id:'hurt',category:'COMBAT',label:'Damage Taken'},
   {id:'jump',category:'MOVEMENT',label:'Jump'},
+  {id:'footstepLeft',category:'MOVEMENT',label:'Footstep Left'},
+  {id:'footstepRight',category:'MOVEMENT',label:'Footstep Right'},
+  {id:'land',category:'MOVEMENT',label:'Landing'},
   {id:'flashThrow',category:'TACTICAL',label:'Flash Throw'},
   {id:'stickyThrow',category:'TACTICAL',label:'Semtex Throw'},
   {id:'flashImpact',category:'TACTICAL',label:'Flash Impact'},
@@ -259,46 +263,54 @@ const SOUND_DEFS = Object.freeze([
 // are warmed first; the rest are staggered into idle time so audio never blocks play.
 const DEFAULT_SAMPLE_ASSETS = Object.freeze({
   introMusic:Object.freeze({url:'https://opengameart.org/sites/default/files/Psycho%20Punch_1.ogg',pool:1,source:'Psycho Punch · KiluaBoy · CC0',bytes:453900}),
-  pistolShot:Object.freeze({url:'https://opengameart.org/sites/default/files/gunshot_0.mp3',pool:6,source:'Basic Sound Effects · n4 · CC0',bytes:42803}),
-  assaultShot:Object.freeze({url:'https://opengameart.org/sites/default/files/gunfire_sfx.wav',pool:7,source:'Random gunfire SFX · iamoneabe · CC0',bytes:353500}),
-  shotgunShot:Object.freeze({url:'https://opengameart.org/sites/default/files/explosion_0.mp3',pool:4,source:'Basic Sound Effects · n4 · CC0',bytes:122300}),
-  sniperShot:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_gunshot1.wav',pool:4,source:'Various Sound Effects · Spring Spring · CC0',bytes:306800}),
+  pistolShot:Object.freeze({url:'https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/1911/A_34P.wav',pool:5,source:'Free Firearms SFX Library · 1911 A_34P · CC0',bytes:5725225}),
+  assaultShot:Object.freeze({url:'https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/AR-15/D_24P.wav',pool:7,source:'Free Firearms SFX Library · AR-15 D_24P · CC0',bytes:3743416}),
+  shotgunShot:Object.freeze({url:'https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mossberg/N_26P.wav',pool:4,source:'Free Firearms SFX Library · Mossberg N_26P · CC0',bytes:6606029}),
+  sniperShot:Object.freeze({url:'https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mosin%20Nagant/M_21P.wav',pool:4,source:'Free Firearms SFX Library · Mosin Nagant M_21P · CC0',bytes:9867100}),
   pistolReload:Object.freeze({url:'https://opengameart.org/sites/default/files/gunreload1.wav',pool:2,source:'Gun reload sounds · SpringySpringo · CC0',bytes:278600}),
   assaultReload:Object.freeze({url:'https://opengameart.org/sites/default/files/assaultriflereload1_0.wav',pool:2,source:'Gun reload sounds · SpringySpringo · CC0',bytes:274500}),
-  shotgunReload:Object.freeze({url:'https://opengameart.org/sites/default/files/shotguncock_0.wav',pool:2,source:'Gun reload sounds · SpringySpringo · CC0',bytes:83600}),
+  shotgunReload:Object.freeze({url:'https://opengameart.org/sites/default/files/singlebullet1.wav',pool:2,source:'Gun Reload Sound Effects · BMacZero · CC0',bytes:26700}),
+  shotgunPump:Object.freeze({url:'https://opengameart.org/sites/default/files/shotguncock_0.wav',pool:2,source:'Gun reload sounds · SpringySpringo · CC0',bytes:83600}),
   sniperReload:Object.freeze({url:'https://opengameart.org/sites/default/files/clipload2.wav',pool:2,source:'Gun Reload Sound Effects · BMacZero · CC0',bytes:18500}),
-  hitmarker:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_bullethit.wav',pool:5,source:'Various Sound Effects · Spring Spring · CC0',bytes:64500}),
+  hitmarker:Object.freeze({url:'https://opengameart.org/sites/default/files/skill_hit.mp3',pool:6,source:'Skill hit · pauliuw · CC0',bytes:18600}),
   headshot:Object.freeze({url:'https://opengameart.org/sites/default/files/bell1_0.mp3',pool:3,source:'Basic Sound Effects · n4 · CC0',bytes:61600}),
   kill:Object.freeze({url:'https://opengameart.org/sites/default/files/success_0.mp3',pool:3,source:'Basic Sound Effects · n4 · CC0',bytes:49100}),
   announcer:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_npc_message.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:29100}),
   shield:Object.freeze({url:'https://opengameart.org/sites/default/files/vibrophone1_0.mp3',pool:2,source:'Basic Sound Effects · n4 · CC0',bytes:142100}),
   hurt:Object.freeze({url:'https://opengameart.org/sites/default/files/hurt_01_0.mp3',pool:3,source:'Hurt Sound Effects · EZduzziteh · CC0',bytes:7100}),
   jump:Object.freeze({url:'https://opengameart.org/sites/default/files/jump.flac',pool:2,source:'Jump and Run and Stand · mieki256 · CC0',bytes:15500}),
+  footstepLeft:Object.freeze({url:'https://opengameart.org/sites/default/files/01-footstep.ogg',pool:3,source:'Footsteps · GboxMikeFozzy · CC0',bytes:9700}),
+  footstepRight:Object.freeze({url:'https://opengameart.org/sites/default/files/02-footstep.ogg',pool:3,source:'Footsteps · GboxMikeFozzy · CC0',bytes:10500}),
+  land:Object.freeze({url:'https://opengameart.org/sites/default/files/jumpland48000.mp3',pool:2,source:'Jump Landing Sound · MentalSanityOff · CC0',bytes:3600}),
   flashThrow:Object.freeze({url:'https://opengameart.org/sites/default/files/snd_throw1.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:86400}),
   stickyThrow:Object.freeze({url:'https://opengameart.org/sites/default/files/cannonball_tap.wav',pool:2,source:'Various Sound Effects · Spring Spring · CC0',bytes:188200}),
   flashImpact:Object.freeze({url:'https://opengameart.org/sites/default/files/clink1_0.wav',pool:3,source:'Metal Impact Sounds · BMacZero · CC0',bytes:27700}),
   stickyImpact:Object.freeze({url:'https://opengameart.org/sites/default/files/thud2.wav',pool:3,source:'Metal Impact Sounds · BMacZero · CC0',bytes:51200}),
-  semtexBeep:Object.freeze({url:'https://opengameart.org/sites/default/files/beep.ogg',pool:3,source:'Beep Sound · Test User · CC0',bytes:5700}),
+  semtexBeep:Object.freeze({url:'https://opengameart.org/sites/default/files/beep.ogg',pool:3,source:'Beep Sound · CC0',bytes:5700}),
   flashDetonate:Object.freeze({url:'https://opengameart.org/sites/default/files/flash_bang.wav',pool:3,source:'flash bang sound · teeeece · CC0',bytes:563000}),
   stickyDetonate:Object.freeze({url:'https://opengameart.org/sites/default/files/explosion_5.ogg',pool:3,source:'Rpg Sound Effect Pack · Delta12 Studio · CC0',bytes:25805}),
 });
 const DEFAULT_SAMPLE_CUES = Object.freeze({
   introMusic:Object.freeze({asset:'introMusic',gain:.56,rate:1,loop:true}),
-  shotPistol:Object.freeze({asset:'pistolShot',gain:.72,rate:1}),
-  shotAssault:Object.freeze({asset:'assaultShot',gain:.60,rate:1}),
-  shotShotgun:Object.freeze({asset:'shotgunShot',gain:.80,rate:.92}),
-  shotSniper:Object.freeze({asset:'sniperShot',gain:.88,rate:.94}),
-  reloadPistol:Object.freeze({asset:'pistolReload',gain:.58,rate:1}),
-  reloadAssault:Object.freeze({asset:'assaultReload',gain:.58,rate:1}),
-  reloadShotgun:Object.freeze({asset:'shotgunReload',gain:.70,rate:1}),
-  reloadSniper:Object.freeze({asset:'sniperReload',gain:.72,rate:1}),
-  hitmarker:Object.freeze({asset:'hitmarker',gain:.30,rate:1.22}),
+  shotPistol:Object.freeze({asset:'pistolShot',gain:.66,rate:1}),
+  shotAssault:Object.freeze({asset:'assaultShot',gain:.56,rate:1}),
+  shotShotgun:Object.freeze({asset:'shotgunShot',gain:.72,rate:1}),
+  shotSniper:Object.freeze({asset:'sniperShot',gain:.78,rate:1}),
+  reloadPistol:Object.freeze({asset:'pistolReload',gain:.52,rate:1}),
+  reloadAssault:Object.freeze({asset:'assaultReload',gain:.50,rate:1}),
+  reloadShotgun:Object.freeze({asset:'shotgunReload',gain:.55,rate:.96}),
+  shotgunPump:Object.freeze({asset:'shotgunPump',gain:.66,rate:1}),
+  reloadSniper:Object.freeze({asset:'sniperReload',gain:.62,rate:1}),
+  hitmarker:Object.freeze({asset:'hitmarker',gain:.30,rate:1.08}),
   headshot:Object.freeze({asset:'headshot',gain:.34,rate:1.18}),
   kill:Object.freeze({asset:'kill',gain:.34,rate:1.06}),
   announcer:Object.freeze({asset:'announcer',gain:.34,rate:1}),
   shield:Object.freeze({asset:'shield',gain:.36,rate:1}),
   hurt:Object.freeze({asset:'hurt',gain:.64,rate:1}),
-  jump:Object.freeze({asset:'jump',gain:.34,rate:1}),
+  jump:Object.freeze({asset:'jump',gain:.28,rate:1}),
+  footstepLeft:Object.freeze({asset:'footstepLeft',gain:.28,rate:1.03}),
+  footstepRight:Object.freeze({asset:'footstepRight',gain:.28,rate:.98}),
+  land:Object.freeze({asset:'land',gain:.52,rate:1}),
   flashThrow:Object.freeze({asset:'flashThrow',gain:.36,rate:1.08}),
   stickyThrow:Object.freeze({asset:'stickyThrow',gain:.38,rate:.96}),
   flashImpact:Object.freeze({asset:'flashImpact',gain:.34,rate:1.08}),
@@ -307,7 +319,6 @@ const DEFAULT_SAMPLE_CUES = Object.freeze({
   flashDetonate:Object.freeze({asset:'flashDetonate',gain:.80,rate:1}),
   stickyDetonate:Object.freeze({asset:'stickyDetonate',gain:.90,rate:1}),
 });
-const DEFAULT_SAMPLE_TOTAL_BYTES=Object.values(DEFAULT_SAMPLE_ASSETS).reduce((sum,a)=>sum+a.bytes,0);
 let worldSettings=cloneSettings(DEFAULT_WORLD_SETTINGS);
 let WALK_SPEED=DEFAULT_WORLD_SETTINGS.movement.walkSpeed,RUN_SPEED=DEFAULT_WORLD_SETTINGS.movement.runSpeed,GRAVITY=DEFAULT_WORLD_SETTINGS.movement.gravity,JUMP_SPEED=Math.sqrt(2*GRAVITY*DEFAULT_WORLD_SETTINGS.movement.jumpHeight);
 const LONG_SHOT_DISTANCE = 30;
@@ -367,7 +378,7 @@ let headshotUntil=0,announcerCurrent=null;const announcerQueue=[];
 let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0;
 let onGround = true, fireTime = 99, localFireCooldown = 0, lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0;
 let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true}, queuedFireUntil=0, serverFireRetryAt=0, localEquipmentCooldownUntil=0;
-let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0;
+let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0,nextFootstepAt=0,footstepSide=0,shotgunPumpStartedAt=0,shotgunPumpSoundPlayed=false;
 let audioCtx = null, musicGain = null, customMusicSource = null, defaultMusicElement = null, defaultMusicPending = false, sfxGain = null;
 let soundVolume=Math.max(0,Math.min(1,Number(localStorage.getItem('breachlineSoundVolume')??.85))),soundDbPromise=null,soundLoadPromise=null,soundHydratePromise=null,pendingSoundUploadId='',soundPreviewSource=null;
 const customSoundRecords=new Map(),customSoundBuffers=new Map(),soundDecodeFailures=new Set();
@@ -576,7 +587,7 @@ function renderSoundSettings(){
   const list=$('soundSettingsList');if(!list)return;
   const groups=new Map();for(const def of SOUND_DEFS){if(!groups.has(def.category))groups.set(def.category,[]);groups.get(def.category).push(def);}
   list.innerHTML=[...groups.entries()].map(([category,defs])=>`<section class="sound-group"><div class="sound-group-title">${category}</div><div class="sound-group-grid">${defs.map(def=>{const rec=customSoundRecords.get(def.id),custom=!!rec,cue=DEFAULT_SAMPLE_CUES[def.id],asset=cue&&DEFAULT_SAMPLE_ASSETS[cue.asset],defaultLabel='CC0 audio default',defaultTitle=asset?.source||'CC0 default audio';return `<div class="sound-row" data-sound-id="${def.id}"><div class="sound-copy"><strong>${def.label}</strong><small title="${custom?escapeHtml(rec.name):escapeHtml(defaultTitle)}">${custom?escapeHtml(rec.name):defaultLabel}</small></div><span class="sound-state ${custom?'custom':''}">${custom?'CUSTOM':'DEFAULT'}</span><div class="sound-actions"><button class="btn icon-btn sound-preview" data-sound-action="preview" title="Preview ${def.label}" aria-label="Preview ${def.label}"><svg class="ui-icon"><use href="#i-play"/></svg></button><button class="btn sound-upload" data-sound-action="upload"><svg class="ui-icon"><use href="#i-upload"/></svg><span>${custom?'Replace':'Upload'}</span></button><button class="btn icon-btn sound-reset" data-sound-action="reset" title="Restore default ${def.label}" aria-label="Restore default ${def.label}" ${custom?'':'disabled'}><svg class="ui-icon"><use href="#i-reset"/></svg></button></div></div>`;}).join('')}</div></section>`).join('');
-  const customCount=customSoundRecords.size;setSoundSettingsStatus(customCount?`${customCount} custom sound${customCount===1?'':'s'} active on this device.`:`Default audio active · ${SOUND_DEFS.length} distinct CC0 cues · ${(DEFAULT_SAMPLE_TOTAL_BYTES/1024/1024).toFixed(1)} MB source set, loaded asynchronously.`,customCount?'ok':'');setSoundVolume(soundVolume);
+  const customCount=customSoundRecords.size;setSoundSettingsStatus(customCount?`${customCount} custom sound${customCount===1?'':'s'} active on this device.`:`Default audio active · ${SOUND_DEFS.length} distinct CC0 cues · firearm audio loads per equipped weapon.`,customCount?'ok':'');setSoundVolume(soundVolume);
 }
 function openSettingsPanel(){ensureAudio();initLocalSounds().then(hydrateCustomSoundBuffers);renderSoundSettings();$('settingsPanel').classList.remove('hide');fitResponsiveOverlays();}
 function closeSettingsPanel(){pendingSoundUploadId='';$('soundFileInput').value='';$('settingsPanel').classList.add('hide');stopSoundPreview();}
@@ -611,13 +622,16 @@ function buildDefaultSamplePool(assetKey){
   return pool;
 }
 function warmDefaultSampleCue(id){const cue=getDefaultSampleCue(id);if(cue)buildDefaultSamplePool(cue.asset);}
+function weaponSoundCueIds(weapon=currentWeapon){return weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='assault'?['shotAssault','reloadAssault']:['shotPistol','reloadPistol'];}
+function warmWeaponAudio(weapon=currentWeapon){weaponSoundCueIds(weapon).forEach(warmDefaultSampleCue);}
 function warmDefaultSamples(){
   if(defaultSamplesWarmStarted)return;defaultSamplesWarmStarted=true;
-  // Start only the latency-sensitive set immediately. Remaining distinct defaults
-  // are staggered into idle time to avoid a large burst of network/decode work.
-  const immediate=['introMusic','shotPistol','shotAssault','shotShotgun','shotSniper','hitmarker','hurt','jump','semtexBeep'];
-  const deferred=SOUND_DEFS.map(x=>x.id).filter(id=>!immediate.includes(id));
-  immediate.forEach(warmDefaultSampleCue);
+  // Keep large real-firearm recordings on demand: only the equipped weapon is warmed.
+  // Small movement/combat cues warm immediately, while non-weapon defaults are staggered.
+  const weaponCues=new Set(['shotPistol','shotAssault','shotShotgun','shotSniper','reloadPistol','reloadAssault','reloadShotgun','shotgunPump','reloadSniper']);
+  const immediate=['introMusic','hitmarker','hurt','jump','footstepLeft','footstepRight','land','semtexBeep'];
+  warmWeaponAudio(currentWeapon);immediate.forEach(warmDefaultSampleCue);
+  const deferred=SOUND_DEFS.map(x=>x.id).filter(id=>!immediate.includes(id)&&!weaponCues.has(id));
   const schedule=(fn,delay)=>{if('requestIdleCallback'in window)requestIdleCallback(fn,{timeout:delay+900});else setTimeout(fn,delay);};
   deferred.forEach((id,i)=>schedule(()=>warmDefaultSampleCue(id),250+i*120));
 }
@@ -1264,7 +1278,7 @@ function handleMessage(m){
   if(m.t==='welcome'){
     if(Number(m.protocol)!==PROTOCOL_VERSION){showToast('CLIENT / SERVER VERSION MISMATCH');leaveWorld();return;}
     if(Number.isFinite(Number(m.serverTime)))serverClockOffset=Number(m.serverTime)-Date.now();
-    currentRoom=m.code;isWorldAdmin=!!m.isAdmin;worldOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;selectedGod=godMode;localStorage.setItem('breachlineGodMode',godMode?'1':'0');syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);combatRevision=Math.max(0,Number(m.self.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;syncLocalWeaponModel();
+    currentRoom=m.code;isWorldAdmin=!!m.isAdmin;worldOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;selectedGod=godMode;localStorage.setItem('breachlineGodMode',godMode?'1':'0');syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);combatRevision=Math.max(0,Number(m.self.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
     position.set(m.self.x||0,m.self.y??terrainHeight(m.self.x||0,m.self.z||0),m.self.z||0);yaw=m.self.yaw||0;pitch=m.self.pitch||0;
     clearRemotes();for(const p of m.players||[])upsertRemote(p,true);for(const b of m.bots||[])upsertRemote(b,true);
     enterGame();updateHealth();updatePlayerCount();return;
@@ -1314,7 +1328,7 @@ function enterGame(){
 }
 function leaveWorld(){
   gameActive=false;paused=false;serverClockOffset=0;lastPingLocalAt=0;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left world')}catch{}}socket=null;currentRoom='';isWorldAdmin=false;worldOwnerId='';applyWorldSettings(DEFAULT_WORLD_SETTINGS);$('adminPanel').classList.add('hide');
-  document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();clearThrowables();clearTacticalFx();keys.clear();hp=100;wastedUntil=0;godMode=selectedGod;syncGodUI();currentWeapon='pistol';ammo=freshClientAmmo();equipment=freshClientEquipment();combatRevision=0;combatSeq=0;reloadPendingUntil=0;lastCombatSync=0;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;fireHeld=false;queuedFireUntil=0;serverFireRetryAt=0;localEquipmentCooldownUntil=0;lastTacticalSimTick=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
+  document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();clearThrowables();clearTacticalFx();keys.clear();hp=100;wastedUntil=0;godMode=selectedGod;syncGodUI();currentWeapon='pistol';ammo=freshClientAmmo();equipment=freshClientEquipment();combatRevision=0;combatSeq=0;reloadPendingUntil=0;lastCombatSync=0;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireHeld=false;queuedFireUntil=0;serverFireRetryAt=0;localEquipmentCooldownUntil=0;lastTacticalSimTick=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshWorlds();startIntroMusic();
 }
 
@@ -1403,7 +1417,7 @@ function drawBloodSplatter(c,w,h,now,missingHealth){for(let i=bloodSplats.length
 function drawDamageIndicators(c,w,h,now){for(let i=damageIndicators.length-1;i>=0;i--){const d=damageIndicators[i],remain=(d.until-now)/1150;if(remain<=0){damageIndicators.splice(i,1);continue;}const radius=Math.min(w,h)*.26,x=w/2-Math.sin(d.angle)*radius,y=h/2-Math.cos(d.angle)*radius,rot=d.angle;c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=Math.min(1,remain*2)*d.strength;c.strokeStyle='#ff334d';c.fillStyle='rgba(255,30,55,.28)';c.lineWidth=3.2;c.beginPath();c.moveTo(-18,8);c.lineTo(0,-9);c.lineTo(18,8);c.stroke();c.beginPath();c.moveTo(-13,6);c.lineTo(0,-5);c.lineTo(13,6);c.lineTo(0,1);c.closePath();c.fill();c.restore();}}
 function handleRespawn(player){
   if(!player?.id)return;
-  if(player.id===clientId){hp=100;myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;currentWeapon=player.weapon||'pistol';sniperZoomLevel=0;adsWanted=false;ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);combatRevision=Math.max(combatRevision,Number(player.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;deathAnimStartedAt=0;landingKick=0;syncLocalWeaponModel();position.set(player.x,player.y,player.z);verticalVelocity=0;knockX=knockZ=0;camera.rotation.z=0;updateHealth();showToast('Back in');return;}
+  if(player.id===clientId){hp=100;myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;currentWeapon=player.weapon||'pistol';sniperZoomLevel=0;adsWanted=false;ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);combatRevision=Math.max(combatRevision,Number(player.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;deathAnimStartedAt=0;landingKick=0;nextFootstepAt=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();position.set(player.x,player.y,player.z);verticalVelocity=0;knockX=knockZ=0;camera.rotation.z=0;updateHealth();showToast('Back in');return;}
   upsertRemote(player,true);const r=remotes.get(player.id);if(r){r.hp=100;if(r.fire)r.fire.visible=false;}
 }
 function flashRemote(r){const old=r.body.material.emissive?.clone?.();r.body.material.emissive=new THREE.Color(0x8a1020);setTimeout(()=>{if(r.body?.material)r.body.material.emissive=old||new THREE.Color(0x000000)},120);}
@@ -1465,7 +1479,7 @@ function nextWeapon(weapon){const i=WEAPON_ORDER.indexOf(weapon);return WEAPON_O
 function switchWeapon(weapon){
   weapon=WEAPON_ORDER.includes(weapon)?weapon:'pistol';
   if(!gameActive||paused||hp<=0||weapon===currentWeapon)return;
-  queuedFireUntil=0;serverFireRetryAt=0;setAim(false);sniperZoomLevel=0;currentWeapon=weapon;pendingWeapon=weapon;reloadPendingUntil=0;reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=performance.now();localFireCooldown=Math.max(localFireCooldown,.12);syncLocalWeaponModel();send({t:'weapon',weapon,seq:++combatSeq});showToast(WEAPON_SPECS[weapon].name);
+  queuedFireUntil=0;serverFireRetryAt=0;setAim(false);sniperZoomLevel=0;currentWeapon=weapon;pendingWeapon=weapon;reloadPendingUntil=0;reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=performance.now();localFireCooldown=Math.max(localFireCooldown,.12);warmWeaponAudio(weapon);syncLocalWeaponModel();send({t:'weapon',weapon,seq:++combatSeq});showToast(WEAPON_SPECS[weapon].name);
 }
 function setAim(active){adsWanted=!!active&&gameActive&&!paused&&hp>0&&!reloadUntil;if(!adsWanted&&currentWeapon==='sniper')sniperZoomLevel=0;else if(adsWanted&&currentWeapon==='sniper'&&sniperZoomLevel===0)sniperZoomLevel=1;}
 function toggleAim(){if(currentWeapon==='sniper'&&gameActive&&!paused&&hp>0&&!reloadUntil){if(!adsWanted){adsWanted=true;sniperZoomLevel=1;showToast('SNIPER 4X');}else if(sniperZoomLevel===1){sniperZoomLevel=2;showToast('SNIPER 8X');}else{adsWanted=false;sniperZoomLevel=0;}return;}setAim(!adsWanted);}
@@ -1550,7 +1564,7 @@ function handleShot(m){
   const color=m.weapon==='sniper'?0xb8efff:m.weapon==='shotgun'?0xffa95d:m.weapon==='assault'?0xffd37d:(m.ownerId===clientId?0xfff1a8:(remotes.get(m.ownerId)?.bot?0xff9b6b:0xffd27a));
   const radius=m.weapon==='sniper'?.045:m.weapon==='assault'?.05:.055;const mesh=new THREE.Mesh(new THREE.SphereGeometry(radius,8,6),new THREE.MeshBasicMaterial({color}));mesh.position.set(m.x,m.y,m.z);scene.add(mesh);
   bullets.set(m.id,{mesh,v:new THREE.Vector3(m.vx,m.vy,m.vz),born:performance.now(),lifetimeMs:Number(m.lifetimeMs)||3600});
-  if(m.ownerId===clientId){const w=m.weapon||currentWeapon;if(m.consumeAmmo!==false&&!godMode){ammo[w]=Math.max(0,(ammo[w]||0)-1);}fireTime=0;soundShot(w);if(w==='sniper')sniperFlash.material.opacity=1;else if(w==='shotgun')shotgunFlash.material.opacity=1;else if(w==='assault')assaultFlash.material.opacity=1;else pistolFlash.material.opacity=1;}else{const r=remotes.get(m.ownerId);if(r)r.fireKickUntil=performance.now()+170;}
+  if(m.ownerId===clientId){const w=m.weapon||currentWeapon;if(m.consumeAmmo!==false&&!godMode){ammo[w]=Math.max(0,(ammo[w]||0)-1);}fireTime=0;soundShot(w);if(w==='shotgun'){shotgunPumpStartedAt=performance.now();shotgunPumpSoundPlayed=false;}if(w==='sniper')sniperFlash.material.opacity=1;else if(w==='shotgun')shotgunFlash.material.opacity=1;else if(w==='assault')assaultFlash.material.opacity=1;else pistolFlash.material.opacity=1;}else{const r=remotes.get(m.ownerId);if(r)r.fireKickUntil=performance.now()+170;}
 }
 function removeBullet(id){const b=bullets.get(id);if(!b)return;scene.remove(b.mesh);b.mesh.geometry.dispose();b.mesh.material.dispose();bullets.delete(id);}
 function clearBullets(){for(const id of [...bullets.keys()])removeBullet(id);}
@@ -1585,7 +1599,7 @@ function updateThrowables(dt){
     g.target.set(px,py,pz);const error=g.root.position.distanceTo(g.target);
     if(error>2.5)g.root.position.copy(g.target);else g.root.position.lerp(g.target,1-Math.exp(-dt*18));
     if(!g.stuck){g.root.rotation.x+=dt*7;g.root.rotation.z+=dt*5;}
-    if(g.kind==='sticky'&&Number.isFinite(g.fuseAt)&&srv>=g.nextBeepAt&&srv<g.fuseAt-45){const remaining=Math.max(0,g.fuseAt-srv);soundSemtexBeep(g,remaining);const interval=remaining>1200?340:remaining>700?235:135;g.nextBeepAt=srv+interval;}
+    if(g.kind==='sticky'&&Number.isFinite(g.fuseAt)&&srv>=g.nextBeepAt&&srv<g.fuseAt-45){const remaining=Math.max(0,g.fuseAt-srv);soundSemtexBeep(g,remaining);g.nextBeepAt=srv+semtexBeepInterval(remaining);}
     if(g.indicator){const remaining=Number.isFinite(g.fuseAt)?Math.max(0,g.fuseAt-srv):900,pulseRate=remaining<650?.035:.020,pulse=.45+.55*Math.sin((now-g.born)*pulseRate);g.indicator.scale.setScalar(.72+pulse*.55);g.indicator.material.opacity=.65+pulse*.35;}
   }
 }
@@ -1626,10 +1640,20 @@ function updateMovement(dt){
   const speed=adsWanted?WALK_SPEED:RUN_SPEED;
   const sin=Math.sin(yaw),cos=Math.cos(yaw);const worldX=(mx*cos + mz*sin)*speed;const worldZ=(-mx*sin + mz*cos)*speed;
   knockX*=Math.pow(.08,dt);knockZ*=Math.pow(.08,dt);
-  const dx=(worldX+knockX)*dt,dz=(worldZ+knockZ)*dt;
+  const dx=(worldX+knockX)*dt,dz=(worldZ+knockZ)*dt,startX=position.x,startZ=position.z;
   moveHorizontal(dx,dz);
-  const wasGround=onGround,previousY=position.y;verticalVelocity-=GRAVITY*dt;const vertical=resolveCeilingCollision(previousY,position.y+verticalVelocity*dt,position.x,position.z);position.y=vertical.y;if(vertical.hit&&verticalVelocity>0)verticalVelocity=0;const ground=worldSupportHeight(position.x,position.z,position.y);
-  if(position.y<=ground||(wasGround&&verticalVelocity<=0&&position.y<ground+.3)){position.y=ground;verticalVelocity=0;onGround=true;if(!wasGround)landingKick=1;}else onGround=false;
+  const moved=Math.hypot(position.x-startX,position.z-startZ),wasGround=onGround,previousY=position.y;
+  verticalVelocity-=GRAVITY*dt;const vertical=resolveCeilingCollision(previousY,position.y+verticalVelocity*dt,position.x,position.z);position.y=vertical.y;if(vertical.hit&&verticalVelocity>0)verticalVelocity=0;const ground=worldSupportHeight(position.x,position.z,position.y);
+  if(position.y<=ground||(wasGround&&verticalVelocity<=0&&position.y<ground+.3)){
+    const landingSpeed=!wasGround?Math.max(0,-verticalVelocity):0;
+    position.y=ground;verticalVelocity=0;onGround=true;
+    if(!wasGround){landingKick=1;nextFootstepAt=performance.now()+120;if(landingSpeed>2.4)soundLanding(THREE.MathUtils.clamp((landingSpeed-2.4)/8,.28,.82));}
+  }else onGround=false;
+  const now=performance.now(),walking=onGround&&hp>0&&len>.12&&moved>.0005;
+  if(walking){
+    const pace=THREE.MathUtils.lerp(530,310,THREE.MathUtils.clamp((speed*len)/Math.max(.1,RUN_SPEED),0,1));
+    if(now>=nextFootstepAt){soundFootstep(footstepSide,THREE.MathUtils.lerp(.22,.38,len));footstepSide^=1;nextFootstepAt=now+pace;}
+  }else if(!onGround||len<=.08)nextFootstepAt=Math.max(nextFootstepAt,now+90);
 }
 function moveHorizontal(dx,dz){
   // Sweep movement in short increments. A single slow frame must never skip
@@ -1694,7 +1718,15 @@ function updateWeaponView(dt){
   if(assaultMag)assaultMag.position.y=-.20-(reloading&&currentWeapon==='assault'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.28:0);
   if(sniperBolt)sniperBolt.position.z=-.12+(reloading&&currentWeapon==='sniper'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.20)/.55,0,1))*.18:0);
   sniperGroup.visible=currentWeapon==='sniper'&&adsBlend<.94;shotgunGroup.visible=currentWeapon==='shotgun';assaultGroup.visible=currentWeapon==='assault';pistolGroup.visible=currentWeapon==='pistol';
-  if(shotgunPump)shotgunPump.position.z=-.48-(reloading&&currentWeapon==='shotgun'?Math.sin(Math.PI*reloadP)*.10:0);
+  if(shotgunPump){
+    let pumpOffset=reloading&&currentWeapon==='shotgun'?Math.sin(Math.PI*reloadP)*.10:0;
+    if(shotgunPumpStartedAt){
+      const elapsed=now-shotgunPumpStartedAt,p=Math.max(0,Math.min(1,(elapsed-150)/470));
+      if(elapsed>=150){const travel=p<.44?THREE.MathUtils.smoothstep(p,0,.44):1-THREE.MathUtils.smoothstep(p,.44,1);pumpOffset=Math.max(pumpOffset,travel*.135);if(!shotgunPumpSoundPlayed&&p>=.42){shotgunPumpSoundPlayed=true;soundShotgunPump();}}
+      if(p>=1){shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;}
+    }
+    shotgunPump.position.z=-.48-pumpOffset;
+  }
   pistolFlash.material.opacity=Math.max(0,pistolFlash.material.opacity-dt*18);assaultFlash.material.opacity=Math.max(0,assaultFlash.material.opacity-dt*22);shotgunFlash.material.opacity=Math.max(0,shotgunFlash.material.opacity-dt*20);sniperFlash.material.opacity=Math.max(0,sniperFlash.material.opacity-dt*18);
 }
 function normalizeAngle(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;return a;}
@@ -1979,10 +2011,14 @@ function soundAnnouncer(priority=1){if(playCustomSound('announcer'))return;playD
 function soundShield(){if(playCustomSound('shield'))return;playDefaultSample('shield');}
 function soundHurt(){if(playCustomSound('hurt'))return;playDefaultSample('hurt');}
 function soundJump(){if(playCustomSound('jump'))return;playDefaultSample('jump');}
+function soundFootstep(side=0,volume=1){const id=side?'footstepRight':'footstepLeft';if(playCustomSound(id,volume))return;playDefaultSample(id,volume);}
+function soundLanding(volume=1){if(playCustomSound('land',volume))return;playDefaultSample('land',volume);}
+function soundShotgunPump(){if(playCustomSound('shotgunPump'))return;playDefaultSample('shotgunPump');}
 function soundThrowableThrow(kind='flash'){const id=kind==='sticky'?'stickyThrow':'flashThrow';if(playCustomSound(id))return;playDefaultSample(id);}
 function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;const id=kind==='sticky'?'stickyImpact':'flashImpact';if(playCustomSound(id,v))return;playDefaultSample(id,v);}
 function semtexDistanceVolume(g,max=42){if(!position||!g?.root)return 0;const p=g.root.position,d=Math.hypot(p.x-position.x,p.y-(position.y+1),p.z-position.z);return Math.max(0,1-d/max);}
-function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;if(playCustomSound('semtexBeep',v))return;playDefaultSample('semtexBeep',v,{rate:remainingMs<650?1.20:1});}
+function semtexBeepInterval(remainingMs){const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1);return Math.round(THREE.MathUtils.lerp(360,85,Math.pow(p,1.22)));}
+function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10;if(playCustomSound('semtexBeep',v,{playbackRate:rate}))return;playDefaultSample('semtexBeep',v,{rate});}
 function tacticalDistanceVolume(m,max=48){if(!position||!m)return .02;const d=Math.hypot((Number(m.x)||0)-position.x,(Number(m.y)||0)-(position.y+1),(Number(m.z)||0)-position.z);return Math.max(0,1-d/max);}
 function soundTacticalDetonation(kind,m){const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;const flash=kind==='flash'||kind==='stun',id=flash?'flashDetonate':'stickyDetonate';if(playCustomSound(id,v))return;playDefaultSample(id,v);}
 initLocalSounds();
