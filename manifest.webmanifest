@@ -1,6 +1,6 @@
 {
-  "name": "Punch World v1.15.27",
-  "short_name": "Punch World",
+  "name": "Breachline v1.16.0",
+  "short_name": "Breachline",
   "id": "./",
   "start_url": "./",
   "scope": "./",
@@ -10,6 +10,6 @@
     "browser"
   ],
   "orientation": "landscape",
-  "background_color": "#0b1118",
-  "theme_color": "#0b1118"
+  "background_color": "#090b0d",
+  "theme_color": "#090b0d"
 }
