@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.10</title>
+<title>Breachline v1.16.11</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -183,7 +183,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.16.10';
+const APP_VERSION = '1.16.11';
 const PROTOCOL_VERSION = 31;
 const ROOM_CODE_LENGTH = 4;
 const MAX_BOTS = 8;
@@ -216,34 +216,37 @@ const TACTICAL_GRAVITY = 18;
 // Fixed game-audio mapping exported from Breachline Sound Picker v1.6.
 // There is intentionally no runtime upload/remap/settings layer in the game.
 const SOUND_CUES = Object.freeze({
-  introMusic:Object.freeze({url:"https://opengameart.org/sites/default/files/Psycho%20Punch_1.ogg",pool:1,gain:0.56,rate:1,loop:true}),
-  shotPistol:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mosin%20Nagant/M_21P.wav",pool:5,gain:0.66,rate:1,loop:false}),
-  shotAssault:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mossberg/N_26P.wav",pool:7,gain:0.56,rate:1,loop:false}),
-  shotShotgun:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/AR-15/D_24P.wav",pool:4,gain:0.72,rate:1,loop:false}),
-  shotSniper:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/1911/A_34P.wav",pool:4,gain:0.78,rate:1,loop:false}),
-  reloadPistol:Object.freeze({url:"https://opengameart.org/sites/default/files/gunreload1.wav",pool:2,gain:0.52,rate:1,loop:false}),
-  reloadAssault:Object.freeze({url:"https://opengameart.org/sites/default/files/assaultriflereload1_0.wav",pool:2,gain:0.5,rate:1,loop:false}),
-  reloadShotgun:Object.freeze({url:"https://opengameart.org/sites/default/files/singlebullet1.wav",pool:2,gain:0.55,rate:0.96,loop:false}),
-  shotgunPump:Object.freeze({url:"https://opengameart.org/sites/default/files/shotguncock_0.wav",pool:2,gain:0.66,rate:1,loop:false}),
-  reloadSniper:Object.freeze({url:"https://opengameart.org/sites/default/files/clipload2.wav",pool:2,gain:0.62,rate:1,loop:false}),
-  hitmarker:Object.freeze({url:"https://opengameart.org/sites/default/files/hurt_01_0.mp3",pool:6,gain:0.3,rate:1.08,loop:false}),
-  headshot:Object.freeze({url:"audio/headshot-announcer.ogg",pool:2,gain:0.56,rate:1,loop:false}),
-  kill:Object.freeze({url:"https://opengameart.org/sites/default/files/pain_jack_03.wav",pool:3,gain:0.48,rate:1,loop:false}),
-  announcer:Object.freeze({url:"https://opengameart.org/sites/default/files/bodyimpact_jack_01.wav",pool:2,gain:0.34,rate:1,loop:false}),
-  shield:Object.freeze({url:"https://opengameart.org/sites/default/files/12._effort_grunt_male.wav",pool:2,gain:0.36,rate:1,loop:false}),
-  hurt:Object.freeze({url:"https://opengameart.org/sites/default/files/06._effort_grunt_male.wav",pool:3,gain:0.64,rate:1,loop:false}),
-  jump:Object.freeze({url:"https://opengameart.org/sites/default/files/jump.flac",pool:2,gain:0.28,rate:1,loop:false}),
-  footstepLeft:Object.freeze({url:"https://opengameart.org/sites/default/files/01-footstep.ogg",pool:3,gain:0.28,rate:1.03,loop:false}),
-  footstepRight:Object.freeze({url:"https://opengameart.org/sites/default/files/02-footstep.ogg",pool:3,gain:0.28,rate:0.98,loop:false}),
-  land:Object.freeze({url:"https://opengameart.org/sites/default/files/jumpland48000.mp3",pool:2,gain:0.52,rate:1,loop:false}),
-  flashThrow:Object.freeze({url:"https://opengameart.org/sites/default/files/punch_jack_01.wav",pool:2,gain:0.36,rate:1.08,loop:false}),
-  stickyThrow:Object.freeze({url:"https://opengameart.org/sites/default/files/punch_jack_02.wav",pool:2,gain:0.36,rate:1.08,loop:false}),
-  flashImpact:Object.freeze({url:"https://opengameart.org/sites/default/files/clink1_0.wav",pool:3,gain:0.34,rate:1.08,loop:false}),
-  stickyImpact:Object.freeze({url:"https://opengameart.org/sites/default/files/thud2.wav",pool:3,gain:0.42,rate:0.92,loop:false}),
-  semtexBeep:Object.freeze({url:"https://opengameart.org/sites/default/files/snd_npc_message.wav",pool:3,gain:0.36,rate:1,loop:false}),
-  flashDetonate:Object.freeze({url:"https://opengameart.org/sites/default/files/flash_bang.wav",pool:3,gain:0.8,rate:1,loop:false}),
-  stickyDetonate:Object.freeze({url:"https://opengameart.org/sites/default/files/explosion_5.ogg",pool:3,gain:0.9,rate:1,loop:false}),
+  introMusic:Object.freeze({url:"https://opengameart.org/sites/default/files/Psycho%20Punch_1.ogg",group:'Music',pool:1,gain:0.56,rate:1,loop:true}),
+  shotPistol:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mosin%20Nagant/M_21P.wav",group:'Gunfire',pool:5,gain:0.66,rate:1,loop:false}),
+  shotAssault:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mossberg/N_26P.wav",group:'Gunfire',pool:7,gain:0.56,rate:1,loop:false}),
+  shotShotgun:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/AR-15/D_24P.wav",group:'Gunfire',pool:4,gain:0.72,rate:1,loop:false}),
+  shotSniper:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/1911/A_34P.wav",group:'Gunfire',pool:4,gain:0.78,rate:1,loop:false}),
+  reloadPistol:Object.freeze({url:"https://opengameart.org/sites/default/files/gunreload1.wav",group:'Weapon Handling',pool:2,gain:0.52,rate:1,loop:false}),
+  reloadAssault:Object.freeze({url:"https://opengameart.org/sites/default/files/assaultriflereload1_0.wav",group:'Weapon Handling',pool:2,gain:0.5,rate:1,loop:false}),
+  reloadShotgun:Object.freeze({url:"https://opengameart.org/sites/default/files/singlebullet1.wav",group:'Weapon Handling',pool:2,gain:0.55,rate:0.96,loop:false}),
+  shotgunPump:Object.freeze({url:"https://opengameart.org/sites/default/files/shotguncock_0.wav",group:'Weapon Handling',pool:2,gain:0.66,rate:1,loop:false}),
+  reloadSniper:Object.freeze({url:"https://opengameart.org/sites/default/files/clipload2.wav",group:'Weapon Handling',pool:2,gain:0.62,rate:1,loop:false}),
+  hitmarker:Object.freeze({url:"https://opengameart.org/sites/default/files/hurt_01_0.mp3",group:'Voice',pool:6,gain:0.3,rate:1.08,loop:false}),
+  headshot:Object.freeze({url:"audio/headshot-announcer.ogg",group:'Voice',pool:2,gain:0.56,rate:1,loop:false}),
+  kill:Object.freeze({url:"https://opengameart.org/sites/default/files/pain_jack_03.wav",group:'Voice',pool:3,gain:0.48,rate:1,loop:false}),
+  announcer:Object.freeze({url:"https://opengameart.org/sites/default/files/bodyimpact_jack_01.wav",group:'Impacts',pool:2,gain:0.34,rate:1,loop:false}),
+  shield:Object.freeze({url:"https://opengameart.org/sites/default/files/12._effort_grunt_male.wav",group:'Voice',pool:2,gain:0.36,rate:1,loop:false}),
+  hurt:Object.freeze({url:"https://opengameart.org/sites/default/files/06._effort_grunt_male.wav",group:'Voice',pool:3,gain:0.64,rate:1,loop:false}),
+  jump:Object.freeze({url:"https://opengameart.org/sites/default/files/jump.flac",group:'Movement',pool:2,gain:0.28,rate:1,loop:false}),
+  footstepLeft:Object.freeze({url:"https://opengameart.org/sites/default/files/01-footstep.ogg",group:'Movement',pool:3,gain:0.28,rate:1.03,loop:false}),
+  footstepRight:Object.freeze({url:"https://opengameart.org/sites/default/files/02-footstep.ogg",group:'Movement',pool:3,gain:0.28,rate:0.98,loop:false}),
+  land:Object.freeze({url:"https://opengameart.org/sites/default/files/jumpland48000.mp3",group:'Movement',pool:2,gain:0.52,rate:1,loop:false}),
+  flashThrow:Object.freeze({url:"https://opengameart.org/sites/default/files/punch_jack_01.wav",group:'Impacts',pool:2,gain:0.36,rate:1.08,loop:false}),
+  stickyThrow:Object.freeze({url:"https://opengameart.org/sites/default/files/punch_jack_02.wav",group:'Impacts',pool:2,gain:0.36,rate:1.08,loop:false}),
+  flashImpact:Object.freeze({url:"https://opengameart.org/sites/default/files/clink1_0.wav",group:'Tactical',pool:3,gain:0.34,rate:1.08,loop:false}),
+  stickyImpact:Object.freeze({url:"https://opengameart.org/sites/default/files/thud2.wav",group:'Tactical',pool:3,gain:0.42,rate:0.92,loop:false}),
+  semtexBeep:Object.freeze({url:"https://opengameart.org/sites/default/files/snd_npc_message.wav",group:'Voice',pool:3,gain:0.36,rate:1,loop:false}),
+  flashDetonate:Object.freeze({url:"https://opengameart.org/sites/default/files/flash_bang.wav",group:'Explosions',pool:3,gain:0.8,rate:1,loop:false}),
+  stickyDetonate:Object.freeze({url:"https://opengameart.org/sites/default/files/explosion_5.ogg",group:'Explosions',pool:3,gain:0.9,rate:1,loop:false}),
 });
+const SOUND_ONE_SHOT_CAPS=Object.freeze({'Gunfire':.92,'Weapon Handling':1.9,'Combat Feedback':.82,'Voice':1.55,'Impacts':.9,'Movement':.88,'Tactical':1.12,'Explosions':1.45});
+const SOUND_FALLBACK_LEAD_IN=Object.freeze({'Gunfire':1.8,'Weapon Handling':1.1,'Combat Feedback':.9,'Voice':1.4,'Impacts':.8,'Movement':.75,'Tactical':1.0,'Explosions':1.1});
+
 let worldSettings=cloneSettings(DEFAULT_WORLD_SETTINGS);
 let WALK_SPEED=DEFAULT_WORLD_SETTINGS.movement.walkSpeed,RUN_SPEED=DEFAULT_WORLD_SETTINGS.movement.runSpeed,GRAVITY=DEFAULT_WORLD_SETTINGS.movement.gravity,JUMP_SPEED=Math.sqrt(2*GRAVITY*DEFAULT_WORLD_SETTINGS.movement.jumpHeight);
 const LONG_SHOT_DISTANCE = 30;
@@ -304,9 +307,9 @@ let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0;
 let onGround = true, fireTime = 99, localFireCooldown = 0, lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0;
 let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true}, queuedFireUntil=0, serverFireRetryAt=0, localEquipmentCooldownUntil=0;
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0,nextFootstepAt=0,footstepSide=0,shotgunPumpStartedAt=0,shotgunPumpSoundPlayed=false;
-let audioCtx = null, defaultMusicElement = null, defaultMusicPending = false;
+let audioCtx = null, analysisAudioCtx = null, defaultMusicElement = null, defaultMusicPending = false;
 const SOUND_VOLUME=.85;
-const soundPools=new Map(),soundFailures=new Set();
+const soundPools=new Map(),soundFailures=new Set(),soundResourcePromises=new Map(),soundOnsets=new Map(),soundOnsetFailures=new Set();
 let gameAudioWarmStarted=false;
 let toastText = '', toastUntil = 0, hurtUntil = 0, hitUntil = 0;
 let botConfig={blueBots:Number(blueBotCount.value)||1,redBots:Number(redBotCount.value)||1,difficulty:botDifficulty.value||'normal'};
@@ -482,26 +485,51 @@ function syncPauseContext(){
 }
 
 
+function soundClipCap(cueId,cue=SOUND_CUES[cueId]){
+  if(!cue||cue.loop)return Infinity;
+  if(cueId==='semtexBeep')return .48;
+  if(cueId==='shotgunPump')return 1.2;
+  if(cueId==='headshot'||cueId==='kill')return 1.6;
+  return SOUND_ONE_SHOT_CAPS[cue.group]??1.35;
+}
+function soundPreroll(cue){if(cue.group==='Gunfire')return .055;if(cue.group==='Voice')return .08;if(cue.group==='Movement')return .045;if(cue.group==='Impacts')return .04;return .06;}
+function getAnalysisAudioContext(){if(!analysisAudioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C)analysisAudioCtx=new C();}return analysisAudioCtx;}
+function findSoundOnset(buffer,cue){
+  const sr=buffer.sampleRate||44100,maxSamples=Math.min(buffer.length,Math.floor(sr*10)),channels=Math.min(buffer.numberOfChannels||1,2),block=Math.max(64,Math.floor(sr*.006));
+  let globalPeak=0,noisePeak=0;const noiseEnd=Math.min(maxSamples,Math.floor(sr*.18));
+  for(let i=0;i<maxSamples;i+=block){let peak=0,end=Math.min(maxSamples,i+block);for(let c=0;c<channels;c++){const d=buffer.getChannelData(c);for(let j=i;j<end;j+=2){const v=Math.abs(d[j]);if(v>peak)peak=v;}}if(peak>globalPeak)globalPeak=peak;if(i<noiseEnd&&peak>noisePeak)noisePeak=peak;}
+  if(globalPeak<.003)return 0;
+  const threshold=Math.max(.005,noisePeak*3.2,globalPeak*(cue.group==='Gunfire'?.018:.026));let hits=0,onset=0;
+  for(let i=0;i<maxSamples;i+=block){let peak=0,end=Math.min(maxSamples,i+block);for(let c=0;c<channels;c++){const d=buffer.getChannelData(c);for(let j=i;j<end;j+=2){const v=Math.abs(d[j]);if(v>peak)peak=v;}}if(peak>=threshold){hits++;if(hits===1)onset=i/sr;if(hits>=2)return Math.max(0,onset-soundPreroll(cue));}else hits=0;}
+  return 0;
+}
+async function waitForMediaReady(el,timeout=18000){return new Promise(resolve=>{let done=false;const finish=ok=>{if(done)return;done=true;clearTimeout(timer);el.removeEventListener('canplaythrough',yes);el.removeEventListener('canplay',yes);el.removeEventListener('loadeddata',yes);el.removeEventListener('error',no);resolve(ok);},yes=()=>finish(true),no=()=>finish(false),timer=setTimeout(()=>finish(el.readyState>=2),timeout);if(el.readyState>=3){finish(true);return;}el.addEventListener('canplaythrough',yes,{once:true});el.addEventListener('canplay',yes,{once:true});el.addEventListener('loadeddata',yes,{once:true});el.addEventListener('error',no,{once:true});});}
+async function prepareSoundResource(cueId){
+  const cue=SOUND_CUES[cueId];if(!cue)throw new Error('Unknown cue');
+  let mediaUrl=cue.url,onset=0,fallback=false,objectUrl='';
+  if(!cue.loop){
+    try{
+      const response=await fetch(cue.url,{mode:'cors',cache:'force-cache'});if(!response.ok)throw new Error(`HTTP ${response.status}`);
+      const blob=await response.blob();objectUrl=URL.createObjectURL(blob);mediaUrl=objectUrl;
+      try{const ctx=getAnalysisAudioContext();if(!ctx)throw new Error('No AudioContext');const data=await blob.arrayBuffer();const buffer=await ctx.decodeAudioData(data.slice(0));onset=findSoundOnset(buffer,cue);soundOnsets.set(cueId,onset);}catch{soundOnsetFailures.add(cueId);}
+    }catch{fallback=true;soundOnsetFailures.add(cueId);}
+  }
+  return {mediaUrl,onset,fallback,objectUrl};
+}
 function buildSoundPool(cueId){
   if(soundPools.has(cueId))return soundPools.get(cueId);
   const cue=SOUND_CUES[cueId];if(!cue||soundFailures.has(cueId))return null;
-  const nodes=[];
-  for(let i=0;i<cue.pool;i++){
-    const el=new Audio();el.preload=i===0?'auto':'metadata';el.src=cue.url;el.playsInline=true;el.crossOrigin=null;
-    try{el.preservesPitch=false;el.webkitPreservesPitch=false;el.mozPreservesPitch=false;}catch{}
-    nodes.push(el);
-  }
-  const pool={cueId,nodes,cursor:0,status:'loading',readyPromise:null};
-  const first=nodes[0];
-  pool.readyPromise=new Promise(resolve=>{
-    let settled=false;
-    const done=ok=>{if(settled)return;settled=true;pool.status=ok?'ready':'failed';if(!ok)soundFailures.add(cueId);if(ok&&nodes.length>1){nodes.slice(1).forEach((el,i)=>setTimeout(()=>{try{el.preload='auto';el.load();}catch{}},20+i*24));}resolve(ok);};
-    if(first.readyState>=2){done(true);return;}
-    first.addEventListener('canplay',()=>done(true),{once:true});
-    first.addEventListener('error',()=>done(false),{once:true});
-    setTimeout(()=>done(first.readyState>=2),5000);
-  });
-  soundPools.set(cueId,pool);try{first.load();}catch{}return pool;
+  const pool={cueId,nodes:[],cursor:0,status:'loading',readyPromise:null,onset:0,fallback:false,objectUrl:''};
+  pool.readyPromise=(async()=>{
+    try{
+      let resourcePromise=soundResourcePromises.get(cueId);if(!resourcePromise){resourcePromise=prepareSoundResource(cueId);soundResourcePromises.set(cueId,resourcePromise);}
+      const resource=await resourcePromise;pool.onset=resource.onset||0;pool.fallback=!!resource.fallback;pool.objectUrl=resource.objectUrl||'';
+      for(let i=0;i<cue.pool;i++){const el=new Audio();el.preload=i===0?'auto':'metadata';el.src=resource.mediaUrl;el.playsInline=true;el.crossOrigin=null;try{el.preservesPitch=false;el.webkitPreservesPitch=false;el.mozPreservesPitch=false;}catch{}pool.nodes.push(el);}
+      const first=pool.nodes[0];try{first.load();}catch{}const ok=await waitForMediaReady(first);if(!ok)throw new Error('Audio not ready');
+      pool.status='ready';if(pool.nodes.length>1)pool.nodes.slice(1).forEach((el,i)=>setTimeout(()=>{try{el.preload='auto';el.load();}catch{}},20+i*24));return true;
+    }catch{pool.status='failed';soundFailures.add(cueId);return false;}
+  })();
+  soundPools.set(cueId,pool);return pool;
 }
 function warmSoundCue(cueId){buildSoundPool(cueId);}
 function weaponSoundCueIds(weapon=currentWeapon){return weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='assault'?['shotAssault','reloadAssault']:['shotPistol','reloadPistol'];}
@@ -515,10 +543,18 @@ function warmGameAudio(){
   const schedule=(fn,delay)=>{if('requestIdleCallback'in window)requestIdleCallback(fn,{timeout:delay+900});else setTimeout(fn,delay);};
   deferred.forEach((id,i)=>schedule(()=>warmSoundCue(id),250+i*120));
 }
+function clearSoundNodeTimers(el){if(el._fadeTimer){clearInterval(el._fadeTimer);el._fadeTimer=0;}if(el._safetyTimer){clearTimeout(el._safetyTimer);el._safetyTimer=0;}}
+function scheduleSoundClipStop(el,cueId,baseVolume,startAt,maxDuration){
+  const cue=SOUND_CUES[cueId];let cap=Number.isFinite(maxDuration)?Math.min(soundClipCap(cueId,cue),Math.max(.04,maxDuration)):soundClipCap(cueId,cue);if(!Number.isFinite(cap))return;
+  const pool=soundPools.get(cueId),fallbackExtra=pool?.fallback?(SOUND_FALLBACK_LEAD_IN[cue.group]??1):0,endAt=startAt+cap+fallbackExtra,fade=Math.min(.16,Math.max(.045,cap*.12)),fadeAt=Math.max(startAt,endAt-fade),token=el._playToken;
+  el._fadeTimer=setInterval(()=>{if(el._playToken!==token){clearSoundNodeTimers(el);return;}const t=Number(el.currentTime)||0;if(t>=fadeAt){const k=Math.max(0,Math.min(1,(endAt-t)/fade));el.volume=baseVolume*k;}if(t>=endAt){clearSoundNodeTimers(el);try{el.pause();el.currentTime=startAt;}catch{}}},24);
+  el._safetyTimer=setTimeout(()=>{if(el._playToken!==token)return;clearSoundNodeTimers(el);try{el.pause();el.currentTime=startAt;}catch{}},Math.max(3000,(cap+fallbackExtra+2)*1000));
+}
 function playSoundCue(cueId,volume=1,override={}){
-  const cue=SOUND_CUES[cueId],pool=buildSoundPool(cueId);if(!cue||!pool||pool.status!=='ready')return null;
-  const el=pool.nodes[pool.cursor++%pool.nodes.length];
-  try{el.pause();el.currentTime=0;el.loop=!!(override.loop??cue.loop);el.playbackRate=Math.max(.5,Math.min(2,Number(override.rate??override.playbackRate??cue.rate)||1));el.volume=Math.max(0,Math.min(1,SOUND_VOLUME*(Number(volume)||0)*(Number(override.gain??cue.gain)||1)));const started=el.play();if(started?.catch)started.catch(()=>{});return el;}catch{return null;}
+  const cue=SOUND_CUES[cueId],pool=buildSoundPool(cueId);if(!cue||!pool||pool.status!=='ready'||!pool.nodes.length)return null;
+  const el=pool.nodes[pool.cursor++%pool.nodes.length];clearSoundNodeTimers(el);el._playToken=(el._playToken||0)+1;
+  const loop=!!(override.loop??cue.loop),startAt=loop?0:(soundOnsets.has(cueId)?soundOnsets.get(cueId):pool.onset||0),rate=Math.max(.5,Math.min(2,Number(override.rate??override.playbackRate??cue.rate)||1)),baseVolume=Math.max(0,Math.min(1,SOUND_VOLUME*(Number(volume)||0)*(Number(override.gain??cue.gain)||1)));
+  try{el.pause();el.loop=loop;el.playbackRate=rate;el.volume=baseVolume;el.currentTime=Math.max(0,startAt);const started=el.play();const after=()=>{if(!loop)scheduleSoundClipStop(el,cueId,baseVolume,startAt,Number(override.maxDuration));};if(started?.then)started.then(after).catch(()=>{});else after();return el;}catch{return null;}
 }
 async function waitForSoundCue(cueId,timeoutMs=1800){const pool=buildSoundPool(cueId);if(!pool)return false;if(pool.status==='ready')return true;if(pool.status==='failed')return false;return await Promise.race([pool.readyPromise,new Promise(resolve=>setTimeout(()=>resolve(false),timeoutMs))]);}
 
@@ -1867,10 +1903,9 @@ function soundThrowableThrow(kind='flash'){playSoundCue(kind==='sticky'?'stickyT
 function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;playSoundCue(kind==='sticky'?'stickyImpact':'flashImpact',v);}
 function semtexDistanceVolume(g,max=42){if(!position||!g?.root)return 0;const p=g.root.position,d=Math.hypot(p.x-position.x,p.y-(position.y+1),p.z-position.z);return Math.max(0,1-d/max);}
 function semtexBeepInterval(remainingMs){const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1);return Math.round(THREE.MathUtils.lerp(360,85,Math.pow(p,1.22)));}
-function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10;playSoundCue('semtexBeep',v,{playbackRate:rate});}
+function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10,interval=semtexBeepInterval(remainingMs)/1000;playSoundCue('semtexBeep',v,{playbackRate:rate,maxDuration:Math.max(.055,Math.min(.18,interval*.72))});}
 function tacticalDistanceVolume(m,max=48){if(!position||!m)return .02;const d=Math.hypot((Number(m.x)||0)-position.x,(Number(m.y)||0)-(position.y+1),(Number(m.z)||0)-position.z);return Math.max(0,1-d/max);}
 function soundTacticalDetonation(kind,m){const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;playSoundCue(kind==='flash'||kind==='stun'?'flashDetonate':'stickyDetonate',v);}
-initLocalSounds();
 document.addEventListener('pointerdown',ensureAudio,{once:true});
 </script>
 </body>

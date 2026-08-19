@@ -1,4 +1,4 @@
-# Breachline v1.16.10 fixed audio mapping
+# Breachline v1.16.11 fixed audio mapping
 
 The in-game audio picker/settings system was removed in v1.16.10. The following cue mapping is fixed from the user's Breachline Sound Picker v1.6 export.
 
@@ -40,3 +40,8 @@ The remaining external assets selected here are CC0/public-domain sources or the
 - **Semtex Beep** → NPC Message — Spring Spring · OpenGameArt — `https://opengameart.org/sites/default/files/snd_npc_message.wav`
 - **Flash Detonation** → Flashbang Detonation — teeeece · OpenGameArt — `https://opengameart.org/sites/default/files/flash_bang.wav`
 - **Semtex Explosion** → Explosion 5 — Delta12 Studio · OpenGameArt — `https://opengameart.org/sites/default/files/explosion_5.ogg`
+
+
+## v1.16.11 one-shot playback
+
+Several selected source recordings contain leading silence or multiple recorded events. Breachline now applies the same smart one-shot treatment used by Sound Picker v1.6: each fixed cue is fetched/analyzed once when warmed, the first audible transient is detected with a small pre-roll, and gameplay plays only a cue-appropriate window rather than the whole source recording. The stop timer is based on media `currentTime`, so network buffering never consumes the audible clip. Semtex beep duration is additionally capped below the current accelerating beep interval to prevent overlapping vocal/message tails.
