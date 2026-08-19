@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.8</title>
+<title>Breachline v1.16.9</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -136,14 +136,27 @@
 <section id="settingsPanel" class="settings-panel hide" aria-label="Local audio settings">
   <div class="settings-shell">
     <header class="settings-head">
-      <div><div class="eyebrow">LOCAL SETTINGS</div><h2>Audio</h2><div class="settings-sub">Replace any game cue with an audio file stored only on this browser/device.</div></div>
+      <div><div class="eyebrow">LOCAL SETTINGS</div><h2>Audio</h2><div class="settings-sub">Upload, audition, and assign game sounds on this browser/device.</div></div>
       <button id="settingsCloseBtn" class="btn icon-btn" title="Close audio settings" aria-label="Close audio settings"><svg class="ui-icon"><use href="#i-close"/></svg></button>
     </header>
     <div class="settings-toolbar">
       <label class="volume-setting" for="soundVolumeRange"><span>Game sound volume</span><input id="soundVolumeRange" type="range" min="0" max="100" step="1"><b id="soundVolumeValue">85%</b></label>
       <div class="local-only-badge">LOCAL ONLY · NOT UPLOADED</div>
     </div>
-    <div id="soundSettingsList" class="sound-settings-list" aria-live="polite"></div>
+    <div class="settings-tabs" role="tablist" aria-label="Audio settings sections">
+      <button id="soundTabCues" class="settings-tab active" type="button" role="tab" aria-selected="true" data-sound-tab="cues">CUE SETTINGS</button>
+      <button id="soundTabBoard" class="settings-tab" type="button" role="tab" aria-selected="false" data-sound-tab="board">SOUND BOARD</button>
+    </div>
+    <div id="soundSettingsList" class="sound-settings-list" data-sound-page="cues" aria-live="polite"></div>
+    <div id="soundBoardPage" class="sound-board-page hide" data-sound-page="board">
+      <div class="sound-board-controls">
+        <label class="sound-board-target"><span>Assign sound to</span><select id="soundBoardTarget" class="input"></select></label>
+        <label class="sound-board-search"><span>Find a sound</span><input id="soundBoardSearch" class="input" type="search" autocomplete="off" placeholder="Search weapons, footsteps, tactical…"></label>
+        <button id="soundBoardResetCueBtn" class="btn"><svg class="ui-icon"><use href="#i-reset"/></svg><span>Default</span></button>
+      </div>
+      <div id="soundBoardCurrent" class="sound-board-current"></div>
+      <div id="soundBoardLibrary" class="sound-board-library" aria-live="polite"></div>
+    </div>
     <footer class="settings-foot"><div id="soundSettingsStatus" class="settings-status" role="status" aria-live="polite">Default sounds active.</div><button id="soundResetAllBtn" class="btn"><svg class="ui-icon"><use href="#i-reset"/></svg><span>Reset All</span></button></footer>
   </div>
   <input id="soundFileInput" class="hide" type="file" accept="audio/*,.wav,.mp3,.ogg,.m4a,.aac,.webm">
@@ -200,7 +213,7 @@ let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.16.8';
+const APP_VERSION = '1.16.9';
 const PROTOCOL_VERSION = 31;
 const ROOM_CODE_LENGTH = 4;
 const MAX_BOTS = 8;
@@ -383,6 +396,8 @@ let audioCtx = null, musicGain = null, customMusicSource = null, defaultMusicEle
 let soundVolume=Math.max(0,Math.min(1,Number(localStorage.getItem('breachlineSoundVolume')??.85))),soundDbPromise=null,soundLoadPromise=null,soundHydratePromise=null,pendingSoundUploadId='',soundPreviewSource=null;
 const customSoundRecords=new Map(),customSoundBuffers=new Map(),soundDecodeFailures=new Set();
 const defaultSamplePools=new Map(),defaultSampleFailures=new Set();
+const SOUND_ASSIGNMENTS_KEY='breachlineSoundAssignments';
+let soundAssignments=loadSoundAssignments(),soundSettingsTab='cues',soundBoardTargetId='shotPistol',soundBoardSearchText='';
 let defaultSamplesWarmStarted=false;
 let toastText = '', toastUntil = 0, hurtUntil = 0, hitUntil = 0;
 let botConfig={blueBots:Number(blueBotCount.value)||1,redBots:Number(redBotCount.value)||1,difficulty:botDifficulty.value||'normal'};
@@ -560,6 +575,22 @@ function syncPauseContext(){
 
 const SOUND_DB_NAME='breachline-local-audio',SOUND_DB_STORE='sounds';
 function setSoundSettingsStatus(text,tone=''){const el=$('soundSettingsStatus');if(!el)return;el.textContent=text;el.className=`settings-status ${tone}`;}
+function loadSoundAssignments(){try{const raw=JSON.parse(localStorage.getItem(SOUND_ASSIGNMENTS_KEY)||'{}');return raw&&typeof raw==='object'&&!Array.isArray(raw)?raw:{};}catch{return {};}}
+function saveSoundAssignments(){localStorage.setItem(SOUND_ASSIGNMENTS_KEY,JSON.stringify(soundAssignments));}
+function soundDef(id){return SOUND_DEFS.find(x=>x.id===id)||null;}
+function soundSourceKey(type,id){return `${type}:${id}`;}
+function parseSoundSourceKey(key){const m=/^(default|custom):(.+)$/.exec(String(key||''));return m?{type:m[1],id:m[2]}:null;}
+function isValidSoundSourceKey(key){const src=parseSoundSourceKey(key);if(!src||!soundDef(src.id))return false;return src.type==='default'||(src.type==='custom'&&customSoundRecords.has(src.id));}
+function effectiveSoundSourceKey(cueId){const assigned=soundAssignments[cueId];if(isValidSoundSourceKey(assigned))return assigned;if(customSoundRecords.has(cueId))return soundSourceKey('custom',cueId);return soundSourceKey('default',cueId);}
+function soundSourceLabel(key){const src=parseSoundSourceKey(key);if(!src)return'Unknown sound';const def=soundDef(src.id);if(src.type==='custom'){const rec=customSoundRecords.get(src.id);return rec?`${def?.label||src.id} · ${rec.name}`:`${def?.label||src.id} · Local`;}return `${def?.label||src.id} · Built-in`;}
+function soundSourceDetail(key){const src=parseSoundSourceKey(key);if(!src)return'';if(src.type==='custom'){const rec=customSoundRecords.get(src.id);return rec?`LOCAL · ${formatSoundBytes(rec.size||0)}`:'LOCAL';}const cue=DEFAULT_SAMPLE_CUES[src.id],asset=cue&&DEFAULT_SAMPLE_ASSETS[cue.asset];return asset?.source||'Built-in default';}
+function formatSoundBytes(bytes){const n=Math.max(0,Number(bytes)||0);return n>=1048576?`${(n/1048576).toFixed(1)} MB`:n>=1024?`${Math.round(n/1024)} KB`:`${n} B`;}
+function removeAssignmentsUsingSource(key){let changed=false;for(const [cue,source] of Object.entries(soundAssignments)){if(source===key){delete soundAssignments[cue];changed=true;}}if(changed)saveSoundAssignments();return changed;}
+function pruneSoundAssignments(){let changed=false;for(const [cue,key] of Object.entries(soundAssignments)){if(!soundDef(cue)||!isValidSoundSourceKey(key)){delete soundAssignments[cue];changed=true;}}if(changed)saveSoundAssignments();return changed;}
+function assignSoundSource(cueId,sourceKey){if(!soundDef(cueId)||!isValidSoundSourceKey(sourceKey))return false;const ownDefault=soundSourceKey('default',cueId);if(sourceKey===ownDefault&&!customSoundRecords.has(cueId))delete soundAssignments[cueId];else soundAssignments[cueId]=sourceKey;saveSoundAssignments();const src=parseSoundSourceKey(sourceKey);if(src?.type==='default')warmDefaultSampleCue(src.id);else if(src?.type==='custom')hydrateCustomSoundBuffers();if(cueId==='introMusic'&&musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();renderSoundBoard();return true;}
+function playSoundSource(sourceKey,volume=1,options={}){const src=parseSoundSourceKey(sourceKey);if(!src)return null;if(src.type==='custom')return playCustomSound(src.id,volume,options);const opts={...options};if(opts.playbackRate!=null&&opts.rate==null)opts.rate=opts.playbackRate;return playDefaultSample(src.id,volume,opts);}
+function playSoundCue(cueId,volume=1,options={}){const key=effectiveSoundSourceKey(cueId),src=parseSoundSourceKey(key),opts={...options};if(cueId!=='introMusic'&&opts.loop==null)opts.loop=false;let played=playSoundSource(key,volume,opts);if(played)return played;if(src?.type==='custom')return playDefaultSample(cueId,volume,{...opts,rate:opts.rate??opts.playbackRate});return null;}
+async function waitForSoundSource(sourceKey,timeoutMs=4000){const src=parseSoundSourceKey(sourceKey);if(!src)return false;if(src.type==='custom'){await initLocalSounds();await hydrateCustomSoundBuffers();return customSoundBuffers.has(src.id);}return waitForSampledDefault(src.id,timeoutMs);}
 function openSoundDb(){
   if(soundDbPromise)return soundDbPromise;
   soundDbPromise=new Promise((resolve,reject)=>{
@@ -573,7 +604,7 @@ function openSoundDb(){
 function soundStoreRequest(mode,work){return openSoundDb().then(db=>new Promise((resolve,reject)=>{const tx=db.transaction(SOUND_DB_STORE,mode),store=tx.objectStore(SOUND_DB_STORE);let result;try{result=work(store);}catch(err){reject(err);return;}tx.oncomplete=()=>resolve(result?.result);tx.onerror=()=>reject(tx.error||new Error('Local audio storage failed.'));tx.onabort=()=>reject(tx.error||new Error('Local audio storage was cancelled.'));}));}
 async function initLocalSounds(){
   if(soundLoadPromise)return soundLoadPromise;
-  soundLoadPromise=(async()=>{try{const rows=await soundStoreRequest('readonly',store=>store.getAll())||[];for(const row of rows){if(row?.id&&row?.blob instanceof Blob)customSoundRecords.set(row.id,row);}renderSoundSettings();if(audioCtx&&customSoundRecords.size)queueMicrotask(hydrateCustomSoundBuffers);}catch(err){console.warn('Local audio storage unavailable:',err);setSoundSettingsStatus('Local sound storage unavailable on this browser.','error');}})();
+  soundLoadPromise=(async()=>{try{const rows=await soundStoreRequest('readonly',store=>store.getAll())||[];for(const row of rows){if(row?.id&&row?.blob instanceof Blob)customSoundRecords.set(row.id,row);}pruneSoundAssignments();renderSoundSettings();if(audioCtx&&customSoundRecords.size)queueMicrotask(hydrateCustomSoundBuffers);}catch(err){console.warn('Local audio storage unavailable:',err);setSoundSettingsStatus('Local sound storage unavailable on this browser.','error');}})();
   return soundLoadPromise;
 }
 async function decodeSoundBlob(blob){const a=ensureAudio();if(!a)throw new Error('Audio is not available.');const copy=await blob.arrayBuffer();return await a.decodeAudioData(copy.slice(0));}
@@ -586,15 +617,31 @@ function setSoundVolume(value){soundVolume=Math.max(0,Math.min(1,Number(value)||
 function renderSoundSettings(){
   const list=$('soundSettingsList');if(!list)return;
   const groups=new Map();for(const def of SOUND_DEFS){if(!groups.has(def.category))groups.set(def.category,[]);groups.get(def.category).push(def);}
-  list.innerHTML=[...groups.entries()].map(([category,defs])=>`<section class="sound-group"><div class="sound-group-title">${category}</div><div class="sound-group-grid">${defs.map(def=>{const rec=customSoundRecords.get(def.id),custom=!!rec,cue=DEFAULT_SAMPLE_CUES[def.id],asset=cue&&DEFAULT_SAMPLE_ASSETS[cue.asset],defaultLabel='CC0 audio default',defaultTitle=asset?.source||'CC0 default audio';return `<div class="sound-row" data-sound-id="${def.id}"><div class="sound-copy"><strong>${def.label}</strong><small title="${custom?escapeHtml(rec.name):escapeHtml(defaultTitle)}">${custom?escapeHtml(rec.name):defaultLabel}</small></div><span class="sound-state ${custom?'custom':''}">${custom?'CUSTOM':'DEFAULT'}</span><div class="sound-actions"><button class="btn icon-btn sound-preview" data-sound-action="preview" title="Preview ${def.label}" aria-label="Preview ${def.label}"><svg class="ui-icon"><use href="#i-play"/></svg></button><button class="btn sound-upload" data-sound-action="upload"><svg class="ui-icon"><use href="#i-upload"/></svg><span>${custom?'Replace':'Upload'}</span></button><button class="btn icon-btn sound-reset" data-sound-action="reset" title="Restore default ${def.label}" aria-label="Restore default ${def.label}" ${custom?'':'disabled'}><svg class="ui-icon"><use href="#i-reset"/></svg></button></div></div>`;}).join('')}</div></section>`).join('');
-  const customCount=customSoundRecords.size;setSoundSettingsStatus(customCount?`${customCount} custom sound${customCount===1?'':'s'} active on this device.`:`Default audio active · ${SOUND_DEFS.length} distinct CC0 cues · firearm audio loads per equipped weapon.`,customCount?'ok':'');setSoundVolume(soundVolume);
+  list.innerHTML=[...groups.entries()].map(([category,defs])=>`<section class="sound-group"><div class="sound-group-title">${category}</div><div class="sound-group-grid">${defs.map(def=>{const rec=customSoundRecords.get(def.id),explicit=soundAssignments[def.id],sourceKey=effectiveSoundSourceKey(def.id),src=parseSoundSourceKey(sourceKey),mapped=!!explicit&&sourceKey!==soundSourceKey('custom',def.id),state=mapped?'MAPPED':src?.type==='custom'?'CUSTOM':'DEFAULT',stateClass=mapped?'mapped':src?.type==='custom'?'custom':'';return `<div class="sound-row" data-sound-id="${def.id}"><div class="sound-copy"><strong>${def.label}</strong><small title="${escapeHtml(soundSourceDetail(sourceKey))}">${escapeHtml(soundSourceLabel(sourceKey))}</small></div><span class="sound-state ${stateClass}">${state}</span><div class="sound-actions"><button class="btn icon-btn sound-preview" data-sound-action="preview" title="Preview ${def.label}" aria-label="Preview ${def.label}"><svg class="ui-icon"><use href="#i-play"/></svg></button><button class="btn sound-upload" data-sound-action="upload"><svg class="ui-icon"><use href="#i-upload"/></svg><span>${rec?'Replace':'Upload'}</span></button><button class="btn icon-btn sound-reset" data-sound-action="reset" title="Restore default ${def.label}" aria-label="Restore default ${def.label}" ${(rec||explicit)?'':'disabled'}><svg class="ui-icon"><use href="#i-reset"/></svg></button></div></div>`;}).join('')}</div></section>`).join('');
+  const customized=new Set([...customSoundRecords.keys(),...Object.keys(soundAssignments)]).size;setSoundSettingsStatus(customized?`${customized} cue${customized===1?'':'s'} customized on this device.`:`Default audio active · ${SOUND_DEFS.length} game cues available in Sound Board.`,customized?'ok':'');setSoundVolume(soundVolume);
 }
-function openSettingsPanel(){ensureAudio();initLocalSounds().then(hydrateCustomSoundBuffers);renderSoundSettings();$('settingsPanel').classList.remove('hide');fitResponsiveOverlays();}
+function switchSoundSettingsTab(tab){soundSettingsTab=tab==='board'?'board':'cues';document.querySelectorAll('[data-sound-tab]').forEach(btn=>{const active=btn.dataset.soundTab===soundSettingsTab;btn.classList.toggle('active',active);btn.setAttribute('aria-selected',String(active));});document.querySelectorAll('[data-sound-page]').forEach(page=>page.classList.toggle('hide',page.dataset.soundPage!==soundSettingsTab));if(soundSettingsTab==='board')renderSoundBoard();requestAnimationFrame(fitResponsiveOverlays);}
+function soundBoardSources(){const out=[];for(const def of SOUND_DEFS)out.push({key:soundSourceKey('default',def.id),type:'default',id:def.id,label:def.label,category:def.category,detail:soundSourceDetail(soundSourceKey('default',def.id))});for(const [id,rec] of customSoundRecords){const def=soundDef(id);if(def)out.push({key:soundSourceKey('custom',id),type:'custom',id,label:`${def.label} · Local`,category:def.category,detail:rec.name||'Local upload'});}return out;}
+function renderSoundBoard(){
+  const target=$('soundBoardTarget'),library=$('soundBoardLibrary'),current=$('soundBoardCurrent');if(!target||!library||!current)return;
+  const prior=target.value||soundBoardTargetId;if(!target.options.length)target.innerHTML=[...new Set(SOUND_DEFS.map(x=>x.category))].map(cat=>`<optgroup label="${cat}">${SOUND_DEFS.filter(x=>x.category===cat).map(def=>`<option value="${def.id}">${def.label}</option>`).join('')}</optgroup>`).join('');
+  soundBoardTargetId=soundDef(prior)?prior:(soundDef(soundBoardTargetId)?soundBoardTargetId:SOUND_DEFS[0].id);target.value=soundBoardTargetId;
+  const activeKey=effectiveSoundSourceKey(soundBoardTargetId),targetDef=soundDef(soundBoardTargetId),explicit=!!soundAssignments[soundBoardTargetId];
+  current.innerHTML=`<div><span>CURRENT FOR</span><strong>${escapeHtml(targetDef?.label||soundBoardTargetId)}</strong></div><div class="sound-board-current-source"><b>${escapeHtml(soundSourceLabel(activeKey))}</b><small>${escapeHtml(soundSourceDetail(activeKey))}</small></div><span class="sound-state ${explicit?'mapped':''}">${explicit?'ASSIGNED':parseSoundSourceKey(activeKey)?.type==='custom'?'CUSTOM':'DEFAULT'}</span>`;
+  const q=soundBoardSearchText.trim().toLowerCase(),sources=soundBoardSources().filter(src=>!q||`${src.label} ${src.category} ${src.detail}`.toLowerCase().includes(q));
+  library.innerHTML=sources.length?sources.map(src=>{const active=src.key===activeKey;return `<article class="sound-board-card ${active?'active':''}" data-sound-source="${escapeHtml(src.key)}"><div class="sound-board-card-head"><div><span>${escapeHtml(src.category)}</span><strong>${escapeHtml(src.label)}</strong></div><span class="sound-state ${src.type==='custom'?'custom':''}">${src.type==='custom'?'LOCAL':'BUILT-IN'}</span></div><small title="${escapeHtml(src.detail)}">${escapeHtml(src.detail)}</small><div class="sound-board-card-actions"><button class="btn icon-btn" data-board-action="preview" title="Preview ${escapeHtml(src.label)}" aria-label="Preview ${escapeHtml(src.label)}"><svg class="ui-icon"><use href="#i-play"/></svg></button><button class="btn ${active?'primary':''}" data-board-action="assign" ${active?'disabled':''}>${active?'IN USE':'USE SOUND'}</button></div></article>`;}).join(''):`<div class="sound-board-empty">No sounds match “${escapeHtml(soundBoardSearchText)}”.</div>`;
+  $('soundBoardResetCueBtn').disabled=activeKey===soundSourceKey('default',soundBoardTargetId);
+}
+function handleSoundBoardClick(e){const action=e.target.closest('[data-board-action]'),card=action?.closest('[data-sound-source]');if(!action||!card)return;const key=card.dataset.soundSource;if(action.dataset.boardAction==='preview')previewSoundSource(key);else if(action.dataset.boardAction==='assign'){if(assignSoundSource(soundBoardTargetId,key)){const def=soundDef(soundBoardTargetId);setSoundSettingsStatus(`${def?.label||'Cue'} now uses ${soundSourceLabel(key)}.`,'ok');}}}
+function previewSoundSource(key){ensureAudio();stopSoundPreview();waitForSoundSource(key,5000).then(ok=>{if(!ok){setSoundSettingsStatus(`${soundSourceLabel(key)} could not load.`,'error');return;}const src=playSoundSource(key,1,{loop:false});if(src){soundPreviewSource=src;src.onended=()=>{if(soundPreviewSource===src)soundPreviewSource=null;};const parsed=parseSoundSourceKey(key);if(parsed?.id==='introMusic')setTimeout(()=>{if(soundPreviewSource===src)stopSoundPreview();},2500);}});}
+function openSettingsPanel(){ensureAudio();initLocalSounds().then(()=>{hydrateCustomSoundBuffers();renderSoundSettings();renderSoundBoard();});renderSoundSettings();$('settingsPanel').classList.remove('hide');switchSoundSettingsTab(soundSettingsTab);fitResponsiveOverlays();}
 function closeSettingsPanel(){pendingSoundUploadId='';$('soundFileInput').value='';$('settingsPanel').classList.add('hide');stopSoundPreview();}
-function handleSoundSettingsClick(e){const action=e.target.closest('[data-sound-action]');if(!action)return;const row=action.closest('[data-sound-id]'),id=row?.dataset.soundId;if(!id)return;if(action.dataset.soundAction==='preview')previewSound(id);else if(action.dataset.soundAction==='upload'){pendingSoundUploadId=id;const input=$('soundFileInput');input.value='';input.click();}else if(action.dataset.soundAction==='reset')resetCustomSound(id);}
-async function handleSoundFileSelected(e){const file=e.target.files?.[0],id=pendingSoundUploadId;pendingSoundUploadId='';if(!file||!id)return;const def=SOUND_DEFS.find(x=>x.id===id);setSoundSettingsStatus(`Checking ${file.name}…`);try{const buffer=await decodeSoundBlob(file);const record={id,name:file.name,type:file.type||'audio',size:file.size,updatedAt:Date.now(),blob:file};await soundStoreRequest('readwrite',store=>store.put(record));customSoundRecords.set(id,record);customSoundBuffers.set(id,buffer);soundDecodeFailures.delete(id);if(id==='introMusic'&&musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();setSoundSettingsStatus(`${def?.label||'Sound'} replaced with ${file.name}.`,'ok');previewSound(id);}catch(err){console.error(err);setSoundSettingsStatus(`Could not use ${file.name}. Choose a browser-supported audio file.`,'error');}finally{e.target.value='';}}
-async function resetCustomSound(id){if(!customSoundRecords.has(id))return;try{await soundStoreRequest('readwrite',store=>store.delete(id));customSoundRecords.delete(id);customSoundBuffers.delete(id);soundDecodeFailures.delete(id);if(id==='introMusic'&&musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();}catch(err){setSoundSettingsStatus('Could not reset that sound.','error');}}
-async function resetAllCustomSounds(){if(!customSoundRecords.size)return;try{await soundStoreRequest('readwrite',store=>store.clear());customSoundRecords.clear();customSoundBuffers.clear();soundDecodeFailures.clear();stopSoundPreview();if(musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();setSoundSettingsStatus('All sounds restored to built-in defaults.','ok');}catch(err){setSoundSettingsStatus('Could not reset local sounds.','error');}}
+function handleSoundSettingsClick(e){const action=e.target.closest('[data-sound-action]');if(!action)return;const row=action.closest('[data-sound-id]'),id=row?.dataset.soundId;if(!id)return;if(action.dataset.soundAction==='preview')previewSound(id);else if(action.dataset.soundAction==='upload'){pendingSoundUploadId=id;const input=$('soundFileInput');input.value='';input.click();}else if(action.dataset.soundAction==='reset')resetCueAudio(id);}
+async function handleSoundFileSelected(e){const file=e.target.files?.[0],id=pendingSoundUploadId;pendingSoundUploadId='';if(!file||!id)return;const def=SOUND_DEFS.find(x=>x.id===id);setSoundSettingsStatus(`Checking ${file.name}…`);try{const buffer=await decodeSoundBlob(file);const record={id,name:file.name,type:file.type||'audio',size:file.size,updatedAt:Date.now(),blob:file};await soundStoreRequest('readwrite',store=>store.put(record));customSoundRecords.set(id,record);customSoundBuffers.set(id,buffer);soundDecodeFailures.delete(id);soundAssignments[id]=soundSourceKey('custom',id);saveSoundAssignments();if(id==='introMusic'&&musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();renderSoundBoard();setSoundSettingsStatus(`${def?.label||'Sound'} replaced with ${file.name}.`,'ok');previewSound(id);}catch(err){console.error(err);setSoundSettingsStatus(`Could not use ${file.name}. Choose a browser-supported audio file.`,'error');}finally{e.target.value='';}}
+async function resetCueAudio(id){
+  try{const hadCustom=customSoundRecords.has(id);if(hadCustom){await soundStoreRequest('readwrite',store=>store.delete(id));customSoundRecords.delete(id);customSoundBuffers.delete(id);soundDecodeFailures.delete(id);removeAssignmentsUsingSource(soundSourceKey('custom',id));}if(soundAssignments[id]!==undefined){delete soundAssignments[id];saveSoundAssignments();}if(id==='introMusic'&&musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();renderSoundBoard();setSoundSettingsStatus(`${soundDef(id)?.label||'Sound'} restored to its built-in default.`,'ok');}catch(err){setSoundSettingsStatus('Could not reset that sound.','error');}
+}
+async function resetAllCustomSounds(){const hadAnything=customSoundRecords.size||Object.keys(soundAssignments).length;if(!hadAnything)return;try{await soundStoreRequest('readwrite',store=>store.clear());customSoundRecords.clear();customSoundBuffers.clear();soundDecodeFailures.clear();soundAssignments={};saveSoundAssignments();stopSoundPreview();if(musicEnabled&&!gameActive){stopIntroMusic();startIntroMusic();}renderSoundSettings();renderSoundBoard();setSoundSettingsStatus('All uploads and Sound Board assignments restored to defaults.','ok');}catch(err){setSoundSettingsStatus('Could not reset local sounds.','error');}}
 function stopSoundPreview(){if(soundPreviewSource){try{if(typeof soundPreviewSource.stop==='function')soundPreviewSource.stop();else if(typeof soundPreviewSource.pause==='function'){soundPreviewSource.pause();soundPreviewSource.currentTime=0;}}catch{}soundPreviewSource=null;}}
 function getDefaultSampleCue(id){return DEFAULT_SAMPLE_CUES[id]||null;}
 function hasSampledDefault(id){return !!getDefaultSampleCue(id);}
@@ -652,7 +699,7 @@ async function waitForSampledDefault(id,timeoutMs=1800){
   return await Promise.race([pool.readyPromise,new Promise(resolve=>setTimeout(()=>resolve(false),timeoutMs))]);
 }
 function playCustomSound(id,volume=1,options={}){const buffer=customSoundBuffers.get(id);if(!buffer)return null;const a=ensureAudio();if(!a)return null;if(options.music&&!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}const source=a.createBufferSource(),gain=a.createGain();source.buffer=buffer;source.loop=!!options.loop;if(options.playbackRate)source.playbackRate.value=options.playbackRate;gain.gain.value=Math.max(0,Math.min(1,Number(volume)||0));source.connect(gain).connect(options.music?musicGain:(sfxGain||a.destination));source.start();if(options.maxDuration)setTimeout(()=>{try{source.stop();}catch{}},options.maxDuration*1000);return source;}
-function previewSound(id){ensureAudio();hydrateCustomSoundBuffers().then(async()=>{stopSoundPreview();const custom=playCustomSound(id,1,{music:id==='introMusic',maxDuration:2.5});if(custom){soundPreviewSource=custom;custom.onended=()=>{if(soundPreviewSource===custom)soundPreviewSource=null;};return;}const ok=await waitForSampledDefault(id,4000);const sampled=ok?playDefaultSample(id,1,{loop:false}):null;if(sampled){soundPreviewSource=sampled;sampled.onended=()=>{if(soundPreviewSource===sampled)soundPreviewSource=null;};if(id==='introMusic')setTimeout(()=>{if(soundPreviewSource===sampled)stopSoundPreview();},2500);return;}const def=SOUND_DEFS.find(x=>x.id===id);setSoundSettingsStatus(`${def?.label||'Default sound'} could not load. Check the connection and try again.`,'error');});}
+function previewSound(id){ensureAudio();hydrateCustomSoundBuffers().then(()=>previewSoundSource(effectiveSoundSourceKey(id)));}
 
 function init3D(){
   scene = new THREE.Scene();
@@ -849,6 +896,11 @@ function bindUI(){
   $('soundResetAllBtn').addEventListener('click',resetAllCustomSounds);
   $('soundFileInput').addEventListener('change',handleSoundFileSelected);
   $('soundSettingsList').addEventListener('click',handleSoundSettingsClick);
+  document.querySelectorAll('[data-sound-tab]').forEach(btn=>btn.addEventListener('click',()=>switchSoundSettingsTab(btn.dataset.soundTab)));
+  $('soundBoardTarget').addEventListener('change',e=>{soundBoardTargetId=e.target.value;renderSoundBoard();});
+  $('soundBoardSearch').addEventListener('input',e=>{soundBoardSearchText=e.target.value||'';renderSoundBoard();});
+  $('soundBoardLibrary').addEventListener('click',handleSoundBoardClick);
+  $('soundBoardResetCueBtn').addEventListener('click',()=>{const key=soundSourceKey('default',soundBoardTargetId);if(assignSoundSource(soundBoardTargetId,key))setSoundSettingsStatus(`${soundDef(soundBoardTargetId)?.label||'Cue'} now uses its built-in default.`,'ok');});
   $('soundVolumeRange').addEventListener('input',e=>setSoundVolume(Number(e.target.value)/100));
   $('godToggle').addEventListener('click',()=>toggleGodMode(false));
   $('menuFullBtn').addEventListener('click', toggleFullscreen);
@@ -1982,45 +2034,31 @@ function drawVersion(c,L){c.font='800 8px system-ui';c.textAlign='center';c.fill
 function roundRect(c,x,y,w,h,r,fill,stroke){if(w<=0||h<=0)return;c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
 
 function startIntroMusic(){
-  if(!musicEnabled||gameActive||!experienceEntered||orientationBlocked)return;
-  const a=ensureAudio();if(!a)return;
-  if(!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}
-  if(customSoundRecords.has('introMusic')&&!customSoundBuffers.has('introMusic')){hydrateCustomSoundBuffers().then(()=>{if(musicEnabled&&!gameActive&&!customMusicSource&&!defaultMusicElement&&!defaultMusicPending)startIntroMusic();});return;}
-  if(customSoundBuffers.has('introMusic')){if(customMusicSource)return;customMusicSource=playCustomSound('introMusic',1,{music:true,loop:true});if(customMusicSource)customMusicSource.onended=()=>{customMusicSource=null;};return;}
-  if(defaultMusicElement||defaultMusicPending)return;
-  const sampled=playDefaultSample('introMusic',1,{loop:true});
-  if(sampled){defaultMusicElement=sampled;sampled.onended=()=>{if(defaultMusicElement===sampled)defaultMusicElement=null;};return;}
-  defaultMusicPending=true;
-  waitForSampledDefault('introMusic',5000).then(ok=>{
-    defaultMusicPending=false;
-    if(!ok||!musicEnabled||gameActive||customMusicSource||defaultMusicElement)return;
-    const el=playDefaultSample('introMusic',1,{loop:true});
-    if(el){defaultMusicElement=el;el.onended=()=>{if(defaultMusicElement===el)defaultMusicElement=null;};}
-  });
+  if(!musicEnabled||gameActive||!experienceEntered||orientationBlocked)return;const a=ensureAudio();if(!a)return;if(!musicGain){musicGain=a.createGain();musicGain.gain.value=.52;musicGain.connect(a.destination);}const sourceKey=effectiveSoundSourceKey('introMusic'),src=parseSoundSourceKey(sourceKey);if(src?.type==='custom'&&!customSoundBuffers.has(src.id)){hydrateCustomSoundBuffers().then(()=>{if(musicEnabled&&!gameActive&&!customMusicSource&&!defaultMusicElement&&!defaultMusicPending)startIntroMusic();});return;}if(customMusicSource||defaultMusicElement||defaultMusicPending)return;const played=playSoundSource(sourceKey,1,{music:true,loop:true});if(played){if(src?.type==='custom'){customMusicSource=played;played.onended=()=>{if(customMusicSource===played)customMusicSource=null;};}else{defaultMusicElement=played;played.onended=()=>{if(defaultMusicElement===played)defaultMusicElement=null;};}return;}defaultMusicPending=true;waitForSoundSource(sourceKey,5000).then(ok=>{defaultMusicPending=false;if(!ok||!musicEnabled||gameActive||customMusicSource||defaultMusicElement)return;const retry=playSoundSource(sourceKey,1,{music:true,loop:true});if(!retry)return;const resolved=parseSoundSourceKey(sourceKey);if(resolved?.type==='custom'){customMusicSource=retry;retry.onended=()=>{if(customMusicSource===retry)customMusicSource=null;};}else{defaultMusicElement=retry;retry.onended=()=>{if(defaultMusicElement===retry)defaultMusicElement=null;};}});
 }
 function stopIntroMusic(){defaultMusicPending=false;if(customMusicSource){try{customMusicSource.stop();}catch{}customMusicSource=null;}if(defaultMusicElement){try{defaultMusicElement.pause();defaultMusicElement.currentTime=0;}catch{}defaultMusicElement=null;}}
 
 function ensureAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C){audioCtx=new C();sfxGain=audioCtx.createGain();sfxGain.gain.value=soundVolume;sfxGain.connect(audioCtx.destination);}}if(audioCtx?.state==='suspended')audioCtx.resume();if(audioCtx&&[...customSoundRecords.keys()].some(id=>!customSoundBuffers.has(id)&&!soundDecodeFailures.has(id)))queueMicrotask(hydrateCustomSoundBuffers);return audioCtx;}
-function soundShot(weapon='pistol'){const id=weapon==='shotgun'?'shotShotgun':weapon==='sniper'?'shotSniper':weapon==='assault'?'shotAssault':'shotPistol';if(playCustomSound(id))return;playDefaultSample(id);}
+function soundShot(weapon='pistol'){const id=weapon==='shotgun'?'shotShotgun':weapon==='sniper'?'shotSniper':weapon==='assault'?'shotAssault':'shotPistol';playSoundCue(id);}
 function reloadSoundId(weapon=currentWeapon){return weapon==='shotgun'?'reloadShotgun':weapon==='sniper'?'reloadSniper':weapon==='assault'?'reloadAssault':'reloadPistol';}
-function soundReload(weapon=currentWeapon){const id=reloadSoundId(weapon);if(playCustomSound(id))return;playDefaultSample(id);}
-function soundHitmarker(){if(playCustomSound('hitmarker'))return;playDefaultSample('hitmarker');}
-function soundHeadshot(){if(playCustomSound('headshot'))return;playDefaultSample('headshot');}
-function soundKill(){if(playCustomSound('kill'))return;playDefaultSample('kill');}
-function soundAnnouncer(priority=1){if(playCustomSound('announcer'))return;playDefaultSample('announcer',1,{rate:priority>=5?1.08:1});}
-function soundShield(){if(playCustomSound('shield'))return;playDefaultSample('shield');}
-function soundHurt(){if(playCustomSound('hurt'))return;playDefaultSample('hurt');}
-function soundJump(){if(playCustomSound('jump'))return;playDefaultSample('jump');}
-function soundFootstep(side=0,volume=1){const id=side?'footstepRight':'footstepLeft';if(playCustomSound(id,volume))return;playDefaultSample(id,volume);}
-function soundLanding(volume=1){if(playCustomSound('land',volume))return;playDefaultSample('land',volume);}
-function soundShotgunPump(){if(playCustomSound('shotgunPump'))return;playDefaultSample('shotgunPump');}
-function soundThrowableThrow(kind='flash'){const id=kind==='sticky'?'stickyThrow':'flashThrow';if(playCustomSound(id))return;playDefaultSample(id);}
-function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;const id=kind==='sticky'?'stickyImpact':'flashImpact';if(playCustomSound(id,v))return;playDefaultSample(id,v);}
+function soundReload(weapon=currentWeapon){playSoundCue(reloadSoundId(weapon));}
+function soundHitmarker(){playSoundCue('hitmarker');}
+function soundHeadshot(){playSoundCue('headshot');}
+function soundKill(){playSoundCue('kill');}
+function soundAnnouncer(priority=1){playSoundCue('announcer',1,{playbackRate:priority>=5?1.08:1});}
+function soundShield(){playSoundCue('shield');}
+function soundHurt(){playSoundCue('hurt');}
+function soundJump(){playSoundCue('jump');}
+function soundFootstep(side=0,volume=1){playSoundCue(side?'footstepRight':'footstepLeft',volume);}
+function soundLanding(volume=1){playSoundCue('land',volume);}
+function soundShotgunPump(){playSoundCue('shotgunPump');}
+function soundThrowableThrow(kind='flash'){playSoundCue(kind==='sticky'?'stickyThrow':'flashThrow');}
+function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;playSoundCue(kind==='sticky'?'stickyImpact':'flashImpact',v);}
 function semtexDistanceVolume(g,max=42){if(!position||!g?.root)return 0;const p=g.root.position,d=Math.hypot(p.x-position.x,p.y-(position.y+1),p.z-position.z);return Math.max(0,1-d/max);}
 function semtexBeepInterval(remainingMs){const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1);return Math.round(THREE.MathUtils.lerp(360,85,Math.pow(p,1.22)));}
-function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10;if(playCustomSound('semtexBeep',v,{playbackRate:rate}))return;playDefaultSample('semtexBeep',v,{rate});}
+function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10;playSoundCue('semtexBeep',v,{playbackRate:rate});}
 function tacticalDistanceVolume(m,max=48){if(!position||!m)return .02;const d=Math.hypot((Number(m.x)||0)-position.x,(Number(m.y)||0)-(position.y+1),(Number(m.z)||0)-position.z);return Math.max(0,1-d/max);}
-function soundTacticalDetonation(kind,m){const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;const flash=kind==='flash'||kind==='stun',id=flash?'flashDetonate':'stickyDetonate';if(playCustomSound(id,v))return;playDefaultSample(id,v);}
+function soundTacticalDetonation(kind,m){const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;playSoundCue(kind==='flash'||kind==='stun'?'flashDetonate':'stickyDetonate',v);}
 initLocalSounds();
 document.addEventListener('pointerdown',ensureAudio,{once:true});
 </script>
