@@ -1,4 +1,4 @@
-# Breachline v1.16.11 fixed audio mapping
+# Breachline v1.16.12 fixed audio mapping
 
 The in-game audio picker/settings system was removed in v1.16.10. The following cue mapping is fixed from the user's Breachline Sound Picker v1.6 export.
 
@@ -42,6 +42,8 @@ The remaining external assets selected here are CC0/public-domain sources or the
 - **Semtex Explosion** → Explosion 5 — Delta12 Studio · OpenGameArt — `https://opengameart.org/sites/default/files/explosion_5.ogg`
 
 
-## v1.16.11 one-shot playback
+## v1.16.12 persistent low-latency playback
 
-Several selected source recordings contain leading silence or multiple recorded events. Breachline now applies the same smart one-shot treatment used by Sound Picker v1.6: each fixed cue is fetched/analyzed once when warmed, the first audible transient is detected with a small pre-roll, and gameplay plays only a cue-appropriate window rather than the whole source recording. The stop timer is based on media `currentTime`, so network buffering never consumes the audible clip. Semtex beep duration is additionally capped below the current accelerating beep interval to prevent overlapping vocal/message tails.
+Several selected source recordings contain leading silence or multiple recorded events. Breachline applies the same smart one-shot treatment used by Sound Picker v1.6: each fixed cue is analyzed during startup, the first audible transient is detected with a small pre-roll, and gameplay keeps only the cue-appropriate one-shot window. One-shot cues use pre-decoded Web Audio buffers with the `interactive` latency hint instead of starting remote media elements when the event fires.
+
+Downloaded CORS-readable source files are stored in IndexedDB together with their detected onset so reloads reuse the on-device copy instead of downloading the source again. Sources that cannot be read through CORS are stored in the browser Cache Storage and served cache-first by `audio-cache-sw.js`; an IndexedDB marker prevents repeated CORS download attempts on later loads. The game requests persistent browser storage on entry. Large firearm source WAVs are not retained in RAM after processing; only their short trimmed AudioBuffers remain in memory. Semtex beep duration is additionally capped below the current accelerating beep interval to prevent overlapping vocal/message tails.
