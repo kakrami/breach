@@ -1,48 +1,42 @@
-# Breachline default audio sources
+# Breachline v1.16.10 fixed audio mapping
 
-Breachline v1.16.8 uses CC0 audio for its built-in sound cues. Default files are loaded asynchronously and cached by the browser; the large firearm recordings are loaded only for the weapon being equipped instead of warming every gun at startup. Local user-uploaded overrides remain device-only and take priority.
+The in-game audio picker/settings system was removed in v1.16.10. The following cue mapping is fixed from the user's Breachline Sound Picker v1.6 export.
 
-Attribution is not required for CC0, but source provenance is kept here for maintenance.
+## Required attribution
 
-| Breachline cue | Source | Creator | License |
-|---|---|---|---|
-| Intro music | Psycho Punch | KiluaBoy | CC0 |
-| Pistol fire | Free Firearms SFX Library – 1911 A_34P | Ben Jaszczak et al. | CC0 |
-| Assault rifle fire | Free Firearms SFX Library – AR-15 D_24P | Ben Jaszczak et al. | CC0 |
-| Shotgun fire | Free Firearms SFX Library – Mossberg N_26P | Ben Jaszczak et al. | CC0 |
-| Sniper fire | Free Firearms SFX Library – Mosin Nagant M_21P | Ben Jaszczak et al. | CC0 |
-| Pistol reload | Gun reload sounds – gunreload1 | SpringySpringo | CC0 |
-| Assault rifle reload | Gun reload sounds – assaultriflereload1 | SpringySpringo | CC0 |
-| Shotgun shell load | Gun Reload Sound Effects – singlebullet1 | BMacZero | CC0 |
-| Shotgun pump action | Gun reload sounds – shotguncock | SpringySpringo | CC0 |
-| Sniper reload | Gun Reload Sound Effects – clipload2 | BMacZero | CC0 |
-| Hitmarker | Skill hit – skill_hit.mp3 | pauliuw | CC0 |
-| Headshot | Basic Sound Effects – bell1 | n4 | CC0 |
-| Elimination confirm | Basic Sound Effects – success | n4 | CC0 |
-| Announcer cue | Various Sound Effects – snd_npc_message | Spring Spring | CC0 |
-| God / shield | Basic Sound Effects – vibrophone1 | n4 | CC0 |
-| Damage taken | Hurt Sound Effects – hurt_01 | EZduzziteh | CC0 |
-| Jump | Jump and Run and Stand – jump | mieki256 | CC0 |
-| Footstep left | Footsteps – 01-footstep | GboxMikeFozzy | CC0 |
-| Footstep right | Footsteps – 02-footstep | GboxMikeFozzy | CC0 |
-| Landing | Jump Landing Sound | MentalSanityOff | CC0 |
-| Flash throw | Various Sound Effects – snd_throw1 | Spring Spring | CC0 |
-| Semtex throw | Various Sound Effects – cannonball_tap | Spring Spring | CC0 |
-| Flash impact | Metal Impact Sounds – clink1 | BMacZero | CC0 |
-| Semtex impact | Metal Impact Sounds – thud2 | BMacZero | CC0 |
-| Semtex beep | Beep Sound – beep | OpenGameArt contributor | CC0 |
-| Flash detonation | flash bang sound | teeeece | CC0 |
-| Semtex explosion | Rpg Sound Effect Pack – explosion_5 | Delta12 Studio | CC0 |
+Some selected sounds are not CC0:
 
-Primary source sites: GitHub mirror of the Free Firearms SFX Library and OpenGameArt.org.
+- **Jack Menhorn – FPS Placeholder Sounds**: CC-BY 3.0. Used for Death Scream (`pain_jack_03.wav`), Announcer Cue (`bodyimpact_jack_01.wav`), Flash Throw (`punch_jack_01.wav`), and Semtex Throw (`punch_jack_02.wav`). Source: https://opengameart.org/content/fps-placeholder-sounds
+- **VoiceBosch – EFFORT SOUNDS (Male) - Audio Pack**: CC-BY-SA 4.0. Used for God / Shield (`12._effort_grunt_male.wav`) and Damage Taken (`06._effort_grunt_male.wav`). Preferred attribution: VoiceBosch. Source: https://opengameart.org/content/effort-sounds-male-audio-pack
 
+The remaining external assets selected here are CC0/public-domain sources or the bundled Breachline headshot announcement.
 
-## v1.16.8 audio mapping changes
+## Fixed cue mapping
 
-- Pistol fire now uses the prior Mosin Nagant / sniper recording.
-- Sniper fire now uses the prior 1911 / pistol recording.
-- Shotgun fire now uses the prior AR-15 / assault-rifle recording.
-- Assault-rifle fire now uses the prior Mossberg / shotgun recording.
-- Semtex throw intentionally uses the same built-in throw asset as Flash. A local Semtex Throw override can still replace it independently.
-- Headshot default is a bundled one-word `Headshot` announcement generated specifically for Breachline and stored at `audio/headshot-announcer.ogg`.
-- Elimination confirmation now uses `snd_enemyscream.wav` from Spring Spring's **Various Sound Effects** on OpenGameArt, released under CC0: https://opengameart.org/content/various-sound-effects-0
+- **Intro Music** → Psycho Punch — KiluaBoy · OpenGameArt — `https://opengameart.org/sites/default/files/Psycho%20Punch_1.ogg`
+- **Pistol Fire** → Mosin Nagant Gunshot — Free Firearms SFX Library · Mosin Nagant M_21P — `https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mosin%20Nagant/M_21P.wav`
+- **Assault Rifle Fire** → Mossberg Gunshot — Free Firearms SFX Library · Mossberg N_26P — `https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mossberg/N_26P.wav`
+- **Shotgun Fire** → AR-15 Gunshot — Free Firearms SFX Library · AR-15 D_24P — `https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/AR-15/D_24P.wav`
+- **Sniper Fire** → 1911 Gunshot — Free Firearms SFX Library · 1911 A_34P — `https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/1911/A_34P.wav`
+- **Pistol Reload** → Pistol Reload — SpringySpringo · OpenGameArt — `https://opengameart.org/sites/default/files/gunreload1.wav`
+- **Assault Rifle Reload** → Assault Rifle Reload — SpringySpringo · OpenGameArt — `https://opengameart.org/sites/default/files/assaultriflereload1_0.wav`
+- **Shotgun Shell Load** → Single Shell Load — BMacZero · OpenGameArt — `https://opengameart.org/sites/default/files/singlebullet1.wav`
+- **Shotgun Pump Action** → Shotgun Pump — SpringySpringo · OpenGameArt — `https://opengameart.org/sites/default/files/shotguncock_0.wav`
+- **Sniper Reload** → Clip Load — BMacZero · OpenGameArt — `https://opengameart.org/sites/default/files/clipload2.wav`
+- **Hitmarker** → Hurt Vocal — EZduzziteh · OpenGameArt — `https://opengameart.org/sites/default/files/hurt_01_0.mp3`
+- **Headshot Announcement** → Headshot Announcement — Breachline bundled announcement — `audio/headshot-announcer.ogg`
+- **Death Scream** → Pain Vocal 03 — Jack Menhorn · FPS Placeholder Sounds · OpenGameArt — `https://opengameart.org/sites/default/files/pain_jack_03.wav`
+- **Announcer Cue** → Body Impact Vocal Foley — Jack Menhorn · FPS Placeholder Sounds · OpenGameArt — `https://opengameart.org/sites/default/files/bodyimpact_jack_01.wav`
+- **God / Shield** → Effort / Pain Grunt 12 — VoiceBosch · Effort Sounds (Male) · OpenGameArt — `https://opengameart.org/sites/default/files/12._effort_grunt_male.wav`
+- **Damage Taken** → Effort / Pain Grunt 06 — VoiceBosch · Effort Sounds (Male) · OpenGameArt — `https://opengameart.org/sites/default/files/06._effort_grunt_male.wav`
+- **Jump** → Jump — mieki256 · OpenGameArt — `https://opengameart.org/sites/default/files/jump.flac`
+- **Footstep Left** → Footstep 01 — GboxMikeFozzy · OpenGameArt — `https://opengameart.org/sites/default/files/01-footstep.ogg`
+- **Footstep Right** → Footstep 02 — GboxMikeFozzy · OpenGameArt — `https://opengameart.org/sites/default/files/02-footstep.ogg`
+- **Landing** → Landing — MentalSanityOff · OpenGameArt — `https://opengameart.org/sites/default/files/jumpland48000.mp3`
+- **Flash Throw** → Punch / Hit Candidate 01 — Jack Menhorn · FPS Placeholder Sounds · OpenGameArt — `https://opengameart.org/sites/default/files/punch_jack_01.wav`
+- **Semtex Throw** → Punch / Hit Candidate 02 — Jack Menhorn · FPS Placeholder Sounds · OpenGameArt — `https://opengameart.org/sites/default/files/punch_jack_02.wav`
+- **Flash Impact** → Metal Clink — BMacZero · OpenGameArt — `https://opengameart.org/sites/default/files/clink1_0.wav`
+- **Semtex Stick / Impact** → Impact Thud — BMacZero · OpenGameArt — `https://opengameart.org/sites/default/files/thud2.wav`
+- **Semtex Beep** → NPC Message — Spring Spring · OpenGameArt — `https://opengameart.org/sites/default/files/snd_npc_message.wav`
+- **Flash Detonation** → Flashbang Detonation — teeeece · OpenGameArt — `https://opengameart.org/sites/default/files/flash_bang.wav`
+- **Semtex Explosion** → Explosion 5 — Delta12 Studio · OpenGameArt — `https://opengameart.org/sites/default/files/explosion_5.ogg`
