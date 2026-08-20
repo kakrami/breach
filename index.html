@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
-<link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.19</title>
-<link rel="stylesheet" href="ui.css">
+<link rel="manifest" href="manifest.webmanifest?v=1.16.20">
+<title>Breachline v1.16.20</title>
+<link rel="stylesheet" href="ui.css?v=1.16.20">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -173,16 +173,36 @@
   </div>
 </section>
 
+<script>
+(()=>{
+  const REV='1.16.20',retryKey=`breach-module-retry-${REV}`;
+  window.__breachModuleBooted=false;
+  const fail=(message)=>{const el=document.getElementById('engineStatus');if(el){el.textContent=message;el.className='engine-status error';}};
+  window.addEventListener('error',(event)=>{const target=event.target;if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK'))fail('CLIENT ASSET LOAD FAILED · RETRYING');},true);
+  setTimeout(()=>{
+    if(window.__breachModuleBooted)return;
+    fail('CLIENT MODULE LOAD FAILED · RETRYING');
+    try{
+      if(sessionStorage.getItem(retryKey)==='1'){fail('CLIENT MODULE LOAD FAILED · REDEPLOY CLIENT');return;}
+      sessionStorage.setItem(retryKey,'1');
+      const url=new URL(location.href);url.searchParams.set('v',REV);url.searchParams.set('boot',Date.now().toString(36));location.replace(url);
+    }catch{location.reload();}
+  },2500);
+})();
+</script>
+
 <script type="module">
+window.__breachModuleBooted=true;
+try{sessionStorage.removeItem('breach-module-retry-1.16.20');}catch{}
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, MAX_STEP_HEIGHT, makeBuildingGeometry, BUILDING_PARTS
-} from './world-geometry.js';
+} from './world-geometry.js?v=1.16.20';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, WEAPON_SPECS as BASE_WEAPON_SPECS, WEAPON_ACCURACY, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js';
+} from './game-config.js?v=1.16.20';
+import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.16.20';
 
 let THREE = null;
 
@@ -351,7 +371,7 @@ syncVisualViewportMetrics();
 syncGodUI();
 syncMusicUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.16.20';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 function setEngineStatus(text,tone=''){
