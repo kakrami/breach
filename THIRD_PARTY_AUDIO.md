@@ -39,7 +39,7 @@ The remaining external assets selected here are CC0/public-domain sources or the
 - **Semtex Stick / Impact** → Impact Thud — BMacZero · OpenGameArt — `https://opengameart.org/sites/default/files/thud2.wav`
 - **Semtex Beep** → NPC Message — Spring Spring · OpenGameArt — `https://opengameart.org/sites/default/files/snd_npc_message.wav`
 - **Flash Detonation** → Flashbang Detonation — teeeece · OpenGameArt — `https://opengameart.org/sites/default/files/flash_bang.wav`
-- **Semtex Explosion** → Explosion 5 — Delta12 Studio · OpenGameArt — `https://opengameart.org/sites/default/files/explosion_5.ogg`
+- **Grenade Explosion** → bundled original procedural blast used by Breach — `audio/grenade-explosion.wav` (no third-party attribution required)
 
 
 ## v1.16.12 persistent low-latency playback

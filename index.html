@@ -9,9 +9,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
-<link rel="manifest" href="manifest.webmanifest?v=1.16.22">
-<title>Breachline v1.16.22</title>
-<link rel="stylesheet" href="ui.css?v=1.16.22">
+<link rel="manifest" href="manifest.webmanifest?v=1.16.23">
+<title>Breachline v1.16.23</title>
+<link rel="stylesheet" href="ui.css?v=1.16.23">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -105,7 +105,7 @@
       </section>
     </div>
 
-    <footer class="menu-footer"><div id="menuStatus" class="status" role="status" aria-live="polite">Ready. <a href="THIRD_PARTY_AUDIO.md" target="_blank" rel="noopener">Audio Credits</a></div><div class="controls-note" aria-label="Desktop controls"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>C CROUCH</span><span>R RELOAD</span><span>1·2·3·4 WEAPONS</span><span>F FLASH</span><span>G STICKY</span><span>TAB SCORE</span></div></footer>
+    <footer class="menu-footer"><div id="menuStatus" class="status" role="status" aria-live="polite">Ready.</div><div class="controls-note" aria-label="Desktop controls"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>C CROUCH</span><span>R RELOAD</span><span>1·2·3·4 WEAPONS</span><span>F FLASH</span><span>G STICKY</span><span>TAB SCORE</span></div></footer>
   </div>
 </section>
 
@@ -175,7 +175,7 @@
 
 <script>
 (()=>{
-  const REV='1.16.22',retryKey=`breach-module-retry-${REV}`;
+  const REV='1.16.23',retryKey=`breach-module-retry-${REV}`;
   window.__breachModuleBooted=false;
   const fail=(message)=>{const el=document.getElementById('engineStatus');if(el){el.textContent=message;el.className='engine-status error';}};
   window.addEventListener('error',(event)=>{const target=event.target;if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK'))fail('CLIENT ASSET LOAD FAILED · RETRYING');},true);
@@ -193,16 +193,16 @@
 
 <script type="module">
 window.__breachModuleBooted=true;
-try{sessionStorage.removeItem('breach-module-retry-1.16.22');}catch{}
+try{sessionStorage.removeItem('breach-module-retry-1.16.23');}catch{}
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, MAX_STEP_HEIGHT, makeBuildingGeometry, BUILDING_PARTS
-} from './world-geometry.js?v=1.16.22';
+} from './world-geometry.js?v=1.16.23';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, WEAPON_SPECS as BASE_WEAPON_SPECS, WEAPON_ACCURACY, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.16.22';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.16.22';
+} from './game-config.js?v=1.16.23';
+import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.16.23';
 
 let THREE = null;
 
@@ -250,7 +250,7 @@ const SOUND_CUES = Object.freeze({
   stickyImpact:Object.freeze({url:"https://opengameart.org/sites/default/files/thud2.wav",group:'Tactical',pool:3,gain:0.42,rate:0.92,loop:false}),
   semtexBeep:Object.freeze({url:"https://opengameart.org/sites/default/files/snd_npc_message.wav",group:'Voice',pool:3,gain:0.36,rate:1,loop:false}),
   flashDetonate:Object.freeze({url:"https://opengameart.org/sites/default/files/flash_bang.wav",group:'Explosions',pool:3,gain:0.8,rate:1,loop:false}),
-  stickyDetonate:Object.freeze({url:"https://opengameart.org/sites/default/files/explosion_5.ogg",group:'Explosions',pool:3,gain:0.9,rate:1,loop:false}),
+  stickyDetonate:Object.freeze({url:"audio/grenade-explosion.wav",group:'Explosions',pool:4,gain:1,rate:1,loop:false}),
 });
 const SOUND_ONE_SHOT_CAPS=Object.freeze({'Gunfire':.92,'Weapon Handling':1.9,'Combat Feedback':.82,'Voice':1.55,'Impacts':.9,'Movement':.88,'Tactical':1.12,'Explosions':1.45});
 
@@ -377,7 +377,7 @@ syncVisualViewportMetrics();
 syncGodUI();
 syncMusicUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.16.22';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.16.23';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 function setEngineStatus(text,tone=''){
