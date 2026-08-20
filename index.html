@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.14</title>
+<title>Breachline v1.16.15</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -105,7 +105,7 @@
       </section>
     </div>
 
-    <footer class="menu-footer"><div id="menuStatus" class="status" role="status" aria-live="polite">Ready.</div><div class="controls-note" aria-label="Desktop controls"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>R RELOAD</span><span>1·2·3·4 WEAPONS</span><span>F FLASH</span><span>G STICKY</span><span>TAB SCORE</span></div></footer>
+    <footer class="menu-footer"><div id="menuStatus" class="status" role="status" aria-live="polite">Ready. <a href="THIRD_PARTY_AUDIO.md" target="_blank" rel="noopener">Audio Credits</a></div><div class="controls-note" aria-label="Desktop controls"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>R RELOAD</span><span>1·2·3·4 WEAPONS</span><span>F FLASH</span><span>G STICKY</span><span>TAB SCORE</span></div></footer>
   </div>
 </section>
 
@@ -187,7 +187,7 @@ import { createObstacleGrid } from './collision-grid.js';
 let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
-const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
+const ONLINE_API = 'https://breach.kiadesignenterprise.workers.dev';
 const MOBILE_MOVE_ZONE_RATIO = .35;
 const WEAPON_SPECS = Object.fromEntries(WEAPON_ORDER.map(name=>[name,{...BASE_WEAPON_SPECS[name]}]));
 function freshClientAmmo(){return Object.fromEntries(WEAPON_ORDER.map(name=>[name,WEAPON_SPECS[name].mag]));}
@@ -1232,10 +1232,15 @@ function joinWorld(code){
 }
 function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
 
-function connectWorld(code, reconnecting=false){
+async function connectWorld(code, reconnecting=false){
   clearTimeout(reconnectTimer);currentRoom=normalizeCode(code);if(!currentRoom)return;
   if(socket){try{socket.close(1000,'Replacing connection')}catch{}}
-  const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?protocol=${PROTOCOL_VERSION}&client=${encodeURIComponent(clientId)}&auth=${encodeURIComponent(clientAuth)}&name=${encodeURIComponent(myName||safeName())}&team=${encodeURIComponent(myTeam)}`;
+  let ticket='';
+  try{
+    const ticketResponse=await fetch(`${ONLINE_API}/rooms/${currentRoom}/ticket`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName||safeName(),team:myTeam}),cache:'no-store'});
+    const ticketData=await ticketResponse.json();if(!ticketResponse.ok)throw new Error(ticketData.error||'Could not authorize match connection.');ticket=String(ticketData.ticket||'');if(!ticket)throw new Error('Server did not issue a join ticket.');
+  }catch(err){if(!gameActive&&!reconnecting){document.exitPointerLock?.();disableMenu(false);setStatus(err.message||'Could not join match.','error');}else scheduleReconnect();return;}
+  const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?protocol=${PROTOCOL_VERSION}&ticket=${encodeURIComponent(ticket)}`;
   try{socket=new WebSocket(url);}catch{if(!gameActive&&!reconnecting){document.exitPointerLock?.();disableMenu(false);setStatus('Could not open multiplayer connection.','error');}else scheduleReconnect();return;}
   socket.addEventListener('open',()=>{reconnectAttempt=0;if(reconnecting)showToast('Reconnected');});
   socket.addEventListener('message',e=>{try{handleMessage(JSON.parse(e.data))}catch{}});
@@ -1415,6 +1420,7 @@ function sendCurrentState(force=false){
   lastStateSent=now;lastSentState={x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,ads:p.ads,grounded:p.grounded};send(p);return true;
 }
 function applyAuthoritativeLoadout(m){
+  const previousReloadUntil=reloadUntil;
   const seq=Math.max(0,Number(m.seq)||0),rev=Math.max(0,Number(m.rev)||0);
   if(seq&&seq<combatSeq)return;
   if(rev&&rev<combatRevision)return;
@@ -1426,9 +1432,11 @@ function applyAuthoritativeLoadout(m){
   reloadWeapon=m.reloadWeapon||'';
   reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;
   reloadPendingUntil=0;
-  if(m.action==='weapon'&&m.accepted!==false)pendingWeapon='';
+  if(m.action==='weapon'&&m.accepted!==false){pendingWeapon='';const retry=Math.max(0,Number(m.retryAfterMs)||0);if(retry)localFireCooldown=Math.max(localFireCooldown,retry/1000);}
+  if(m.action==='reloadShell'&&reloadWeapon==='shotgun'&&reloadUntil>serverNow())soundReload('shotgun');
+  if(m.action==='fire'&&m.accepted!==false&&reloadWeapon==='shotgun'&&reloadUntil>serverNow()&&!previousReloadUntil)soundReload('shotgun');
   if(m.action==='fire'){
-    if(m.accepted===false&&m.reason==='cooldown'){
+    if(m.accepted===false&&(m.reason==='cooldown'||m.reason==='weapon_switch')){
       const retry=Math.max(8,Math.min(180,Number(m.retryAfterMs)||35));
       serverFireRetryAt=performance.now()+retry;localFireCooldown=Math.max(localFireCooldown,retry/1000);queuedFireUntil=Math.max(queuedFireUntil,serverFireRetryAt+90);
     }else if(m.accepted!==false){serverFireRetryAt=0;}
