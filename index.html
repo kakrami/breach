@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.15</title>
+<title>Breachline v1.16.16</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -187,7 +187,7 @@ import { createObstacleGrid } from './collision-grid.js';
 let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
-const ONLINE_API = 'https://breach.kiadesignenterprise.workers.dev';
+const ONLINE_API = 'https://breach-online.kiadesignenterprise.workers.dev';
 const MOBILE_MOVE_ZONE_RATIO = .35;
 const WEAPON_SPECS = Object.fromEntries(WEAPON_ORDER.map(name=>[name,{...BASE_WEAPON_SPECS[name]}]));
 function freshClientAmmo(){return Object.fromEntries(WEAPON_ORDER.map(name=>[name,WEAPON_SPECS[name].mag]));}
