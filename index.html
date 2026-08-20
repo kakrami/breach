@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#0b1118">
+<meta name="theme-color" content="#090b0d">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <link rel="preconnect" href="https://opengameart.org">
 <link rel="dns-prefetch" href="//opengameart.org">
 <link rel="manifest" href="manifest.webmanifest">
-<title>Breachline v1.16.13</title>
+<title>Breachline v1.16.14</title>
 <link rel="stylesheet" href="ui.css">
 </head>
 <body>
@@ -73,7 +73,7 @@
 
     <div class="menu-grid">
       <section class="panel operator-panel">
-        <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-team"/></svg> Operator</strong><span>Player settings apply to Create and Join</span></div>
+        <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-team"/></svg> Operator</strong><span>Name and team apply to Create + Join · God Mode is creator/admin only</span></div>
         <div class="operator-row">
           <div class="field operator-name"><label class="label" for="nameInput">Player name</label><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></div>
           <div class="field operator-team">
@@ -84,7 +84,7 @@
             </div>
             <div id="teamSummary" class="team-summary"></div>
           </div>
-          <button id="godToggle" type="button" class="god-toggle operator-god" aria-pressed="false" title="God Mode: invincible + unlimited ammo and equipment"><span class="god-icon"><svg class="ui-icon"><use href="#i-shield"/></svg></span><span class="god-copy"><strong>God Mode</strong><small>Invincible + Unlimited</small></span><span id="godState" class="god-state">OFF</span></button>
+          <button id="godToggle" type="button" class="god-toggle operator-god" aria-pressed="false" title="Create match with admin God Mode"><span class="god-icon"><svg class="ui-icon"><use href="#i-shield"/></svg></span><span class="god-copy"><strong>Creator God Mode</strong><small>Admin-only cheat</small></span><span id="godState" class="god-state">OFF</span></button>
         </div>
       </section>
 
@@ -178,41 +178,23 @@ import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, MAX_STEP_HEIGHT, makeBuildingGeometry, BUILDING_PARTS
 } from './world-geometry.js';
+import {
+  APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, WEAPON_SPECS as BASE_WEAPON_SPECS, EQUIPMENT_CAPS,
+  DEFAULT_WORLD_SETTINGS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
+} from './game-config.js';
+import { createObstacleGrid } from './collision-grid.js';
 
 let THREE = null;
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const ONLINE_API = 'https://punch-world-online.kiadesignenterprise.workers.dev';
-const APP_VERSION = '1.16.13';
-const PROTOCOL_VERSION = 31;
-const ROOM_CODE_LENGTH = 4;
-const MAX_BOTS = 8;
-const WEAPON_ORDER = ['pistol','assault','shotgun','sniper'];
-const EQUIPMENT_CAPS = Object.freeze({flash:2,sticky:2});
 const MOBILE_MOVE_ZONE_RATIO = .35;
-const WEAPON_SPECS = {
-  pistol: { name:'PISTOL', short:'PST', mag:12, damage:34, reloadMs:475, cooldownMs:190, bulletSpeed:42, adsFov:54 },
-  assault: { name:'ASSAULT RIFLE', short:'AR', mag:12, damage:26, reloadMs:650, cooldownMs:105, bulletSpeed:82, adsFov:46 },
-  shotgun: { name:'SHOTGUN', short:'SG', mag:6, damage:18, reloadMs:980, cooldownMs:760, bulletSpeed:68, adsFov:52 },
-  sniper: { name:'SNIPER', short:'SNP', mag:12, damage:120, reloadMs:1100, cooldownMs:950, bulletSpeed:180, adsFov:18 },
-};
-const DEFAULT_WORLD_SETTINGS = Object.freeze({
-  movement:Object.freeze({runSpeed:8.4,walkSpeed:4.6,jumpHeight:1.6,gravity:23}),
-  combat:Object.freeze({regenDelayMs:5000,regenPerSecond:8,respawnMs:2800}),
-  weapons:Object.freeze(Object.fromEntries(WEAPON_ORDER.map(name=>{
-    const spec=WEAPON_SPECS[name];
-    return [name,Object.freeze({damage:spec.damage,speed:spec.bulletSpeed,reloadMs:spec.reloadMs,cooldownMs:spec.cooldownMs})];
-  })))
-});
+const WEAPON_SPECS = Object.fromEntries(WEAPON_ORDER.map(name=>[name,{...BASE_WEAPON_SPECS[name]}]));
 function freshClientAmmo(){return Object.fromEntries(WEAPON_ORDER.map(name=>[name,WEAPON_SPECS[name].mag]));}
 function freshClientEquipment(){return {...EQUIPMENT_CAPS};}
-const TEAM_COLORS = { blue:'#54a9ff', red:'#ff6873' };
 const HUD_ACCENT='#d7ff58', HUD_SURFACE='rgba(9,11,13,.90)', HUD_LINE='rgba(255,255,255,.16)', HUD_MUTED='#8b969f';
 const ACTIVE_STATE_INTERVAL = 33;
 const IDLE_STATE_INTERVAL = 250;
-const TACTICAL_THROW_SPEED = 23.5;
-const TACTICAL_THROW_LOFT = 6.4;
-const TACTICAL_GRAVITY = 18;
 // Fixed game-audio mapping exported from Breachline Sound Picker v1.6.
 // There is intentionally no runtime upload/remap/settings layer in the game.
 const SOUND_CUES = Object.freeze({
@@ -264,6 +246,7 @@ const isIPhone = /iPhone|iPod/i.test(navigator.userAgent);
 const isStandaloneApp = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
 const iPhoneSafariTab = () => isIPhone && !isStandaloneApp();
 const clientId = getClientId();
+const clientAuth = getClientAuth();
 nameInput.value = localStorage.getItem('breachlineName') || `Player${Math.floor(Math.random()*90+10)}`;
 blueBotCount.value=localStorage.getItem('breachlineBlueBots')||'1';
 redBotCount.value=localStorage.getItem('breachlineRedBots')||'1';
@@ -294,7 +277,7 @@ updateBotTeamSelection();
 
 let scene, camera, renderer, clock, pistolGroup, pistolFlash, pistolMag, assaultGroup, assaultFlash, assaultMag, shotgunGroup, shotgunFlash, shotgunPump, sniperGroup, sniperFlash, sniperBolt;
 let hudScene, hudCamera, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0;
-let gameActive = false, paused = false, socket = null, reconnectTimer = null, reconnectAttempt = 0;
+let gameActive = false, paused = false, socket = null, reconnectTimer = null, reconnectAttempt = 0, pendingCreatorGod = false;
 let currentRoom = '', myName = '', myTeam = 'blue', selfColor = TEAM_COLORS.blue, godMode = false, isWorldAdmin = false, worldOwnerId = '';
 let hp = 100, wastedUntil = 0, currentWeapon = 'pistol', ammo = freshClientAmmo(), equipment=freshClientEquipment(), reloadUntil = 0, reloadWeapon = '', combatRevision=0, combatSeq=0, reloadPendingUntil=0, lastCombatSync=0, pendingWeapon='';
 let flashUntil=0,flashPeakUntil=0;
@@ -302,7 +285,7 @@ let fireMode=localStorage.getItem('breachlineFireMode')==='auto'?'auto':'semi',f
 let adsWanted=false,adsBlend=0,baseFov=70,sniperZoomLevel=0,lastWastedBy='',lastWastedWeapon='';
 let myStats={kills:0,deaths:0},scoreboardOpen=false,scoreboardScroll=0,scoreboardDrag=null,scoreboardPanel=null,killConfirmUntil=0,killConfirmName='',killConfirmWeapon='',killConfirmHeadshot=false,killConfirmDistance=0;
 let headshotUntil=0,announcerCurrent=null;const announcerQueue=[];
-let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0;
+let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0, jumpSeq = 0;
 let onGround = true, fireTime = 99, localFireCooldown = 0, lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0;
 let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true}, queuedFireUntil=0, serverFireRetryAt=0, localEquipmentCooldownUntil=0;
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0,nextFootstepAt=0,footstepSide=0,shotgunPumpStartedAt=0,shotgunPumpSoundPlayed=false;
@@ -336,19 +319,10 @@ const trajectoryBuildingGrid=new Map();
 function trajectoryCellKey(cx,cy,cz){return `${cx},${cy},${cz}`;}
 function buildTrajectoryGrid(){for(const part of BUILDING_PARTS){if(part.projectileSolid===false)continue;const minCX=Math.floor((part.x-part.w/2)/TRAJECTORY_BUILDING_CELL),maxCX=Math.floor((part.x+part.w/2)/TRAJECTORY_BUILDING_CELL),minCY=Math.floor(part.bottomY/TRAJECTORY_BUILDING_CELL),maxCY=Math.floor(part.topY/TRAJECTORY_BUILDING_CELL),minCZ=Math.floor((part.z-part.d/2)/TRAJECTORY_BUILDING_CELL),maxCZ=Math.floor((part.z+part.d/2)/TRAJECTORY_BUILDING_CELL);for(let cx=minCX;cx<=maxCX;cx++)for(let cy=minCY;cy<=maxCY;cy++)for(let cz=minCZ;cz<=maxCZ;cz++){const key=trajectoryCellKey(cx,cy,cz);let list=trajectoryBuildingGrid.get(key);if(!list){list=[];trajectoryBuildingGrid.set(key,list);}list.push(part);}}}
 buildTrajectoryGrid();
-const obstacleBoxes = [];
-const OBSTACLE_CELL_SIZE = 8;
-const OBSTACLE_CELL_HEIGHT = 3;
-const obstacleGrid = new Map();
-function obstacleGridKey(cx,cy,cz){return `${cx},${cy},${cz}`;}
-function registerObstacle(b){
-  obstacleBoxes.push(b);
-  const minX=b.type==='box'?b.minX:b.x-b.r,maxX=b.type==='box'?b.maxX:b.x+b.r,minZ=b.type==='box'?b.minZ:b.z-b.r,maxZ=b.type==='box'?b.maxZ:b.z+b.r;
-  const minCX=Math.floor(minX/OBSTACLE_CELL_SIZE),maxCX=Math.floor(maxX/OBSTACLE_CELL_SIZE),minCY=Math.floor(b.minY/OBSTACLE_CELL_HEIGHT),maxCY=Math.floor(b.maxY/OBSTACLE_CELL_HEIGHT),minCZ=Math.floor(minZ/OBSTACLE_CELL_SIZE),maxCZ=Math.floor(maxZ/OBSTACLE_CELL_SIZE);
-  for(let cx=minCX;cx<=maxCX;cx++)for(let cy=minCY;cy<=maxCY;cy++)for(let cz=minCZ;cz<=maxCZ;cz++){const key=obstacleGridKey(cx,cy,cz);let list=obstacleGrid.get(key);if(!list){list=[];obstacleGrid.set(key,list);}list.push(b);}
-  return b;
-}
-function nearbyObstacles(x,z,y){const minCY=Math.floor(y/OBSTACLE_CELL_HEIGHT),maxCY=Math.floor((y+PLAYER_HEIGHT*.92)/OBSTACLE_CELL_HEIGHT),cx=Math.floor(x/OBSTACLE_CELL_SIZE),cz=Math.floor(z/OBSTACLE_CELL_SIZE),out=[],seen=new Set();for(let cy=minCY;cy<=maxCY;cy++){const list=obstacleGrid.get(obstacleGridKey(cx,cy,cz));if(!list)continue;for(const b of list)if(!seen.has(b)){seen.add(b);out.push(b);}}return out;}
+const obstacleIndex=createObstacleGrid({cellSize:8,cellHeight:3,playerHeight:PLAYER_HEIGHT});
+const obstacleBoxes=obstacleIndex.obstacles;
+const registerObstacle=obstacleIndex.register;
+const nearbyObstacles=obstacleIndex.nearby;
 const mapObstacles = [];
 const joy = { x:0, y:0, pointer:null, centerX:0, centerY:0 };
 const look = { pointer:null, x:0, y:0 };
@@ -431,6 +405,16 @@ function getClientId(){
   }
   return id;
 }
+function getClientAuth(){
+  let secret=String(localStorage.getItem('breachlineClientAuth')||'').toLowerCase();
+  if(!/^[a-f0-9]{64}$/.test(secret)){
+    const cryptoApi=globalThis.crypto;
+    if(typeof cryptoApi?.getRandomValues==='function'){const bytes=new Uint8Array(32);cryptoApi.getRandomValues(bytes);secret=[...bytes].map(value=>value.toString(16).padStart(2,'0')).join('');}
+    else{secret='';while(secret.length<64)secret+=`${Date.now().toString(16)}${Math.random().toString(16).slice(2)}`;secret=secret.replace(/[^a-f0-9]/g,'').padEnd(64,'0').slice(0,64);}
+    localStorage.setItem('breachlineClientAuth',secret);
+  }
+  return secret;
+}
 function normalizeCode(v){ return String(v||'').toUpperCase().replace(/[^A-HJ-NP-Z2-9]/g,'').slice(0,ROOM_CODE_LENGTH); }
 function setStatus(text, tone=''){ menuStatus.textContent=text; menuStatus.className=`status ${tone}`; }
 function apiToWs(base){ return base.replace(/^https:/,'wss:').replace(/^http:/,'ws:'); }
@@ -461,17 +445,15 @@ function applyTeamSelection(team,persist=true){
 }
 function syncGodUI(){
   const btn=$('godToggle'),state=$('godState'),pauseBtn=$('pauseGodBtn'),pauseText=$('pauseGodText');
-  if(btn){btn.setAttribute('aria-pressed',String(selectedGod));btn.title=selectedGod?'God Mode enabled: invincible + unlimited ammo and equipment':'God Mode disabled';}
+  if(btn){btn.setAttribute('aria-pressed',String(selectedGod));btn.title=selectedGod?'New matches start with creator God Mode enabled':'Creator God Mode disabled';}
   if(state)state.textContent=selectedGod?'ON':'OFF';
-  if(pauseBtn)pauseBtn.classList.toggle('god-active',!!godMode);
+  if(pauseBtn){pauseBtn.classList.toggle('god-active',!!godMode);pauseBtn.classList.toggle('hide',!isWorldAdmin);}
   if(pauseText)pauseText.textContent=godMode?'God On':'God Off';
 }
 function toggleGodMode(live=false){
-  const next=!(live?godMode:selectedGod);
-  selectedGod=next;localStorage.setItem('breachlineGodMode',next?'1':'0');
-  if(gameActive&&socket?.readyState===WebSocket.OPEN){godMode=next;send({t:'god',enabled:next});showToast(next?'GOD MODE ENABLED':'GOD MODE DISABLED');}
-  else godMode=next;
-  syncGodUI();
+  if(!live){selectedGod=!selectedGod;localStorage.setItem('breachlineGodMode',selectedGod?'1':'0');syncGodUI();return;}
+  if(!gameActive||!isWorldAdmin){showToast('ADMIN ACCESS REQUIRED');syncGodUI();return;}
+  send({t:'god',enabled:!godMode});
 }
 function syncMusicUI(){
   const use=$('musicIconUse'),btn=$('musicBtn');if(use)use.setAttribute('href',musicEnabled?'#i-sound':'#i-mute');if(btn)btn.title=musicEnabled?'Mute intro music':'Enable intro music';
@@ -1218,8 +1200,14 @@ function renderWorlds(rooms){
   worldList.innerHTML='';
   for(const room of visible){
     const row=document.createElement('div');row.className='world';
-    const left=document.createElement('div');const blue=Number(room.blue)||0,red=Number(room.red)||0,blueBots=Number(room.blueBots)||0,redBots=Number(room.redBots)||0;left.innerHTML=`<div class="world-code">${room.code}</div><div class="world-meta">Bots · Blue ${blueBots} · Red ${redBots} · ${String(room.botDifficulty||'normal').toUpperCase()}</div><div class="team-counts"><span class="team-chip blue">BLUE ${blue}</span><span class="team-chip red">RED ${red}</span></div>`;
-    const meta=document.createElement('div');meta.className='world-meta';meta.textContent=`${room.players}/${room.maxPlayers}`;
+    const left=document.createElement('div');const blue=Number(room.blue)||0,red=Number(room.red)||0,blueBots=Number(room.blueBots)||0,redBots=Number(room.redBots)||0;
+    const codeEl=document.createElement('div');codeEl.className='world-code';codeEl.textContent=String(room.code||'');
+    const botMeta=document.createElement('div');botMeta.className='world-meta';botMeta.textContent=`Bots · Blue ${blueBots} · Red ${redBots} · ${String(room.botDifficulty||'normal').toUpperCase()}`;
+    const teamCounts=document.createElement('div');teamCounts.className='team-counts';
+    const blueChip=document.createElement('span');blueChip.className='team-chip blue';blueChip.textContent=`BLUE ${blue}`;
+    const redChip=document.createElement('span');redChip.className='team-chip red';redChip.textContent=`RED ${red}`;
+    teamCounts.append(blueChip,redChip);left.append(codeEl,botMeta,teamCounts);
+    const meta=document.createElement('div');meta.className='world-meta';meta.textContent=`${Number(room.players)||0}/${Number(room.maxPlayers)||0}`;
     const btn=document.createElement('button');btn.className='btn icon-btn';btn.title=`Join ${room.code}`;btn.setAttribute('aria-label',`Join ${room.code}`);btn.innerHTML='<svg class="ui-icon"><use href="#i-enter"/></svg>';btn.addEventListener('click',()=>joinWorld(room.code));
     row.append(left,meta,btn);worldList.append(row);
   }
@@ -1230,9 +1218,9 @@ async function createWorld(){
   if(!updateBotTeamSelection()){setStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}
   beginGameplayFromGesture();
   const bots=selectedBotTeams();
-  myName=safeName();myTeam=selectedTeam;godMode=selectedGod;localStorage.setItem('breachlineName',myName);localStorage.setItem('breachlineBlueBots',String(bots.blue));localStorage.setItem('breachlineRedBots',String(bots.red));localStorage.setItem('breachlineBotDifficulty',botDifficulty.value);localStorage.setItem('breachlineTeam',myTeam);setStatus('Creating match…');disableMenu(true);
+  myName=safeName();myTeam=selectedTeam;godMode=false;pendingCreatorGod=selectedGod;localStorage.setItem('breachlineName',myName);localStorage.setItem('breachlineBlueBots',String(bots.blue));localStorage.setItem('breachlineRedBots',String(bots.red));localStorage.setItem('breachlineBotDifficulty',botDifficulty.value);localStorage.setItem('breachlineTeam',myTeam);setStatus('Creating match…');disableMenu(true);
   try{
-    const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value}),cache:'no-store'});
+    const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value}),cache:'no-store'});
     const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not create match.');
     connectWorld(data.code);
   }catch(err){document.exitPointerLock?.();setStatus(err.message||'Could not create match.','error');disableMenu(false);}
@@ -1240,14 +1228,14 @@ async function createWorld(){
 function joinWorld(code){
   if(code.length!==ROOM_CODE_LENGTH){setStatus('Enter a 4-character room code.','error');return;}
   beginGameplayFromGesture();
-  myName=safeName();myTeam=selectedTeam;godMode=selectedGod;localStorage.setItem('breachlineName',myName);localStorage.setItem('breachlineTeam',myTeam);setStatus(`Joining ${code}…`);disableMenu(true);connectWorld(code);
+  myName=safeName();myTeam=selectedTeam;godMode=false;pendingCreatorGod=false;localStorage.setItem('breachlineName',myName);localStorage.setItem('breachlineTeam',myTeam);setStatus(`Joining ${code}…`);disableMenu(true);connectWorld(code);
 }
 function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
 
 function connectWorld(code, reconnecting=false){
   clearTimeout(reconnectTimer);currentRoom=normalizeCode(code);if(!currentRoom)return;
   if(socket){try{socket.close(1000,'Replacing connection')}catch{}}
-  const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?protocol=${PROTOCOL_VERSION}&client=${encodeURIComponent(clientId)}&name=${encodeURIComponent(myName||safeName())}&team=${encodeURIComponent(myTeam)}&god=${selectedGod?1:0}`;
+  const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?protocol=${PROTOCOL_VERSION}&client=${encodeURIComponent(clientId)}&auth=${encodeURIComponent(clientAuth)}&name=${encodeURIComponent(myName||safeName())}&team=${encodeURIComponent(myTeam)}`;
   try{socket=new WebSocket(url);}catch{if(!gameActive&&!reconnecting){document.exitPointerLock?.();disableMenu(false);setStatus('Could not open multiplayer connection.','error');}else scheduleReconnect();return;}
   socket.addEventListener('open',()=>{reconnectAttempt=0;if(reconnecting)showToast('Reconnected');});
   socket.addEventListener('message',e=>{try{handleMessage(JSON.parse(e.data))}catch{}});
@@ -1269,7 +1257,8 @@ function handleMessage(m){
   if(m.t==='welcome'){
     if(Number(m.protocol)!==PROTOCOL_VERSION){showToast('CLIENT / SERVER VERSION MISMATCH');leaveWorld();return;}
     if(Number.isFinite(Number(m.serverTime)))serverClockOffset=Number(m.serverTime)-Date.now();
-    currentRoom=m.code;isWorldAdmin=!!m.isAdmin;worldOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;selectedGod=godMode;localStorage.setItem('breachlineGodMode',godMode?'1':'0');syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);combatRevision=Math.max(0,Number(m.self.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
+    currentRoom=m.code;isWorldAdmin=!!m.isAdmin;worldOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;onGround=m.self.grounded!==false;jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);combatRevision=Math.max(0,Number(m.self.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
+    if(pendingCreatorGod&&isWorldAdmin&&!godMode)send({t:'god',enabled:true});pendingCreatorGod=false;
     position.set(m.self.x||0,m.self.y??terrainHeight(m.self.x||0,m.self.z||0),m.self.z||0);yaw=m.self.yaw||0;pitch=m.self.pitch||0;
     clearRemotes();for(const p of m.players||[])upsertRemote(p,true);for(const b of m.bots||[])upsertRemote(b,true);
     enterGame();updateHealth();updatePlayerCount();return;
@@ -1277,7 +1266,7 @@ function handleMessage(m){
   if(m.t==='join'){upsertRemote(m.player,true);updatePlayerCount();renderAdminPlayers();showToast(`${m.player.name} joined`);return;}
   if(m.t==='leave'){const r=remotes.get(m.id);if(r&&!r.bot)showToast(`${r.name} left`);removeRemote(m.id);updatePlayerCount();renderAdminPlayers();return;}
   if(m.t==='state'){const r=remotes.get(m.id);if(r)updateRemoteTarget(r,m);return;}
-  if(m.t==='correction'){const cx=Number(m.x),cz=Number(m.z),cy=Number(m.y);position.set(Number.isFinite(cx)?cx:position.x,Number.isFinite(cy)?cy:position.y,Number.isFinite(cz)?cz:position.z);if(m.vertical){verticalVelocity=Math.min(0,verticalVelocity);const support=worldSupportHeight(position.x,position.z,position.y);onGround=Math.abs(position.y-support)<=.08;}return;}
+  if(m.t==='correction'){const cx=Number(m.x),cz=Number(m.z),cy=Number(m.y);position.set(Number.isFinite(cx)?cx:position.x,Number.isFinite(cy)?cy:position.y,Number.isFinite(cz)?cz:position.z);if(m.vertical){const serverVy=Number(m.verticalVelocity);if(Number.isFinite(serverVy))verticalVelocity=serverVy;onGround=typeof m.grounded==='boolean'?m.grounded:Math.abs(position.y-worldSupportHeight(position.x,position.z,position.y))<=.08;}return;}
   if(m.t==='botState'){for(const b of m.bots||[])upsertRemote(b,false);return;}
   if(m.t==='shot'){handleShot(m);return;}
   if(m.t==='bulletEnd'){removeBullet(m.id);return;}
@@ -1294,7 +1283,7 @@ function handleMessage(m){
   if(m.t==='loadout'){applyAuthoritativeLoadout(m);return;}
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';r.swapStartedAt=performance.now();syncRemoteWeapon(r);}return;}
   if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;}return;}
-  if(m.t==='god'){if(m.id===clientId){godMode=!!m.enabled;selectedGod=godMode;localStorage.setItem('breachlineGodMode',godMode?'1':'0');syncGodUI();}else{const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}renderAdminPlayers();return;}
+  if(m.t==='god'){if(m.id===clientId){godMode=!!m.enabled;syncGodUI();showToast(godMode?'GOD MODE ENABLED':'GOD MODE DISABLED');}else{const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}renderAdminPlayers();return;}
   if(m.t==='adminRole'){if(m.id===clientId){isWorldAdmin=!!m.enabled;syncPauseContext();if(!isWorldAdmin&&!$('adminPanel').classList.contains('hide'))closeAdminPanel();showToast(isWorldAdmin?'ADMIN PRIVILEGES GRANTED':'ADMIN PRIVILEGES REMOVED');}else{const r=remotes.get(m.id);if(r)r.admin=!!m.enabled;}renderAdminPlayers();return;}
   if(m.t==='teamChange'){const pl=m.player;if(!pl)return;if(pl.id===clientId){myTeam=pl.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,true);selfColor=TEAM_COLORS[myTeam]||selfColor;handleRespawn(pl);showToast(`JOINED ${myTeam.toUpperCase()} TEAM`);}else{upsertRemote(pl,true);applyRemoteTeamVisual(remotes.get(pl.id),pl.team);}updatePlayerCount();renderAdminPlayers();return;}
   if(m.t==='blocked'){handleBlocked(m);return;}
@@ -1319,7 +1308,7 @@ function enterGame(){
 }
 function leaveWorld(){
   gameActive=false;paused=false;serverClockOffset=0;lastPingLocalAt=0;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left world')}catch{}}socket=null;currentRoom='';isWorldAdmin=false;worldOwnerId='';applyWorldSettings(DEFAULT_WORLD_SETTINGS);$('adminPanel').classList.add('hide');
-  document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();clearThrowables();clearTacticalFx();keys.clear();hp=100;wastedUntil=0;godMode=selectedGod;syncGodUI();currentWeapon='pistol';ammo=freshClientAmmo();equipment=freshClientEquipment();combatRevision=0;combatSeq=0;reloadPendingUntil=0;lastCombatSync=0;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireHeld=false;queuedFireUntil=0;serverFireRetryAt=0;localEquipmentCooldownUntil=0;lastTacticalSimTick=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
+  document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();clearThrowables();clearTacticalFx();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingCreatorGod=false;syncGodUI();currentWeapon='pistol';ammo=freshClientAmmo();equipment=freshClientEquipment();combatRevision=0;combatSeq=0;reloadPendingUntil=0;lastCombatSync=0;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,grounded:true};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireHeld=false;queuedFireUntil=0;serverFireRetryAt=0;localEquipmentCooldownUntil=0;lastTacticalSimTick=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshWorlds();startIntroMusic();
 }
 
@@ -1408,7 +1397,7 @@ function drawBloodSplatter(c,w,h,now,missingHealth){for(let i=bloodSplats.length
 function drawDamageIndicators(c,w,h,now){for(let i=damageIndicators.length-1;i>=0;i--){const d=damageIndicators[i],remain=(d.until-now)/1150;if(remain<=0){damageIndicators.splice(i,1);continue;}const radius=Math.min(w,h)*.26,x=w/2-Math.sin(d.angle)*radius,y=h/2-Math.cos(d.angle)*radius,rot=d.angle;c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=Math.min(1,remain*2)*d.strength;c.strokeStyle='#ff334d';c.fillStyle='rgba(255,30,55,.28)';c.lineWidth=3.2;c.beginPath();c.moveTo(-18,8);c.lineTo(0,-9);c.lineTo(18,8);c.stroke();c.beginPath();c.moveTo(-13,6);c.lineTo(0,-5);c.lineTo(13,6);c.lineTo(0,1);c.closePath();c.fill();c.restore();}}
 function handleRespawn(player){
   if(!player?.id)return;
-  if(player.id===clientId){hp=100;myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;currentWeapon=player.weapon||'pistol';sniperZoomLevel=0;adsWanted=false;ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);combatRevision=Math.max(combatRevision,Number(player.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;deathAnimStartedAt=0;landingKick=0;nextFootstepAt=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();position.set(player.x,player.y,player.z);verticalVelocity=0;knockX=knockZ=0;camera.rotation.z=0;updateHealth();showToast('Back in');return;}
+  if(player.id===clientId){hp=100;myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;currentWeapon=player.weapon||'pistol';sniperZoomLevel=0;adsWanted=false;ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);combatRevision=Math.max(combatRevision,Number(player.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;deathAnimStartedAt=0;landingKick=0;nextFootstepAt=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();position.set(player.x,player.y,player.z);verticalVelocity=Number.isFinite(Number(player.verticalVelocity))?Number(player.verticalVelocity):0;onGround=player.grounded!==false;jumpSeq=Math.max(jumpSeq,Math.floor(Number(player.jumpSeq)||0));knockX=knockZ=0;camera.rotation.z=0;updateHealth();showToast('Back in');return;}
   upsertRemote(player,true);const r=remotes.get(player.id);if(r){r.hp=100;if(r.fire)r.fire.visible=false;}
 }
 function flashRemote(r){const old=r.body.material.emissive?.clone?.();r.body.material.emissive=new THREE.Color(0x8a1020);setTimeout(()=>{if(r.body?.material)r.body.material.emissive=old||new THREE.Color(0x000000)},120);}
@@ -1417,8 +1406,8 @@ function showHurt(){hurtUntil=performance.now()+650;}
 function showToast(text){toastText=String(text||'');toastUntil=performance.now()+1600;}
 function updateHealth(){if(hp<=0)setAim(false);syncPauseContext();}
 
-function tryJump(){if(!gameActive||paused||hp<=0||!onGround)return;verticalVelocity=JUMP_SPEED;onGround=false;landingKick=0;sendCurrentState(true);soundJump();}
-function statePayload(){return {t:'state',x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,grounded:onGround,clientAt:Date.now()};}
+function tryJump(){if(!gameActive||paused||hp<=0||!onGround)return;jumpSeq+=1;verticalVelocity=JUMP_SPEED;onGround=false;landingKick=0;sendCurrentState(true);soundJump();}
+function statePayload(){return {t:'state',x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,grounded:onGround,jumpSeq,clientAt:Date.now()};}
 function stateChanged(p){return !Number.isFinite(lastSentState.x)||Math.abs(p.x-lastSentState.x)>.008||Math.abs(p.y-lastSentState.y)>.008||Math.abs(p.z-lastSentState.z)>.008||Math.abs(normalizeAngle(p.yaw-lastSentState.yaw))>.0025||Math.abs(p.pitch-lastSentState.pitch)>.0025||p.ads!==lastSentState.ads||p.grounded!==lastSentState.grounded;}
 function sendCurrentState(force=false){
   const now=performance.now(),p=statePayload(),changed=stateChanged(p),interval=changed?ACTIVE_STATE_INTERVAL:IDLE_STATE_INTERVAL;
@@ -1647,19 +1636,25 @@ function updateMovement(dt){
     if(now>=nextFootstepAt){soundFootstep(footstepSide,THREE.MathUtils.lerp(.22,.38,len));footstepSide^=1;nextFootstepAt=now+pace;}
   }else if(!onGround||len<=.08)nextFootstepAt=Math.max(nextFootstepAt,now+90);
 }
+function followGroundAfterHorizontalMove(){
+  if(!onGround)return;
+  const support=worldSupportHeight(position.x,position.z,position.y);
+  if(support>=position.y-GROUND_FOLLOW_DROP)position.y=support;
+  else onGround=false;
+}
 function moveHorizontal(dx,dz){
-  // Sweep movement in short increments. A single slow frame must never skip
-  // multiple stair treads or outrun the maximum legal step height.
+  // Sweep movement in short increments. Follow stairs/slopes, but a real ledge
+  // starts a gravity fall instead of snapping straight to the lower support.
   const distance=Math.hypot(dx,dz),steps=Math.max(1,Math.ceil(distance/.16)),sx=dx/steps,sz=dz/steps;
   for(let i=0;i<steps;i++){
     const startX=position.x,startZ=position.z;
     const nx=THREE.MathUtils.clamp(position.x+sx,-ARENA_LIMIT,ARENA_LIMIT);
     if(!blocked(nx,position.z,position.y)&&!remoteActorBlocked(nx,position.z,position.y,startX,startZ))position.x=nx;
-    if(onGround)position.y=worldSupportHeight(position.x,position.z,position.y);
+    followGroundAfterHorizontalMove();
     const midX=position.x,midZ=position.z;
     const nz=THREE.MathUtils.clamp(position.z+sz,-ARENA_LIMIT,ARENA_LIMIT);
     if(!blocked(position.x,nz,position.y)&&!remoteActorBlocked(position.x,nz,position.y,midX,midZ))position.z=nz;
-    if(onGround)position.y=worldSupportHeight(position.x,position.z,position.y);
+    followGroundAfterHorizontalMove();
   }
 }
 function blocked(x,z,y=position?.y??terrainHeight(x,z)){for(const b of nearbyObstacles(x,z,y)){const vertical=y+PLAYER_HEIGHT*.92>b.minY&&y<b.maxY-.04;if(!vertical)continue;if(b.supportTop&&b.maxY<=y+MAX_STEP_HEIGHT)continue;if(b.type==='box'){if(x>b.minX&&x<b.maxX&&z>b.minZ&&z<b.maxZ)return true;}else if(Math.hypot(x-b.x,z-b.z)<b.r)return true;}return false;}
