@@ -6,12 +6,12 @@ import {
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.18.8';
+} from './game-config.js?v=1.18.9';
 import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.18.6';
 import { createAudioEngine } from './audio-engine.js?v=1.18.6';
 import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.18.6';
 import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.18.6';
-import { APP_PHASE, APP_OVERLAY, createAppLifecycle } from './app-lifecycle.js?v=1.18.8';
+import { APP_SCREEN, APP_OVERLAY, createAppSession } from './app-lifecycle.js?v=1.18.9';
 
 let THREE = null;
 
@@ -84,9 +84,7 @@ const platform=Object.freeze({
 });
 const isTouch=platform.touchControls;
 document.documentElement.classList.toggle('touch',isTouch);
-const isIPhone = /iPhone|iPod/i.test(navigator.userAgent);
 const isStandaloneApp = () => navigator.standalone === true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
-const iPhoneSafariTab = () => isIPhone && !isStandaloneApp();
 const clientId = getClientId();
 const clientAuth = getClientAuth();
 nameInput.value = localStorage.getItem('breachName') || `Player${Math.floor(Math.random()*90+10)}`;
@@ -187,8 +185,8 @@ let hudLayout = null;
 let viewW = Math.max(1, window.visualViewport?.width || window.innerWidth || document.documentElement.clientWidth || 1), viewH = Math.max(1, window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 1);
 let viewportMetrics={w:viewW,h:viewH};
 let resizeRaf=0;
-let lastLifecyclePhase='',lastLifecycleOverlay='';
-const lifecycle=createAppLifecycle({requireLandscape:platform.requiresLandscape,onChange:syncLifecycleUI});
+let lastInteractive=false;
+const lifecycle=createAppSession({requireLandscape:platform.requiresLandscape,onChange:syncLifecycleUI});
 
 function syncVisualViewportMetrics(){
   const vv=window.visualViewport;
@@ -210,23 +208,20 @@ function suspendGameplayInput(){
   scoreboardOpen=false;
 }
 function syncLifecycleUI(state=lifecycle.snapshot(),reason='sync'){
-  const orientation=state.phase===APP_PHASE.ORIENTATION;
-  const showOverlay=!orientation;
-  boot.classList.toggle('hide',state.phase!==APP_PHASE.BOOT);
-  rotateGate.classList.toggle('hide',!orientation);
-  menu.classList.toggle('hide',state.phase!==APP_PHASE.LOBBY);
-  pause.classList.toggle('hide',state.phase!==APP_PHASE.PAUSED||state.overlay!==APP_OVERLAY.NONE);
-  $('settingsPanel').classList.toggle('hide',!showOverlay||state.overlay!==APP_OVERLAY.SETTINGS);
-  $('adminPanel').classList.toggle('hide',!showOverlay||state.overlay!==APP_OVERLAY.ADMIN);
+  boot.classList.toggle('hide',state.screen!==APP_SCREEN.BOOT);
+  menu.classList.toggle('hide',state.screen!==APP_SCREEN.MENU);
+  rotateGate.classList.toggle('hide',!state.orientationBlocked);
+  pause.classList.toggle('hide',!state.inMatch||!state.paused||state.overlay!==APP_OVERLAY.NONE);
+  $('settingsPanel').classList.toggle('hide',state.overlay!==APP_OVERLAY.SETTINGS);
+  $('adminPanel').classList.toggle('hide',state.overlay!==APP_OVERLAY.ADMIN);
 
-  const wasInteractive=lastLifecyclePhase===APP_PHASE.PLAYING&&lastLifecycleOverlay===APP_OVERLAY.NONE;
-  if(wasInteractive&&!state.interactive)suspendGameplayInput();
-  if(state.phase===APP_PHASE.PAUSED)syncPauseContext();
-  if(state.phase===APP_PHASE.LOBBY&&!document.hidden)startIntroMusic();else stopIntroMusic();
-  lastLifecyclePhase=state.phase;
-  lastLifecycleOverlay=state.overlay;
+  if(lastInteractive&&!state.interactive)suspendGameplayInput();
+  if(state.inMatch&&state.paused)syncPauseContext();
+  if(state.screen===APP_SCREEN.MENU&&!document.hidden)startIntroMusic();else stopIntroMusic();
+  lastInteractive=state.interactive;
 }
 
+syncLifecycleUI(lifecycle.snapshot(),'init');
 syncGodUI();
 syncMusicUI();
 syncPlayerSettingsUI();
@@ -565,8 +560,7 @@ function bindUI(){
   document.addEventListener('fullscreenerror',syncFullscreenUI);
 
   $('enterBtn').addEventListener('click', enterExperience);
-  $('continueSafariBtn')?.addEventListener('click', continueInSafari);
-  $('rotateFullBtn').addEventListener('click', restoreLandscapeFromGesture);
+  $('rotatePauseBtn').addEventListener('click', openPause);
   for(const btn of teamButtons)btn.addEventListener('click',()=>applyTeamSelection(btn.dataset.teamChoice));
   $('createBtn').addEventListener('click', createMatch);
   $('refreshBtn').addEventListener('click', refreshMatches);
@@ -580,7 +574,6 @@ function bindUI(){
   for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id).addEventListener('input',()=>updatePlayerSettingFromUI(id,key));
   $('playerGraphics').addEventListener('change',()=>{playerSettings={...playerSettings,graphics:$('playerGraphics').value};savePlayerSettings();applyGraphicsQuality();});
   primaryWeaponInput.addEventListener('change',()=>{selectedPrimary=PRIMARY_WEAPONS.includes(primaryWeaponInput.value)?primaryWeaponInput.value:'assault';localStorage.setItem('breachPrimary',selectedPrimary);});
-  $('menuFullBtn').addEventListener('click', toggleFullscreen);
   $('joinBtn').addEventListener('click', () => joinMatch(normalizeCode(codeInput.value)));
   codeInput.addEventListener('blur', () => { codeInput.value = normalizeCode(codeInput.value); });
   codeInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); joinMatch(normalizeCode(codeInput.value)); } });
@@ -626,15 +619,16 @@ function bindUI(){
   document.addEventListener('pointerlockchange', () => {
     if(lifecycle.interactive&&!isTouch&&document.pointerLockElement!==canvas)lifecycle.pause('pointer-lock-lost');
   });
+  document.addEventListener('pointerlockerror',()=>{if(lifecycle.inMatch&&!isTouch)lifecycle.pause('pointer-lock-error');});
   document.addEventListener('keydown', e => {
-    if(!lifecycle.inMatch || lifecycle.orientationBlocked || isEditableTarget(e.target)) return;
+    if(!lifecycle.inMatch || isEditableTarget(e.target)) return;
     if((e.code==='KeyM'||e.code==='Escape')&&!e.repeat){
       e.preventDefault();
       if(lifecycle.overlay===APP_OVERLAY.SETTINGS){closePlayerSettings();return;}
       if(lifecycle.overlay===APP_OVERLAY.ADMIN){closeAdminPanel();return;}
       if(scoreboardOpen){scoreboardOpen=false;return;}
-      if(lifecycle.paused){resumeFromGesture();return;}
-      openPause();return;
+      if(!lifecycle.paused)openPause();
+      return;
     }
     if(!lifecycle.interactive)return;
     if(['KeyW','KeyA','KeyS','KeyD','Space','KeyC','KeyR','KeyQ','KeyB','KeyF','KeyG','Digit1','Digit2','Tab'].includes(e.code)) e.preventDefault();
@@ -657,9 +651,9 @@ function bindUI(){
     if(e.code==='KeyF'&&equipmentAim.kind==='flash'){releaseEquipmentAim();}
     if(e.code==='KeyG'&&equipmentAim.kind==='sticky'){releaseEquipmentAim();}
   });
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)lifecycle.background();syncLifecycleUI(lifecycle.snapshot(),'visibility');if(!document.hidden)scheduleViewportSync();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)lifecycle.background();else scheduleViewportSync();});
   addEventListener('pagehide',()=>lifecycle.background());
-  addEventListener('pageshow',()=>{syncLifecycleUI(lifecycle.snapshot(),'pageshow');scheduleViewportSync();});
+  addEventListener('pageshow',scheduleViewportSync);
   document.addEventListener('mouseup',e=>{if(e.button===0)mouseFireDown=false;});
   document.addEventListener('selectstart',e=>{if(!isEditableTarget(e.target))e.preventDefault();});
   document.addEventListener('dragstart',e=>e.preventDefault());
@@ -674,32 +668,9 @@ async function enterExperience(){
   ensureAudio();
   if(!engineReady&&!(await ensureThreeEngine()))return;
   await ensureGameAudioReady();
-  if(iPhoneSafariTab()){
-    $('iosInstallHint')?.classList.remove('hide');
-    $('enterBtn').classList.add('hide');
-    return;
-  }
   syncOrientationState(syncVisualViewportMetrics());
-  lifecycle.enter();
+  lifecycle.enterMenu();
   scheduleViewportSync();
-}
-async function continueInSafari(){
-  ensureAudio();
-  if(!engineReady&&!(await ensureThreeEngine()))return;
-  await ensureGameAudioReady();
-  $('iosInstallHint')?.classList.add('hide');
-  syncOrientationState(syncVisualViewportMetrics());
-  lifecycle.enter();
-  scheduleViewportSync();
-}
-function beginGameplayFromGesture(){
-  ensureAudio();
-  if(!isTouch)return;
-  void (async()=>{
-    if(!isStandaloneApp()&&fullscreenSupported()&&!isFullscreenActive())await requestFullscreenNow();
-    await lockLandscape();
-    scheduleViewportSync();
-  })();
 }
 
 function fullscreenElement(){
@@ -707,79 +678,66 @@ function fullscreenElement(){
 }
 function isFullscreenActive(){return !!fullscreenElement();}
 function fullscreenSupported(){
-  if(iPhoneSafariTab()||isStandaloneApp())return false;
+  if(isStandaloneApp())return false;
   const enabled=document.fullscreenEnabled ?? document.webkitFullscreenEnabled;
   if(enabled===false)return false;
   return !!(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen);
 }
 async function requestFullscreenNow(){
-  if(isFullscreenActive()){syncFullscreenUI();return 'active';}
+  if(isFullscreenActive()){syncFullscreenUI();return true;}
   const el=document.documentElement,fn=el.requestFullscreen||el.webkitRequestFullscreen;
-  if(!fn){syncFullscreenUI();return 'unsupported';}
-  try{
-    const result=fn.call(el);
-    if(result?.then)await result;
-    syncFullscreenUI();
-    return isFullscreenActive()?'entered':'requested';
-  }catch{syncFullscreenUI();return 'denied';}
+  if(!fn){syncFullscreenUI();return false;}
+  try{const result=fn.call(el);if(result?.then)await result;syncFullscreenUI();return true;}catch{syncFullscreenUI();return false;}
 }
 async function exitFullscreenNow(){
   if(!isFullscreenActive()){syncFullscreenUI();return true;}
   const fn=document.exitFullscreen||document.webkitExitFullscreen||document.webkitCancelFullScreen;
   if(!fn){syncFullscreenUI();return false;}
-  try{
-    const result=fn.call(document);
-    if(result?.then)await result;
-    syncFullscreenUI();
-    return true;
-  }catch{syncFullscreenUI();return false;}
-}
-function showIPhoneFullscreenHelp(){
-  const text='iPhone Safari fullscreen requires Add to Home Screen.';
-  if(lifecycle.inMatch)showToast(text);else setStatus(text,'');
+  try{const result=fn.call(document);if(result?.then)await result;syncFullscreenUI();return true;}catch{syncFullscreenUI();return false;}
 }
 async function toggleFullscreen(){
   ensureAudio();
-  if(iPhoneSafariTab()){showIPhoneFullscreenHelp();return;}
   if(isStandaloneApp())return;
-  if(isFullscreenActive())await exitFullscreenNow();
-  else{await requestFullscreenNow();await lockLandscape();}
+  if(isFullscreenActive())await exitFullscreenNow();else await requestFullscreenNow();
   scheduleViewportSync();
 }
 function syncFullscreenUI(){
-  const active=isFullscreenActive(),supported=fullscreenSupported(),standalone=isStandaloneApp(),iphoneTab=iPhoneSafariTab();
-  const pauseBtn=$('fullBtn'),menuBtn=$('menuFullBtn');
-  if(pauseBtn){
-    const label=pauseBtn.querySelector('span');
-    if(standalone){if(label)label.textContent='App Mode';pauseBtn.disabled=true;pauseBtn.title='Already running as a Home Screen web app.';}
-    else if(iphoneTab){if(label)label.textContent='Home Screen';pauseBtn.disabled=false;pauseBtn.title='Use Add to Home Screen for fullscreen on iPhone Safari.';}
-    else{if(label)label.textContent=active?'Exit Full':'Fullscreen';pauseBtn.disabled=!active&&!supported;pauseBtn.title=!active&&!supported?'Fullscreen is not supported by this browser session.':active?'Exit Fullscreen':'Enter Fullscreen';}
-  }
-  if(menuBtn){menuBtn.disabled=standalone||(!iphoneTab&&!active&&!supported);menuBtn.classList.toggle('active',active||standalone);menuBtn.title=standalone?'Running as Home Screen app':iphoneTab?'Full-screen instructions':active?'Exit Fullscreen':'Enter Fullscreen';}
+  const btn=$('fullBtn');if(!btn)return;
+  const active=isFullscreenActive(),supported=fullscreenSupported(),standalone=isStandaloneApp(),label=btn.querySelector('span');
+  if(standalone){if(label)label.textContent='App Mode';btn.disabled=true;btn.title='Already running as an installed web app.';return;}
+  if(label)label.textContent=active?'Exit Full':'Fullscreen';
+  btn.disabled=!active&&!supported;
+  btn.title=!active&&!supported?'Fullscreen is not supported by this browser.':active?'Exit Fullscreen':'Enter Fullscreen';
 }
-function onFullscreenChange(){
-  syncFullscreenUI();
-  scheduleViewportSync();
-}
+function onFullscreenChange(){syncFullscreenUI();scheduleViewportSync();}
 async function lockLandscape(){
   if(!platform.requiresLandscape||!screen.orientation?.lock)return false;
   try{await screen.orientation.lock('landscape');return true;}catch{return false;}
 }
-async function restoreLandscapeFromGesture(){
+function prepareMobileImmersionFromGesture(){
+  if(!isTouch)return;
   ensureAudio();
-  if(isTouch&&!isFullscreenActive()&&fullscreenSupported())await requestFullscreenNow();
-  await lockLandscape();
+  void (async()=>{
+    if(!isStandaloneApp()&&fullscreenSupported()&&!isFullscreenActive())await requestFullscreenNow();
+    await lockLandscape();
+    scheduleViewportSync();
+  })();
+}
+function releaseGameplayPresentation(){
+  try{screen.orientation?.unlock?.();}catch{}
+  if(!isStandaloneApp()&&isFullscreenActive())void exitFullscreenNow();
   scheduleViewportSync();
 }
 function requestPointerLockNow(){
-  if(isTouch||document.pointerLockElement===canvas||!canvas.requestPointerLock)return;
-  try{canvas.requestPointerLock();}catch{}
+  if(isTouch||document.pointerLockElement===canvas)return true;
+  if(!canvas.requestPointerLock)return false;
+  try{canvas.requestPointerLock();return true;}catch{return false;}
 }
-async function resumeFromGesture(){
-  if(!lifecycle.inMatch||lifecycle.orientationBlocked)return;
-  lifecycle.closeOverlay();
+function resumeFromGesture(){
+  if(!lifecycle.inMatch)return;
   ensureAudio();
-  if(!isTouch)requestPointerLockNow();
+  if(isTouch)prepareMobileImmersionFromGesture();
+  else if(!requestPointerLockNow()){showToast('Mouse capture unavailable');return;}
   lifecycle.resume();
   resetTouchInput();
   clock?.getDelta();
@@ -923,18 +881,18 @@ function renderMatches(rooms){
 
 async function createMatch(){
   if(!updateBotTeamSelection()){setStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}
-  beginGameplayFromGesture();
+  prepareMobileImmersionFromGesture();
   const bots=selectedBotTeams();
   myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachName',myName);localStorage.setItem('breachBlueBots',String(bots.blue));localStorage.setItem('breachRedBots',String(bots.red));localStorage.setItem('breachBotDifficulty',botDifficulty.value);localStorage.setItem('breachTeam',myTeam);setStatus('Creating match…');disableMenu(true);
   try{
     const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value,creatorGod:selectedGod}),cache:'no-store'});
     const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not create match.');
     connectMatch(data.code);
-  }catch(err){document.exitPointerLock?.();setStatus(err.message||'Could not create match.','error');disableMenu(false);}
+  }catch(err){document.exitPointerLock?.();releaseGameplayPresentation();setStatus(err.message||'Could not create match.','error');disableMenu(false);}
 }
 function joinMatch(code){
   if(code.length!==ROOM_CODE_LENGTH){setStatus('Enter a 4-character room code.','error');return;}
-  beginGameplayFromGesture();
+  prepareMobileImmersionFromGesture();
   myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachName',myName);localStorage.setItem('breachTeam',myTeam);setStatus(`Joining ${code}…`);disableMenu(true);connectMatch(code);
 }
 function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;primaryWeaponInput.disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
@@ -946,14 +904,14 @@ async function connectMatch(code, reconnecting=false){
   try{
     const ticketResponse=await fetch(`${ONLINE_API}/rooms/${currentRoom}/ticket`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName||safeName(),team:myTeam,primaryWeapon}),cache:'no-store'});
     const ticketData=await ticketResponse.json();if(!ticketResponse.ok)throw new Error(ticketData.error||'Could not authorize match connection.');ticket=String(ticketData.ticket||'');if(!ticket)throw new Error('Server did not issue a join ticket.');
-  }catch(err){if(!lifecycle.inMatch&&!reconnecting){document.exitPointerLock?.();disableMenu(false);setStatus(err.message||'Could not join match.','error');}else scheduleReconnect();return;}
+  }catch(err){if(!lifecycle.inMatch&&!reconnecting){document.exitPointerLock?.();releaseGameplayPresentation();disableMenu(false);setStatus(err.message||'Could not join match.','error');}else scheduleReconnect();return;}
   const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?protocol=${PROTOCOL_VERSION}&ticket=${encodeURIComponent(ticket)}`;
-  let ws;try{ws=new WebSocket(url);socket=ws;}catch{if(!lifecycle.inMatch&&!reconnecting){document.exitPointerLock?.();disableMenu(false);setStatus('Could not open multiplayer connection.','error');}else scheduleReconnect();return;}
+  let ws;try{ws=new WebSocket(url);socket=ws;}catch{if(!lifecycle.inMatch&&!reconnecting){document.exitPointerLock?.();releaseGameplayPresentation();disableMenu(false);setStatus('Could not open multiplayer connection.','error');}else scheduleReconnect();return;}
   ws.addEventListener('open',()=>{if(ws!==socket)return;reconnectAttempt=0;if(reconnecting)showToast('Reconnected');});
   ws.addEventListener('message',e=>{if(ws!==socket)return;try{handleMessage(JSON.parse(e.data))}catch{}});
   ws.addEventListener('close',e=>{
     if(ws!==socket)return;
-    if(!lifecycle.inMatch && !reconnecting){document.exitPointerLock?.();disableMenu(false);setStatus(e.reason||'Could not join match.','error');return;}
+    if(!lifecycle.inMatch && !reconnecting){document.exitPointerLock?.();releaseGameplayPresentation();disableMenu(false);setStatus(e.reason||'Could not join match.','error');return;}
     if(lifecycle.inMatch && e.code!==1000){showToast('Connection lost · reconnecting');scheduleReconnect();}
   });
   ws.addEventListener('error',()=>{if(ws===socket&&!lifecycle.inMatch)setStatus('Multiplayer server unreachable.','error');});
@@ -1013,15 +971,15 @@ function handleMessage(m){
 
 function enterGame(){
   stopIntroMusic();
-  lifecycle.startMatch();
+  lifecycle.enterMatch({paused:!isTouch});
   syncPauseContext();disableMenu(false);setStatus('Ready.');
   const url=new URL(location.href);url.searchParams.set('room',currentRoom);history.replaceState(null,'',url);
   onResize();
-  if(!isTouch&&document.pointerLockElement!==canvas)showToast('Click the game to capture mouse');
+  if(!isTouch)showToast('Ready · Resume to capture mouse');
 }
 
 function leaveMatch(){
-  lifecycle.leaveMatch();serverClockOffset=0;lastPingLocalAt=0;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left match')}catch{}}socket=null;currentRoom='';isMatchAdmin=false;matchOwnerId='';applyWorldSettings(DEFAULT_WORLD_SETTINGS);
+  lifecycle.leaveMatch();releaseGameplayPresentation();serverClockOffset=0;lastPingLocalAt=0;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left match')}catch{}}socket=null;currentRoom='';isMatchAdmin=false;matchOwnerId='';applyWorldSettings(DEFAULT_WORLD_SETTINGS);
   document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();clearThrowables();clearTacticalFx();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;primaryWeapon=selectedPrimary;syncGodUI();currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;viewFeetY=NaN;ammo=freshClientAmmo();equipment=freshClientEquipment();reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,grounded:true,moveX:0,moveZ:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;setAim(false);syncLocalWeaponModel();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshMatches();
 }
@@ -1529,7 +1487,7 @@ function updateWeaponView(dt){
 function normalizeAngle(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;return a;}
 
 function syncOrientationState(metrics=viewportMetrics){
-  lifecycle.setOrientationBlocked(platform.requiresLandscape&&metrics.h>metrics.w);
+  lifecycle.setPortrait(platform.requiresLandscape&&metrics.h>metrics.w);
 }
 function scheduleViewportSync(){
   cancelAnimationFrame(resizeRaf);

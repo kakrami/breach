@@ -61,7 +61,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
 .boot-emblem{width:72px;height:72px;padding:16px;border-radius:18px;background:var(--accent);color:var(--accent-ink);box-shadow:0 12px 36px rgba(215,255,88,.12)}
 .boot-card h1{margin:0;font-size:clamp(32px,6vw,44px);line-height:.95;letter-spacing:.055em;text-transform:uppercase}.boot-card p{max-width:360px;margin:2px 0 6px;color:var(--muted);font-size:12px;line-height:1.55}.hero-action{width:min(250px,100%);min-height:48px;margin-top:3px;font-size:12px}.hero-action .ui-icon{width:16px;height:16px}
 .engine-status{font-size:9px;font-weight:900;letter-spacing:.12em;color:var(--muted-2)}.engine-status.ready{color:var(--ok)}.engine-status.error{color:var(--danger)}
-.ios-install-hint{width:100%;display:grid;gap:8px;padding:12px 14px;border:1px solid var(--line);border-radius:var(--r-sm);background:#0a0d0f;text-align:left}.ios-install-hint>b{font-size:11px}.ios-install-hint>span{font-size:10px;line-height:1.45;color:var(--muted)}.ios-install-hint>span b{color:var(--text)}
 .rotate-icon{width:58px;height:58px;display:grid;place-items:center;border-radius:16px;background:var(--surface-2);color:var(--accent);font-size:32px;font-weight:800}
 
 /* Main menu */
@@ -98,7 +97,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
 
 @media (hover:hover) and (pointer:fine){.team-option:hover,.god-toggle:hover{border-color:#46515b;background:#11161a}}
 @media (pointer:coarse){.btn{min-height:42px}.icon-btn{width:42px;min-width:42px}.input,.setting input,.weapon-settings-card input{height:42px}}
-.touch .controls-note{display:none}.touch .menu-footer{justify-content:flex-start}
+.touch .controls-note{display:none}.touch .menu-footer{justify-content:flex-start}.touch #fullBtn{display:none}.touch .pause-session-actions{grid-template-columns:repeat(2,1fr)}
 
 /* Landscape phone/tablet */
 @media (max-width:920px),(max-height:540px){
@@ -114,6 +113,6 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
   .menu-header{min-height:50px}.logo{width:34px;height:34px}.eyebrow{font-size:7px}.brand-copy h1{font-size:15px}.menu-grid{grid-template-columns:170px 185px minmax(225px,1fr)}.panel{padding:7px}.team-picker{gap:4px}.team-option{padding:6px;gap:6px}.team-swatch{width:5px;height:24px}.team-long{display:none}.team-short{display:inline}.god-icon{width:28px;height:28px}.create-footer{display:grid;grid-template-columns:1fr}.create-footer .btn{width:100%}.match{grid-template-columns:minmax(0,1fr) auto}.match>.match-meta{display:none}.pause-card{width:min(470px,100%)}.pause-context{display:none}.admin-sub{display:none}
 }
 @media (max-height:390px) and (orientation:landscape){.menu-header{min-height:46px;padding-top:5px;padding-bottom:5px}.menu-shell{gap:5px}.panel{padding-top:6px;padding-bottom:6px}.panel-title{min-height:24px}.team-option{min-height:41px}.god-toggle{min-height:42px}.input{height:35px}.btn{min-height:35px}.match{min-height:49px}.menu-footer{min-height:20px}.pause-card{padding:9px}.pause-resume{min-height:36px}.pause-group{margin-top:6px}.pause-group+.pause-group{padding-top:6px}}
-@media (orientation:portrait),(max-width:560px){.settings-shell>.settings-grid{grid-template-columns:1fr}.menu-grid{grid-template-columns:1fr}.menu{overflow:auto}.menu-shell{height:auto;min-height:100%}.panel{overflow:visible}.match-list{max-height:260px}.admin-shell{height:100%}.weapon-settings-grid,.settings-grid,.bot-admin-grid{grid-template-columns:1fr}.pause-player-actions,.pause-session-actions{grid-template-columns:1fr}}
+@media (orientation:portrait),(max-width:560px){.touch .pause-session-actions{grid-template-columns:1fr}.settings-shell>.settings-grid{grid-template-columns:1fr}.menu-grid{grid-template-columns:1fr}.menu{overflow:auto}.menu-shell{height:auto;min-height:100%}.panel{overflow:visible}.match-list{max-height:260px}.admin-shell{height:100%}.weapon-settings-grid,.settings-grid,.bot-admin-grid{grid-template-columns:1fr}.pause-player-actions,.pause-session-actions{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
 

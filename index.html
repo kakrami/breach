@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.18.8">
-<title>Breach v1.18.8</title>
-<link rel="stylesheet" href="ui.css?v=1.18.8">
+<link rel="manifest" href="manifest.webmanifest?v=1.18.9">
+<title>Breach v1.18.9</title>
+<link rel="stylesheet" href="ui.css?v=1.18.9">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -41,11 +41,7 @@
     <p>Fast gunplay. Live team combat. Built for short, aggressive matches.</p>
     <button id="enterBtn" class="btn primary hero-action"><svg class="ui-icon"><use href="#i-play"/></svg><span>DEPLOY</span></button>
     <div id="engineStatus" class="engine-status" role="status" aria-live="polite">LOADING 3D ENGINE</div>
-    <div id="iosInstallHint" class="ios-install-hint hide">
-      <b>iPhone Safari Fullscreen</b>
-      <span>Safari on iPhone does not provide webpage fullscreen for the game canvas. For the full-screen app experience: tap <b>Share</b> → <b>Add to Home Screen</b>, keep <b>Open as Web App</b> enabled, then launch Breach from the Home Screen.</span>
-      <button id="continueSafariBtn" class="btn">Continue in Safari</button>
-    </div>
+
   </div>
 </section>
 
@@ -54,7 +50,7 @@
     <div class="rotate-icon">↻</div>
     <h1>Landscape Required</h1>
     <p id="rotateText">Rotate your device to landscape to continue.</p>
-    <button id="rotateFullBtn" class="btn primary">Try Landscape</button>
+    <button id="rotatePauseBtn" class="btn">Pause Menu</button>
   </div>
 </section>
 
@@ -62,7 +58,7 @@
   <div class="menu-shell">
     <header class="menu-header">
       <div class="brand"><div class="logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div><div class="brand-copy"><div class="eyebrow">LIVE COMBAT NETWORK</div><h1>Breach</h1><div class="version brand-version" data-app-version></div><p class="sub">Tactical team combat · persistent live sessions · instant deployment</p></div></div>
-      <div class="header-actions"><button id="musicBtn" class="btn icon-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button><button id="settingsBtn" class="btn icon-btn" title="Player settings" aria-label="Player settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button><button id="menuFullBtn" class="btn icon-btn" title="Fullscreen" aria-label="Fullscreen"><svg class="ui-icon"><use href="#i-full"/></svg></button><button id="refreshBtn" class="btn icon-btn" title="Refresh matches" aria-label="Refresh matches"><svg class="ui-icon"><use href="#i-refresh"/></svg></button></div>
+      <div class="header-actions"><button id="musicBtn" class="btn icon-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button><button id="settingsBtn" class="btn icon-btn" title="Player settings" aria-label="Player settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button><button id="refreshBtn" class="btn icon-btn" title="Refresh matches" aria-label="Refresh matches"><svg class="ui-icon"><use href="#i-refresh"/></svg></button></div>
     </header>
 
     <div class="menu-grid">
@@ -175,6 +171,6 @@
 })();
 </script>
 
-<script type="module" src="client.js?v=1.18.8"></script>
+<script type="module" src="client.js?v=1.18.9"></script>
 </body>
 </html>
