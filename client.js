@@ -2,16 +2,16 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.19.1';
+} from './world-geometry.js?v=1.20.0';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.19.1';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.19.1';
-import { createAudioEngine } from './audio-engine.js?v=1.19.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.19.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.19.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.19.1';
+} from './game-config.js?v=1.20.0';
+import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.20.0';
+import { createAudioEngine } from './audio-engine.js?v=1.20.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.20.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.20.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.20.0';
 
 let THREE = null;
 
@@ -69,11 +69,12 @@ let worldSettings=normalizeWorldSettings(DEFAULT_WORLD_SETTINGS);
 const LONG_SHOT_DISTANCE = 30;
 
 const $ = (id) => document.getElementById(id);
-const rotateGate = $('rotateGate'), menu = $('menu'), pause = $('pause');
+const appRoot=$('appRoot'), gameStage=$('gameStage'), startup=$('startup'), rotateGate=$('rotateGate'), menu=$('menu'), pause=$('pause');
 const nameInput = $('nameInput'), codeInput = $('codeInput'), blueBotCount = $('blueBotCount'), redBotCount = $('redBotCount'), botDifficulty = $('botDifficulty'), botTotal = $('botTotal'), menuStatus = $('menuStatus'), primaryWeaponInput=$('primaryWeapon');
 const teamButtons=[...document.querySelectorAll('[data-team-choice]')];
 const matchList = $('matchList'), matchCount = $('matchCount');
 const canvas = $('game');
+const connectionOverlay=$('connectionOverlay'), connectionText=$('connectionText');
 document.querySelectorAll('[data-app-version]').forEach(el => { el.textContent = `Version ${APP_VERSION}`; });
 
 const platform=detectInputPlatform();
@@ -196,11 +197,19 @@ function handleViewportChange(metrics){
 }
 
 const shell=createSessionShell({
+  root:appRoot,
+  stage:gameStage,
   canvas,
   platform,
   elements:{
+    startup,
     menu,
+    menuShell:$('menuShell'),
+    menuTabs:[...document.querySelectorAll('[data-menu-tab]')],
     rotate:rotateGate,
+    rotateText:$('rotateText'),
+    connection:connectionOverlay,
+    connectionText,
     pause,
     settings:$('settingsPanel'),
     admin:$('adminPanel'),
@@ -219,7 +228,7 @@ syncGodUI();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.19.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.20.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -535,7 +544,6 @@ function remoteActorBlocked(x,z,y,fromX,fromZ){const localHeight=currentPlayerHe
 
 function bindUI(){
 
-  $('rotatePauseBtn').addEventListener('click',()=>shell.showPauseMenu());
   for(const btn of teamButtons)btn.addEventListener('click',()=>applyTeamSelection(btn.dataset.teamChoice));
   $('createBtn').addEventListener('click', createMatch);
   $('refreshBtn').addEventListener('click', refreshMatches);
@@ -771,12 +779,13 @@ function renderMatches(rooms){
 
 async function createMatch(){
   if(!updateBotTeamSelection()){setStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}
+  shell.beginConnection('Preparing game…');
   void shell.prepareMatchFromGesture();
   const bots=selectedBotTeams();
   myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachName',myName);localStorage.setItem('breachBlueBots',String(bots.blue));localStorage.setItem('breachRedBots',String(bots.red));localStorage.setItem('breachBotDifficulty',botDifficulty.value);localStorage.setItem('breachTeam',myTeam);
   disableMenu(true);setStatus('Preparing game…');
   if(!(await prepareGameRuntime())){shell.cancelPreparedMatch();disableMenu(false);return;}
-  setStatus('Creating match…');
+  shell.updateConnection('Creating match…');setStatus('Creating match…');
   try{
     const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value,creatorGod:selectedGod}),cache:'no-store'});
     const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not create match.');
@@ -785,16 +794,18 @@ async function createMatch(){
 }
 async function joinMatch(code){
   if(code.length!==ROOM_CODE_LENGTH){setStatus('Enter a 4-character room code.','error');return;}
+  shell.beginConnection(`Joining ${code}…`);
   void shell.prepareMatchFromGesture();
   myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachName',myName);localStorage.setItem('breachTeam',myTeam);
   disableMenu(true);setStatus('Preparing game…');
   if(!(await prepareGameRuntime())){shell.cancelPreparedMatch();disableMenu(false);return;}
-  setStatus(`Joining ${code}…`);connectMatch(code);
+  shell.updateConnection(`Joining ${code}…`);setStatus(`Joining ${code}…`);connectMatch(code);
 }
 function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;primaryWeaponInput.disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
 
 async function connectMatch(code, reconnecting=false){
   clearTimeout(reconnectTimer);currentRoom=normalizeCode(code);if(!currentRoom)return;
+  if(!reconnecting)shell.updateConnection(`Connecting to ${currentRoom}…`);
   if(socket){try{socket.close(1000,'Replacing connection')}catch{}}
   let ticket='';
   try{
