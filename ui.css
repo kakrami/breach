@@ -98,6 +98,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
 
 @media (hover:hover) and (pointer:fine){.team-option:hover,.god-toggle:hover{border-color:#46515b;background:#11161a}}
 @media (pointer:coarse){.btn{min-height:42px}.icon-btn{width:42px;min-width:42px}.input,.setting input,.weapon-settings-card input{height:42px}}
+.touch .controls-note{display:none}.touch .menu-footer{justify-content:flex-start}
 
 /* Landscape phone/tablet */
 @media (max-width:920px),(max-height:540px){
