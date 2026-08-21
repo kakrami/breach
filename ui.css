@@ -21,8 +21,6 @@
   --safe-right:env(safe-area-inset-right,0px);
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --safe-left:env(safe-area-inset-left,0px);
-  --vv-width:100vw;
-  --vv-height:100vh;
   --r-xs:7px;
   --r-sm:10px;
   --r-md:14px;
@@ -31,7 +29,6 @@
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
-body{touch-action:none}
 button,input,select{font:inherit;color:inherit}
 button{border:0}
 input,select,textarea,[contenteditable="true"]{user-select:text;-webkit-user-select:text;touch-action:manipulation}
@@ -39,7 +36,7 @@ button,.team-option,.god-toggle{user-select:none;-webkit-user-select:none;-webki
 button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .hide{display:none!important}.svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
 .ui-icon,.mini-icon,.brand-icon{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ui-icon{width:18px;height:18px}.mini-icon{width:14px;height:14px}.brand-icon{width:100%;height:100%;stroke-width:1.6}.brand-icon .cut,.ui-icon .cut{fill:currentColor;stroke:none}
-#game,.boot,.menu,.pause,.admin-panel{position:fixed;inset:0;width:var(--vv-width);height:var(--vv-height)}
+#game,.menu,.pause,.rotate-gate,.admin-panel{position:fixed;inset:0;width:auto;height:auto}
 #game{z-index:0;display:block;background:#90cbe7;outline:0;isolation:isolate;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}
 
 /* Core controls */
@@ -52,15 +49,13 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
 .input:hover,.setting input:hover,.weapon-settings-card input:hover{border-color:#3b444d}.input:focus,.setting input:focus,.weapon-settings-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.08);background:#101418}
 .eyebrow{color:var(--accent);font-size:9px;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.version{color:var(--muted-2);font-size:9px;font-weight:800;letter-spacing:.11em;text-transform:uppercase}.brand-version{margin-top:3px}
 
-/* Boot */
-.boot,.menu{isolation:isolate;background:var(--bg)}
-.boot::before,.menu::before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 17% 18%,rgba(215,255,88,.07),transparent 29%),radial-gradient(circle at 80% 76%,rgba(84,169,255,.045),transparent 32%),linear-gradient(135deg,#0c0f12 0%,#07090b 60%,#050607 100%)}
-.boot::after,.menu::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.18;background:linear-gradient(115deg,transparent 0 44%,rgba(255,255,255,.03) 44% 45%,transparent 45% 100%)}
-.boot{z-index:60;display:grid;place-items:center;overflow:auto;padding:calc(var(--safe-top) + 18px) calc(var(--safe-right) + 18px) calc(var(--safe-bottom) + 18px) calc(var(--safe-left) + 18px);text-align:center}
-.boot-card{width:min(460px,100%);max-height:100%;overflow:auto;display:grid;justify-items:center;gap:12px;padding:30px 30px 26px;border:1px solid var(--line);border-radius:var(--r-lg);background:rgba(14,17,20,.96);box-shadow:var(--shadow)}
-.boot-emblem{width:72px;height:72px;padding:16px;border-radius:18px;background:var(--accent);color:var(--accent-ink);box-shadow:0 12px 36px rgba(215,255,88,.12)}
-.boot-card h1{margin:0;font-size:clamp(32px,6vw,44px);line-height:.95;letter-spacing:.055em;text-transform:uppercase}.boot-card p{max-width:360px;margin:2px 0 6px;color:var(--muted);font-size:12px;line-height:1.55}.hero-action{width:min(250px,100%);min-height:48px;margin-top:3px;font-size:12px}.hero-action .ui-icon{width:16px;height:16px}
-.engine-status{font-size:9px;font-weight:900;letter-spacing:.12em;color:var(--muted-2)}.engine-status.ready{color:var(--ok)}.engine-status.error{color:var(--danger)}
+/* Menu and orientation gate */
+.menu{isolation:isolate;background:var(--bg)}
+.menu::before{content:"";position:absolute;inset:0;z-index:-2;background:radial-gradient(circle at 17% 18%,rgba(215,255,88,.07),transparent 29%),radial-gradient(circle at 80% 76%,rgba(84,169,255,.045),transparent 32%),linear-gradient(135deg,#0c0f12 0%,#07090b 60%,#050607 100%)}
+.menu::after{content:"";position:absolute;inset:0;z-index:-1;pointer-events:none;opacity:.18;background:linear-gradient(115deg,transparent 0 44%,rgba(255,255,255,.03) 44% 45%,transparent 45% 100%)}
+.rotate-gate{z-index:75;display:grid;place-items:center;overflow:auto;padding:calc(var(--safe-top) + 18px) calc(var(--safe-right) + 18px) calc(var(--safe-bottom) + 18px) calc(var(--safe-left) + 18px);text-align:center;background:rgba(3,5,6,.82);backdrop-filter:blur(9px)}
+.rotate-card{width:min(420px,100%);display:grid;justify-items:center;gap:12px;padding:26px;border:1px solid var(--line-strong);border-radius:var(--r-lg);background:#0e1114;box-shadow:var(--shadow)}
+.rotate-card h1{margin:0;font-size:clamp(24px,6vw,34px);letter-spacing:.035em}.rotate-card p{max-width:330px;margin:0 0 4px;color:var(--muted);font-size:12px;line-height:1.5}.rotate-card .btn{min-width:150px}
 .rotate-icon{width:58px;height:58px;display:grid;place-items:center;border-radius:16px;background:var(--surface-2);color:var(--accent);font-size:32px;font-weight:800}
 
 /* Main menu */
@@ -93,11 +88,11 @@ button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-v
 .operator-primary{min-width:0}.operator-primary .field-help,.field-help{color:var(--muted-2);font-size:7px;line-height:1.35}.create-options{margin-top:8px}.settings-shell{width:min(760px,100%);height:auto;max-height:min(620px,100%);grid-template-rows:auto minmax(0,1fr) auto}.settings-shell>.settings-grid{overflow:auto;padding:16px;grid-template-columns:repeat(2,minmax(0,1fr))}.player-settings-grid .setting{padding:10px;border:1px solid var(--line);border-radius:var(--r-sm);background:#101418}.player-settings-grid .setting span{font-size:9px;font-weight:900}.player-settings-grid output{justify-self:end;color:var(--accent);font-size:8px;font-weight:900}.player-settings-grid input[type=range]{width:100%;accent-color:var(--accent)}.custom-match{color:var(--accent)!important}.custom-match::after{content:' CUSTOM';margin-left:6px;padding:2px 4px;border:1px solid rgba(215,255,88,.28);border-radius:4px;color:var(--accent);font-size:6px;vertical-align:middle}.admin-tabs{overflow-x:auto;scrollbar-width:none}.admin-tabs::-webkit-scrollbar{display:none}.admin-tab{flex:0 0 auto}
 
 /* Scrollbars */
-.panel,.match-list,.admin-page,.boot-card,.pause-card{scrollbar-width:thin;scrollbar-color:#303840 transparent}.panel::-webkit-scrollbar,.match-list::-webkit-scrollbar,.admin-page::-webkit-scrollbar,.boot-card::-webkit-scrollbar,.pause-card::-webkit-scrollbar{width:6px;height:6px}.panel::-webkit-scrollbar-thumb,.match-list::-webkit-scrollbar-thumb,.admin-page::-webkit-scrollbar-thumb,.boot-card::-webkit-scrollbar-thumb,.pause-card::-webkit-scrollbar-thumb{background:#303840;border-radius:99px}
+.panel,.match-list,.admin-page,.pause-card{scrollbar-width:thin;scrollbar-color:#303840 transparent}.panel::-webkit-scrollbar,.match-list::-webkit-scrollbar,.admin-page::-webkit-scrollbar,.pause-card::-webkit-scrollbar{width:6px;height:6px}.panel::-webkit-scrollbar-thumb,.match-list::-webkit-scrollbar-thumb,.admin-page::-webkit-scrollbar-thumb,.pause-card::-webkit-scrollbar-thumb{background:#303840;border-radius:99px}
 
 @media (hover:hover) and (pointer:fine){.team-option:hover,.god-toggle:hover{border-color:#46515b;background:#11161a}}
 @media (pointer:coarse){.btn{min-height:42px}.icon-btn{width:42px;min-width:42px}.input,.setting input,.weapon-settings-card input{height:42px}}
-.touch .controls-note{display:none}.touch .menu-footer{justify-content:flex-start}.touch #fullBtn{display:none}.touch .pause-session-actions{grid-template-columns:repeat(2,1fr)}
+.touch .controls-note{display:none}.touch .menu-footer{justify-content:flex-start}
 
 /* Landscape phone/tablet */
 @media (max-width:920px),(max-height:540px){

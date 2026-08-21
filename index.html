@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.18.9">
-<title>Breach v1.18.9</title>
-<link rel="stylesheet" href="ui.css?v=1.18.9">
+<link rel="manifest" href="manifest.webmanifest?v=1.19.0">
+<title>Breach v1.19.0</title>
+<link rel="stylesheet" href="ui.css?v=1.19.0">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -32,29 +32,16 @@
 </svg>
 <canvas id="game" draggable="false" aria-label="Breach gameplay"></canvas>
 
-<section id="boot" class="boot">
-  <div class="boot-card">
-    <div class="boot-emblem"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
-    <div class="eyebrow">ONLINE TACTICAL FPS</div>
-    <h1>Breach</h1>
-    <div class="version" data-app-version></div>
-    <p>Fast gunplay. Live team combat. Built for short, aggressive matches.</p>
-    <button id="enterBtn" class="btn primary hero-action"><svg class="ui-icon"><use href="#i-play"/></svg><span>DEPLOY</span></button>
-    <div id="engineStatus" class="engine-status" role="status" aria-live="polite">LOADING 3D ENGINE</div>
-
-  </div>
-</section>
-
-<section id="rotateGate" class="boot hide">
-  <div class="boot-card">
+<section id="rotateGate" class="rotate-gate hide" aria-label="Landscape required">
+  <div class="rotate-card">
     <div class="rotate-icon">↻</div>
     <h1>Landscape Required</h1>
     <p id="rotateText">Rotate your device to landscape to continue.</p>
-    <button id="rotatePauseBtn" class="btn">Pause Menu</button>
+    <button id="rotatePauseBtn" class="btn">Match Menu</button>
   </div>
 </section>
 
-<section id="menu" class="menu hide">
+<section id="menu" class="menu">
   <div class="menu-shell">
     <header class="menu-header">
       <div class="brand"><div class="logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div><div class="brand-copy"><div class="eyebrow">LIVE COMBAT NETWORK</div><h1>Breach</h1><div class="version brand-version" data-app-version></div><p class="sub">Tactical team combat · persistent live sessions · instant deployment</p></div></div>
@@ -165,12 +152,12 @@
 <script>
 (()=>{
   window.__breachModuleBooted=false;
-  const fail=(message)=>{const el=document.getElementById('engineStatus');if(el){el.textContent=message;el.className='engine-status error';}};
+  const fail=(message)=>{const el=document.getElementById('menuStatus');if(el){el.textContent=message;el.className='status error';}};
   window.addEventListener('error',(event)=>{const target=event.target;if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK'))fail('CLIENT ASSET LOAD FAILED');},true);
   window.addEventListener('unhandledrejection',()=>{if(!window.__breachModuleBooted)fail('CLIENT MODULE LOAD FAILED');});
 })();
 </script>
 
-<script type="module" src="client.js?v=1.18.9"></script>
+<script type="module" src="client.js?v=1.19.0"></script>
 </body>
 </html>
