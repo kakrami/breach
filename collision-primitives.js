@@ -59,17 +59,3 @@ export function segmentPyramidFirstT(x1, y1, z1, x2, y2, z2, cx, cz, baseWidth, 
   }
   return lo >= 0 && lo <= 1 ? lo : null;
 }
-
-export function segmentEllipsoidFirstT(x1, y1, z1, x2, y2, z2, cx, cy, cz, rx, ry, rz) {
-  const dx = (x2 - x1) / rx, dy = (y2 - y1) / ry, dz = (z2 - z1) / rz;
-  const ox = (x1 - cx) / rx, oy = (y1 - cy) / ry, oz = (z1 - cz) / rz;
-  const a = dx * dx + dy * dy + dz * dz;
-  const b = 2 * (ox * dx + oy * dy + oz * dz);
-  const c = ox * ox + oy * oy + oz * oz - 1;
-  if (a <= 1e-12) return c <= 0 ? 0 : null;
-  const disc = b * b - 4 * a * c; if (disc < 0) return null;
-  const root = Math.sqrt(disc), t1 = (-b - root) / (2 * a), t2 = (-b + root) / (2 * a);
-  if (t1 >= 0 && t1 <= 1) return t1;
-  if (t2 >= 0 && t2 <= 1) return t2;
-  return null;
-}

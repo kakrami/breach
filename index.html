@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.18.1">
-<title>Breach v1.18.1</title>
-<link rel="stylesheet" href="ui.css?v=1.18.1">
+<link rel="manifest" href="manifest.webmanifest?v=1.18.5">
+<title>Breach v1.18.5</title>
+<link rel="stylesheet" href="ui.css?v=1.18.5">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -168,22 +168,13 @@
 </section>
 <script>
 (()=>{
-  const REV='1.18.1',retryKey=`breach-module-retry-${REV}`;
   window.__breachModuleBooted=false;
   const fail=(message)=>{const el=document.getElementById('engineStatus');if(el){el.textContent=message;el.className='engine-status error';}};
-  window.addEventListener('error',(event)=>{const target=event.target;if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK'))fail('CLIENT ASSET LOAD FAILED · RETRYING');},true);
-  setTimeout(()=>{
-    if(window.__breachModuleBooted)return;
-    fail('CLIENT MODULE LOAD FAILED · RETRYING');
-    try{
-      if(sessionStorage.getItem(retryKey)==='1'){fail('CLIENT MODULE LOAD FAILED · REDEPLOY CLIENT');return;}
-      sessionStorage.setItem(retryKey,'1');
-      const url=new URL(location.href);url.searchParams.set('v',REV);url.searchParams.set('boot',Date.now().toString(36));location.replace(url);
-    }catch{location.reload();}
-  },2500);
+  window.addEventListener('error',(event)=>{const target=event.target;if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK'))fail('CLIENT ASSET LOAD FAILED');},true);
+  window.addEventListener('unhandledrejection',()=>{if(!window.__breachModuleBooted)fail('CLIENT MODULE LOAD FAILED');});
 })();
 </script>
 
-<script type="module" src="client.js?v=1.18.1"></script>
+<script type="module" src="client.js?v=1.18.5"></script>
 </body>
 </html>

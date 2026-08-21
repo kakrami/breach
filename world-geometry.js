@@ -232,18 +232,18 @@ export function makeBuildingGeometry(b){
     addBox(parts,'rail',b.x-b.w/2+.10,b.z,.20,b.d,py,py+.55);addBox(parts,'rail',b.x+b.w/2-.10,b.z,.20,b.d,py,py+.55);
   }
 
-  // The visible stair treads are also the authoritative walkable surfaces.
-  // There is no hidden ramp underneath them. Keeping rendering and support on
-  // the same geometry prevents the player from visually sinking/jumping through
-  // stairs when frame time or network updates are uneven.
+  // Visible treads stay discrete, but player support uses one continuous
+  // ramp per flight. This is the conventional FPS stair collider: the rendered
+  // steps keep their shape while feet/camera move continuously instead of
+  // climbing fourteen 23 cm ledges and producing a repeated vertical hitch.
   const steps=14,stepLen=plan.runLen/steps;
   for(let story=0;story<levels-1;story++){
     const floorY=base+story*b.floorH,nextY=floorY+b.floorH,laneZ=plan.stairZs[story],x0=plan.lowX,x1=plan.highX;
+    supports.push({type:'ramp',x1:x0,x2:x1,z:laneZ,w:plan.stairW,y0:floorY,y1:nextY,role:'stairRamp'});
     for(let i=0;i<steps;i++){
       const p0=i/steps,p1=(i+1)/steps,mid=(p0+p1)/2,tread=floorY+(nextY-floorY)*p1,x=x0+(x1-x0)*mid;
       const treadW=stepLen+.055;
       addBox(parts,'stairStep',x,laneZ,treadW,plan.stairW,tread-.18,tread,{playerSolid:false,projectileSolid:true,supportTop:false});
-      supports.push({type:'rect',x,z:laneZ,w:treadW,d:plan.stairW,y:tread,role:'stairStep'});
       horizontalSolids.push({x,z:laneZ,w:treadW,d:plan.stairW,bottomY:tread-.18,topY:tread,role:'stairStep'});
       // Side rails sit just outside the tread width. They stop side entry while
       // leaving both ends of the straight flight completely open.
