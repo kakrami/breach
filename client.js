@@ -2,16 +2,16 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.20.1';
+} from './world-geometry.js?v=1.21.0';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.20.1';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.20.1';
-import { createAudioEngine } from './audio-engine.js?v=1.20.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.20.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.20.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.20.1';
+} from './game-config.js?v=1.21.0';
+import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.21.0';
+import { createAudioEngine } from './audio-engine.js?v=1.21.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.21.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.21.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.21.0';
 
 let THREE = null;
 
@@ -69,7 +69,7 @@ let worldSettings=normalizeWorldSettings(DEFAULT_WORLD_SETTINGS);
 const LONG_SHOT_DISTANCE = 30;
 
 const $ = (id) => document.getElementById(id);
-const appRoot=$('appRoot'), gameStage=$('gameStage'), startup=$('startup'), rotateGate=$('rotateGate'), menu=$('menu'), pause=$('pause');
+const appRoot=$('appRoot'), gameStage=$('gameStage'), entryScreen=$('entryScreen'), rotateGate=$('rotateGate'), menu=$('menu'), pause=$('pause');
 const nameInput = $('nameInput'), codeInput = $('codeInput'), blueBotCount = $('blueBotCount'), redBotCount = $('redBotCount'), botDifficulty = $('botDifficulty'), botTotal = $('botTotal'), menuStatus = $('menuStatus');
 const teamButtons=[...document.querySelectorAll('[data-team-choice]')];
 const primaryButtons=[...document.querySelectorAll('[data-primary-choice]')];
@@ -191,7 +191,7 @@ function suspendGameplayInput(){
 
 function handleShellState(state){
   if(state.inMatch&&state.paused)syncPauseContext();
-  if(state.location==='menu'&&!document.hidden)startIntroMusic();else stopIntroMusic();
+  if(state.location==='menu'&&state.immersive&&!document.hidden)startIntroMusic();else stopIntroMusic();
 }
 
 function handleViewportChange(metrics){
@@ -204,16 +204,16 @@ const shell=createSessionShell({
   canvas,
   platform,
   elements:{
-    startup,
+    entry:entryScreen,
+    entryButton:$('enterFullscreenBtn'),
+    entryStatus:$('entryStatus'),
     menu,
     rotate:rotateGate,
-    rotateText:$('rotateText'),
     connection:connectionOverlay,
     connectionText,
     pause,
     settings:$('settingsPanel'),
     admin:$('adminPanel'),
-    resumeButton:$('resumeBtn'),
     fullscreenButton:$('fullBtn'),
   },
   onSuspend:suspendGameplayInput,
@@ -228,7 +228,7 @@ syncGodUI();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.20.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.21.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -562,6 +562,8 @@ function bindUI(){
   });
   $('createBtn').addEventListener('click', createMatch);
   $('refreshBtn').addEventListener('click', refreshMatches);
+  $('enterFullscreenBtn').addEventListener('click',()=>{ensureAudio();void shell.enterFullscreenFromGesture();});
+  $('exitAppBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
   $('musicBtn').addEventListener('click',()=>{ensureAudio();toggleMasterMute();});
   $('godToggle').addEventListener('click',toggleGodMode);
   $('settingsBtn').addEventListener('click',openPlayerSettings);
@@ -592,7 +594,7 @@ function bindUI(){
     });
   }
   $('setBotDifficulty').addEventListener('change',()=>{$('botDifficultyHelp').textContent=botDifficultyDescription($('setBotDifficulty').value);});
-  $('fullBtn').addEventListener('click',()=>{ensureAudio();void shell.toggleFullscreenFromGesture();});
+  $('fullBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
   $('leaveBtn').addEventListener('click', leaveMatch);
 
   canvas.addEventListener('contextmenu', e => e.preventDefault());
@@ -794,25 +796,25 @@ function renderMatches(rooms){
 async function createMatch(){
   if(!updateBotTeamSelection()){setStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}
   shell.beginConnection('Preparing game…');
-  void shell.prepareMatchFromGesture();
+  void shell.prepareInputFromGesture();
   const bots=selectedBotTeams();
   myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachName',myName);localStorage.setItem('breachBlueBots',String(bots.blue));localStorage.setItem('breachRedBots',String(bots.red));localStorage.setItem('breachBotDifficulty',botDifficulty.value);localStorage.setItem('breachTeam',myTeam);
   disableMenu(true);setStatus('Preparing game…');
-  if(!(await prepareGameRuntime())){shell.cancelPreparedMatch();disableMenu(false);return;}
+  if(!(await prepareGameRuntime())){shell.cancelConnection();disableMenu(false);return;}
   shell.updateConnection('Creating match…');setStatus('Creating match…');
   try{
     const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value,creatorGod:selectedGod}),cache:'no-store'});
     const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not create match.');
     connectMatch(data.code);
-  }catch(err){shell.cancelPreparedMatch();setStatus(err.message||'Could not create match.','error');disableMenu(false);}
+  }catch(err){shell.cancelConnection();setStatus(err.message||'Could not create match.','error');disableMenu(false);}
 }
 async function joinMatch(code){
   if(code.length!==ROOM_CODE_LENGTH){setStatus('Enter a 4-character room code.','error');return;}
   shell.beginConnection(`Joining ${code}…`);
-  void shell.prepareMatchFromGesture();
+  void shell.prepareInputFromGesture();
   myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachName',myName);localStorage.setItem('breachTeam',myTeam);
   disableMenu(true);setStatus('Preparing game…');
-  if(!(await prepareGameRuntime())){shell.cancelPreparedMatch();disableMenu(false);return;}
+  if(!(await prepareGameRuntime())){shell.cancelConnection();disableMenu(false);return;}
   shell.updateConnection(`Joining ${code}…`);setStatus(`Joining ${code}…`);connectMatch(code);
 }
 function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of [...teamButtons,...primaryButtons,...deployTabs])btn.disabled=disabled;}
@@ -825,14 +827,14 @@ async function connectMatch(code, reconnecting=false){
   try{
     const ticketResponse=await fetch(`${ONLINE_API}/rooms/${currentRoom}/ticket`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName||safeName(),team:myTeam,primaryWeapon}),cache:'no-store'});
     const ticketData=await ticketResponse.json();if(!ticketResponse.ok)throw new Error(ticketData.error||'Could not authorize match connection.');ticket=String(ticketData.ticket||'');if(!ticket)throw new Error('Server did not issue a join ticket.');
-  }catch(err){if(!shell.inMatch&&!reconnecting){shell.cancelPreparedMatch();disableMenu(false);setStatus(err.message||'Could not join match.','error');}else scheduleReconnect();return;}
+  }catch(err){if(!shell.inMatch&&!reconnecting){shell.cancelConnection();disableMenu(false);setStatus(err.message||'Could not join match.','error');}else scheduleReconnect();return;}
   const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?protocol=${PROTOCOL_VERSION}&ticket=${encodeURIComponent(ticket)}`;
-  let ws;try{ws=new WebSocket(url);socket=ws;}catch{if(!shell.inMatch&&!reconnecting){shell.cancelPreparedMatch();disableMenu(false);setStatus('Could not open multiplayer connection.','error');}else scheduleReconnect();return;}
+  let ws;try{ws=new WebSocket(url);socket=ws;}catch{if(!shell.inMatch&&!reconnecting){shell.cancelConnection();disableMenu(false);setStatus('Could not open multiplayer connection.','error');}else scheduleReconnect();return;}
   ws.addEventListener('open',()=>{if(ws!==socket)return;reconnectAttempt=0;if(reconnecting)showToast('Reconnected');});
   ws.addEventListener('message',e=>{if(ws!==socket)return;try{handleMessage(JSON.parse(e.data))}catch{}});
   ws.addEventListener('close',e=>{
     if(ws!==socket)return;
-    if(!shell.inMatch && !reconnecting){shell.cancelPreparedMatch();disableMenu(false);setStatus(e.reason||'Could not join match.','error');return;}
+    if(!shell.inMatch && !reconnecting){shell.cancelConnection();disableMenu(false);setStatus(e.reason||'Could not join match.','error');return;}
     if(shell.inMatch && e.code!==1000){showToast('Connection lost · reconnecting');scheduleReconnect();}
   });
   ws.addEventListener('error',()=>{if(ws===socket&&!shell.inMatch)setStatus('Multiplayer server unreachable.','error');});

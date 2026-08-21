@@ -1,16 +1,13 @@
 export const SHELL_PANEL = Object.freeze({ NONE: '', SETTINGS: 'settings', ADMIN: 'admin' });
 
+function fullscreenElement() {
+  return document.fullscreenElement || document.webkitFullscreenElement || document.webkitCurrentFullScreenElement || null;
+}
+
 function isStandalone() {
   return navigator.standalone === true
     || matchMedia('(display-mode: standalone)').matches
     || matchMedia('(display-mode: fullscreen)').matches;
-}
-
-function fullscreenElement() {
-  return document.fullscreenElement
-    || document.webkitFullscreenElement
-    || document.webkitCurrentFullScreenElement
-    || null;
 }
 
 function measure(element) {
@@ -25,10 +22,8 @@ export function detectInputPlatform() {
   const touchPoints = Number(navigator.maxTouchPoints) > 0;
   const coarse = matchMedia('(pointer: coarse)').matches;
   const noHover = matchMedia('(hover: none)').matches;
-  const touchControls = touchPoints && (coarse || noHover);
   return Object.freeze({
-    touchControls,
-    requiresLandscape: touchControls,
+    touchControls: touchPoints && (coarse || noHover),
     standalone: isStandalone(),
   });
 }
@@ -44,10 +39,10 @@ export function createSessionShell({
   onViewport = () => {},
   onPointerLockUnavailable = () => {},
 } = {}) {
-  if (!root || !stage || !canvas) throw new Error('Session shell requires root, stage, and canvas elements.');
+  if (!root || !stage || !canvas) throw new Error('Session shell requires root, stage, and canvas.');
 
   const state = {
-    location: 'startup',
+    location: 'menu',
     paused: true,
     pauseReason: '',
     panel: SHELL_PANEL.NONE,
@@ -57,28 +52,27 @@ export function createSessionShell({
 
   let viewport = measure(stage);
   let lastCanPlay = false;
-  let launchGeneration = 0;
-  let launchPromise = Promise.resolve(false);
-  let lastFullscreen = !!fullscreenElement();
 
   root.classList.toggle('touch', platform.touchControls);
   root.classList.toggle('desktop', !platform.touchControls);
 
   const inMatch = () => state.location === 'match';
   const fullscreen = () => !!fullscreenElement();
+  const immersive = () => platform.standalone || fullscreen();
   const pointerLocked = () => document.pointerLockElement === canvas;
-  const portrait = () => viewport.h > viewport.w;
-  const orientationBlocked = () => state.location !== 'startup' && platform.requiresLandscape && portrait();
+  const landscapeReady = () => !platform.touchControls || viewport.w >= viewport.h;
 
   function fullscreenSupported() {
-    if (platform.standalone) return false;
+    if (platform.standalone) return true;
     const enabled = document.fullscreenEnabled ?? document.webkitFullscreenEnabled;
     return enabled !== false && !!(root.requestFullscreen || root.webkitRequestFullscreen);
   }
 
   function snapshot() {
     const match = inMatch();
-    const blocked = orientationBlocked();
+    const entered = immersive();
+    const landscape = landscapeReady();
+    const blocked = entered && platform.touchControls && !landscape;
     const inputReady = platform.touchControls || pointerLocked();
     return Object.freeze({
       location: state.location,
@@ -89,54 +83,55 @@ export function createSessionShell({
       connecting: state.connecting,
       connectionText: state.connectionText,
       hidden: document.hidden,
-      portrait: portrait(),
-      orientationBlocked: blocked,
-      inputReady,
-      canPlay: match && !state.paused && !state.panel && !document.hidden && !blocked && inputReady,
+      immersive: entered,
       fullscreen: fullscreen(),
       fullscreenSupported: fullscreenSupported(),
       standalone: platform.standalone,
       touchControls: platform.touchControls,
+      landscapeReady: landscape,
+      orientationBlocked: blocked,
+      inputReady,
+      canPlay: entered && landscape && match && !state.paused && !state.panel && !state.connecting && !document.hidden && inputReady,
       viewport: Object.freeze({ ...viewport }),
     });
   }
 
-  function updateConnectionUi(s) {
-    if (elements.connectionText) elements.connectionText.textContent = s.connectionText || 'Connecting…';
+  function setVisible(element, visible) {
+    element?.classList.toggle('hide', !visible);
   }
 
   function render(reason = 'sync') {
     const s = snapshot();
-    const blocked = s.orientationBlocked;
+    const showEntry = !s.immersive;
+    const showRotate = s.immersive && s.orientationBlocked;
+    const usable = s.immersive && !s.orientationBlocked;
 
-    elements.startup?.classList.toggle('hide', s.location !== 'startup');
-    elements.rotate?.classList.toggle('hide', !blocked);
-    elements.menu?.classList.toggle('hide', s.location !== 'menu' || blocked);
-    elements.pause?.classList.toggle('hide', !s.inMatch || !s.paused || !!s.panel || blocked);
-    elements.settings?.classList.toggle('hide', s.panel !== SHELL_PANEL.SETTINGS || blocked);
-    elements.admin?.classList.toggle('hide', s.panel !== SHELL_PANEL.ADMIN || blocked);
-    elements.connection?.classList.toggle('hide', !s.connecting || s.location !== 'menu' || blocked);
-    updateConnectionUi(s);
+    setVisible(elements.entry, showEntry);
+    setVisible(elements.rotate, showRotate);
+    setVisible(elements.menu, usable && s.location === 'menu' && !s.panel);
+    setVisible(elements.pause, usable && s.inMatch && s.paused && !s.panel);
+    setVisible(elements.settings, usable && s.panel === SHELL_PANEL.SETTINGS);
+    setVisible(elements.admin, usable && s.panel === SHELL_PANEL.ADMIN);
+    setVisible(elements.connection, usable && s.connecting);
 
-    if (elements.rotateText) {
-      elements.rotateText.textContent = s.inMatch
-        ? 'Your match is paused. Rotate back to landscape to continue.'
-        : 'Breach uses landscape on phones and tablets. Rotate your device to continue.';
+    if (elements.connectionText) elements.connectionText.textContent = s.connectionText || 'Connecting…';
+    if (elements.entryButton) {
+      const label = elements.entryButton.querySelector('span');
+      if (label) label.textContent = platform.standalone ? 'ENTER BREACH' : 'ENTER FULLSCREEN';
+      elements.entryButton.disabled = !platform.standalone && !s.fullscreenSupported;
     }
-
-    const fullButton = elements.fullscreenButton;
-    const fullLabel = fullButton?.querySelector('span');
-    if (fullButton) {
-      if (platform.touchControls || s.standalone) {
-        fullButton.classList.add('hide');
-      } else {
-        fullButton.classList.remove('hide');
-        if (fullLabel) fullLabel.textContent = s.fullscreen ? 'Exit Fullscreen' : 'Fullscreen';
-        fullButton.disabled = !s.fullscreen && !s.fullscreenSupported;
-      }
+    if (elements.entryStatus && !s.fullscreenSupported && !platform.standalone) {
+      elements.entryStatus.textContent = 'Fullscreen is not available in this browser.';
+      elements.entryStatus.classList.add('error');
+    }
+    if (elements.fullscreenButton) {
+      const label = elements.fullscreenButton.querySelector('span');
+      if (label) label.textContent = 'Exit Fullscreen';
+      elements.fullscreenButton.disabled = platform.standalone || !s.fullscreen;
     }
 
     root.dataset.location = s.location;
+    root.dataset.immersive = String(s.immersive);
     root.dataset.paused = String(s.paused);
 
     if (lastCanPlay && !s.canPlay) onSuspend(reason, s);
@@ -145,43 +140,32 @@ export function createSessionShell({
     return s;
   }
 
-  function mutate(reason, change) {
-    change(state);
-    return render(reason);
-  }
-
-
-  function syncViewport(renderOrientation = true) {
-    const wasBlocked = orientationBlocked();
+  function syncViewport() {
     const next = measure(stage);
     const changed = next.w !== viewport.w || next.h !== viewport.h;
-    if (changed) {
-      viewport = next;
-      onViewport({ ...viewport });
-    }
+    if (!changed) return false;
 
-    if (inMatch() && !state.paused && platform.requiresLandscape && portrait()) {
+    viewport = next;
+    onViewport({ ...viewport });
+    if (platform.touchControls && immersive() && !landscapeReady() && inMatch() && !state.paused) {
       state.paused = true;
       state.pauseReason = 'orientation';
       state.panel = SHELL_PANEL.NONE;
-      return render('orientation');
     }
-    if (renderOrientation && wasBlocked !== orientationBlocked()) return render('orientation');
-    return snapshot();
+    return true;
   }
 
-  const resizeObserver = typeof ResizeObserver === 'function'
-    ? new ResizeObserver(syncViewport)
-    : null;
+  const viewportChanged = () => { if (syncViewport()) render('viewport'); };
+  const resizeObserver = typeof ResizeObserver === 'function' ? new ResizeObserver(viewportChanged) : null;
   resizeObserver?.observe(stage);
-  if (!resizeObserver) addEventListener('resize', syncViewport);
+  if (!resizeObserver) addEventListener('resize', viewportChanged);
 
-  async function enterFullscreen() {
-    if (fullscreen()) return true;
+  async function requestFullscreen() {
+    if (platform.standalone || fullscreen()) return true;
     if (!fullscreenSupported()) return false;
     const fn = root.requestFullscreen || root.webkitRequestFullscreen;
     try {
-      const result = fn.call(root);
+      const result = fn.call(root, { navigationUI: 'hide' });
       if (result?.then) await result;
       return fullscreen();
     } catch {
@@ -189,8 +173,8 @@ export function createSessionShell({
     }
   }
 
-  async function leaveFullscreen() {
-    if (!fullscreen()) return true;
+  async function exitFullscreen() {
+    if (platform.standalone || !fullscreen()) return false;
     const fn = document.exitFullscreen || document.webkitExitFullscreen || document.webkitCancelFullScreen;
     if (!fn) return false;
     try {
@@ -203,7 +187,7 @@ export function createSessionShell({
   }
 
   async function lockLandscape() {
-    if (!platform.requiresLandscape || !screen.orientation?.lock) return false;
+    if (!platform.touchControls || !screen.orientation?.lock) return false;
     try {
       await screen.orientation.lock('landscape');
       return true;
@@ -232,197 +216,167 @@ export function createSessionShell({
     }
   }
 
+  async function enterFullscreenFromGesture() {
+    if (platform.standalone) {
+      await lockLandscape();
+      render('standalone-enter');
+      return true;
+    }
+    const ok = await requestFullscreen();
+    if (!ok) {
+      if (elements.entryStatus) {
+        elements.entryStatus.textContent = 'Could not enter fullscreen. Tap the button and try again.';
+        elements.entryStatus.classList.add('error');
+      }
+      render('fullscreen-failed');
+      return false;
+    }
+    await lockLandscape();
+    return true;
+  }
+
+  async function exitFullscreenFromGesture() {
+    if (inMatch() && !state.paused) {
+      state.paused = true;
+      state.pauseReason = 'fullscreen';
+      state.panel = SHELL_PANEL.NONE;
+    }
+    if (!platform.touchControls && pointerLocked()) document.exitPointerLock?.();
+    unlockLandscape();
+    const exited = await exitFullscreen();
+    if (!exited && immersive()) render('fullscreen-exit-failed');
+    return exited;
+  }
+
   function beginConnection(text = 'Preparing game…') {
-    return mutate('connection-start', s => {
-      if (s.location !== 'menu') return;
-      s.connecting = true;
-      s.connectionText = text;
-      s.panel = SHELL_PANEL.NONE;
-    });
+    if (!immersive() || state.location !== 'menu') return snapshot();
+    state.connecting = true;
+    state.connectionText = String(text || 'Connecting…');
+    state.panel = SHELL_PANEL.NONE;
+    return render('connection-start');
   }
 
   function updateConnection(text) {
     state.connectionText = String(text || 'Connecting…');
-    updateConnectionUi(snapshot());
+    if (elements.connectionText) elements.connectionText.textContent = state.connectionText;
   }
 
   function endConnection() {
     if (!state.connecting) return snapshot();
-    return mutate('connection-end', s => {
-      s.connecting = false;
-      s.connectionText = '';
-    });
-  }
-
-  function prepareMatchFromGesture() {
-    const generation = ++launchGeneration;
-    if (platform.touchControls) {
-      launchPromise = (async () => {
-        if (!platform.standalone && !fullscreen() && fullscreenSupported()) await enterFullscreen();
-        if (generation !== launchGeneration) return false;
-        await lockLandscape();
-        syncViewport();
-        return generation === launchGeneration;
-      })();
-    } else {
-      launchPromise = requestPointerLock().then(() => generation === launchGeneration);
-    }
-    return launchPromise;
-  }
-
-  function cancelPreparedMatch() {
-    ++launchGeneration;
     state.connecting = false;
     state.connectionText = '';
-    if (pointerLocked()) document.exitPointerLock?.();
-    unlockLandscape();
-    if (fullscreen() && !platform.standalone) void leaveFullscreen();
-    return render('launch-cancel');
+    return render('connection-end');
+  }
+
+  function prepareInputFromGesture() {
+    if (platform.touchControls) return Promise.resolve(true);
+    return requestPointerLock();
+  }
+
+  function cancelConnection() {
+    state.connecting = false;
+    state.connectionText = '';
+    if (!platform.touchControls && pointerLocked()) document.exitPointerLock?.();
+    return render('connection-cancel');
   }
 
   async function enterMatch() {
-    await launchPromise.catch(() => false);
-    syncViewport();
-    return mutate('match-enter', s => {
-      s.location = 'match';
-      s.connecting = false;
-      s.connectionText = '';
-      s.panel = SHELL_PANEL.NONE;
-      if (platform.requiresLandscape && portrait()) {
-        s.paused = true;
-        s.pauseReason = 'orientation';
-      } else if (!platform.touchControls && !pointerLocked()) {
-        s.paused = true;
-        s.pauseReason = 'pointer';
-      } else {
-        s.paused = false;
-        s.pauseReason = '';
-      }
-    });
+    state.location = 'match';
+    state.connecting = false;
+    state.connectionText = '';
+    state.panel = SHELL_PANEL.NONE;
+    if (!immersive() || !landscapeReady()) {
+      state.paused = true;
+      state.pauseReason = !immersive() ? 'fullscreen' : 'orientation';
+    } else if (!platform.touchControls && !pointerLocked()) {
+      state.paused = true;
+      state.pauseReason = 'pointer';
+    } else {
+      state.paused = false;
+      state.pauseReason = '';
+    }
+    return render('match-enter');
   }
 
   function pause(reason = 'pause') {
     if (!inMatch() || state.paused) return snapshot();
-    const result = mutate(reason, s => {
-      s.paused = true;
-      s.pauseReason = reason;
-      s.panel = SHELL_PANEL.NONE;
-    });
+    state.paused = true;
+    state.pauseReason = reason;
+    state.panel = SHELL_PANEL.NONE;
     if (!platform.touchControls && pointerLocked()) document.exitPointerLock?.();
-    return result;
-  }
-
-  function showPauseMenu() {
-    if (!inMatch()) return snapshot();
-    const result = mutate('pause-menu', s => {
-      s.paused = true;
-      s.pauseReason = 'user';
-      s.panel = SHELL_PANEL.NONE;
-    });
-    if (!platform.touchControls && pointerLocked()) document.exitPointerLock?.();
-    return result;
+    return render(reason);
   }
 
   async function resumeFromGesture() {
-    if (!inMatch() || state.panel) return false;
-
-    if (platform.touchControls) {
-      if (!platform.standalone && !fullscreen() && fullscreenSupported()) await enterFullscreen();
-      await lockLandscape();
-      syncViewport();
-      if (portrait()) {
-        mutate('resume-orientation', s => {
-          s.paused = true;
-          s.pauseReason = 'orientation';
-        });
-        return false;
-      }
-      mutate('resume', s => {
-        s.paused = false;
-        s.pauseReason = '';
-      });
-      return true;
-    }
-
-    const locked = await requestPointerLock();
-    if (!locked) return false;
-    mutate('resume', s => {
-      s.paused = false;
-      s.pauseReason = '';
-    });
+    if (!inMatch() || state.panel || !immersive() || !landscapeReady()) return false;
+    if (!platform.touchControls && !(await requestPointerLock())) return false;
+    state.paused = false;
+    state.pauseReason = '';
+    render('resume');
     return true;
   }
 
   function openPanel(name) {
     if (name !== SHELL_PANEL.SETTINGS && name !== SHELL_PANEL.ADMIN) return snapshot();
-    const result = mutate(`panel-open:${name}`, s => {
-      if (s.location === 'match') {
-        s.paused = true;
-        s.pauseReason = 'panel';
-      }
-      s.panel = name;
-    });
-    if (!platform.touchControls && pointerLocked()) document.exitPointerLock?.();
-    return result;
+    if (inMatch() && !state.paused) {
+      state.paused = true;
+      state.pauseReason = 'panel';
+      if (!platform.touchControls && pointerLocked()) document.exitPointerLock?.();
+    }
+    state.panel = name;
+    return render(`panel-open:${name}`);
   }
 
   function closePanel(name = '') {
-    return mutate(`panel-close:${name || 'current'}`, s => {
-      if (!name || s.panel === name) s.panel = SHELL_PANEL.NONE;
-    });
-  }
-
-  async function toggleFullscreenFromGesture() {
-    if (platform.touchControls || platform.standalone) return false;
-    return fullscreen() ? leaveFullscreen() : enterFullscreen();
+    if (!name || state.panel === name) state.panel = SHELL_PANEL.NONE;
+    return render(`panel-close:${name || 'current'}`);
   }
 
   function leaveToMenu() {
-    ++launchGeneration;
-    mutate('menu', s => {
-      s.location = 'menu';
-      s.paused = true;
-      s.pauseReason = '';
-      s.panel = SHELL_PANEL.NONE;
-      s.connecting = false;
-      s.connectionText = '';
-    });
-    if (pointerLocked()) document.exitPointerLock?.();
-    unlockLandscape();
-    if (fullscreen() && !platform.standalone) void leaveFullscreen();
+    state.location = 'menu';
+    state.paused = true;
+    state.pauseReason = '';
+    state.panel = SHELL_PANEL.NONE;
+    state.connecting = false;
+    state.connectionText = '';
+    if (!platform.touchControls && pointerLocked()) document.exitPointerLock?.();
+    return render('menu');
+  }
+
+  function fullscreenChanged() {
+    if (!immersive()) {
+      if (inMatch() && !state.paused) {
+        state.paused = true;
+        state.pauseReason = 'fullscreen';
+        state.panel = SHELL_PANEL.NONE;
+      }
+      if (!platform.touchControls && pointerLocked()) document.exitPointerLock?.();
+      unlockLandscape();
+    }
+    syncViewport();
+    render('fullscreen');
   }
 
   function pointerLockChanged() {
-    if (platform.touchControls || !inMatch()) return;
-    if (!pointerLocked() && !state.paused) pause('pointer');
+    if (platform.touchControls || !inMatch() || state.paused) return;
+    if (!pointerLocked()) pause('pointer');
   }
 
   function visibilityChanged() {
     if (document.hidden && inMatch() && !state.paused) pause('background');
   }
 
-  function fullscreenChanged() {
-    const active = fullscreen();
-    if (active === lastFullscreen) return;
-    const exited = lastFullscreen && !active;
-    lastFullscreen = active;
-    syncViewport(false);
-    if (exited && platform.touchControls && inMatch() && !state.paused) pause('fullscreen');
-    else render('fullscreen');
-  }
-
+  const fullscreenEvent = ('fullscreenEnabled' in document || 'fullscreenElement' in document) ? 'fullscreenchange' : 'webkitfullscreenchange';
+  document.addEventListener(fullscreenEvent, fullscreenChanged);
   document.addEventListener('pointerlockchange', pointerLockChanged);
   document.addEventListener('pointerlockerror', () => {
     if (!platform.touchControls && inMatch() && !state.paused) pause('pointer');
     onPointerLockUnavailable();
   });
   document.addEventListener('visibilitychange', visibilityChanged);
-  document.addEventListener('fullscreenchange', fullscreenChanged);
-  document.addEventListener('webkitfullscreenchange', fullscreenChanged);
   addEventListener('pagehide', visibilityChanged);
 
   function start() {
-    state.location = 'menu';
     syncViewport();
     return render('start');
   }
@@ -433,25 +387,33 @@ export function createSessionShell({
     get paused() { return inMatch() ? state.paused : false; },
     get panel() { return state.panel; },
     get canPlay() { return snapshot().canPlay; },
-    get orientationBlocked() { return snapshot().orientationBlocked; },
     get viewport() { return { ...viewport }; },
     get fullscreen() { return fullscreen(); },
+    get immersive() { return immersive(); },
     get connecting() { return state.connecting; },
     snapshot,
     render,
     start,
+    enterFullscreenFromGesture,
+    exitFullscreenFromGesture,
     beginConnection,
     updateConnection,
     endConnection,
-    prepareMatchFromGesture,
-    cancelPreparedMatch,
+    prepareInputFromGesture,
+    cancelConnection,
     enterMatch,
     pause,
-    showPauseMenu,
     resumeFromGesture,
     openPanel,
     closePanel,
-    toggleFullscreenFromGesture,
     leaveToMenu,
+    destroy() {
+      resizeObserver?.disconnect();
+      if (!resizeObserver) removeEventListener('resize', viewportChanged);
+      document.removeEventListener(fullscreenEvent, fullscreenChanged);
+      document.removeEventListener('pointerlockchange', pointerLockChanged);
+      document.removeEventListener('visibilitychange', visibilityChanged);
+      removeEventListener('pagehide', visibilityChanged);
+    },
   };
 }

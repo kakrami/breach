@@ -1,12 +1,9 @@
 {
-  "name": "Breach v1.20.1",
+  "name": "Breach",
   "short_name": "Breach",
-  "id": "./",
   "start_url": "./",
-  "scope": "./",
-  "display": "standalone",
-  "display_override": ["standalone", "browser"],
+  "display": "fullscreen",
   "orientation": "landscape",
-  "background_color": "#080b0d",
-  "theme_color": "#080b0d"
+  "background_color": "#070a0c",
+  "theme_color": "#070a0c"
 }
