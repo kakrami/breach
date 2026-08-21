@@ -7,11 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="preconnect" href="https://opengameart.org">
-<link rel="dns-prefetch" href="//opengameart.org">
-<link rel="manifest" href="manifest.webmanifest?v=1.16.23">
-<title>Breachline v1.16.23</title>
-<link rel="stylesheet" href="ui.css?v=1.16.23">
+<link rel="manifest" href="manifest.webmanifest?v=1.17.0">
+<title>Breach v1.17.0</title>
+<link rel="stylesheet" href="ui.css?v=1.17.0">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -25,31 +23,27 @@
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-enter" viewBox="0 0 24 24"><path d="M13 5h6v14h-6"/><path d="m10 8 4 4-4 4M4 12h10"/></symbol>
     <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-2.8 7.5-7 9-4.2-1.5-7-4.5-7-9V6l7-2.5Z"/><path d="m9.2 12 1.8 1.8 3.9-4.4"/></symbol>
-    <symbol id="i-bot" viewBox="0 0 24 24"><rect x="5" y="7.5" width="14" height="10.5" rx="3"/><path d="M12 4v3.5M8.5 12h.01M15.5 12h.01M9 15h6"/></symbol>
     <symbol id="i-team" viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="2.8"/><circle cx="16.5" cy="9.5" r="2.3"/><path d="M3.5 20c.2-3.8 1.9-5.8 5-5.8s4.9 2 5.1 5.8M14 15.5c3.8 0 6 1.5 6.5 4.5"/></symbol>
     <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
     <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5v16h5"/><path d="m14 8 4 4-4 4M8 12h10"/></symbol>
-    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 6v12M15 6v12"/></symbol>
     <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.5 1.5M16.5 16.5 18 18M18 6l-1.5 1.5M7.5 16.5 6 18"/><circle cx="12" cy="12" r="7"/></symbol>
-    <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V5M8 9l4-4 4 4"/><path d="M5 14v5h14v-5"/></symbol>
-    <symbol id="i-reset" viewBox="0 0 24 24"><path d="M5 8V4m0 0h4M5 4l3.2 3.2A7 7 0 1 1 5 13"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></symbol>
   </defs>
 </svg>
-<canvas id="game" draggable="false" aria-label="Breachline gameplay"></canvas>
+<canvas id="game" draggable="false" aria-label="Breach gameplay"></canvas>
 
 <section id="boot" class="boot">
   <div class="boot-card">
     <div class="boot-emblem"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
     <div class="eyebrow">ONLINE TACTICAL FPS</div>
-    <h1>Breachline</h1>
+    <h1>Breach</h1>
     <div class="version" data-app-version></div>
     <p>Fast gunplay. Live team combat. Built for short, aggressive matches.</p>
     <button id="enterBtn" class="btn primary hero-action"><svg class="ui-icon"><use href="#i-play"/></svg><span>DEPLOY</span></button>
     <div id="engineStatus" class="engine-status" role="status" aria-live="polite">LOADING 3D ENGINE</div>
     <div id="iosInstallHint" class="ios-install-hint hide">
       <b>iPhone Safari Fullscreen</b>
-      <span>Safari on iPhone does not provide webpage fullscreen for the game canvas. For the full-screen app experience: tap <b>Share</b> → <b>Add to Home Screen</b>, keep <b>Open as Web App</b> enabled, then launch Breachline from the Home Screen.</span>
+      <span>Safari on iPhone does not provide webpage fullscreen for the game canvas. For the full-screen app experience: tap <b>Share</b> → <b>Add to Home Screen</b>, keep <b>Open as Web App</b> enabled, then launch Breach from the Home Screen.</span>
       <button id="continueSafariBtn" class="btn">Continue in Safari</button>
     </div>
   </div>
@@ -67,13 +61,13 @@
 <section id="menu" class="menu hide">
   <div class="menu-shell">
     <header class="menu-header">
-      <div class="brand"><div class="logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div><div class="brand-copy"><div class="eyebrow">LIVE COMBAT NETWORK</div><h1>Breachline</h1><div class="version brand-version" data-app-version></div><p class="sub">Tactical team combat · persistent live sessions · instant deployment</p></div></div>
-      <div class="header-actions"><button id="musicBtn" class="btn icon-btn" title="Toggle intro music" aria-label="Toggle intro music"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button><button id="menuFullBtn" class="btn icon-btn" title="Fullscreen" aria-label="Fullscreen"><svg class="ui-icon"><use href="#i-full"/></svg></button><button id="refreshBtn" class="btn icon-btn" title="Refresh matches" aria-label="Refresh matches"><svg class="ui-icon"><use href="#i-refresh"/></svg></button></div>
+      <div class="brand"><div class="logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div><div class="brand-copy"><div class="eyebrow">LIVE COMBAT NETWORK</div><h1>Breach</h1><div class="version brand-version" data-app-version></div><p class="sub">Tactical team combat · persistent live sessions · instant deployment</p></div></div>
+      <div class="header-actions"><button id="musicBtn" class="btn icon-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button><button id="settingsBtn" class="btn icon-btn" title="Player settings" aria-label="Player settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button><button id="menuFullBtn" class="btn icon-btn" title="Fullscreen" aria-label="Fullscreen"><svg class="ui-icon"><use href="#i-full"/></svg></button><button id="refreshBtn" class="btn icon-btn" title="Refresh matches" aria-label="Refresh matches"><svg class="ui-icon"><use href="#i-refresh"/></svg></button></div>
     </header>
 
     <div class="menu-grid">
       <section class="panel operator-panel">
-        <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-team"/></svg> Operator</strong><span>Name and team apply to Create + Join · God Mode is creator/admin only</span></div>
+        <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-team"/></svg> Operator</strong><span>Name, team and loadout apply to Create + Join</span></div>
         <div class="operator-row">
           <div class="field operator-name"><label class="label" for="nameInput">Player name</label><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></div>
           <div class="field operator-team">
@@ -84,18 +78,18 @@
             </div>
             <div id="teamSummary" class="team-summary"></div>
           </div>
-          <button id="godToggle" type="button" class="god-toggle operator-god" aria-pressed="false" title="Create match with admin God Mode"><span class="god-icon"><svg class="ui-icon"><use href="#i-shield"/></svg></span><span class="god-copy"><strong>Creator God Mode</strong><small>Admin-only cheat</small></span><span id="godState" class="god-state">OFF</span></button>
+          <label class="field operator-primary"><span class="label">Primary</span><select id="primaryWeapon" class="input"><option value="assault">Assault Rifle</option><option value="shotgun">Shotgun</option><option value="sniper">Sniper Rifle</option></select><small class="field-help">Pistol is always your secondary</small></label>
         </div>
       </section>
 
       <section class="panel create-panel">
-        <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-plus"/></svg> Create Match</strong><span>Configure the opposing force</span></div>
+        <div class="panel-title"><strong><svg class="mini-icon"><use href="#i-plus"/></svg> Create Match</strong><span>Standard rules unless a custom option is enabled</span></div>
         <div class="bot-config-grid">
           <label class="bot-team-field blue"><span class="bot-team-label">Blue bots</span><select id="blueBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
           <label class="bot-team-field red"><span class="bot-team-label">Red bots</span><select id="redBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
           <label class="bot-team-field"><span class="bot-team-label neutral">Difficulty</span><select id="botDifficulty" class="input"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
         </div>
-        <div class="create-footer"><div id="botTotal" class="bot-total">2 / 8 bots</div><button id="createBtn" class="btn primary action-btn"><svg class="ui-icon"><use href="#i-plus"/></svg><span>Create Match</span></button></div>
+        <div class="create-options"><button id="godToggle" type="button" class="god-toggle" aria-pressed="false" title="Create a custom match with host invulnerability"><span class="god-icon"><svg class="ui-icon"><use href="#i-shield"/></svg></span><span class="god-copy"><strong>Host Invulnerability</strong><small>Marks this as a custom match</small></span><span id="godState" class="god-state">OFF</span></button></div><div class="create-footer"><div id="botTotal" class="bot-total">2 / 8 bots</div><button id="createBtn" class="btn primary action-btn"><svg class="ui-icon"><use href="#i-plus"/></svg><span>Create Match</span></button></div>
       </section>
 
       <section class="panel join-panel">
@@ -105,7 +99,7 @@
       </section>
     </div>
 
-    <footer class="menu-footer"><div id="menuStatus" class="status" role="status" aria-live="polite">Ready.</div><div class="controls-note" aria-label="Desktop controls"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>C CROUCH</span><span>R RELOAD</span><span>1·2·3·4 WEAPONS</span><span>F FLASH</span><span>G STICKY</span><span>TAB SCORE</span></div></footer>
+    <footer class="menu-footer"><div id="menuStatus" class="status" role="status" aria-live="polite">Ready.</div><div class="controls-note" aria-label="Desktop controls"><span>WASD</span><span>◉ FIRE</span><span>⌖ ADS</span><span>C CROUCH</span><span>R RELOAD</span><span>1 PRIMARY · 2 PISTOL · Q SWAP</span><span>F FLASH</span><span>G STICKY</span><span>HOLD TAB SCORE</span></div></footer>
   </div>
 </section>
 
@@ -116,9 +110,9 @@
     <div class="pause-group">
       <div class="pause-group-title">PLAYER</div>
       <div class="pause-player-actions">
-        <button id="pauseGodBtn" class="btn"><svg class="ui-icon"><use href="#i-shield"/></svg><span id="pauseGodText">God Off</span></button>
-        <button id="teamSwitchBtn" class="btn"><svg class="ui-icon"><use href="#i-team"/></svg><span id="teamSwitchText">Switch Team</span></button>
-        <button id="adminBtn" class="btn pause-admin-badge hide"><svg class="ui-icon"><use href="#i-settings"/></svg><span>Admin</span></button>
+        <button id="pauseSettingsBtn" class="btn"><svg class="ui-icon"><use href="#i-settings"/></svg><span>Settings</span></button>
+        <button id="teamSwitchBtn" class="btn"><svg class="ui-icon"><use href="#i-team"/></svg><span id="teamSwitchText">Switch on Respawn</span></button>
+        <button id="adminBtn" class="btn pause-admin-badge hide"><svg class="ui-icon"><use href="#i-shield"/></svg><span>Match Control</span></button>
       </div>
     </div>
     <div class="pause-group">
@@ -132,50 +126,49 @@
   </div>
 </section>
 
-<section id="adminPanel" class="admin-panel hide" aria-label="Match admin settings">
-  <div class="admin-shell" data-page="general">
-    <header class="admin-head">
-      <div><div class="eyebrow">MATCH CONTROL // LIVE RULES</div><h2>Match Control</h2><div class="admin-sub">Changes apply live to the current match. Combat rules remain server-authoritative.</div></div>
-      <button id="adminCloseBtn" class="btn icon-btn" title="Close admin settings" aria-label="Close admin settings"><svg class="ui-icon"><use href="#i-close"/></svg></button>
-    </header>
-    <div class="admin-tabs" role="tablist" aria-label="Admin settings sections"><button id="adminTabGeneral" class="admin-tab active" type="button" role="tab" aria-selected="true" aria-controls="adminGeneral" data-admin-tab="general">MATCH</button><button id="adminTabWeapons" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="adminWeapons" data-admin-tab="weapons">WEAPONS</button><button id="adminTabBots" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="adminBots" data-admin-tab="bots">BOTS</button><button id="adminTabPlayers" class="admin-tab" type="button" role="tab" aria-selected="false" aria-controls="adminPlayers" data-admin-tab="players">PLAYERS</button></div>
-    <div id="adminGeneral" class="admin-page" role="tabpanel" aria-labelledby="adminTabGeneral">
-      <div class="settings-grid">
-        <label class="setting"><span>Run Speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label>
-        <label class="setting"><span>ADS Walk Speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label>
-        <label class="setting"><span>Jump Height</span><input id="setJumpHeight" type="number" min="0.4" max="5" step="0.1"></label>
-        <label class="setting"><span>Gravity</span><input id="setGravity" type="number" min="8" max="40" step="1"></label>
-        <label class="setting"><span>Regen Delay (s)</span><input id="setRegenDelay" type="number" min="0" max="15" step="0.5"></label>
-        <label class="setting"><span>Regen / Second</span><input id="setRegenRate" type="number" min="0" max="30" step="0.5"></label>
-        <label class="setting"><span>Respawn Delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label>
-      </div>
+<section id="settingsPanel" class="admin-panel hide" aria-label="Player settings">
+  <div class="admin-shell settings-shell">
+    <header class="admin-head"><div><div class="eyebrow">PLAYER SETTINGS</div><h2>Settings</h2><div class="admin-sub">Saved on this device.</div></div><button id="settingsCloseBtn" class="btn icon-btn" aria-label="Close settings"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
+    <div class="settings-grid player-settings-grid">
+      <label class="setting"><span>Look Sensitivity</span><input id="playerLookSensitivity" type="range" min="0.5" max="2" step="0.05"><output id="playerLookSensitivityValue"></output></label>
+      <label class="setting"><span>ADS Sensitivity</span><input id="playerAdsSensitivity" type="range" min="0.35" max="1.25" step="0.05"><output id="playerAdsSensitivityValue"></output></label>
+      <label class="setting"><span>Touch Sensitivity</span><input id="playerTouchSensitivity" type="range" min="0.5" max="2" step="0.05"><output id="playerTouchSensitivityValue"></output></label>
+      <label class="setting"><span>Master Volume</span><input id="playerMasterVolume" type="range" min="0" max="1" step="0.05"><output id="playerMasterVolumeValue"></output></label>
+      <label class="setting"><span>SFX Volume</span><input id="playerSfxVolume" type="range" min="0" max="1" step="0.05"><output id="playerSfxVolumeValue"></output></label>
+      <label class="setting"><span>Music Volume</span><input id="playerMusicVolume" type="range" min="0" max="1" step="0.05"><output id="playerMusicVolumeValue"></output></label>
+      <label class="setting"><span>Graphics</span><select id="playerGraphics" class="input"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
     </div>
-    <div id="adminWeapons" class="admin-page hide" role="tabpanel" aria-labelledby="adminTabWeapons">
-      <div class="weapon-settings-grid">
-        <section class="weapon-settings-card"><strong>PISTOL</strong><label>Damage<input id="setPistolDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setPistolSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setPistolReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setPistolCooldown" type="number" min="50" max="2500" step="5"></label></section>
-        <section class="weapon-settings-card assault"><strong>ASSAULT RIFLE</strong><label>Damage<input id="setAssaultDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setAssaultSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setAssaultReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setAssaultCooldown" type="number" min="50" max="2500" step="5"></label><small>Headshots eliminate a full-health target.</small></section>
-        <section class="weapon-settings-card"><strong>SHOTGUN</strong><label>Pellet Damage<input id="setShotgunDamage" type="number" min="1" max="100" step="1"></label><label>Pellet Speed<input id="setShotgunSpeed" type="number" min="10" max="200" step="1"></label><label>Reload (ms)<input id="setShotgunReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setShotgunCooldown" type="number" min="100" max="2500" step="10"></label><small>Eight pellets per shot with close-range spread.</small></section>
-        <section class="weapon-settings-card sniper"><strong>SNIPER</strong><label>Damage / Power<input id="setSniperDamage" type="number" min="1" max="400" step="1"></label><label>Bullet Speed<input id="setSniperSpeed" type="number" min="10" max="400" step="1"></label><label>Reload (ms)<input id="setSniperReload" type="number" min="100" max="5000" step="25"></label><label>Fire Delay (ms)<input id="setSniperCooldown" type="number" min="50" max="2500" step="5"></label><small>Penetration uses remaining damage power. Each target consumes its current HP.</small></section>
-      </div>
-    </div>
-    <div id="adminBots" class="admin-page hide" role="tabpanel" aria-labelledby="adminTabBots">
-      <div class="settings-grid bot-admin-grid">
-        <label class="setting"><span>Blue Bots</span><input id="setBlueBots" type="number" min="0" max="8" step="1"></label>
-        <label class="setting"><span>Red Bots</span><input id="setRedBots" type="number" min="0" max="8" step="1"></label>
-        <label class="setting"><span>Difficulty</span><select id="setBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
-        <div class="setting"><span>Difficulty Effect</span><div id="botDifficultyHelp" class="input difficulty-help">Faster pressure, tighter aim and active strafing.</div></div>
-      </div>
-    </div>
-    <div id="adminPlayers" class="admin-page hide" role="tabpanel" aria-labelledby="adminTabPlayers">
-      <div id="adminPlayerList" class="admin-player-list"></div>
-    </div>
-    <footer class="admin-foot"><div id="adminStatus" class="admin-status" role="status" aria-live="polite">Admins can tune the match and manage connected players.</div><button id="adminResetBtn" class="btn">Defaults</button><button id="adminSaveBtn" class="btn primary">Apply Rules</button></footer>
+    <footer class="admin-foot"><div class="admin-status">Changes apply immediately.</div><button id="settingsDefaultsBtn" class="btn">Defaults</button><button id="settingsDoneBtn" class="btn primary">Done</button></footer>
   </div>
 </section>
 
+<section id="adminPanel" class="admin-panel hide" aria-label="Match control">
+  <div class="admin-shell" data-page="match">
+    <header class="admin-head"><div><div class="eyebrow">CUSTOM MATCH CONTROL</div><h2>Match Control</h2><div class="admin-sub">Changing standard rules marks the room as CUSTOM.</div></div><button id="adminCloseBtn" class="btn icon-btn" aria-label="Close match control"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
+    <div class="admin-tabs" role="tablist"><button class="admin-tab active" data-admin-tab="match">MATCH</button><button class="admin-tab" data-admin-tab="gameplay">GAMEPLAY</button><button class="admin-tab" data-admin-tab="advanced">ADVANCED</button><button class="admin-tab" data-admin-tab="bots">BOTS</button><button class="admin-tab" data-admin-tab="players">PLAYERS</button></div>
+    <div id="adminMatch" class="admin-page" data-admin-page="match">
+      <div class="settings-grid"><label class="setting"><span>Score Limit</span><input id="setScoreLimit" type="number" min="5" max="100" step="5"></label><label class="setting"><span>Time Limit (minutes)</span><input id="setTimeLimit" type="number" min="2" max="30" step="1"></label></div>
+      <div class="admin-note">Standard: 30 eliminations or 8 minutes. The server owns score, winner and round reset.</div>
+    </div>
+    <div id="adminGameplay" class="admin-page hide" data-admin-page="gameplay">
+      <div class="settings-grid"><label class="setting"><span>Run Speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label><label class="setting"><span>ADS Walk Speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label><label class="setting"><span>Jump Height</span><input id="setJumpHeight" type="number" min="0.4" max="5" step="0.1"></label><label class="setting"><span>Gravity</span><input id="setGravity" type="number" min="8" max="40" step="1"></label><label class="setting"><span>Health Regen Delay (s)</span><input id="setRegenDelay" type="number" min="0" max="15" step="0.5"></label><label class="setting"><span>Health Regen / Second</span><input id="setRegenRate" type="number" min="0" max="30" step="0.5"></label><label class="setting"><span>Respawn Delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label></div>
+    </div>
+    <div id="adminAdvanced" class="admin-page hide" data-admin-page="advanced">
+      <div class="weapon-settings-grid">
+        <section class="weapon-settings-card"><strong>PISTOL</strong><label>Damage<input id="setPistolDamage" type="number" min="1" max="400" step="1"></label><label>Projectile Velocity<input id="setPistolSpeed" type="number" min="10" max="400" step="1"></label><label>Reload Time (s)<input id="setPistolReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setPistolCooldown" type="number" min="24" max="1200" step="5"></label></section>
+        <section class="weapon-settings-card assault"><strong>ASSAULT RIFLE</strong><label>Damage<input id="setAssaultDamage" type="number" min="1" max="400" step="1"></label><label>Projectile Velocity<input id="setAssaultSpeed" type="number" min="10" max="400" step="1"></label><label>Reload Time (s)<input id="setAssaultReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setAssaultCooldown" type="number" min="24" max="1200" step="5"></label></section>
+        <section class="weapon-settings-card"><strong>SHOTGUN</strong><label>Pellet Damage<input id="setShotgunDamage" type="number" min="1" max="100" step="1"></label><label>Projectile Velocity<input id="setShotgunSpeed" type="number" min="10" max="200" step="1"></label><label>Reload Time (s)<input id="setShotgunReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setShotgunCooldown" type="number" min="24" max="600" step="5"></label></section>
+        <section class="weapon-settings-card sniper"><strong>SNIPER</strong><label>Damage<input id="setSniperDamage" type="number" min="1" max="400" step="1"></label><label>Projectile Velocity<input id="setSniperSpeed" type="number" min="10" max="400" step="1"></label><label>Reload Time (s)<input id="setSniperReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setSniperCooldown" type="number" min="24" max="1200" step="5"></label></section>
+      </div>
+    </div>
+    <div id="adminBots" class="admin-page hide" data-admin-page="bots"><div class="settings-grid bot-admin-grid"><label class="setting"><span>Blue Bots</span><input id="setBlueBots" type="number" min="0" max="8" step="1"></label><label class="setting"><span>Red Bots</span><input id="setRedBots" type="number" min="0" max="8" step="1"></label><label class="setting"><span>Difficulty</span><select id="setBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label><div class="setting"><span>Difficulty Effect</span><div id="botDifficultyHelp" class="input difficulty-help"></div></div></div></div>
+    <div id="adminPlayers" class="admin-page hide" data-admin-page="players"><div id="adminPlayerList" class="admin-player-list"></div></div>
+    <footer class="admin-foot"><div id="adminStatus" class="admin-status" role="status" aria-live="polite">Standard match rules are active.</div><button id="adminResetBtn" class="btn">Reset This Tab</button><button id="adminSaveBtn" class="btn primary">Apply</button></footer>
+  </div>
+</section>
 <script>
 (()=>{
-  const REV='1.16.23',retryKey=`breach-module-retry-${REV}`;
+  const REV='1.17.0',retryKey=`breach-module-retry-${REV}`;
   window.__breachModuleBooted=false;
   const fail=(message)=>{const el=document.getElementById('engineStatus');if(el){el.textContent=message;el.className='engine-status error';}};
   window.addEventListener('error',(event)=>{const target=event.target;if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK'))fail('CLIENT ASSET LOAD FAILED · RETRYING');},true);
@@ -193,16 +186,18 @@
 
 <script type="module">
 window.__breachModuleBooted=true;
-try{sessionStorage.removeItem('breach-module-retry-1.16.23');}catch{}
+try{sessionStorage.removeItem('breach-module-retry-1.17.0');}catch{}
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, MAX_STEP_HEIGHT, makeBuildingGeometry, BUILDING_PARTS
-} from './world-geometry.js?v=1.16.23';
+} from './world-geometry.js?v=1.17.0';
 import {
-  APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, WEAPON_SPECS as BASE_WEAPON_SPECS, WEAPON_ACCURACY, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
-  DEFAULT_WORLD_SETTINGS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.16.23';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.16.23';
+  APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS as BASE_WEAPON_SPECS, WEAPON_ACCURACY, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
+  DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
+} from './game-config.js?v=1.17.0';
+import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.17.0';
+import { createAudioEngine } from './audio-engine.js?v=1.17.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.17.0';
 
 let THREE = null;
 
@@ -221,38 +216,37 @@ const GROUND_VIEW_UP_RATE = 11.5;
 const GROUND_VIEW_DOWN_RATE = 9.0;
 const AIR_VIEW_RATE = 28;
 const VIEW_VERTICAL_SNAP_DISTANCE = 2.75;
-// Fixed game-audio mapping exported from Breachline Sound Picker v1.6.
-// There is intentionally no runtime upload/remap/settings layer in the game.
+// Entire sound set is generated locally as lightweight 8-bit PCM WAV assets.
+// No third-party or runtime-hosted audio is required.
 const SOUND_CUES = Object.freeze({
-  introMusic:Object.freeze({url:"https://opengameart.org/sites/default/files/Psycho%20Punch_1.ogg",group:'Music',pool:1,gain:0.56,rate:1,loop:true}),
-  shotPistol:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mosin%20Nagant/M_21P.wav",group:'Gunfire',pool:5,gain:0.66,rate:1,loop:false}),
-  shotAssault:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/Mossberg/N_26P.wav",group:'Gunfire',pool:7,gain:0.56,rate:1,loop:false}),
-  shotShotgun:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/AR-15/D_24P.wav",group:'Gunfire',pool:4,gain:0.72,rate:1,loop:false}),
-  shotSniper:Object.freeze({url:"https://raw.githubusercontent.com/buddingmonkey/FreeFirearmsSFXLibrary/main/Prepared%20SFX/1911/A_34P.wav",group:'Gunfire',pool:4,gain:0.78,rate:1,loop:false}),
-  reloadPistol:Object.freeze({url:"https://opengameart.org/sites/default/files/gunreload1.wav",group:'Weapon Handling',pool:2,gain:0.52,rate:1,loop:false}),
-  reloadAssault:Object.freeze({url:"https://opengameart.org/sites/default/files/assaultriflereload1_0.wav",group:'Weapon Handling',pool:2,gain:0.5,rate:1,loop:false}),
-  reloadShotgun:Object.freeze({url:"https://opengameart.org/sites/default/files/singlebullet1.wav",group:'Weapon Handling',pool:2,gain:0.55,rate:0.96,loop:false}),
-  shotgunPump:Object.freeze({url:"https://opengameart.org/sites/default/files/shotguncock_0.wav",group:'Weapon Handling',pool:2,gain:0.66,rate:1,loop:false}),
-  reloadSniper:Object.freeze({url:"https://opengameart.org/sites/default/files/clipload2.wav",group:'Weapon Handling',pool:2,gain:0.62,rate:1,loop:false}),
-  hitmarker:Object.freeze({url:"https://opengameart.org/sites/default/files/hurt_01_0.mp3",group:'Voice',pool:6,gain:0.3,rate:1.08,loop:false}),
-  headshot:Object.freeze({url:"audio/headshot-announcer.ogg",group:'Voice',pool:2,gain:0.56,rate:1,loop:false}),
-  kill:Object.freeze({url:"https://opengameart.org/sites/default/files/pain_jack_03.wav",group:'Voice',pool:3,gain:0.48,rate:1,loop:false}),
-  announcer:Object.freeze({url:"https://opengameart.org/sites/default/files/bodyimpact_jack_01.wav",group:'Impacts',pool:2,gain:0.34,rate:1,loop:false}),
-  shield:Object.freeze({url:"https://opengameart.org/sites/default/files/12._effort_grunt_male.wav",group:'Voice',pool:2,gain:0.36,rate:1,loop:false}),
-  hurt:Object.freeze({url:"https://opengameart.org/sites/default/files/06._effort_grunt_male.wav",group:'Voice',pool:3,gain:0.64,rate:1,loop:false}),
-  jump:Object.freeze({url:"https://opengameart.org/sites/default/files/jump.flac",group:'Movement',pool:2,gain:0.28,rate:1,loop:false}),
-  footstepLeft:Object.freeze({url:"https://opengameart.org/sites/default/files/01-footstep.ogg",group:'Movement',pool:3,gain:0.28,rate:1.03,loop:false}),
-  footstepRight:Object.freeze({url:"https://opengameart.org/sites/default/files/02-footstep.ogg",group:'Movement',pool:3,gain:0.28,rate:0.98,loop:false}),
-  land:Object.freeze({url:"https://opengameart.org/sites/default/files/jumpland48000.mp3",group:'Movement',pool:2,gain:0.52,rate:1,loop:false}),
-  flashThrow:Object.freeze({url:"https://opengameart.org/sites/default/files/punch_jack_01.wav",group:'Impacts',pool:2,gain:0.36,rate:1.08,loop:false}),
-  stickyThrow:Object.freeze({url:"https://opengameart.org/sites/default/files/punch_jack_02.wav",group:'Impacts',pool:2,gain:0.36,rate:1.08,loop:false}),
-  flashImpact:Object.freeze({url:"https://opengameart.org/sites/default/files/clink1_0.wav",group:'Tactical',pool:3,gain:0.34,rate:1.08,loop:false}),
-  stickyImpact:Object.freeze({url:"https://opengameart.org/sites/default/files/thud2.wav",group:'Tactical',pool:3,gain:0.42,rate:0.92,loop:false}),
-  semtexBeep:Object.freeze({url:"https://opengameart.org/sites/default/files/snd_npc_message.wav",group:'Voice',pool:3,gain:0.36,rate:1,loop:false}),
-  flashDetonate:Object.freeze({url:"https://opengameart.org/sites/default/files/flash_bang.wav",group:'Explosions',pool:3,gain:0.8,rate:1,loop:false}),
-  stickyDetonate:Object.freeze({url:"audio/grenade-explosion.wav",group:'Explosions',pool:4,gain:1,rate:1,loop:false}),
+  introMusic:Object.freeze({url:'audio/intro.wav',group:'Music',gain:.48,loop:true}),
+  shotPistol:Object.freeze({url:'audio/shot-pistol.wav',group:'Gunfire',gain:.72}),
+  shotAssault:Object.freeze({url:'audio/shot-assault.wav',group:'Gunfire',gain:.60}),
+  shotShotgun:Object.freeze({url:'audio/shot-shotgun.wav',group:'Gunfire',gain:.82}),
+  shotSniper:Object.freeze({url:'audio/shot-sniper.wav',group:'Gunfire',gain:.88}),
+  reloadPistol:Object.freeze({url:'audio/reload-pistol.wav',group:'Weapon Handling',gain:.58}),
+  reloadAssault:Object.freeze({url:'audio/reload-assault.wav',group:'Weapon Handling',gain:.58}),
+  reloadShotgun:Object.freeze({url:'audio/reload-shotgun.wav',group:'Weapon Handling',gain:.62}),
+  shotgunPump:Object.freeze({url:'audio/shotgun-pump.wav',group:'Weapon Handling',gain:.72}),
+  reloadSniper:Object.freeze({url:'audio/reload-sniper.wav',group:'Weapon Handling',gain:.66}),
+  hitmarker:Object.freeze({url:'audio/hitmarker.wav',group:'Feedback',gain:.54}),
+  headshot:Object.freeze({url:'audio/headshot.wav',group:'Feedback',gain:.66}),
+  kill:Object.freeze({url:'audio/kill.wav',group:'Feedback',gain:.62}),
+  announcer:Object.freeze({url:'audio/announcer.wav',group:'Feedback',gain:.62}),
+  shield:Object.freeze({url:'audio/shield.wav',group:'Feedback',gain:.56}),
+  hurt:Object.freeze({url:'audio/hurt.wav',group:'Feedback',gain:.64}),
+  jump:Object.freeze({url:'audio/jump.wav',group:'Movement',gain:.40}),
+  footstepLeft:Object.freeze({url:'audio/footstep-left.wav',group:'Movement',gain:.38}),
+  footstepRight:Object.freeze({url:'audio/footstep-right.wav',group:'Movement',gain:.38}),
+  land:Object.freeze({url:'audio/land.wav',group:'Movement',gain:.62}),
+  flashThrow:Object.freeze({url:'audio/flash-throw.wav',group:'Tactical',gain:.50}),
+  stickyThrow:Object.freeze({url:'audio/sticky-throw.wav',group:'Tactical',gain:.50}),
+  flashImpact:Object.freeze({url:'audio/flash-impact.wav',group:'Tactical',gain:.52}),
+  stickyImpact:Object.freeze({url:'audio/sticky-impact.wav',group:'Tactical',gain:.58}),
+  semtexBeep:Object.freeze({url:'audio/semtex-beep.wav',group:'Tactical',gain:.58}),
+  flashDetonate:Object.freeze({url:'audio/flash-detonate.wav',group:'Explosions',gain:.86}),
+  grenadeExplosion:Object.freeze({url:'audio/grenade-explosion.wav',group:'Explosions',gain:1}),
 });
-const SOUND_ONE_SHOT_CAPS=Object.freeze({'Gunfire':.92,'Weapon Handling':1.9,'Combat Feedback':.82,'Voice':1.55,'Impacts':.9,'Movement':.88,'Tactical':1.12,'Explosions':1.45});
 
 let worldSettings=cloneSettings(DEFAULT_WORLD_SETTINGS);
 let WALK_SPEED=DEFAULT_WORLD_SETTINGS.movement.walkSpeed,RUN_SPEED=DEFAULT_WORLD_SETTINGS.movement.runSpeed,GRAVITY=DEFAULT_WORLD_SETTINGS.movement.gravity,JUMP_SPEED=Math.sqrt(2*GRAVITY*DEFAULT_WORLD_SETTINGS.movement.jumpHeight);
@@ -260,7 +254,7 @@ const LONG_SHOT_DISTANCE = 30;
 
 const $ = (id) => document.getElementById(id);
 const boot = $('boot'), rotateGate = $('rotateGate'), menu = $('menu'), pause = $('pause');
-const nameInput = $('nameInput'), codeInput = $('codeInput'), blueBotCount = $('blueBotCount'), redBotCount = $('redBotCount'), botDifficulty = $('botDifficulty'), botTotal = $('botTotal'), menuStatus = $('menuStatus');
+const nameInput = $('nameInput'), codeInput = $('codeInput'), blueBotCount = $('blueBotCount'), redBotCount = $('redBotCount'), botDifficulty = $('botDifficulty'), botTotal = $('botTotal'), menuStatus = $('menuStatus'), primaryWeaponInput=$('primaryWeapon');
 const teamButtons=[...document.querySelectorAll('[data-team-choice]')];
 const worldList = $('worldList'), worldCount = $('worldCount');
 const canvas = $('game');
@@ -279,7 +273,9 @@ redBotCount.value=localStorage.getItem('breachlineRedBots')||'1';
 botDifficulty.value=localStorage.getItem('breachlineBotDifficulty')||'normal';
 let selectedTeam=localStorage.getItem('breachlineTeam')==='red'?'red':'blue';
 let selectedGod=localStorage.getItem('breachlineGodMode')==='1';
-let musicEnabled=localStorage.getItem('breachlineMusic')!=='0';
+let selectedPrimary=PRIMARY_WEAPONS.includes(localStorage.getItem('breachlinePrimary'))?localStorage.getItem('breachlinePrimary'):'assault';
+primaryWeaponInput.value=selectedPrimary;
+let masterMuted=localStorage.getItem('breachlineMuted')==='1';
 const requestedRoom = new URL(location.href).searchParams.get('room');
 if (requestedRoom) codeInput.value = normalizeCode(requestedRoom);
 applyTeamSelection(selectedTeam,false);
@@ -303,25 +299,27 @@ updateBotTeamSelection();
 
 let scene, camera, renderer, clock, pistolGroup, pistolFlash, pistolMag, assaultGroup, assaultFlash, assaultMag, shotgunGroup, shotgunFlash, shotgunPump, sniperGroup, sniperFlash, sniperBolt;
 let hudScene, hudCamera, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0;
-let gameActive = false, paused = false, socket = null, reconnectTimer = null, reconnectAttempt = 0, pendingCreatorGod = false;
-let currentRoom = '', myName = '', myTeam = 'blue', selfColor = TEAM_COLORS.blue, godMode = false, isWorldAdmin = false, worldOwnerId = '';
-let hp = 100, wastedUntil = 0, currentWeapon = 'pistol', ammo = freshClientAmmo(), equipment=freshClientEquipment(), reloadUntil = 0, reloadWeapon = '', combatRevision=0, combatSeq=0, reloadPendingUntil=0, lastCombatSync=0, pendingWeapon='';
+let gameActive = false, paused = false, socket = null, reconnectTimer = null, reconnectAttempt = 0;
+let currentRoom = '', myName = '', myTeam = 'blue', selfColor = TEAM_COLORS.blue, godMode = false, isWorldAdmin = false, worldOwnerId = '', pendingTeam='';
+let primaryWeapon=selectedPrimary,matchState={status:'waiting',round:1,blueScore:0,redScore:0,scoreLimit:DEFAULT_MATCH_RULES.scoreLimit,timeLimitMs:DEFAULT_MATCH_RULES.timeLimitMs,warmupEndsAt:0,endsAt:0,winner:'',reason:'',serverTime:0},matchCustom=false;
+let hp = 100, wastedUntil = 0, currentWeapon = selectedPrimary, ammo = freshClientAmmo(), equipment=freshClientEquipment(), reloadUntil = 0, reloadWeapon = '', combatRevision=0, combatSeq=0, reloadPendingUntil=0, lastCombatSync=0, pendingWeapon='';
 let flashUntil=0,flashPeakUntil=0;
-let fireMode=localStorage.getItem('breachlineFireMode')==='auto'?'auto':'semi',fireHeld=false;
+let assaultFireMode=localStorage.getItem('breachlineAssaultFireMode')==='semi'?'semi':'auto',fireHeld=false;
 let adsWanted=false,adsBlend=0,baseFov=70,sniperZoomLevel=0,lastWastedBy='',lastWastedWeapon='';
 let crouchWanted=false,crouched=false,crouchBlend=0,viewFeetY=NaN;
 let myStats={kills:0,deaths:0},scoreboardOpen=false,scoreboardScroll=0,scoreboardDrag=null,scoreboardPanel=null,killConfirmUntil=0,killConfirmName='',killConfirmWeapon='',killConfirmHeadshot=false,killConfirmDistance=0;
 let headshotUntil=0,announcerCurrent=null;const announcerQueue=[];
 let yaw = 0, pitch = 0, verticalVelocity = 0, knockX = 0, knockZ = 0, jumpSeq = 0;
 let onGround = true, fireTime = 99, localFireCooldown = 0, lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0;
-let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,grounded:true}, queuedFireUntil=0, serverFireRetryAt=0, localEquipmentCooldownUntil=0;
+let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,grounded:true,moveX:0,moveZ:0}, queuedFireUntil=0, serverFireRetryAt=0, localEquipmentCooldownUntil=0;
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0,nextFootstepAt=0,footstepSide=0,shotgunPumpStartedAt=0,shotgunPumpSoundPlayed=false;
-let audioCtx = null, analysisAudioCtx = null, defaultMusicElement = null, defaultMusicPending = false;
-const SOUND_VOLUME=.85;
-const SOUND_DB_NAME='breachline-fixed-audio-v1',SOUND_DB_STORE='resources',SOUND_DB_VERSION=2,SOUND_ASSET_REV='mapping-20260818-v3-trimmed',SOUND_FALLBACK_CACHE='breachline-fixed-audio-fallback-v3';
-const soundPools=new Map(),soundFailures=new Set(),soundResourcePromises=new Map(),soundOnsets=new Map();
-let soundDbPromise=null,soundWorkerPromise=null,gameAudioPreparePromise=null,gameAudioReady=false,gameAudioPrepareDone=0;
+let gameAudioPreparePromise=null,gameAudioReady=false,gameAudioPrepareDone=0;
 const GAME_AUDIO_TOTAL=Object.keys(SOUND_CUES).length;
+const DEFAULT_PLAYER_SETTINGS=Object.freeze({lookSensitivity:1,adsSensitivity:1,touchSensitivity:1,masterVolume:.85,sfxVolume:.9,musicVolume:.55,graphics:isTouch?'medium':'high'});
+function loadPlayerSettings(){try{return{...DEFAULT_PLAYER_SETTINGS,...JSON.parse(localStorage.getItem('breachlinePlayerSettings')||'{}')}}catch{return{...DEFAULT_PLAYER_SETTINGS}}}
+let playerSettings=loadPlayerSettings();
+const gameAudio=createAudioEngine({cues:SOUND_CUES,getVolumes:()=>({master:masterMuted?0:playerSettings.masterVolume,sfx:playerSettings.sfxVolume,music:playerSettings.musicVolume})});
+let introMusicHandle=null;
 const CLIENT_STALL_MS=180,STALE_INPUT_MS=220;
 let lastAnimationAt=performance.now(),suppressRealtimeAudioUntil=0,lastClientStallAt=0;
 let toastText = '', toastUntil = 0, hurtUntil = 0, hitUntil = 0;
@@ -332,6 +330,9 @@ let position = null;
 const keys = new Set();
 const remotes = new Map();
 const bullets = new Map();
+const bulletGeometryCache = new Map();
+const bulletMaterialCache = new Map();
+const bulletMeshPool = [];
 const throwables = new Map();
 const tacticalFx = [];
 let equipmentAim={kind:'',startedAt:0,pointer:null};
@@ -347,7 +348,6 @@ const trajectoryCollision=createProjectileCollisionGrid({
   terrainHeight,naturalGroundBase,cellSize:8,cellHeight:3
 });
 const obstacleIndex=createObstacleGrid({cellSize:8,cellHeight:3,playerHeight:PLAYER_HEIGHT});
-const obstacleBoxes=obstacleIndex.obstacles;
 const registerObstacle=obstacleIndex.register;
 const nearbyObstacles=obstacleIndex.nearby;
 const mapObstacles = [];
@@ -355,9 +355,10 @@ const joy = { x:0, y:0, pointer:null, centerX:0, centerY:0 };
 const look = { pointer:null, x:0, y:0 };
 const touchRoles = new Map();
 const fireTouchPointers = new Set();
-const touchVisual = { jumpUntil:0, fireUntil:0, reloadUntil:0, swapUntil:0, modeUntil:0, flashUntil:0, stickyUntil:0 };
+const touchVisual = { jumpUntil:0, fireUntil:0, flashUntil:0, stickyUntil:0 };
 
 const killFeed = [];
+let minimapStaticCache=null;
 let hudLayout = null;
 let viewW = Math.max(1, window.visualViewport?.width || window.innerWidth || document.documentElement.clientWidth || 1), viewH = Math.max(1, window.visualViewport?.height || window.innerHeight || document.documentElement.clientHeight || 1);
 let viewportMetrics={w:viewW,h:viewH};
@@ -376,8 +377,9 @@ syncVisualViewportMetrics();
 
 syncGodUI();
 syncMusicUI();
+syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.16.23';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.17.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 function setEngineStatus(text,tone=''){
@@ -403,7 +405,7 @@ async function ensureThreeEngine(){
       if(gameAudioReady){setEngineStatus('3D ENGINE READY · AUDIO READY','ready');setEnterLabel('ENTER ARENA');}else updateAudioPrepareStatus();
       return true;
     }catch(error){
-      console.error('Breachline could not initialize its bundled 3D engine.',error);
+      console.error('Breach could not initialize its bundled 3D engine.',error);
       const webglError=/webgl|context/i.test(String(error?.message||error));
       setEngineStatus(webglError?'WEBGL2 UNAVAILABLE · ENABLE HARDWARE ACCELERATION':'3D ENGINE FILE ERROR · REDEPLOY CLIENT','error');
       setEnterLabel('RETRY ENGINE');
@@ -417,7 +419,7 @@ bindUI();
 scheduleViewportSync();
 refreshWorlds();
 setInterval(() => { if (!gameActive) refreshWorlds(); }, 7000);
-ensureThreeEngine(false);
+ensureThreeEngine();
 setTimeout(()=>prepareAllGameAudio(),0);
 
 function getClientId(){
@@ -460,7 +462,7 @@ function applyWorldSettings(value){
   for(const name of WEAPON_ORDER){const w=worldSettings.weapons[name],spec=WEAPON_SPECS[name];spec.damage=w.damage;spec.bulletSpeed=w.speed;spec.reloadMs=w.reloadMs;spec.cooldownMs=w.cooldownMs;}
   syncPauseContext();
 }
-function aimSensitivityScale(){if(!adsWanted)return 1;if(currentWeapon==='sniper')return sniperZoomLevel>=2?.14:.28;return .62;}
+function aimSensitivityScale(){if(!adsWanted)return 1;const base=currentWeapon==='sniper'?(sniperZoomLevel>=2?.14:.28):.62;return base*playerSettings.adsSensitivity;}
 function currentSpreadRadians(){const accuracy=WEAPON_ACCURACY[currentWeapon]||WEAPON_ACCURACY.pistol,ads=!!adsWanted,speed=(ads?WALK_SPEED:RUN_SPEED)*(crouched?CROUCH_SPEED_MULTIPLIER:1),moveRatio=THREE.MathUtils.clamp((localMoveAmount||0)*speed/Math.max(.1,RUN_SPEED),0,1);let degrees=(ads?accuracy.adsDeg:accuracy.hipDeg)+accuracy.moveDeg*moveRatio*(ads?.35:1);if(crouched)degrees*=.82;return degrees*Math.PI/180;}
 function accuracyCrosshairRadius(){const fov=(camera?.fov||baseFov)*Math.PI/180,spread=currentSpreadRadians();return THREE.MathUtils.clamp(Math.tan(spread)*(viewH*.5)/Math.max(.08,Math.tan(fov*.5)),3.5,52);}
 function sniperScopeActive(){return currentWeapon==='sniper'&&adsBlend>.72;}
@@ -473,21 +475,16 @@ function applyTeamSelection(team,persist=true){
   if(persist)localStorage.setItem('breachlineTeam',selectedTeam);
 }
 function syncGodUI(){
-  const btn=$('godToggle'),state=$('godState'),pauseBtn=$('pauseGodBtn'),pauseText=$('pauseGodText');
-  if(btn){btn.setAttribute('aria-pressed',String(selectedGod));btn.title=selectedGod?'New matches start with creator God Mode enabled':'Creator God Mode disabled';}
+  const btn=$('godToggle'),state=$('godState');
+  if(btn){btn.setAttribute('aria-pressed',String(selectedGod));btn.title=selectedGod?'Custom match: host invulnerability enabled':'Standard host health';}
   if(state)state.textContent=selectedGod?'ON':'OFF';
-  if(pauseBtn){pauseBtn.classList.toggle('god-active',!!godMode);pauseBtn.classList.toggle('hide',!isWorldAdmin);}
-  if(pauseText)pauseText.textContent=godMode?'God On':'God Off';
 }
-function toggleGodMode(live=false){
-  if(!live){selectedGod=!selectedGod;localStorage.setItem('breachlineGodMode',selectedGod?'1':'0');syncGodUI();return;}
-  if(!gameActive||!isWorldAdmin){showToast('ADMIN ACCESS REQUIRED');syncGodUI();return;}
-  send({t:'god',enabled:!godMode});
-}
+function toggleGodMode(){selectedGod=!selectedGod;localStorage.setItem('breachlineGodMode',selectedGod?'1':'0');syncGodUI();}
+
 function syncMusicUI(){
-  const use=$('musicIconUse'),btn=$('musicBtn');if(use)use.setAttribute('href',musicEnabled?'#i-sound':'#i-mute');if(btn)btn.title=musicEnabled?'Mute intro music':'Enable intro music';
+  const use=$('musicIconUse'),btn=$('musicBtn');if(use)use.setAttribute('href',masterMuted?'#i-mute':'#i-sound');if(btn)btn.title=masterMuted?'Unmute audio':'Mute all audio';
 }
-function toggleIntroMusic(){musicEnabled=!musicEnabled;localStorage.setItem('breachlineMusic',musicEnabled?'1':'0');syncMusicUI();if(musicEnabled&&!gameActive&&experienceEntered&&!orientationBlocked)startIntroMusic();else stopIntroMusic();}
+function toggleMasterMute(){masterMuted=!masterMuted;localStorage.setItem('breachlineMuted',masterMuted?'1':'0');syncMusicUI();if(masterMuted)stopIntroMusic();else if(!gameActive&&experienceEntered&&!orientationBlocked)startIntroMusic();}
 
 function inputEventAgeMs(e){const ts=Number(e?.timeStamp);if(!Number.isFinite(ts)||ts<=0)return 0;const age=performance.now()-ts;return age>=0&&age<60000?age:0;}
 function staleActionEvent(e,limit=STALE_INPUT_MS){return inputEventAgeMs(e)>limit;}
@@ -504,160 +501,51 @@ function realtimeAudioAllowed(){return !gameActive||performance.now()>=suppressR
 function syncPauseContext(){
   const badge=$('pauseTeamBadge');if(badge){badge.textContent=`${myTeam.toUpperCase()} TEAM`;badge.style.color=TEAM_COLORS[myTeam];badge.style.borderColor=`${TEAM_COLORS[myTeam]}88`;badge.style.background=`${TEAM_COLORS[myTeam]}22`;}
   if($('pauseRoom'))$('pauseRoom').textContent=`Match ${currentRoom||'----'}`;
-  if($('pauseLoadout'))$('pauseLoadout').textContent=`${WEAPON_SPECS[currentWeapon].name} · ${Math.max(0,Math.floor(ammo[currentWeapon]||0))} rounds`;
+  if($('pauseLoadout'))$('pauseLoadout').textContent=`${WEAPON_SPECS[primaryWeapon].name} + Pistol · ${Math.max(0,Math.floor(ammo[currentWeapon]||0))} rounds`;
   const adminBtn=$('adminBtn');if(adminBtn)adminBtn.classList.toggle('hide',!isWorldAdmin);
-  const teamText=$('teamSwitchText');if(teamText)teamText.textContent=`Join ${myTeam==='blue'?'Red':'Blue'} Team`;
+  const teamText=$('teamSwitchText');if(teamText)teamText.textContent=pendingTeam?`${pendingTeam.toUpperCase()} ON RESPAWN`:`Switch to ${myTeam==='blue'?'Red':'Blue'} on Respawn`;
   syncGodUI();
 }
 
 
-function soundClipCap(cueId,cue=SOUND_CUES[cueId]){
-  if(!cue||cue.loop)return Infinity;
-  if(cueId==='semtexBeep')return .48;
-  if(cueId==='shotgunPump')return 1.2;
-  if(cueId==='headshot'||cueId==='kill')return 1.6;
-  return SOUND_ONE_SHOT_CAPS[cue.group]??1.35;
-}
-function soundPreroll(cue){if(cue.group==='Gunfire')return .055;if(cue.group==='Voice')return .08;if(cue.group==='Movement')return .045;if(cue.group==='Impacts')return .04;return .06;}
-function getAnalysisAudioContext(){if(!analysisAudioCtx){const O=window.OfflineAudioContext||window.webkitOfflineAudioContext,C=window.AudioContext||window.webkitAudioContext;try{if(O)analysisAudioCtx=new O(1,1,44100);else if(C)analysisAudioCtx=new C();}catch{analysisAudioCtx=null;}}return analysisAudioCtx;}
-function findSoundOnset(buffer,cue){
-  const sr=buffer.sampleRate||44100,maxSamples=Math.min(buffer.length,Math.floor(sr*10)),channels=Math.min(buffer.numberOfChannels||1,2),block=Math.max(64,Math.floor(sr*.006));
-  let globalPeak=0,noisePeak=0;const noiseEnd=Math.min(maxSamples,Math.floor(sr*.18));
-  for(let i=0;i<maxSamples;i+=block){let peak=0,end=Math.min(maxSamples,i+block);for(let c=0;c<channels;c++){const d=buffer.getChannelData(c);for(let j=i;j<end;j+=2){const v=Math.abs(d[j]);if(v>peak)peak=v;}}if(peak>globalPeak)globalPeak=peak;if(i<noiseEnd&&peak>noisePeak)noisePeak=peak;}
-  if(globalPeak<.003)return 0;
-  const threshold=Math.max(.005,noisePeak*3.2,globalPeak*(cue.group==='Gunfire'?.018:.026));let hits=0,onset=0;
-  for(let i=0;i<maxSamples;i+=block){let peak=0,end=Math.min(maxSamples,i+block);for(let c=0;c<channels;c++){const d=buffer.getChannelData(c);for(let j=i;j<end;j+=2){const v=Math.abs(d[j]);if(v>peak)peak=v;}}if(peak>=threshold){hits++;if(hits===1)onset=i/sr;if(hits>=2)return Math.max(0,onset-soundPreroll(cue));}else hits=0;}
-  return 0;
-}
-function trimSoundBuffer(buffer,cueId,cue,onset){
-  const cap=soundClipCap(cueId,cue);if(!Number.isFinite(cap))return buffer;
-  const ctx=getAnalysisAudioContext();if(!ctx)return buffer;
-  const sr=buffer.sampleRate||44100,start=Math.max(0,Math.min(buffer.length-1,Math.floor(Math.max(0,onset)*sr))),frames=Math.max(1,Math.min(buffer.length-start,Math.ceil(cap*sr)));
-  const out=ctx.createBuffer(buffer.numberOfChannels,frames,sr);
-  for(let c=0;c<buffer.numberOfChannels;c++)out.copyToChannel(buffer.getChannelData(c).subarray(start,start+frames),c,0);
-  return out;
-}
-function openSoundDb(){
-  if(soundDbPromise)return soundDbPromise;
-  soundDbPromise=new Promise(resolve=>{
-    if(!('indexedDB'in window)){resolve(null);return;}
-    try{const req=indexedDB.open(SOUND_DB_NAME,SOUND_DB_VERSION);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(SOUND_DB_STORE))db.createObjectStore(SOUND_DB_STORE,{keyPath:'cueId'});else if(req.oldVersion<SOUND_DB_VERSION)req.transaction.objectStore(SOUND_DB_STORE).clear();};req.onsuccess=()=>resolve(req.result);req.onerror=()=>resolve(null);req.onblocked=()=>resolve(null);}catch{resolve(null);}
-  });
-  return soundDbPromise;
-}
-async function readStoredSound(cueId){
-  const db=await openSoundDb();if(!db)return null;
-  return new Promise(resolve=>{try{const tx=db.transaction(SOUND_DB_STORE,'readonly'),req=tx.objectStore(SOUND_DB_STORE).get(cueId);req.onsuccess=()=>resolve(req.result||null);req.onerror=()=>resolve(null);}catch{resolve(null);}});
-}
-async function writeStoredSound(record){
-  const db=await openSoundDb();if(!db)return false;
-  return new Promise(resolve=>{try{const tx=db.transaction(SOUND_DB_STORE,'readwrite');tx.objectStore(SOUND_DB_STORE).put(record);tx.oncomplete=()=>resolve(true);tx.onerror=()=>resolve(false);tx.onabort=()=>resolve(false);}catch{resolve(false);}});
-}
-async function requestPersistentAudioStorage(){try{if(navigator.storage?.persist)await navigator.storage.persist();}catch{}}
-async function registerSoundCacheWorker(){
-  if(!('serviceWorker'in navigator)||!/^https?:$/.test(location.protocol))return null;
-  try{const reg=await navigator.serviceWorker.register('./audio-cache-sw.js',{scope:'./'});await navigator.serviceWorker.ready;return reg;}catch{return null;}
-}
-function ensureSoundWorker(){if(!soundWorkerPromise)soundWorkerPromise=registerSoundCacheWorker();return soundWorkerPromise;}
-async function cacheOpaqueSound(url){
-  try{await ensureSoundWorker();if(!('caches'in window))return false;const cache=await caches.open(SOUND_FALLBACK_CACHE);if(await cache.match(url))return true;const response=await fetch(url,{mode:'no-cors',cache:'reload'});if(!(response.ok||response.type==='opaque'))return false;await cache.put(url,response.clone());return true;}catch{return false;}
-}
-async function decodeSoundBlob(blob,cueId,cue,knownOnset=null){
-  if(cue.loop)return {onset:0,buffer:null};
-  const ctx=getAnalysisAudioContext();if(!ctx)throw new Error('No AudioContext');
-  const data=await blob.arrayBuffer(),decoded=await ctx.decodeAudioData(data.slice(0)),onset=Number.isFinite(knownOnset)?Math.max(0,knownOnset):findSoundOnset(decoded,cue),buffer=trimSoundBuffer(decoded,cueId,cue,onset);
-  return {onset,buffer};
-}
-
-function serializeTrimmedBuffer(buffer){return {sampleRate:buffer.sampleRate,numberOfChannels:buffer.numberOfChannels,channels:Array.from({length:buffer.numberOfChannels},(_,c)=>buffer.getChannelData(c).slice().buffer)};}
-function restoreTrimmedBuffer(pcm){
-  const ctx=getAnalysisAudioContext();if(!ctx||!pcm||!Number.isFinite(Number(pcm.sampleRate))||!Array.isArray(pcm.channels)||!pcm.channels.length)return null;
-  const arrays=pcm.channels.map(x=>new Float32Array(x)),frames=Math.min(...arrays.map(x=>x.length));if(!frames)return null;const out=ctx.createBuffer(arrays.length,frames,Number(pcm.sampleRate));for(let c=0;c<arrays.length;c++)out.copyToChannel(arrays[c].subarray(0,frames),c);return out;
-}
-function yieldAudioPreparation(){return new Promise(resolve=>{if('requestIdleCallback'in window)requestIdleCallback(()=>resolve(),{timeout:40});else setTimeout(resolve,0);});}
-async function prepareSoundResource(cueId){
-  const cue=SOUND_CUES[cueId];if(!cue)throw new Error('Unknown cue');
-  let record=await readStoredSound(cueId);
-  if(record&&record.rev===SOUND_ASSET_REV&&record.url===cue.url&&record.pcm){
-    const buffer=restoreTrimmedBuffer(record.pcm);if(buffer){soundOnsets.set(cueId,Number(record.onset)||0);return {mediaUrl:'',onset:Number(record.onset)||0,objectUrl:'',buffer,persistent:true,fallback:false};}
-  }
-  if(record&&record.rev===SOUND_ASSET_REV&&record.url===cue.url&&record.opaque===true){const cached=await cacheOpaqueSound(cue.url);return {mediaUrl:cue.url,onset:Number(record.onset)||0,objectUrl:'',buffer:null,persistent:cached,fallback:true};}
-  if(record&&record.rev===SOUND_ASSET_REV&&record.url===cue.url&&record.blob instanceof Blob&&record.blob.size>0){
-    if(cue.loop){const objectUrl=URL.createObjectURL(record.blob);return {mediaUrl:objectUrl,onset:0,objectUrl,buffer:null,persistent:true,fallback:false};}
-    try{const decoded=await decodeSoundBlob(record.blob,cueId,cue,Number(record.onset));soundOnsets.set(cueId,decoded.onset||0);const pcm=serializeTrimmedBuffer(decoded.buffer);await writeStoredSound({cueId,rev:SOUND_ASSET_REV,url:cue.url,onset:decoded.onset||0,pcm,storedAt:Date.now()});return {mediaUrl:'',onset:decoded.onset||0,objectUrl:'',buffer:decoded.buffer,persistent:true,fallback:false};}
-    catch{const objectUrl=URL.createObjectURL(record.blob);return {mediaUrl:objectUrl,onset:Number(record.onset)||0,objectUrl,buffer:null,persistent:true,fallback:true};}
-  }
-  try{
-    const response=await fetch(cue.url,{mode:'cors',cache:'no-store'});if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    const blob=await response.blob();if(!blob.size)throw new Error('Empty audio');
-    if(cue.loop){await writeStoredSound({cueId,rev:SOUND_ASSET_REV,url:cue.url,onset:0,blob,storedAt:Date.now()});const objectUrl=URL.createObjectURL(blob);return {mediaUrl:objectUrl,onset:0,objectUrl,buffer:null,persistent:true,fallback:false};}
-    try{const decoded=await decodeSoundBlob(blob,cueId,cue,null);soundOnsets.set(cueId,decoded.onset||0);const pcm=serializeTrimmedBuffer(decoded.buffer);await writeStoredSound({cueId,rev:SOUND_ASSET_REV,url:cue.url,onset:decoded.onset||0,pcm,storedAt:Date.now()});return {mediaUrl:'',onset:decoded.onset||0,objectUrl:'',buffer:decoded.buffer,persistent:true,fallback:false};}
-    catch{await writeStoredSound({cueId,rev:SOUND_ASSET_REV,url:cue.url,onset:0,blob,storedAt:Date.now()});const objectUrl=URL.createObjectURL(blob);return {mediaUrl:objectUrl,onset:0,objectUrl,buffer:null,persistent:true,fallback:true};}
-  }catch(error){
-    const cached=await cacheOpaqueSound(cue.url);if(cached)await writeStoredSound({cueId,rev:SOUND_ASSET_REV,url:cue.url,onset:0,opaque:true,storedAt:Date.now()});return {mediaUrl:cue.url,onset:0,objectUrl:'',buffer:null,persistent:cached,fallback:true};
-  }
-}
-async function waitForMediaReady(el,timeout=18000){return new Promise(resolve=>{let done=false;const finish=ok=>{if(done)return;done=true;clearTimeout(timer);el.removeEventListener('canplaythrough',yes);el.removeEventListener('canplay',yes);el.removeEventListener('loadeddata',yes);el.removeEventListener('error',no);resolve(ok);},yes=()=>finish(true),no=()=>finish(false),timer=setTimeout(()=>finish(el.readyState>=2),timeout);if(el.readyState>=3){finish(true);return;}el.addEventListener('canplaythrough',yes,{once:true});el.addEventListener('canplay',yes,{once:true});el.addEventListener('loadeddata',yes,{once:true});el.addEventListener('error',no,{once:true});});}
-function buildSoundPool(cueId){
-  if(soundPools.has(cueId))return soundPools.get(cueId);
-  const cue=SOUND_CUES[cueId];if(!cue||soundFailures.has(cueId))return null;
-  const pool={cueId,nodes:[],cursor:0,status:'loading',readyPromise:null,onset:0,fallback:false,objectUrl:'',buffer:null,persistent:false};
-  pool.readyPromise=(async()=>{
-    try{
-      let resourcePromise=soundResourcePromises.get(cueId);if(!resourcePromise){resourcePromise=prepareSoundResource(cueId);soundResourcePromises.set(cueId,resourcePromise);}
-      const resource=await resourcePromise;pool.onset=resource.onset||0;pool.fallback=!!resource.fallback;pool.objectUrl=resource.objectUrl||'';pool.buffer=resource.buffer||null;pool.persistent=!!resource.persistent;
-      if(pool.buffer&&!cue.loop){pool.status='ready';return true;}
-      for(let i=0;i<1;i++){const el=new Audio();el.preload='auto';el.src=resource.mediaUrl;el.playsInline=true;el.crossOrigin=null;try{el.preservesPitch=false;el.webkitPreservesPitch=false;el.mozPreservesPitch=false;}catch{}pool.nodes.push(el);}
-      const first=pool.nodes[0];try{first.load();}catch{}const ok=await waitForMediaReady(first);if(!ok)throw new Error('Audio not ready');
-      pool.status='ready';return true;
-    }catch(error){console.warn('Audio cue failed to prepare',cueId,error);pool.status='failed';soundFailures.add(cueId);return false;}
-  })();
-  soundPools.set(cueId,pool);return pool;
-}
-function warmSoundCue(cueId){return buildSoundPool(cueId)?.readyPromise||Promise.resolve(false);}
 function weaponSoundCueIds(weapon=currentWeapon){return weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='assault'?['shotAssault','reloadAssault']:['shotPistol','reloadPistol'];}
-function warmWeaponAudio(weapon=currentWeapon){weaponSoundCueIds(weapon).forEach(id=>buildSoundPool(id));}
+function warmWeaponAudio(weapon=currentWeapon){for(const id of weaponSoundCueIds(weapon))gameAudio.load(id);}
 function updateAudioPrepareStatus(){
   if(!engineReady||experienceEntered)return;
   if(gameAudioReady){setEngineStatus('3D ENGINE READY · AUDIO READY','ready');setEnterLabel('ENTER ARENA');return;}
-  setEngineStatus(`PREPARING AUDIO ${gameAudioPrepareDone}/${GAME_AUDIO_TOTAL} · SAVING ON DEVICE`);setEnterLabel('PREPARING AUDIO');
+  setEngineStatus(`PREPARING LOCAL AUDIO ${gameAudioPrepareDone}/${GAME_AUDIO_TOTAL}`);setEnterLabel('PREPARING AUDIO');
 }
 function prepareAllGameAudio(){
   if(gameAudioPreparePromise)return gameAudioPreparePromise;
-  gameAudioPreparePromise=(async()=>{
-    ensureSoundWorker();const ids=Object.keys(SOUND_CUES);gameAudioPrepareDone=0;
-    for(const id of ids){const pool=buildSoundPool(id);if(pool)await pool.readyPromise;gameAudioPrepareDone++;updateAudioPrepareStatus();await yieldAudioPreparation();}
-    gameAudioReady=true;updateAudioPrepareStatus();return true;
-  })();
+  gameAudioPreparePromise=gameAudio.preloadAll((done)=>{gameAudioPrepareDone=done;updateAudioPrepareStatus();}).then(()=>{gameAudioReady=true;updateAudioPrepareStatus();return true;});
   return gameAudioPreparePromise;
 }
-async function ensureGameAudioReady(){if(gameAudioReady)return true;updateAudioPrepareStatus();await prepareAllGameAudio();return gameAudioReady;}
-function clearSoundNodeTimers(el){if(el?._fadeTimer){clearInterval(el._fadeTimer);el._fadeTimer=0;}if(el?._safetyTimer){clearTimeout(el._safetyTimer);el._safetyTimer=0;}}
-function scheduleSoundClipStop(el,cueId,baseVolume,startAt,maxDuration){
-  const cue=SOUND_CUES[cueId];let cap=Number.isFinite(maxDuration)?Math.min(soundClipCap(cueId,cue),Math.max(.04,maxDuration)):soundClipCap(cueId,cue);if(!Number.isFinite(cap))return;
-  const endAt=startAt+cap,fade=Math.min(.16,Math.max(.045,cap*.12)),fadeAt=Math.max(startAt,endAt-fade),token=el._playToken;
-  el._fadeTimer=setInterval(()=>{if(el._playToken!==token){clearSoundNodeTimers(el);return;}const t=Number(el.currentTime)||0;if(t>=fadeAt){const k=Math.max(0,Math.min(1,(endAt-t)/fade));el.volume=baseVolume*k;}if(t>=endAt){clearSoundNodeTimers(el);try{el.pause();el.currentTime=startAt;}catch{}}},24);
-  el._safetyTimer=setTimeout(()=>{if(el._playToken!==token)return;clearSoundNodeTimers(el);try{el.pause();el.currentTime=startAt;}catch{}},Math.max(3000,(cap+2)*1000));
+async function ensureGameAudioReady(){if(gameAudioReady)return true;updateAudioPrepareStatus();await prepareAllGameAudio();return true;}
+function ensureAudio(){return gameAudio.context();}
+function playSoundCue(cueId,volume=1,override={}){detectClientStall();if(!realtimeAudioAllowed())return null;return gameAudio.play(cueId,volume,override);}
+function spatialAudioParams(x,y,z,maxDistance=60){
+  if(!position)return{volume:.08,pan:0};
+  const dx=Number(x||0)-position.x,dy=Number(y||0)-(position.y+1),dz=Number(z||0)-position.z,d=Math.hypot(dx,dy,dz);
+  const volume=Math.max(0,1-d/Math.max(1,maxDistance));
+  if(d<.001)return{volume,pan:0};
+  const rightX=-Math.cos(yaw),rightZ=Math.sin(yaw),pan=THREE.MathUtils.clamp((dx*rightX+dz*rightZ)/d,-.92,.92);
+  return{volume:volume*volume,pan};
 }
-function playBufferedSound(pool,cueId,volume,override){
-  const cue=SOUND_CUES[cueId],ctx=ensureAudio();if(!ctx||!pool.buffer)return null;
-  try{
-    const rate=Math.max(.5,Math.min(2,Number(override.rate??override.playbackRate??cue.rate)||1)),baseVolume=Math.max(0,Math.min(1,SOUND_VOLUME*(Number(volume)||0)*(Number(override.gain??cue.gain)||1))),source=ctx.createBufferSource(),gain=ctx.createGain();
-    source.buffer=pool.buffer;source.playbackRate.value=rate;gain.gain.setValueAtTime(baseVolume,ctx.currentTime);source.connect(gain).connect(ctx.destination);
-    const available=Math.max(.015,pool.buffer.duration/rate),requested=Number(override.maxDuration),duration=Number.isFinite(requested)?Math.max(.015,Math.min(available,requested)):available,fade=Math.min(.07,Math.max(.018,duration*.10)),fadeStart=Math.max(ctx.currentTime,ctx.currentTime+duration-fade);
-    gain.gain.setValueAtTime(baseVolume,fadeStart);gain.gain.linearRampToValueAtTime(0,ctx.currentTime+duration);source.start(ctx.currentTime);source.stop(ctx.currentTime+duration+.012);return source;
-  }catch{return null;}
+function playSpatialCue(cueId,x,y,z,maxDistance=60,volume=1,override={}){const p=spatialAudioParams(x,y,z,maxDistance);if(p.volume<=.004)return null;return playSoundCue(cueId,p.volume*volume,{...override,pan:p.pan});}
+function savePlayerSettings(){localStorage.setItem('breachlinePlayerSettings',JSON.stringify(playerSettings));}
+function applyGraphicsQuality(){
+  if(!renderer)return;const quality=playerSettings.graphics;
+  const maxRatio=quality==='low'?1:quality==='medium'?1.5:2;renderer.setPixelRatio(Math.min(devicePixelRatio||1,maxRatio));renderer.shadowMap.enabled=quality==='high'&&!isTouch;renderer.setSize(viewW,viewH,false);
 }
-function playSoundCue(cueId,volume=1,override={}){
-  detectClientStall();if(!realtimeAudioAllowed())return null;
-  const cue=SOUND_CUES[cueId],pool=buildSoundPool(cueId);if(!cue||!pool||pool.status!=='ready')return null;
-  if(pool.buffer&&!cue.loop)return playBufferedSound(pool,cueId,volume,override);
-  if(!pool.nodes.length)return null;
-  const el=pool.nodes[pool.cursor++%pool.nodes.length];clearSoundNodeTimers(el);el._playToken=(el._playToken||0)+1;
-  const loop=!!(override.loop??cue.loop),startAt=loop?0:(soundOnsets.has(cueId)?soundOnsets.get(cueId):pool.onset||0),rate=Math.max(.5,Math.min(2,Number(override.rate??override.playbackRate??cue.rate)||1)),baseVolume=Math.max(0,Math.min(1,SOUND_VOLUME*(Number(volume)||0)*(Number(override.gain??cue.gain)||1)));
-  try{el.pause();el.loop=loop;el.playbackRate=rate;el.volume=baseVolume;el.currentTime=Math.max(0,startAt);const started=el.play();const after=()=>{if(!loop)scheduleSoundClipStop(el,cueId,baseVolume,startAt,Number(override.maxDuration));};if(started?.then)started.then(after).catch(()=>{});else after();return el;}catch{return null;}
+function syncPlayerSettingsUI(){
+  const values=[['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']];
+  for(const [id,key] of values){const el=$(id),out=$(`${id}Value`);if(el)el.value=playerSettings[key];if(out)out.textContent=key.includes('Volume')?`${Math.round(playerSettings[key]*100)}%`:`${Number(playerSettings[key]).toFixed(2)}×`;}
+  if($('playerGraphics'))$('playerGraphics').value=playerSettings.graphics;
 }
-async function waitForSoundCue(cueId,timeoutMs=1800){const pool=buildSoundPool(cueId);if(!pool)return false;if(pool.status==='ready')return true;if(pool.status==='failed')return false;return await Promise.race([pool.readyPromise,new Promise(resolve=>setTimeout(()=>resolve(false),timeoutMs))]);}
+function updatePlayerSettingFromUI(id,key){const el=$(id);if(!el)return;playerSettings={...playerSettings,[key]:Number(el.value)};savePlayerSettings();syncPlayerSettingsUI();if((key==='masterVolume'||key==='musicVolume')&&!gameActive&&introMusicHandle){stopIntroMusic();if(!masterMuted)startIntroMusic();}}
+function openPlayerSettings(){syncPlayerSettingsUI();$('settingsPanel').classList.remove('hide');if(document.pointerLockElement)document.exitPointerLock?.();}
+function closePlayerSettings(){$('settingsPanel').classList.add('hide');if(gameActive&&!paused&&!isTouch)requestPointerLockNow();}
+function resetPlayerSettings(){playerSettings={...DEFAULT_PLAYER_SETTINGS};savePlayerSettings();syncPlayerSettingsUI();applyGraphicsQuality();}
 
 
 function init3D(){
@@ -668,13 +556,14 @@ function init3D(){
   camera = new THREE.PerspectiveCamera(70, viewW/viewH, 0.05, 360);
   camera.rotation.order = 'YXZ';
   renderer = new THREE.WebGLRenderer({ canvas, antialias:true, powerPreference:'high-performance' });
-  renderer.setPixelRatio(Math.min(devicePixelRatio || 1, isTouch ? 1.75 : 2));
+  renderer.setPixelRatio(1);
   renderer.setSize(viewW, viewH, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.shadowMap.enabled = !isTouch;
+  renderer.shadowMap.enabled = false;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
+  applyGraphicsQuality();
   clock = new THREE.Clock();
   initHudOverlay();
 
@@ -848,20 +737,27 @@ function bindUI(){
   for(const btn of teamButtons)btn.addEventListener('click',()=>applyTeamSelection(btn.dataset.teamChoice));
   $('createBtn').addEventListener('click', createWorld);
   $('refreshBtn').addEventListener('click', refreshWorlds);
-  $('musicBtn').addEventListener('click',()=>{ensureAudio();toggleIntroMusic();});
-  $('godToggle').addEventListener('click',()=>toggleGodMode(false));
+  $('musicBtn').addEventListener('click',()=>{ensureAudio();toggleMasterMute();});
+  $('godToggle').addEventListener('click',toggleGodMode);
+  $('settingsBtn').addEventListener('click',openPlayerSettings);
+  $('pauseSettingsBtn').addEventListener('click',openPlayerSettings);
+  $('settingsCloseBtn').addEventListener('click',closePlayerSettings);
+  $('settingsDoneBtn').addEventListener('click',closePlayerSettings);
+  $('settingsDefaultsBtn').addEventListener('click',resetPlayerSettings);
+  for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id).addEventListener('input',()=>updatePlayerSettingFromUI(id,key));
+  $('playerGraphics').addEventListener('change',()=>{playerSettings={...playerSettings,graphics:$('playerGraphics').value};savePlayerSettings();applyGraphicsQuality();});
+  primaryWeaponInput.addEventListener('change',()=>{selectedPrimary=PRIMARY_WEAPONS.includes(primaryWeaponInput.value)?primaryWeaponInput.value:'assault';localStorage.setItem('breachlinePrimary',selectedPrimary);});
   $('menuFullBtn').addEventListener('click', toggleFullscreen);
   $('joinBtn').addEventListener('click', () => joinWorld(normalizeCode(codeInput.value)));
   codeInput.addEventListener('blur', () => { codeInput.value = normalizeCode(codeInput.value); });
   codeInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); joinWorld(normalizeCode(codeInput.value)); } });
   $('resumeBtn').addEventListener('click', resumeFromGesture);
   $('copyBtn').addEventListener('click', copyInvite);
-  $('pauseGodBtn').addEventListener('click',()=>toggleGodMode(true));
-  $('teamSwitchBtn').addEventListener('click',()=>requestTeamChange(myTeam==='blue'?'red':'blue'));
+  $('teamSwitchBtn').addEventListener('click',()=>requestTeamChange(pendingTeam?myTeam:(myTeam==='blue'?'red':'blue')));
   $('adminBtn').addEventListener('click',openAdminPanel);
   $('adminCloseBtn').addEventListener('click',closeAdminPanel);
   $('adminSaveBtn').addEventListener('click',saveAdminSettings);
-  $('adminResetBtn').addEventListener('click',()=>{populateAdminSettings(DEFAULT_WORLD_SETTINGS);populateAdminBots({blueBots:1,redBots:1,difficulty:'normal'});});
+  $('adminResetBtn').addEventListener('click',resetActiveAdminTab);
   const adminTabs=[...document.querySelectorAll('[data-admin-tab]')];
   for(const tab of adminTabs){
     tab.addEventListener('click',()=>switchAdminTab(tab.dataset.adminTab));
@@ -893,7 +789,7 @@ function bindUI(){
   document.addEventListener('mousemove', e => {
     if(staleActionEvent(e,140))return;
     if(document.pointerLockElement!==canvas || !gameActive || paused || hp<=0) return;
-    const sens=aimSensitivityScale();yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
+    const sens=aimSensitivityScale()*playerSettings.lookSensitivity;yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
   });
   document.addEventListener('pointerlockchange', () => {
     if(gameActive && !isTouch && !paused && document.pointerLockElement!==canvas) openPause();
@@ -910,30 +806,30 @@ function bindUI(){
     }
     if(e.code==='Escape' && !e.repeat){
       e.preventDefault();
+      if(!$('settingsPanel').classList.contains('hide')){closePlayerSettings();return;}
       if(!$('adminPanel').classList.contains('hide')){closeAdminPanel();return;}
       if(scoreboardOpen){scoreboardOpen=false;return;}
       if(paused){resumeFromGesture();return;}
       openPause();return;
     }
     if(paused) return;
-    if(['KeyW','KeyA','KeyS','KeyD','Space','KeyC','KeyR','KeyQ','KeyB','KeyF','KeyG','Digit1','Digit2','Digit3','Digit4','Tab'].includes(e.code)) e.preventDefault();
+    if(['KeyW','KeyA','KeyS','KeyD','Space','KeyC','KeyR','KeyQ','KeyB','KeyF','KeyG','Digit1','Digit2','Tab'].includes(e.code)) e.preventDefault();
     keys.add(e.code);
     if(e.code==='Space' && !e.repeat) tryJump();
     if(e.code==='KeyC' && !e.repeat) toggleCrouch();
     if(e.code==='KeyR' && !e.repeat) doReload();
-    if(e.code==='Digit1' && !e.repeat) switchWeapon('pistol');
-    if(e.code==='Digit2' && !e.repeat) switchWeapon('assault');
-    if(e.code==='Digit3' && !e.repeat) switchWeapon('shotgun');
-    if(e.code==='Digit4' && !e.repeat) switchWeapon('sniper');
+    if(e.code==='Digit1' && !e.repeat) switchWeapon(primaryWeapon);
+    if(e.code==='Digit2' && !e.repeat) switchWeapon('pistol');
     if(e.code==='KeyF' && !e.repeat) beginEquipmentAim('flash');
     if(e.code==='KeyG' && !e.repeat) beginEquipmentAim('sticky');
-    if(e.code==='KeyQ' && !e.repeat) switchWeapon(nextWeapon(currentWeapon));
+    if(e.code==='KeyQ' && !e.repeat) switchWeapon(currentWeapon==='pistol'?primaryWeapon:'pistol');
     if(e.code==='KeyB' && !e.repeat) toggleFireMode();
-    if(e.code==='Tab' && !e.repeat) toggleScoreboard();
+    if(e.code==='Tab'){scoreboardOpen=true;scoreboardScroll=0;}
   });
   document.addEventListener('keyup', e => {
     if(isEditableTarget(e.target))return;
     keys.delete(e.code);
+    if(e.code==='Tab')scoreboardOpen=false;
     if(e.code==='KeyF'&&equipmentAim.kind==='flash'){if(staleActionEvent(e))cancelEquipmentAim();else releaseEquipmentAim();}
     if(e.code==='KeyG'&&equipmentAim.kind==='sticky'){if(staleActionEvent(e))cancelEquipmentAim();else releaseEquipmentAim();}
   });
@@ -949,18 +845,9 @@ function isEditableTarget(target){
 }
 function isLandscape(){ const v=getViewSize(); return v.w>v.h; }
 function getViewSize(){const v=viewportMetrics||syncVisualViewportMetrics();return {w:v.w,h:v.h};}
-function fitResponsiveOverlays(){
-  for(const el of [document.querySelector('.menu-shell'),document.querySelector('.pause-card'),document.querySelector('.admin-shell'),document.querySelector('.boot:not(.hide) .boot-card')]){
-    if(!el)continue;
-    el.style.removeProperty('zoom');
-    el.style.removeProperty('transform');
-    el.style.removeProperty('transform-origin');
-    delete el.dataset.fitScale;
-  }
-}
 async function enterExperience(){
-  ensureAudio();requestPersistentAudioStorage();
-  if(!engineReady){if(!(await ensureThreeEngine(true)))return;}
+  ensureAudio();
+  if(!engineReady){if(!(await ensureThreeEngine()))return;}
   await ensureGameAudioReady();
   if(iPhoneSafariTab()){
     $('iosInstallHint')?.classList.remove('hide');
@@ -976,8 +863,8 @@ async function enterExperience(){
   setTimeout(()=>{if(!gameActive&&!orientationBlocked)startIntroMusic();},160);
 }
 async function continueInSafari(){
-  ensureAudio();requestPersistentAudioStorage();
-  if(!(await ensureThreeEngine(true)))return;
+  ensureAudio();
+  if(!(await ensureThreeEngine()))return;
   await ensureGameAudioReady();
   experienceEntered=true;
   $('iosInstallHint')?.classList.add('hide');
@@ -1136,13 +1023,14 @@ function onCanvasPointerDown(e){
     if(pointInCircle(p.x,p.y,layout.fire)){
       touchRoles.set(e.pointerId,'fire');fireTouchPointers.add(e.pointerId);touchVisual.fireUntil=performance.now()+150;fireHeld=true;doFire();return;
     }
-    if(pointInCircle(p.x,p.y,layout.reload)){
-      touchRoles.set(e.pointerId,'reload');touchVisual.reloadUntil=performance.now()+150;doReload();return;
+    if(pointInRect(p.x,p.y,layout.weapon)){
+      touchRoles.set(e.pointerId,'weapon');
+      const rel=(p.x-layout.weapon.x)/Math.max(1,layout.weapon.w);
+      if(rel<.36)switchWeapon(nextWeapon(currentWeapon));
+      else if(rel<.66){if(primaryWeapon==='assault')toggleFireMode();else showToast('FIRE MODE · ASSAULT ONLY');}
+      else doReload();
+      return;
     }
-    if(pointInCircle(p.x,p.y,layout.swap)){
-      touchRoles.set(e.pointerId,'swap');touchVisual.swapUntil=performance.now()+150;switchWeapon(nextWeapon(currentWeapon));return;
-    }
-    if(pointInCircle(p.x,p.y,layout.mode)){touchRoles.set(e.pointerId,'mode');touchVisual.modeUntil=performance.now()+150;toggleFireMode();return;}
     if(pointInCircle(p.x,p.y,layout.jump)){
       touchRoles.set(e.pointerId,'jump');
       touchVisual.jumpUntil=performance.now()+150;
@@ -1188,7 +1076,7 @@ function onCanvasPointerMove(e){
   if(role==='joy'){const L=hudLayout||computeHudLayout();updateJoy(p.x,p.y,{...L,joy:{...L.joy,x:joy.centerX||L.joy.x,y:joy.centerY||L.joy.y}});return;}
   if(role==='look' && e.pointerId===look.pointer && hp>0){
     const dx=p.x-look.x,dy=p.y-look.y;look.x=p.x;look.y=p.y;
-    const sens=aimSensitivityScale();yaw-=dx*.006*sens;pitch-=dy*.0052*sens;pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
+    const sens=aimSensitivityScale()*playerSettings.touchSensitivity;yaw-=dx*.006*sens;pitch-=dy*.0052*sens;pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
   }
 }
 
@@ -1233,7 +1121,7 @@ function renderWorlds(rooms){
     const row=document.createElement('div');row.className='world';
     const left=document.createElement('div');const blue=Number(room.blue)||0,red=Number(room.red)||0,blueBots=Number(room.blueBots)||0,redBots=Number(room.redBots)||0;
     const codeEl=document.createElement('div');codeEl.className='world-code';codeEl.textContent=String(room.code||'');
-    const botMeta=document.createElement('div');botMeta.className='world-meta';botMeta.textContent=`Bots · Blue ${blueBots} · Red ${redBots} · ${String(room.botDifficulty||'normal').toUpperCase()}`;
+    const botMeta=document.createElement('div');botMeta.className='world-meta';botMeta.textContent=`${room.custom?'CUSTOM · ':''}${String(room.matchStatus||'waiting').toUpperCase()} · ${Number(room.blueScore)||0}-${Number(room.redScore)||0} / ${Number(room.scoreLimit)||DEFAULT_MATCH_RULES.scoreLimit} · Bots ${blueBots+redBots}`;if(room.custom)codeEl.classList.add('custom-match');
     const teamCounts=document.createElement('div');teamCounts.className='team-counts';
     const blueChip=document.createElement('span');blueChip.className='team-chip blue';blueChip.textContent=`BLUE ${blue}`;
     const redChip=document.createElement('span');redChip.className='team-chip red';redChip.textContent=`RED ${red}`;
@@ -1242,16 +1130,16 @@ function renderWorlds(rooms){
     const btn=document.createElement('button');btn.className='btn icon-btn';btn.title=`Join ${room.code}`;btn.setAttribute('aria-label',`Join ${room.code}`);btn.innerHTML='<svg class="ui-icon"><use href="#i-enter"/></svg>';btn.addEventListener('click',()=>joinWorld(room.code));
     row.append(left,meta,btn);worldList.append(row);
   }
-  requestAnimationFrame(fitResponsiveOverlays);
+  
 }
 
 async function createWorld(){
   if(!updateBotTeamSelection()){setStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}
   beginGameplayFromGesture();
   const bots=selectedBotTeams();
-  myName=safeName();myTeam=selectedTeam;godMode=false;pendingCreatorGod=selectedGod;localStorage.setItem('breachlineName',myName);localStorage.setItem('breachlineBlueBots',String(bots.blue));localStorage.setItem('breachlineRedBots',String(bots.red));localStorage.setItem('breachlineBotDifficulty',botDifficulty.value);localStorage.setItem('breachlineTeam',myTeam);setStatus('Creating match…');disableMenu(true);
+  myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachlineName',myName);localStorage.setItem('breachlineBlueBots',String(bots.blue));localStorage.setItem('breachlineRedBots',String(bots.red));localStorage.setItem('breachlineBotDifficulty',botDifficulty.value);localStorage.setItem('breachlineTeam',myTeam);setStatus('Creating match…');disableMenu(true);
   try{
-    const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value}),cache:'no-store'});
+    const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value,creatorGod:selectedGod}),cache:'no-store'});
     const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not create match.');
     connectWorld(data.code);
   }catch(err){document.exitPointerLock?.();setStatus(err.message||'Could not create match.','error');disableMenu(false);}
@@ -1259,16 +1147,16 @@ async function createWorld(){
 function joinWorld(code){
   if(code.length!==ROOM_CODE_LENGTH){setStatus('Enter a 4-character room code.','error');return;}
   beginGameplayFromGesture();
-  myName=safeName();myTeam=selectedTeam;godMode=false;pendingCreatorGod=false;localStorage.setItem('breachlineName',myName);localStorage.setItem('breachlineTeam',myTeam);setStatus(`Joining ${code}…`);disableMenu(true);connectWorld(code);
+  myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachlineName',myName);localStorage.setItem('breachlineTeam',myTeam);setStatus(`Joining ${code}…`);disableMenu(true);connectWorld(code);
 }
-function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
+function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;primaryWeaponInput.disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
 
 async function connectWorld(code, reconnecting=false){
   clearTimeout(reconnectTimer);currentRoom=normalizeCode(code);if(!currentRoom)return;
   if(socket){try{socket.close(1000,'Replacing connection')}catch{}}
   let ticket='';
   try{
-    const ticketResponse=await fetch(`${ONLINE_API}/rooms/${currentRoom}/ticket`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName||safeName(),team:myTeam}),cache:'no-store'});
+    const ticketResponse=await fetch(`${ONLINE_API}/rooms/${currentRoom}/ticket`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName||safeName(),team:myTeam,primaryWeapon}),cache:'no-store'});
     const ticketData=await ticketResponse.json();if(!ticketResponse.ok)throw new Error(ticketData.error||'Could not authorize match connection.');ticket=String(ticketData.ticket||'');if(!ticket)throw new Error('Server did not issue a join ticket.');
   }catch(err){if(!gameActive&&!reconnecting){document.exitPointerLock?.();disableMenu(false);setStatus(err.message||'Could not join match.','error');}else scheduleReconnect();return;}
   const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?protocol=${PROTOCOL_VERSION}&ticket=${encodeURIComponent(ticket)}`;
@@ -1287,14 +1175,15 @@ function scheduleReconnect(){
 }
 function send(payload){if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.stringify(payload));}
 function serverNow(){return Date.now()+serverClockOffset;}
+function normalizeClientMatch(value){const v=value&&typeof value==='object'?value:{};return{...normalizeSharedMatchState(v,Date.now(),v),serverTime:Number(v.serverTime)||serverNow()};}
+function matchClockText(){const m=matchState,now=serverNow();if(m.status==='warmup')return `START ${(Math.max(0,m.warmupEndsAt-now)/1000).toFixed(1)}`;if(m.status==='active'){const sec=Math.max(0,Math.ceil((m.endsAt-now)/1000)),min=Math.floor(sec/60);return `${min}:${String(sec%60).padStart(2,'0')}`;}if(m.status==='ended')return m.winner==='draw'?'DRAW':`${String(m.winner||'').toUpperCase()} WINS`;return 'WAITING';}
 
 function handleMessage(m){
   detectClientStall();
   if(m.t==='welcome'){
     if(Number(m.protocol)!==PROTOCOL_VERSION){showToast('CLIENT / SERVER VERSION MISMATCH');leaveWorld();return;}
     if(Number.isFinite(Number(m.serverTime)))serverClockOffset=Number(m.serverTime)-Date.now();
-    currentRoom=m.code;isWorldAdmin=!!m.isAdmin;worldOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;onGround=m.self.grounded!==false;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;currentWeapon=m.self.weapon||'pistol';ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);combatRevision=Math.max(0,Number(m.self.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
-    if(pendingCreatorGod&&isWorldAdmin&&!godMode)send({t:'god',enabled:true});pendingCreatorGod=false;
+    currentRoom=m.code;isWorldAdmin=!!m.isAdmin;worldOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;onGround=m.self.grounded!==false;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon==='pistol'||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);combatRevision=Math.max(0,Number(m.self.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
     position.set(m.self.x||0,m.self.y??terrainHeight(m.self.x||0,m.self.z||0),m.self.z||0);resetViewVertical();yaw=m.self.yaw||0;pitch=m.self.pitch||0;
     clearRemotes();for(const p of m.players||[])upsertRemote(p,true);for(const b of m.bots||[])upsertRemote(b,true);
     enterGame();updateHealth();updatePlayerCount();return;
@@ -1314,17 +1203,18 @@ function handleMessage(m){
   if(m.t==='throwableEnd'){removeThrowableVisual(m.id);return;}
   if(m.t==='flashDetonate'){soundTacticalDetonation('flash',m);spawnDetonationFx('flash',m);removeThrowableVisual(m.id);return;}
   if(m.t==='flashEffect'){applyFlashEffect(m);return;}
-  if(m.t==='stunDetonate'){soundTacticalDetonation('stun',m);spawnDetonationFx('flash',m);removeThrowableVisual(m.id);return;}
   if(m.t==='explosion'){soundTacticalDetonation(m.kind||'sticky',m);spawnDetonationFx(m.kind||'sticky',m);removeThrowableVisual(m.id);return;}
   if(m.t==='loadout'){applyAuthoritativeLoadout(m);return;}
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';r.swapStartedAt=performance.now();syncRemoteWeapon(r);}return;}
-  if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;}return;}
+  if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;playSpatialCue(reloadSoundId(r.reloadWeapon),r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
   if(m.t==='god'){if(m.id===clientId){godMode=!!m.enabled;syncGodUI();showToast(godMode?'GOD MODE ENABLED':'GOD MODE DISABLED');}else{const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}renderAdminPlayers();return;}
   if(m.t==='adminRole'){if(m.id===clientId){isWorldAdmin=!!m.enabled;syncPauseContext();if(!isWorldAdmin&&!$('adminPanel').classList.contains('hide'))closeAdminPanel();showToast(isWorldAdmin?'ADMIN PRIVILEGES GRANTED':'ADMIN PRIVILEGES REMOVED');}else{const r=remotes.get(m.id);if(r)r.admin=!!m.enabled;}renderAdminPlayers();return;}
-  if(m.t==='teamChange'){const pl=m.player;if(!pl)return;if(pl.id===clientId){myTeam=pl.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,true);selfColor=TEAM_COLORS[myTeam]||selfColor;handleRespawn(pl);showToast(`JOINED ${myTeam.toUpperCase()} TEAM`);}else{upsertRemote(pl,true);applyRemoteTeamVisual(remotes.get(pl.id),pl.team);}updatePlayerCount();renderAdminPlayers();return;}
+  if(m.t==='teamQueued'){if(m.id===clientId){pendingTeam=m.pendingTeam||'';syncPauseContext();showToast(pendingTeam?`TEAM SWITCH QUEUED · ${pendingTeam.toUpperCase()}`:'TEAM SWITCH CANCELED');}return;}
+  if(m.t==='match'){matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;if(!$('adminPanel').classList.contains('hide'))populateAdminMatch(matchState);return;}
+  if(m.t==='matchReset'){matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;killFeed.length=0;myStats={kills:0,deaths:0};clearBullets();clearThrowables();syncBotRoster(m.bots||[]);for(const pl of m.players||[]){if(pl.id===clientId){myTeam=pl.team||myTeam;pendingTeam='';primaryWeapon=PRIMARY_WEAPONS.includes(pl.primaryWeapon)?pl.primaryWeapon:primaryWeapon;handleRespawn(pl);}else upsertRemote(pl,true);}showToast(`ROUND ${matchState.round}`);return;}
   if(m.t==='blocked'){handleBlocked(m);return;}
   if(m.t==='kill'){handleKill(m);return;}
-  if(m.t==='settings'){applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);if(!$('adminPanel').classList.contains('hide')){populateAdminSettings(worldSettings);populateAdminBots(botConfig);setAdminStatus('Rules applied to the match.','ok');}showToast('MATCH RULES UPDATED');return;}
+  if(m.t==='settings'){applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);if(typeof m.custom==='boolean')matchCustom=m.custom;if(!$('adminPanel').classList.contains('hide')){populateAdminSettings(worldSettings);setAdminStatus('Gameplay rules applied.','ok');}showToast('MATCH RULES UPDATED');return;}
   if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncBotRoster(m.bots||[]);if(!$('adminPanel').classList.contains('hide'))populateAdminBots(botConfig);showToast(`BOTS · ${botConfig.difficulty.toUpperCase()}`);return;}
   if(m.t==='notice'){showToast(m.text||'Server notice');if(!$('adminPanel').classList.contains('hide'))setAdminStatus(m.text||'Server notice',m.tone==='error'?'error':'');return;}
   if(m.t==='pong'){const echoed=Number(m.clientAt)||lastPingLocalAt;if(echoed&&Number.isFinite(Number(m.at))){const received=Date.now(),mid=echoed+(received-echoed)/2,estimate=Number(m.at)-mid;serverClockOffset=serverClockOffset*.7+estimate*.3;}return;}
@@ -1344,7 +1234,7 @@ function enterGame(){
 }
 function leaveWorld(){
   gameActive=false;paused=false;serverClockOffset=0;lastPingLocalAt=0;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left world')}catch{}}socket=null;currentRoom='';isWorldAdmin=false;worldOwnerId='';applyWorldSettings(DEFAULT_WORLD_SETTINGS);$('adminPanel').classList.add('hide');
-  document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();clearThrowables();clearTacticalFx();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingCreatorGod=false;syncGodUI();currentWeapon='pistol';crouchWanted=false;crouched=false;crouchBlend=0;viewFeetY=NaN;ammo=freshClientAmmo();equipment=freshClientEquipment();combatRevision=0;combatSeq=0;reloadPendingUntil=0;lastCombatSync=0;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,grounded:true};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireHeld=false;queuedFireUntil=0;serverFireRetryAt=0;localEquipmentCooldownUntil=0;lastTacticalSimTick=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
+  document.exitPointerLock?.();resetTouchInput();clearRemotes();clearBullets();clearThrowables();clearTacticalFx();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;primaryWeapon=selectedPrimary;syncGodUI();currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;viewFeetY=NaN;ammo=freshClientAmmo();equipment=freshClientEquipment();combatRevision=0;combatSeq=0;reloadPendingUntil=0;lastCombatSync=0;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,grounded:true,moveX:0,moveZ:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireHeld=false;queuedFireUntil=0;serverFireRetryAt=0;localEquipmentCooldownUntil=0;lastTacticalSimTick=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;setAim(false);syncLocalWeaponModel();pause.classList.add('hide');menu.classList.add('hide');applyExperienceGate();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshWorlds();startIntroMusic();
 }
 
@@ -1354,19 +1244,33 @@ function populateAdminBots(value){const x=normalizeBotConfig(value);$('setBlueBo
 function collectAdminBots(){return normalizeBotConfig({blueBots:$('setBlueBots').value,redBots:$('setRedBots').value,difficulty:$('setBotDifficulty').value});}
 function syncBotRoster(list){const incoming=new Set((list||[]).map(b=>b.id));for(const [id,r] of remotes){if(r.bot&&!incoming.has(id))removeRemote(id);}for(const b of list||[])upsertRemote(b,true);updatePlayerCount();}
 function setAdminStatus(text,tone=''){const el=$('adminStatus');el.textContent=text;el.className=`admin-status ${tone}`;}
-function switchAdminTab(tab){const weapons=tab==='weapons',bots=tab==='bots',players=tab==='players';$('adminGeneral').classList.toggle('hide',weapons||bots||players);$('adminWeapons').classList.toggle('hide',!weapons);$('adminBots').classList.toggle('hide',!bots);$('adminPlayers').classList.toggle('hide',!players);$('adminResetBtn').classList.toggle('hide',players);$('adminSaveBtn').classList.toggle('hide',players);const shell=document.querySelector('.admin-shell');if(shell)shell.dataset.page=weapons?'weapons':bots?'bots':players?'players':'general';for(const b of document.querySelectorAll('[data-admin-tab]')){const active=b.dataset.adminTab===tab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;}if(players)renderAdminPlayers(true);requestAnimationFrame(fitResponsiveOverlays);}
-function populateAdminSettings(value){const x=normalizeWorldSettingsClient(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=w.reloadMs;$(`set${cap}Cooldown`).value=w.cooldownMs;}}
-function collectAdminSettings(){return normalizeWorldSettingsClient({movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000},weapons:{pistol:{damage:$('setPistolDamage').value,speed:$('setPistolSpeed').value,reloadMs:$('setPistolReload').value,cooldownMs:$('setPistolCooldown').value},assault:{damage:$('setAssaultDamage').value,speed:$('setAssaultSpeed').value,reloadMs:$('setAssaultReload').value,cooldownMs:$('setAssaultCooldown').value},shotgun:{damage:$('setShotgunDamage').value,speed:$('setShotgunSpeed').value,reloadMs:$('setShotgunReload').value,cooldownMs:$('setShotgunCooldown').value},sniper:{damage:$('setSniperDamage').value,speed:$('setSniperSpeed').value,reloadMs:$('setSniperReload').value,cooldownMs:$('setSniperCooldown').value}}});}
-function adminPlayerSnapshot(){const list=[{id:clientId,name:myName||'You',team:myTeam,godMode,admin:isWorldAdmin,self:true},...Array.from(remotes.values()).filter(r=>!r.bot).map(r=>({id:r.id,name:r.name,team:r.team,godMode:!!r.godMode,admin:!!r.admin,self:false}))];return list;}
-function renderAdminPlayers(force=false){const root=$('adminPlayerList');if(!root)return;const panel=$('adminPanel'),page=$('adminPlayers');if(!force&&(panel?.classList.contains('hide')||page?.classList.contains('hide')))return;const rows=adminPlayerSnapshot();root.innerHTML='';for(const pl of rows){const row=document.createElement('div');row.className='admin-player-row';const owner=pl.id===worldOwnerId;row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${pl.team}"></span><div><strong>${escapeHtml(pl.name)}${pl.self?' (You)':''}</strong><small>${owner?'MATCH OWNER':pl.admin?'ADMIN':'PLAYER'} · ${String(pl.team||'blue').toUpperCase()}</small></div></div><div class="admin-player-actions"><button class="btn admin-mini ${pl.godMode?'active':''}" data-admin-god="${pl.id}">${pl.godMode?'God On':'God Off'}</button><button class="btn admin-mini ${pl.admin?'active':''}" data-admin-role="${pl.id}" ${owner?'disabled title="Match owner cannot be demoted"':''}>${pl.admin?'Admin':'Make Admin'}</button></div>`;root.appendChild(row);}for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{if(btn.disabled)return;const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});}
-function requestTeamChange(team){if(!gameActive||socket?.readyState!==WebSocket.OPEN)return;const next=team==='red'?'red':'blue';if(next===myTeam)return;resetTouchInput();send({t:'team',team:next});pause.classList.add('hide');paused=false;clock?.getDelta?.();if(!isTouch)requestPointerLockNow();}
+let activeAdminTab='match';
+function switchAdminTab(tab){
+  activeAdminTab=['match','gameplay','advanced','bots','players'].includes(tab)?tab:'match';
+  for(const page of document.querySelectorAll('[data-admin-page]'))page.classList.toggle('hide',page.dataset.adminPage!==activeAdminTab);
+  for(const b of document.querySelectorAll('[data-admin-tab]')){const active=b.dataset.adminTab===activeAdminTab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;}
+  const players=activeAdminTab==='players';$('adminResetBtn').classList.toggle('hide',players);$('adminSaveBtn').classList.toggle('hide',players);document.querySelector('.admin-shell').dataset.page=activeAdminTab;if(players)renderAdminPlayers(true);
+}
+function populateAdminMatch(value=matchState){const m=normalizeClientMatch(value);$('setScoreLimit').value=m.scoreLimit;$('setTimeLimit').value=Math.round(m.timeLimitMs/60000);}
+function collectAdminMatch(){return{scoreLimit:Math.max(5,Math.min(100,Math.round(Number($('setScoreLimit').value)||DEFAULT_MATCH_RULES.scoreLimit))),timeLimitMs:Math.max(120000,Math.min(1800000,Math.round((Number($('setTimeLimit').value)||DEFAULT_MATCH_RULES.timeLimitMs/60000)*60000)))}};
+function populateAdminSettings(value){const x=normalizeWorldSettingsClient(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=(w.reloadMs/1000).toFixed(2);$(`set${cap}Cooldown`).value=Math.round(60000/w.cooldownMs);}}
+function collectAdminSettings(){return normalizeWorldSettingsClient({movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000},weapons:Object.fromEntries(WEAPON_ORDER.map(name=>{const cap=name[0].toUpperCase()+name.slice(1);return[name,{damage:$(`set${cap}Damage`).value,speed:$(`set${cap}Speed`).value,reloadMs:Number($(`set${cap}Reload`).value)*1000,cooldownMs:60000/Math.max(24,Number($(`set${cap}Cooldown`).value)||60)}]}))});}
+function adminPlayerSnapshot(){return[{id:clientId,name:myName||'You',team:myTeam,godMode,admin:isWorldAdmin,self:true},...Array.from(remotes.values()).filter(r=>!r.bot).map(r=>({id:r.id,name:r.name,team:r.team,godMode:!!r.godMode,admin:!!r.admin,self:false}))];}
+function renderAdminPlayers(force=false){const root=$('adminPlayerList');if(!root)return;if(!force&&($('adminPanel').classList.contains('hide')||activeAdminTab!=='players'))return;root.innerHTML='';for(const pl of adminPlayerSnapshot()){const row=document.createElement('div');row.className='admin-player-row';const owner=pl.id===worldOwnerId;row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${pl.team}"></span><div><strong>${escapeHtml(pl.name)}${pl.self?' (You)':''}</strong><small>${owner?'MATCH OWNER':pl.admin?'ADMIN':'PLAYER'} · ${String(pl.team||'blue').toUpperCase()}</small></div></div><div class="admin-player-actions"><button class="btn admin-mini ${pl.godMode?'active':''}" data-admin-god="${pl.id}">${pl.godMode?'Invulnerable':'Invulnerability'}</button><button class="btn admin-mini ${pl.admin?'active':''}" data-admin-role="${pl.id}" ${owner?'disabled':''}>${pl.admin?'Admin':'Make Admin'}</button></div>`;root.appendChild(row);}for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{if(btn.disabled)return;const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});}
+function requestTeamChange(team){if(!gameActive||socket?.readyState!==WebSocket.OPEN)return;const next=team==='red'?'red':'blue';send({t:'team',team:next,seq:++combatSeq});showToast(next===myTeam?'CANCELING TEAM SWITCH':`SWITCH TO ${next.toUpperCase()} ON RESPAWN`);}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function applyRemoteTeamVisual(r,team){if(!r)return;const next=team==='red'?'red':'blue';r.team=next;r.color=TEAM_COLORS[next];if(r.body?.material?.color)r.body.material.color.set(TEAM_COLORS[next]);if(r.tag){r.group.remove(r.tag);r.tag.material?.map?.dispose?.();r.tag.material?.dispose?.();r.tag=makeNameTag(r.bot?`[BOT] ${r.name}`:r.name,TEAM_COLORS[next]);r.tag.position.set(0,2.18,0);r.group.add(r.tag);}}
-function openAdminPanel(){if(!isWorldAdmin){showToast('ADMIN ACCESS REQUIRED');return;}populateAdminSettings(worldSettings);populateAdminBots(botConfig);renderAdminPlayers(true);switchAdminTab('general');setAdminStatus('Admins can tune the match and manage connected players.');$('adminPanel').classList.remove('hide');requestAnimationFrame(fitResponsiveOverlays);}
-function closeAdminPanel(){$('adminPanel').classList.add('hide');}
-function saveAdminSettings(){if(!isWorldAdmin||socket?.readyState!==WebSocket.OPEN){setAdminStatus('Admin connection unavailable.','error');return;}const next=collectAdminSettings(),bots=collectAdminBots();if(bots.blueBots+bots.redBots>MAX_BOTS){setAdminStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}populateAdminSettings(next);populateAdminBots(bots);setAdminStatus('Applying validated rules…');send({t:'adminSettings',settings:next});send({t:'adminBots',...bots});}
+function openAdminPanel(){if(!isWorldAdmin){showToast('ADMIN ACCESS REQUIRED');return;}populateAdminMatch(matchState);populateAdminSettings(worldSettings);populateAdminBots(botConfig);renderAdminPlayers(true);switchAdminTab('match');setAdminStatus(matchCustom?'CUSTOM rules active.':'Standard match rules active.');$('adminPanel').classList.remove('hide');if(document.pointerLockElement)document.exitPointerLock?.();}
+function closeAdminPanel(){$('adminPanel').classList.add('hide');if(gameActive&&!paused&&!isTouch)requestPointerLockNow();}
+function resetActiveAdminTab(){if(activeAdminTab==='match')populateAdminMatch({...matchState,...DEFAULT_MATCH_RULES});else if(activeAdminTab==='gameplay'){const merged=cloneSettings(worldSettings);merged.movement=cloneSettings(DEFAULT_WORLD_SETTINGS.movement);merged.combat=cloneSettings(DEFAULT_WORLD_SETTINGS.combat);populateAdminSettings(merged);}else if(activeAdminTab==='advanced'){const merged=cloneSettings(worldSettings);merged.weapons=cloneSettings(DEFAULT_WORLD_SETTINGS.weapons);populateAdminSettings(merged);}else if(activeAdminTab==='bots')populateAdminBots({blueBots:1,redBots:1,difficulty:'normal'});}
+function saveAdminSettings(){
+  if(!isWorldAdmin||socket?.readyState!==WebSocket.OPEN){setAdminStatus('Admin connection unavailable.','error');return;}
+  if(activeAdminTab==='match'){send({t:'adminMatch',rules:collectAdminMatch()});setAdminStatus('Applying match rules…');return;}
+  if(activeAdminTab==='gameplay'||activeAdminTab==='advanced'){const next=collectAdminSettings();send({t:'adminSettings',settings:next});setAdminStatus('Applying gameplay rules…');return;}
+  if(activeAdminTab==='bots'){const bots=collectAdminBots();if(bots.blueBots+bots.redBots>MAX_BOTS){setAdminStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}send({t:'adminBots',...bots});setAdminStatus('Updating bots…');}
+}
 
-function openPause(){if(!gameActive||paused)return;paused=true;keys.clear();resetTouchInput();setAim(false);syncPauseContext();pause.classList.remove('hide');requestAnimationFrame(fitResponsiveOverlays);if(document.pointerLockElement)document.exitPointerLock?.();}
+function openPause(){if(!gameActive||paused)return;paused=true;keys.clear();resetTouchInput();setAim(false);syncPauseContext();pause.classList.remove('hide');if(document.pointerLockElement)document.exitPointerLock?.();}
 async function copyInvite(){
   const url=new URL(location.href);url.searchParams.set('room',currentRoom);try{await navigator.clipboard.writeText(url.toString());showToast('Invite copied');}catch{showToast(`Match code: ${currentRoom}`);}
 }
@@ -1387,14 +1291,13 @@ function makeRemote(player){
   const assault=new THREE.Mesh(new THREE.BoxGeometry(.13,.11,.66),gunMat.clone());assault.position.set(.45,1.09,-.38);assault.visible=false;
   const shotgun=new THREE.Mesh(new THREE.BoxGeometry(.15,.12,.74),gunMat.clone());shotgun.position.set(.45,1.10,-.41);shotgun.visible=false;
   const sniper=new THREE.Mesh(new THREE.BoxGeometry(.12,.10,.82),gunMat.clone());sniper.position.set(.45,1.10,-.45);sniper.visible=false;
-  const fire=createDeathFire();const godRing=new THREE.Mesh(new THREE.TorusGeometry(.42,.035,6,28),new THREE.MeshBasicMaterial({color:0xffdd67,transparent:true,opacity:.9}));godRing.rotation.x=Math.PI/2;godRing.position.y=2.03;godRing.visible=!!player.godMode;
-  model.add(body,head,armL,armR,legL,legR,pistol,assault,shotgun,sniper,fire,godRing);group.position.set(player.x||0,player.y||0,player.z||0);scene.add(group);
+  const godRing=new THREE.Mesh(new THREE.TorusGeometry(.42,.035,6,28),new THREE.MeshBasicMaterial({color:0xffdd67,transparent:true,opacity:.9}));godRing.rotation.x=Math.PI/2;godRing.position.y=2.03;godRing.visible=!!player.godMode;
+  model.add(body,head,armL,armR,legL,legR,pistol,assault,shotgun,sniper,godRing);group.position.set(player.x||0,player.y||0,player.z||0);scene.add(group);
   const tag=makeNameTag(player.bot?`[BOT] ${player.name||'Bot'}`:(player.name||'Player'),TEAM_COLORS[team]);tag.position.set(0,2.18,0);group.add(tag);
   const now=performance.now();
-  const remote={id:player.id,name:player.name||'Player',color:TEAM_COLORS[team],team,bot:!!player.bot,weapon:player.weapon||'pistol',group,model,tag,target:new THREE.Vector3(player.x||0,player.y||0,player.z||0),targetYaw:player.yaw||0,hp:player.hp??100,kills:Number(player.kills)||0,deaths:Number(player.deaths)||0,armL,armR,legL,legR,body,head,pistol,assault,shotgun,sniper,fire,godRing,godMode:!!player.godMode,admin:!!player.admin,lastSeen:now,lastNetAt:now,lastNetX:player.x||0,lastNetY:player.y||0,lastNetZ:player.z||0,moveSpeed:0,airborne:false,ads:!!player.ads,crouched:!!player.crouched,crouchBlend:player.crouched?1:0,animPhase:Math.random()*Math.PI*2,deathPose:player.hp<=0?1:0,reloadUntil:Number(player.reloadAt)||0,reloadStartedAt:0,reloadWeapon:player.reloadWeapon||'',swapStartedAt:0,fireKickUntil:0};fire.visible=remote.hp<=0;tag.visible=remote.hp>0;
+  const remote={id:player.id,name:player.name||'Player',color:TEAM_COLORS[team],team,bot:!!player.bot,weapon:player.weapon||'pistol',group,model,tag,target:new THREE.Vector3(player.x||0,player.y||0,player.z||0),targetYaw:player.yaw||0,hp:player.hp??100,kills:Number(player.kills)||0,deaths:Number(player.deaths)||0,armL,armR,legL,legR,body,head,pistol,assault,shotgun,sniper,godRing,godMode:!!player.godMode,admin:!!player.admin,lastSeen:now,lastNetAt:now,lastNetX:player.x||0,lastNetY:player.y||0,lastNetZ:player.z||0,moveSpeed:0,airborne:false,ads:!!player.ads,crouched:!!player.crouched,crouchBlend:player.crouched?1:0,animPhase:Math.random()*Math.PI*2,deathPose:player.hp<=0?1:0,reloadUntil:Number(player.reloadAt)||0,reloadStartedAt:0,reloadWeapon:player.reloadWeapon||'',swapStartedAt:0,fireKickUntil:0,revealedUntil:0,nextFootstepAt:now+300+Math.random()*260,footstepSide:Math.random()<.5?0:1};tag.visible=remote.hp>0;
   syncRemoteWeapon(remote);return remote;
 }
-function createDeathFire(){const g=new THREE.Group();const mats=[new THREE.MeshBasicMaterial({color:0xff5a18,transparent:true,opacity:.78}),new THREE.MeshBasicMaterial({color:0xffc63a,transparent:true,opacity:.72})];for(let i=0;i<7;i++){const m=new THREE.Mesh(new THREE.ConeGeometry(.13,.55,6),mats[i%2].clone());m.position.set((i%3-1)*.22,.35+(i%4)*.28,(i%2?-.18:.18));m.rotation.z=(i%2?.18:-.18);m.userData.phase=i*.73;g.add(m);}g.visible=false;return g;}
 function makeNameTag(name,color){
   const c=document.createElement('canvas');c.width=512;c.height=128;const x=c.getContext('2d');x.fillStyle='rgba(5,10,15,.78)';x.beginPath();x.roundRect(24,16,464,96,28);x.fill();x.strokeStyle=color;x.lineWidth=6;x.stroke();x.fillStyle='#fff';x.font='800 48px system-ui';x.textAlign='center';x.textBaseline='middle';x.fillText(name,256,64);
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true,depthTest:true}));sprite.scale.set(2.2,.55,1);return sprite;
@@ -1405,7 +1308,7 @@ function updateRemoteTarget(r,player,instant=false){
   if(Number(player.reloadAt)>0){r.reloadUntil=Number(player.reloadAt);r.reloadWeapon=player.reloadWeapon||r.weapon;if(!r.reloadStartedAt)r.reloadStartedAt=serverNow();}
   if(instant){r.group.position.copy(r.target);r.group.rotation.y=r.targetYaw;}
 }
-function upsertRemote(player,instant=false){if(!player?.id||player.id===clientId)return;let r=remotes.get(player.id);if(!r){r=makeRemote(player);remotes.set(player.id,r);}const oldTeam=r.team;r.name=player.name||r.name;r.bot=!!player.bot;r.team=player.team||r.team;r.color=TEAM_COLORS[r.team]||r.color;r.admin=player.admin??r.admin;r.weapon=player.weapon||r.weapon;r.hp=player.hp??r.hp;if(r.fire)r.fire.visible=r.hp<=0;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;if(r.godRing)r.godRing.visible=!!r.godMode;if(oldTeam!==r.team)applyRemoteTeamVisual(r,r.team);syncRemoteWeapon(r);updateRemoteTarget(r,player,instant);}
+function upsertRemote(player,instant=false){if(!player?.id||player.id===clientId)return;let r=remotes.get(player.id);if(!r){r=makeRemote(player);remotes.set(player.id,r);}const oldTeam=r.team;r.name=player.name||r.name;r.bot=!!player.bot;r.team=player.team||r.team;r.color=TEAM_COLORS[r.team]||r.color;r.admin=player.admin??r.admin;r.weapon=player.weapon||r.weapon;r.hp=player.hp??r.hp;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;if(r.godRing)r.godRing.visible=!!r.godMode;if(oldTeam!==r.team)applyRemoteTeamVisual(r,r.team);syncRemoteWeapon(r);updateRemoteTarget(r,player,instant);}
 function removeRemote(id){const r=remotes.get(id);if(!r)return;scene.remove(r.group);r.group.traverse(o=>{if(o.geometry)o.geometry.dispose?.();if(o.material){if(o.material.map)o.material.map.dispose?.();o.material.dispose?.();}});remotes.delete(id);}
 function clearRemotes(){for(const id of [...remotes.keys()])removeRemote(id);}
 function updatePlayerCount(){syncPauseContext();}
@@ -1415,7 +1318,7 @@ function handleBlocked(m){
   if(m.target===clientId){hurtUntil=performance.now()+220;soundShield();showToast('GOD MODE');}
 }
 function handleHit(m){
-  const targetRemote=remotes.get(m.target);if(targetRemote){targetRemote.hp=m.hp;if(targetRemote.fire)targetRemote.fire.visible=!!m.wasted;flashRemote(targetRemote);}
+  const targetRemote=remotes.get(m.target);if(targetRemote){targetRemote.hp=m.hp;flashRemote(targetRemote);}
   if(m.attacker===clientId){showHitmarker(!!m.headshot);if(realtimeAudioAllowed()){if(m.headshot)soundHeadshot();else soundHitmarker(m.weapon||'pistol');}}
   if(m.target===clientId){
     hp=m.hp;knockX+=m.knockback?.x||0;knockZ+=m.knockback?.z||0;verticalVelocity=Math.max(verticalVelocity,m.knockback?.y||0);onGround=false;addDamageFeedback(m);updateHealth();showHurt();if(realtimeAudioAllowed())soundHurt();
@@ -1433,8 +1336,8 @@ function drawBloodSplatter(c,w,h,now,missingHealth){for(let i=bloodSplats.length
 function drawDamageIndicators(c,w,h,now){for(let i=damageIndicators.length-1;i>=0;i--){const d=damageIndicators[i],remain=(d.until-now)/1150;if(remain<=0){damageIndicators.splice(i,1);continue;}const radius=Math.min(w,h)*.26,x=w/2-Math.sin(d.angle)*radius,y=h/2-Math.cos(d.angle)*radius,rot=d.angle;c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=Math.min(1,remain*2)*d.strength;c.strokeStyle='#ff334d';c.fillStyle='rgba(255,30,55,.28)';c.lineWidth=3.2;c.beginPath();c.moveTo(-18,8);c.lineTo(0,-9);c.lineTo(18,8);c.stroke();c.beginPath();c.moveTo(-13,6);c.lineTo(0,-5);c.lineTo(13,6);c.lineTo(0,1);c.closePath();c.fill();c.restore();}}
 function handleRespawn(player){
   if(!player?.id)return;
-  if(player.id===clientId){hp=100;myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;currentWeapon=player.weapon||'pistol';sniperZoomLevel=0;adsWanted=false;crouchWanted=false;crouched=false;crouchBlend=0;ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);combatRevision=Math.max(combatRevision,Number(player.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;deathAnimStartedAt=0;landingKick=0;nextFootstepAt=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();position.set(player.x,player.y,player.z);resetViewVertical();verticalVelocity=Number.isFinite(Number(player.verticalVelocity))?Number(player.verticalVelocity):0;onGround=player.grounded!==false;jumpSeq=Math.max(jumpSeq,Math.floor(Number(player.jumpSeq)||0));knockX=knockZ=0;camera.rotation.z=0;updateHealth();showToast('Back in');return;}
-  upsertRemote(player,true);const r=remotes.get(player.id);if(r){r.hp=100;if(r.fire)r.fire.visible=false;}
+  if(player.id===clientId){hp=Math.max(0,Math.min(100,Number(player.hp??100)||0));myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;myTeam=player.team||myTeam;pendingTeam=player.pendingTeam||'';selfColor=TEAM_COLORS[myTeam]||selfColor;primaryWeapon=PRIMARY_WEAPONS.includes(player.primaryWeapon)?player.primaryWeapon:primaryWeapon;currentWeapon=(player.weapon==='pistol'||player.weapon===primaryWeapon)?player.weapon:primaryWeapon;sniperZoomLevel=0;adsWanted=false;crouchWanted=false;crouched=false;crouchBlend=0;ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);combatRevision=Math.max(combatRevision,Number(player.combatRev)||0);pendingWeapon='';reloadPendingUntil=0;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs:0;deathAnimStartedAt=0;landingKick=0;nextFootstepAt=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();position.set(player.x,player.y,player.z);resetViewVertical();verticalVelocity=Number.isFinite(Number(player.verticalVelocity))?Number(player.verticalVelocity):0;onGround=player.grounded!==false;jumpSeq=Math.max(jumpSeq,Math.floor(Number(player.jumpSeq)||0));knockX=knockZ=0;camera.rotation.z=0;updateHealth();showToast('Back in');return;}
+  upsertRemote(player,true);const r=remotes.get(player.id);if(r){r.hp=100;}
 }
 function flashRemote(r){const old=r.body.material.emissive?.clone?.();r.body.material.emissive=new THREE.Color(0x8a1020);setTimeout(()=>{if(r.body?.material)r.body.material.emissive=old||new THREE.Color(0x000000)},120);}
 function showHitmarker(headshot=false){hitUntil=performance.now()+190;if(headshot)headshotUntil=performance.now()+280;}
@@ -1459,12 +1362,21 @@ function updateCrouchState(dt=0){
 function setCrouch(active){crouchWanted=!!active;if(crouchWanted)crouched=true;else if(canStandHere())crouched=false;sendCurrentState(true);}
 function toggleCrouch(){if(!gameActive||paused||hp<=0)return;const next=!crouchWanted;if(!next&&!canStandHere()){crouched=true;crouchWanted=false;showToast('NEED CLEARANCE');sendCurrentState(true);return;}setCrouch(next);}
 function tryJump(){if(!gameActive||paused||hp<=0||!onGround)return;if(crouched||crouchWanted){crouchWanted=false;if(!canStandHere()){crouched=true;showToast('NEED CLEARANCE');sendCurrentState(true);return;}crouched=false;}jumpSeq+=1;verticalVelocity=JUMP_SPEED;onGround=false;landingKick=0;sendCurrentState(true);soundJump();}
-function statePayload(){return {t:'state',x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,crouched,grounded:onGround,jumpSeq,clientAt:Date.now()};}
-function stateChanged(p){return !Number.isFinite(lastSentState.x)||Math.abs(p.x-lastSentState.x)>.008||Math.abs(p.y-lastSentState.y)>.008||Math.abs(p.z-lastSentState.z)>.008||Math.abs(normalizeAngle(p.yaw-lastSentState.yaw))>.0025||Math.abs(p.pitch-lastSentState.pitch)>.0025||p.ads!==lastSentState.ads||p.crouched!==lastSentState.crouched||p.grounded!==lastSentState.grounded;}
+function movementInput(){
+  let mx=0,mz=0;
+  if(gameActive&&!paused&&hp>0){
+    if(isTouch){mx=joy.x;mz=joy.y;}
+    else{if(keys.has('KeyA'))mx-=1;if(keys.has('KeyD'))mx+=1;if(keys.has('KeyW'))mz-=1;if(keys.has('KeyS'))mz+=1;}
+  }
+  const len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;}
+  return {mx,mz,len:Math.min(1,len)};
+}
+function statePayload(){const input=movementInput();return {t:'state',x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,crouched,grounded:onGround,jumpSeq,moveX:round3(input.mx),moveZ:round3(input.mz),clientAt:Date.now()};}
+function stateChanged(p){return !Number.isFinite(lastSentState.x)||Math.abs(p.x-lastSentState.x)>.008||Math.abs(p.y-lastSentState.y)>.008||Math.abs(p.z-lastSentState.z)>.008||Math.abs(normalizeAngle(p.yaw-lastSentState.yaw))>.0025||Math.abs(p.pitch-lastSentState.pitch)>.0025||Math.abs(p.moveX-lastSentState.moveX)>.02||Math.abs(p.moveZ-lastSentState.moveZ)>.02||p.ads!==lastSentState.ads||p.crouched!==lastSentState.crouched||p.grounded!==lastSentState.grounded;}
 function sendCurrentState(force=false){
   const now=performance.now(),p=statePayload(),changed=stateChanged(p),interval=changed?ACTIVE_STATE_INTERVAL:IDLE_STATE_INTERVAL;
   if(!force&&now-lastStateSent<interval)return false;
-  lastStateSent=now;lastSentState={x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,ads:p.ads,crouched:p.crouched,grounded:p.grounded};send(p);return true;
+  lastStateSent=now;lastSentState={x:p.x,y:p.y,z:p.z,yaw:p.yaw,pitch:p.pitch,ads:p.ads,crouched:p.crouched,grounded:p.grounded,moveX:p.moveX,moveZ:p.moveZ};send(p);return true;
 }
 function applyAuthoritativeLoadout(m){
   const previousReloadUntil=reloadUntil;
@@ -1472,7 +1384,8 @@ function applyAuthoritativeLoadout(m){
   if(seq&&seq<combatSeq)return;
   if(rev&&rev<combatRevision)return;
   if(rev)combatRevision=rev;
-  const serverWeapon=WEAPON_ORDER.includes(m.weapon)?m.weapon:currentWeapon;
+  if(PRIMARY_WEAPONS.includes(m.primaryWeapon))primaryWeapon=m.primaryWeapon;if(typeof m.pendingTeam==='string')pendingTeam=m.pendingTeam;
+  const serverWeapon=(m.weapon==='pistol'||m.weapon===primaryWeapon)?m.weapon:currentWeapon;
   if(!pendingWeapon||serverWeapon===pendingWeapon){currentWeapon=serverWeapon;if(pendingWeapon===serverWeapon)pendingWeapon='';}
   ammo=normalizeClientAmmo(m.ammo);
   reloadUntil=Math.max(0,Number(m.reloadAt)||0);
@@ -1495,7 +1408,7 @@ function requestCombatSync(){
 }
 function doFire(fromQueue=false){
   const spec=WEAPON_SPECS[currentWeapon],now=performance.now();
-  if(!gameActive||paused||hp<=0||(!godMode&&(reloadUntil||reloadPendingUntil>now)))return;
+  if(!gameActive||paused||matchState.status!=='active'||hp<=0||(!godMode&&(reloadUntil||reloadPendingUntil>now)))return;
   if(now<serverFireRetryAt||localFireCooldown>0){if(!fromQueue)queuedFireUntil=Math.max(queuedFireUntil,now+150);return;}
   if(!godMode&&(ammo[currentWeapon]||0)<=0){queuedFireUntil=0;doReload();return;}
   queuedFireUntil=0;localFireCooldown=spec.cooldownMs/1000;sendCurrentState(true);send({t:'fire',weapon:currentWeapon,seq:++combatSeq,yaw:round3(yaw),pitch:round3(pitch)});
@@ -1510,18 +1423,18 @@ function doReload(){
   if(reloadUntil){requestCombatSync();return;}
   setAim(false);reloadPendingUntil=performance.now()+650;send({t:'reload',weapon:currentWeapon,seq:++combatSeq});soundReload(currentWeapon);
 }
-function nextWeapon(weapon){const i=WEAPON_ORDER.indexOf(weapon);return WEAPON_ORDER[(i+1+WEAPON_ORDER.length)%WEAPON_ORDER.length];}
+function nextWeapon(weapon){return weapon==='pistol'?primaryWeapon:'pistol';}
 function switchWeapon(weapon){
-  weapon=WEAPON_ORDER.includes(weapon)?weapon:'pistol';
+  weapon=weapon==='pistol'?'pistol':primaryWeapon;
   if(!gameActive||paused||hp<=0||weapon===currentWeapon)return;
   queuedFireUntil=0;serverFireRetryAt=0;setAim(false);sniperZoomLevel=0;currentWeapon=weapon;pendingWeapon=weapon;reloadPendingUntil=0;reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=performance.now();localFireCooldown=Math.max(localFireCooldown,.12);warmWeaponAudio(weapon);syncLocalWeaponModel();send({t:'weapon',weapon,seq:++combatSeq});showToast(WEAPON_SPECS[weapon].name);
 }
 function setAim(active){adsWanted=!!active&&gameActive&&!paused&&hp>0&&!reloadUntil;if(!adsWanted&&currentWeapon==='sniper')sniperZoomLevel=0;else if(adsWanted&&currentWeapon==='sniper'&&sniperZoomLevel===0)sniperZoomLevel=1;}
 function toggleAim(){if(currentWeapon==='sniper'&&gameActive&&!paused&&hp>0&&!reloadUntil){if(!adsWanted){adsWanted=true;sniperZoomLevel=1;showToast('SNIPER 4X');}else if(sniperZoomLevel===1){sniperZoomLevel=2;showToast('SNIPER 8X');}else{adsWanted=false;sniperZoomLevel=0;}return;}setAim(!adsWanted);}
-function toggleFireMode(){fireMode=fireMode==='semi'?'auto':'semi';fireHeld=false;queuedFireUntil=0;localStorage.setItem('breachlineFireMode',fireMode);touchVisual.modeUntil=performance.now()+180;showToast(fireMode==='auto'?'AUTO FIRE':'SEMI AUTO');}
+function toggleFireMode(){if(currentWeapon!=='assault'&&primaryWeapon!=='assault'){showToast('FIRE MODE · ASSAULT ONLY');return;}assaultFireMode=assaultFireMode==='semi'?'auto':'semi';fireHeld=false;queuedFireUntil=0;localStorage.setItem('breachlineAssaultFireMode',assaultFireMode);showToast(assaultFireMode==='auto'?'ASSAULT · AUTO':'ASSAULT · SEMI');}
 function normalizeClientAmmo(value){const v=value&&typeof value==='object'?value:{};return Object.fromEntries(WEAPON_ORDER.map(name=>{const spec=WEAPON_SPECS[name];return[name,Math.max(0,Math.min(spec.mag,Number(v[name]??spec.mag)))]}));}
 function normalizeEquipment(v){v=v&&typeof v==='object'?v:{};return Object.fromEntries(Object.entries(EQUIPMENT_CAPS).map(([name,cap])=>[name,Math.max(0,Math.min(cap,Number(v[name]??cap)))]));}
-function beginEquipmentAim(kind,pointer=null){const now=performance.now();kind=kind==='sticky'?'sticky':'flash';if(!gameActive||paused||hp<=0||now<localEquipmentCooldownUntil||(!godMode&&(equipment[kind]||0)<=0))return false;if(equipmentAim.kind)return false;equipmentAim={kind,startedAt:now,pointer};showTrajectory();if(kind==='flash')touchVisual.flashUntil=now+220;else touchVisual.stickyUntil=now+220;return true;}
+function beginEquipmentAim(kind,pointer=null){const now=performance.now();kind=kind==='sticky'?'sticky':'flash';if(!gameActive||paused||matchState.status!=='active'||hp<=0||now<localEquipmentCooldownUntil||(!godMode&&(equipment[kind]||0)<=0))return false;if(equipmentAim.kind)return false;equipmentAim={kind,startedAt:now,pointer};showTrajectory();if(kind==='flash')touchVisual.flashUntil=now+220;else touchVisual.stickyUntil=now+220;return true;}
 function makeThrowId(){return crypto.randomUUID().replace(/-/g,'').slice(0,16);}
 function releaseEquipmentAim(){
   if(!equipmentAim.kind)return;
@@ -1622,14 +1535,22 @@ function sendTacticalSimulationTick(){const now=performance.now();if(!hasOwnedAc
 
 function syncLocalWeaponModel(){if(pistolGroup)pistolGroup.visible=currentWeapon==='pistol';if(assaultGroup)assaultGroup.visible=currentWeapon==='assault';if(shotgunGroup)shotgunGroup.visible=currentWeapon==='shotgun';if(sniperGroup)sniperGroup.visible=currentWeapon==='sniper';syncPauseContext();}
 function syncRemoteWeapon(r){if(!r)return;if(r.pistol)r.pistol.visible=r.weapon==='pistol';if(r.assault)r.assault.visible=r.weapon==='assault';if(r.shotgun)r.shotgun.visible=r.weapon==='shotgun';if(r.sniper)r.sniper.visible=r.weapon==='sniper';}
+function bulletGeometry(radius){const key=String(radius);let g=bulletGeometryCache.get(key);if(!g){g=new THREE.SphereGeometry(radius,8,6);bulletGeometryCache.set(key,g);}return g;}
+function bulletMaterial(color){const key=String(color);let m=bulletMaterialCache.get(key);if(!m){m=new THREE.MeshBasicMaterial({color});bulletMaterialCache.set(key,m);}return m;}
+function acquireBulletMesh(radius,color){const mesh=bulletMeshPool.pop()||new THREE.Mesh();mesh.geometry=bulletGeometry(radius);mesh.material=bulletMaterial(color);mesh.visible=true;return mesh;}
+function releaseBulletMesh(mesh){if(!mesh)return;scene.remove(mesh);mesh.visible=false;if(bulletMeshPool.length<192)bulletMeshPool.push(mesh);}
 function handleShot(m){
   if(!m?.id||bullets.has(m.id))return;const packetAge=Number.isFinite(Number(m.at))?Math.max(0,serverNow()-Number(m.at)):0;if(packetAge>520)return;
   const color=m.weapon==='sniper'?0xb8efff:m.weapon==='shotgun'?0xffa95d:m.weapon==='assault'?0xffd37d:(m.ownerId===clientId?0xfff1a8:(remotes.get(m.ownerId)?.bot?0xff9b6b:0xffd27a));
-  const radius=m.weapon==='sniper'?.045:m.weapon==='assault'?.05:.055;const mesh=new THREE.Mesh(new THREE.SphereGeometry(radius,8,6),new THREE.MeshBasicMaterial({color}));mesh.position.set(m.x,m.y,m.z);scene.add(mesh);
+  const radius=m.weapon==='sniper'?.045:m.weapon==='assault'?.05:.055,mesh=acquireBulletMesh(radius,color);mesh.position.set(m.x,m.y,m.z);scene.add(mesh);
   bullets.set(m.id,{mesh,v:new THREE.Vector3(m.vx,m.vy,m.vz),born:performance.now(),lifetimeMs:Number(m.lifetimeMs)||3600});
-  if(m.ownerId===clientId){const w=m.weapon||currentWeapon;if(m.consumeAmmo!==false&&!godMode){ammo[w]=Math.max(0,(ammo[w]||0)-1);}fireTime=0;soundShot(w);if(w==='shotgun'){shotgunPumpStartedAt=performance.now();shotgunPumpSoundPlayed=false;}if(w==='sniper')sniperFlash.material.opacity=1;else if(w==='shotgun')shotgunFlash.material.opacity=1;else if(w==='assault')assaultFlash.material.opacity=1;else pistolFlash.material.opacity=1;}else{const r=remotes.get(m.ownerId);if(r)r.fireKickUntil=performance.now()+170;}
+  if(m.ownerId===clientId){
+    const w=m.weapon||currentWeapon;if(m.consumeAmmo!==false&&!godMode){ammo[w]=Math.max(0,(ammo[w]||0)-1);}fireTime=0;soundShot(w);if(w==='shotgun'){shotgunPumpStartedAt=performance.now();shotgunPumpSoundPlayed=false;}if(w==='sniper')sniperFlash.material.opacity=1;else if(w==='shotgun')shotgunFlash.material.opacity=1;else if(w==='assault')assaultFlash.material.opacity=1;else pistolFlash.material.opacity=1;
+  }else{
+    const r=remotes.get(m.ownerId);if(r){r.fireKickUntil=performance.now()+170;r.revealedUntil=performance.now()+1500;playSpatialCue(weaponShotSoundId(m.weapon),m.x,m.y,m.z,95,.95);}
+  }
 }
-function removeBullet(id){const b=bullets.get(id);if(!b)return;scene.remove(b.mesh);b.mesh.geometry.dispose();b.mesh.material.dispose();bullets.delete(id);}
+function removeBullet(id){const b=bullets.get(id);if(!b)return;releaseBulletMesh(b.mesh);bullets.delete(id);}
 function clearBullets(){for(const id of [...bullets.keys()])removeBullet(id);}
 function updateBullets(dt){for(const [id,b] of bullets){b.mesh.position.addScaledVector(b.v,dt);if(performance.now()-b.born>b.lifetimeMs+250)removeBullet(id);}}
 
@@ -1645,6 +1566,7 @@ function spawnThrowableVisual(m){
   root.position.set(m.x,m.y,m.z);scene.add(root);
   const at=Number(m.at)||serverNow(),fuseAt=Number(m.fuseAt)||at+(m.kind==='sticky'?1850:1650);throwables.set(m.id,{root,mesh:root,body,indicator,kind:m.kind,ownerId:m.ownerId,target:new THREE.Vector3(m.x,m.y,m.z),snapshotPos:new THREE.Vector3(m.x,m.y,m.z),snapshotVel:new THREE.Vector3(m.vx||0,m.vy||0,m.vz||0),snapshotAt:at,fuseAt,nextBeepAt:m.kind==='sticky'?at+170:0,born:performance.now(),stuck:!!m.stuck});
   if(m.ownerId===clientId)soundThrowableThrow(m.kind);
+  else playSpatialCue(m.kind==='sticky'?'stickyThrow':'flashThrow',m.x,m.y,m.z,30,.55);
 }
 function updateThrowableVisual(m){
   const g=throwables.get(m.id);if(!g)return;
@@ -1693,18 +1615,17 @@ function updatePausedNetwork(){
 function updateGame(dt){
   localFireCooldown=Math.max(0,localFireCooldown-dt);
   const combatNow=performance.now();if((reloadUntil&&serverNow()>=reloadUntil+180)||(reloadPendingUntil&&combatNow>=reloadPendingUntil)){reloadPendingUntil=0;requestCombatSync();}
-  if(hp>0){updateCrouchState(dt);updateMovement(dt);if(fireHeld&&fireMode==='auto')doFire();if(queuedFireUntil>combatNow&&localFireCooldown<=0&&combatNow>=serverFireRetryAt)doFire(true);else if(queuedFireUntil&&queuedFireUntil<=combatNow)queuedFireUntil=0;}
+  if(hp>0){updateCrouchState(dt);updateMovement(dt);if(fireHeld&&currentWeapon==='assault'&&assaultFireMode==='auto')doFire();if(queuedFireUntil>combatNow&&localFireCooldown<=0&&combatNow>=serverFireRetryAt)doFire(true);else if(queuedFireUntil&&queuedFireUntil<=combatNow)queuedFireUntil=0;}
   const deathP=hp<=0?THREE.MathUtils.clamp((performance.now()-(deathAnimStartedAt||performance.now()))/700,0,1):0,deathEase=deathP*deathP*(3-2*deathP),viewY=updateViewVertical(dt),stanceEase=smoothstep01(crouchBlend);camera.position.set(position.x,viewY+THREE.MathUtils.lerp(PLAYER_HEIGHT,CROUCH_HEIGHT,stanceEase)-.42*deathEase,position.z);camera.rotation.y=yaw;camera.rotation.x=pitch+.10*deathEase;camera.rotation.z=.72*deathEase;
   const now=performance.now();sendCurrentState(false);sendTacticalSimulationTick();if(now-lastPing>15000){lastPing=now;lastPingLocalAt=Date.now();send({t:'ping',clientAt:lastPingLocalAt});}
 }
 function updateMovement(dt){
-  let mx=0,mz=0;
-  if(isTouch){mx=joy.x;mz=joy.y;}else{if(keys.has('KeyA'))mx-=1;if(keys.has('KeyD'))mx+=1;if(keys.has('KeyW'))mz-=1;if(keys.has('KeyS'))mz+=1;}
-  let len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;len=1;}localMoveAmount=THREE.MathUtils.lerp(localMoveAmount,len,Math.min(1,dt*12));
+  const input=movementInput(),mx=input.mx,mz=input.mz,len=input.len;localMoveAmount=THREE.MathUtils.lerp(localMoveAmount,len,Math.min(1,dt*12));
   const speed=(adsWanted?WALK_SPEED:RUN_SPEED)*(crouched?CROUCH_SPEED_MULTIPLIER:1);
   const sin=Math.sin(yaw),cos=Math.cos(yaw);const worldX=(mx*cos + mz*sin)*speed;const worldZ=(-mx*sin + mz*cos)*speed;
-  knockX*=Math.pow(.08,dt);knockZ*=Math.pow(.08,dt);
-  const dx=(worldX+knockX)*dt,dz=(worldZ+knockZ)*dt,startX=position.x,startZ=position.z;
+  const knockDecay=Math.pow(.08,dt),knockRate=-Math.log(.08),knockFactor=(1-knockDecay)/knockRate;
+  const dx=worldX*dt+knockX*knockFactor,dz=worldZ*dt+knockZ*knockFactor,startX=position.x,startZ=position.z;
+  knockX*=knockDecay;knockZ*=knockDecay;if(Math.abs(knockX)<.015)knockX=0;if(Math.abs(knockZ)<.015)knockZ=0;
   moveHorizontal(dx,dz);
   const moved=Math.hypot(position.x-startX,position.z-startZ),wasGround=onGround,previousY=position.y;
   verticalVelocity-=GRAVITY*dt;const vertical=resolveCeilingCollision(previousY,position.y+verticalVelocity*dt,position.x,position.z,currentPlayerHeight());position.y=vertical.y;if(vertical.hit&&verticalVelocity>0)verticalVelocity=0;const ground=worldSupportHeight(position.x,position.z,position.y);
@@ -1756,13 +1677,14 @@ function updateRemoteVisuals(dt){
     if(!dead){
       r.crouchBlend=THREE.MathUtils.lerp(r.crouchBlend,r.crouched?1:0,Math.min(1,dt*12));r.model.scale.y=THREE.MathUtils.lerp(1,CROUCH_HEIGHT/PLAYER_HEIGHT,r.crouchBlend);if(r.tag)r.tag.position.y=THREE.MathUtils.lerp(2.18,1.48,r.crouchBlend);
       const move=THREE.MathUtils.clamp(r.moveSpeed/(RUN_SPEED*.75),0,1),running=move>.08&&!r.airborne;r.animPhase+=dt*(running?5.5+move*6:1.8);const swing=running?Math.sin(r.animPhase)*.68*move:Math.sin(r.animPhase)*.035;
+      if(running&&now>=r.nextFootstepAt){playSpatialCue(r.footstepSide?'footstepRight':'footstepLeft',r.group.position.x,r.group.position.y,r.group.position.z,30,.48);r.footstepSide^=1;r.nextFootstepAt=now+THREE.MathUtils.lerp(540,315,move);}else if(!running)r.nextFootstepAt=Math.max(r.nextFootstepAt,now+120);
       r.legL.rotation.x=r.airborne?-.34:swing;r.legR.rotation.x=r.airborne?.34:-swing;r.armL.rotation.x=r.airborne?.28:-swing*.72;r.armR.rotation.x=r.airborne?-.20:swing*.52;r.armL.rotation.z=-.12;r.armR.rotation.z=.12;
       const reloadActive=r.reloadUntil>srv;if(!reloadActive){r.reloadUntil=0;r.reloadStartedAt=0;}const total=WEAPON_SPECS[r.reloadWeapon||r.weapon]?.reloadMs||650,reloadP=reloadActive?THREE.MathUtils.clamp((srv-(r.reloadStartedAt||srv))/Math.max(1,total),0,1):0,reloadCurve=Math.sin(Math.PI*reloadP);const swapP=r.swapStartedAt?THREE.MathUtils.clamp((now-r.swapStartedAt)/360,0,1):1,swapCurve=swapP<1?Math.sin(Math.PI*swapP):0;if(swapP>=1)r.swapStartedAt=0;const kick=now<r.fireKickUntil?Math.sin(Math.PI*THREE.MathUtils.clamp((r.fireKickUntil-now)/170,0,1))*.18:0;
       r.armR.rotation.x+=reloadCurve*.95+kick;r.armR.rotation.z=.12-reloadCurve*.28;const lower=reloadCurve*.24+swapCurve*.34;
       r.pistol.position.set(.45,1.08-lower,-.25+kick*.20);r.assault.position.set(.45,1.09-lower,-.38+kick*.24);r.shotgun.position.set(.45,1.10-lower,-.41+kick*.26);r.sniper.position.set(.45,1.10-lower,-.45+kick*.28);r.pistol.rotation.z=-reloadCurve*.45-swapCurve*.35;r.assault.rotation.z=-reloadCurve*.42-swapCurve*.35;r.shotgun.rotation.z=-reloadCurve*.34-swapCurve*.35;r.sniper.rotation.z=-reloadCurve*.25-swapCurve*.35;
       r.body.rotation.x=r.airborne?-.08:running?Math.sin(r.animPhase*2)*.025:Math.sin(r.animPhase)*.012;r.head.rotation.x=r.ads?-.045:0;
     }
-    if(r.fire?.visible){const tm=now*.005;for(const f of r.fire.children){const p=f.userData.phase||0;f.scale.y=.72+.42*(.5+.5*Math.sin(tm+p));f.position.y=.32+((tm*.17+p)%1.15);f.material.opacity=.48+.34*(.5+.5*Math.sin(tm*1.4+p));}}if(r.godRing?.visible){r.godRing.rotation.z+=dt*1.8;r.godRing.material.opacity=.66+.24*Math.sin(now*.004+r.group.position.x);}
+    if(r.godRing?.visible){r.godRing.rotation.z+=dt*1.8;r.godRing.material.opacity=.66+.24*Math.sin(now*.004+r.group.position.x);}
   }
 }
 function updateAim(dt){
@@ -1809,7 +1731,7 @@ function normalizeAngle(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math
 
 function scheduleViewportSync(){
   cancelAnimationFrame(resizeRaf);
-  resizeRaf=requestAnimationFrame(()=>requestAnimationFrame(()=>{syncVisualViewportMetrics();onResize();applyExperienceGate();requestAnimationFrame(fitResponsiveOverlays);}));
+  resizeRaf=requestAnimationFrame(()=>requestAnimationFrame(()=>{syncVisualViewportMetrics();onResize();applyExperienceGate();}));
 }
 function onResize(){
   const v=syncVisualViewportMetrics();viewW=v.w;viewH=v.h;
@@ -1850,20 +1772,14 @@ function safeInsets(){
 function computeHudLayout(){
   const safe=safeInsets(),landscape=viewW>viewH,compact=isTouch&&landscape&&viewH<=520,margin=compact?8:12;
   const mapSize=compact?96:(isTouch?112:140),menuW=compact?36:42,menuH=compact?32:36;
-  const teamW=compact?188:(isTouch?230:270),teamH=compact?30:34,joyR=compact?54:(isTouch?62:0);
-  const fireR=compact?37:43,leftFireR=compact?32:37,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=compact?20:23,equipR=compact?23:27,crouchR=compact?22:26;
-  const bottom=safe.bottom+margin,weaponW=compact?158:(isTouch?174:198),weaponH=compact?50:(isTouch?54:58);
+  const teamW=compact?208:(isTouch?248:292),teamH=compact?32:36,joyR=compact?54:(isTouch?62:0);
+  const fireR=compact?37:43,leftFireR=compact?32:37,aimR=compact?27:31,jumpR=compact?29:33,equipR=compact?23:27,crouchR=compact?22:26;
+  const bottom=safe.bottom+margin,weaponW=compact?178:(isTouch?194:210),weaponH=compact?60:(isTouch?64:58);
   const killW=compact?220:(isTouch?252:300),killH=compact?70:(isTouch?104:128);
   const teamX=(viewW-teamW)/2,teamY=safe.top+margin,moveBoundary=viewW*MOBILE_MOVE_ZONE_RATIO;
   const defaultJoyX=Math.max(safe.left+joyR+margin,Math.min(moveBoundary-joyR-margin,safe.left+joyR+margin));
   const defaultJoyY=viewH-bottom-joyR;
   const joyX=joy.pointer!=null&&joy.centerX?joy.centerX:defaultJoyX,joyY=joy.pointer!=null&&joy.centerY?joy.centerY:defaultJoyY;
-
-  // Left-hand actions stay INSIDE the 35% movement side instead of sitting on
-  // the center divide. FIRE is upper-left for the index finger; equipment sits
-  // farther in and lower for the thumb while leaving the bottom-left stick area
-  // open. Button hit-testing runs before joystick placement, so these remain
-  // reliable even though the rest of the left 35% is a floating-stick surface.
   const leftSpan=Math.max(120,moveBoundary-safe.left);
   const leftFireX=Math.max(safe.left+leftFireR+8,Math.min(moveBoundary-leftFireR-10,safe.left+leftSpan*.30));
   const equipX=Math.max(safe.left+equipR+8,Math.min(moveBoundary-equipR-10,safe.left+leftSpan*.63));
@@ -1871,34 +1787,16 @@ function computeHudLayout(){
   const crouchX=leftFireX,crouchY=Math.max(safe.top+crouchR+70,Math.min(viewH-bottom-crouchR-82,leftFireY+leftFireR+crouchR+10));
   const flashY=Math.max(safe.top+equipR+86,Math.min(viewH-bottom-equipR-76,viewH*.59));
   const stickyY=Math.max(flashY+equipR*2+9,Math.min(viewH-bottom-equipR-8,viewH*.75));
-
-  // The right 65% is the look surface. Its action cluster hugs the outer edge
-  // so the center/right-middle remains free for broad aiming swipes.
   const fireX=viewW-safe.right-margin-fireR,fireY=viewH-bottom-fireR;
   const aimX=fireX-fireR-aimR-11,aimY=fireY;
   const jumpX=fireX,jumpY=fireY-fireR-jumpR-11;
-  const reloadX=aimX-aimR-reloadR-9,reloadY=fireY;
-  const swapX=aimX,swapY=jumpY;
-  const modeX=reloadX,modeY=jumpY;
-  const weaponLift=isTouch?(fireR*3.75+8):0;
+  const weaponLift=isTouch?(fireR*2.90+8):0;
   return{compact,safe,moveBoundary,
-    map:{x:viewW-safe.right-margin-mapSize,y:safe.top+margin,w:mapSize,h:mapSize},
-    kill:{x:safe.left+margin,y:safe.top+margin,w:killW,h:killH},
-    team:{x:teamX,y:teamY,w:teamW,h:teamH},
-    god:{x:teamX-31,y:teamY,w:25,h:teamH},
-    menu:{x:teamX+teamW+7,y:teamY,w:menuW,h:menuH},
-    weapon:{x:viewW-safe.right-margin-weaponW,y:viewH-bottom-weaponH-weaponLift,w:weaponW,h:weaponH},
-    joy:{x:joyX,y:joyY,r:joyR},
-    leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},
-    crouch:{x:crouchX,y:crouchY,r:crouchR},
-    flash:{x:equipX,y:flashY,r:equipR},
-    sticky:{x:equipX,y:stickyY,r:equipR},
-    fire:{x:fireX,y:fireY,r:fireR},
-    aim:{x:aimX,y:aimY,r:aimR},
-    jump:{x:jumpX,y:jumpY,r:jumpR},
-    reload:{x:reloadX,y:reloadY,r:reloadR},
-    swap:{x:swapX,y:swapY,r:swapR},
-    mode:{x:modeX,y:modeY,r:modeR}
+    map:{x:viewW-safe.right-margin-mapSize,y:safe.top+margin,w:mapSize,h:mapSize},kill:{x:safe.left+margin,y:safe.top+margin,w:killW,h:killH},
+    team:{x:teamX,y:teamY,w:teamW,h:teamH},god:{x:teamX-31,y:teamY,w:25,h:teamH},menu:{x:teamX+teamW+7,y:teamY,w:menuW,h:menuH},
+    weapon:{x:viewW-safe.right-margin-weaponW,y:viewH-bottom-weaponH-weaponLift,w:weaponW,h:weaponH},joy:{x:joyX,y:joyY,r:joyR},
+    leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},crouch:{x:crouchX,y:crouchY,r:crouchR},flash:{x:equipX,y:flashY,r:equipR},sticky:{x:equipX,y:stickyY,r:equipR},
+    fire:{x:fireX,y:fireY,r:fireR},aim:{x:aimX,y:aimY,r:aimR},jump:{x:jumpX,y:jumpY,r:jumpR}
   };
 }
 
@@ -1915,31 +1813,35 @@ function drawHud(now){
   const headshotHit=now<headshotUntil;
   if(scoped)drawScopeReticle(c,w,h,now<hitUntil,headshotHit);else drawWeaponCrosshair(c,w/2,h/2,currentWeapon,now<hitUntil,adsBlend,headshotHit);
   drawDamageIndicators(c,w,h,now);
-  drawAnnouncer(c,w,h,now);
+  drawAnnouncer(c,w,h,now);drawMatchStatus(c,w,h);
   if(isTouch)drawTouchControls(c,L,now);else drawDesktopHint(c,L);
-  drawVersion(c,L);
   if(killConfirmUntil>now)drawKillConfirm(c,w,h,now);
   if(scoreboardOpen)drawScoreboard(c,L);
   if(toastText&&now<toastUntil){c.font='800 11px system-ui';const tw=Math.min(w-30,c.measureText(toastText).width+24),tx=(w-tw)/2,ty=(scoped?safeInsets().top+12:L.team.y+L.team.h+9);roundRect(c,tx,ty,tw,28,8,HUD_SURFACE,HUD_LINE);c.fillStyle='#fff';c.textAlign='center';c.fillText(toastText,w/2,ty+14);}
-  if(hp<=0){drawDeathFlames(c,w,h,now);c.fillStyle='rgba(24,3,8,.48)';c.fillRect(0,0,w,h);c.textAlign='center';c.fillStyle='#ff6676';c.font=`1000 ${L.compact?34:48}px system-ui`;c.fillText('ELIMINATED',w/2,h/2-19);c.font='900 11px system-ui';c.fillStyle='#ffd8dd';if(lastWastedBy)c.fillText(`${lastWastedBy}${lastWastedWeapon?' · '+weaponLabel(lastWastedWeapon):''}`,w/2,h/2+14);c.font='800 11px system-ui';c.fillStyle='#c8b4b8';c.fillText(`Respawning in ${Math.max(1,Math.ceil((wastedUntil-serverNow())/1000))}`,w/2,h/2+36);}
+  if(hp<=0){c.fillStyle='rgba(24,3,8,.48)';c.fillRect(0,0,w,h);c.textAlign='center';c.fillStyle='#ff6676';c.font=`1000 ${L.compact?34:48}px system-ui`;c.fillText('ELIMINATED',w/2,h/2-19);c.font='900 11px system-ui';c.fillStyle='#ffd8dd';if(lastWastedBy)c.fillText(`${lastWastedBy}${lastWastedWeapon?' · '+weaponLabel(lastWastedWeapon):''}`,w/2,h/2+14);c.font='800 11px system-ui';c.fillStyle='#c8b4b8';c.fillText(`Respawning in ${Math.max(1,Math.ceil((wastedUntil-serverNow())/1000))}`,w/2,h/2+36);}
   hudTexture.needsUpdate=true;
+}
+function drawMatchStatus(c,w,h){
+  if(matchState.status==='active')return;
+  const text=matchState.status==='warmup'?matchClockText():matchState.status==='ended'?matchClockText():'WAITING FOR MATCH';
+  const sub=matchState.status==='ended'?`Round ${matchState.round} · restarting shortly`:matchState.status==='warmup'?`Round ${matchState.round}`:'Waiting for players';
+  c.save();c.textAlign='center';c.fillStyle='rgba(6,9,12,.70)';roundRect(c,w/2-128,h*.34-32,256,64,10,'rgba(6,9,12,.72)','rgba(255,255,255,.15)');c.fillStyle='#fff';c.font='1000 19px system-ui';c.fillText(text,w/2,h*.34-8);c.fillStyle=HUD_MUTED;c.font='850 9px system-ui';c.fillText(sub,w/2,h*.34+15);c.restore();
 }
 function allCombatStats(){
   const rows=[{id:clientId,name:myName||safeName(),team:myTeam,bot:false,godMode,kills:myStats.kills||0,deaths:myStats.deaths||0}];
   for(const r of remotes.values())rows.push({id:r.id,name:r.name,team:r.team,bot:r.bot,godMode:!!r.godMode,kills:r.kills||0,deaths:r.deaths||0});
   return rows.sort((a,b)=>a.team.localeCompare(b.team)||(b.kills-a.kills)||(a.deaths-b.deaths)||a.name.localeCompare(b.name));
 }
-function teamWasteTotals(){let blue=0,red=0;for(const p of allCombatStats()){if(p.team==='red')red+=p.kills;else blue+=p.kills;}return{blue,red};}
+function teamScores(){return{blue:Math.max(0,Number(matchState.blueScore)||0),red:Math.max(0,Number(matchState.redScore)||0)};}
 function drawTeamBar(c,r){
-  const t=teamWasteTotals(),mid=r.x+r.w/2;
-  roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);
-  c.fillStyle=TEAM_COLORS.blue;c.fillRect(r.x,r.y,3,r.h);
-  c.fillStyle=TEAM_COLORS.red;c.fillRect(r.x+r.w-3,r.y,3,r.h);
-  c.textBaseline='middle';c.textAlign='left';c.font=`900 ${r.h<=30?7:8}px system-ui`;c.fillStyle='#8fc8ff';c.fillText('BLUE',r.x+11,r.y+r.h/2);
-  c.textAlign='right';c.font=`1000 ${r.h<=30?15:17}px system-ui`;c.fillStyle='#fff';c.fillText(String(t.blue),mid-14,r.y+r.h/2);
-  c.textAlign='center';c.font='900 7px system-ui';c.fillStyle='#66717b';c.fillText('—',mid,r.y+r.h/2);
-  c.textAlign='left';c.font=`1000 ${r.h<=30?15:17}px system-ui`;c.fillStyle='#fff';c.fillText(String(t.red),mid+14,r.y+r.h/2);
-  c.textAlign='right';c.font=`900 ${r.h<=30?7:8}px system-ui`;c.fillStyle='#ff9ca4';c.fillText('RED',r.x+r.w-11,r.y+r.h/2);
+  const t=teamScores(),mid=r.x+r.w/2,limit=Math.max(1,matchState.scoreLimit||DEFAULT_MATCH_RULES.scoreLimit),clock=matchClockText();
+  roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);c.fillStyle=TEAM_COLORS.blue;c.fillRect(r.x,r.y,3,r.h);c.fillStyle=TEAM_COLORS.red;c.fillRect(r.x+r.w-3,r.y,3,r.h);
+  c.textBaseline='middle';c.textAlign='left';c.font=`900 ${r.h<=32?7:8}px system-ui`;c.fillStyle='#8fc8ff';c.fillText('BLUE',r.x+10,r.y+r.h/2);
+  c.textAlign='right';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(t.blue),mid-40,r.y+r.h/2);
+  c.textAlign='center';c.font='1000 8px system-ui';c.fillStyle=matchState.status==='ended'?HUD_ACCENT:'#dbe4ea';c.fillText(clock,mid,r.y+r.h/2-4);
+  c.font='800 6px system-ui';c.fillStyle='#69747d';c.fillText(`${matchCustom?'CUSTOM · ':''}FIRST ${limit}`,mid,r.y+r.h/2+7);
+  c.textAlign='left';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(t.red),mid+40,r.y+r.h/2);
+  c.textAlign='right';c.font=`900 ${r.h<=32?7:8}px system-ui`;c.fillStyle='#ff9ca4';c.fillText('RED',r.x+r.w-10,r.y+r.h/2);
 }
 function toggleScoreboard(){if(!gameActive||paused)return;scoreboardOpen=!scoreboardOpen;scoreboardDrag=null;if(scoreboardOpen){scoreboardScroll=0;touchRoles.clear();fireTouchPointers.clear();joy.pointer=null;joy.x=joy.y=0;look.pointer=null;fireHeld=false;}}
 function drawScoreboard(c,L){
@@ -1955,7 +1857,7 @@ function drawScoreboard(c,L){
   for(const p of rows){if(ry+rowH>=bodyTop&&ry<=bodyTop+bodyH){const self=p.id===clientId;if(self){c.fillStyle='rgba(255,255,255,.06)';c.fillRect(x+7,ry,w-14,rowH-1);}c.fillStyle=TEAM_COLORS[p.team]||'#fff';c.fillRect(x+8,ry+5,3,rowH-10);c.textAlign='left';c.font=`${self?'1000':'850'} 10px system-ui`;c.fillStyle=self?'#fff':'#d6e0e8';c.fillText(`${p.godMode?'◆ ':''}${p.bot?'[BOT] ':''}${p.name}`,nameX,ry+rowH/2);c.textAlign='right';c.fillStyle='#fff';c.fillText(String(p.kills),kX,ry+rowH/2);c.fillStyle='#b9c5cf';c.fillText(String(p.deaths),dX,ry+rowH/2);c.fillText(p.deaths?(p.kills/p.deaths).toFixed(2):p.kills?String(p.kills):'0.00',kdX,ry+rowH/2);}ry+=rowH;}c.restore();
   if(maxScroll>0){const trackY=bodyTop+3,trackH=bodyH-6,thumbH=Math.max(24,trackH*(bodyH/contentH)),thumbY=trackY+(trackH-thumbH)*(scoreboardScroll/maxScroll);roundRect(c,x+w-6,trackY,2,trackH,1,'rgba(255,255,255,.08)');roundRect(c,x+w-7,thumbY,4,thumbH,2,'rgba(255,255,255,.35)');}
 }
-function drawDeathFlames(c,w,h,now){c.save();const base=h+8;for(let i=0;i<16;i++){const x=(i+.5)/16*w+Math.sin(now*.003+i)*8,flame=34+24*(.5+.5*Math.sin(now*.006+i*.9));const g=c.createLinearGradient(x,base-flame,x,base);g.addColorStop(0,'rgba(255,224,70,0)');g.addColorStop(.35,'rgba(255,177,30,.55)');g.addColorStop(1,'rgba(235,45,5,.78)');c.fillStyle=g;c.beginPath();c.moveTo(x-18,base);c.quadraticCurveTo(x-10,base-flame*.45,x,base-flame);c.quadraticCurveTo(x+10,base-flame*.45,x+18,base);c.closePath();c.fill();}c.restore();}
+
 function drawKillConfirm(c,w,h,now){const remain=Math.max(0,Math.min(1,(killConfirmUntil-now)/1450)),a=Math.min(1,remain*2.5);c.save();c.globalAlpha=a;c.textAlign='center';c.fillStyle='#fff';c.font='1000 16px system-ui';c.fillText('ELIMINATED',w/2,h/2+48);c.fillStyle=killConfirmHeadshot?'#ffd36d':'#f0c96a';c.font='900 10px system-ui';const extra=killConfirmHeadshot?' · HEADSHOT':'';c.fillText(`${killConfirmName}${killConfirmWeapon?' · '+weaponLabel(killConfirmWeapon):''}${extra}`,w/2,h/2+68);c.restore();}
 function queueAnnouncer(title,subtitle='',duration=1500,priority=1){const item={title:String(title||''),subtitle:String(subtitle||''),duration,priority};if(!item.title)return;if(announcerCurrent&&priority>announcerCurrent.priority){announcerQueue.unshift(announcerCurrent);announcerCurrent=null;}announcerQueue.push(item);announcerQueue.sort((a,b)=>b.priority-a.priority);}
 function drawAnnouncer(c,w,h,now){if(announcerCurrent&&now>=announcerCurrent.until)announcerCurrent=null;if(!announcerCurrent&&announcerQueue.length){const next=announcerQueue.shift();announcerCurrent={...next,start:now,until:now+next.duration};if(realtimeAudioAllowed())soundAnnouncer(next.priority); }if(!announcerCurrent)return;const a=announcerCurrent,life=(now-a.start)/a.duration,fade=Math.min(1,life*6,(1-life)*5),scale=1+Math.max(0,.12-life*.45);c.save();c.translate(w/2,Math.max(62,h*.28));c.scale(scale,scale);c.globalAlpha=Math.max(0,fade);c.textAlign='center';c.shadowColor='rgba(0,0,0,.75)';c.shadowBlur=10;c.fillStyle='#fff';c.font=`1000 ${Math.max(20,Math.min(32,h*.065))}px system-ui`;c.fillText(a.title,0,0);if(a.subtitle){c.fillStyle=HUD_ACCENT;c.font=`900 ${Math.max(10,Math.min(14,h*.032))}px system-ui`;c.fillText(a.subtitle,0,25);}c.restore();}
@@ -1963,20 +1865,26 @@ function weaponLabel(w){return WEAPON_SPECS[w]?.name||'PISTOL';}
 function drawWeapon(c,r){
   const spec=WEAPON_SPECS[currentWeapon],count=Math.max(0,Math.floor(ammo[currentWeapon]||0)),unlimited=!!godMode;
   const accent=currentWeapon==='sniper'?'#8edcff':currentWeapon==='shotgun'?'#ffad69':currentWeapon==='assault'?HUD_ACCENT:'#f4f6f7';
-  roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);
-  c.fillStyle=accent;c.fillRect(r.x,r.y,2.5,r.h);
-  const left=r.x+10,top=r.y+11,right=r.x+r.w-9;
-  c.textAlign='left';c.fillStyle='#fff';c.font=`1000 ${r.w<170?8.5:9.5}px system-ui`;c.fillText(spec.name,left,top);
-  c.fillStyle=HUD_MUTED;c.font='850 6.5px system-ui';c.fillText(`${fireMode.toUpperCase()} · ${currentWeapon==='sniper'?sniperZoomLabel():(adsWanted?'ADS':'HIP')}`,left,top+13);
-  c.textAlign='right';c.fillStyle=unlimited?HUD_ACCENT:count<=3?'#ff747d':'#fff';c.font=`1000 ${r.h<=50?22:24}px system-ui`;c.fillText(unlimited?'∞':String(count),right-23,top+6);
-  c.fillStyle='#69747d';c.font='900 7px system-ui';c.fillText(unlimited?'∞':`/ ${spec.mag}`,right,top+8);
-  const bx=left,by=r.y+r.h-7,bw=r.w-19,bh=2.5;roundRect(c,bx,by,bw,bh,2,'rgba(255,255,255,.09)');
-  if(unlimited)roundRect(c,bx,by,bw,bh,2,HUD_ACCENT);
-  else if(reloadUntil){const total=WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs,remain=Math.max(0,reloadUntil-serverNow()),q=Math.max(0,Math.min(1,1-remain/total));roundRect(c,bx,by,bw*q,bh,2,HUD_ACCENT);c.fillStyle=HUD_ACCENT;c.font='900 6.5px system-ui';c.textAlign='left';c.fillText('RELOADING',left,by-7);}
-  else roundRect(c,bx,by,bw*(count/spec.mag),bh,2,accent);
+  roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);c.fillStyle=accent;c.fillRect(r.x,r.y,2.5,r.h);
+  const left=r.x+10,top=r.y+11,right=r.x+r.w-9,mode=currentWeapon==='assault'?assaultFireMode.toUpperCase():'SEMI';
+  c.textAlign='left';c.fillStyle='#fff';c.font=`1000 ${r.w<180?8.5:9.5}px system-ui`;c.fillText(spec.name,left,top);
+  c.fillStyle=HUD_MUTED;c.font='850 6.5px system-ui';c.fillText(`${mode} · ${currentWeapon==='sniper'?sniperZoomLabel():(adsWanted?'ADS':'HIP')}`,left,top+13);
+  c.textAlign='right';c.fillStyle=unlimited?HUD_ACCENT:count<=3?'#ff747d':'#fff';c.font=`1000 ${r.h<=60?22:24}px system-ui`;c.fillText(unlimited?'∞':String(count),right-23,top+6);c.fillStyle='#69747d';c.font='900 7px system-ui';c.fillText(unlimited?'∞':`/ ${spec.mag}`,right,top+8);
+  const bx=left,by=r.y+r.h-(isTouch?16:7),bw=r.w-19,bh=2.5;roundRect(c,bx,by,bw,bh,2,'rgba(255,255,255,.09)');
+  if(unlimited)roundRect(c,bx,by,bw,bh,2,HUD_ACCENT);else if(reloadUntil){const total=WEAPON_SPECS[reloadWeapon||currentWeapon].reloadMs,remain=Math.max(0,reloadUntil-serverNow()),q=Math.max(0,Math.min(1,1-remain/total));roundRect(c,bx,by,bw*q,bh,2,HUD_ACCENT);c.fillStyle=HUD_ACCENT;c.font='900 6.5px system-ui';c.textAlign='left';c.fillText('RELOADING',left,by-7);}else roundRect(c,bx,by,bw*(count/spec.mag),bh,2,accent);
+  if(isTouch){const y=r.y+r.h-6;c.font='900 6.5px system-ui';c.textBaseline='middle';c.textAlign='center';const a=r.x+r.w*.18,b=r.x+r.w*.51,d=r.x+r.w*.83;c.fillStyle='#dce6eb';c.fillText('SWAP',a,y);c.fillStyle=primaryWeapon==='assault'?HUD_ACCENT:'#56616a';c.fillText(primaryWeapon==='assault'?assaultFireMode.toUpperCase():'MODE',b,y);c.fillStyle='#dce6eb';c.fillText('RELOAD',d,y);}
 }
 function minimapDotColor(rmt){return !rmt.bot&&rmt.team===myTeam?'#62ef86':(TEAM_COLORS[rmt.team]||rmt.color||'#fff');}
-function drawMiniMap(c,r){roundRect(c,r.x,r.y,r.w,r.h,9,HUD_SURFACE,HUD_LINE);const pad=8,ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;c.save();c.beginPath();c.rect(ix,iy,iw,ih);c.clip();c.fillStyle='rgba(190,202,194,.18)';c.fillRect(ix,iy,iw,ih);const terrainCells=12,cellW=iw/terrainCells,cellH=ih/terrainCells;for(let gy=0;gy<terrainCells;gy++)for(let gx=0;gx<terrainCells;gx++){const wx=-ARENA_LIMIT+(gx+.5)/terrainCells*ARENA_LIMIT*2,wz=-ARENA_LIMIT+(gy+.5)/terrainCells*ARENA_LIMIT*2,h=terrainHeight(wx,wz),t=Math.max(0,Math.min(1,(h+2.4)/16.2));c.fillStyle=`rgba(${Math.round(72+88*t)},${Math.round(102+55*t)},${Math.round(70+38*t)},${.18+.28*t})`;c.fillRect(ix+gx*cellW,iy+gy*cellH,cellW+.5,cellH+.5);}c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1;c.strokeRect(ix+.5,iy+.5,iw-1,ih-1);const toX=x=>ix+(x+ARENA_LIMIT)/(ARENA_LIMIT*2)*iw,toY=z=>iy+(z+ARENA_LIMIT)/(ARENA_LIMIT*2)*ih;c.fillStyle='rgba(210,216,220,.34)';for(const b of mapObstacles){if(b.type==='box'){const x1=toX(b.x-b.w/2),x2=toX(b.x+b.w/2),y1=toY(b.z-b.d/2),y2=toY(b.z+b.d/2);c.fillRect(x1,y1,x2-x1,y2-y1);}else if(b.type==='pyramid'){const px=toX(b.x),py=toY(b.z),rr=b.base/(ARENA_LIMIT*2)*iw*.55;c.beginPath();c.moveTo(px,py-rr);c.lineTo(px+rr,py+rr);c.lineTo(px-rr,py+rr);c.closePath();c.fill();}else{const px=toX(b.x),py=toY(b.z),rr=Math.max(1.3,(b.r||1)/(ARENA_LIMIT*2)*iw*1.6);c.beginPath();c.arc(px,py,rr,0,Math.PI*2);c.fillStyle=b.type==='tree'?'rgba(48,105,56,.72)':b.type==='bush'?'rgba(73,124,66,.58)':'rgba(156,160,158,.60)';c.fill();c.fillStyle='rgba(210,216,220,.34)';}}for(const rmt of remotes.values()){const px=toX(rmt.group.position.x),py=toY(rmt.group.position.z);c.beginPath();c.arc(px,py,3.4,0,Math.PI*2);const humanTeammate=!rmt.bot&&rmt.team===myTeam;c.fillStyle=minimapDotColor(rmt);c.fill();if(rmt.team===myTeam){c.strokeStyle=humanTeammate?'#d8ffe3':'#fff';c.lineWidth=1;c.stroke();}}const px=toX(position.x),py=toY(position.z);c.save();c.translate(px,py);c.rotate(-yaw);c.beginPath();c.moveTo(0,-6);c.lineTo(4.5,5);c.lineTo(0,3);c.lineTo(-4.5,5);c.closePath();c.fillStyle=selfColor;c.fill();c.strokeStyle='#fff';c.lineWidth=1.2;c.stroke();c.restore();c.restore();c.fillStyle='#fff';c.font=`900 ${r.w<110?8:9}px system-ui`;c.textAlign='left';c.fillText(currentRoom||'----',r.x+9,r.y+r.h-8);c.textAlign='right';c.fillStyle='#c7d3dd';const humanCount=[...remotes.values()].filter(v=>!v.bot).length+1,botTotal=[...remotes.values()].filter(v=>v.bot).length;c.fillText(`${humanCount}P · ${botTotal}B`,r.x+r.w-9,r.y+r.h-8);}
+function getMinimapStatic(w,h){
+  const key=`${Math.round(w)}x${Math.round(h)}`;if(minimapStaticCache?.key===key)return minimapStaticCache.canvas;
+  const q=document.createElement('canvas');q.width=Math.max(1,Math.round(w));q.height=Math.max(1,Math.round(h));const c=q.getContext('2d'),iw=q.width,ih=q.height,terrainCells=12,cellW=iw/terrainCells,cellH=ih/terrainCells;
+  c.fillStyle='rgba(190,202,194,.18)';c.fillRect(0,0,iw,ih);for(let gy=0;gy<terrainCells;gy++)for(let gx=0;gx<terrainCells;gx++){const wx=-ARENA_LIMIT+(gx+.5)/terrainCells*ARENA_LIMIT*2,wz=-ARENA_LIMIT+(gy+.5)/terrainCells*ARENA_LIMIT*2,hv=terrainHeight(wx,wz),t=Math.max(0,Math.min(1,(hv+2.4)/16.2));c.fillStyle=`rgba(${Math.round(72+88*t)},${Math.round(102+55*t)},${Math.round(70+38*t)},${.18+.28*t})`;c.fillRect(gx*cellW,gy*cellH,cellW+.5,cellH+.5);}const toX=x=>(x+ARENA_LIMIT)/(ARENA_LIMIT*2)*iw,toY=z=>(z+ARENA_LIMIT)/(ARENA_LIMIT*2)*ih;c.fillStyle='rgba(210,216,220,.34)';for(const b of mapObstacles){if(b.type==='box'){const x1=toX(b.x-b.w/2),x2=toX(b.x+b.w/2),y1=toY(b.z-b.d/2),y2=toY(b.z+b.d/2);c.fillRect(x1,y1,x2-x1,y2-y1);}else if(b.type==='pyramid'){const px=toX(b.x),py=toY(b.z),rr=b.base/(ARENA_LIMIT*2)*iw*.55;c.beginPath();c.moveTo(px,py-rr);c.lineTo(px+rr,py+rr);c.lineTo(px-rr,py+rr);c.closePath();c.fill();}else{const px=toX(b.x),py=toY(b.z),rr=Math.max(1.3,(b.r||1)/(ARENA_LIMIT*2)*iw*1.6);c.beginPath();c.arc(px,py,rr,0,Math.PI*2);c.fillStyle=b.type==='tree'?'rgba(48,105,56,.72)':b.type==='bush'?'rgba(73,124,66,.58)':'rgba(156,160,158,.60)';c.fill();c.fillStyle='rgba(210,216,220,.34)';}}minimapStaticCache={key,canvas:q};return q;
+}
+function drawMiniMap(c,r){
+  roundRect(c,r.x,r.y,r.w,r.h,9,HUD_SURFACE,HUD_LINE);const pad=8,ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;c.save();c.beginPath();c.rect(ix,iy,iw,ih);c.clip();c.drawImage(getMinimapStatic(iw,ih),ix,iy,iw,ih);c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1;c.strokeRect(ix+.5,iy+.5,iw-1,ih-1);const toX=x=>ix+(x+ARENA_LIMIT)/(ARENA_LIMIT*2)*iw,toY=z=>iy+(z+ARENA_LIMIT)/(ARENA_LIMIT*2)*ih,now=performance.now();
+  for(const rmt of remotes.values()){if(rmt.team!==myTeam&&now>=rmt.revealedUntil)continue;const px=toX(rmt.group.position.x),py=toY(rmt.group.position.z);c.beginPath();c.arc(px,py,3.4,0,Math.PI*2);const humanTeammate=!rmt.bot&&rmt.team===myTeam;c.fillStyle=minimapDotColor(rmt);c.fill();if(rmt.team===myTeam){c.strokeStyle=humanTeammate?'#d8ffe3':'#fff';c.lineWidth=1;c.stroke();}}
+  const px=toX(position.x),py=toY(position.z);c.save();c.translate(px,py);c.rotate(-yaw);c.beginPath();c.moveTo(0,-6);c.lineTo(4.5,5);c.lineTo(0,3);c.lineTo(-4.5,5);c.closePath();c.fillStyle=selfColor;c.fill();c.strokeStyle='#fff';c.lineWidth=1.2;c.stroke();c.restore();c.restore();c.fillStyle='#fff';c.font=`900 ${r.w<110?8:9}px system-ui`;c.textAlign='left';c.fillText(currentRoom||'----',r.x+9,r.y+r.h-8);c.textAlign='right';c.fillStyle='#c7d3dd';const humanCount=[...remotes.values()].filter(v=>!v.bot).length+1,botTotal=[...remotes.values()].filter(v=>v.bot).length;c.fillText(`${humanCount}P · ${botTotal}B`,r.x+r.w-9,r.y+r.h-8);
+}
 function handleKill(m){
   if(!m?.attacker||!m?.victim)return;const update=p=>{if(!p)return;if(p.id===clientId){myStats.kills=Number(p.kills)||0;myStats.deaths=Number(p.deaths)||0;}else{const r=remotes.get(p.id);if(r){r.kills=Number(p.kills)||0;r.deaths=Number(p.deaths)||0;}}};update(m.attacker);update(m.victim);
   if(m.victim.id===clientId){lastWastedBy=m.attacker.name||'Player';lastWastedWeapon=m.weapon||'';}
@@ -2011,24 +1919,12 @@ function drawWeaponCrosshair(c,x,y,weapon,hit,ads=0,headshot=false){const color=
 function drawScopeMask(c,w,h){const r=Math.min(w,h)*.43,cx=w/2,cy=h/2;c.save();c.beginPath();c.rect(0,0,w,h);c.arc(cx,cy,r,0,Math.PI*2,true);c.fillStyle='rgba(0,0,0,.94)';c.fill('evenodd');c.strokeStyle='rgba(255,255,255,.22)';c.lineWidth=2;c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.stroke();c.restore();}
 function drawScopeReticle(c,w,h,hit,headshot=false){const r=Math.min(w,h)*.43,cx=w/2,cy=h/2;c.save();c.beginPath();c.arc(cx,cy,r-2,0,Math.PI*2);c.clip();c.strokeStyle=headshot?'#ffd36d':hit?'#fff':'rgba(20,20,20,.86)';c.lineWidth=1.2;c.beginPath();c.moveTo(cx-r,cy);c.lineTo(cx+r,cy);c.moveTo(cx,cy-r);c.lineTo(cx,cy+r);c.stroke();c.fillStyle=headshot?'#ffd36d':hit?'#fff':'rgba(15,15,15,.92)';c.beginPath();c.arc(cx,cy,2,0,Math.PI*2);c.fill();for(let i=1;i<=4;i++){const off=i*18;c.beginPath();c.moveTo(cx-5,cy+off);c.lineTo(cx+5,cy+off);c.stroke();}c.fillStyle='rgba(255,255,255,.76)';c.font='900 10px system-ui';c.textAlign='center';c.fillText(sniperZoomLabel(),cx,cy-r+18);c.restore();}
 function drawTouchControls(c,L,now){
-  c.save();
-  if(joy.pointer==null){}
-  else{
-    const j=L.joy;c.beginPath();c.arc(j.x,j.y,j.r,0,Math.PI*2);c.fillStyle='rgba(9,11,13,.42)';c.fill();c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1.5;c.stroke();
-    c.beginPath();c.arc(j.x,j.y,j.r*.72,0,Math.PI*2);c.strokeStyle='rgba(255,255,255,.08)';c.stroke();
-    const max=j.r*.45,sx=j.x+joy.x*max,sy=j.y+joy.y*max;c.beginPath();c.arc(sx,sy,j.r*.40,0,Math.PI*2);c.fillStyle='rgba(215,255,88,.16)';c.fill();c.strokeStyle='rgba(215,255,88,.42)';c.stroke();
-    c.fillStyle='rgba(255,255,255,.58)';c.font='900 7px system-ui';c.textAlign='center';c.fillText('MOVE',j.x,j.y+j.r*.70);
-  }
-  c.restore();
-  drawRoundControl(c,L.leftFire,now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.crouch,crouched,'crouch');drawRoundControl(c,L.flash,equipmentAim.kind==='flash'||now<touchVisual.flashUntil,'flash');drawRoundControl(c,L.sticky,equipmentAim.kind==='sticky'||now<touchVisual.stickyUntil,'sticky');drawRoundControl(c,L.fire,now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.aim,adsWanted,'aim');drawRoundControl(c,L.jump,now<touchVisual.jumpUntil,'jump');drawRoundControl(c,L.reload,now<touchVisual.reloadUntil||!!reloadUntil,'reload');drawRoundControl(c,L.swap,now<touchVisual.swapUntil,'swap');drawRoundControl(c,L.mode,now<touchVisual.modeUntil||fireMode==='auto','mode');
+  c.save();if(joy.pointer!=null){const j=L.joy;c.beginPath();c.arc(j.x,j.y,j.r,0,Math.PI*2);c.fillStyle='rgba(9,11,13,.42)';c.fill();c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1.5;c.stroke();c.beginPath();c.arc(j.x,j.y,j.r*.72,0,Math.PI*2);c.strokeStyle='rgba(255,255,255,.08)';c.stroke();const max=j.r*.45,sx=j.x+joy.x*max,sy=j.y+joy.y*max;c.beginPath();c.arc(sx,sy,j.r*.40,0,Math.PI*2);c.fillStyle='rgba(215,255,88,.16)';c.fill();c.strokeStyle='rgba(215,255,88,.42)';c.stroke();c.fillStyle='rgba(255,255,255,.58)';c.font='900 7px system-ui';c.textAlign='center';c.fillText('MOVE',j.x,j.y+j.r*.70);}c.restore();
+  drawRoundControl(c,L.leftFire,now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.crouch,crouched,'crouch');drawRoundControl(c,L.flash,equipmentAim.kind==='flash'||now<touchVisual.flashUntil,'flash');drawRoundControl(c,L.sticky,equipmentAim.kind==='sticky'||now<touchVisual.stickyUntil,'sticky');drawRoundControl(c,L.fire,now<touchVisual.fireUntil,'fire');drawRoundControl(c,L.aim,adsWanted,'aim');drawRoundControl(c,L.jump,now<touchVisual.jumpUntil,'jump');
 }
 function drawRoundControl(c,b,active,type){
-  c.save();c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);const hot=type==='fire',aim=type==='aim';
-  c.fillStyle=active?(aim?'rgba(215,255,88,.30)':hot?'rgba(255,95,103,.48)':'rgba(215,255,88,.22)'):(hot?'rgba(60,22,25,.56)':'rgba(9,11,13,.62)');c.fill();
-  c.strokeStyle=active?(aim?HUD_ACCENT:hot?'rgba(255,132,139,.86)':HUD_ACCENT):(hot?'rgba(255,115,123,.52)':'rgba(255,255,255,.22)');c.lineWidth=active?2:1.4;c.stroke();
-  drawControlIcon(c,b.x,b.y-b.r*.08,b.r,type,active);
-  const label=type==='fire'?'FIRE':type==='aim'?(currentWeapon==='sniper'?(adsWanted?(sniperZoomLevel===1?'8X NEXT':'EXIT 8X'):'4X ADS'):'ADS'):type==='jump'?'JUMP':type==='crouch'?(crouched?'STAND':'CROUCH'):type==='reload'?'R':type==='swap'?'SWAP':type==='flash'?(equipmentAim.kind==='flash'?'RELEASE':`FLASH ${godMode?'∞':equipment.flash}`):type==='sticky'?(equipmentAim.kind==='sticky'?'RELEASE':`STICKY ${godMode?'∞':equipment.sticky}`):fireMode.toUpperCase();
-  c.textAlign='center';c.fillStyle=active?'#fff':'rgba(230,243,249,.68)';c.font=`900 ${Math.max(6.5,Math.min(8,b.r*.22))}px system-ui`;c.fillText(label,b.x,b.y+b.r*.56);c.restore();
+  c.save();c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);const hot=type==='fire',aim=type==='aim';c.fillStyle=active?(aim?'rgba(215,255,88,.30)':hot?'rgba(255,95,103,.48)':'rgba(215,255,88,.22)'):(hot?'rgba(60,22,25,.56)':'rgba(9,11,13,.62)');c.fill();c.strokeStyle=active?(aim?HUD_ACCENT:hot?'rgba(255,132,139,.86)':HUD_ACCENT):(hot?'rgba(255,115,123,.52)':'rgba(255,255,255,.22)');c.lineWidth=active?2:1.4;c.stroke();drawControlIcon(c,b.x,b.y-b.r*.08,b.r,type,active);
+  const label=type==='fire'?'FIRE':type==='aim'?(currentWeapon==='sniper'?(adsWanted?(sniperZoomLevel===1?'8X NEXT':'EXIT 8X'):'4X ADS'):'ADS'):type==='jump'?'JUMP':type==='crouch'?(crouched?'STAND':'CROUCH'):type==='flash'?(equipmentAim.kind==='flash'?'RELEASE':`FLASH ${godMode?'∞':equipment.flash}`):type==='sticky'?(equipmentAim.kind==='sticky'?'RELEASE':`STICKY ${godMode?'∞':equipment.sticky}`):'';c.textAlign='center';c.fillStyle=active?'#fff':'rgba(230,243,249,.68)';c.font=`900 ${Math.max(6.5,Math.min(8,b.r*.22))}px system-ui`;c.fillText(label,b.x,b.y+b.r*.56);c.restore();
 }
 function drawControlIcon(c,x,y,r,type,active){
   const q=Math.max(8,r*.44),ink=active?'#fff':'rgba(241,250,255,.92)';
@@ -2039,35 +1935,30 @@ function drawControlIcon(c,x,y,r,type,active){
     const a=q*.68,g=q*.22;c.beginPath();c.moveTo(x-a,y-g);c.lineTo(x-a,y-a);c.lineTo(x-g,y-a);c.moveTo(x+g,y-a);c.lineTo(x+a,y-a);c.lineTo(x+a,y-g);c.moveTo(x+a,y+g);c.lineTo(x+a,y+a);c.lineTo(x+g,y+a);c.moveTo(x-g,y+a);c.lineTo(x-a,y+a);c.lineTo(x-a,y+g);c.stroke();c.beginPath();c.arc(x,y,q*.18,0,Math.PI*2);c.stroke();
   }else if(type==='jump'){
     c.beginPath();c.moveTo(x-q*.55,y+q*.25);c.lineTo(x,y-q*.48);c.lineTo(x+q*.55,y+q*.25);c.stroke();c.beginPath();c.moveTo(x-q*.52,y+q*.56);c.lineTo(x+q*.52,y+q*.56);c.stroke();
-  }else if(type==='reload'){
-    c.beginPath();c.arc(x,y,q*.56,-.7,Math.PI*1.45);c.stroke();c.beginPath();c.moveTo(x+q*.42,y-q*.46);c.lineTo(x+q*.72,y-q*.42);c.lineTo(x+q*.58,y-q*.14);c.stroke();
-  }else if(type==='swap'){
-    c.beginPath();c.moveTo(x-q*.66,y-q*.26);c.lineTo(x+q*.43,y-q*.26);c.lineTo(x+q*.20,y-q*.49);c.moveTo(x+q*.66,y+q*.26);c.lineTo(x-q*.43,y+q*.26);c.lineTo(x-q*.20,y+q*.49);c.stroke();
   }else if(type==='flash'){
     c.beginPath();c.roundRect(x-q*.38,y-q*.45,q*.76,q*.78,q*.18);c.stroke();c.beginPath();c.moveTo(x-q*.10,y-q*.55);c.lineTo(x+q*.18,y-q*.72);c.lineTo(x+q*.34,y-q*.60);c.stroke();for(const a of [-.9,0,.9]){const sx=x+Math.sin(a)*q*.66,sy=y+Math.cos(a)*q*.66;c.beginPath();c.moveTo(sx,sy);c.lineTo(x+Math.sin(a)*q*.84,y+Math.cos(a)*q*.84);c.stroke();}
   }else if(type==='sticky'){
     c.beginPath();c.arc(x,y,q*.50,0,Math.PI*2);c.stroke();c.beginPath();c.arc(x,y,q*.15,0,Math.PI*2);c.fill();c.beginPath();c.moveTo(x-q*.12,y-q*.55);c.lineTo(x+q*.18,y-q*.76);c.lineTo(x+q*.34,y-q*.62);c.stroke();
   }else if(type==='crouch'){
     c.beginPath();c.arc(x-q*.28,y-q*.32,q*.18,0,Math.PI*2);c.stroke();c.beginPath();c.moveTo(x-q*.13,y-q*.18);c.lineTo(x+q*.12,y+q*.04);c.lineTo(x+q*.48,y+q*.04);c.moveTo(x+q*.12,y+q*.04);c.lineTo(x-q*.10,y+q*.36);c.moveTo(x+q*.10,y+q*.05);c.lineTo(x+q*.34,y+q*.35);c.stroke();
-  }else if(type==='mode'){
-    const n=fireMode==='auto'?3:1;for(let i=0;i<n;i++){const yy=y+(i-(n-1)/2)*q*.33;c.beginPath();c.roundRect(x-q*.50,yy-q*.085,q*.82,q*.17,q*.085);c.fill();c.beginPath();c.moveTo(x+q*.35,yy);c.lineTo(x+q*.58,yy);c.stroke();}
   }
   c.restore();
 }
-function drawDesktopHint(c,L){c.font='800 9px system-ui';c.textAlign='left';c.fillStyle='rgba(255,255,255,.66)';const text=document.pointerLockElement===canvas?'LMB FIRE · RMB ADS/ZOOM · C CROUCH · B FIRE MODE · R RELOAD · 1/2/3/4/Q WEAPON · F FLASH · G STICKY · TAB SCORE':'CLICK GAME TO CAPTURE MOUSE';c.fillText(text,L.safe.left+12,viewH-L.safe.bottom-12);}
-function drawVersion(c,L){c.font='800 8px system-ui';c.textAlign='center';c.fillStyle='rgba(255,255,255,.38)';c.fillText(`BREACHLINE v${APP_VERSION}`,viewW/2,viewH-L.safe.bottom-9);}
+function drawDesktopHint(c,L){if(document.pointerLockElement===canvas)return;c.font='800 9px system-ui';c.textAlign='left';c.fillStyle='rgba(255,255,255,.66)';c.fillText('CLICK GAME TO CAPTURE MOUSE',L.safe.left+12,viewH-L.safe.bottom-12);}
+
 
 function roundRect(c,x,y,w,h,r,fill,stroke){if(w<=0||h<=0)return;c.beginPath();c.roundRect(x,y,w,h,r);if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
 
 function startIntroMusic(){
-  if(!musicEnabled||gameActive||!experienceEntered||orientationBlocked||defaultMusicElement||defaultMusicPending)return;
-  const played=playSoundCue('introMusic',1,{loop:true});if(played){defaultMusicElement=played;played.onended=()=>{if(defaultMusicElement===played)defaultMusicElement=null;};return;}
-  defaultMusicPending=true;waitForSoundCue('introMusic',5000).then(ok=>{defaultMusicPending=false;if(!ok||!musicEnabled||gameActive||defaultMusicElement)return;const retry=playSoundCue('introMusic',1,{loop:true});if(retry){defaultMusicElement=retry;retry.onended=()=>{if(defaultMusicElement===retry)defaultMusicElement=null;};}});
+  if(masterMuted||gameActive||!experienceEntered||orientationBlocked||introMusicHandle)return;
+  introMusicHandle=playSoundCue('introMusic',1,{loop:true,onended:()=>{introMusicHandle=null;}});
 }
-function stopIntroMusic(){defaultMusicPending=false;if(defaultMusicElement){try{defaultMusicElement.pause();defaultMusicElement.currentTime=0;}catch{}defaultMusicElement=null;}}
+function stopIntroMusic(){if(introMusicHandle){introMusicHandle.stop();introMusicHandle=null;}}
 
-function ensureAudio(){if(!audioCtx){const C=window.AudioContext||window.webkitAudioContext;if(C){try{audioCtx=new C({latencyHint:'interactive'});}catch{audioCtx=new C();}}}if(audioCtx?.state==='suspended')audioCtx.resume();return audioCtx;}
-function soundShot(weapon='pistol'){const id=weapon==='shotgun'?'shotShotgun':weapon==='sniper'?'shotSniper':weapon==='assault'?'shotAssault':'shotPistol';playSoundCue(id);}
+
+
+function weaponShotSoundId(weapon='pistol'){return weapon==='shotgun'?'shotShotgun':weapon==='sniper'?'shotSniper':weapon==='assault'?'shotAssault':'shotPistol';}
+function soundShot(weapon='pistol'){playSoundCue(weaponShotSoundId(weapon));}
 function reloadSoundId(weapon=currentWeapon){return weapon==='shotgun'?'reloadShotgun':weapon==='sniper'?'reloadSniper':weapon==='assault'?'reloadAssault':'reloadPistol';}
 function soundReload(weapon=currentWeapon){playSoundCue(reloadSoundId(weapon));}
 function soundHitmarker(){playSoundCue('hitmarker');}
@@ -2081,12 +1972,12 @@ function soundFootstep(side=0,volume=1){playSoundCue(side?'footstepRight':'foots
 function soundLanding(volume=1){playSoundCue('land',volume);}
 function soundShotgunPump(){playSoundCue('shotgunPump');}
 function soundThrowableThrow(kind='flash'){playSoundCue(kind==='sticky'?'stickyThrow':'flashThrow');}
-function soundThrowableImpact(kind='flash',m){const v=tacticalDistanceVolume(m,28);if(v<=.02)return;playSoundCue(kind==='sticky'?'stickyImpact':'flashImpact',v);}
-function semtexDistanceVolume(g,max=42){if(!position||!g?.root)return 0;const p=g.root.position,d=Math.hypot(p.x-position.x,p.y-(position.y+1),p.z-position.z);return Math.max(0,1-d/max);}
+function soundThrowableImpact(kind='flash',m){if(!m)return;playSpatialCue(kind==='sticky'?'stickyImpact':'flashImpact',Number(m.x)||0,Number(m.y)||0,Number(m.z)||0,32,.85);}
+
 function semtexBeepInterval(remainingMs){const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1);return Math.round(THREE.MathUtils.lerp(360,85,Math.pow(p,1.22)));}
-function soundSemtexBeep(g,remainingMs){const v=semtexDistanceVolume(g);if(v<=.025)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10,interval=semtexBeepInterval(remainingMs)/1000;playSoundCue('semtexBeep',v,{playbackRate:rate,maxDuration:Math.max(.055,Math.min(.18,interval*.72))});}
-function tacticalDistanceVolume(m,max=48){if(!position||!m)return .02;const d=Math.hypot((Number(m.x)||0)-position.x,(Number(m.y)||0)-(position.y+1),(Number(m.z)||0)-position.z);return Math.max(0,1-d/max);}
-function soundTacticalDetonation(kind,m){const v=tacticalDistanceVolume(m,kind==='sticky'?58:52);if(v<=.01)return;playSoundCue(kind==='flash'||kind==='stun'?'flashDetonate':'stickyDetonate',v);}
+function soundSemtexBeep(g,remainingMs){if(!g?.root)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10,interval=semtexBeepInterval(remainingMs)/1000,pos=g.root.position;playSpatialCue('semtexBeep',pos.x,pos.y,pos.z,44,1,{playbackRate:rate,maxDuration:Math.max(.055,Math.min(.18,interval*.72))});}
+
+function soundTacticalDetonation(kind,m){if(!m)return;playSpatialCue(kind==='flash'?'flashDetonate':'grenadeExplosion',Number(m.x)||0,Number(m.y)||0,Number(m.z)||0,kind==='sticky'?70:58,1);}
 document.addEventListener('pointerdown',ensureAudio,{once:true});
 </script>
 </body>
