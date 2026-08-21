@@ -150,22 +150,6 @@ export function createSessionShell({
     return render(reason);
   }
 
-  function setMenuView(view) {
-    const next = view === 'operator' ? 'operator' : 'play';
-    if (elements.menuShell) elements.menuShell.dataset.mobileView = next;
-    for (const tab of elements.menuTabs || []) {
-      const active = tab.dataset.menuTab === next;
-      tab.classList.toggle('active', active);
-      tab.setAttribute('aria-selected', String(active));
-    }
-  }
-
-  function bindMenuTabs() {
-    for (const tab of elements.menuTabs || []) {
-      tab.addEventListener('click', () => setMenuView(tab.dataset.menuTab));
-    }
-    setMenuView('play');
-  }
 
   function syncViewport(renderOrientation = true) {
     const wasBlocked = orientationBlocked();
@@ -438,7 +422,6 @@ export function createSessionShell({
   addEventListener('pagehide', visibilityChanged);
 
   function start() {
-    bindMenuTabs();
     state.location = 'menu';
     syncViewport();
     return render('start');

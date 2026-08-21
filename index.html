@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.20.0">
-<title>Breach v1.20.0</title>
-<link rel="stylesheet" href="ui.css?v=1.20.0">
+<link rel="manifest" href="manifest.webmanifest?v=1.20.1">
+<title>Breach v1.20.1</title>
+<link rel="stylesheet" href="ui.css?v=1.20.1">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -54,83 +54,98 @@
   </section>
 
   <section id="menu" class="menu-screen hide" aria-label="Breach main menu">
-    <div id="menuShell" class="menu-shell" data-mobile-view="play">
-      <header class="menu-header">
-        <div class="brand">
-          <div class="logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
-          <div class="brand-copy">
-            <div class="eyebrow">LIVE COMBAT NETWORK</div>
-            <div class="brand-line"><h1>BREACH</h1><span class="version" data-app-version></span></div>
-            <p>Fast team combat. Create a room or join a live match.</p>
+    <div id="menuShell" class="menu-shell" data-deploy-mode="create">
+      <header class="menu-topbar">
+        <div class="menu-brand">
+          <div class="menu-logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
+          <div class="menu-brand-copy">
+            <div class="menu-brand-line"><strong>BREACH</strong><span data-app-version></span></div>
+            <div class="menu-network"><span class="network-dot"></span>LIVE COMBAT NETWORK</div>
           </div>
         </div>
         <div class="header-actions">
           <button id="musicBtn" class="btn icon-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button>
           <button id="settingsBtn" class="btn icon-btn" title="Player settings" aria-label="Player settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button>
-          <button id="refreshBtn" class="btn icon-btn" title="Refresh matches" aria-label="Refresh matches"><svg class="ui-icon"><use href="#i-refresh"/></svg></button>
         </div>
       </header>
 
-      <nav class="mobile-menu-tabs" aria-label="Main menu sections">
-        <button class="mobile-menu-tab active" data-menu-tab="play" aria-selected="true"><svg class="mini-icon"><use href="#i-play"/></svg>PLAY</button>
-        <button class="mobile-menu-tab" data-menu-tab="operator" aria-selected="false"><svg class="mini-icon"><use href="#i-team"/></svg>OPERATOR</button>
-      </nav>
+      <div class="menu-main">
+        <section class="deploy-console" aria-label="Deploy">
+          <div class="deploy-head">
+            <div class="deploy-title">
+              <span class="eyebrow">DEPLOY</span>
+              <h1>Choose how to enter</h1>
+              <p>Host a match, join a code, or drop into a live room.</p>
+            </div>
+            <nav class="deploy-tabs" aria-label="Deployment mode">
+              <button type="button" class="deploy-tab active" data-deploy-tab="create" aria-selected="true"><svg class="mini-icon"><use href="#i-plus"/></svg>CREATE</button>
+              <button type="button" class="deploy-tab" data-deploy-tab="join" aria-selected="false"><svg class="mini-icon"><use href="#i-enter"/></svg>JOIN</button>
+              <button type="button" class="deploy-tab" data-deploy-tab="live" aria-selected="false"><span class="live-dot"></span>LIVE <span id="matchCount" class="tab-count"></span></button>
+            </nav>
+          </div>
 
-      <div class="menu-content">
-        <section class="panel operator-panel menu-operator-view">
-          <div class="panel-head">
-            <div><span class="panel-kicker">PLAYER</span><h2>Operator</h2></div>
+          <div class="deploy-content">
+            <section class="deploy-view create-view" data-deploy-view="create">
+              <div class="create-settings">
+                <label class="config-control"><span class="label blue-label">Blue bots</span><select id="blueBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+                <label class="config-control"><span class="label red-label">Red bots</span><select id="redBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+                <label class="config-control difficulty-control"><span class="label">Difficulty</span><select id="botDifficulty" class="input"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
+              </div>
+              <div class="host-options">
+                <button id="godToggle" type="button" class="god-toggle" aria-pressed="false" title="Host is invulnerable in this custom match">
+                  <span class="god-icon"><svg class="ui-icon"><use href="#i-shield"/></svg></span>
+                  <span class="god-copy"><strong>Invulnerable host</strong><small>Custom match</small></span>
+                  <span id="godState" class="toggle-state">OFF</span>
+                </button>
+                <div class="deploy-action">
+                  <span id="botTotal" class="bot-total">2 / 8 bots</span>
+                  <button id="createBtn" class="btn primary deploy-button"><svg class="ui-icon"><use href="#i-play"/></svg><span>START MATCH</span></button>
+                </div>
+              </div>
+            </section>
+
+            <section class="deploy-view join-view" data-deploy-view="join">
+              <div class="join-callout">
+                <div><span class="eyebrow">ROOM CODE</span><h2>Join a private match</h2><p>Enter the four-character invite code from the host.</p></div>
+                <div class="join-controls"><input id="codeInput" class="input code-input" maxlength="4" autocapitalize="characters" autocomplete="off" placeholder="ABCD" aria-label="Match code"><button id="joinBtn" class="btn primary deploy-button"><svg class="ui-icon"><use href="#i-enter"/></svg><span>JOIN MATCH</span></button></div>
+              </div>
+            </section>
+
+            <section class="deploy-view live-view" data-deploy-view="live">
+              <div class="live-head"><div><span class="eyebrow">PUBLIC ROOMS</span><h2>Live matches</h2></div><button id="refreshBtn" type="button" class="btn refresh-inline"><svg class="ui-icon"><use href="#i-refresh"/></svg><span>Refresh</span></button></div>
+              <div id="matchList" class="match-list" aria-live="polite"><div class="empty">Loading live matches…</div></div>
+            </section>
+          </div>
+
+          <div id="menuStatus" class="menu-status" role="status" aria-live="polite">Ready.</div>
+        </section>
+
+        <aside class="operator-console" aria-label="Operator">
+          <div class="operator-head">
+            <div><span class="eyebrow">OPERATOR</span><h2>Combat profile</h2></div>
             <svg class="panel-icon"><use href="#i-team"/></svg>
           </div>
-          <div class="operator-fields">
-            <label class="field"><span class="label">Player name</span><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
-            <div class="field">
-              <span class="label">Team</span>
-              <div class="team-picker" role="radiogroup" aria-label="Team selection">
-                <button type="button" class="team-option blue" data-team-choice="blue" aria-pressed="true"><span class="team-swatch"></span><span><strong>Blue</strong><small>Friendly fire off</small></span></button>
-                <button type="button" class="team-option red" data-team-choice="red" aria-pressed="false"><span class="team-swatch"></span><span><strong>Red</strong><small>Friendly fire off</small></span></button>
-              </div>
-              <div id="teamSummary" class="team-summary"></div>
+
+          <label class="operator-field name-field"><span class="label">Callsign</span><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
+
+          <div class="operator-field">
+            <span class="label">Team</span>
+            <div class="team-picker" role="radiogroup" aria-label="Team selection">
+              <button type="button" class="team-option blue" data-team-choice="blue" aria-pressed="true"><span class="team-swatch"></span><span><strong>BLUE</strong><small>Friendly</small></span></button>
+              <button type="button" class="team-option red" data-team-choice="red" aria-pressed="false"><span class="team-swatch"></span><span><strong>RED</strong><small>Friendly</small></span></button>
             </div>
-            <label class="field"><span class="label">Primary weapon</span><select id="primaryWeapon" class="input"><option value="assault">Assault Rifle</option><option value="shotgun">Shotgun</option><option value="sniper">Sniper Rifle</option></select><small class="field-help">Pistol is always your secondary.</small></label>
           </div>
-        </section>
 
-        <div class="play-column menu-play-view">
-          <section class="panel create-panel">
-            <div class="panel-head compact">
-              <div><span class="panel-kicker">HOST</span><h2>Create match</h2></div>
-              <svg class="panel-icon"><use href="#i-plus"/></svg>
+          <div class="operator-field weapon-field">
+            <div class="field-row"><span class="label">Primary</span><span class="secondary-note">Pistol secondary</span></div>
+            <div class="weapon-picker" role="radiogroup" aria-label="Primary weapon">
+              <button type="button" class="weapon-option" data-primary-choice="assault" aria-pressed="true"><span class="weapon-code">AR</span><span><strong>ASSAULT</strong><small>Balanced</small></span></button>
+              <button type="button" class="weapon-option" data-primary-choice="shotgun" aria-pressed="false"><span class="weapon-code">SG</span><span><strong>SHOTGUN</strong><small>Close range</small></span></button>
+              <button type="button" class="weapon-option" data-primary-choice="sniper" aria-pressed="false"><span class="weapon-code">SR</span><span><strong>SNIPER</strong><small>Long range</small></span></button>
             </div>
-            <div class="bot-config-grid">
-              <label class="field"><span class="label blue-label">Blue bots</span><select id="blueBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-              <label class="field"><span class="label red-label">Red bots</span><select id="redBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-              <label class="field difficulty-field"><span class="label">Difficulty</span><select id="botDifficulty" class="input"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
-            </div>
-            <button id="godToggle" type="button" class="god-toggle" aria-pressed="false" title="Create a custom match with host invulnerability">
-              <span class="god-icon"><svg class="ui-icon"><use href="#i-shield"/></svg></span>
-              <span class="god-copy"><strong>Host invulnerability</strong><small>Custom match option</small></span>
-              <span id="godState" class="toggle-state">OFF</span>
-            </button>
-            <div class="panel-action-row"><span id="botTotal" class="bot-total">2 / 8 bots</span><button id="createBtn" class="btn primary main-action"><svg class="ui-icon"><use href="#i-play"/></svg>Create</button></div>
-          </section>
-
-          <section class="panel join-panel">
-            <div class="panel-head compact"><div><span class="panel-kicker">DIRECT</span><h2>Join by code</h2></div><svg class="panel-icon"><use href="#i-enter"/></svg></div>
-            <div class="join-row"><input id="codeInput" class="input code-input" maxlength="4" autocapitalize="characters" placeholder="ABCD" aria-label="Match code"><button id="joinBtn" class="btn primary"><svg class="ui-icon"><use href="#i-enter"/></svg>Join</button></div>
-          </section>
-        </div>
-
-        <section class="panel matches-panel menu-play-view">
-          <div class="panel-head compact"><div><span class="panel-kicker">ONLINE</span><h2>Live matches</h2></div><span id="matchCount" class="count-badge"></span></div>
-          <div id="matchList" class="match-list" aria-live="polite"><div class="empty">Loading matches…</div></div>
-        </section>
+          </div>
+        </aside>
       </div>
-
-      <footer class="menu-footer">
-        <div id="menuStatus" class="status" role="status" aria-live="polite">Ready.</div>
-        <div class="controls-note" aria-label="Desktop controls"><span>WASD MOVE</span><span>MOUSE AIM</span><span>LMB FIRE</span><span>RMB ADS</span><span>ESC MENU</span></div>
-      </footer>
     </div>
   </section>
 
@@ -214,6 +229,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.20.0"></script>
+<script type="module" src="client.js?v=1.20.1"></script>
 </body>
 </html>

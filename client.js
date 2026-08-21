@@ -2,16 +2,16 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.20.0';
+} from './world-geometry.js?v=1.20.1';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.20.0';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.20.0';
-import { createAudioEngine } from './audio-engine.js?v=1.20.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.20.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.20.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.20.0';
+} from './game-config.js?v=1.20.1';
+import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.20.1';
+import { createAudioEngine } from './audio-engine.js?v=1.20.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.20.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.20.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.20.1';
 
 let THREE = null;
 
@@ -70,8 +70,10 @@ const LONG_SHOT_DISTANCE = 30;
 
 const $ = (id) => document.getElementById(id);
 const appRoot=$('appRoot'), gameStage=$('gameStage'), startup=$('startup'), rotateGate=$('rotateGate'), menu=$('menu'), pause=$('pause');
-const nameInput = $('nameInput'), codeInput = $('codeInput'), blueBotCount = $('blueBotCount'), redBotCount = $('redBotCount'), botDifficulty = $('botDifficulty'), botTotal = $('botTotal'), menuStatus = $('menuStatus'), primaryWeaponInput=$('primaryWeapon');
+const nameInput = $('nameInput'), codeInput = $('codeInput'), blueBotCount = $('blueBotCount'), redBotCount = $('redBotCount'), botDifficulty = $('botDifficulty'), botTotal = $('botTotal'), menuStatus = $('menuStatus');
 const teamButtons=[...document.querySelectorAll('[data-team-choice]')];
+const primaryButtons=[...document.querySelectorAll('[data-primary-choice]')];
+const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')];
 const matchList = $('matchList'), matchCount = $('matchCount');
 const canvas = $('game');
 const connectionOverlay=$('connectionOverlay'), connectionText=$('connectionText');
@@ -88,7 +90,7 @@ botDifficulty.value=localStorage.getItem('breachBotDifficulty')||'normal';
 let selectedTeam=localStorage.getItem('breachTeam')==='red'?'red':'blue';
 let selectedGod=localStorage.getItem('breachGodMode')==='1';
 let selectedPrimary=PRIMARY_WEAPONS.includes(localStorage.getItem('breachPrimary'))?localStorage.getItem('breachPrimary'):'assault';
-primaryWeaponInput.value=selectedPrimary;
+for(const btn of primaryButtons)btn.setAttribute('aria-pressed',String(btn.dataset.primaryChoice===selectedPrimary));
 let masterMuted=localStorage.getItem('breachMuted')==='1';
 const requestedRoom = new URL(location.href).searchParams.get('room');
 if (requestedRoom) codeInput.value = normalizeCode(requestedRoom);
@@ -204,8 +206,6 @@ const shell=createSessionShell({
   elements:{
     startup,
     menu,
-    menuShell:$('menuShell'),
-    menuTabs:[...document.querySelectorAll('[data-menu-tab]')],
     rotate:rotateGate,
     rotateText:$('rotateText'),
     connection:connectionOverlay,
@@ -228,7 +228,7 @@ syncGodUI();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.20.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.20.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -306,7 +306,6 @@ function applyTeamSelection(team,persist=true){
   selectedTeam=team==='red'?'red':'blue';
   document.documentElement.style.setProperty('--team',TEAM_COLORS[selectedTeam]);
   for(const btn of teamButtons)btn.setAttribute('aria-pressed',String(btn.dataset.teamChoice===selectedTeam));
-  const summary=$('teamSummary');if(summary)summary.innerHTML=`<b>${selectedTeam==='red'?'Red':'Blue'} Team</b> selected · teammates are protected from friendly fire`;
   if(persist)localStorage.setItem('breachTeam',selectedTeam);
 }
 function syncGodUI(){
@@ -544,7 +543,23 @@ function remoteActorBlocked(x,z,y,fromX,fromZ){const localHeight=currentPlayerHe
 
 function bindUI(){
 
+  const menuShell=$('menuShell');
+  const setDeployMode=(mode)=>{
+    const next=['create','join','live'].includes(mode)?mode:'create';
+    menuShell.dataset.deployMode=next;
+    for(const tab of deployTabs){const active=tab.dataset.deployTab===next;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));}
+    if(next==='live')void refreshMatches();
+    if(next==='join')requestAnimationFrame(()=>codeInput.focus({preventScroll:true}));
+  };
+  for(const tab of deployTabs)tab.addEventListener('click',()=>setDeployMode(tab.dataset.deployTab));
+  setDeployMode(requestedRoom?'join':'create');
+
   for(const btn of teamButtons)btn.addEventListener('click',()=>applyTeamSelection(btn.dataset.teamChoice));
+  for(const btn of primaryButtons)btn.addEventListener('click',()=>{
+    const weapon=PRIMARY_WEAPONS.includes(btn.dataset.primaryChoice)?btn.dataset.primaryChoice:'assault';
+    selectedPrimary=weapon;localStorage.setItem('breachPrimary',weapon);
+    for(const option of primaryButtons)option.setAttribute('aria-pressed',String(option.dataset.primaryChoice===weapon));
+  });
   $('createBtn').addEventListener('click', createMatch);
   $('refreshBtn').addEventListener('click', refreshMatches);
   $('musicBtn').addEventListener('click',()=>{ensureAudio();toggleMasterMute();});
@@ -556,7 +571,6 @@ function bindUI(){
   $('settingsDefaultsBtn').addEventListener('click',resetPlayerSettings);
   for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id).addEventListener('input',()=>updatePlayerSettingFromUI(id,key));
   $('playerGraphics').addEventListener('change',()=>{playerSettings={...playerSettings,graphics:$('playerGraphics').value};savePlayerSettings();applyGraphicsQuality();});
-  primaryWeaponInput.addEventListener('change',()=>{selectedPrimary=PRIMARY_WEAPONS.includes(primaryWeaponInput.value)?primaryWeaponInput.value:'assault';localStorage.setItem('breachPrimary',selectedPrimary);});
   $('joinBtn').addEventListener('click', () => joinMatch(normalizeCode(codeInput.value)));
   codeInput.addEventListener('blur', () => { codeInput.value = normalizeCode(codeInput.value); });
   codeInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); joinMatch(normalizeCode(codeInput.value)); } });
@@ -758,7 +772,7 @@ async function refreshMatches(){
 }
 function renderMatches(rooms){
   const visible=rooms.slice(0,3);
-  matchCount.textContent=rooms.length?`${rooms.length} live${rooms.length>visible.length?' · showing 3':''}`:'';
+  matchCount.textContent=rooms.length?String(rooms.length):'';
   if(!rooms.length){matchList.innerHTML='<div class="empty">No live matches. Create one.</div>';return;}
   matchList.innerHTML='';
   for(const room of visible){
@@ -801,7 +815,7 @@ async function joinMatch(code){
   if(!(await prepareGameRuntime())){shell.cancelPreparedMatch();disableMenu(false);return;}
   shell.updateConnection(`Joining ${code}…`);setStatus(`Joining ${code}…`);connectMatch(code);
 }
-function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;primaryWeaponInput.disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of teamButtons)btn.disabled=disabled;}
+function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of [...teamButtons,...primaryButtons,...deployTabs])btn.disabled=disabled;}
 
 async function connectMatch(code, reconnecting=false){
   clearTimeout(reconnectTimer);currentRoom=normalizeCode(code);if(!currentRoom)return;
