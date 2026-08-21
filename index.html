@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.18.0">
-<title>Breach v1.18.0</title>
-<link rel="stylesheet" href="ui.css?v=1.18.0">
+<link rel="manifest" href="manifest.webmanifest?v=1.18.1">
+<title>Breach v1.18.1</title>
+<link rel="stylesheet" href="ui.css?v=1.18.1">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -168,7 +168,7 @@
 </section>
 <script>
 (()=>{
-  const REV='1.18.0',retryKey=`breach-module-retry-${REV}`;
+  const REV='1.18.1',retryKey=`breach-module-retry-${REV}`;
   window.__breachModuleBooted=false;
   const fail=(message)=>{const el=document.getElementById('engineStatus');if(el){el.textContent=message;el.className='engine-status error';}};
   window.addEventListener('error',(event)=>{const target=event.target;if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK'))fail('CLIENT ASSET LOAD FAILED · RETRYING');},true);
@@ -184,6 +184,6 @@
 })();
 </script>
 
-<script type="module" src="client.js?v=1.18.0"></script>
+<script type="module" src="client.js?v=1.18.1"></script>
 </body>
 </html>
