@@ -1,4 +1,4 @@
-import { DEFAULT_MATCH_RULES } from './game-config.js?v=1.18.5';
+import { DEFAULT_MATCH_RULES } from './game-config.js?v=1.18.6';
 
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 const number = (value, fallback = 0) => Number.isFinite(Number(value)) ? Number(value) : fallback;

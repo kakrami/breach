@@ -2,15 +2,15 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.18.5';
+} from './world-geometry.js?v=1.18.6';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.18.5';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.18.5';
-import { createAudioEngine } from './audio-engine.js?v=1.18.5';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.18.5';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.18.5';
+} from './game-config.js?v=1.18.6';
+import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.18.6';
+import { createAudioEngine } from './audio-engine.js?v=1.18.6';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.18.6';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.18.6';
 
 let THREE = null;
 
@@ -196,7 +196,7 @@ syncGodUI();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.18.5';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.18.6';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 function setEngineStatus(text,tone=''){

@@ -1,4 +1,4 @@
-import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.18.5';
+import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.18.6';
 
 export function createObstacleGrid({ cellSize = 8, cellHeight = 3, playerHeight }) {
   const grid = new Map(), entries = [];
