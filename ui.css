@@ -36,7 +36,7 @@ button,.team-option,.god-toggle{user-select:none;-webkit-user-select:none;-webki
 button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .hide{display:none!important}.svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}
 .ui-icon,.mini-icon,.brand-icon{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ui-icon{width:18px;height:18px}.mini-icon{width:14px;height:14px}.brand-icon{width:100%;height:100%;stroke-width:1.6}.brand-icon .cut,.ui-icon .cut{fill:currentColor;stroke:none}
-#game,.menu,.pause,.rotate-gate,.admin-panel{position:fixed;inset:0;width:auto;height:auto}
+#game,.menu,.pause,.rotate-gate,.admin-panel{position:fixed;inset:0;width:100%;height:100%}
 #game{z-index:0;display:block;background:#90cbe7;outline:0;isolation:isolate;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}
 
 /* Core controls */
