@@ -6,7 +6,7 @@ import {
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.18.6';
+} from './game-config.js?v=1.18.7';
 import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.18.6';
 import { createAudioEngine } from './audio-engine.js?v=1.18.6';
 import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.18.6';
@@ -329,9 +329,16 @@ function spatialAudioParams(x,y,z,maxDistance=60){
 }
 function playSpatialCue(cueId,x,y,z,maxDistance=60,volume=1,override={}){const p=spatialAudioParams(x,y,z,maxDistance);if(p.volume<=.004)return null;return playSoundCue(cueId,p.volume*volume,{...override,pan:p.pan});}
 function savePlayerSettings(){localStorage.setItem('breachPlayerSettings',JSON.stringify(playerSettings));}
+function targetPixelRatio(){
+  const quality=playerSettings.graphics,maxRatio=quality==='low'?1:quality==='medium'?(isTouch?1.25:1.5):(isTouch?1.5:2);
+  return Math.min(devicePixelRatio||1,maxRatio);
+}
 function applyGraphicsQuality(){
-  if(!renderer)return;const quality=playerSettings.graphics;
-  const maxRatio=quality==='low'?1:quality==='medium'?(isTouch?1.25:1.5):(isTouch?1.5:2);renderer.setPixelRatio(Math.min(devicePixelRatio||1,maxRatio));renderer.shadowMap.enabled=quality==='high'&&!isTouch;renderer.setSize(viewW,viewH,false);if(hudCanvas)resizeHudOverlay();
+  if(!renderer)return;
+  const ratio=targetPixelRatio();
+  if(Math.abs(renderer.getPixelRatio()-ratio)>.001)renderer.setPixelRatio(ratio);
+  renderer.shadowMap.enabled=playerSettings.graphics==='high'&&!isTouch;
+  if(hudCanvas)resizeHudOverlay();
 }
 function syncPlayerSettingsUI(){
   const values=[['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']];
@@ -518,7 +525,6 @@ function bindUI(){
   addEventListener('resize', scheduleViewportSync);
   addEventListener('orientationchange', scheduleViewportSync);
   window.visualViewport?.addEventListener('resize', scheduleViewportSync);
-  window.visualViewport?.addEventListener('scroll', scheduleViewportSync);
   document.addEventListener('fullscreenchange', onFullscreenChange);
 
   $('enterBtn').addEventListener('click', enterExperience);
@@ -1519,11 +1525,17 @@ function normalizeAngle(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math
 
 function scheduleViewportSync(){
   cancelAnimationFrame(resizeRaf);
-  resizeRaf=requestAnimationFrame(()=>requestAnimationFrame(()=>{syncVisualViewportMetrics();onResize();applyExperienceGate();}));
+  resizeRaf=requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    resizeRaf=0;
+    const v=syncVisualViewportMetrics();
+    if(v.w!==viewW||v.h!==viewH)onResize(v);
+    applyExperienceGate();
+  }));
 }
-function onResize(){
-  const v=syncVisualViewportMetrics();viewW=v.w;viewH=v.h;
-  if(!camera || !renderer){return;}
+function onResize(metrics=syncVisualViewportMetrics()){
+  const nextW=metrics.w,nextH=metrics.h,sizeChanged=nextW!==viewW||nextH!==viewH;
+  viewW=nextW;viewH=nextH;
+  if(!camera || !renderer)return;
   const aspect=viewW/viewH;
   camera.aspect=aspect;
   const maxHorizontalFov=104*Math.PI/180;
@@ -1531,7 +1543,8 @@ function onResize(){
   baseFov=THREE.MathUtils.clamp(landscapeVFov,58,72);
   if(adsBlend<.01)camera.fov=baseFov;
   camera.updateProjectionMatrix();
-  applyGraphicsQuality();hudLayout=computeHudLayout();
+  if(sizeChanged){renderer.setSize(viewW,viewH,false);resizeHudOverlay();}
+  hudLayout=computeHudLayout();
 }
 
 function initHudOverlay(){
