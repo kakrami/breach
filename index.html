@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.17.1">
-<title>Breach v1.17.1</title>
-<link rel="stylesheet" href="ui.css?v=1.17.1">
+<link rel="manifest" href="manifest.webmanifest?v=1.17.2">
+<title>Breach v1.17.2</title>
+<link rel="stylesheet" href="ui.css?v=1.17.2">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -169,7 +169,7 @@
 </section>
 <script>
 (()=>{
-  const REV='1.17.1',retryKey=`breach-module-retry-${REV}`;
+  const REV='1.17.2',retryKey=`breach-module-retry-${REV}`;
   window.__breachModuleBooted=false;
   const fail=(message)=>{const el=document.getElementById('engineStatus');if(el){el.textContent=message;el.className='engine-status error';}};
   window.addEventListener('error',(event)=>{const target=event.target;if(target&&target!==window&&(target.tagName==='SCRIPT'||target.tagName==='LINK'))fail('CLIENT ASSET LOAD FAILED · RETRYING');},true);
@@ -187,18 +187,18 @@
 
 <script type="module">
 window.__breachModuleBooted=true;
-try{sessionStorage.removeItem('breach-module-retry-1.17.1');}catch{}
+try{sessionStorage.removeItem('breach-module-retry-1.17.2');}catch{}
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, MAX_STEP_HEIGHT, makeBuildingGeometry, BUILDING_PARTS
-} from './world-geometry.js?v=1.17.1';
+} from './world-geometry.js?v=1.17.2';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS as BASE_WEAPON_SPECS, WEAPON_ACCURACY, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.17.1';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.17.1';
-import { createAudioEngine } from './audio-engine.js?v=1.17.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.17.1';
+} from './game-config.js?v=1.17.2';
+import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.17.2';
+import { createAudioEngine } from './audio-engine.js?v=1.17.2';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.17.2';
 
 let THREE = null;
 
@@ -379,7 +379,7 @@ syncGodUI();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.17.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.17.2';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 function setEngineStatus(text,tone=''){
@@ -679,13 +679,13 @@ function makeTerrainTexture(){
 function createInstances(geometry,mat,items,{castShadow=!isTouch,receiveShadow=!isTouch}={}){
   if(!items.length)return null;const mesh=new THREE.InstancedMesh(geometry,mat,items.length),dummy=new THREE.Object3D();
   for(let i=0;i<items.length;i++){const o=items[i];dummy.position.set(o.x,o.y,o.z);dummy.rotation.set(o.rx||0,o.ry||0,o.rz||0);dummy.scale.set(o.sx??1,o.sy??1,o.sz??1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);}
-  mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);mesh.castShadow=castShadow;mesh.receiveShadow=receiveShadow;scene.add(mesh);return mesh;
+  mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingBox?.();mesh.computeBoundingSphere?.();mesh.castShadow=castShadow;mesh.receiveShadow=receiveShadow;scene.add(mesh);return mesh;
 }
 function createBoxInstances(items,mat,{castShadow=!isTouch,receiveShadow=!isTouch}={}){
   if(!items.length)return null;
   const geo=new THREE.BoxGeometry(1,1,1),mesh=new THREE.InstancedMesh(geo,mat,items.length),dummy=new THREE.Object3D();
   for(let i=0;i<items.length;i++){const o=items[i];dummy.position.set(o.x,o.y,o.z);dummy.rotation.set(0,0,0);dummy.scale.set(o.w,o.h,o.d);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);}
-  mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);mesh.castShadow=castShadow;mesh.receiveShadow=receiveShadow;scene.add(mesh);return mesh;
+  mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingBox?.();mesh.computeBoundingSphere?.();mesh.castShadow=castShadow;mesh.receiveShadow=receiveShadow;scene.add(mesh);return mesh;
 }
 function addBoundaryWallsBatched(mat){
   const pieces=16,span=ARENA_LIMIT*2,piece=span/pieces,edge=ARENA_LIMIT+1,items=[];
@@ -1653,14 +1653,27 @@ function updateTacticalFx(dt){for(let i=tacticalFx.length-1;i>=0;i--){const f=ta
 
 function clearTacticalFx(){for(const f of tacticalFx){scene.remove(f.root);disposeObject3D(f.root);}tacticalFx.length=0;}
 function applyFlashEffect(m){const power=Math.max(0,Math.min(1,Number(m.power)||0));if(power<=0)return;const now=performance.now(),duration=Math.max(350,Number(m.durationMs)||700+power*2600);flashPeakUntil=Math.max(flashPeakUntil,now+180+power*520);flashUntil=Math.max(flashUntil,now+duration);}
+const FRAME_PACING_EPSILON_MS=1.0;
 let lastRenderedAt=0,lastGameFrameAt=performance.now();
+function advanceFrameSchedule(frameNow,lastFrame,targetMs,epsilon=FRAME_PACING_EPSILON_MS){
+  if(!(targetMs>0))return{render:true,next:frameNow};
+  if(!(lastFrame>0))return{render:true,next:frameNow};
+  const elapsed=frameNow-lastFrame;
+  if(elapsed<targetMs-epsilon)return{render:false,next:lastFrame};
+  const steps=Math.max(1,Math.floor((elapsed+epsilon)/targetMs));
+  let next=lastFrame+steps*targetMs;
+  if(next>frameNow+epsilon)next=frameNow;
+  if(frameNow-next>targetMs*2)next=frameNow;
+  return{render:true,next};
+}
 function animate(frameNow=performance.now()){
   requestAnimationFrame(animate);
   const frameGap=frameNow-lastAnimationAt;lastAnimationAt=frameNow;if(gameActive&&!paused&&frameGap>CLIENT_STALL_MS)recoverFromClientStall(frameGap);
-  if(!gameActive){lastGameFrameAt=frameNow;return;}
-  const minFrameMs=paused?1000/24:(isTouch?1000/60:0);
-  if(minFrameMs&&frameNow-lastRenderedAt<minFrameMs)return;
-  const dt=Math.min(Math.max(0,(frameNow-lastGameFrameAt)/1000),.05);lastGameFrameAt=frameNow;lastRenderedAt=frameNow;
+  if(!gameActive){lastGameFrameAt=frameNow;lastRenderedAt=0;return;}
+  const targetFrameMs=paused?1000/24:(isTouch?1000/60:0),schedule=advanceFrameSchedule(frameNow,lastRenderedAt,targetFrameMs);
+  if(!schedule.render)return;
+  lastRenderedAt=schedule.next;
+  const dt=Math.min(Math.max(0,(frameNow-lastGameFrameAt)/1000),.05);lastGameFrameAt=frameNow;
   if(!paused)updateGame(dt);else updatePausedNetwork();
   updateAim(dt);updateRemoteVisuals(dt);updateWeaponView(dt);updateBullets(dt);updateThrowables(dt);updateTacticalFx(dt);updateEquipmentTrajectory();
   renderer.render(scene,camera);
