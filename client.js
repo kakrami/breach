@@ -4,13 +4,13 @@ import {
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
 } from './world-geometry.js?v=1.23.0';
 import {
-  APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
-  DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.23.0';
+  APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
+  DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
+} from './game-config.js?v=1.24.0';
 import { createProjectileCollisionGrid } from './collision-grid.js?v=1.23.0';
 import { worldBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.23.0';
 import { createAudioEngine } from './audio-engine.js?v=1.23.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.23.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.24.0';
 import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.23.0';
 import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.23.0';
 
@@ -71,10 +71,12 @@ const LONG_SHOT_DISTANCE = 30;
 
 const $ = (id) => document.getElementById(id);
 const appRoot=$('appRoot'), gameStage=$('gameStage'), entryScreen=$('entryScreen'), rotateGate=$('rotateGate'), menu=$('menu'), pause=$('pause');
-const nameInput = $('nameInput'), codeInput = $('codeInput'), blueBotCount = $('blueBotCount'), redBotCount = $('redBotCount'), botDifficulty = $('botDifficulty'), botTotal = $('botTotal'), menuStatus = $('menuStatus');
+const nameInput=$('nameInput'),codeInput=$('codeInput'),blueBotCount=$('blueBotCount'),redBotCount=$('redBotCount'),ffaBotCount=$('ffaBotCount'),botDifficulty=$('botDifficulty'),botTotal=$('botTotal'),menuStatus=$('menuStatus');
 const teamButtons=[...document.querySelectorAll('[data-team-choice]')];
 const primaryButtons=[...document.querySelectorAll('[data-primary-choice]')];
 const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')];
+const gameModeButtons=[...document.querySelectorAll('[data-game-mode-choice]')],lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')];
+const lobbyScreen=$('lobbyScreen'),lobbyRoster=$('lobbyRoster');
 const matchList = $('matchList'), matchCount = $('matchCount');
 const canvas = $('game');
 const connectionOverlay=$('connectionOverlay'), connectionText=$('connectionText');
@@ -88,8 +90,10 @@ nameInput.value = localStorage.getItem('breachName') || `Player${Math.floor(Math
 blueBotCount.value=localStorage.getItem('breachBlueBots')||'1';
 redBotCount.value=localStorage.getItem('breachRedBots')||'1';
 botDifficulty.value=localStorage.getItem('breachBotDifficulty')||'normal';
+ffaBotCount.value=localStorage.getItem('breachFfaBots')||'2';
 let selectedTeam=localStorage.getItem('breachTeam')==='red'?'red':'blue';
 let selectedGod=localStorage.getItem('breachGodMode')==='1';
+let selectedMode=normalizeGameMode(localStorage.getItem('breachGameMode')||DEFAULT_GAME_MODE),lobbyOpen=false;
 let selectedPrimary=PRIMARY_WEAPONS.includes(localStorage.getItem('breachPrimary'))?localStorage.getItem('breachPrimary'):'assault';
 for(const btn of primaryButtons)btn.setAttribute('aria-pressed',String(btn.dataset.primaryChoice===selectedPrimary));
 let masterMuted=localStorage.getItem('breachMuted')==='1';
@@ -98,9 +102,14 @@ if (requestedRoom) codeInput.value = normalizeCode(requestedRoom);
 applyTeamSelection(selectedTeam,false);
 
 function selectedBotTeams(){
-  const blue=Math.max(0,Math.min(MAX_BOTS,Number(blueBotCount.value)||0));
-  const red=Math.max(0,Math.min(MAX_BOTS,Number(redBotCount.value)||0));
-  return {blue,red,total:blue+red};
+  if(selectedMode==='ffa'){const total=Math.max(0,Math.min(MAX_BOTS,Number(ffaBotCount.value)||0));return{blue:Math.ceil(total/2),red:Math.floor(total/2),total};}
+  const blue=Math.max(0,Math.min(MAX_BOTS,Number(blueBotCount.value)||0)),red=Math.max(0,Math.min(MAX_BOTS,Number(redBotCount.value)||0));return{blue,red,total:blue+red};
+}
+function applyGameModeSelection(mode,persist=true){
+  selectedMode=normalizeGameMode(mode);const spec=gameModeSpec(selectedMode);
+  for(const btn of gameModeButtons){const active=btn.dataset.gameModeChoice===selectedMode;btn.classList.toggle('active',active);btn.setAttribute('aria-pressed',String(active));}
+  $('setupTeamGroup')?.classList.toggle('mode-disabled',!spec.teamBased);$('blueBotWrap')?.classList.toggle('hide',!spec.teamBased);$('redBotWrap')?.classList.toggle('hide',!spec.teamBased);$('ffaBotWrap')?.classList.toggle('hide',spec.teamBased);
+  if(persist)localStorage.setItem('breachGameMode',selectedMode);updateBotTeamSelection();
 }
 function updateBotTeamSelection(){
   const counts=selectedBotTeams(),valid=counts.total<=MAX_BOTS;
@@ -111,14 +120,15 @@ function updateBotTeamSelection(){
 }
 blueBotCount.addEventListener('change',updateBotTeamSelection);
 redBotCount.addEventListener('change',updateBotTeamSelection);
+ffaBotCount.addEventListener('change',()=>{localStorage.setItem('breachFfaBots',ffaBotCount.value);updateBotTeamSelection();});
 botDifficulty.addEventListener('change',()=>localStorage.setItem('breachBotDifficulty',botDifficulty.value));
-updateBotTeamSelection();
+applyGameModeSelection(selectedMode,false);
 
 let scene, camera, renderer, clock, pistolGroup, pistolFlash, pistolMag, assaultGroup, assaultFlash, assaultMag, shotgunGroup, shotgunFlash, shotgunPump, sniperGroup, sniperFlash, sniperBolt, mantleHands;
 let hudScene, hudCamera, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0;
 let socket = null, reconnectTimer = null, reconnectAttempt = 0;
 let currentRoom = '', myName = '', myTeam = 'blue', selfColor = TEAM_COLORS.blue, godMode = false, isMatchAdmin = false, matchOwnerId = '', pendingTeam='';
-let primaryWeapon=selectedPrimary,matchState={status:'waiting',round:1,blueScore:0,redScore:0,scoreLimit:DEFAULT_MATCH_RULES.scoreLimit,timeLimitMs:DEFAULT_MATCH_RULES.timeLimitMs,warmupEndsAt:0,endsAt:0,winner:'',reason:'',serverTime:0},matchCustom=false;
+let primaryWeapon=selectedPrimary,matchState={status:'waiting',round:1,mode:DEFAULT_GAME_MODE,blueScore:0,redScore:0,scoreLimit:DEFAULT_MATCH_RULES.scoreLimit,timeLimitMs:DEFAULT_MATCH_RULES.timeLimitMs,warmupEndsAt:0,endsAt:0,winner:'',winnerId:'',winnerName:'',reason:'',serverTime:0},matchCustom=false;
 let hp = 100, wastedUntil = 0, currentWeapon = selectedPrimary, ammo = freshClientAmmo(), equipment=freshClientEquipment(), reloadUntil = 0, reloadWeapon = '', reloadRequestPending=false, pendingWeapon='';
 let flashUntil=0,flashPeakUntil=0;
 let assaultFireMode=localStorage.getItem('breachAssaultFireMode')==='semi'?'semi':'auto';
@@ -309,7 +319,7 @@ function applyTeamSelection(team,persist=true){
 }
 function syncGodUI(){
   const btn=$('godToggle'),state=$('godState');
-  if(btn){btn.setAttribute('aria-pressed',String(selectedGod));btn.title=selectedGod?'Custom match: host invulnerability enabled':'Standard host health';}
+  if(btn){btn.setAttribute('aria-pressed',String(selectedGod));btn.title=selectedGod?'God Mode enabled':'God Mode disabled';}
   if(state)state.textContent=selectedGod?'ON':'OFF';
 }
 function toggleGodMode(){selectedGod=!selectedGod;localStorage.setItem('breachGodMode',selectedGod?'1':'0');syncGodUI();}
@@ -319,12 +329,51 @@ function syncMusicUI(){
 }
 function toggleMasterMute(){masterMuted=!masterMuted;localStorage.setItem('breachMuted',masterMuted?'1':'0');syncMusicUI();if(masterMuted)stopIntroMusic();else if(!shell.inMatch)startIntroMusic();}
 
+function currentGameMode(){return normalizeGameMode(matchState?.mode||selectedMode||DEFAULT_GAME_MODE);}
+function currentModeSpec(){return gameModeSpec(currentGameMode());}
+function modeFriendly(team){return currentModeSpec().teamBased&&team===myTeam;}
+function remoteDisplayColor(team){return currentModeSpec().teamBased?(TEAM_COLORS[team]||'#fff'):TEAM_COLORS.red;}
+function syncModeVisuals(){selfColor=currentModeSpec().teamBased?(TEAM_COLORS[myTeam]||TEAM_COLORS.blue):TEAM_COLORS.blue;for(const r of remotes.values())applyRemoteTeamVisual(r,r.team);syncPauseContext();syncLobby();}
+function roomSessionActive(){return !!currentRoom&&(lobbyOpen||shell.inMatch||socket?.readyState===WebSocket.OPEN);}
+function lobbyModeDescription(mode=currentGameMode()){
+  return mode==='ffa'?'Every player and bot is hostile. Highest eliminations wins.':mode==='sandbox'?'Open-ended team sandbox. No score or time limit.':'Blue vs Red. First team to the elimination limit wins.';
+}
+function lobbySnapshot(){
+  const rows=[{id:clientId,name:myName||safeName(),team:myTeam,bot:false,godMode,admin:isMatchAdmin,primaryWeapon,kills:myStats.kills||0,deaths:myStats.deaths||0,self:true}];
+  for(const r of remotes.values())rows.push({id:r.id,name:r.name,team:r.team,bot:r.bot,godMode:!!r.godMode,admin:!!r.admin,primaryWeapon:r.primaryWeapon||r.weapon||'assault',kills:r.kills||0,deaths:r.deaths||0,self:false});
+  return rows;
+}
+function renderLobbyRoster(){
+  if(!lobbyRoster)return;const rows=lobbySnapshot(),mode=currentGameMode(),teamBased=gameModeSpec(mode).teamBased;
+  const humanCount=rows.filter(x=>!x.bot).length,botCount=rows.filter(x=>x.bot).length;$('lobbyPlayerCount').textContent=`${humanCount} / ${MAX_PLAYERS} · ${botCount} bots`;
+  const playerRow=p=>`<div class="lobby-player ${p.self?'self':''}"><span class="lobby-player-color ${teamBased?p.team:'ffa'}"></span><div class="lobby-player-copy"><strong>${escapeHtml(p.bot?'[BOT] '+p.name:p.name)}${p.self?' · YOU':''}</strong><small>${teamBased?String(p.team||'blue').toUpperCase()+' · ':''}${escapeHtml(WEAPON_SPECS[p.primaryWeapon]?.name||'ASSAULT RIFLE')}${p.admin?' · ADMIN':''}${p.godMode?' · GOD MODE':''}</small></div></div>`;
+  if(!teamBased){lobbyRoster.className='lobby-roster ffa';lobbyRoster.innerHTML=`<div class="lobby-team-column ffa"><div class="lobby-team-title"><span>FREE FOR ALL</span><b>${rows.length}</b></div>${rows.sort((a,b)=>Number(b.self)-Number(a.self)||a.name.localeCompare(b.name)).map(playerRow).join('')}</div>`;return;}
+  lobbyRoster.className='lobby-roster';
+  const column=team=>{const list=rows.filter(p=>p.team===team),name=team==='red'?'RED':'BLUE';return `<div class="lobby-team-column ${team}"><div class="lobby-team-title"><span>${name}</span><b>${list.length}</b></div>${list.map(playerRow).join('')||'<div class="lobby-empty-team">Open slot</div>'}</div>`;};
+  lobbyRoster.innerHTML=column('blue')+column('red');
+}
+function syncLobby(){
+  if(!lobbyOpen)return;const mode=currentGameMode(),spec=gameModeSpec(mode);
+  $('lobbyRoomCode').textContent=currentRoom||'----';$('lobbyModeBadge').textContent=spec.name;$('lobbyModeDescription').textContent=lobbyModeDescription(mode);
+  $('lobbyTeamGroup').classList.toggle('hide',!spec.teamBased);$('lobbyAdminControls').classList.toggle('hide',!isMatchAdmin);const startBtn=$('lobbyStartBtn');startBtn.classList.toggle('hide',!isMatchAdmin);if(matchState.status==='waiting')startBtn.disabled=false;
+  for(const btn of lobbyTeamButtons)btn.classList.toggle('active',spec.teamBased&&btn.dataset.lobbyTeamChoice===myTeam);
+  for(const btn of lobbyPrimaryButtons)btn.classList.toggle('active',btn.dataset.lobbyPrimaryChoice===primaryWeapon);
+  for(const btn of lobbyModeButtons)btn.classList.toggle('active',btn.dataset.lobbyModeChoice===mode);
+  const godBtn=$('lobbyGodBtn');if(godBtn){godBtn.setAttribute('aria-pressed',String(godMode));godBtn.classList.toggle('active',godMode);}$('lobbyGodState').textContent=godMode?'ON':'OFF';
+  $('lobbyStatus').textContent=isMatchAdmin?'Lobby ready':'Waiting for host';$('lobbyHint').textContent=isMatchAdmin?'Adjust mode, team or loadout, then start the match.':'Choose your loadout while the host prepares the match.';
+  renderLobbyRoster();
+}
+function showLobby(){
+  lobbyOpen=true;lobbyScreen.classList.remove('hide');shell.cancelConnection();disableMenu(true);syncLobby();const url=new URL(location.href);url.searchParams.set('room',currentRoom);history.replaceState(null,'',url);
+}
+function hideLobby(){lobbyOpen=false;lobbyScreen.classList.add('hide');}
+
 function syncPauseContext(){
-  const badge=$('pauseTeamBadge');if(badge){badge.textContent=`${myTeam.toUpperCase()} TEAM`;badge.style.color=TEAM_COLORS[myTeam];badge.style.borderColor=`${TEAM_COLORS[myTeam]}88`;badge.style.background=`${TEAM_COLORS[myTeam]}22`;}
-  if($('pauseRoom'))$('pauseRoom').textContent=`Match ${currentRoom||'----'}`;
+  const spec=currentModeSpec(),badge=$('pauseTeamBadge');if(badge){badge.textContent=spec.teamBased?`${myTeam.toUpperCase()} TEAM`:spec.short;const color=spec.teamBased?TEAM_COLORS[myTeam]:HUD_ACCENT;badge.style.color=color;badge.style.borderColor=`${color}88`;badge.style.background=`${color}22`;}
+  if($('pauseRoom'))$('pauseRoom').textContent=`${spec.short} · ${currentRoom||'----'}`;
   if($('pauseLoadout'))$('pauseLoadout').textContent=`${WEAPON_SPECS[primaryWeapon].name} + Pistol · ${Math.max(0,Math.floor(ammo[currentWeapon]||0))} rounds`;
   const adminBtn=$('adminBtn');if(adminBtn)adminBtn.classList.toggle('hide',!isMatchAdmin);
-  const teamText=$('teamSwitchText');if(teamText)teamText.textContent=pendingTeam?`${pendingTeam.toUpperCase()} ON RESPAWN`:`Switch to ${myTeam==='blue'?'Red':'Blue'} on Respawn`;
+  const teamBtn=$('teamSwitchBtn');if(teamBtn)teamBtn.classList.toggle('hide',!spec.teamBased);const teamText=$('teamSwitchText');if(teamText)teamText.textContent=pendingTeam?`${pendingTeam.toUpperCase()} ON RESPAWN`:`Switch to ${myTeam==='blue'?'Red':'Blue'} on Respawn`;
   syncGodUI();
 }
 
@@ -566,6 +615,7 @@ function bindUI(){
   setDeployMode(requestedRoom?'join':'create');
 
   for(const btn of teamButtons)btn.addEventListener('click',()=>applyTeamSelection(btn.dataset.teamChoice));
+  for(const btn of gameModeButtons)btn.addEventListener('click',()=>applyGameModeSelection(btn.dataset.gameModeChoice));
   for(const btn of primaryButtons)btn.addEventListener('click',()=>{
     const weapon=PRIMARY_WEAPONS.includes(btn.dataset.primaryChoice)?btn.dataset.primaryChoice:'assault';
     selectedPrimary=weapon;localStorage.setItem('breachPrimary',weapon);
@@ -606,7 +656,14 @@ function bindUI(){
   }
   $('setBotDifficulty').addEventListener('change',()=>{$('botDifficultyHelp').textContent=botDifficultyDescription($('setBotDifficulty').value);});
   $('fullBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
-  $('leaveBtn').addEventListener('click', leaveMatch);
+  $('leaveBtn').addEventListener('click',leaveMatch);
+  $('lobbyLeaveBtn').addEventListener('click',leaveMatch);
+  $('lobbyCopyBtn').addEventListener('click',copyInvite);
+  for(const btn of lobbyTeamButtons)btn.addEventListener('click',()=>{if(socket?.readyState===WebSocket.OPEN)send({t:'team',team:btn.dataset.lobbyTeamChoice});});
+  for(const btn of lobbyPrimaryButtons)btn.addEventListener('click',()=>{const primary=PRIMARY_WEAPONS.includes(btn.dataset.lobbyPrimaryChoice)?btn.dataset.lobbyPrimaryChoice:'assault';if(socket?.readyState===WebSocket.OPEN)send({t:'loadout',primaryWeapon:primary});});
+  for(const btn of lobbyModeButtons)btn.addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN)send({t:'lobbyMode',mode:btn.dataset.lobbyModeChoice});});
+  $('lobbyGodBtn').addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN)send({t:'god',enabled:!godMode});});
+  $('lobbyStartBtn').addEventListener('click',()=>{if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN)return;void shell.prepareInputFromGesture();send({t:'startMatch'});$('lobbyStatus').textContent='Starting match…';$('lobbyStartBtn').disabled=true;});
 
   canvas.addEventListener('contextmenu', e => e.preventDefault());
   canvas.addEventListener('pointerdown', onCanvasPointerDown, {passive:false});
@@ -792,11 +849,10 @@ function renderMatches(rooms){
     const row=document.createElement('div');row.className='match';
     const left=document.createElement('div');const blue=Number(room.blue)||0,red=Number(room.red)||0,blueBots=Number(room.blueBots)||0,redBots=Number(room.redBots)||0;
     const codeEl=document.createElement('div');codeEl.className='match-code';codeEl.textContent=String(room.code||'');
-    const botMeta=document.createElement('div');botMeta.className='match-meta';botMeta.textContent=`${room.custom?'CUSTOM · ':''}${String(room.matchStatus||'waiting').toUpperCase()} · ${Number(room.blueScore)||0}-${Number(room.redScore)||0} / ${Number(room.scoreLimit)||DEFAULT_MATCH_RULES.scoreLimit} · Bots ${blueBots+redBots}`;if(room.custom)codeEl.classList.add('custom-match');
+    const botMeta=document.createElement('div');botMeta.className='match-meta';const roomMode=normalizeGameMode(room.mode),roomSpec=gameModeSpec(roomMode),scoreText=roomSpec.scoreType==='team'?`${Number(room.blueScore)||0}-${Number(room.redScore)||0} / ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:roomSpec.scoreType==='player'?`First ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:'Open play';botMeta.textContent=`${room.custom?'CUSTOM · ':''}${roomSpec.short} · ${String(room.matchStatus||'waiting').toUpperCase()} · ${scoreText} · Bots ${blueBots+redBots}`;if(room.custom)codeEl.classList.add('custom-match');
     const teamCounts=document.createElement('div');teamCounts.className='team-counts';
-    const blueChip=document.createElement('span');blueChip.className='team-chip blue';blueChip.textContent=`BLUE ${blue}`;
-    const redChip=document.createElement('span');redChip.className='team-chip red';redChip.textContent=`RED ${red}`;
-    teamCounts.append(blueChip,redChip);left.append(codeEl,botMeta,teamCounts);
+    if(roomSpec.teamBased){const blueChip=document.createElement('span');blueChip.className='team-chip blue';blueChip.textContent=`BLUE ${blue}`;const redChip=document.createElement('span');redChip.className='team-chip red';redChip.textContent=`RED ${red}`;teamCounts.append(blueChip,redChip);}else{const ffaChip=document.createElement('span');ffaChip.className='team-chip ffa';ffaChip.textContent=`COMBATANTS ${blue+red}`;teamCounts.append(ffaChip);}
+    left.append(codeEl,botMeta,teamCounts);
     const meta=document.createElement('div');meta.className='match-meta';meta.textContent=`${Number(room.players)||0}/${Number(room.maxPlayers)||0}`;
     const btn=document.createElement('button');btn.className='btn icon-btn';btn.title=`Join ${room.code}`;btn.setAttribute('aria-label',`Join ${room.code}`);btn.innerHTML='<svg class="ui-icon"><use href="#i-enter"/></svg>';btn.addEventListener('click',()=>joinMatch(room.code));
     row.append(left,meta,btn);matchList.append(row);
@@ -809,12 +865,12 @@ async function createMatch(){
   shell.beginConnection('Preparing game…');
   void shell.prepareInputFromGesture();
   const bots=selectedBotTeams();
-  myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachName',myName);localStorage.setItem('breachBlueBots',String(bots.blue));localStorage.setItem('breachRedBots',String(bots.red));localStorage.setItem('breachBotDifficulty',botDifficulty.value);localStorage.setItem('breachTeam',myTeam);
+  myName=safeName();myTeam=selectedTeam;godMode=false;primaryWeapon=selectedPrimary;pendingTeam='';localStorage.setItem('breachName',myName);localStorage.setItem('breachBlueBots',String(bots.blue));localStorage.setItem('breachRedBots',String(bots.red));localStorage.setItem('breachBotDifficulty',botDifficulty.value);localStorage.setItem('breachTeam',myTeam);localStorage.setItem('breachGameMode',selectedMode);
   disableMenu(true);setStatus('Preparing game…');
   if(!(await prepareGameRuntime())){shell.cancelConnection();disableMenu(false);return;}
   shell.updateConnection('Creating match…');setStatus('Creating match…');
   try{
-    const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value,creatorGod:selectedGod}),cache:'no-store'});
+    const response=await fetch(`${ONLINE_API}/rooms`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({protocol:PROTOCOL_VERSION,client:clientId,auth:clientAuth,name:myName,blueBots:bots.blue,redBots:bots.red,botDifficulty:botDifficulty.value,mode:selectedMode,creatorGod:selectedGod}),cache:'no-store'});
     const data=await response.json();if(!response.ok)throw new Error(data.error||'Could not create match.');
     connectMatch(data.code);
   }catch(err){shell.cancelConnection();setStatus(err.message||'Could not create match.','error');disableMenu(false);}
@@ -828,7 +884,7 @@ async function joinMatch(code){
   if(!(await prepareGameRuntime())){shell.cancelConnection();disableMenu(false);return;}
   shell.updateConnection(`Joining ${code}…`);setStatus(`Joining ${code}…`);connectMatch(code);
 }
-function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of [...teamButtons,...primaryButtons,...deployTabs])btn.disabled=disabled;}
+function disableMenu(disabled){$('createBtn').disabled=disabled||selectedBotTeams().total>MAX_BOTS;$('joinBtn').disabled=disabled;$('refreshBtn').disabled=disabled;$('godToggle').disabled=disabled;blueBotCount.disabled=disabled;redBotCount.disabled=disabled;ffaBotCount.disabled=disabled;botDifficulty.disabled=disabled;for(const btn of [...teamButtons,...primaryButtons,...deployTabs,...gameModeButtons])btn.disabled=disabled;}
 
 async function connectMatch(code, reconnecting=false){
   clearTimeout(reconnectTimer);currentRoom=normalizeCode(code);if(!currentRoom)return;
@@ -845,19 +901,19 @@ async function connectMatch(code, reconnecting=false){
   ws.addEventListener('message',e=>{if(ws!==socket)return;try{handleMessage(JSON.parse(e.data))}catch{}});
   ws.addEventListener('close',e=>{
     if(ws!==socket)return;
-    if(!shell.inMatch && !reconnecting){shell.cancelConnection();disableMenu(false);setStatus(e.reason||'Could not join match.','error');return;}
-    if(shell.inMatch && e.code!==1000){showToast('Connection lost · reconnecting');scheduleReconnect();}
+    if(!roomSessionActive()&&!reconnecting){shell.cancelConnection();disableMenu(false);setStatus(e.reason||'Could not join match.','error');return;}
+    if(roomSessionActive()&&e.code!==1000){showToast('Connection lost · reconnecting');scheduleReconnect();}
   });
   ws.addEventListener('error',()=>{if(ws===socket&&!shell.inMatch)setStatus('Multiplayer server unreachable.','error');});
 }
 function scheduleReconnect(){
-  if(!shell.inMatch||!currentRoom)return;clearTimeout(reconnectTimer);reconnectAttempt++;
+  if(!roomSessionActive()||!currentRoom)return;clearTimeout(reconnectTimer);reconnectAttempt++;
   reconnectTimer=setTimeout(()=>connectMatch(currentRoom,true),Math.min(5000,700*reconnectAttempt));
 }
 function send(payload){if(socket?.readyState===WebSocket.OPEN)socket.send(JSON.stringify(payload));}
 function serverNow(){return Date.now()+serverClockOffset;}
 function normalizeClientMatch(value){const v=value&&typeof value==='object'?value:{};return{...normalizeSharedMatchState(v,Date.now(),v),serverTime:Number(v.serverTime)||serverNow()};}
-function matchClockText(){const m=matchState,now=serverNow();if(m.status==='warmup')return `START ${(Math.max(0,m.warmupEndsAt-now)/1000).toFixed(1)}`;if(m.status==='active'){const sec=Math.max(0,Math.ceil((m.endsAt-now)/1000)),min=Math.floor(sec/60);return `${min}:${String(sec%60).padStart(2,'0')}`;}if(m.status==='ended')return m.winner==='draw'?'DRAW':`${String(m.winner||'').toUpperCase()} WINS`;return 'WAITING';}
+function matchClockText(){const m=matchState,now=serverNow(),spec=gameModeSpec(m.mode);if(m.status==='warmup')return `START ${(Math.max(0,m.warmupEndsAt-now)/1000).toFixed(1)}`;if(m.status==='active'){if(spec.scoreType==='none')return 'SANDBOX';const sec=Math.max(0,Math.ceil((m.endsAt-now)/1000)),min=Math.floor(sec/60);return `${min}:${String(sec%60).padStart(2,'0')}`;}if(m.status==='ended'){if(m.winner==='draw')return 'DRAW';if(m.winnerName)return `${String(m.winnerName).toUpperCase()} WINS`;return `${String(m.winner||'').toUpperCase()} WINS`;}return 'LOBBY';}
 
 function handleMessage(m){
   if(m.t==='welcome'){
@@ -866,10 +922,15 @@ function handleMessage(m){
     currentRoom=m.code;isMatchAdmin=!!m.isAdmin;matchOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;myTeam=m.self.team||myTeam;selectedTeam=myTeam;applyTeamSelection(myTeam,false);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;onGround=m.self.grounded!==false;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));traversal=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;syncGodUI();hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon==='pistol'||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
     position.set(m.self.x||0,m.self.y??terrainHeight(m.self.x||0,m.self.z||0),m.self.z||0);clearCorrectionView();resetViewVertical();yaw=m.self.yaw||0;pitch=m.self.pitch||0;
     clearRemotes();for(const p of m.players||[])upsertRemote(p,true);for(const b of m.bots||[])upsertRemote(b,true);
-    void enterGame();syncLocalStatus();syncPauseContext();return;
+    syncModeVisuals();syncLocalStatus();syncPauseContext();if(matchState.status==='waiting')showLobby();else{hideLobby();void enterGame();}return;
   }
-  if(m.t==='join'){upsertRemote(m.player,true);syncPauseContext();renderAdminPlayers();showToast(`${m.player.name} joined`);return;}
-  if(m.t==='leave'){const r=remotes.get(m.id);if(r&&!r.bot)showToast(`${r.name} left`);removeRemote(m.id);syncPauseContext();renderAdminPlayers();return;}
+  if(m.t==='join'){upsertRemote(m.player,true);syncPauseContext();renderAdminPlayers();syncLobby();showToast(`${m.player.name} joined`);return;}
+  if(m.t==='leave'){const r=remotes.get(m.id);if(r&&!r.bot)showToast(`${r.name} left`);removeRemote(m.id);syncPauseContext();renderAdminPlayers();syncLobby();return;}
+  if(m.t==='lobbyPlayer'){
+    const p=m.player;if(!p?.id)return;
+    if(p.id===clientId){myTeam=p.team||myTeam;primaryWeapon=PRIMARY_WEAPONS.includes(p.primaryWeapon)?p.primaryWeapon:primaryWeapon;currentWeapon=primaryWeapon;godMode=!!p.godMode;ammo=normalizeClientAmmo(p.ammo);equipment=normalizeEquipment(p.equipment);selfColor=currentModeSpec().teamBased?(TEAM_COLORS[myTeam]||selfColor):TEAM_COLORS.blue;syncLocalWeaponModel();}else upsertRemote(p,true);
+    syncPauseContext();syncLobby();return;
+  }
   if(m.t==='state'){const r=remotes.get(m.id);if(r)updateRemoteTarget(r,m);return;}
   if(m.t==='traverse'){handleTraversalMessage(m);return;}
   if(m.t==='correction'){applyServerCorrection(m);return;}
@@ -885,18 +946,18 @@ function handleMessage(m){
   if(m.t==='flashDetonate'){soundTacticalDetonation('flash',m);spawnDetonationFx('flash',m);removeThrowableVisual(m.id);return;}
   if(m.t==='flashEffect'){applyFlashEffect(m);return;}
   if(m.t==='explosion'){soundTacticalDetonation(m.kind||'sticky',m);spawnDetonationFx(m.kind||'sticky',m);removeThrowableVisual(m.id);return;}
-  if(m.t==='loadout'){applyAuthoritativeLoadout(m);return;}
+  if(m.t==='loadout'){applyAuthoritativeLoadout(m);syncLobby();return;}
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';r.swapStartedAt=performance.now();syncRemoteWeapon(r);}return;}
   if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;playSpatialCue(reloadSoundId(r.reloadWeapon),r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
-  if(m.t==='god'){if(m.id===clientId){godMode=!!m.enabled;syncGodUI();showToast(godMode?'GOD MODE ENABLED':'GOD MODE DISABLED');}else{const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}renderAdminPlayers();return;}
-  if(m.t==='adminRole'){if(m.id===clientId){isMatchAdmin=!!m.enabled;syncPauseContext();if(!isMatchAdmin&&shell.panel===SHELL_PANEL.ADMIN)closeAdminPanel();showToast(isMatchAdmin?'ADMIN PRIVILEGES GRANTED':'ADMIN PRIVILEGES REMOVED');}else{const r=remotes.get(m.id);if(r)r.admin=!!m.enabled;}renderAdminPlayers();return;}
-  if(m.t==='teamQueued'){if(m.id===clientId){pendingTeam=m.pendingTeam||'';syncPauseContext();showToast(pendingTeam?`TEAM SWITCH QUEUED · ${pendingTeam.toUpperCase()}`:'TEAM SWITCH CANCELED');}return;}
-  if(m.t==='match'){matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;if(shell.panel===SHELL_PANEL.ADMIN)populateAdminMatch(matchState);return;}
-  if(m.t==='matchReset'){matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;killFeed.length=0;myStats={kills:0,deaths:0};clearBullets();clearThrowables();syncBotRoster(m.bots||[]);for(const pl of m.players||[]){if(pl.id===clientId){myTeam=pl.team||myTeam;pendingTeam='';primaryWeapon=PRIMARY_WEAPONS.includes(pl.primaryWeapon)?pl.primaryWeapon:primaryWeapon;handleRespawn(pl);}else upsertRemote(pl,true);}showToast(`ROUND ${matchState.round}`);return;}
+  if(m.t==='god'){if(m.id===clientId){godMode=!!m.enabled;syncGodUI();syncLobby();showToast(godMode?'GOD MODE ENABLED':'GOD MODE DISABLED');}else{const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}renderAdminPlayers();syncLobby();return;}
+  if(m.t==='adminRole'){if(m.id===clientId){isMatchAdmin=!!m.enabled;syncPauseContext();if(!isMatchAdmin&&shell.panel===SHELL_PANEL.ADMIN)closeAdminPanel();showToast(isMatchAdmin?'ADMIN PRIVILEGES GRANTED':'ADMIN PRIVILEGES REMOVED');}else{const r=remotes.get(m.id);if(r)r.admin=!!m.enabled;}renderAdminPlayers();syncLobby();return;}
+  if(m.t==='teamQueued'){if(m.id===clientId){pendingTeam=m.pendingTeam||'';syncPauseContext();showToast(pendingTeam?`TEAM SWITCH QUEUED · ${pendingTeam.toUpperCase()}`:'TEAM SWITCH CANCELED');syncLobby();}return;}
+  if(m.t==='match'){const wasWaiting=matchState.status==='waiting';matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;if(shell.panel===SHELL_PANEL.ADMIN)populateAdminMatch(matchState);if(matchState.status==='waiting'){syncLobby();syncModeVisuals();}else if(lobbyOpen&&wasWaiting){hideLobby();void enterGame();}return;}
+  if(m.t==='matchReset'){matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;killFeed.length=0;myStats={kills:0,deaths:0};clearBullets();clearThrowables();syncBotRoster(m.bots||[]);for(const pl of m.players||[]){if(pl.id===clientId){myTeam=pl.team||myTeam;pendingTeam='';primaryWeapon=PRIMARY_WEAPONS.includes(pl.primaryWeapon)?pl.primaryWeapon:primaryWeapon;handleRespawn(pl);}else upsertRemote(pl,true);}syncModeVisuals();if(lobbyOpen){hideLobby();void enterGame();}showToast(`ROUND ${matchState.round}`);return;}
   if(m.t==='blocked'){handleBlocked(m);return;}
   if(m.t==='kill'){handleKill(m);return;}
   if(m.t==='settings'){applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);if(typeof m.custom==='boolean')matchCustom=m.custom;if(shell.panel===SHELL_PANEL.ADMIN){populateAdminSettings(worldSettings);setAdminStatus('Gameplay rules applied.','ok');}showToast('MATCH RULES UPDATED');return;}
-  if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncBotRoster(m.bots||[]);if(shell.panel===SHELL_PANEL.ADMIN)populateAdminBots(botConfig);showToast(`BOTS · ${botConfig.difficulty.toUpperCase()}`);return;}
+  if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncBotRoster(m.bots||[]);syncLobby();if(shell.panel===SHELL_PANEL.ADMIN)populateAdminBots(botConfig);showToast(`BOTS · ${botConfig.difficulty.toUpperCase()}`);return;}
   if(m.t==='notice'){showToast(m.text||'Server notice');if(shell.panel===SHELL_PANEL.ADMIN)setAdminStatus(m.text||'Server notice',m.tone==='error'?'error':'');return;}
   if(m.t==='pong'){const echoed=Number(m.clientAt)||lastPingLocalAt;if(echoed&&Number.isFinite(Number(m.at))){const received=Date.now(),mid=echoed+(received-echoed)/2,estimate=Number(m.at)-mid;serverClockOffset=serverClockOffset*.7+estimate*.3;}return;}
   if(m.t==='health'){if(m.id===clientId){hp=Math.max(0,Math.min(100,Number(m.hp)||0));syncLocalStatus();}else{const r=remotes.get(m.id);if(r)r.hp=Math.max(0,Math.min(100,Number(m.hp)||0));}return;}
@@ -905,7 +966,7 @@ function handleMessage(m){
 }
 
 async function enterGame(){
-  stopIntroMusic();
+  hideLobby();stopIntroMusic();
   await shell.enterMatch();
   syncPauseContext();disableMenu(false);setStatus('Ready.');
   const url=new URL(location.href);url.searchParams.set('room',currentRoom);history.replaceState(null,'',url);
@@ -913,15 +974,15 @@ async function enterGame(){
 }
 
 function leaveMatch(){
-  shell.leaveToMenu();serverClockOffset=0;lastPingLocalAt=0;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left match')}catch{}}socket=null;currentRoom='';isMatchAdmin=false;matchOwnerId='';applyWorldSettings(DEFAULT_WORLD_SETTINGS);
+  hideLobby();shell.leaveToMenu();disableMenu(false);serverClockOffset=0;lastPingLocalAt=0;clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left match')}catch{}}socket=null;currentRoom='';isMatchAdmin=false;matchOwnerId='';applyWorldSettings(DEFAULT_WORLD_SETTINGS);
   resetTouchInput();clearRemotes();clearBullets();clearThrowables();clearTacticalFx();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;primaryWeapon=selectedPrimary;syncGodUI();currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;viewFeetY=NaN;traversal=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;ammo=freshClientAmmo();equipment=freshClientEquipment();reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,grounded:true,moveX:0,moveZ:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;setAim(false);syncLocalWeaponModel();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshMatches();
 }
 
 function normalizeBotConfig(value){const v=value&&typeof value==='object'?value:{};const blueBots=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(v.blueBots)||0))),redBots=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(v.redBots)||0)));const diff=['easy','normal','hard','elite'].includes(String(v.difficulty||'normal').toLowerCase())?String(v.difficulty||'normal').toLowerCase():'normal';return{blueBots,redBots,difficulty:diff};}
 function botDifficultyDescription(diff){return({easy:'Forgiving aim and slower reactions.',normal:'Faster pressure, tighter aim and active strafing.',hard:'Aggressive pursuit, fast strafing and accurate sustained fire.',elite:'Relentless pursuit, evasive strafing, long range and near-instant reactions.'})[diff]||'Faster pressure and tighter aim.';}
-function populateAdminBots(value){const x=normalizeBotConfig(value);$('setBlueBots').value=x.blueBots;$('setRedBots').value=x.redBots;$('setBotDifficulty').value=x.difficulty;$('botDifficultyHelp').textContent=botDifficultyDescription(x.difficulty);}
-function collectAdminBots(){return normalizeBotConfig({blueBots:$('setBlueBots').value,redBots:$('setRedBots').value,difficulty:$('setBotDifficulty').value});}
+function populateAdminBots(value){const x=normalizeBotConfig(value),ffa=currentGameMode()==='ffa';$('adminBlueBotsWrap').classList.toggle('hide',ffa);$('adminRedBotsWrap').classList.toggle('hide',ffa);$('adminFfaBotsWrap').classList.toggle('hide',!ffa);$('setBlueBots').value=x.blueBots;$('setRedBots').value=x.redBots;$('setFfaBots').value=x.blueBots+x.redBots;$('setBotDifficulty').value=x.difficulty;$('botDifficultyHelp').textContent=botDifficultyDescription(x.difficulty);}
+function collectAdminBots(){if(currentGameMode()==='ffa'){const total=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number($('setFfaBots').value)||0)));return normalizeBotConfig({blueBots:Math.ceil(total/2),redBots:Math.floor(total/2),difficulty:$('setBotDifficulty').value});}return normalizeBotConfig({blueBots:$('setBlueBots').value,redBots:$('setRedBots').value,difficulty:$('setBotDifficulty').value});}
 function syncBotRoster(list){const incoming=new Set((list||[]).map(b=>b.id));for(const [id,r] of remotes){if(r.bot&&!incoming.has(id))removeRemote(id);}for(const b of list||[])upsertRemote(b,true);syncPauseContext();}
 function setAdminStatus(text,tone=''){const el=$('adminStatus');el.textContent=text;el.className=`admin-status ${tone}`;}
 let activeAdminTab='match';
@@ -931,18 +992,18 @@ function switchAdminTab(tab){
   for(const b of document.querySelectorAll('[data-admin-tab]')){const active=b.dataset.adminTab===activeAdminTab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;}
   const players=activeAdminTab==='players';$('adminResetBtn').classList.toggle('hide',players);$('adminSaveBtn').classList.toggle('hide',players);document.querySelector('.admin-shell').dataset.page=activeAdminTab;if(players)renderAdminPlayers(true);
 }
-function populateAdminMatch(value=matchState){const m=normalizeClientMatch(value);$('setScoreLimit').value=m.scoreLimit;$('setTimeLimit').value=Math.round(m.timeLimitMs/60000);}
-function collectAdminMatch(){return{scoreLimit:Math.max(5,Math.min(100,Math.round(Number($('setScoreLimit').value)||DEFAULT_MATCH_RULES.scoreLimit))),timeLimitMs:Math.max(120000,Math.min(1800000,Math.round((Number($('setTimeLimit').value)||DEFAULT_MATCH_RULES.timeLimitMs/60000)*60000)))}};
+function populateAdminMatch(value=matchState){const m=normalizeClientMatch(value),spec=gameModeSpec(m.mode),sandbox=spec.scoreType==='none';$('setScoreLimit').value=sandbox?'':m.scoreLimit;$('setTimeLimit').value=sandbox?'':Math.round(m.timeLimitMs/60000);$('setScoreLimit').disabled=sandbox;$('setTimeLimit').disabled=sandbox;const note=$('adminMatchNote');if(note)note.textContent=sandbox?'Sandbox has no score limit or time limit.':m.mode==='ffa'?`Free For All: first to ${m.scoreLimit} eliminations or highest score after ${Math.round(m.timeLimitMs/60000)} minutes.`:`Team Deathmatch: first team to ${m.scoreLimit} eliminations or highest score after ${Math.round(m.timeLimitMs/60000)} minutes.`;}
+function collectAdminMatch(){const spec=currentModeSpec();if(spec.scoreType==='none')return{scoreLimit:0,timeLimitMs:0};return{scoreLimit:Math.max(5,Math.min(100,Math.round(Number($('setScoreLimit').value)||spec.scoreLimit))),timeLimitMs:Math.max(120000,Math.min(1800000,Math.round((Number($('setTimeLimit').value)||spec.timeLimitMs/60000)*60000)))}};
 function populateAdminSettings(value){const x=normalizeWorldSettings(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=(w.reloadMs/1000).toFixed(2);$(`set${cap}Cooldown`).value=Math.round(60000/w.cooldownMs);}}
 function collectAdminSettings(){return normalizeWorldSettings({movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000},weapons:Object.fromEntries(WEAPON_ORDER.map(name=>{const cap=name[0].toUpperCase()+name.slice(1);return[name,{damage:$(`set${cap}Damage`).value,speed:$(`set${cap}Speed`).value,reloadMs:Number($(`set${cap}Reload`).value)*1000,cooldownMs:60000/Math.max(24,Number($(`set${cap}Cooldown`).value)||60)}]}))});}
 function adminPlayerSnapshot(){return[{id:clientId,name:myName||'You',team:myTeam,godMode,admin:isMatchAdmin,self:true},...Array.from(remotes.values()).filter(r=>!r.bot).map(r=>({id:r.id,name:r.name,team:r.team,godMode:!!r.godMode,admin:!!r.admin,self:false}))];}
-function renderAdminPlayers(force=false){const root=$('adminPlayerList');if(!root)return;if(!force&&(shell.panel!==SHELL_PANEL.ADMIN||activeAdminTab!=='players'))return;root.innerHTML='';for(const pl of adminPlayerSnapshot()){const row=document.createElement('div');row.className='admin-player-row';const owner=pl.id===matchOwnerId;row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${pl.team}"></span><div><strong>${escapeHtml(pl.name)}${pl.self?' (You)':''}</strong><small>${owner?'MATCH OWNER':pl.admin?'ADMIN':'PLAYER'} · ${String(pl.team||'blue').toUpperCase()}</small></div></div><div class="admin-player-actions"><button class="btn admin-mini ${pl.godMode?'active':''}" data-admin-god="${pl.id}">${pl.godMode?'Invulnerable':'Invulnerability'}</button><button class="btn admin-mini ${pl.admin?'active':''}" data-admin-role="${pl.id}" ${owner?'disabled':''}>${pl.admin?'Admin':'Make Admin'}</button></div>`;root.appendChild(row);}for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{if(btn.disabled)return;const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});}
+function renderAdminPlayers(force=false){const root=$('adminPlayerList');if(!root)return;if(!force&&(shell.panel!==SHELL_PANEL.ADMIN||activeAdminTab!=='players'))return;root.innerHTML='';for(const pl of adminPlayerSnapshot()){const row=document.createElement('div');row.className='admin-player-row';const owner=pl.id===matchOwnerId;row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${currentModeSpec().teamBased?pl.team:'ffa'}"></span><div><strong>${escapeHtml(pl.name)}${pl.self?' (You)':''}</strong><small>${owner?'MATCH OWNER':pl.admin?'ADMIN':'PLAYER'} · ${currentModeSpec().teamBased?String(pl.team||'blue').toUpperCase():'FFA'}</small></div></div><div class="admin-player-actions"><button class="btn admin-mini ${pl.godMode?'active':''}" data-admin-god="${pl.id}">${pl.godMode?'God Mode On':'God Mode Off'}</button><button class="btn admin-mini ${pl.admin?'active':''}" data-admin-role="${pl.id}" ${owner?'disabled':''}>${pl.admin?'Admin':'Make Admin'}</button></div>`;root.appendChild(row);}for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{if(btn.disabled)return;const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});}
 function requestTeamChange(team){if(!shell.inMatch||socket?.readyState!==WebSocket.OPEN)return;const next=team==='red'?'red':'blue';send({t:'team',team:next});showToast(next===myTeam?'CANCELING TEAM SWITCH':`SWITCH TO ${next.toUpperCase()} ON RESPAWN`);}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function applyRemoteTeamVisual(r,team){if(!r)return;const next=team==='red'?'red':'blue';r.team=next;r.color=TEAM_COLORS[next];if(r.body?.material?.color)r.body.material.color.set(TEAM_COLORS[next]);if(r.tag){r.group.remove(r.tag);r.tag.material?.map?.dispose?.();r.tag.material?.dispose?.();r.tag=makeNameTag(r.bot?`[BOT] ${r.name}`:r.name,TEAM_COLORS[next]);r.tag.position.set(0,2.18,0);r.group.add(r.tag);}}
+function applyRemoteTeamVisual(r,team){if(!r)return;const next=team==='red'?'red':'blue';r.team=next;r.color=remoteDisplayColor(next);if(r.body?.material?.color)r.body.material.color.set(remoteDisplayColor(next));if(r.tag){r.group.remove(r.tag);r.tag.material?.map?.dispose?.();r.tag.material?.dispose?.();r.tag=makeNameTag(r.bot?`[BOT] ${r.name}`:r.name,remoteDisplayColor(next));r.tag.position.set(0,2.18,0);r.group.add(r.tag);}}
 function openAdminPanel(){if(!isMatchAdmin){showToast('ADMIN ACCESS REQUIRED');return;}populateAdminMatch(matchState);populateAdminSettings(worldSettings);populateAdminBots(botConfig);switchAdminTab('match');setAdminStatus(matchCustom?'CUSTOM rules active.':'Standard match rules active.');shell.openPanel(SHELL_PANEL.ADMIN);renderAdminPlayers(true);}
 function closeAdminPanel(){shell.closePanel(SHELL_PANEL.ADMIN);}
-function resetActiveAdminTab(){if(activeAdminTab==='match')populateAdminMatch({...matchState,...DEFAULT_MATCH_RULES});else if(activeAdminTab==='gameplay')populateAdminSettings({...worldSettings,movement:DEFAULT_WORLD_SETTINGS.movement,combat:DEFAULT_WORLD_SETTINGS.combat});else if(activeAdminTab==='advanced')populateAdminSettings({...worldSettings,weapons:DEFAULT_WORLD_SETTINGS.weapons});else if(activeAdminTab==='bots')populateAdminBots({blueBots:1,redBots:1,difficulty:'normal'});}
+function resetActiveAdminTab(){if(activeAdminTab==='match'){const spec=currentModeSpec();populateAdminMatch({...matchState,mode:spec.id,scoreLimit:spec.scoreLimit,timeLimitMs:spec.timeLimitMs});}else if(activeAdminTab==='gameplay')populateAdminSettings({...worldSettings,movement:DEFAULT_WORLD_SETTINGS.movement,combat:DEFAULT_WORLD_SETTINGS.combat});else if(activeAdminTab==='advanced')populateAdminSettings({...worldSettings,weapons:DEFAULT_WORLD_SETTINGS.weapons});else if(activeAdminTab==='bots')populateAdminBots({blueBots:1,redBots:1,difficulty:'normal'});}
 function saveAdminSettings(){
   if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN){setAdminStatus('Admin connection unavailable.','error');return;}
   if(activeAdminTab==='match'){send({t:'adminMatch',rules:collectAdminMatch()});setAdminStatus('Applying match rules…');return;}
@@ -958,7 +1019,7 @@ async function copyInvite(){
 function makeRemote(player){
   const group=new THREE.Group(),model=new THREE.Group();group.add(model);
   const team=player.team==='red'?'red':'blue';
-  const color=new THREE.Color(TEAM_COLORS[team]);
+  const color=new THREE.Color(remoteDisplayColor(team));
   const mat=new THREE.MeshStandardMaterial({color,roughness:.75,metalness:player.bot?.18:0});
   const skin=new THREE.MeshStandardMaterial({color:player.bot?0x9faab3:0xe4aa82,roughness:.8});
   const body=new THREE.Mesh(new THREE.CapsuleGeometry(.34,.78,5,9),mat);body.position.y=.94;
@@ -973,9 +1034,9 @@ function makeRemote(player){
   const sniper=new THREE.Mesh(new THREE.BoxGeometry(.12,.10,.82),gunMat.clone());sniper.position.set(.45,1.10,-.45);sniper.visible=false;
   const godRing=new THREE.Mesh(new THREE.TorusGeometry(.42,.035,6,28),new THREE.MeshBasicMaterial({color:0xffdd67,transparent:true,opacity:.9}));godRing.rotation.x=Math.PI/2;godRing.position.y=2.03;godRing.visible=!!player.godMode;
   model.add(body,head,armL,armR,legL,legR,pistol,assault,shotgun,sniper,godRing);group.position.set(player.x||0,player.y||0,player.z||0);scene.add(group);
-  const tag=makeNameTag(player.bot?`[BOT] ${player.name||'Bot'}`:(player.name||'Player'),TEAM_COLORS[team]);tag.position.set(0,2.18,0);group.add(tag);
+  const tag=makeNameTag(player.bot?`[BOT] ${player.name||'Bot'}`:(player.name||'Player'),remoteDisplayColor(team));tag.position.set(0,2.18,0);group.add(tag);
   const now=performance.now();
-  const remote={id:player.id,name:player.name||'Player',color:TEAM_COLORS[team],team,bot:!!player.bot,weapon:player.weapon||'pistol',group,model,tag,target:new THREE.Vector3(player.x||0,player.y||0,player.z||0),targetYaw:player.yaw||0,hp:player.hp??100,kills:Number(player.kills)||0,deaths:Number(player.deaths)||0,armL,armR,legL,legR,body,head,pistol,assault,shotgun,sniper,godRing,godMode:!!player.godMode,admin:!!player.admin,lastSeen:now,lastNetAt:now,lastNetX:player.x||0,lastNetY:player.y||0,lastNetZ:player.z||0,moveSpeed:0,airborne:false,ads:!!player.ads,crouched:!!player.crouched,crouchBlend:player.crouched?1:0,animPhase:Math.random()*Math.PI*2,deathPose:player.hp<=0?1:0,reloadUntil:Number(player.reloadAt)||0,reloadStartedAt:0,reloadWeapon:player.reloadWeapon||'',swapStartedAt:0,fireKickUntil:0,revealedUntil:0,nextFootstepAt:now+300+Math.random()*260,footstepSide:Math.random()<.5?0:1,traversal:player.traversal?traversalPlanFromServer({id:player.id,accepted:true,...player.traversal}):null};tag.visible=remote.hp>0;
+  const remote={id:player.id,name:player.name||'Player',color:remoteDisplayColor(team),team,bot:!!player.bot,weapon:player.weapon||'pistol',primaryWeapon:PRIMARY_WEAPONS.includes(player.primaryWeapon)?player.primaryWeapon:'assault',group,model,tag,target:new THREE.Vector3(player.x||0,player.y||0,player.z||0),targetYaw:player.yaw||0,hp:player.hp??100,kills:Number(player.kills)||0,deaths:Number(player.deaths)||0,armL,armR,legL,legR,body,head,pistol,assault,shotgun,sniper,godRing,godMode:!!player.godMode,admin:!!player.admin,lastSeen:now,lastNetAt:now,lastNetX:player.x||0,lastNetY:player.y||0,lastNetZ:player.z||0,moveSpeed:0,airborne:false,ads:!!player.ads,crouched:!!player.crouched,crouchBlend:player.crouched?1:0,animPhase:Math.random()*Math.PI*2,deathPose:player.hp<=0?1:0,reloadUntil:Number(player.reloadAt)||0,reloadStartedAt:0,reloadWeapon:player.reloadWeapon||'',swapStartedAt:0,fireKickUntil:0,revealedUntil:0,nextFootstepAt:now+300+Math.random()*260,footstepSide:Math.random()<.5?0:1,traversal:player.traversal?traversalPlanFromServer({id:player.id,accepted:true,...player.traversal}):null};tag.visible=remote.hp>0;
   syncRemoteWeapon(remote);return remote;
 }
 function makeNameTag(name,color){
@@ -988,7 +1049,7 @@ function updateRemoteTarget(r,player,instant=false){
   if(Number(player.reloadAt)>0){r.reloadUntil=Number(player.reloadAt);r.reloadWeapon=player.reloadWeapon||r.weapon;if(!r.reloadStartedAt)r.reloadStartedAt=serverNow();}
   if(instant){r.group.position.copy(r.target);r.group.rotation.y=r.targetYaw;}
 }
-function upsertRemote(player,instant=false){if(!player?.id||player.id===clientId)return;let r=remotes.get(player.id);if(!r){r=makeRemote(player);remotes.set(player.id,r);}const oldTeam=r.team;r.name=player.name||r.name;r.bot=!!player.bot;r.team=player.team||r.team;r.color=TEAM_COLORS[r.team]||r.color;r.admin=player.admin??r.admin;r.weapon=player.weapon||r.weapon;r.hp=player.hp??r.hp;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;if(player.traversal&&typeof player.traversal==='object'&&Number(player.traversal.seq)!==Number(r.traversal?.seq))r.traversal=traversalPlanFromServer({id:player.id,accepted:true,...player.traversal});else if(player.bot&&player.traversal===null)r.traversal=null;if(r.godRing)r.godRing.visible=!!r.godMode;if(oldTeam!==r.team)applyRemoteTeamVisual(r,r.team);syncRemoteWeapon(r);updateRemoteTarget(r,player,instant);}
+function upsertRemote(player,instant=false){if(!player?.id||player.id===clientId)return;let r=remotes.get(player.id);if(!r){r=makeRemote(player);remotes.set(player.id,r);}const oldTeam=r.team;r.name=player.name||r.name;r.bot=!!player.bot;r.team=player.team||r.team;r.color=remoteDisplayColor(r.team);r.admin=player.admin??r.admin;r.weapon=player.weapon||r.weapon;if(PRIMARY_WEAPONS.includes(player.primaryWeapon))r.primaryWeapon=player.primaryWeapon;r.hp=player.hp??r.hp;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;if(player.traversal&&typeof player.traversal==='object'&&Number(player.traversal.seq)!==Number(r.traversal?.seq))r.traversal=traversalPlanFromServer({id:player.id,accepted:true,...player.traversal});else if(player.bot&&player.traversal===null)r.traversal=null;if(r.godRing)r.godRing.visible=!!r.godMode;if(oldTeam!==r.team)applyRemoteTeamVisual(r,r.team);syncRemoteWeapon(r);updateRemoteTarget(r,player,instant);}
 function removeRemote(id){const r=remotes.get(id);if(!r)return;scene.remove(r.group);r.group.traverse(o=>{if(o.geometry)o.geometry.dispose?.();if(o.material){if(o.material.map)o.material.map.dispose?.();o.material.dispose?.();}});remotes.delete(id);}
 function clearRemotes(){for(const id of [...remotes.keys()])removeRemote(id);}
 
@@ -1015,7 +1076,7 @@ function drawBloodSplatter(c,w,h,now,missingHealth){for(let i=bloodSplats.length
 function drawDamageIndicators(c,w,h,now){for(let i=damageIndicators.length-1;i>=0;i--){const d=damageIndicators[i],remain=(d.until-now)/1150;if(remain<=0){damageIndicators.splice(i,1);continue;}const radius=Math.min(w,h)*.26,x=w/2-Math.sin(d.angle)*radius,y=h/2-Math.cos(d.angle)*radius,rot=d.angle;c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=Math.min(1,remain*2)*d.strength;c.strokeStyle='#ff334d';c.fillStyle='rgba(255,30,55,.28)';c.lineWidth=3.2;c.beginPath();c.moveTo(-18,8);c.lineTo(0,-9);c.lineTo(18,8);c.stroke();c.beginPath();c.moveTo(-13,6);c.lineTo(0,-5);c.lineTo(13,6);c.lineTo(0,1);c.closePath();c.fill();c.restore();}}
 function handleRespawn(player){
   if(!player?.id)return;
-  if(player.id===clientId){hp=Math.max(0,Math.min(100,Number(player.hp??100)||0));myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;localEquipmentCooldownUntil=0;myTeam=player.team||myTeam;pendingTeam=player.pendingTeam||'';selfColor=TEAM_COLORS[myTeam]||selfColor;primaryWeapon=PRIMARY_WEAPONS.includes(player.primaryWeapon)?player.primaryWeapon:primaryWeapon;currentWeapon=(player.weapon==='pistol'||player.weapon===primaryWeapon)?player.weapon:primaryWeapon;sniperZoomLevel=0;adsWanted=false;crouchWanted=false;crouched=false;crouchBlend=0;ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;deathAnimStartedAt=0;landingKick=0;nextFootstepAt=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();warmWeaponAudio(currentWeapon);syncLocalWeaponModel();traversal=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;position.set(player.x,player.y,player.z);clearCorrectionView();resetViewVertical();verticalVelocity=Number.isFinite(Number(player.verticalVelocity))?Number(player.verticalVelocity):0;onGround=player.grounded!==false;jumpSeq=Math.max(jumpSeq,Math.floor(Number(player.jumpSeq)||0));knockX=knockZ=0;camera.rotation.z=0;syncLocalStatus();showToast('Back in');return;}
+  if(player.id===clientId){hp=Math.max(0,Math.min(100,Number(player.hp??100)||0));myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;localEquipmentCooldownUntil=0;myTeam=player.team||myTeam;pendingTeam=player.pendingTeam||'';selfColor=currentModeSpec().teamBased?(TEAM_COLORS[myTeam]||selfColor):TEAM_COLORS.blue;primaryWeapon=PRIMARY_WEAPONS.includes(player.primaryWeapon)?player.primaryWeapon:primaryWeapon;currentWeapon=(player.weapon==='pistol'||player.weapon===primaryWeapon)?player.weapon:primaryWeapon;sniperZoomLevel=0;adsWanted=false;crouchWanted=false;crouched=false;crouchBlend=0;ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;deathAnimStartedAt=0;landingKick=0;nextFootstepAt=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();warmWeaponAudio(currentWeapon);syncLocalWeaponModel();traversal=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;position.set(player.x,player.y,player.z);clearCorrectionView();resetViewVertical();verticalVelocity=Number.isFinite(Number(player.verticalVelocity))?Number(player.verticalVelocity):0;onGround=player.grounded!==false;jumpSeq=Math.max(jumpSeq,Math.floor(Number(player.jumpSeq)||0));knockX=knockZ=0;camera.rotation.z=0;syncLocalStatus();showToast('Back in');return;}
   upsertRemote(player,true);const r=remotes.get(player.id);if(r){r.hp=100;}
 }
 function flashRemote(r){const old=r.body.material.emissive?.clone?.();r.body.material.emissive=new THREE.Color(0x8a1020);setTimeout(()=>{if(r.body?.material)r.body.material.emissive=old||new THREE.Color(0x000000)},120);}
@@ -1119,7 +1180,7 @@ function sendCurrentState(force=false){
 }
 function applyAuthoritativeLoadout(m){
   const previousReloadUntil=reloadUntil;
-  if(PRIMARY_WEAPONS.includes(m.primaryWeapon))primaryWeapon=m.primaryWeapon;if(typeof m.pendingTeam==='string')pendingTeam=m.pendingTeam;
+  if(PRIMARY_WEAPONS.includes(m.primaryWeapon)){primaryWeapon=m.primaryWeapon;if(lobbyOpen){selectedPrimary=primaryWeapon;localStorage.setItem('breachPrimary',primaryWeapon);}}if(typeof m.pendingTeam==='string')pendingTeam=m.pendingTeam;
   const serverWeapon=(m.weapon==='pistol'||m.weapon===primaryWeapon)?m.weapon:currentWeapon;
   if(!pendingWeapon||serverWeapon===pendingWeapon){currentWeapon=serverWeapon;if(pendingWeapon===serverWeapon)pendingWeapon='';}
   syncClientAmmo(m.ammo);
@@ -1580,18 +1641,21 @@ function drawMatchStatus(c,w,h){
 function allCombatStats(){
   const rows=[{id:clientId,name:myName||safeName(),team:myTeam,bot:false,godMode,kills:myStats.kills||0,deaths:myStats.deaths||0}];
   for(const r of remotes.values())rows.push({id:r.id,name:r.name,team:r.team,bot:r.bot,godMode:!!r.godMode,kills:r.kills||0,deaths:r.deaths||0});
-  return rows.sort((a,b)=>a.team.localeCompare(b.team)||(b.kills-a.kills)||(a.deaths-b.deaths)||a.name.localeCompare(b.name));
+  return rows.sort((a,b)=>currentModeSpec().teamBased?(a.team.localeCompare(b.team)||(b.kills-a.kills)||(a.deaths-b.deaths)||a.name.localeCompare(b.name)):((b.kills-a.kills)||(a.deaths-b.deaths)||a.name.localeCompare(b.name)));
 }
 function teamScores(){return{blue:Math.max(0,Number(matchState.blueScore)||0),red:Math.max(0,Number(matchState.redScore)||0)};}
 function drawTeamBar(c,r){
-  const t=teamScores(),mid=r.x+r.w/2,limit=Math.max(1,matchState.scoreLimit||DEFAULT_MATCH_RULES.scoreLimit),clock=matchClockText();
-  roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);c.fillStyle=TEAM_COLORS.blue;c.fillRect(r.x,r.y,3,r.h);c.fillStyle=TEAM_COLORS.red;c.fillRect(r.x+r.w-3,r.y,3,r.h);
-  c.textBaseline='middle';c.textAlign='left';c.font=`900 ${r.h<=32?7:8}px system-ui`;c.fillStyle='#8fc8ff';c.fillText('BLUE',r.x+10,r.y+r.h/2);
-  c.textAlign='right';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(t.blue),mid-40,r.y+r.h/2);
-  c.textAlign='center';c.font='1000 8px system-ui';c.fillStyle=matchState.status==='ended'?HUD_ACCENT:'#dbe4ea';c.fillText(clock,mid,r.y+r.h/2-4);
-  c.font='800 6px system-ui';c.fillStyle='#69747d';c.fillText(`${matchCustom?'CUSTOM · ':''}FIRST ${limit}`,mid,r.y+r.h/2+7);
-  c.textAlign='left';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(t.red),mid+40,r.y+r.h/2);
-  c.textAlign='right';c.font=`900 ${r.h<=32?7:8}px system-ui`;c.fillStyle='#ff9ca4';c.fillText('RED',r.x+r.w-10,r.y+r.h/2);
+  const spec=currentModeSpec(),mid=r.x+r.w/2,clock=matchClockText();roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);c.textBaseline='middle';
+  if(spec.scoreType==='player'){
+    const rows=allCombatStats(),leader=rows[0],limit=Math.max(1,matchState.scoreLimit||spec.scoreLimit);c.fillStyle=HUD_ACCENT;c.fillRect(r.x,r.y,3,r.h);c.fillStyle=TEAM_COLORS.red;c.fillRect(r.x+r.w-3,r.y,3,r.h);
+    c.textAlign='left';c.font=`900 ${r.h<=32?7:8}px system-ui`;c.fillStyle='#dfe8ee';c.fillText('YOU',r.x+10,r.y+r.h/2);c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(myStats.kills||0),r.x+37,r.y+r.h/2);
+    c.textAlign='center';c.font='1000 8px system-ui';c.fillStyle=matchState.status==='ended'?HUD_ACCENT:'#dbe4ea';c.fillText(clock,mid,r.y+r.h/2-4);c.font='800 6px system-ui';c.fillStyle='#69747d';c.fillText(`FFA · FIRST ${limit}`,mid,r.y+r.h/2+7);
+    c.textAlign='right';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(leader?.kills||0),r.x+r.w-37,r.y+r.h/2);c.font=`900 ${r.h<=32?7:8}px system-ui`;c.fillStyle='#ff9ca4';c.fillText('LEAD',r.x+r.w-10,r.y+r.h/2);return;
+  }
+  const rows=allCombatStats(),bluePlayers=rows.filter(p=>p.team==='blue').length,redPlayers=rows.filter(p=>p.team==='red').length,t=teamScores();c.fillStyle=TEAM_COLORS.blue;c.fillRect(r.x,r.y,3,r.h);c.fillStyle=TEAM_COLORS.red;c.fillRect(r.x+r.w-3,r.y,3,r.h);
+  c.textAlign='left';c.font=`900 ${r.h<=32?7:8}px system-ui`;c.fillStyle='#8fc8ff';c.fillText('BLUE',r.x+10,r.y+r.h/2);c.textAlign='right';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(spec.scoreType==='none'?bluePlayers:t.blue),mid-40,r.y+r.h/2);
+  c.textAlign='center';c.font='1000 8px system-ui';c.fillStyle=matchState.status==='ended'?HUD_ACCENT:'#dbe4ea';c.fillText(clock,mid,r.y+r.h/2-4);c.font='800 6px system-ui';c.fillStyle='#69747d';c.fillText(spec.scoreType==='none'?'SANDBOX':`${matchCustom?'CUSTOM · ':''}FIRST ${Math.max(1,matchState.scoreLimit||spec.scoreLimit)}`,mid,r.y+r.h/2+7);
+  c.textAlign='left';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(spec.scoreType==='none'?redPlayers:t.red),mid+40,r.y+r.h/2);c.textAlign='right';c.font=`900 ${r.h<=32?7:8}px system-ui`;c.fillStyle='#ff9ca4';c.fillText('RED',r.x+r.w-10,r.y+r.h/2);
 }
 function toggleScoreboard(){if(!shell.canPlay)return;scoreboardOpen=!scoreboardOpen;scoreboardDrag=null;if(scoreboardOpen){scoreboardScroll=0;touchRoles.clear();clearFireInput();cancelEquipmentAim();joy.x=joy.y=0;}}
 function drawScoreboard(c,L){
@@ -1604,7 +1668,7 @@ function drawScoreboard(c,L){
   roundRect(c,x+w-40,y+6,28,25,7,'rgba(255,255,255,.08)','rgba(255,255,255,.14)');c.fillStyle='#fff';c.font='1000 13px system-ui';c.textAlign='center';c.fillText('×',x+w-26,y+18.5);
   const nameX=x+14,kX=x+w-112,dX=x+w-67,kdX=x+w-18;c.fillStyle='#737e87';c.font='900 8px system-ui';c.textAlign='right';c.fillText('K',kX,y+35);c.fillText('D',dX,y+35);c.fillText('K/D',kdX,y+35);
   c.save();c.beginPath();c.rect(x+7,bodyTop,w-14,bodyH);c.clip();let ry=bodyTop-scoreboardScroll;
-  for(const p of rows){if(ry+rowH>=bodyTop&&ry<=bodyTop+bodyH){const self=p.id===clientId;if(self){c.fillStyle='rgba(255,255,255,.06)';c.fillRect(x+7,ry,w-14,rowH-1);}c.fillStyle=TEAM_COLORS[p.team]||'#fff';c.fillRect(x+8,ry+5,3,rowH-10);c.textAlign='left';c.font=`${self?'1000':'850'} 10px system-ui`;c.fillStyle=self?'#fff':'#d6e0e8';c.fillText(`${p.godMode?'◆ ':''}${p.bot?'[BOT] ':''}${p.name}`,nameX,ry+rowH/2);c.textAlign='right';c.fillStyle='#fff';c.fillText(String(p.kills),kX,ry+rowH/2);c.fillStyle='#b9c5cf';c.fillText(String(p.deaths),dX,ry+rowH/2);c.fillText(p.deaths?(p.kills/p.deaths).toFixed(2):p.kills?String(p.kills):'0.00',kdX,ry+rowH/2);}ry+=rowH;}c.restore();
+  for(const p of rows){if(ry+rowH>=bodyTop&&ry<=bodyTop+bodyH){const self=p.id===clientId;if(self){c.fillStyle='rgba(255,255,255,.06)';c.fillRect(x+7,ry,w-14,rowH-1);}c.fillStyle=p.id===clientId?HUD_ACCENT:(currentModeSpec().teamBased?(TEAM_COLORS[p.team]||'#fff'):TEAM_COLORS.red);c.fillRect(x+8,ry+5,3,rowH-10);c.textAlign='left';c.font=`${self?'1000':'850'} 10px system-ui`;c.fillStyle=self?'#fff':'#d6e0e8';c.fillText(`${p.godMode?'◆ ':''}${p.bot?'[BOT] ':''}${p.name}`,nameX,ry+rowH/2);c.textAlign='right';c.fillStyle='#fff';c.fillText(String(p.kills),kX,ry+rowH/2);c.fillStyle='#b9c5cf';c.fillText(String(p.deaths),dX,ry+rowH/2);c.fillText(p.deaths?(p.kills/p.deaths).toFixed(2):p.kills?String(p.kills):'0.00',kdX,ry+rowH/2);}ry+=rowH;}c.restore();
   if(maxScroll>0){const trackY=bodyTop+3,trackH=bodyH-6,thumbH=Math.max(24,trackH*(bodyH/contentH)),thumbY=trackY+(trackH-thumbH)*(scoreboardScroll/maxScroll);roundRect(c,x+w-6,trackY,2,trackH,1,'rgba(255,255,255,.08)');roundRect(c,x+w-7,thumbY,4,thumbH,2,'rgba(255,255,255,.35)');}
 }
 
@@ -1623,7 +1687,7 @@ function drawWeapon(c,r){
   const bx=left,by=r.y+r.h-7,bw=r.w-19,bh=2.5;roundRect(c,bx,by,bw,bh,2,'rgba(255,255,255,.09)');
   if(unlimited)roundRect(c,bx,by,bw,bh,2,HUD_ACCENT);else if(reloadUntil){const total=weaponRules(reloadWeapon||currentWeapon).reloadMs,remain=Math.max(0,reloadUntil-serverNow()),q=Math.max(0,Math.min(1,1-remain/total));roundRect(c,bx,by,bw*q,bh,2,HUD_ACCENT);c.fillStyle=HUD_ACCENT;c.font='900 6.5px system-ui';c.textAlign='left';c.fillText('RELOADING',left,by-7);}else roundRect(c,bx,by,bw*(count/spec.mag),bh,2,accent);
 }
-function minimapDotColor(rmt){return !rmt.bot&&rmt.team===myTeam?'#62ef86':(TEAM_COLORS[rmt.team]||rmt.color||'#fff');}
+function minimapDotColor(rmt){return modeFriendly(rmt.team)?(!rmt.bot?'#62ef86':TEAM_COLORS[rmt.team]):TEAM_COLORS.red;}
 function getMinimapStatic(w,h){
   const key=`${Math.round(w)}x${Math.round(h)}`;if(minimapStaticCache?.key===key)return minimapStaticCache.canvas;
   const q=document.createElement('canvas');q.width=Math.max(1,Math.round(w));q.height=Math.max(1,Math.round(h));const c=q.getContext('2d'),iw=q.width,ih=q.height,terrainCells=12,cellW=iw/terrainCells,cellH=ih/terrainCells;
@@ -1631,7 +1695,7 @@ function getMinimapStatic(w,h){
 }
 function drawMiniMap(c,r){
   roundRect(c,r.x,r.y,r.w,r.h,9,HUD_SURFACE,HUD_LINE);const pad=8,ix=r.x+pad,iy=r.y+pad,iw=r.w-pad*2,ih=r.h-pad*2;c.save();c.beginPath();c.rect(ix,iy,iw,ih);c.clip();c.drawImage(getMinimapStatic(iw,ih),ix,iy,iw,ih);c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1;c.strokeRect(ix+.5,iy+.5,iw-1,ih-1);const toX=x=>ix+(x+ARENA_LIMIT)/(ARENA_LIMIT*2)*iw,toY=z=>iy+(z+ARENA_LIMIT)/(ARENA_LIMIT*2)*ih,now=performance.now();
-  for(const rmt of remotes.values()){if(rmt.team!==myTeam&&now>=rmt.revealedUntil)continue;const px=toX(rmt.group.position.x),py=toY(rmt.group.position.z);c.beginPath();c.arc(px,py,3.4,0,Math.PI*2);const humanTeammate=!rmt.bot&&rmt.team===myTeam;c.fillStyle=minimapDotColor(rmt);c.fill();if(rmt.team===myTeam){c.strokeStyle=humanTeammate?'#d8ffe3':'#fff';c.lineWidth=1;c.stroke();}}
+  for(const rmt of remotes.values()){if(!modeFriendly(rmt.team)&&now>=rmt.revealedUntil)continue;const px=toX(rmt.group.position.x),py=toY(rmt.group.position.z);c.beginPath();c.arc(px,py,3.4,0,Math.PI*2);const humanTeammate=!rmt.bot&&modeFriendly(rmt.team);c.fillStyle=minimapDotColor(rmt);c.fill();if(modeFriendly(rmt.team)){c.strokeStyle=humanTeammate?'#d8ffe3':'#fff';c.lineWidth=1;c.stroke();}}
   const px=toX(position.x),py=toY(position.z);c.save();c.translate(px,py);c.rotate(-yaw);c.beginPath();c.moveTo(0,-6);c.lineTo(4.5,5);c.lineTo(0,3);c.lineTo(-4.5,5);c.closePath();c.fillStyle=selfColor;c.fill();c.strokeStyle='#fff';c.lineWidth=1.2;c.stroke();c.restore();c.restore();c.fillStyle='#fff';c.font=`900 ${r.w<110?8:9}px system-ui`;c.textAlign='left';c.fillText(currentRoom||'----',r.x+9,r.y+r.h-8);c.textAlign='right';c.fillStyle='#c7d3dd';const humanCount=[...remotes.values()].filter(v=>!v.bot).length+1,botTotal=[...remotes.values()].filter(v=>v.bot).length;c.fillText(`${humanCount}P · ${botTotal}B`,r.x+r.w-9,r.y+r.h-8);
 }
 function handleKill(m){
@@ -1653,10 +1717,10 @@ function drawKillFeed(c,r,now){
   while(killFeed.length&&killFeed[killFeed.length-1].until<now)killFeed.pop();
   let y=r.y;for(const item of killFeed){const h=22,weapon=`${WEAPON_SPECS[item.weapon]?.short||'PST'}${item.headshot?' HS':''}`;if(y+h>r.y+r.h)break;
     roundRect(c,r.x,y,r.w,h,6,'rgba(9,11,13,.76)','rgba(255,255,255,.09)');
-    c.fillStyle=TEAM_COLORS[item.attacker.team]||'#fff';c.fillRect(r.x,y,2,h);
+    const teamBased=currentModeSpec().teamBased,attackerColor=teamBased?(TEAM_COLORS[item.attacker.team]||'#fff'):(item.attacker.id===clientId?HUD_ACCENT:TEAM_COLORS.red),victimColor=teamBased?(TEAM_COLORS[item.victim.team]||'#fff'):(item.victim.id===clientId?HUD_ACCENT:TEAM_COLORS.red);c.fillStyle=attackerColor;c.fillRect(r.x,y,2,h);
     c.font='900 8px system-ui';c.textAlign='left';c.fillStyle='#fff';const attacker=item.attacker.name||'Player',victim=item.victim.name||'Player';c.fillText(attacker,r.x+8,y+h/2);
     const aw=c.measureText(attacker).width;c.fillStyle=item.headshot?HUD_ACCENT:'#6f7982';c.font='900 7px system-ui';c.fillText(`  ${weapon}  `,r.x+10+aw,y+h/2);
-    const ww=c.measureText(`  ${weapon}  `).width;c.fillStyle=TEAM_COLORS[item.victim.team]||'#fff';c.font='900 8px system-ui';c.fillText(victim,r.x+12+aw+ww,y+h/2);y+=h+4;
+    const ww=c.measureText(`  ${weapon}  `).width;c.fillStyle=victimColor;c.font='900 8px system-ui';c.fillText(victim,r.x+12+aw+ww,y+h/2);y+=h+4;
   }
 }
 function drawGodBadge(c,r,now){const pulse=.6+.4*Math.sin(now*.005);roundRect(c,r.x,r.y,r.w,r.h,8,`rgba(215,255,88,${.10+.04*pulse})`,'rgba(215,255,88,.44)');const cx=r.x+r.w/2,cy=r.y+r.h/2;c.save();c.translate(cx,cy);c.strokeStyle=HUD_ACCENT;c.lineWidth=1.5;c.beginPath();c.moveTo(0,-7);c.lineTo(6,-4);c.lineTo(5,3);c.quadraticCurveTo(3,7,0,8);c.quadraticCurveTo(-3,7,-5,3);c.lineTo(-6,-4);c.closePath();c.stroke();c.beginPath();c.moveTo(-2,0);c.lineTo(0,2);c.lineTo(3,-3);c.stroke();c.restore();}

@@ -7,9 +7,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.23.0">
-<title>Breach v1.23.0</title>
-<link rel="stylesheet" href="ui.css?v=1.23.0">
+<link rel="manifest" href="manifest.webmanifest?v=1.24.0">
+<title>Breach v1.24.0</title>
+<link rel="stylesheet" href="ui.css?v=1.24.0">
+<link rel="stylesheet" href="lobby.css?v=1.24.0">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -72,19 +73,28 @@
 
       <section class="profile-strip" aria-label="Operator setup">
         <label class="profile-name"><span>CALLSIGN</span><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
-        <div class="profile-group"><span>TEAM</span><div class="segmented team-picker" role="radiogroup" aria-label="Team selection"><button type="button" class="team-option blue" data-team-choice="blue" aria-pressed="true"><i></i><b>BLUE</b></button><button type="button" class="team-option red" data-team-choice="red" aria-pressed="false"><i></i><b>RED</b></button></div></div>
+        <div id="setupTeamGroup" class="profile-group"><span>TEAM</span><div class="segmented team-picker" role="radiogroup" aria-label="Team selection"><button type="button" class="team-option blue" data-team-choice="blue" aria-pressed="true"><i></i><b>BLUE</b></button><button type="button" class="team-option red" data-team-choice="red" aria-pressed="false"><i></i><b>RED</b></button></div></div>
         <div class="profile-group weapon-field"><span>PRIMARY</span><div class="segmented weapon-picker" role="radiogroup" aria-label="Primary weapon"><button type="button" class="weapon-option" data-primary-choice="assault" aria-pressed="true"><b>AR</b><small>ASSAULT</small></button><button type="button" class="weapon-option" data-primary-choice="shotgun" aria-pressed="false"><b>SG</b><small>SHOTGUN</small></button><button type="button" class="weapon-option" data-primary-choice="sniper" aria-pressed="false"><b>SR</b><small>SNIPER</small></button></div></div>
       </section>
 
       <section class="play-surface">
         <div class="deploy-view create-view" data-deploy-view="create">
-          <div class="host-grid">
-            <label><span>BLUE BOTS</span><select id="blueBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-            <label><span>RED BOTS</span><select id="redBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-            <label><span>DIFFICULTY</span><select id="botDifficulty" class="input"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
-            <button id="godToggle" type="button" class="god-toggle" aria-pressed="false"><svg class="mini-icon"><use href="#i-shield"/></svg><span>INVULNERABLE</span><b id="godState">OFF</b></button>
+          <div class="game-mode-config">
+            <span class="game-mode-label">GAME MODE</span>
+            <div class="game-mode-picker" role="radiogroup" aria-label="Game mode">
+              <button type="button" class="game-mode-choice active" data-game-mode-choice="tdm" aria-pressed="true"><strong>TEAM DEATHMATCH</strong><small>Teams · first to 30</small></button>
+              <button type="button" class="game-mode-choice" data-game-mode-choice="ffa" aria-pressed="false"><strong>FREE FOR ALL</strong><small>Everyone is hostile</small></button>
+              <button type="button" class="game-mode-choice" data-game-mode-choice="sandbox" aria-pressed="false"><strong>SANDBOX</strong><small>No score or time limit</small></button>
+            </div>
           </div>
-          <div class="play-action-row"><span id="botTotal" class="bot-total">2 / 8 bots</span><button id="createBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-play"/></svg><span>START MATCH</span></button></div>
+          <div class="host-grid">
+            <label id="blueBotWrap"><span>BLUE BOTS</span><select id="blueBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+            <label id="redBotWrap"><span>RED BOTS</span><select id="redBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+            <label id="ffaBotWrap" class="hide"><span>BOTS</span><select id="ffaBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+            <label><span>DIFFICULTY</span><select id="botDifficulty" class="input"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
+            <button id="godToggle" type="button" class="god-toggle" aria-pressed="false"><svg class="mini-icon"><use href="#i-shield"/></svg><span>GOD MODE</span><b id="godState">OFF</b></button>
+          </div>
+          <div class="play-action-row"><span id="botTotal" class="bot-total">2 / 8 bots</span><button id="createBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-play"/></svg><span>CREATE LOBBY</span></button></div>
         </div>
 
         <div class="deploy-view join-view" data-deploy-view="join">
@@ -98,6 +108,70 @@
       </section>
 
       <footer id="menuStatus" class="menu-status" role="status" aria-live="polite">Ready.</footer>
+    </div>
+  </section>
+
+  <section id="lobbyScreen" class="lobby-screen hide" aria-label="Match lobby">
+    <div class="lobby-shell">
+      <header class="lobby-header">
+        <div class="lobby-title">
+          <div class="eyebrow">MATCH LOBBY</div>
+          <div class="lobby-room-line"><h1 id="lobbyRoomCode">----</h1><span id="lobbyModeBadge" class="lobby-mode-badge">TEAM DEATHMATCH</span></div>
+          <p id="lobbyModeDescription">Teams compete for the elimination limit.</p>
+        </div>
+        <div class="lobby-header-actions">
+          <button id="lobbyCopyBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-copy"/></svg><span>INVITE</span></button>
+          <button id="lobbyLeaveBtn" class="secondary-btn danger"><svg class="mini-icon"><use href="#i-exit"/></svg><span>LEAVE</span></button>
+        </div>
+      </header>
+
+      <div class="lobby-main">
+        <section class="lobby-roster-panel">
+          <div class="lobby-section-head"><div><span class="eyebrow">PLAYERS</span><h2>Roster</h2></div><span id="lobbyPlayerCount" class="lobby-count">1 / 8</span></div>
+          <div id="lobbyRoster" class="lobby-roster"></div>
+        </section>
+
+        <aside class="lobby-operator-panel">
+          <div class="lobby-section-head"><div><span class="eyebrow">OPERATOR</span><h2>Operator</h2></div><span class="lobby-secondary">Pistol secondary</span></div>
+
+          <div id="lobbyTeamGroup" class="lobby-control-group">
+            <span>TEAM</span>
+            <div class="lobby-team-picker">
+              <button type="button" class="lobby-team-choice blue" data-lobby-team-choice="blue"><i></i><strong>BLUE</strong></button>
+              <button type="button" class="lobby-team-choice red" data-lobby-team-choice="red"><i></i><strong>RED</strong></button>
+            </div>
+          </div>
+
+          <div class="lobby-control-group">
+            <span>PRIMARY LOADOUT</span>
+            <div class="lobby-loadout-picker">
+              <button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="assault"><b>AR</b><strong>ASSAULT</strong><small>Balanced</small></button>
+              <button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="shotgun"><b>SG</b><strong>SHOTGUN</strong><small>Close range</small></button>
+              <button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="sniper"><b>SR</b><strong>SNIPER</strong><small>Long range</small></button>
+            </div>
+          </div>
+
+          <div id="lobbyAdminControls" class="lobby-admin-controls hide">
+            <div class="lobby-control-group">
+              <span>HOST OPTIONS</span>
+              <button id="lobbyGodBtn" type="button" class="lobby-god-button" aria-pressed="false"><svg class="mini-icon"><use href="#i-shield"/></svg><strong>GOD MODE</strong><b id="lobbyGodState">OFF</b></button>
+            </div>
+            <div class="lobby-control-group">
+              <span>GAME MODE</span>
+              <div class="lobby-mode-picker">
+                <button type="button" data-lobby-mode-choice="tdm">TDM</button>
+                <button type="button" data-lobby-mode-choice="ffa">FFA</button>
+                <button type="button" data-lobby-mode-choice="sandbox">SANDBOX</button>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+
+      <footer class="lobby-footer">
+        <div><strong id="lobbyStatus">Waiting in lobby</strong><span id="lobbyHint">Choose your team and loadout.</span></div>
+        <button id="lobbyStartBtn" class="primary lobby-start hide"><svg class="ui-icon"><use href="#i-play"/></svg><span>START MATCH</span></button>
+      </footer>
     </div>
   </section>
 
@@ -140,7 +214,7 @@
     <div class="modal-shell admin-shell" data-page="match">
       <header class="modal-head"><div><div class="eyebrow">CUSTOM MATCH</div><h2>Match control</h2><p>Server-authoritative room settings.</p></div><button id="adminCloseBtn" class="square-btn" aria-label="Close match control"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
       <div class="admin-tabs" role="tablist"><button class="admin-tab active" data-admin-tab="match">MATCH</button><button class="admin-tab" data-admin-tab="gameplay">GAMEPLAY</button><button class="admin-tab" data-admin-tab="advanced">WEAPONS</button><button class="admin-tab" data-admin-tab="bots">BOTS</button><button class="admin-tab" data-admin-tab="players">PLAYERS</button></div>
-      <div id="adminMatch" class="admin-page" data-admin-page="match"><div class="settings-grid"><label class="setting"><span>Score limit</span><input id="setScoreLimit" type="number" min="5" max="100" step="5"></label><label class="setting"><span>Time limit (minutes)</span><input id="setTimeLimit" type="number" min="2" max="30" step="1"></label></div><div class="admin-note">Standard: 30 eliminations or 8 minutes.</div></div>
+      <div id="adminMatch" class="admin-page" data-admin-page="match"><div class="settings-grid"><label class="setting"><span>Score limit</span><input id="setScoreLimit" type="number" min="5" max="100" step="5"></label><label class="setting"><span>Time limit (minutes)</span><input id="setTimeLimit" type="number" min="2" max="30" step="1"></label></div><div id="adminMatchNote" class="admin-note">Team Deathmatch: first team to 30 eliminations or highest score after 8 minutes.</div></div>
       <div id="adminGameplay" class="admin-page hide" data-admin-page="gameplay"><div class="settings-grid"><label class="setting"><span>Run speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label><label class="setting"><span>ADS walk speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label><label class="setting"><span>Jump height</span><input id="setJumpHeight" type="number" min="0.4" max="5" step="0.1"></label><label class="setting"><span>Gravity</span><input id="setGravity" type="number" min="8" max="40" step="1"></label><label class="setting"><span>Health regen delay (s)</span><input id="setRegenDelay" type="number" min="0" max="15" step="0.5"></label><label class="setting"><span>Health regen / second</span><input id="setRegenRate" type="number" min="0" max="30" step="0.5"></label><label class="setting"><span>Respawn delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label></div></div>
       <div id="adminAdvanced" class="admin-page hide" data-admin-page="advanced"><div class="weapon-settings-grid">
         <section class="weapon-settings-card"><strong>PISTOL</strong><label>Damage<input id="setPistolDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setPistolSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setPistolReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setPistolCooldown" type="number" min="24" max="1200" step="5"></label></section>
@@ -148,7 +222,7 @@
         <section class="weapon-settings-card"><strong>SHOTGUN</strong><label>Pellet damage<input id="setShotgunDamage" type="number" min="1" max="100" step="1"></label><label>Projectile velocity<input id="setShotgunSpeed" type="number" min="10" max="200" step="1"></label><label>Reload time (s)<input id="setShotgunReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setShotgunCooldown" type="number" min="24" max="600" step="5"></label></section>
         <section class="weapon-settings-card sniper"><strong>SNIPER</strong><label>Damage<input id="setSniperDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setSniperSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setSniperReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setSniperCooldown" type="number" min="24" max="1200" step="5"></label></section>
       </div></div>
-      <div id="adminBots" class="admin-page hide" data-admin-page="bots"><div class="settings-grid"><label class="setting"><span>Blue bots</span><input id="setBlueBots" type="number" min="0" max="8" step="1"></label><label class="setting"><span>Red bots</span><input id="setRedBots" type="number" min="0" max="8" step="1"></label><label class="setting"><span>Difficulty</span><select id="setBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label><div class="setting"><span>Difficulty effect</span><div id="botDifficultyHelp" class="difficulty-help"></div></div></div></div>
+      <div id="adminBots" class="admin-page hide" data-admin-page="bots"><div class="settings-grid"><label id="adminBlueBotsWrap" class="setting"><span>Blue bots</span><input id="setBlueBots" type="number" min="0" max="8" step="1"></label><label id="adminRedBotsWrap" class="setting"><span>Red bots</span><input id="setRedBots" type="number" min="0" max="8" step="1"></label><label id="adminFfaBotsWrap" class="setting hide"><span>Bots</span><input id="setFfaBots" type="number" min="0" max="8" step="1"></label><label class="setting"><span>Difficulty</span><select id="setBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label><div class="setting"><span>Difficulty effect</span><div id="botDifficultyHelp" class="difficulty-help"></div></div></div></div>
       <div id="adminPlayers" class="admin-page hide" data-admin-page="players"><div id="adminPlayerList" class="admin-player-list"></div></div>
       <footer class="modal-foot"><div id="adminStatus" class="admin-status" role="status" aria-live="polite">Standard match rules are active.</div><button id="adminResetBtn" class="secondary-btn">Reset tab</button><button id="adminSaveBtn" class="primary modal-action">Apply</button></footer>
     </div>
@@ -173,6 +247,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.23.0"></script>
+<script type="module" src="client.js?v=1.24.0"></script>
 </body>
 </html>
