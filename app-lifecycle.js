@@ -54,15 +54,15 @@ export function createSessionShell({
   const visible=(el,show)=>el?.classList.toggle('hide',!show);
 
   function render(reason='sync'){
-    const s=snapshot(),usable=s.immersive&&!s.orientationBlocked;
-    visible(elements.entry,!s.immersive);
-    visible(elements.rotate,s.immersive&&s.orientationBlocked);
-    visible(elements.menu,usable&&s.location==='menu'&&!s.panel&&!s.connecting);
-    visible(elements.lobby,usable&&s.location==='lobby'&&!s.panel&&!s.connecting);
-    visible(elements.pause,usable&&s.inMatch&&s.paused&&!s.panel&&!s.connecting);
-    visible(elements.settings,usable&&s.panel===SHELL_PANEL.SETTINGS);
-    visible(elements.admin,usable&&s.panel===SHELL_PANEL.ADMIN);
-    visible(elements.connection,usable&&s.connecting);
+    const s=snapshot(),matchUsable=s.immersive&&!s.orientationBlocked,frontUsable=platform.touchControls?matchUsable:true;
+    visible(elements.entry,platform.touchControls&&!s.immersive);
+    visible(elements.rotate,platform.touchControls&&s.immersive&&s.orientationBlocked);
+    visible(elements.menu,frontUsable&&s.location==='menu'&&!s.panel&&!s.connecting);
+    visible(elements.lobby,frontUsable&&s.location==='lobby'&&!s.panel&&!s.connecting);
+    visible(elements.pause,matchUsable&&s.inMatch&&s.paused&&!s.panel&&!s.connecting);
+    visible(elements.settings,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.SETTINGS);
+    visible(elements.admin,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.ADMIN);
+    visible(elements.connection,(s.inMatch?matchUsable:frontUsable)&&s.connecting);
     if(elements.connectionText)elements.connectionText.textContent=s.connectionText||'Connecting…';
     if(elements.entryButton){
       const label=elements.entryButton.querySelector('span');
@@ -127,7 +127,13 @@ export function createSessionShell({
     if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();
     return render('lobby');
   }
-  async function prepareInputFromGesture(){return platform.touchControls?true:requestPointerLock();}
+  async function prepareInputFromGesture(){
+    if(!immersive()){
+      if(!(await requestFullscreen()))return false;
+      await lockLandscape();syncViewport();render('input-fullscreen');
+    }
+    return platform.touchControls?true:requestPointerLock();
+  }
   async function enterMatch(){
     location='match';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
     if(!immersive()||!landscapeReady()){paused=true;pauseReason=!immersive()?'fullscreen':'orientation';return render('match-blocked');}
@@ -139,7 +145,12 @@ export function createSessionShell({
     if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();return render(reason);
   }
   async function resumeFromGesture(){
-    if(!inMatch()||panel||!immersive()||!landscapeReady())return false;
+    if(!inMatch()||panel)return false;
+    if(!immersive()){
+      if(!(await requestFullscreen()))return false;
+      await lockLandscape();syncViewport();
+    }
+    if(!landscapeReady())return false;
     if(!platform.touchControls&&!(await requestPointerLock()))return false;
     paused=false;pauseReason='';render('resume');return true;
   }

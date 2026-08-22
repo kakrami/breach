@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.25.3">
-<title>Breach v1.25.3</title>
-<link rel="stylesheet" href="ui.css?v=1.25.3">
+<link rel="manifest" href="manifest.webmanifest?v=1.25.4">
+<title>Breach v1.25.4</title>
+<link rel="stylesheet" href="ui.css?v=1.25.4">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -102,13 +102,13 @@
       <header class="lobby-header">
         <div class="lobby-title">
           <div class="eyebrow">MATCH LOBBY</div>
-          <div class="lobby-room-line"><h1 id="lobbyRoomCode">----</h1><span id="lobbyModeBadge" class="lobby-mode-badge">TEAM DEATHMATCH</span></div>
+          <div class="lobby-room-line"><h1 id="lobbyRoomCode">----</h1><span id="lobbyModeBadge" class="lobby-mode-badge">TEAM DEATHMATCH</span><span class="lobby-version" data-app-version></span></div>
           <p id="lobbyModeDescription">Teams compete for the elimination limit.</p>
         </div>
         <div class="lobby-header-actions">
           <button id="lobbyMusicBtn" class="square-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="lobbyMusicIconUse" href="#i-sound"/></svg></button>
           <button id="lobbySettingsBtn" class="square-btn" title="Player settings" aria-label="Player settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button>
-          <button id="lobbyExitFullscreenBtn" class="square-btn" title="Exit fullscreen" aria-label="Exit fullscreen"><svg class="ui-icon"><use href="#i-full"/></svg></button>
+          <button id="lobbyExitFullscreenBtn" class="square-btn" title="Exit fullscreen" aria-label="Exit fullscreen"><svg class="ui-icon"><use href="#i-exit"/></svg></button>
           <button id="lobbyCopyBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-copy"/></svg><span>INVITE</span></button>
           <button id="lobbyLeaveBtn" class="secondary-btn danger"><svg class="mini-icon"><use href="#i-exit"/></svg><span>LEAVE</span></button>
         </div>
@@ -116,7 +116,7 @@
 
       <div class="lobby-main">
         <section class="lobby-roster-panel">
-          <div class="lobby-section-head"><div><span class="eyebrow">PLAYERS</span><h2>Roster</h2></div><span id="lobbyPlayerCount" class="lobby-count">1 / 8</span></div>
+          <div class="lobby-section-head"><div><span class="eyebrow">PLAYERS</span><h2>Roster</h2></div><div class="lobby-roster-actions"><span id="lobbyPlayerCount" class="lobby-count">1 / 8</span><button id="lobbyManagePlayersBtn" type="button" class="lobby-manage-players hide">MANAGE</button></div></div>
           <div id="lobbyRoster" class="lobby-roster"></div>
         </section>
 
@@ -129,7 +129,7 @@
           </section>
 
           <section class="lobby-setup-panel">
-            <div class="lobby-section-head"><div><span class="eyebrow">MATCH SETUP</span><h2>Rules</h2></div><span id="lobbySetupOwnerLabel" class="lobby-secondary">Host controls</span></div>
+            <div class="lobby-section-head"><div><span class="eyebrow">MATCH SETUP</span><h2>Rules</h2></div><span id="lobbySetupOwnerLabel" class="lobby-secondary">Admin controls</span></div>
             <div id="lobbyHostSetup" class="lobby-host-setup hide">
               <div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button type="button" data-lobby-mode-choice="tdm">TDM</button><button type="button" data-lobby-mode-choice="ffa">FFA</button><button type="button" data-lobby-mode-choice="sandbox">SANDBOX</button></div></div>
               <div class="lobby-setup-row">
@@ -138,9 +138,9 @@
                 <label id="lobbyFfaBotWrap" class="hide"><span>BOTS</span><select id="lobbyFfaBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
                 <label><span>DIFFICULTY</span><select id="lobbyBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
               </div>
-              <button id="lobbyMatchSettingsBtn" class="secondary-btn lobby-match-settings"><svg class="mini-icon"><use href="#i-settings"/></svg><span>ADVANCED MATCH SETTINGS</span></button>
+              <div id="lobbyRuleSummary" class="lobby-rule-summary">First 30 · 8 min</div><button id="lobbyMatchSettingsBtn" class="secondary-btn lobby-match-settings"><svg class="mini-icon"><use href="#i-settings"/></svg><span>ADVANCED MATCH SETTINGS</span></button>
             </div>
-            <div id="lobbyGuestSetup" class="lobby-guest-setup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><small>The host controls match rules. You can change your team and loadout while you wait.</small></div>
+            <div id="lobbyGuestSetup" class="lobby-guest-setup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><span id="lobbyGuestRules">First 30 · 8 min</span><small>A lobby admin controls match rules. You can change your team and loadout while you wait.</small></div>
           </section>
         </div>
       </div>
@@ -190,7 +190,7 @@
   <section id="adminPanel" class="modal-screen hide" aria-label="Match control">
     <div class="modal-shell admin-shell" data-page="match">
       <header class="modal-head"><div><div id="adminEyebrow" class="eyebrow">CUSTOM MATCH</div><h2 id="adminTitle">Match control</h2><p id="adminDescription">Server-authoritative room settings.</p></div><button id="adminCloseBtn" class="square-btn" aria-label="Close match control"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
-      <div class="admin-tabs" role="tablist"><button class="admin-tab active" data-admin-tab="match">MATCH</button><button class="admin-tab" data-admin-tab="gameplay">GAMEPLAY</button><button class="admin-tab" data-admin-tab="advanced">WEAPONS</button><button class="admin-tab" data-admin-tab="bots" data-hide-in-lobby="true">BOTS</button><button class="admin-tab" data-admin-tab="players">PLAYERS</button></div>
+      <div class="admin-tabs" role="tablist"><button class="admin-tab active" data-admin-tab="match">SCORE / TIME</button><button class="admin-tab" data-admin-tab="gameplay">GAMEPLAY</button><button class="admin-tab" data-admin-tab="advanced">WEAPONS</button><button class="admin-tab" data-admin-tab="bots">BOTS</button><button class="admin-tab" data-admin-tab="players">PLAYERS</button></div>
       <div id="adminMatch" class="admin-page" data-admin-page="match"><div class="settings-grid"><label class="setting"><span>Score limit</span><input id="setScoreLimit" type="number" min="5" max="100" step="5"></label><label class="setting"><span>Time limit (minutes)</span><input id="setTimeLimit" type="number" min="2" max="30" step="1"></label></div><div id="adminMatchNote" class="admin-note">Team Deathmatch: first team to 30 eliminations or highest score after 8 minutes.</div></div>
       <div id="adminGameplay" class="admin-page hide" data-admin-page="gameplay"><div class="settings-grid"><label class="setting"><span>Run speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label><label class="setting"><span>ADS walk speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label><label class="setting"><span>Jump height</span><input id="setJumpHeight" type="number" min="0.4" max="5" step="0.1"></label><label class="setting"><span>Gravity</span><input id="setGravity" type="number" min="8" max="40" step="1"></label><label class="setting"><span>Health regen delay (s)</span><input id="setRegenDelay" type="number" min="0" max="15" step="0.5"></label><label class="setting"><span>Health regen / second</span><input id="setRegenRate" type="number" min="0" max="30" step="0.5"></label><label class="setting"><span>Respawn delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label></div></div>
       <div id="adminAdvanced" class="admin-page hide" data-admin-page="advanced"><div class="weapon-settings-grid">
@@ -224,6 +224,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.25.3"></script>
+<script type="module" src="client.js?v=1.25.4"></script>
 </body>
 </html>
