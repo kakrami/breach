@@ -6,11 +6,11 @@ import {
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.24.0';
+} from './game-config.js?v=1.24.1';
 import { createProjectileCollisionGrid } from './collision-grid.js?v=1.23.0';
 import { worldBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.23.0';
 import { createAudioEngine } from './audio-engine.js?v=1.23.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.24.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.24.1';
 import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.23.0';
 import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.23.0';
 
@@ -75,6 +75,7 @@ const nameInput=$('nameInput'),codeInput=$('codeInput'),blueBotCount=$('blueBotC
 const teamButtons=[...document.querySelectorAll('[data-team-choice]')];
 const primaryButtons=[...document.querySelectorAll('[data-primary-choice]')];
 const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')];
+const deployViews=[...document.querySelectorAll('[data-deploy-view]')];
 const gameModeButtons=[...document.querySelectorAll('[data-game-mode-choice]')],lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')];
 const lobbyScreen=$('lobbyScreen'),lobbyRoster=$('lobbyRoster');
 const matchList = $('matchList'), matchCount = $('matchCount');
@@ -608,8 +609,15 @@ function bindUI(){
     const next=['create','join','live'].includes(mode)?mode:'create';
     menuShell.dataset.deployMode=next;
     for(const tab of deployTabs){const active=tab.dataset.deployTab===next;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));}
+    for(const view of deployViews){
+      const active=view.dataset.deployView===next;
+      view.hidden=!active;
+      view.inert=!active;
+      view.setAttribute('aria-hidden',String(!active));
+    }
+    const focused=document.activeElement;
+    if(focused instanceof HTMLElement&&focused.matches('input,textarea,select')&&focused.closest('[data-deploy-view]')?.dataset.deployView!==next)focused.blur();
     if(next==='live')void refreshMatches();
-    if(next==='join')requestAnimationFrame(()=>codeInput.focus({preventScroll:true}));
   };
   for(const tab of deployTabs)tab.addEventListener('click',()=>setDeployMode(tab.dataset.deployTab));
   setDeployMode(requestedRoom?'join':'create');

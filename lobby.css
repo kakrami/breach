@@ -4,7 +4,7 @@
 /* Host setup owns one compact two-row layout: mode across the top, match
    options and the Create Lobby action below. This prevents the mode selector
    from being layered onto whatever grid the older host surface happened to use. */
-.create-view{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(160px,190px)!important;grid-template-rows:auto minmax(0,1fr)!important;align-items:center!important;gap:8px 10px!important}
+.deploy-view.create-view{display:grid;grid-template-columns:minmax(0,1fr) minmax(160px,190px);grid-template-rows:auto minmax(0,1fr);align-items:center;gap:8px 10px}
 .create-view>.game-mode-config{grid-column:1/-1;grid-row:1}
 .create-view>.host-grid{grid-column:1;grid-row:2;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-items:end;gap:7px;min-width:0}
 .create-view>.play-action-row{grid-column:2;grid-row:2;display:grid;align-content:center;gap:6px;min-width:0}
@@ -23,5 +23,9 @@
 
 .team-chip.ffa{color:var(--accent,#d7ff58);background:rgba(215,255,88,.10)}
 
-@media(max-width:720px) and (orientation:landscape){.create-view{grid-template-columns:minmax(0,1fr) minmax(135px,155px)!important;gap:5px 7px!important}.create-view>.host-grid{gap:5px}.create-view>.play-action-row{gap:3px}.create-view>.play-action-row .bot-total{font-size:6px}.game-mode-config{gap:5px}}
-@media(max-height:350px) and (orientation:landscape){.create-view{gap:3px 6px!important}.game-mode-config{padding:0}.game-mode-choice{min-height:31px!important}.create-view>.play-action-row .bot-total{display:none}}
+@media(max-width:720px) and (orientation:landscape){.deploy-view.create-view{grid-template-columns:minmax(0,1fr) minmax(135px,155px);gap:5px 7px}.create-view>.host-grid{gap:5px}.create-view>.play-action-row{gap:3px}.create-view>.play-action-row .bot-total{font-size:6px}.game-mode-config{gap:5px}}
+@media(max-height:350px) and (orientation:landscape){.deploy-view.create-view{gap:3px 6px}.game-mode-config{padding:0}.game-mode-choice{min-height:31px!important}.create-view>.play-action-row .bot-total{display:none}}
+
+/* Deploy tabs have one layout/input owner. Native hidden + inert prevents stale
+   tab content from rendering, receiving touches, or focusing form controls. */
+[data-deploy-view][hidden]{display:none!important}

@@ -7,10 +7,10 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.24.0">
-<title>Breach v1.24.0</title>
-<link rel="stylesheet" href="ui.css?v=1.24.0">
-<link rel="stylesheet" href="lobby.css?v=1.24.0">
+<link rel="manifest" href="manifest.webmanifest?v=1.24.1">
+<title>Breach v1.24.1</title>
+<link rel="stylesheet" href="ui.css?v=1.24.1">
+<link rel="stylesheet" href="lobby.css?v=1.24.1">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -78,7 +78,7 @@
       </section>
 
       <section class="play-surface">
-        <div class="deploy-view create-view" data-deploy-view="create">
+        <div class="deploy-view create-view" data-deploy-view="create" aria-hidden="false">
           <div class="game-mode-config">
             <span class="game-mode-label">GAME MODE</span>
             <div class="game-mode-picker" role="radiogroup" aria-label="Game mode">
@@ -97,11 +97,11 @@
           <div class="play-action-row"><span id="botTotal" class="bot-total">2 / 8 bots</span><button id="createBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-play"/></svg><span>CREATE LOBBY</span></button></div>
         </div>
 
-        <div class="deploy-view join-view" data-deploy-view="join">
+        <div class="deploy-view join-view" data-deploy-view="join" hidden inert aria-hidden="true">
           <div class="join-panel"><div><div class="eyebrow">PRIVATE MATCH</div><h1>Enter room code</h1><p>Use the four-character code from the host.</p></div><div class="join-controls"><input id="codeInput" class="input code-input" maxlength="4" autocapitalize="characters" autocomplete="off" placeholder="ABCD" aria-label="Match code"><button id="joinBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-enter"/></svg><span>JOIN MATCH</span></button></div></div>
         </div>
 
-        <div class="deploy-view live-view" data-deploy-view="live">
+        <div class="deploy-view live-view" data-deploy-view="live" hidden inert aria-hidden="true">
           <div class="live-toolbar"><div><div class="eyebrow">PUBLIC ROOMS</div><h1>Live matches</h1></div><button id="refreshBtn" type="button" class="small-btn"><svg class="mini-icon"><use href="#i-refresh"/></svg><span>REFRESH</span></button></div>
           <div id="matchList" class="match-list" aria-live="polite"><div class="empty">Loading live matches…</div></div>
         </div>
@@ -247,6 +247,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.24.0"></script>
+<script type="module" src="client.js?v=1.24.1"></script>
 </body>
 </html>
