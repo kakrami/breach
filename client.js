@@ -1,17 +1,18 @@
 window.__breachModuleBooted=true;
 import {
-  PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES,
+  PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.21.0';
+} from './world-geometry.js?v=1.22.0';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.21.0';
-import { createObstacleGrid, createProjectileCollisionGrid } from './collision-grid.js?v=1.21.0';
-import { createAudioEngine } from './audio-engine.js?v=1.21.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.21.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.21.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.21.0';
+} from './game-config.js?v=1.22.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.22.0';
+import { worldBlockedAt } from './world-collision.js?v=1.22.0';
+import { createAudioEngine } from './audio-engine.js?v=1.22.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.22.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, tacticalThrowVelocity } from './movement-model.js?v=1.22.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.22.0';
 
 let THREE = null;
 
@@ -164,9 +165,6 @@ const trajectoryCollision=createProjectileCollisionGrid({
   staticBoxes:STATIC_BOXES,pyramids:PYRAMIDS,naturalObstacles:NATURAL_OBSTACLES,buildingParts:BUILDING_PARTS,
   terrainHeight,naturalGroundBase,cellSize:8,cellHeight:3
 });
-const obstacleIndex=createObstacleGrid({cellSize:8,cellHeight:3,playerHeight:PLAYER_HEIGHT});
-const registerObstacle=obstacleIndex.register;
-const obstacleBlocked=obstacleIndex.blocked;
 const mapObstacles = [];
 const joy = { x:0, y:0, centerX:0, centerY:0 };
 const look = { x:0, y:0 };
@@ -228,7 +226,7 @@ syncGodUI();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.21.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.22.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -471,7 +469,7 @@ function init3D(){
 
 
 function addTerrain(){
-  const size=244,segments=128;
+  const size=TERRAIN_SIZE,segments=TERRAIN_SEGMENTS;
   const geo=new THREE.PlaneGeometry(size,size,segments,segments),pos=geo.attributes.position;
   const colors=[];
   const low=new THREE.Color(0x587552),mid=new THREE.Color(0x78915f),high=new THREE.Color(0x807a65),peak=new THREE.Color(0x9a9586);
@@ -516,21 +514,20 @@ function addBoundaryWalls(mat){
 }
 function addBox(x,y,z,w,h,d,mat,collidable){
   const base=terrainHeight(x,z)+y;const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat);mesh.position.set(x,base+h/2,z);mesh.castShadow=!isTouch;mesh.receiveShadow=!isTouch;scene.add(mesh);
-  if(collidable){registerObstacle({type:'box',x,z,w,d,minX:x-w/2-PLAYER_RADIUS,maxX:x+w/2+PLAYER_RADIUS,minZ:z-d/2-PLAYER_RADIUS,maxZ:z+d/2+PLAYER_RADIUS,minY:base,maxY:base+h,supportTop:true});mapObstacles.push({type:'box',x,z,w,d});}
+  if(collidable)mapObstacles.push({type:'box',x,z,w,d});
   return mesh;
 }
 function addPyramid(x,z,base,h,mat){
   const radius=base/Math.sqrt(2),ground=terrainHeight(x,z);const mesh=new THREE.Mesh(new THREE.ConeGeometry(radius,h,4,1),mat);mesh.position.set(x,ground+h/2-.05,z);mesh.rotation.y=Math.PI/4;mesh.castShadow=!isTouch;mesh.receiveShadow=!isTouch;scene.add(mesh);
   mapObstacles.push({type:'pyramid',x,z,base});return mesh;
 }
-function addRoundObstacle(type,x,z,r,h,base=naturalGroundBase(type,x,z,r)){registerObstacle({type:'round',x,z,r:r+PLAYER_RADIUS,minY:base,maxY:base+h+.18});mapObstacles.push({type,x,z,r,h});}
+function addRoundObstacle(type,x,z,r,h,base=naturalGroundBase(type,x,z,r)){mapObstacles.push({type,x,z,r,h});}
 function addTree(x,z,r,h,trunkMat,leafMat){const base=naturalGroundBase('tree',x,z,r),g=new THREE.Group();const trunk=new THREE.Mesh(new THREE.CylinderGeometry(r*.72,r,h*.64,8),trunkMat);trunk.position.y=h*.32;const crown1=new THREE.Mesh(new THREE.ConeGeometry(r*3.0,h*.48,9),leafMat);crown1.position.y=h*.62;const crown2=new THREE.Mesh(new THREE.ConeGeometry(r*2.35,h*.40,9),leafMat);crown2.position.y=h*.83;g.add(trunk,crown1,crown2);g.traverse(o=>{if(o.isMesh){o.castShadow=!isTouch;o.receiveShadow=!isTouch;}});g.position.set(x,base,z);scene.add(g);addRoundObstacle('tree',x,z,r,h,base);return g;}
 function addBush(x,z,r,h,mat){const base=naturalGroundBase('bush',x,z,r),g=new THREE.Group();for(const [ox,oz,s] of [[0,0,1],[-.55,0,.72],[.55,.08,.68],[0,.48,.63]]){const m=new THREE.Mesh(new THREE.SphereGeometry(r*s*.72,8,6),mat);m.scale.y=.62;m.position.set(ox*r*.45,h*.42,oz*r*.45);g.add(m);}g.position.set(x,base,z);scene.add(g);addRoundObstacle('bush',x,z,r,h,base);return g;}
 function addRock(x,z,r,h,mat){const base=naturalGroundBase('rock',x,z,r),m=new THREE.Mesh(new THREE.DodecahedronGeometry(r,0),mat);m.scale.set(1,h/(r*2),.82);m.position.set(x,base+h*.46,z);m.rotation.set(.18,.4,.12);scene.add(m);addRoundObstacle('rock',x,z,r,h,base);return m;}
 function addBuildingPart(part,materials){
   const h=part.topY-part.bottomY,mat=part.role==='wall'?materials.wall:part.role==='trim'?materials.trim:part.role==='rail'||part.role==='roof'||part.role==='stairSide'?materials.trim:materials.floor;
   const mesh=new THREE.Mesh(new THREE.BoxGeometry(part.w,h,part.d),mat);mesh.position.set(part.x,(part.bottomY+part.topY)/2,part.z);mesh.castShadow=!isTouch;mesh.receiveShadow=!isTouch;scene.add(mesh);
-  if(part.playerSolid){registerObstacle({type:'box',x:part.x,z:part.z,w:part.w,d:part.d,minX:part.x-part.w/2-PLAYER_RADIUS,maxX:part.x+part.w/2+PLAYER_RADIUS,minZ:part.z-part.d/2-PLAYER_RADIUS,maxZ:part.z+part.d/2+PLAYER_RADIUS,minY:part.bottomY,maxY:part.topY,supportTop:part.supportTop,crouchStep:!!part.crouchStep});}
   return mesh;
 }
 function addBuilding(b,geometry){
@@ -1346,7 +1343,7 @@ function moveHorizontal(dx,dz){
   });
   position.set(next.x,next.y,next.z);onGround=next.grounded;
 }
-function blocked(x,z,y=position?.y??terrainHeight(x,z),playerHeight=currentPlayerHeight()){return obstacleBlocked(x,z,y,playerHeight);}
+function blocked(x,z,y=position?.y??terrainHeight(x,z),playerHeight=currentPlayerHeight()){return worldBlockedAt(x,z,y,playerHeight,PLAYER_RADIUS);}
 function round3(n){return Math.round(n*1000)/1000;}
 
 function updateRemoteVisuals(dt){
