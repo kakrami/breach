@@ -29,6 +29,7 @@ export function createSessionShell({
   let connectionText='';
   let viewport=measure(stage);
   let lastCanPlay=false;
+  let hadPointerLock=false;
 
   root.classList.toggle('touch',platform.touchControls);
   root.classList.toggle('desktop',!platform.touchControls);
@@ -38,23 +39,25 @@ export function createSessionShell({
   const fullscreen=()=>!!fullscreenElement();
   const immersive=()=>platform.standalone||fullscreen();
   const pointerLocked=()=>document.pointerLockElement===canvas;
+  hadPointerLock=pointerLocked();
   const landscapeReady=()=>!platform.touchControls||viewport.w>=viewport.h;
   const fullscreenSupported=()=>platform.standalone||((document.fullscreenEnabled??document.webkitFullscreenEnabled)!==false&&!!(root.requestFullscreen||root.webkitRequestFullscreen));
 
   function snapshot(){
     const entered=immersive(),landscape=landscapeReady(),match=inMatch(),blocked=entered&&platform.touchControls&&!landscape;
     const inputReady=platform.touchControls||pointerLocked();
+    const playSurfaceReady=platform.touchControls?(entered&&landscape):true;
     return Object.freeze({
       location,inMatch:match,inLobby:inLobby(),paused:match?paused:false,pauseReason:match?pauseReason:'',panel,connecting,connectionText,
       immersive:entered,fullscreen:fullscreen(),standalone:platform.standalone,touchControls:platform.touchControls,landscapeReady:landscape,orientationBlocked:blocked,
-      hidden:document.hidden,inputReady,canPlay:entered&&landscape&&match&&!paused&&!panel&&!connecting&&!document.hidden&&inputReady,
+      hidden:document.hidden,inputReady,canPlay:playSurfaceReady&&match&&!paused&&!panel&&!connecting&&!document.hidden,
       viewport:Object.freeze({...viewport}),fullscreenSupported:fullscreenSupported(),
     });
   }
   const visible=(el,show)=>el?.classList.toggle('hide',!show);
 
   function render(reason='sync'){
-    const s=snapshot(),matchUsable=s.immersive&&!s.orientationBlocked,frontUsable=platform.touchControls?matchUsable:true;
+    const s=snapshot(),matchUsable=platform.touchControls?(s.immersive&&!s.orientationBlocked):true,frontUsable=platform.touchControls?matchUsable:true;
     visible(elements.entry,platform.touchControls&&!s.immersive);
     visible(elements.rotate,platform.touchControls&&s.immersive&&s.orientationBlocked);
     visible(elements.menu,frontUsable&&s.location==='menu'&&!s.panel&&!s.connecting);
@@ -134,10 +137,13 @@ export function createSessionShell({
     }
     return platform.touchControls?true:requestPointerLock();
   }
+  async function capturePointerFromGesture(){return platform.touchControls?true:requestPointerLock();}
   async function enterMatch(){
     location='match';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
-    if(!immersive()||!landscapeReady()){paused=true;pauseReason=!immersive()?'fullscreen':'orientation';return render('match-blocked');}
-    if(!platform.touchControls&&!pointerLocked()){paused=true;pauseReason='pointer';return render('match-pointer');}
+    // Touch play still requires the immersive landscape surface. Desktop play
+    // must not depend on browser-gated fullscreen/pointer-lock because remote
+    // players enter the match from a WebSocket event, not a user gesture.
+    if(platform.touchControls&&(!immersive()||!landscapeReady())){paused=true;pauseReason=!immersive()?'fullscreen':'orientation';return render('match-blocked');}
     paused=false;pauseReason='';return render('match-enter');
   }
   function pause(reason='pause'){
@@ -146,12 +152,13 @@ export function createSessionShell({
   }
   async function resumeFromGesture(){
     if(!inMatch()||panel)return false;
-    if(!immersive()){
-      if(!(await requestFullscreen()))return false;
-      await lockLandscape();syncViewport();
-    }
-    if(!landscapeReady())return false;
-    if(!platform.touchControls&&!(await requestPointerLock()))return false;
+    if(platform.touchControls){
+      if(!immersive()){
+        if(!(await requestFullscreen()))return false;
+        await lockLandscape();syncViewport();
+      }
+      if(!landscapeReady())return false;
+    }else if(!(await requestPointerLock()))return false;
     paused=false;pauseReason='';render('resume');return true;
   }
   function openPanel(name){
@@ -169,7 +176,13 @@ export function createSessionShell({
     if(!immersive()){if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();unlockLandscape();}
     syncViewport();render('fullscreen');
   }
-  function pointerLockChanged(){if(platform.touchControls||!inMatch()||paused)return;if(!pointerLocked())pause('pointer');}
+  function pointerLockChanged(){
+    if(platform.touchControls)return;
+    const locked=pointerLocked();
+    if(locked){hadPointerLock=true;return;}
+    const lostOwnedPointer=hadPointerLock;hadPointerLock=false;
+    if(lostOwnedPointer&&inMatch()&&!paused)pause('pointer');
+  }
   function visibilityChanged(){if(document.hidden&&inMatch()&&!paused)pause('background');}
   const fullscreenEvent=('fullscreenEnabled'in document||'fullscreenElement'in document)?'fullscreenchange':'webkitfullscreenchange';
   document.addEventListener(fullscreenEvent,fullscreenChanged);document.addEventListener('pointerlockchange',pointerLockChanged);document.addEventListener('pointerlockerror',()=>{if(!platform.touchControls&&inMatch()&&!paused)pause('pointer');onPointerLockUnavailable();});document.addEventListener('visibilitychange',visibilityChanged);addEventListener('pagehide',visibilityChanged);
@@ -177,7 +190,7 @@ export function createSessionShell({
   function start(){syncViewport();onViewport({...viewport});return render('start');}
   return {
     platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
-    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,enterMatch,pause,resumeFromGesture,openPanel,closePanel,leaveToMenu,
+    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,pause,resumeFromGesture,openPanel,closePanel,leaveToMenu,
     destroy(){resizeObserver?.disconnect();if(!resizeObserver)removeEventListener('resize',viewportChanged);document.removeEventListener(fullscreenEvent,fullscreenChanged);document.removeEventListener('pointerlockchange',pointerLockChanged);document.removeEventListener('visibilitychange',visibilityChanged);removeEventListener('pagehide',visibilityChanged);}
   };
 }

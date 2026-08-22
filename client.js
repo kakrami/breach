@@ -2,17 +2,17 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.25.5';
+} from './world-geometry.js?v=1.25.6';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.25.5';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.25.5';
-import { worldBlockedAt, worldMoveBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.25.5';
-import { createAudioEngine } from './audio-engine.js?v=1.25.5';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.25.5';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.25.5';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.25.5';
+} from './game-config.js?v=1.25.6';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.25.6';
+import { worldBlockedAt, worldMoveBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.25.6';
+import { createAudioEngine } from './audio-engine.js?v=1.25.6';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.25.6';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.25.6';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.25.6';
 
 let THREE = null;
 
@@ -216,7 +216,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.25.5';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.25.6';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -787,6 +787,7 @@ async function resumeFromGesture(){
 function onCanvasPointerDown(e){
   if(!shell.canPlay)return;
   ensureAudio();
+  if(!isTouch&&document.pointerLockElement!==canvas){void shell.capturePointerFromGesture();return;}
   const p=canvasPoint(e);
   if(isTouch || e.pointerType==='touch' || e.pointerType==='pen'){
     e.preventDefault();
