@@ -2,17 +2,17 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.25.6';
+} from './world-geometry.js?v=1.25.8';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.25.6';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.25.6';
-import { worldBlockedAt, worldMoveBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.25.6';
-import { createAudioEngine } from './audio-engine.js?v=1.25.6';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.25.6';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.25.6';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.25.6';
+} from './game-config.js?v=1.25.8';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.25.8';
+import { worldBlockedAt, worldMoveBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.25.8';
+import { createAudioEngine } from './audio-engine.js?v=1.25.8';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.25.8';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.25.8';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.25.8';
 
 let THREE = null;
 
@@ -87,7 +87,8 @@ const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobb
 const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText');
 document.querySelectorAll('[data-app-version]').forEach(el=>{el.textContent=`Version ${APP_VERSION}`;});
 
-const platform=detectInputPlatform(),isTouch=platform.touchControls;
+const platform=detectInputPlatform();
+let isTouch=platform.touchControls;
 const clientId=getClientId(),clientAuth=getClientAuth();
 nameInput.value=localStorage.getItem('breachName')||`Player${Math.floor(Math.random()*90+10)}`;
 let preferredTeam=localStorage.getItem('breachTeam')==='red'?'red':'blue';
@@ -161,6 +162,16 @@ const touchRoles = new Map();
 let mouseFireDown=false;
 const touchVisual = { jumpUntil:0, fireUntil:0, reloadUntil:0, swapUntil:0, modeUntil:0, flashUntil:0, stickyUntil:0 };
 
+function activateTouchInputMode(){
+  if(isTouch)return false;
+  isTouch=true;
+  appRoot.classList.add('touch');
+  appRoot.classList.remove('desktop');
+  hudLayout=null;
+  if(renderer){applyGraphicsQuality();onResize();}
+  return true;
+}
+
 const killFeed = [];
 let minimapStaticCache=null;
 let hudLayout=null;
@@ -216,7 +227,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.25.6';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.25.8';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -787,9 +798,11 @@ async function resumeFromGesture(){
 function onCanvasPointerDown(e){
   if(!shell.canPlay)return;
   ensureAudio();
-  if(!isTouch&&document.pointerLockElement!==canvas){void shell.capturePointerFromGesture();return;}
+  const directTouch=e.pointerType==='touch'||e.pointerType==='pen';
+  if(directTouch)activateTouchInputMode();
+  if(!directTouch&&!isTouch&&document.pointerLockElement!==canvas){void shell.capturePointerFromGesture();return;}
   const p=canvasPoint(e);
-  if(isTouch || e.pointerType==='touch' || e.pointerType==='pen'){
+  if(isTouch||directTouch){
     e.preventDefault();
     try{canvas.setPointerCapture(e.pointerId)}catch{}
     const layout=hudLayout||computeHudLayout();
@@ -1572,6 +1585,19 @@ function updateMovement(dt){
     const pace=THREE.MathUtils.lerp(530,310,moveRatio);
     if(now>=nextFootstepAt){soundFootstep(footstepSide,THREE.MathUtils.lerp(.22,.38,moveRatio));footstepSide^=1;nextFootstepAt=now+pace;}
   }else if(!onGround||planarSpeed<=.25)nextFootstepAt=Math.max(nextFootstepAt,now+90);
+}
+
+function remoteActorBlocked(x,z,y,fromX,fromZ,playerHeight=currentPlayerHeight()){
+  for(const r of remotes.values()){
+    if(!r||Number(r.hp)<=0)continue;
+    const actor=r.target||r.group?.position;if(!actor)continue;
+    const ax=Number(actor.x),ay=Number(actor.y),az=Number(actor.z);if(!Number.isFinite(ax)||!Number.isFinite(ay)||!Number.isFinite(az))continue;
+    const actorHeight=r.crouched?CROUCH_HEIGHT:PLAYER_HEIGHT;
+    if(y+playerHeight-.08<=ay||y>=ay+actorHeight-.08)continue;
+    const minDist=PLAYER_RADIUS*2+.02,newDist=Math.hypot(x-ax,z-az),oldDist=Math.hypot(fromX-ax,fromZ-az);
+    if(newDist<minDist&&(oldDist>=minDist||newDist<oldDist-.002))return true;
+  }
+  return false;
 }
 
 function moveHorizontal(dx,dz){

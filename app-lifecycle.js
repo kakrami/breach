@@ -11,8 +11,13 @@ function measure(el){
   return {w:Math.max(1,Math.round(r.width||innerWidth||1)),h:Math.max(1,Math.round(r.height||innerHeight||1))};
 }
 export function detectInputPlatform(){
-  const touch=Number(navigator.maxTouchPoints)>0;
-  return Object.freeze({touchControls:touch&&(matchMedia('(pointer: coarse)').matches||matchMedia('(hover: none)').matches),standalone:standaloneMode()});
+  const touchPoints=Math.max(0,Number(navigator.maxTouchPoints)||0),touchCapable=touchPoints>0;
+  const media=query=>typeof matchMedia==='function'&&matchMedia(query).matches;
+  const ua=String(navigator.userAgent||''),platformName=String(navigator.platform||'');
+  const mobileUa=navigator.userAgentData?.mobile===true||/Android|iPhone|iPod|Mobile/i.test(ua);
+  const ipadDesktopUa=touchPoints>1&&(/iPad/i.test(ua)||(/Macintosh|MacIntel/i.test(`${ua} ${platformName}`)));
+  const touchControls=touchCapable&&(media('(pointer: coarse)')||media('(hover: none)')||mobileUa||ipadDesktopUa);
+  return Object.freeze({touchControls,touchCapable,standalone:standaloneMode()});
 }
 
 export function createSessionShell({
@@ -185,7 +190,7 @@ export function createSessionShell({
   }
   function visibilityChanged(){if(document.hidden&&inMatch()&&!paused)pause('background');}
   const fullscreenEvent=('fullscreenEnabled'in document||'fullscreenElement'in document)?'fullscreenchange':'webkitfullscreenchange';
-  document.addEventListener(fullscreenEvent,fullscreenChanged);document.addEventListener('pointerlockchange',pointerLockChanged);document.addEventListener('pointerlockerror',()=>{if(!platform.touchControls&&inMatch()&&!paused)pause('pointer');onPointerLockUnavailable();});document.addEventListener('visibilitychange',visibilityChanged);addEventListener('pagehide',visibilityChanged);
+  document.addEventListener(fullscreenEvent,fullscreenChanged);document.addEventListener('pointerlockchange',pointerLockChanged);document.addEventListener('pointerlockerror',()=>{onPointerLockUnavailable();});document.addEventListener('visibilitychange',visibilityChanged);addEventListener('pagehide',visibilityChanged);
 
   function start(){syncViewport();onViewport({...viewport});return render('start');}
   return {
