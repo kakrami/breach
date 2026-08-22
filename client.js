@@ -6,10 +6,10 @@ import {
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.24.1';
+} from './game-config.js?v=1.24.2';
 import { createProjectileCollisionGrid } from './collision-grid.js?v=1.23.0';
 import { worldBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.23.0';
-import { createAudioEngine } from './audio-engine.js?v=1.23.0';
+import { createAudioEngine } from './audio-engine.js?v=1.24.2';
 import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.24.1';
 import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.23.0';
 import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.23.0';
@@ -143,9 +143,13 @@ let traversal=null,traversalSeq=0,traversalIntentUntil=0,traversalIntentSeq=0,tr
 let onGround = true, lastShotVisualAt = 0, fireReadyAt = freshClientFireReady(), lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0;
 let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,grounded:true,moveX:0,moveZ:0}, localEquipmentCooldownUntil=0;
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0,nextFootstepAt=0,footstepSide=0,shotgunPumpStartedAt=0,shotgunPumpSoundPlayed=false;
-let gameAudioPreparePromise=null,gameAudioReady=false;
+let gameAudioPreloadPromise=null,gameAudioPreparePromise=null,audioUnlockPromise=null,gameAudioReady=false;
 const DEFAULT_PLAYER_SETTINGS=Object.freeze({lookSensitivity:1,adsSensitivity:1,touchSensitivity:1,masterVolume:.85,sfxVolume:.9,musicVolume:.55,graphics:isTouch?'medium':'high'});
-function loadPlayerSettings(){try{return{...DEFAULT_PLAYER_SETTINGS,...JSON.parse(localStorage.getItem('breachPlayerSettings')||'{}')}}catch{return{...DEFAULT_PLAYER_SETTINGS}}}
+function loadPlayerSettings(){
+  let saved={};try{saved=JSON.parse(localStorage.getItem('breachPlayerSettings')||'{}')||{}}catch{}
+  const numeric=(key,min,max)=>{const raw=saved[key];if(raw===null||raw===undefined||raw==='')return DEFAULT_PLAYER_SETTINGS[key];const value=Number(raw);return Number.isFinite(value)?Math.max(min,Math.min(max,value)):DEFAULT_PLAYER_SETTINGS[key];};
+  return {lookSensitivity:numeric('lookSensitivity',.5,2),adsSensitivity:numeric('adsSensitivity',.35,1.25),touchSensitivity:numeric('touchSensitivity',.5,2),masterVolume:numeric('masterVolume',0,1),sfxVolume:numeric('sfxVolume',0,1),musicVolume:numeric('musicVolume',0,1),graphics:['low','medium','high'].includes(saved.graphics)?saved.graphics:DEFAULT_PLAYER_SETTINGS.graphics};
+}
 let playerSettings=loadPlayerSettings();
 const gameAudio=createAudioEngine({cues:SOUND_CUES,getVolumes:()=>({master:masterMuted?0:playerSettings.masterVolume,sfx:playerSettings.sfxVolume,music:playerSettings.musicVolume})});
 let introMusicHandle=null;
@@ -264,17 +268,19 @@ async function ensureThreeEngine(){
 }
 
 async function prepareGameRuntime(){
-  ensureAudio();
+  // Audio starts unlocking immediately inside the click/tap, but audio readiness
+  // never blocks networking or 3D startup. Pending cues wait for the engine.
+  const unlockPromise=ensureAudio();
   const engineOk=await ensureThreeEngine();
   if(!engineOk)return false;
-  await ensureGameAudioReady();
+  void unlockPromise.then(ok=>{if(ok)void ensureGameAudioReady();});
   return true;
 }
 
 bindUI();
 refreshMatches();
 setInterval(() => { if (!shell.inMatch) refreshMatches(); }, 7000);
-void prepareAllGameAudio();
+void preloadGameAudioAssets();
 
 function getClientId(){
   let id = localStorage.getItem('breachClient');
@@ -381,13 +387,30 @@ function syncPauseContext(){
 
 function weaponSoundCueIds(weapon=currentWeapon){return weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='assault'?['shotAssault','reloadAssault']:['shotPistol','reloadPistol'];}
 function warmWeaponAudio(weapon=currentWeapon){for(const id of weaponSoundCueIds(weapon))gameAudio.load(id);}
+function preloadGameAudioAssets(){
+  if(gameAudioPreloadPromise)return gameAudioPreloadPromise;
+  gameAudioPreloadPromise=gameAudio.preloadAll().then(report=>{if(report.failed)console.warn(`Breach audio preload: ${report.failed}/${report.total} assets failed`);return report;}).finally(()=>{gameAudioPreloadPromise=null;});
+  return gameAudioPreloadPromise;
+}
+function ensureAudio(){
+  audioUnlockPromise=gameAudio.unlock();
+  void audioUnlockPromise.then(ok=>{if(ok)void prepareAllGameAudio();});
+  return audioUnlockPromise;
+}
 function prepareAllGameAudio(){
+  if(gameAudioReady)return Promise.resolve(true);
   if(gameAudioPreparePromise)return gameAudioPreparePromise;
-  gameAudioPreparePromise=gameAudio.preloadAll().then(()=>{gameAudioReady=true;return true;});
+  gameAudioPreparePromise=(async()=>{
+    const unlocked=await (audioUnlockPromise||Promise.resolve(false));
+    if(!unlocked)return false;
+    const report=await gameAudio.prepareAll();
+    gameAudioReady=report.failed===0&&report.decoded===report.total;
+    if(!gameAudioReady)console.warn(`Breach audio decode: ${report.failed}/${report.total} assets failed`);
+    return gameAudioReady;
+  })().finally(()=>{if(!gameAudioReady)gameAudioPreparePromise=null;});
   return gameAudioPreparePromise;
 }
-async function ensureGameAudioReady(){if(gameAudioReady)return true;await prepareAllGameAudio();return true;}
-function ensureAudio(){return gameAudio.context();}
+async function ensureGameAudioReady(){if(gameAudioReady)return true;return prepareAllGameAudio();}
 function playSoundCue(cueId,volume=1,override={}){return gameAudio.play(cueId,volume,override);}
 function spatialAudioParams(x,y,z,maxDistance=60){
   if(!position)return{volume:.08,pan:0};
@@ -1807,4 +1830,5 @@ function semtexBeepInterval(remainingMs){const p=1-THREE.MathUtils.clamp(Number(
 function soundSemtexBeep(g,remainingMs){if(!g?.root)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10,interval=semtexBeepInterval(remainingMs)/1000,pos=g.root.position;playSpatialCue('semtexBeep',pos.x,pos.y,pos.z,44,1,{playbackRate:rate,maxDuration:Math.max(.055,Math.min(.18,interval*.72))});}
 
 function soundTacticalDetonation(kind,m){if(!m)return;playSpatialCue(kind==='flash'?'flashDetonate':'grenadeExplosion',Number(m.x)||0,Number(m.y)||0,Number(m.z)||0,kind==='sticky'?70:58,1);}
-document.addEventListener('pointerdown',()=>{ensureAudio();if(!shell.inMatch&&!masterMuted)startIntroMusic();},{once:true});
+document.addEventListener('pointerdown',()=>{void ensureAudio();if(!shell.inMatch&&!masterMuted)startIntroMusic();},{capture:true});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void gameAudio.resume();});
