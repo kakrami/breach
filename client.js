@@ -2,18 +2,18 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.26.1';
+} from './world-geometry.js?v=1.26.2';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.26.1';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.26.1';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.26.1';
-import { createAudioEngine } from './audio-engine.js?v=1.26.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.26.1';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.26.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.26.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.26.1';
+} from './game-config.js?v=1.26.2';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.26.2';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.26.2';
+import { createAudioEngine } from './audio-engine.js?v=1.26.2';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.26.2';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.26.2';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.26.2';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.26.2';
 
 let THREE = null;
 
@@ -228,7 +228,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.26.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.26.2';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1208,7 +1208,7 @@ function resetViewVertical(){viewFeetY=position?position.y:NaN;}
 function clearCorrectionView(){correctionViewX=0;correctionViewY=0;correctionViewZ=0;}
 function traversalPlanFromServer(m){
   const durationMs=Math.max(1,Number(m.durationMs)||1),elapsed=Math.max(0,serverNow()-(Number(m.startedAt)||serverNow()));
-  return {seq:Math.max(0,Math.floor(Number(m.seq)||0)),mode:m.mode==='vault'?'vault':'mantle',role:String(m.role||''),startX:Number(m.startX)||0,startY:Number(m.startY)||0,startZ:Number(m.startZ)||0,endX:Number(m.endX)||0,endY:Number(m.endY)||0,endZ:Number(m.endZ)||0,peakY:Number(m.peakY)||Number(m.endY)||0,durationMs,startedAt:performance.now()-Math.min(durationMs,elapsed)};
+  return {seq:Math.max(0,Math.floor(Number(m.seq)||0)),mode:m.mode==='vault'?'vault':'mantle',role:String(m.role||''),portalId:String(m.portalId||''),startX:Number(m.startX)||0,startY:Number(m.startY)||0,startZ:Number(m.startZ)||0,endX:Number(m.endX)||0,endY:Number(m.endY)||0,endZ:Number(m.endZ)||0,peakY:Number(m.peakY)||Number(m.endY)||0,durationMs,startedAt:performance.now()-Math.min(durationMs,elapsed),endGrounded:m.endGrounded!==false,exitVelocityY:Number.isFinite(Number(m.exitVelocityY))?Number(m.exitVelocityY):0};
 }
 function handleTraversalMessage(m){
   if(m.id===clientId){
@@ -1267,7 +1267,7 @@ function tryTraversal({vaultOnly=false}={}){
 function updateTraversal(now){
   if(!traversal)return false;const pose=traversalPose(traversal,now);if(!pose){traversal=null;return false;}
   position.set(pose.x,pose.y,pose.z);verticalVelocity=0;onGround=false;
-  if(pose.done){position.set(traversal.endX,traversal.endY,traversal.endZ);traversal=null;onGround=true;landingKick=.32;nextFootstepAt=now+120;soundLanding(.28);sendCurrentState(true);}
+  if(pose.done){const finished=traversal;position.set(finished.endX,finished.endY,finished.endZ);traversal=null;onGround=finished.endGrounded!==false;verticalVelocity=onGround?0:(Number.isFinite(Number(finished.exitVelocityY))?Number(finished.exitVelocityY):-1.15);if(onGround){lastGroundedAt=now;landingKick=.32;nextFootstepAt=now+120;soundLanding(.28);}else{landingKick=0;}sendCurrentState(true);}
   return true;
 }
 function startPlayerJump(now=performance.now(),{allowTraversal=true}={}){
