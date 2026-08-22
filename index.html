@@ -7,10 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.24.2">
-<title>Breach v1.24.2</title>
-<link rel="stylesheet" href="ui.css?v=1.24.2">
-<link rel="stylesheet" href="lobby.css?v=1.24.2">
+<link rel="manifest" href="manifest.webmanifest?v=1.25.0">
+<title>Breach v1.25.0</title>
+<link rel="stylesheet" href="ui.css?v=1.25.0">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -53,17 +52,15 @@
   </section>
 
   <section id="menu" class="menu-screen hide" aria-label="Breach main menu">
-    <div id="menuShell" class="menu-shell" data-deploy-mode="create">
-      <header class="menu-header">
+    <div id="menuShell" class="front-shell" data-deploy-mode="create">
+      <header class="front-header">
         <div class="menu-brand">
           <div class="menu-logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
           <div><strong>BREACH</strong><span data-app-version></span></div>
         </div>
-        <nav class="mode-tabs" aria-label="Play mode">
-          <button type="button" class="mode-tab active" data-deploy-tab="create" aria-selected="true"><svg class="mini-icon"><use href="#i-plus"/></svg><span>HOST</span></button>
-          <button type="button" class="mode-tab" data-deploy-tab="join" aria-selected="false"><svg class="mini-icon"><use href="#i-enter"/></svg><span>JOIN</span></button>
-          <button type="button" class="mode-tab" data-deploy-tab="live" aria-selected="false"><span class="live-dot"></span><span>LIVE</span><span id="matchCount" class="tab-count"></span></button>
-        </nav>
+        <div class="front-profile">
+          <label><span>CALLSIGN</span><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
+        </div>
         <div class="menu-actions">
           <button id="musicBtn" class="square-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button>
           <button id="settingsBtn" class="square-btn" title="Settings" aria-label="Settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button>
@@ -71,42 +68,31 @@
         </div>
       </header>
 
-      <section class="profile-strip" aria-label="Operator setup">
-        <label class="profile-name"><span>CALLSIGN</span><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
-        <div id="setupTeamGroup" class="profile-group"><span>TEAM</span><div class="segmented team-picker" role="radiogroup" aria-label="Team selection"><button type="button" class="team-option blue" data-team-choice="blue" aria-pressed="true"><i></i><b>BLUE</b></button><button type="button" class="team-option red" data-team-choice="red" aria-pressed="false"><i></i><b>RED</b></button></div></div>
-        <div class="profile-group weapon-field"><span>PRIMARY</span><div class="segmented weapon-picker" role="radiogroup" aria-label="Primary weapon"><button type="button" class="weapon-option" data-primary-choice="assault" aria-pressed="true"><b>AR</b><small>ASSAULT</small></button><button type="button" class="weapon-option" data-primary-choice="shotgun" aria-pressed="false"><b>SG</b><small>SHOTGUN</small></button><button type="button" class="weapon-option" data-primary-choice="sniper" aria-pressed="false"><b>SR</b><small>SNIPER</small></button></div></div>
-      </section>
+      <div class="front-body">
+        <nav class="front-nav" aria-label="Multiplayer menu">
+          <button type="button" class="front-nav-button active" data-deploy-tab="create" aria-selected="true"><svg class="ui-icon"><use href="#i-plus"/></svg><span><strong>CREATE MATCH</strong><small>Open a new lobby</small></span></button>
+          <button type="button" class="front-nav-button" data-deploy-tab="join" aria-selected="false"><svg class="ui-icon"><use href="#i-enter"/></svg><span><strong>JOIN PRIVATE</strong><small>Enter a room code</small></span></button>
+          <button type="button" class="front-nav-button" data-deploy-tab="live" aria-selected="false"><span class="live-dot"></span><span><strong>LIVE MATCHES</strong><small>Browse open rooms</small></span><b id="matchCount" class="tab-count"></b></button>
+        </nav>
 
-      <section class="play-surface">
-        <div class="deploy-view create-view" data-deploy-view="create" aria-hidden="false">
-          <div class="game-mode-config">
-            <span class="game-mode-label">GAME MODE</span>
-            <div class="game-mode-picker" role="radiogroup" aria-label="Game mode">
-              <button type="button" class="game-mode-choice active" data-game-mode-choice="tdm" aria-pressed="true"><strong>TEAM DEATHMATCH</strong><small>Teams · first to 30</small></button>
-              <button type="button" class="game-mode-choice" data-game-mode-choice="ffa" aria-pressed="false"><strong>FREE FOR ALL</strong><small>Everyone is hostile</small></button>
-              <button type="button" class="game-mode-choice" data-game-mode-choice="sandbox" aria-pressed="false"><strong>SANDBOX</strong><small>No score or time limit</small></button>
+        <section class="front-content">
+          <div class="deploy-view front-create" data-deploy-view="create" aria-hidden="false">
+            <div class="front-hero">
+              <div><div class="eyebrow">MULTIPLAYER</div><h1>Create a lobby</h1><p>Create the room first. Game mode, bots, teams, loadouts, God Mode and match rules are configured together inside the lobby.</p></div>
+              <button id="createBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-plus"/></svg><span>CREATE LOBBY</span></button>
             </div>
           </div>
-          <div class="host-grid">
-            <label id="blueBotWrap"><span>BLUE BOTS</span><select id="blueBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-            <label id="redBotWrap"><span>RED BOTS</span><select id="redBotCount" class="input"><option value="0">0</option><option value="1" selected>1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-            <label id="ffaBotWrap" class="hide"><span>BOTS</span><select id="ffaBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-            <label><span>DIFFICULTY</span><select id="botDifficulty" class="input"><option value="easy">Easy</option><option value="normal" selected>Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
-            <button id="godToggle" type="button" class="god-toggle" aria-pressed="false"><svg class="mini-icon"><use href="#i-shield"/></svg><span>GOD MODE</span><b id="godState">OFF</b></button>
+
+          <div class="deploy-view front-join" data-deploy-view="join" hidden inert aria-hidden="true">
+            <div class="join-panel"><div><div class="eyebrow">PRIVATE MATCH</div><h1>Join by code</h1><p>Enter the four-character room code from the host.</p></div><div class="join-controls"><input id="codeInput" class="input code-input" maxlength="4" autocapitalize="characters" autocomplete="off" placeholder="ABCD" aria-label="Match code"><button id="joinBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-enter"/></svg><span>JOIN LOBBY</span></button></div></div>
           </div>
-          <div class="play-action-row"><span id="botTotal" class="bot-total">2 / 8 bots</span><button id="createBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-play"/></svg><span>CREATE LOBBY</span></button></div>
-        </div>
 
-        <div class="deploy-view join-view" data-deploy-view="join" hidden inert aria-hidden="true">
-          <div class="join-panel"><div><div class="eyebrow">PRIVATE MATCH</div><h1>Enter room code</h1><p>Use the four-character code from the host.</p></div><div class="join-controls"><input id="codeInput" class="input code-input" maxlength="4" autocapitalize="characters" autocomplete="off" placeholder="ABCD" aria-label="Match code"><button id="joinBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-enter"/></svg><span>JOIN MATCH</span></button></div></div>
-        </div>
-
-        <div class="deploy-view live-view" data-deploy-view="live" hidden inert aria-hidden="true">
-          <div class="live-toolbar"><div><div class="eyebrow">PUBLIC ROOMS</div><h1>Live matches</h1></div><button id="refreshBtn" type="button" class="small-btn"><svg class="mini-icon"><use href="#i-refresh"/></svg><span>REFRESH</span></button></div>
-          <div id="matchList" class="match-list" aria-live="polite"><div class="empty">Loading live matches…</div></div>
-        </div>
-      </section>
-
+          <div class="deploy-view front-live" data-deploy-view="live" hidden inert aria-hidden="true">
+            <div class="live-toolbar"><div><div class="eyebrow">PUBLIC ROOMS</div><h1>Live matches</h1></div><button id="refreshBtn" type="button" class="small-btn"><svg class="mini-icon"><use href="#i-refresh"/></svg><span>REFRESH</span></button></div>
+            <div id="matchList" class="match-list" aria-live="polite"><div class="empty">Loading live matches…</div></div>
+          </div>
+        </section>
+      </div>
       <footer id="menuStatus" class="menu-status" role="status" aria-live="polite">Ready.</footer>
     </div>
   </section>
@@ -120,6 +106,9 @@
           <p id="lobbyModeDescription">Teams compete for the elimination limit.</p>
         </div>
         <div class="lobby-header-actions">
+          <button id="lobbyMusicBtn" class="square-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="lobbyMusicIconUse" href="#i-sound"/></svg></button>
+          <button id="lobbySettingsBtn" class="square-btn" title="Player settings" aria-label="Player settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button>
+          <button id="lobbyExitFullscreenBtn" class="square-btn" title="Exit fullscreen" aria-label="Exit fullscreen"><svg class="ui-icon"><use href="#i-full"/></svg></button>
           <button id="lobbyCopyBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-copy"/></svg><span>INVITE</span></button>
           <button id="lobbyLeaveBtn" class="secondary-btn danger"><svg class="mini-icon"><use href="#i-exit"/></svg><span>LEAVE</span></button>
         </div>
@@ -131,41 +120,29 @@
           <div id="lobbyRoster" class="lobby-roster"></div>
         </section>
 
-        <aside class="lobby-operator-panel">
-          <div class="lobby-section-head"><div><span class="eyebrow">OPERATOR</span><h2>Operator</h2></div><span class="lobby-secondary">Pistol secondary</span></div>
+        <div class="lobby-side-stack">
+          <section class="lobby-operator-panel">
+            <div class="lobby-section-head"><div><span class="eyebrow">YOUR OPERATOR</span><h2>Loadout</h2></div><span class="lobby-secondary">Pistol secondary</span></div>
+            <div id="lobbyTeamGroup" class="lobby-control-group compact-group"><span>TEAM</span><div class="lobby-team-picker"><button type="button" class="lobby-team-choice blue" data-lobby-team-choice="blue"><i></i><strong>BLUE</strong></button><button type="button" class="lobby-team-choice red" data-lobby-team-choice="red"><i></i><strong>RED</strong></button></div></div>
+            <div class="lobby-control-group compact-group"><span>PRIMARY</span><div class="lobby-loadout-picker"><button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="assault" aria-label="Assault Rifle"><b>AR</b><strong>ASSAULT</strong></button><button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="shotgun" aria-label="Shotgun"><b>SG</b><strong>SHOTGUN</strong></button><button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="sniper" aria-label="Sniper Rifle"><b>SR</b><strong>SNIPER</strong></button></div></div>
+            <div id="lobbyGodWrap" class="lobby-control-group compact-group hide"><button id="lobbyGodBtn" type="button" class="lobby-god-button" aria-pressed="false"><svg class="mini-icon"><use href="#i-shield"/></svg><strong>GOD MODE</strong><b id="lobbyGodState">OFF</b></button></div>
+          </section>
 
-          <div id="lobbyTeamGroup" class="lobby-control-group">
-            <span>TEAM</span>
-            <div class="lobby-team-picker">
-              <button type="button" class="lobby-team-choice blue" data-lobby-team-choice="blue"><i></i><strong>BLUE</strong></button>
-              <button type="button" class="lobby-team-choice red" data-lobby-team-choice="red"><i></i><strong>RED</strong></button>
-            </div>
-          </div>
-
-          <div class="lobby-control-group">
-            <span>PRIMARY LOADOUT</span>
-            <div class="lobby-loadout-picker">
-              <button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="assault"><b>AR</b><strong>ASSAULT</strong><small>Balanced</small></button>
-              <button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="shotgun"><b>SG</b><strong>SHOTGUN</strong><small>Close range</small></button>
-              <button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="sniper"><b>SR</b><strong>SNIPER</strong><small>Long range</small></button>
-            </div>
-          </div>
-
-          <div id="lobbyAdminControls" class="lobby-admin-controls hide">
-            <div class="lobby-control-group">
-              <span>HOST OPTIONS</span>
-              <button id="lobbyGodBtn" type="button" class="lobby-god-button" aria-pressed="false"><svg class="mini-icon"><use href="#i-shield"/></svg><strong>GOD MODE</strong><b id="lobbyGodState">OFF</b></button>
-            </div>
-            <div class="lobby-control-group">
-              <span>GAME MODE</span>
-              <div class="lobby-mode-picker">
-                <button type="button" data-lobby-mode-choice="tdm">TDM</button>
-                <button type="button" data-lobby-mode-choice="ffa">FFA</button>
-                <button type="button" data-lobby-mode-choice="sandbox">SANDBOX</button>
+          <section class="lobby-setup-panel">
+            <div class="lobby-section-head"><div><span class="eyebrow">MATCH SETUP</span><h2>Rules</h2></div><span id="lobbySetupOwnerLabel" class="lobby-secondary">Host controls</span></div>
+            <div id="lobbyHostSetup" class="lobby-host-setup hide">
+              <div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button type="button" data-lobby-mode-choice="tdm">TDM</button><button type="button" data-lobby-mode-choice="ffa">FFA</button><button type="button" data-lobby-mode-choice="sandbox">SANDBOX</button></div></div>
+              <div class="lobby-setup-row">
+                <label id="lobbyBlueBotWrap"><span>BLUE BOTS</span><select id="lobbyBlueBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+                <label id="lobbyRedBotWrap"><span>RED BOTS</span><select id="lobbyRedBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+                <label id="lobbyFfaBotWrap" class="hide"><span>BOTS</span><select id="lobbyFfaBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+                <label><span>DIFFICULTY</span><select id="lobbyBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
               </div>
+              <button id="lobbyMatchSettingsBtn" class="secondary-btn lobby-match-settings"><svg class="mini-icon"><use href="#i-settings"/></svg><span>ADVANCED MATCH SETTINGS</span></button>
             </div>
-          </div>
-        </aside>
+            <div id="lobbyGuestSetup" class="lobby-guest-setup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><small>The host controls match rules. You can change your team and loadout while you wait.</small></div>
+          </section>
+        </div>
       </div>
 
       <footer class="lobby-footer">
@@ -247,6 +224,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.24.2"></script>
+<script type="module" src="client.js?v=1.25.0"></script>
 </body>
 </html>
