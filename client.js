@@ -1,19 +1,19 @@
 window.__breachModuleBooted=true;
 import {
-  PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
-  terrainHeight, naturalGroundBase, worldSupportHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.26.0';
+  PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
+  terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
+} from './world-geometry.js?v=1.26.1';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.26.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.26.0';
-import { worldBlockedAt, worldMoveBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.26.0';
-import { createAudioEngine } from './audio-engine.js?v=1.26.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.26.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.26.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.26.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.26.0';
+} from './game-config.js?v=1.26.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.26.1';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.26.1';
+import { createAudioEngine } from './audio-engine.js?v=1.26.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.26.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.26.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.26.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.26.1';
 
 let THREE = null;
 
@@ -228,7 +228,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.26.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.26.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1200,7 +1200,7 @@ function showToast(text){toastText=String(text||'');toastUntil=performance.now()
 function syncLocalStatus(){if(hp<=0)setAim(false);syncPauseContext();}
 
 function currentPlayerHeight(){return crouched?CROUCH_HEIGHT:PLAYER_HEIGHT;}
-function canStandHere(){return !blocked(position.x,position.z,position.y,PLAYER_HEIGHT);}
+function canStandHere(){return !worldHeightExpansionBlockedAt(position.x,position.z,position.y,CROUCH_HEIGHT,PLAYER_HEIGHT,PLAYER_RADIUS);}
 function expFollow(current,target,rate,dt){return current+(target-current)*(1-Math.exp(-Math.max(0,rate)*Math.max(0,dt)));}
 function approachVector(x,z,targetX,targetZ,maxDelta){const dx=targetX-x,dz=targetZ-z,d=Math.hypot(dx,dz);if(d<=maxDelta||d<1e-7)return{x:targetX,z:targetZ};const scale=maxDelta/d;return{x:x+dx*scale,z:z+dz*scale};}
 function smoothstep01(value){const t=THREE.MathUtils.clamp(value,0,1);return t*t*(3-2*t);}
@@ -1271,7 +1271,10 @@ function updateTraversal(now){
   return true;
 }
 function startPlayerJump(now=performance.now(),{allowTraversal=true}={}){
-  if(crouched||crouchWanted){crouchWanted=false;if(!canStandHere()){crouched=true;showToast('NEED CLEARANCE');sendCurrentState(true);return false;}crouched=false;}
+  // A crouched player at a window/low barrier gets first chance to vault it.
+  // Only require standing headroom when an actual free jump is needed.
+  if((crouched||crouchWanted)&&allowTraversal&&tryTraversal())return true;
+  if(crouched||crouchWanted){crouchWanted=false;if(!canStandHere()){crouched=true;showToast('LOW CEILING');sendCurrentState(true);return false;}crouched=false;}
   if(allowTraversal&&onGround&&tryTraversal({vaultOnly:true}))return true;
   jumpBufferedUntil=0;jumpSeq+=1;verticalVelocity=Math.sqrt(2*worldSettings.movement.gravity*worldSettings.movement.jumpHeight);onGround=false;landingKick=0;sendCurrentState(true);soundJump();return true;
 }
@@ -1622,6 +1625,7 @@ function moveHorizontal(dx,dz){
   const next=sweepHorizontalMovement({
     x:position.x,y:position.y,z:position.z,dx,dz,grounded:onGround,arenaLimit:ARENA_LIMIT,followDrop:GROUND_FOLLOW_DROP,
     supportHeight:(x,z,y)=>worldSupportHeight(x,z,y,crouched),
+    stepUpHeight:(x,z,y,maxStep)=>worldStepUpHeight(x,z,y,maxStep,PLAYER_RADIUS),maxStepHeight:MAX_STEP_HEIGHT,
     blockedAt:(x,z,y,fromX,fromZ)=>worldMoveBlockedAt(x,z,y,fromX,fromZ,currentPlayerHeight(),PLAYER_RADIUS)||remoteActorBlocked(x,z,y,fromX,fromZ),
   });
   position.set(next.x,next.y,next.z);onGround=next.grounded;return next;
