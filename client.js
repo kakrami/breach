@@ -1,26 +1,36 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.32.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.32.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.32.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.32.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.34.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.34.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.34.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.34.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.34.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.34.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.34.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.34.0';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.32.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.32.0';
-import { createAudioEngine } from './audio-engine.js?v=1.32.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.32.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.32.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.32.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.32.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.32.0';
+} from './game-config.js?v=1.34.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.34.0';
+import { createAudioEngine } from './audio-engine.js?v=1.34.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.34.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.34.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.34.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.34.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.34.0';
 
 let THREE = null;
 
 // A room owns one authoritative map. Both maps export the same world contract,
 // so movement, traversal, minimap, rendering and prediction switch together.
 const {PLAYER_HEIGHT,PLAYER_RADIUS,ARENA_LIMIT,MAX_STEP_HEIGHT}=HighlandsGeometry;
+const CLIENT_WORLD_BUNDLES=Object.freeze({
+  highlands:Object.freeze({geometry:HighlandsGeometry,collision:HighlandsWorldCollision}),
+  depot:Object.freeze({geometry:DepotGeometry,collision:DepotWorldCollision}),
+  yard:Object.freeze({geometry:YardGeometry,collision:YardWorldCollision}),
+  rig:Object.freeze({geometry:RigGeometry,collision:RigWorldCollision}),
+});
 let currentMapId=DEFAULT_MAP_ID;
 let worldGeometry=HighlandsGeometry;
 let activeWorldCollision=HighlandsWorldCollision;
@@ -239,8 +249,9 @@ function rebuildTrajectoryCollision(){
 function setActiveMap(value,{rebuild=true}={}){
   const nextId=normalizeMapId(value),changed=nextId!==currentMapId;
   currentMapId=nextId;
-  worldGeometry=nextId==='depot'?DepotGeometry:HighlandsGeometry;
-  activeWorldCollision=nextId==='depot'?DepotWorldCollision:HighlandsWorldCollision;
+  const bundle=CLIENT_WORLD_BUNDLES[nextId]||CLIENT_WORLD_BUNDLES[DEFAULT_MAP_ID];
+  worldGeometry=bundle.geometry;
+  activeWorldCollision=bundle.collision;
   STATIC_BOXES=worldGeometry.STATIC_BOXES;BUILDINGS=worldGeometry.BUILDINGS;PYRAMIDS=worldGeometry.PYRAMIDS;NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;
   TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE;TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS;BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY;BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
   terrainHeight=worldGeometry.terrainHeight;naturalGroundBase=worldGeometry.naturalGroundBase;worldSupportHeight=worldGeometry.worldSupportHeight;worldStepUpHeight=worldGeometry.worldStepUpHeight;resolveCeilingCollision=worldGeometry.resolveCeilingCollision;
@@ -302,7 +313,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.32.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.34.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -691,15 +702,15 @@ function buildWorldVisuals(){
   if(!scene||!THREE)return;
   mapObstacles.length=0;
   worldRoot=new THREE.Group();worldRoot.name=`world:${currentMapId}`;scene.add(worldRoot);
-  const depot=currentMapId==='depot';
-  const sky=depot?0x89979d:0x9acde6;scene.background=new THREE.Color(sky);scene.fog=new THREE.Fog(sky,depot?90:95,depot?260:285);
+  const depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig';
+  const sky=rig?0xb9a27f:(yard?0x7e878d:(depot?0x89979d:0x9acde6));scene.background=new THREE.Color(sky);scene.fog=new THREE.Fog(sky,rig?72:(yard?58:(depot?90:95)),rig?205:(yard?145:(depot?260:285)));
   addTerrain();
-  const wallMat=new THREE.MeshStandardMaterial({color:depot?0x626a6e:0xd8d4cc,roughness:.9});addBoundaryWallsBatch(wallMat);
-  const blockMat=new THREE.MeshStandardMaterial({color:depot?0x697983:0xb8c0c5,roughness:.85});
-  const pyramidMat=new THREE.MeshStandardMaterial({color:depot?0x88775f:0xc8a86b,roughness:.92});addStaticBoxesBatch(blockMat);addPyramidsBatch(pyramidMat);
-  const trunkMat=new THREE.MeshStandardMaterial({color:0x60452f,roughness:1}),leafMat=new THREE.MeshStandardMaterial({color:depot?0x405b3f:0x315f37,roughness:1}),bushMat=new THREE.MeshStandardMaterial({color:depot?0x53664b:0x3f7441,roughness:1}),rockMat=new THREE.MeshStandardMaterial({color:depot?0x777b78:0x6b706f,roughness:.96});
+  const wallMat=new THREE.MeshStandardMaterial({color:rig?0x6d5d49:(yard?0x454c50:(depot?0x626a6e:0xd8d4cc)),roughness:.9});addBoundaryWallsBatch(wallMat);
+  const blockMat=new THREE.MeshStandardMaterial({color:rig?0x756a59:(yard?0x6f777a:(depot?0x697983:0xb8c0c5)),roughness:.85});
+  const pyramidMat=new THREE.MeshStandardMaterial({color:rig?0x9b8058:(depot?0x88775f:0xc8a86b),roughness:.92});addStaticBoxesBatch(blockMat);addPyramidsBatch(pyramidMat);
+  const trunkMat=new THREE.MeshStandardMaterial({color:0x60452f,roughness:1}),leafMat=new THREE.MeshStandardMaterial({color:depot?0x405b3f:0x315f37,roughness:1}),bushMat=new THREE.MeshStandardMaterial({color:depot?0x53664b:0x3f7441,roughness:1}),rockMat=new THREE.MeshStandardMaterial({color:rig?0x8b7459:(depot?0x777b78:0x6b706f),roughness:.96});
   addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat);addBuildingsBatch();
-  const markerMat=new THREE.MeshStandardMaterial({color:depot?0x303a40:0x49606f,roughness:.75});addMarkersBatch(markerMat);
+  const markerMat=new THREE.MeshStandardMaterial({color:depot?0x303a40:0x49606f,roughness:.75});if(!yard&&!rig)addMarkersBatch(markerMat);
   minimapStaticCache=null;
 }
 function rebuildWorldVisuals(){
@@ -713,7 +724,7 @@ function addTerrain(){
   const size=TERRAIN_SIZE,segments=TERRAIN_SEGMENTS;
   const geo=new THREE.PlaneGeometry(size,size,segments,segments),pos=geo.attributes.position;
   const colors=[];
-  const depot=currentMapId==='depot',low=new THREE.Color(depot?0x62655f:0x587552),mid=new THREE.Color(depot?0x777972:0x78915f),high=new THREE.Color(depot?0x756d60:0x807a65),peak=new THREE.Color(depot?0x8b8375:0x9a9586);
+  const depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig',low=new THREE.Color(rig?0x8f7957:(yard?0x686c6d:(depot?0x62655f:0x587552))),mid=new THREE.Color(rig?0xa58d66:(yard?0x747878:(depot?0x777972:0x78915f))),high=new THREE.Color(rig?0xb59a70:(yard?0x7d8080:(depot?0x756d60:0x807a65))),peak=new THREE.Color(rig?0xc0a77c:(yard?0x858888:(depot?0x8b8375:0x9a9586)));
   for(let i=0;i<pos.count;i++){
     const x=pos.getX(i),z=-pos.getY(i),h=terrainHeight(x,z);pos.setZ(i,h);
     const color=new THREE.Color();
@@ -730,18 +741,19 @@ function addTerrain(){
 }
 function makeTerrainTexture(){
   const size=256,c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');
-  const image=x.createImageData(size,size);const depot=currentMapId==='depot';let seed=depot?0x6d4f23:0x51f15e;
+  const image=x.createImageData(size,size),depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig';let seed=rig?0x9f5e2b:(yard?0x413c37:(depot?0x6d4f23:0x51f15e));
   const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
   for(let py=0;py<size;py++)for(let px=0;px<size;px++){
     const i=(py*size+px)*4,n=rand(),wave=Math.sin(px*.19+Math.sin(py*.07))*5+Math.cos(py*.15)*4;
-    const v=Math.max(depot?128:168,Math.min(depot?202:238,(depot?168:211)+(n-.5)*(depot?36:30)+wave));
-    image.data[i]=Math.round(v*(depot?.94:.96));image.data[i+1]=Math.round(v*(depot?.93:1));image.data[i+2]=Math.round(v*(depot?.89:.88));image.data[i+3]=255;
+    if(rig){const v=Math.max(142,Math.min(205,176+(n-.5)*34+wave*.42));image.data[i]=v;image.data[i+1]=Math.round(v*.86);image.data[i+2]=Math.round(v*.64);image.data[i+3]=255;}
+    else if(yard){const v=Math.max(118,Math.min(174,145+(n-.5)*24+wave*.35));image.data[i]=v;image.data[i+1]=v+2;image.data[i+2]=v+3;image.data[i+3]=255;}
+    else{const v=Math.max(depot?128:168,Math.min(depot?202:238,(depot?168:211)+(n-.5)*(depot?36:30)+wave));image.data[i]=Math.round(v*(depot?.94:.96));image.data[i+1]=Math.round(v*(depot?.93:1));image.data[i+2]=Math.round(v*(depot?.89:.88));image.data[i+3]=255;}
   }
   x.putImageData(image,0,0);
-  x.globalAlpha=depot?.28:.22;x.strokeStyle=depot?'#575d5b':'#758064';x.lineWidth=1;
-  for(let i=0;i<34;i++){const y=(i*37)%size;x.beginPath();x.moveTo(0,y);x.bezierCurveTo(70,y+10,150,y-12,size,y+4);x.stroke();}
-  x.globalAlpha=.16;x.fillStyle=depot?'#777064':'#5d674d';for(let i=0;i<520;i++){const px=rand()*size,py=rand()*size,r=.4+rand()*1.5;x.beginPath();x.arc(px,py,r,0,Math.PI*2);x.fill();}
-  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(28,28);tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy?.()||1);return tex;
+  if(rig){x.globalAlpha=.18;x.strokeStyle='#8a7251';x.lineWidth=1;for(let i=0;i<28;i++){const y=(i*29+13)%size;x.beginPath();x.moveTo(0,y);x.bezierCurveTo(80,y+3,170,y-4,size,y+2);x.stroke();}x.globalAlpha=.20;x.fillStyle='#715d43';for(let i=0;i<520;i++){const px=rand()*size,py=rand()*size,r=.3+rand()*1.0;x.fillRect(px,py,r,r);}}
+  else if(yard){x.globalAlpha=.22;x.strokeStyle='#575d60';x.lineWidth=1;for(let i=0;i<18;i++){const y=(i*31+9)%size;x.beginPath();x.moveTo(0,y);x.lineTo(size,y+((i%3)-1)*2);x.stroke();}x.globalAlpha=.18;x.fillStyle='#4e5355';for(let i=0;i<420;i++){const px=rand()*size,py=rand()*size,r=.35+rand()*1.2;x.fillRect(px,py,r,r);}}
+  else{x.globalAlpha=depot?.28:.22;x.strokeStyle=depot?'#575d5b':'#758064';x.lineWidth=1;for(let i=0;i<34;i++){const y=(i*37)%size;x.beginPath();x.moveTo(0,y);x.bezierCurveTo(70,y+10,150,y-12,size,y+4);x.stroke();}x.globalAlpha=.16;x.fillStyle=depot?'#777064':'#5d674d';for(let i=0;i<520;i++){const px=rand()*size,py=rand()*size,r=.4+rand()*1.5;x.beginPath();x.arc(px,py,r,0,Math.PI*2);x.fill();}}
+  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(yard?34:(rig?30:28),yard?34:(rig?30:28));tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy?.()||1);return tex;
 }
 function addStaticInstancedMesh(geometry,material,transforms,{castShadow=true,receiveShadow=true}={}){
   if(!transforms.length)return null;
@@ -763,8 +775,31 @@ function addBoundaryWallsBatch(mat){
   addStaticInstancedMesh(new THREE.BoxGeometry(1,1,1),mat,transforms);
 }
 function addStaticBoxesBatch(mat){
-  const transforms=STATIC_BOXES.map(o=>({x:o.x,y:terrainHeight(o.x,o.z)+o.h/2,z:o.z,sx:o.w,sy:o.h,sz:o.d}));
-  addStaticInstancedMesh(new THREE.BoxGeometry(1,1,1),mat,transforms);
+  const unit=new THREE.BoxGeometry(1,1,1);
+  if(currentMapId==='yard'||currentMapId==='rig'){
+    const palette=currentMapId==='rig'?{
+      boundary:new THREE.MeshStandardMaterial({color:0x5a4f41,roughness:.95}),
+      pipe:new THREE.MeshStandardMaterial({color:0x6d665d,roughness:.72,metalness:.18}),
+      tank:new THREE.MeshStandardMaterial({color:0x82755f,roughness:.76,metalness:.10}),
+      shed:new THREE.MeshStandardMaterial({color:0x765744,roughness:.88}),
+      barrier:new THREE.MeshStandardMaterial({color:0x9a8b70,roughness:.94}),
+      crate:new THREE.MeshStandardMaterial({color:0x755437,roughness:.94}),
+      default:mat,
+    }:{
+      boundary:new THREE.MeshStandardMaterial({color:0x3d4448,roughness:.94}),
+      containerBlue:new THREE.MeshStandardMaterial({color:0x385f78,roughness:.82}),
+      containerRed:new THREE.MeshStandardMaterial({color:0x8a473f,roughness:.84}),
+      containerGreen:new THREE.MeshStandardMaterial({color:0x4f6d58,roughness:.86}),
+      containerTan:new THREE.MeshStandardMaterial({color:0x847457,roughness:.88}),
+      crate:new THREE.MeshStandardMaterial({color:0x80684a,roughness:.94}),
+      default:mat,
+    };
+    const groups=new Map();for(const o of STATIC_BOXES){const kind=o.kind||'default';if(!groups.has(kind))groups.set(kind,[]);groups.get(kind).push({x:o.x,y:terrainHeight(o.x,o.z)+o.h/2,z:o.z,sx:o.w,sy:o.h,sz:o.d});}
+    for(const [kind,transforms] of groups)addStaticInstancedMesh(unit,palette[kind]||mat,transforms);
+  }else{
+    const transforms=STATIC_BOXES.map(o=>({x:o.x,y:terrainHeight(o.x,o.z)+o.h/2,z:o.z,sx:o.w,sy:o.h,sz:o.d}));
+    addStaticInstancedMesh(unit,mat,transforms);
+  }
   for(const o of STATIC_BOXES)mapObstacles.push({type:'box',x:o.x,z:o.z,w:o.w,d:o.d});
 }
 function addPyramidsBatch(mat){
@@ -795,9 +830,9 @@ function addBuildingsBatch(){
   for(let index=0;index<BUILDINGS.length;index++){
     const b=BUILDINGS[index],geometry=BUILDING_GEOMETRY[index];
     const materials={
-      wall:new THREE.MeshStandardMaterial({color:currentMapId==='depot'?(b.tall?0x7d8589:0x919698):(b.tall?0x929aa0:0xa8adb0),roughness:.9}),
-      trim:new THREE.MeshStandardMaterial({color:currentMapId==='depot'?(b.tall?0x30383d:0x41494e):(b.tall?0x39444d:0x4f5961),roughness:.75}),
-      floor:new THREE.MeshStandardMaterial({color:currentMapId==='depot'?0x5d6264:0x6d7478,roughness:.95}),
+      wall:new THREE.MeshStandardMaterial({color:currentMapId==='rig'?(b.tall?0x6f6250:0x89735b):(currentMapId==='depot'?(b.tall?0x7d8589:0x919698):(b.tall?0x929aa0:0xa8adb0)),roughness:.9}),
+      trim:new THREE.MeshStandardMaterial({color:currentMapId==='rig'?(b.tall?0x3b3229:0x514336):(currentMapId==='depot'?(b.tall?0x30383d:0x41494e):(b.tall?0x39444d:0x4f5961)),roughness:.75}),
+      floor:new THREE.MeshStandardMaterial({color:currentMapId==='rig'?0x5b5145:(currentMapId==='depot'?0x5d6264:0x6d7478),roughness:.95}),
     };
     const groups={wall:[],trim:[],floor:[]};
     for(const part of geometry.parts){
@@ -2475,16 +2510,17 @@ function drawWeapon(c,r){
 }
 function minimapDotColor(rmt){return modeFriendly(rmt.team)?(!rmt.bot?'#62ef86':TEAM_COLORS[rmt.team]):TEAM_COLORS.red;}
 const MINIMAP_ZOOM=1.45;
+function minimapWorldLimit(){const value=Number(worldGeometry.MINIMAP_LIMIT);return Number.isFinite(value)&&value>8?value:ARENA_LIMIT;}
 function getMinimapStatic(w=512,h=512){
-  const key=`${currentMapId}:${Math.round(w)}x${Math.round(h)}`;if(minimapStaticCache?.key===key)return minimapStaticCache.canvas;
+  const mapLimit=minimapWorldLimit(),key=`${currentMapId}:${mapLimit}:${Math.round(w)}x${Math.round(h)}`;if(minimapStaticCache?.key===key)return minimapStaticCache.canvas;
   const q=document.createElement('canvas');q.width=Math.max(1,Math.round(w));q.height=Math.max(1,Math.round(h));const c=q.getContext('2d'),iw=q.width,ih=q.height,terrainCells=24,cellW=iw/terrainCells,cellH=ih/terrainCells;
-  c.fillStyle='rgba(19,27,26,.94)';c.fillRect(0,0,iw,ih);for(let gy=0;gy<terrainCells;gy++)for(let gx=0;gx<terrainCells;gx++){const wx=-ARENA_LIMIT+(gx+.5)/terrainCells*ARENA_LIMIT*2,wz=-ARENA_LIMIT+(gy+.5)/terrainCells*ARENA_LIMIT*2,hv=terrainHeight(wx,wz),t=Math.max(0,Math.min(1,(hv+2.4)/16.2));c.fillStyle=`rgba(${Math.round(58+72*t)},${Math.round(78+46*t)},${Math.round(57+31*t)},${.34+.34*t})`;c.fillRect(gx*cellW,gy*cellH,cellW+.7,cellH+.7);}const toX=x=>(x+ARENA_LIMIT)/(ARENA_LIMIT*2)*iw,toY=z=>(z+ARENA_LIMIT)/(ARENA_LIMIT*2)*ih;c.fillStyle='rgba(205,213,218,.42)';for(const b of mapObstacles){if(b.type==='box'){const x1=toX(b.x-b.w/2),x2=toX(b.x+b.w/2),y1=toY(b.z-b.d/2),y2=toY(b.z+b.d/2);c.fillRect(x1,y1,x2-x1,y2-y1);}else if(b.type==='pyramid'){const px=toX(b.x),py=toY(b.z),rr=b.base/(ARENA_LIMIT*2)*iw*.55;c.beginPath();c.moveTo(px,py-rr);c.lineTo(px+rr,py+rr);c.lineTo(px-rr,py+rr);c.closePath();c.fill();}else{const px=toX(b.x),py=toY(b.z),rr=Math.max(1.6,(b.r||1)/(ARENA_LIMIT*2)*iw*1.6);c.beginPath();c.arc(px,py,rr,0,Math.PI*2);c.fillStyle=b.type==='tree'?'rgba(41,101,52,.82)':b.type==='bush'?'rgba(65,116,59,.72)':'rgba(148,154,153,.68)';c.fill();c.fillStyle='rgba(205,213,218,.42)';}}minimapStaticCache={key,canvas:q};return q;
+  c.fillStyle='rgba(19,27,26,.94)';c.fillRect(0,0,iw,ih);for(let gy=0;gy<terrainCells;gy++)for(let gx=0;gx<terrainCells;gx++){const wx=-mapLimit+(gx+.5)/terrainCells*mapLimit*2,wz=-mapLimit+(gy+.5)/terrainCells*mapLimit*2,hv=terrainHeight(wx,wz),t=Math.max(0,Math.min(1,(hv+2.4)/16.2));c.fillStyle=`rgba(${Math.round(58+72*t)},${Math.round(78+46*t)},${Math.round(57+31*t)},${.34+.34*t})`;c.fillRect(gx*cellW,gy*cellH,cellW+.7,cellH+.7);}const toX=x=>(x+mapLimit)/(mapLimit*2)*iw,toY=z=>(z+mapLimit)/(mapLimit*2)*ih;c.fillStyle='rgba(205,213,218,.42)';for(const b of mapObstacles){if(b.type==='box'){const x1=toX(b.x-b.w/2),x2=toX(b.x+b.w/2),y1=toY(b.z-b.d/2),y2=toY(b.z+b.d/2);c.fillRect(x1,y1,x2-x1,y2-y1);}else if(b.type==='pyramid'){const px=toX(b.x),py=toY(b.z),rr=b.base/(mapLimit*2)*iw*.55;c.beginPath();c.moveTo(px,py-rr);c.lineTo(px+rr,py+rr);c.lineTo(px-rr,py+rr);c.closePath();c.fill();}else{const px=toX(b.x),py=toY(b.z),rr=Math.max(1.6,(b.r||1)/(mapLimit*2)*iw*1.6);c.beginPath();c.arc(px,py,rr,0,Math.PI*2);c.fillStyle=b.type==='tree'?'rgba(41,101,52,.82)':b.type==='bush'?'rgba(65,116,59,.72)':'rgba(148,154,153,.68)';c.fill();c.fillStyle='rgba(205,213,218,.42)';}}minimapStaticCache={key,canvas:q};return q;
 }
 function drawMiniMap(c,r){
-  const ix=r.x,iy=r.y,iw=r.w,ih=r.h,cx=ix+iw/2,cy=iy+ih/2,visibleWorld=(ARENA_LIMIT*2)/MINIMAP_ZOOM,ppm=iw/visibleWorld,now=performance.now(),staticMap=getMinimapStatic(),staticScale=(ARENA_LIMIT*2)/staticMap.width,sinYaw=Math.sin(yaw),cosYaw=Math.cos(yaw);
+  const mapLimit=minimapWorldLimit(),ix=r.x,iy=r.y,iw=r.w,ih=r.h,cx=ix+iw/2,cy=iy+ih/2,visibleWorld=(mapLimit*2)/MINIMAP_ZOOM,ppm=iw/visibleWorld,now=performance.now(),staticMap=getMinimapStatic(),staticScale=(mapLimit*2)/staticMap.width,sinYaw=Math.sin(yaw),cosYaw=Math.cos(yaw);
   c.save();c.beginPath();if(typeof c.roundRect==='function')c.roundRect(ix,iy,iw,ih,7);else c.rect(ix,iy,iw,ih);c.clip();
   c.fillStyle='rgba(8,13,17,.58)';c.fillRect(ix,iy,iw,ih);
-  const playerMapX=(position.x+ARENA_LIMIT)/staticScale,playerMapY=(position.z+ARENA_LIMIT)/staticScale,drawScale=ppm*staticScale;
+  const playerMapX=(position.x+mapLimit)/staticScale,playerMapY=(position.z+mapLimit)/staticScale,drawScale=ppm*staticScale;
   c.save();c.translate(cx,cy);c.rotate(yaw);c.globalAlpha=.96;c.drawImage(staticMap,-playerMapX*drawScale,-playerMapY*drawScale,staticMap.width*drawScale,staticMap.height*drawScale);c.globalAlpha=1;c.restore();
   const toMap=(x,z)=>{const dx=(x-position.x)*ppm,dz=(z-position.z)*ppm;return{x:cx+dx*cosYaw-dz*sinYaw,y:cy+dx*sinYaw+dz*cosYaw};};
   const edgePad=8,edgeHalfW=Math.max(1,iw/2-edgePad),edgeHalfH=Math.max(1,ih/2-edgePad);
