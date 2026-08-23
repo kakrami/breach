@@ -2,19 +2,19 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.30.1';
+} from './world-geometry.js?v=1.30.2';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.30.1';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.30.1';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.30.1';
-import { createAudioEngine } from './audio-engine.js?v=1.30.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.30.1';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.30.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.30.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.30.1';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.30.1';
+} from './game-config.js?v=1.30.2';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.30.2';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.30.2';
+import { createAudioEngine } from './audio-engine.js?v=1.30.2';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.30.2';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.30.2';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.30.2';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.30.2';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.30.2';
 
 let THREE = null;
 
@@ -272,7 +272,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.30.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.30.2';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1002,19 +1002,22 @@ async function resumeFromGesture(){
 }
 
 function onCanvasPointerDown(e){
-  if(chatOpen||!shell.canPlay)return;
-  ensureAudio();
+  if(!shell.canPlay)return;
   const directTouch=e.pointerType==='touch'||e.pointerType==='pen';
+  const p=canvasPoint(e);
+  if(chatOpen){
+    if((isTouch||directTouch)&&pointInRect(p.x,p.y,(hudLayout||computeHudLayout()).chat)){e.preventDefault();void dismissChat({restorePointer:false});}
+    return;
+  }
+  ensureAudio();
   if(directTouch){activateTouchInputMode();setActiveInputMode(INPUT_MODE.TOUCH,{quiet:true});}
   else setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
   if(!directTouch&&!isTouch&&document.pointerLockElement!==canvas){void shell.capturePointerFromGesture();return;}
-  const p=canvasPoint(e);
   if(isTouch||directTouch){
     e.preventDefault();
     const layout=hudLayout||computeHudLayout();
-    // Open the real text input directly from the touch gesture before pointer
-    // capture so iOS/Android recognize the focus as user initiated and show the
-    // native QWERTY keyboard reliably.
+    // CHAT is a game-owned toggle. Handle it before pointer capture so the
+    // same HUD control cleanly opens and closes the Breach QWERTY composer.
     if(pointInRect(p.x,p.y,layout.chat)){openChat();return;}
     try{canvas.setPointerCapture(e.pointerId)}catch{}
     if(scoreboardOpen){
@@ -1109,7 +1112,7 @@ function updateJoy(x,y,center){
 function canvasPoint(e){const r=canvas.getBoundingClientRect(),rw=Math.max(1,r.width),rh=Math.max(1,r.height);return{x:(e.clientX-r.left)*(viewW/rw),y:(e.clientY-r.top)*(viewH/rh)};}
 function pointInCircle(x,y,c){return Math.hypot(x-c.x,y-c.y)<=c.r;}
 function pointNearCircle(x,y,c,padding=0){return Math.hypot(x-c.x,y-c.y)<=c.r+padding;}
-function joystickSpawnAllowed(p,layout){return p.x<=layout.moveBoundary&&![layout.leftFire,layout.crouch,layout.flash,layout.sticky].some(c=>pointNearCircle(p.x,p.y,c,TOUCH_JOY_BUTTON_PADDING));}
+function joystickSpawnAllowed(p,layout){return p.x<=layout.moveBoundary&&![layout.leftFire,layout.flash,layout.sticky].some(c=>pointNearCircle(p.x,p.y,c,TOUCH_JOY_BUTTON_PADDING));}
 function pointInRect(x,y,r){return !!r&&x>=r.x&&x<=r.x+r.w&&y>=r.y&&y<=r.y+r.h;}
 function onScoreboardWheel(e){if(!scoreboardOpen||!scoreboardPanel)return;e.preventDefault();scoreboardScroll=Math.max(0,Math.min(scoreboardPanel.maxScroll,scoreboardScroll+e.deltaY));}
 
@@ -2229,24 +2232,33 @@ function computeHudLayout(){
   const defaultJoyX=safe.left+joyR+margin;
   const defaultJoyY=viewH-bottom-joyR;
   const leftSpan=Math.max(120,moveBoundary-safe.left);
+  // Keep the established left FIRE position unchanged. Equipment now forms one
+  // row beneath it: Tactical, Lethal.
   const leftFireX=Math.max(safe.left+leftFireR+8,Math.min(moveBoundary-leftFireR-10,safe.left+leftSpan*.30));
-  const equipX=Math.max(safe.left+equipR+8,Math.min(moveBoundary-equipR-10,safe.left+leftSpan*.63));
   const leftFireY=Math.max(safe.top+leftFireR+52,Math.min(viewH-bottom-leftFireR-118,viewH*.31));
-  const crouchX=leftFireX,crouchY=Math.max(safe.top+crouchR+70,Math.min(viewH-bottom-crouchR-92,leftFireY+leftFireR+crouchR+9));
-  const flashY=Math.max(safe.top+equipR+74,Math.min(viewH-bottom-equipR-112,viewH*.36));
-  const stickyY=Math.max(flashY+equipR*2+8,Math.min(viewH-bottom-equipR-62,viewH*.54));
+  const equipGap=compact?8:10,equipOffset=equipR+equipGap/2;
+  const equipCenterX=Math.max(safe.left+equipR+equipOffset+8,Math.min(moveBoundary-equipR-equipOffset-10,leftFireX));
+  const flashX=equipCenterX-equipOffset,stickyX=equipCenterX+equipOffset;
+  const equipRowY=Math.max(safe.top+equipR+74,Math.min(viewH-bottom-equipR-62,leftFireY+leftFireR+equipR+9));
+  const flashY=equipRowY,stickyY=equipRowY;
+  // Right controls are a deliberate two-row grid, preserving every existing
+  // button radius: Jump / Swap / ADS, then Crouch / Reload / Fire.
   const fireX=viewW-safe.right-margin-fireR,fireY=viewH-bottom-fireR;
-  const aimX=fireX-fireR-aimR-11,aimY=fireY;
-  const jumpX=fireX,jumpY=fireY-fireR-jumpR-11;
-  const reloadX=aimX-aimR-reloadR-9,reloadY=fireY;
-  const swapX=aimX,swapY=jumpY;
-  const modeX=reloadX,modeY=jumpY;
+  const reloadX=fireX-fireR-reloadR-9,reloadY=fireY;
+  const crouchX=reloadX-reloadR-crouchR-9,crouchY=fireY;
+  const topRowY=fireY-fireR-Math.max(jumpR,swapR,aimR)-11;
+  const jumpX=crouchX,jumpY=topRowY;
+  const swapX=reloadX,swapY=topRowY;
+  const aimX=fireX,aimY=topRowY;
+  // Fire-mode remains a separate auxiliary control so it does not disturb the
+  // requested two-row combat-button order.
+  const modeX=crouchX-crouchR-modeR-9,modeY=(topRowY+fireY)/2;
   const weaponLift=touchGameplayControlsVisible()?(fireR*3.75+8):0;
   return{compact,safe,moveBoundary,
     map:{x:viewW-safe.right-margin-mapSize,y:safe.top+margin,w:mapSize,h:mapSize},kill:{x:safe.left+margin,y:safe.top+margin,w:killW,h:killH},
     team:{x:teamX,y:teamY,w:teamW,h:teamH},god:{x:teamX-31,y:teamY,w:25,h:teamH},chat:{x:Math.max(safe.left+margin,teamX-chatW-38),y:teamY,w:chatW,h:menuH},menu:{x:teamX+teamW+7,y:teamY,w:menuW,h:menuH},
     weapon:{x:viewW-safe.right-margin-weaponW,y:viewH-bottom-weaponH-weaponLift,w:weaponW,h:weaponH},joy:{x:defaultJoyX,y:defaultJoyY,r:joyR},
-    leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},crouch:{x:crouchX,y:crouchY,r:crouchR},flash:{x:equipX,y:flashY,r:equipR},sticky:{x:equipX,y:stickyY,r:equipR},
+    leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},crouch:{x:crouchX,y:crouchY,r:crouchR},flash:{x:flashX,y:flashY,r:equipR},sticky:{x:stickyX,y:stickyY,r:equipR},
     fire:{x:fireX,y:fireY,r:fireR},aim:{x:aimX,y:aimY,r:aimR},jump:{x:jumpX,y:jumpY,r:jumpR},
     reload:{x:reloadX,y:reloadY,r:reloadR},swap:{x:swapX,y:swapY,r:swapR},mode:{x:modeX,y:modeY,r:modeR}
   };
