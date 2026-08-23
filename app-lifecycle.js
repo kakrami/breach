@@ -1,4 +1,4 @@
-export const SHELL_PANEL = Object.freeze({ NONE:'', SETTINGS:'settings', ADMIN:'admin' });
+export const SHELL_PANEL = Object.freeze({ NONE:'', SETTINGS:'settings', ADMIN:'admin', LOADOUT:'loadout' });
 
 function fullscreenElement(){
   return document.fullscreenElement || document.webkitFullscreenElement || document.webkitCurrentFullScreenElement || null;
@@ -71,6 +71,7 @@ export function createSessionShell({
     visible(elements.pause,matchUsable&&s.inMatch&&s.paused&&!s.panel&&!s.connecting);
     visible(elements.settings,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.SETTINGS);
     visible(elements.admin,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.ADMIN);
+    visible(elements.loadout,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.LOADOUT);
     visible(elements.connection,(s.inMatch?matchUsable:frontUsable)&&s.connecting);
     if(elements.connectionText)elements.connectionText.textContent=s.connectionText||'Connecting…';
     if(elements.entryButton){
@@ -173,7 +174,7 @@ export function createSessionShell({
     paused=false;pauseReason='';render('resume-alternate');return true;
   }
   function openPanel(name){
-    if(name!==SHELL_PANEL.SETTINGS&&name!==SHELL_PANEL.ADMIN)return snapshot();
+    if(name!==SHELL_PANEL.SETTINGS&&name!==SHELL_PANEL.ADMIN&&name!==SHELL_PANEL.LOADOUT)return snapshot();
     if(inMatch()&&!paused){paused=true;pauseReason='panel';if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();}
     panel=name;return render(`panel-open:${name}`);
   }
