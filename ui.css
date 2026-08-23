@@ -55,16 +55,25 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .loadout-fixed{min-height:48px;padding:7px;border:1px solid var(--line);border-radius:8px;background:#10161a;display:flex;align-items:center;gap:8px}.loadout-fixed>b{min-width:30px;color:var(--text);font-size:9px;text-align:center}.loadout-fixed>div{min-width:0;display:grid;gap:2px}.loadout-fixed strong{font-size:8px}.loadout-fixed small{color:var(--dim);font-size:7px}
 .loadout-foot .primary{height:34px;padding:0 13px;font-size:8px}
 
-/* In-match room chat. The actual text box is a native HTML input so mobile
-   browsers open the OS QWERTY keyboard only after the player explicitly opens chat. */
-.chat-composer{position:fixed;z-index:68;left:50%;bottom:calc(var(--safe-bottom) + 18px);width:min(560px,calc(100vw - var(--safe-left) - var(--safe-right) - 24px));transform:translateX(-50%);pointer-events:auto}
-.chat-compose-shell{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;padding:6px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(7,10,12,.94);box-shadow:0 10px 34px rgba(0,0,0,.42);backdrop-filter:blur(8px)}
-.chat-channel{height:31px;display:grid;place-items:center;padding:0 8px;border-radius:6px;background:#171d21;color:var(--accent);font-size:8px;font-weight:1000;letter-spacing:.08em}
-.chat-input{min-width:0;height:31px;padding:0 9px;border:1px solid var(--line2);border-radius:6px;outline:0;background:#050809;color:#fff;font:800 12px system-ui,sans-serif;caret-color:var(--accent)}
-.chat-input:focus{border-color:rgba(215,255,88,.62);box-shadow:0 0 0 1px rgba(215,255,88,.18)}
-.chat-send{height:31px;padding:0 10px;border:1px solid rgba(215,255,88,.32);border-radius:6px;background:#1a2118;color:var(--accent);font-size:8px;font-weight:1000;letter-spacing:.06em;cursor:pointer}
-.touch .chat-composer{bottom:calc(var(--safe-bottom) + 6px);width:min(620px,calc(100vw - var(--safe-left) - var(--safe-right) - 12px))}
-.touch .chat-compose-shell{padding:4px;gap:4px}.touch .chat-channel,.touch .chat-input,.touch .chat-send{height:30px}.touch .chat-input{font-size:16px}
+/* In-match room chat. Breach owns the QWERTY keyboard and text buffer;
+   no mobile OS/browser keyboard is invoked. */
+.chat-composer{position:fixed;z-index:68;left:50%;bottom:calc(var(--safe-bottom) + 14px);width:min(760px,calc(100vw - var(--safe-left) - var(--safe-right) - 24px));transform:translateX(-50%);display:grid;gap:6px;pointer-events:auto;user-select:none;-webkit-user-select:none}
+.chat-compose-shell{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;padding:6px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(7,10,12,.96);box-shadow:0 10px 34px rgba(0,0,0,.42);backdrop-filter:blur(8px)}
+.chat-channel{height:32px;display:grid;place-items:center;padding:0 8px;border-radius:6px;background:#171d21;color:var(--accent);font-size:8px;font-weight:1000;letter-spacing:.08em}
+.chat-input{position:relative;min-width:0;height:32px;padding:0 9px;border:1px solid rgba(215,255,88,.48);border-radius:6px;background:#050809;color:#fff;font:800 12px/32px system-ui,sans-serif;white-space:nowrap;overflow:hidden;box-shadow:0 0 0 1px rgba(215,255,88,.10)}
+.chat-input-text{position:relative;z-index:2}.chat-placeholder{position:absolute;left:9px;top:0;color:#667078;font-weight:750;pointer-events:none}.chat-input.has-text .chat-placeholder{display:none}
+.chat-caret{display:inline-block;width:1px;height:14px;margin-left:2px;vertical-align:-2px;background:var(--accent);animation:chatCaretBlink 1s steps(1,end) infinite}
+@keyframes chatCaretBlink{0%,48%{opacity:1}49%,100%{opacity:0}}
+.chat-send{height:32px;padding:0 11px;border:1px solid rgba(215,255,88,.32);border-radius:6px;background:#1a2118;color:var(--accent);font-size:8px;font-weight:1000;letter-spacing:.06em;cursor:pointer;touch-action:manipulation}
+.chat-keyboard{display:grid;gap:5px;padding:7px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(7,10,12,.96);box-shadow:0 14px 42px rgba(0,0,0,.48);backdrop-filter:blur(10px);touch-action:manipulation}
+.chat-key-row{display:flex;justify-content:center;gap:5px;min-width:0}.chat-key-row-middle{padding:0 4.2%}.chat-key-row-bottom{padding-top:1px}
+.chat-key{height:38px;flex:1 1 0;min-width:0;max-width:58px;padding:0 3px;border:1px solid rgba(255,255,255,.18);border-bottom-color:rgba(0,0,0,.7);border-radius:6px;background:linear-gradient(#252d32,#151b1f);color:#f0f4f6;font:900 11px system-ui,sans-serif;box-shadow:0 2px 0 rgba(0,0,0,.42);touch-action:manipulation;cursor:pointer}
+.chat-key:active,.chat-key.pressed{transform:translateY(1px);background:#303a3f;box-shadow:0 1px 0 rgba(0,0,0,.35)}
+.chat-key-wide{flex:1.55 1 0;max-width:92px;font-size:8px;letter-spacing:.04em}.chat-key-space{flex:5 1 0;max-width:310px}.chat-key-command{flex:1.75 1 0;max-width:105px;font-size:8px}.chat-key-send{border-color:rgba(215,255,88,.42);background:linear-gradient(#273221,#182014);color:var(--accent)}
+#chatShiftBtn.active{border-color:var(--accent);color:var(--accent);background:#263019}
+.touch .chat-composer{bottom:calc(var(--safe-bottom) + 5px);width:min(760px,calc(100vw - var(--safe-left) - var(--safe-right) - 10px));gap:4px}
+.touch .chat-compose-shell{padding:4px;gap:4px}.touch .chat-channel,.touch .chat-input,.touch .chat-send{height:29px}.touch .chat-input{font-size:11px;line-height:29px}.touch .chat-keyboard{gap:3px;padding:4px}.touch .chat-key-row{gap:3px}.touch .chat-key{height:30px;max-width:none;border-radius:5px;font-size:9px}.touch .chat-key-wide,.touch .chat-key-command{font-size:7px}
+@media(max-height:390px) and (orientation:landscape){.touch .chat-key-row-numbers{display:none}.touch .chat-key{height:28px}.touch .chat-composer{gap:3px}.touch .chat-keyboard{gap:3px}}
 
 .match-list,.lobby-roster,.admin-page,.pause-card,.settings-grid{scrollbar-width:thin;scrollbar-color:#303943 transparent}
 

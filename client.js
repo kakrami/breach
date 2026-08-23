@@ -2,19 +2,19 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.30.0';
+} from './world-geometry.js?v=1.30.1';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.30.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.30.0';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.30.0';
-import { createAudioEngine } from './audio-engine.js?v=1.30.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.30.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.30.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.30.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.30.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.30.0';
+} from './game-config.js?v=1.30.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.30.1';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.30.1';
+import { createAudioEngine } from './audio-engine.js?v=1.30.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.30.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.30.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.30.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.30.1';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.30.1';
 
 let THREE = null;
 
@@ -92,7 +92,7 @@ const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews
 const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
 const matchPrimaryButtons=[...document.querySelectorAll('[data-match-primary-choice]')],matchTacticalButtons=[...document.querySelectorAll('[data-match-tactical-choice]')],matchLethalButtons=[...document.querySelectorAll('[data-match-lethal-choice]')];
 const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMinimapMode=$('lobbyMinimapMode');
-const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatSendBtn=$('chatSendBtn');
+const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
 document.querySelectorAll('[data-app-version]').forEach(el=>{el.textContent=`Version ${APP_VERSION}`;});
 
 const platform=detectInputPlatform();
@@ -213,7 +213,7 @@ function activateTouchInputMode(){
 
 const killFeed = [];
 const chatMessages=[];
-let chatOpen=false;
+let chatOpen=false,chatDraft='',chatShift=false;
 let minimapStaticCache=null;
 let hudLayout=null;
 let viewW=1,viewH=1,viewDpr=1;
@@ -272,7 +272,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.30.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.30.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -808,8 +808,7 @@ function bindUI(){
   for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id).addEventListener('input',()=>updatePlayerSettingFromUI(id,key));
   $('playerGraphics').addEventListener('change',()=>{playerSettings={...playerSettings,graphics:$('playerGraphics').value};savePlayerSettings();applyGraphicsQuality();});
   chatSendBtn.addEventListener('click',submitChat);
-  chatInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();submitChat();return;}if(e.key==='Escape'){e.preventDefault();void dismissChat();}});
-  chatInput.addEventListener('focus',()=>{if(chatOpen){clearFireInput();cancelEquipmentAim();keys.clear();}});
+  chatKeyboard.addEventListener('pointerdown',e=>{const btn=e.target.closest?.('[data-chat-char],[data-chat-action]');if(!btn||!chatOpen)return;e.preventDefault();handleChatKeyboardButton(btn);});
   $('joinBtn').addEventListener('click', () => joinMatch(normalizeCode(codeInput.value)));
   codeInput.addEventListener('blur', () => { codeInput.value = normalizeCode(codeInput.value); });
   codeInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); joinMatch(normalizeCode(codeInput.value)); } });
@@ -878,6 +877,7 @@ function bindUI(){
     const sens=aimSensitivityScale()*playerSettings.lookSensitivity;yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
   });
   document.addEventListener('keydown', e => {
+    if(chatOpen){handlePhysicalChatKey(e);return;}
     if(isEditableTarget(e.target)) return;
     if(controllerInputActive()&&(e.code==='Space'||e.code==='Escape'||e.code.startsWith('Arrow'))){e.preventDefault();return;}
     if(!controllerInputActive()||isTouch||document.pointerLockElement===canvas)setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
@@ -910,6 +910,7 @@ function bindUI(){
     if(e.code==='Tab'&&!e.repeat){scoreboardOpen=true;scoreboardScroll=0;clearFireInput();cancelEquipmentAim();}
   });
   document.addEventListener('keyup', e => {
+    if(chatOpen){e.preventDefault();return;}
     if(isEditableTarget(e.target))return;
     keys.delete(e.code);
     if(e.code==='Tab')scoreboardOpen=false;
@@ -928,26 +929,52 @@ function receiveChatMessage(m){
   chatMessages.push({id:String(m?.id||''),name,team:String(m?.team||'blue')==='red'?'red':'blue',text,until:performance.now()+CHAT_VISIBLE_MS});
   while(chatMessages.length>CHAT_MAX_MESSAGES)chatMessages.shift();hudLastDraw=0;
 }
+function renderChatDraft(){
+  const text=chatDraft.slice(0,CHAT_MAX_LENGTH);chatInputText.textContent=text;chatInput.classList.toggle('has-text',!!text);chatShiftBtn?.classList.toggle('active',chatShift);
+}
+function setChatDraft(value){chatDraft=String(value??'').replace(/[\u0000-\u001f\u007f]/g,' ').slice(0,CHAT_MAX_LENGTH);renderChatDraft();}
+function appendChatCharacter(char){
+  if(!chatOpen||chatDraft.length>=CHAT_MAX_LENGTH)return;let out=String(char||'');if(!out)return;
+  if(/^[a-z]$/i.test(out)){out=chatShift?out.toUpperCase():out.toLowerCase();if(chatShift)chatShift=false;}
+  setChatDraft(chatDraft+out);
+}
+function backspaceChat(){if(!chatDraft)return;const chars=Array.from(chatDraft);chars.pop();setChatDraft(chars.join(''));}
+function handleChatKeyboardButton(btn){
+  const char=btn.dataset.chatChar,action=btn.dataset.chatAction;if(char!=null){appendChatCharacter(char);return;}
+  if(action==='shift'){chatShift=!chatShift;renderChatDraft();return;}
+  if(action==='backspace'){backspaceChat();return;}
+  if(action==='space'){appendChatCharacter(' ');return;}
+  if(action==='send'){submitChat();return;}
+  if(action==='cancel')void dismissChat();
+}
+function handlePhysicalChatKey(e){
+  if(!chatOpen)return false;e.preventDefault();e.stopPropagation();
+  if(e.key==='Escape'){void dismissChat();return true;}
+  if(e.key==='Enter'){submitChat();return true;}
+  if(e.key==='Backspace'){backspaceChat();return true;}
+  if(e.key===' '){if(chatDraft.length<CHAT_MAX_LENGTH)setChatDraft(chatDraft+' ');return true;}
+  if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.key?.length===1&&chatDraft.length<CHAT_MAX_LENGTH)setChatDraft(chatDraft+e.key);
+  return true;
+}
 function openChat(){
   if(chatOpen||!shell.inMatch||shell.paused||shell.panel||shell.connecting)return false;
-  chatOpen=true;scoreboardOpen=false;suspendGameplayInput();chatComposer.classList.remove('hide');chatInput.value='';
+  chatOpen=true;scoreboardOpen=false;chatShift=true;setChatDraft('');suspendGameplayInput();chatComposer.classList.remove('hide');
   if(!isTouch&&document.pointerLockElement===canvas)document.exitPointerLock?.();
-  try{chatInput.focus({preventScroll:true});}catch{chatInput.focus();}
-  if(document.activeElement!==chatInput)requestAnimationFrame(()=>{try{chatInput.focus({preventScroll:true});}catch{chatInput.focus();}});
   hudLastDraw=0;return true;
 }
 async function dismissChat({restorePointer=true}={}){
   if(!chatOpen){chatComposer.classList.add('hide');return false;}
-  chatComposer.classList.add('hide');chatInput.blur();keys.clear();resetTouchInput();clearFireInput();cancelEquipmentAim();
+  chatComposer.classList.add('hide');chatShift=false;setChatDraft('');keys.clear();resetTouchInput();clearFireInput();cancelEquipmentAim();
   const recapture=restorePointer&&!isTouch&&shell.inMatch&&!shell.paused&&!shell.panel&&!controllerInputActive();let captured=true;
   if(recapture)captured=await shell.capturePointerFromGesture();
   chatOpen=false;hudLastDraw=0;if(recapture&&!captured)showToast('CLICK GAME TO CAPTURE MOUSE');return true;
 }
 function submitChat(){
-  if(!chatOpen)return;const text=cleanChatText(chatInput.value);chatInput.value='';
+  if(!chatOpen)return;const text=cleanChatText(chatDraft);setChatDraft('');
   if(text){if(socket?.readyState===WebSocket.OPEN)send({t:'chat',text});else showToast('CHAT OFFLINE');}
   void dismissChat();
 }
+
 function clipHudText(c,text,maxWidth){let out=String(text||'');if(c.measureText(out).width<=maxWidth)return out;const ell='…';while(out.length>1&&c.measureText(out+ell).width>maxWidth)out=out.slice(0,-1);return out+ell;}
 function drawChatFeed(c,L,w,h,now){
   const visible=chatMessages.filter(item=>chatOpen||item.until>now).slice(-(isTouch?3:5));if(!visible.length)return;

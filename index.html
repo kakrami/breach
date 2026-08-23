@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.30.0">
-<title>Breach v1.30.0</title>
-<link rel="stylesheet" href="ui.css?v=1.30.0">
+<link rel="manifest" href="manifest.webmanifest?v=1.30.1">
+<title>Breach v1.30.1</title>
+<link rel="stylesheet" href="ui.css?v=1.30.1">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -36,11 +36,28 @@
 <main id="appRoot" class="app-root">
   <div id="gameStage" class="game-stage"><canvas id="game" draggable="false" aria-label="Breach gameplay"></canvas></div>
 
-  <div id="chatComposer" class="chat-composer hide" role="dialog" aria-label="Game chat">
+  <div id="chatComposer" class="chat-composer hide" role="dialog" aria-label="Game chat" aria-modal="false">
     <div class="chat-compose-shell">
       <span class="chat-channel">ALL</span>
-      <input id="chatInput" class="chat-input" type="text" maxlength="120" inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true" aria-label="Chat message" placeholder="Message">
+      <div id="chatInput" class="chat-input" role="textbox" aria-label="Chat message" aria-live="polite"><span id="chatInputText" class="chat-input-text"></span><span class="chat-caret" aria-hidden="true"></span><span id="chatPlaceholder" class="chat-placeholder">Message</span></div>
       <button id="chatSendBtn" class="chat-send" type="button">SEND</button>
+    </div>
+    <div id="chatKeyboard" class="chat-keyboard" aria-label="In-game QWERTY keyboard">
+      <div class="chat-key-row chat-key-row-numbers">
+        <button type="button" class="chat-key" data-chat-char="1">1</button><button type="button" class="chat-key" data-chat-char="2">2</button><button type="button" class="chat-key" data-chat-char="3">3</button><button type="button" class="chat-key" data-chat-char="4">4</button><button type="button" class="chat-key" data-chat-char="5">5</button><button type="button" class="chat-key" data-chat-char="6">6</button><button type="button" class="chat-key" data-chat-char="7">7</button><button type="button" class="chat-key" data-chat-char="8">8</button><button type="button" class="chat-key" data-chat-char="9">9</button><button type="button" class="chat-key" data-chat-char="0">0</button>
+      </div>
+      <div class="chat-key-row">
+        <button type="button" class="chat-key" data-chat-char="q">Q</button><button type="button" class="chat-key" data-chat-char="w">W</button><button type="button" class="chat-key" data-chat-char="e">E</button><button type="button" class="chat-key" data-chat-char="r">R</button><button type="button" class="chat-key" data-chat-char="t">T</button><button type="button" class="chat-key" data-chat-char="y">Y</button><button type="button" class="chat-key" data-chat-char="u">U</button><button type="button" class="chat-key" data-chat-char="i">I</button><button type="button" class="chat-key" data-chat-char="o">O</button><button type="button" class="chat-key" data-chat-char="p">P</button>
+      </div>
+      <div class="chat-key-row chat-key-row-middle">
+        <button type="button" class="chat-key" data-chat-char="a">A</button><button type="button" class="chat-key" data-chat-char="s">S</button><button type="button" class="chat-key" data-chat-char="d">D</button><button type="button" class="chat-key" data-chat-char="f">F</button><button type="button" class="chat-key" data-chat-char="g">G</button><button type="button" class="chat-key" data-chat-char="h">H</button><button type="button" class="chat-key" data-chat-char="j">J</button><button type="button" class="chat-key" data-chat-char="k">K</button><button type="button" class="chat-key" data-chat-char="l">L</button>
+      </div>
+      <div class="chat-key-row">
+        <button type="button" id="chatShiftBtn" class="chat-key chat-key-wide" data-chat-action="shift">SHIFT</button><button type="button" class="chat-key" data-chat-char="z">Z</button><button type="button" class="chat-key" data-chat-char="x">X</button><button type="button" class="chat-key" data-chat-char="c">C</button><button type="button" class="chat-key" data-chat-char="v">V</button><button type="button" class="chat-key" data-chat-char="b">B</button><button type="button" class="chat-key" data-chat-char="n">N</button><button type="button" class="chat-key" data-chat-char="m">M</button><button type="button" id="chatBackspaceBtn" class="chat-key chat-key-wide" data-chat-action="backspace" aria-label="Backspace">⌫</button>
+      </div>
+      <div class="chat-key-row chat-key-row-bottom">
+        <button type="button" class="chat-key chat-key-command" data-chat-action="cancel">CANCEL</button><button type="button" class="chat-key" data-chat-char="!">!</button><button type="button" class="chat-key chat-key-space" data-chat-action="space">SPACE</button><button type="button" class="chat-key" data-chat-char="?">?</button><button type="button" class="chat-key chat-key-command chat-key-send" data-chat-action="send">SEND</button>
+      </div>
     </div>
   </div>
 
@@ -289,6 +306,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.30.0"></script>
+<script type="module" src="client.js?v=1.30.1"></script>
 </body>
 </html>
