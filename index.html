@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.37.1" rel="manifest"/>
-<title>Breach v1.37.1</title>
-<link href="ui.css?v=1.37.1" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.37.2" rel="manifest"/>
+<title>Breach v1.37.2</title>
+<link href="ui.css?v=1.37.2" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -145,6 +145,7 @@
 <div aria-label="Lobby panels" class="lobby-side-tabs" role="tablist">
 <button aria-selected="true" class="lobby-side-tab active" data-lobby-side-tab="players" type="button">PLAYERS</button>
 <button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="match" type="button">MATCH</button>
+<button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="map" type="button">MAP</button>
 <button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="loadout" type="button">LOADOUT</button>
 </div>
 <section class="lobby-side-view lobby-roster-panel active" data-lobby-side-view="players">
@@ -164,7 +165,6 @@
 <div class="lobby-card-title"><span class="eyebrow">RULES</span><strong>Match</strong></div>
 <div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button data-lobby-mode-choice="tdm" type="button">TEAM DEATHMATCH</button><button data-lobby-mode-choice="ffa" type="button">FREE FOR ALL</button><button data-lobby-mode-choice="sandbox" type="button">SANDBOX</button></div></div>
 <div class="lobby-setup-row lobby-rules-row">
-<label><span>MAP</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"highlands","label":"Highlands"},{"value":"depot","label":"Freight Depot"},{"value":"yard","label":"Container Yard"},{"value":"rig","label":"Dust Rig"}]' data-value="highlands" id="lobbyMap" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Highlands</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <label><span>MINIMAP</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"standard","label":"Standard"},{"value":"all","label":"Show Everyone"}]' data-value="standard" id="lobbyMinimapMode" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Standard</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <label id="lobbyScoreWrap"><span>SCORE LIMIT</span><div class="input game-control game-stepper" data-game-control="stepper" data-max="100" data-min="5" data-step="5" data-value="5" id="lobbyScoreLimit" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">5</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label>
 <label id="lobbyTimeWrap"><span>TIME LIMIT</span><div class="input game-control game-stepper" data-game-control="stepper" data-max="30" data-min="2" data-step="1" data-value="2" id="lobbyTimeLimit" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">2</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label>
@@ -183,6 +183,20 @@
 </div>
 </div>
 <div class="lobby-guest-setup" id="lobbyGuestSetup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><span id="lobbyGuestRules">First 30 · 8 min</span><small>A lobby admin controls match rules. You can change your team and loadout while you wait.</small></div>
+</section>
+</div>
+<div class="lobby-side-view lobby-map-view" data-lobby-side-view="map" hidden="">
+<section class="lobby-map-panel">
+<div class="lobby-map-toolbar">
+<div><span class="eyebrow">MAP</span><h2 id="lobbyMapName">Highlands</h2><p id="lobbyMapDescription">Full level overview</p></div>
+<div class="lobby-map-choice-grid" aria-label="Map selection">
+<button class="lobby-map-choice" data-lobby-map-choice="highlands" type="button"><strong>HIGHLANDS</strong><small>Open terrain</small></button>
+<button class="lobby-map-choice" data-lobby-map-choice="depot" type="button"><strong>FREIGHT DEPOT</strong><small>Industrial lanes</small></button>
+<button class="lobby-map-choice" data-lobby-map-choice="yard" type="button"><strong>CONTAINER YARD</strong><small>Dense cover</small></button>
+<button class="lobby-map-choice" data-lobby-map-choice="rig" type="button"><strong>DUST RIG</strong><small>Close quarters</small></button>
+</div>
+</div>
+<div class="lobby-map-canvas-wrap"><canvas aria-label="Full map overview" id="lobbyMapPreview"></canvas><div class="lobby-map-legend"><span><i class="map-legend-building"></i>STRUCTURE</span><span><i class="map-legend-natural"></i>TERRAIN / COVER</span><span>NORTH ↑</span></div></div>
 </section>
 </div>
 <div class="lobby-side-view lobby-loadout-view" data-lobby-side-view="loadout" hidden="">
@@ -269,6 +283,7 @@
 </div></section>
 <section class="settings-page" data-settings-page="display" hidden="" inert=""><div class="settings-category-head"><h3>Graphics</h3></div><div class="settings-grid">
 <label class="setting select-setting"><span>Graphics quality</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"low","label":"Low"},{"value":"medium","label":"Medium"},{"value":"high","label":"High"}]' data-value="low" id="playerGraphics" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Low</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label class="setting select-setting"><span>Minimap orientation</span><div aria-label="Minimap orientation" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"heading","label":"Heading Up"},{"value":"north","label":"North Up"}]' data-value="heading" id="playerMinimapOrientation" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Heading Up</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <div class="setting setting-action"><span>FULLSCREEN</span><button class="secondary-btn" id="settingsFullscreenBtn" type="button">ENTER FULLSCREEN</button></div></div></section>
 </div>
 <footer class="modal-foot"><button class="secondary-btn" id="settingsDefaultsBtn">DEFAULTS</button></footer>
@@ -312,6 +327,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.37.1" type="module"></script>
+<script src="client.js?v=1.37.2" type="module"></script>
 </body>
 </html>
