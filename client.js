@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.7';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.7';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.7';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.7';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.7';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.7';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.7';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.7';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.9';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.9';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.9';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.9';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.9';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.9';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.9';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.9';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.7';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.7';
-import { createAudioEngine } from './audio-engine.js?v=1.37.7';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.7';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.7';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.7';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.7';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.7';
+} from './game-config.js?v=1.37.9';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.9';
+import { createAudioEngine } from './audio-engine.js?v=1.37.9';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.9';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.9';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.9';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.9';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.9';
 
 let THREE = null;
 
@@ -165,7 +165,36 @@ function initGameControls(){
       Object.defineProperty(el,'disabled',{configurable:true,get(){return el.classList.contains('disabled');},set(v){el.classList.toggle('disabled',!!v);el.setAttribute('aria-disabled',v?'true':'false');for(const b of el.querySelectorAll('button'))b.disabled=!!v;}});
       for(const key of ['min','max','step'])Object.defineProperty(el,key,{configurable:true,get(){return el.dataset[key]??'';}});
       el.value=initial;
-      for(const btn of el.querySelectorAll('[data-control-step]'))btn.addEventListener('click',e=>{e.stopPropagation();adjustGameControl(el,Number(btn.dataset.controlStep)||0);});
+      for(const btn of el.querySelectorAll('[data-control-step]')){
+        const dir=Number(btn.dataset.controlStep)||0;
+        let heldPointer=null,repeatTimer=0,pressStartedAt=0,startValue='';
+        const clearRepeat=()=>{if(repeatTimer){clearTimeout(repeatTimer);repeatTimer=0;}};
+        const repeatStep=()=>{
+          if(heldPointer===null)return;
+          adjustGameControl(el,dir,{commit:false});
+          const heldFor=performance.now()-pressStartedAt;
+          const delay=heldFor>=2400?42:heldFor>=1200?68:105;
+          repeatTimer=setTimeout(repeatStep,delay);
+        };
+        const finishPress=e=>{
+          if(heldPointer===null||(e?.pointerId!=null&&e.pointerId!==heldPointer))return;
+          const pointerId=heldPointer;heldPointer=null;clearRepeat();btn.classList.remove('pressed');
+          try{if(btn.hasPointerCapture?.(pointerId))btn.releasePointerCapture(pointerId);}catch{}
+          if(String(el.value)!==startValue)el.dispatchEvent(new Event('change',{bubbles:true}));
+        };
+        btn.addEventListener('pointerdown',e=>{
+          if(el.disabled||!dir||(e.pointerType==='mouse'&&e.button!==0))return;
+          e.preventDefault();e.stopPropagation();clearRepeat();heldPointer=e.pointerId;startValue=String(el.value);pressStartedAt=performance.now();btn.classList.add('pressed');
+          try{btn.setPointerCapture?.(e.pointerId);}catch{}
+          adjustGameControl(el,dir,{commit:false});
+          repeatTimer=setTimeout(repeatStep,360);
+        });
+        btn.addEventListener('pointerup',finishPress);
+        btn.addEventListener('pointercancel',finishPress);
+        btn.addEventListener('lostpointercapture',finishPress);
+        btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();});
+        btn.addEventListener('contextmenu',e=>e.preventDefault());
+      }
       el.addEventListener('keydown',e=>{if(controllerInputActive()){if(e.key.startsWith('Arrow'))e.preventDefault();return;}if(e.key==='ArrowLeft'||e.key==='ArrowDown'){e.preventDefault();adjustGameControl(el,-1);}else if(e.key==='ArrowRight'||e.key==='ArrowUp'){e.preventDefault();adjustGameControl(el,1);}});
       if(type==='slider'){
         const track=el.querySelector('[data-slider-track]');let dragging=false;
@@ -383,7 +412,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.7';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.9';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
