@@ -2,19 +2,19 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.29.1';
+} from './world-geometry.js?v=1.29.2';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.29.1';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.29.1';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.29.1';
-import { createAudioEngine } from './audio-engine.js?v=1.29.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.29.1';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.29.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.29.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.29.1';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.29.1';
+} from './game-config.js?v=1.29.2';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.29.2';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.29.2';
+import { createAudioEngine } from './audio-engine.js?v=1.29.2';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.29.2';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.29.2';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.29.2';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.29.2';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.29.2';
 
 let THREE = null;
 
@@ -265,7 +265,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.29.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.29.2';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1088,7 +1088,7 @@ async function connectMatch(code, reconnecting=false){
   const url=`${apiToWs(ONLINE_API)}/rooms/${currentRoom}/socket?protocol=${PROTOCOL_VERSION}&ticket=${encodeURIComponent(ticket)}`;
   let ws;try{ws=new WebSocket(url);socket=ws;}catch{if(!shell.inMatch&&!reconnecting){shell.cancelConnection();disableMenu(false);setStatus('Could not open multiplayer connection.','error');}else scheduleReconnect();return;}
   ws.addEventListener('open',()=>{if(ws!==socket)return;reconnectAttempt=0;if(reconnecting)showToast('Reconnected');});
-  ws.addEventListener('message',e=>{if(ws!==socket)return;try{handleMessage(JSON.parse(e.data))}catch{}});
+  ws.addEventListener('message',e=>{if(ws!==socket)return;try{handleMessage(JSON.parse(e.data))}catch(error){console.error('WebSocket message handling failed',error);}});
   ws.addEventListener('close',e=>{
     if(ws!==socket)return;
     if(!roomSessionActive()&&!reconnecting){shell.cancelConnection();disableMenu(false);setStatus(e.reason||'Could not join match.','error');return;}
@@ -1684,7 +1684,23 @@ function updateThrowableVisual(m){
   if(g.stuck)g.snapshotVel.set(0,0,0);else g.snapshotVel.set(Number(m.vx)||0,Number(m.vy)||0,Number(m.vz)||0);
 }
 function handleThrowableImpact(m){soundThrowableImpact(m.kind||'flash',m);updateThrowableVisual(m);}
-function removeThrowableVisual(id){const g=throwables.get(id);if(!g)return;scene.remove(g.root||g.mesh);disposeObject3D(g.root||g.mesh);throwables.delete(id);}
+function disposeMaterialResources(material){
+  const materials=Array.isArray(material)?material:[material];
+  for(const mat of materials){
+    if(!mat)continue;
+    // Transient gameplay effects own their materials. Dispose any texture-like
+    // resources defensively, then the material itself. Cleanup must never throw
+    // into the animation loop.
+    for(const value of Object.values(mat)){if(value?.isTexture){try{value.dispose?.();}catch{}}}
+    try{mat.dispose?.();}catch{}
+  }
+}
+function disposeObject3D(root){
+  if(!root)return;
+  const disposeNode=(node)=>{if(!node)return;try{node.geometry?.dispose?.();}catch{}disposeMaterialResources(node.material);};
+  try{if(typeof root.traverse==='function')root.traverse(disposeNode);else disposeNode(root);}catch(error){console.warn('Transient object cleanup failed',error);}
+}
+function removeThrowableVisual(id){const g=throwables.get(id);if(!g)return;throwables.delete(id);const root=g.root||g.mesh;try{scene?.remove(root);}catch{}disposeObject3D(root);}
 function clearThrowables(){for(const id of [...throwables.keys()])removeThrowableVisual(id);}
 function updateThrowables(dt){
   const now=performance.now(),srv=serverNow();
@@ -1725,18 +1741,18 @@ function updateTacticalFx(dt){
     const attr=f.particles.geometry.getAttribute('position'),pos=attr.array,v=f.velocities;
     for(let j=0;j<pos.length;j+=3){v[j+1]-=9*dt;pos[j]+=v[j]*dt;pos[j+1]+=v[j+1]*dt;pos[j+2]+=v[j+2]*dt;}
     attr.needsUpdate=true;f.particles.material.opacity=Math.max(0,1-p);f.particles.material.size=(sticky?.10:launcher?.12:.08)*(1+p*1.25);
-    if(p>=1){scene.remove(f.root);disposeObject3D(f.root);tacticalFx.splice(i,1);}
+    if(p>=1){tacticalFx.splice(i,1);try{scene?.remove(f.root);}catch{}disposeObject3D(f.root);}
   }
 }
-function clearTacticalFx(){for(const f of tacticalFx){scene.remove(f.root);disposeObject3D(f.root);}tacticalFx.length=0;}
+function clearTacticalFx(){const pending=tacticalFx.splice(0);for(const f of pending){try{scene?.remove(f.root);}catch{}disposeObject3D(f.root);}}
 function spawnSmokeCloud(m){
   if(!scene||!THREE||!m?.id)return;const existing=smokeClouds.get(m.id);if(existing){existing.expiresAt=Math.max(existing.expiresAt,Number(m.expiresAt)||serverNow()+SMOKE_DURATION_MS);return;}
   const root=new THREE.Group();root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);const puffs=[];
   for(let i=0;i<13;i++){const mat=new THREE.MeshBasicMaterial({color:i%3===0?0x7e8588:0x686f72,transparent:true,opacity:.0,depthWrite:false});const mesh=new THREE.Mesh(new THREE.SphereGeometry(.75+Math.random()*.42,10,7),mat);const a=Math.random()*Math.PI*2,r=.25+Math.random()*2.3;mesh.position.set(Math.cos(a)*r,(Math.random()-.25)*1.45,Math.sin(a)*r);root.add(mesh);puffs.push(mesh);}
   scene.add(root);smokeClouds.set(m.id,{root,puffs,born:performance.now(),expiresAt:Number(m.expiresAt)||serverNow()+SMOKE_DURATION_MS,radius:Math.max(1,Number(m.radius)||6.8)});
 }
-function updateSmokeClouds(dt){const now=performance.now(),srv=serverNow();for(const [id,c] of smokeClouds){const age=Math.max(0,(now-c.born)/1000),remaining=c.expiresAt-srv;if(remaining<=0){scene.remove(c.root);disposeObject3D(c.root);smokeClouds.delete(id);continue;}const grow=Math.min(1,age/1.1),fade=Math.min(1,remaining/1800);c.root.scale.setScalar(.45+.55*grow);for(let i=0;i<c.puffs.length;i++){const puff=c.puffs[i];puff.material.opacity=(.23+.07*Math.sin(now*.001+i))*grow*fade;puff.rotation.y+=dt*.08*(i%2?1:-1);}}}
-function clearSmokeClouds(){for(const c of smokeClouds.values()){scene.remove(c.root);disposeObject3D(c.root);}smokeClouds.clear();}
+function updateSmokeClouds(dt){const now=performance.now(),srv=serverNow();for(const [id,c] of smokeClouds){const age=Math.max(0,(now-c.born)/1000),remaining=c.expiresAt-srv;if(remaining<=0){smokeClouds.delete(id);try{scene?.remove(c.root);}catch{}disposeObject3D(c.root);continue;}const grow=Math.min(1,age/1.1),fade=Math.min(1,remaining/1800);c.root.scale.setScalar(.45+.55*grow);for(let i=0;i<c.puffs.length;i++){const puff=c.puffs[i];puff.material.opacity=(.23+.07*Math.sin(now*.001+i))*grow*fade;puff.rotation.y+=dt*.08*(i%2?1:-1);}}}
+function clearSmokeClouds(){const pending=[...smokeClouds.values()];smokeClouds.clear();for(const c of pending){try{scene?.remove(c.root);}catch{}disposeObject3D(c.root);}}
 
 function applyFlashEffect(m){const power=Math.max(0,Math.min(1,Number(m.power)||0));if(power<=0)return;const now=performance.now(),duration=Math.max(350,Number(m.durationMs)||700+power*2600);flashPeakUntil=Math.max(flashPeakUntil,now+180+power*520);flashUntil=Math.max(flashUntil,now+duration);}
 function animate(){
