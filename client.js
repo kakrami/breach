@@ -2,18 +2,18 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.26.3';
+} from './world-geometry.js?v=1.26.4';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.26.3';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.26.3';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.26.3';
-import { createAudioEngine } from './audio-engine.js?v=1.26.3';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.26.3';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.26.3';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.26.3';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.26.3';
+} from './game-config.js?v=1.26.4';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.26.4';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.26.4';
+import { createAudioEngine } from './audio-engine.js?v=1.26.4';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.26.4';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.26.4';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.26.4';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.26.4';
 
 let THREE = null;
 
@@ -91,6 +91,7 @@ document.querySelectorAll('[data-app-version]').forEach(el=>{el.textContent=`Ver
 const platform=detectInputPlatform();
 let isTouch=platform.touchControls;
 const clientId=getClientId(),clientAuth=getClientAuth();
+const samePlayerId=(a,b)=>String(a??'')===String(b??'');
 nameInput.value=localStorage.getItem('breachName')||`Player${Math.floor(Math.random()*90+10)}`;
 let preferredTeam=localStorage.getItem('breachTeam')==='red'?'red':'blue';
 let preferredPrimary=PRIMARY_WEAPONS.includes(localStorage.getItem('breachPrimary'))?localStorage.getItem('breachPrimary'):'assault';
@@ -228,7 +229,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.26.3';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.26.4';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -524,19 +525,23 @@ function init3D(){
   sniperFlash = new THREE.Mesh(new THREE.SphereGeometry(.085,8,6),new THREE.MeshBasicMaterial({color:0xffe6a6,transparent:true,opacity:0}));sniperFlash.position.set(0,.025,-1.23);
   sniperGroup.add(rifleBody,rifleBarrel,stock,scope,sniperBolt,sniperFlash);sniperGroup.position.set(.28,-.28,-.48);sniperGroup.rotation.set(-.055,-.05,0);sniperGroup.visible=false;
   camera.add(pistolGroup,assaultGroup,shotgunGroup,sniperGroup);
+  // First-person traversal view model. Keep this geometry entirely in camera
+  // space and well in front of the near plane. The old capsule arms extended
+  // back toward the eye and could fill the screen during mantle/vault motion,
+  // creating the appearance that the camera had entered the player's body.
   mantleHands=new THREE.Group();
-  const mantleGloveMat=new THREE.MeshStandardMaterial({color:0x171c20,roughness:.92});
-  const mantleSleeveMat=new THREE.MeshStandardMaterial({color:0x344047,roughness:.96});
+  const mantleGloveMat=new THREE.MeshStandardMaterial({color:0x171c20,roughness:.92,depthTest:false,depthWrite:false});
+  const mantleSleeveMat=new THREE.MeshStandardMaterial({color:0x344047,roughness:.96,depthTest:false,depthWrite:false});
   for(const side of [-1,1]){
     const limb=new THREE.Group();
-    const arm=new THREE.Mesh(new THREE.CapsuleGeometry(.042,.30,4,8),mantleSleeveMat);
-    arm.rotation.x=Math.PI/2;arm.position.set(0,-.06,.11);
-    const hand=new THREE.Mesh(new THREE.SphereGeometry(.052,10,7),mantleGloveMat);
-    hand.scale.set(1.15,.70,1.30);hand.position.set(0,.075,-.13);
-    limb.position.set(side*.18,-.38,-.64);limb.rotation.z=side*.08;limb.userData.side=side;limb.userData.arm=arm;limb.userData.hand=hand;
-    limb.add(arm,hand);mantleHands.add(limb);
+    const forearm=new THREE.Mesh(new THREE.CylinderGeometry(.038,.050,.30,8),mantleSleeveMat);
+    forearm.rotation.x=Math.PI/2;forearm.position.set(0,-.035,.10);forearm.renderOrder=1000;
+    const hand=new THREE.Mesh(new THREE.SphereGeometry(.050,10,7),mantleGloveMat);
+    hand.scale.set(1.12,.66,1.24);hand.position.set(0,.025,-.105);hand.renderOrder=1001;
+    limb.position.set(side*.27,-.34,-.82);limb.rotation.z=side*.06;limb.userData.side=side;limb.userData.forearm=forearm;limb.userData.hand=hand;
+    limb.add(forearm,hand);mantleHands.add(limb);
   }
-  mantleHands.visible=false;camera.add(mantleHands);scene.add(camera);
+  mantleHands.visible=false;mantleHands.renderOrder=1000;camera.add(mantleHands);scene.add(camera);
 
   animate();
 }
@@ -1126,7 +1131,7 @@ function applyGameSnapshot(snapshot,{resetRound=false}={}){
   clearRemotes();
   const self=snapshot.self||snapshot.players.find(player=>player?.id===clientId)||null;
   if(self)handleRespawn(self);
-  for(const player of snapshot.players){if(player?.id&&player.id!==clientId)upsertRemote(player,true);}
+  for(const player of snapshot.players){if(player?.id&&!samePlayerId(player.id,clientId))upsertRemote(player,true);}
   for(const bot of snapshot.bots)upsertRemote(bot,true);
   syncPauseContext();return true;
 }
@@ -1163,7 +1168,7 @@ function updateRemoteTarget(r,player,instant=false){
   if(Number(player.reloadAt)>0){r.reloadUntil=Number(player.reloadAt);r.reloadWeapon=player.reloadWeapon||r.weapon;if(!r.reloadStartedAt)r.reloadStartedAt=serverNow();}
   if(instant){r.group.position.copy(r.target);r.group.rotation.y=r.targetYaw;}
 }
-function upsertRemote(player,instant=false){if(!player?.id||player.id===clientId)return;let r=remotes.get(player.id);if(!r){r=makeRemote(player);remotes.set(player.id,r);}const oldTeam=r.team;r.name=player.name||r.name;r.bot=!!player.bot;r.team=player.team||r.team;r.color=remoteDisplayColor(r.team);r.admin=player.admin??r.admin;r.weapon=player.weapon||r.weapon;if(PRIMARY_WEAPONS.includes(player.primaryWeapon))r.primaryWeapon=player.primaryWeapon;r.hp=player.hp??r.hp;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;if(player.traversal&&typeof player.traversal==='object'&&Number(player.traversal.seq)!==Number(r.traversal?.seq))r.traversal=traversalPlanFromServer({id:player.id,accepted:true,...player.traversal});else if(player.bot&&player.traversal===null)r.traversal=null;if(r.godRing)r.godRing.visible=!!r.godMode;if(oldTeam!==r.team)applyRemoteTeamVisual(r,r.team);syncRemoteWeapon(r);updateRemoteTarget(r,player,instant);}
+function upsertRemote(player,instant=false){if(!player?.id)return;if(samePlayerId(player.id,clientId)){for(const [id] of remotes){if(samePlayerId(id,clientId))removeRemote(id);}return;}let r=remotes.get(player.id);if(!r){r=makeRemote(player);remotes.set(player.id,r);}const oldTeam=r.team;r.name=player.name||r.name;r.bot=!!player.bot;r.team=player.team||r.team;r.color=remoteDisplayColor(r.team);r.admin=player.admin??r.admin;r.weapon=player.weapon||r.weapon;if(PRIMARY_WEAPONS.includes(player.primaryWeapon))r.primaryWeapon=player.primaryWeapon;r.hp=player.hp??r.hp;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;if(player.traversal&&typeof player.traversal==='object'&&Number(player.traversal.seq)!==Number(r.traversal?.seq))r.traversal=traversalPlanFromServer({id:player.id,accepted:true,...player.traversal});else if(player.bot&&player.traversal===null)r.traversal=null;if(r.godRing)r.godRing.visible=!!r.godMode;if(oldTeam!==r.team)applyRemoteTeamVisual(r,r.team);syncRemoteWeapon(r);updateRemoteTarget(r,player,instant);}
 function removeRemote(id){const r=remotes.get(id);if(!r)return;scene.remove(r.group);r.group.traverse(o=>{if(o.geometry)o.geometry.dispose?.();if(o.material){if(o.material.map)o.material.map.dispose?.();o.material.dispose?.();}});remotes.delete(id);}
 function clearRemotes(){for(const id of [...remotes.keys()])removeRemote(id);}
 
@@ -1211,7 +1216,7 @@ function traversalPlanFromServer(m){
   return {seq:Math.max(0,Math.floor(Number(m.seq)||0)),mode:m.mode==='vault'?'vault':'mantle',role:String(m.role||''),portalId:String(m.portalId||''),startX:Number(m.startX)||0,startY:Number(m.startY)||0,startZ:Number(m.startZ)||0,endX:Number(m.endX)||0,endY:Number(m.endY)||0,endZ:Number(m.endZ)||0,peakY:Number(m.peakY)||Number(m.endY)||0,durationMs,startedAt:performance.now()-Math.min(durationMs,elapsed),endGrounded:m.endGrounded!==false,exitVelocityY:Number.isFinite(Number(m.exitVelocityY))?Number(m.exitVelocityY):0,viewMaxY:m.viewMaxY!=null&&Number.isFinite(Number(m.viewMaxY))?Number(m.viewMaxY):null};
 }
 function handleTraversalMessage(m){
-  if(m.id===clientId){
+  if(samePlayerId(m.id,clientId)){
     if(m.accepted===false){traversal=null;const x=Number(m.x),y=Number(m.y),z=Number(m.z);if(Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z)){position.set(x,y,z);clearCorrectionView();resetViewVertical();}return;}
     traversal=traversalPlanFromServer(m);clearCorrectionView();resetViewVertical();verticalVelocity=0;onGround=false;return;
   }
@@ -1658,6 +1663,7 @@ function round3(n){return Math.round(n*1000)/1000;}
 
 function updateRemoteVisuals(dt){
   const now=performance.now(),srv=serverNow();
+  for(const [id] of remotes){if(samePlayerId(id,clientId))removeRemote(id);}
   for(const r of remotes.values()){
     const netFollow=1-Math.exp(-dt*(r.bot?15:20));r.group.position.lerp(r.target,netFollow);let d=normalizeAngle(r.targetYaw-r.group.rotation.y);r.group.rotation.y+=d*netFollow;
     const dead=r.hp<=0;r.deathPose=THREE.MathUtils.lerp(r.deathPose,dead?1:0,Math.min(1,dt*(dead?5.5:12)));const dp=r.deathPose*r.deathPose*(3-2*r.deathPose);r.model.rotation.z=1.34*dp;r.model.rotation.x=.10*dp;r.model.position.y=-.18*dp;if(r.tag)r.tag.visible=!dead;
@@ -1719,8 +1725,11 @@ function updateWeaponView(dt){
     mantleHands.visible=!!traversePoseNow;
     if(traversePoseNow){
       const reach=smoothstep01(Math.min(1,traverseP/.42)),pull=smoothstep01(Math.max(0,(traverseP-.42)/.58)),vault=traversal?.mode==='vault';
-      mantleHands.position.set(0,-.01+pull*.05,-.02-reach*.06+pull*.03);mantleHands.rotation.x=-.08-reach*.10+pull*.13;
-      mantleHands.children.forEach((limb,i)=>{const side=limb.userData.side|| (i?1:-1),stagger=vault?(i?-.07:.04):0,wave=Math.sin(Math.PI*THREE.MathUtils.clamp(traverseP+stagger,0,1));limb.position.x=side*(.18-.018*reach);limb.position.y=-.38+.10*reach-.05*pull+(vault?side*.018*wave:0);limb.position.z=-.64-.06*reach+.06*pull;limb.rotation.x=(vault?side*.12:0)*wave;limb.rotation.z=side*(.08-.12*reach);});
+      // Hands rise from the lower corners and reach forward. No traversal
+      // geometry is allowed closer than ~0.55 m to the eye, so camera pitch or
+      // mantle motion cannot expose the inside of a forearm mesh.
+      mantleHands.position.set(0,-.015+pull*.035,-.03-reach*.07+pull*.025);mantleHands.rotation.x=-.045-reach*.055+pull*.07;
+      mantleHands.children.forEach((limb,i)=>{const side=limb.userData.side|| (i?1:-1),stagger=vault?(i?-.055:.035):0,wave=Math.sin(Math.PI*THREE.MathUtils.clamp(traverseP+stagger,0,1));limb.position.x=side*(.27-.025*reach);limb.position.y=-.34+.085*reach-.035*pull+(vault?side*.012*wave:0);limb.position.z=-.82-.10*reach+.055*pull;limb.rotation.x=(vault?side*.07:0)*wave;limb.rotation.z=side*(.06-.08*reach);});
     }
   }
   pistolFlash.material.opacity=Math.max(0,pistolFlash.material.opacity-dt*18);assaultFlash.material.opacity=Math.max(0,assaultFlash.material.opacity-dt*22);shotgunFlash.material.opacity=Math.max(0,shotgunFlash.material.opacity-dt*20);sniperFlash.material.opacity=Math.max(0,sniperFlash.material.opacity-dt*18);
