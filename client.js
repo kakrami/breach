@@ -2,19 +2,19 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.29.0';
+} from './world-geometry.js?v=1.29.1';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.29.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.29.0';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.29.0';
-import { createAudioEngine } from './audio-engine.js?v=1.29.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.29.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.29.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.29.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.29.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.29.0';
+} from './game-config.js?v=1.29.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.29.1';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.29.1';
+import { createAudioEngine } from './audio-engine.js?v=1.29.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.29.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.29.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.29.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.29.1';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.29.1';
 
 let THREE = null;
 
@@ -210,7 +210,7 @@ function activateTouchInputMode(){
 const killFeed = [];
 let minimapStaticCache=null;
 let hudLayout=null;
-let viewW=1,viewH=1;
+let viewW=1,viewH=1,viewDpr=1;
 
 function suspendGameplayInput(){
   keys.clear();
@@ -259,13 +259,13 @@ const shell=createSessionShell({
   onPointerLockUnavailable:()=>showToast('Mouse capture unavailable'),
   alternateInputReady:()=>controllerInputActive(),
 });
-({w:viewW,h:viewH}=shell.viewport);
+({w:viewW,h:viewH,dpr:viewDpr}=shell.viewport);
 shell.start();
 
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.29.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.29.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1024,7 +1024,7 @@ function updateJoy(x,y,center){
   joy.x=dx/max;joy.y=dy/max;
 }
 
-function canvasPoint(e){const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*(viewW/r.width),y:(e.clientY-r.top)*(viewH/r.height)};}
+function canvasPoint(e){const r=canvas.getBoundingClientRect(),rw=Math.max(1,r.width),rh=Math.max(1,r.height);return{x:(e.clientX-r.left)*(viewW/rw),y:(e.clientY-r.top)*(viewH/rh)};}
 function pointInCircle(x,y,c){return Math.hypot(x-c.x,y-c.y)<=c.r;}
 function pointNearCircle(x,y,c,padding=0){return Math.hypot(x-c.x,y-c.y)<=c.r+padding;}
 function joystickSpawnAllowed(p,layout){return p.x<=layout.moveBoundary&&![layout.leftFire,layout.crouch,layout.flash,layout.sticky].some(c=>pointNearCircle(p.x,p.y,c,TOUCH_JOY_BUTTON_PADDING));}
@@ -1701,14 +1701,33 @@ function updateThrowables(dt){
 }
 
 function spawnDetonationFx(kind,m){
-  if(!scene||!THREE)return;const sticky=kind==='sticky',root=new THREE.Group();root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);
-  const core=new THREE.Mesh(new THREE.SphereGeometry(1,14,10),new THREE.MeshBasicMaterial({color:sticky?0xff8a35:0xffffff,transparent:true,opacity:1,depthWrite:false,blending:THREE.AdditiveBlending}));core.scale.setScalar(.08);root.add(core);
-  const ring=new THREE.Mesh(new THREE.RingGeometry(.62,.82,28),new THREE.MeshBasicMaterial({color:sticky?0xffb15c:0xeafaff,transparent:true,opacity:.92,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));ring.rotation.x=-Math.PI/2;ring.scale.setScalar(.15);root.add(ring);
-  const light=new THREE.PointLight(sticky?0xff7a2e:0xffffff,sticky?11:15,sticky?17:22,2);root.add(light);
-  const particles=[];const count=sticky?18:10;for(let i=0;i<count;i++){const p=new THREE.Mesh(new THREE.SphereGeometry(sticky?.035:.025,5,4),new THREE.MeshBasicMaterial({color:sticky?(i%3?0xff9c45:0xffe0a0):0xffffff,transparent:true,opacity:.95,depthWrite:false,blending:THREE.AdditiveBlending}));const a=Math.random()*Math.PI*2,e=.15+Math.random()*.8,speed=(sticky?4.5:6)+Math.random()*(sticky?7:5);const dir=new THREE.Vector3(Math.cos(a)*Math.cos(e),Math.sin(e),Math.sin(a)*Math.cos(e)).multiplyScalar(speed);root.add(p);particles.push({mesh:p,v:dir});}
-  scene.add(root);tacticalFx.push({kind,root,core,ring,light,particles,age:0,duration:sticky?.72:.48});
+  if(!scene||!THREE)return;
+  const sticky=kind==='sticky',launcher=kind==='rpg'||kind==='grenadeLauncher',root=new THREE.Group();root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);
+  // Explosion FX must stay cosmetic. The old effect added/removes a real PointLight
+  // per blast, which changes Three.js lighting programs and can force broad shader
+  // recompilation exactly when a GL/RPG detonates. Keep the flash fully unlit so
+  // detonation never changes the renderer's light count or blocks gameplay.
+  const coreColor=sticky?0xff8a35:launcher?0xffb05d:0xffffff,ringColor=sticky?0xffb15c:launcher?0xffd19a:0xeafaff;
+  const core=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),new THREE.MeshBasicMaterial({color:coreColor,transparent:true,opacity:1,depthWrite:false,blending:THREE.AdditiveBlending}));core.scale.setScalar(.08);root.add(core);
+  const ring=new THREE.Mesh(new THREE.RingGeometry(.62,.82,24),new THREE.MeshBasicMaterial({color:ringColor,transparent:true,opacity:.92,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));ring.rotation.x=-Math.PI/2;ring.scale.setScalar(.15);root.add(ring);
+  const count=sticky?18:launcher?16:10,positions=new Float32Array(count*3),velocities=new Float32Array(count*3),geometry=new THREE.BufferGeometry();
+  for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,e=.15+Math.random()*.8,speed=(sticky?4.5:launcher?6.4:6)+Math.random()*(sticky?7:launcher?6.5:5),j=i*3;velocities[j]=Math.cos(a)*Math.cos(e)*speed;velocities[j+1]=Math.sin(e)*speed;velocities[j+2]=Math.sin(a)*Math.cos(e)*speed;}
+  geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  const particleMaterial=new THREE.PointsMaterial({color:sticky?0xffae68:launcher?0xffc17a:0xffffff,size:sticky?.10:launcher?.12:.08,sizeAttenuation:true,transparent:true,opacity:.92,depthWrite:false,blending:THREE.AdditiveBlending});
+  const particles=new THREE.Points(geometry,particleMaterial);particles.frustumCulled=false;root.add(particles);scene.add(root);
+  tacticalFx.push({kind,root,core,ring,particles,velocities,age:0,duration:sticky?.72:launcher?.56:.48});
 }
-function updateTacticalFx(dt){for(let i=tacticalFx.length-1;i>=0;i--){const f=tacticalFx[i];f.age+=dt;const p=Math.min(1,f.age/f.duration),sticky=f.kind==='sticky';f.core.scale.setScalar((sticky?3.8:5.5)*(1-Math.pow(1-p,3))+.05);f.core.material.opacity=(1-p)*(sticky?.62:.88);f.ring.scale.setScalar(.2+p*(sticky?7.5:10));f.ring.material.opacity=(1-p)*(sticky?.72:.86);f.light.intensity=(sticky?11:15)*Math.pow(1-p,2);for(const q of f.particles){q.v.y-=9*dt;q.mesh.position.addScaledVector(q.v,dt);q.mesh.material.opacity=Math.max(0,1-p);q.mesh.scale.setScalar(1+p*1.8);}if(p>=1){scene.remove(f.root);disposeObject3D(f.root);tacticalFx.splice(i,1);}}}
+function updateTacticalFx(dt){
+  for(let i=tacticalFx.length-1;i>=0;i--){
+    const f=tacticalFx[i];f.age+=dt;const p=Math.min(1,f.age/f.duration),sticky=f.kind==='sticky',launcher=f.kind==='rpg'||f.kind==='grenadeLauncher';
+    f.core.scale.setScalar((sticky?3.8:launcher?6.4:5.5)*(1-Math.pow(1-p,3))+.05);f.core.material.opacity=(1-p)*(sticky?.62:launcher?.78:.88);
+    f.ring.scale.setScalar(.2+p*(sticky?7.5:launcher?11.5:10));f.ring.material.opacity=(1-p)*(sticky?.72:launcher?.82:.86);
+    const attr=f.particles.geometry.getAttribute('position'),pos=attr.array,v=f.velocities;
+    for(let j=0;j<pos.length;j+=3){v[j+1]-=9*dt;pos[j]+=v[j]*dt;pos[j+1]+=v[j+1]*dt;pos[j+2]+=v[j+2]*dt;}
+    attr.needsUpdate=true;f.particles.material.opacity=Math.max(0,1-p);f.particles.material.size=(sticky?.10:launcher?.12:.08)*(1+p*1.25);
+    if(p>=1){scene.remove(f.root);disposeObject3D(f.root);tacticalFx.splice(i,1);}
+  }
+}
 function clearTacticalFx(){for(const f of tacticalFx){scene.remove(f.root);disposeObject3D(f.root);}tacticalFx.length=0;}
 function spawnSmokeCloud(m){
   if(!scene||!THREE||!m?.id)return;const existing=smokeClouds.get(m.id);if(existing){existing.expiresAt=Math.max(existing.expiresAt,Number(m.expiresAt)||serverNow()+SMOKE_DURATION_MS);return;}
@@ -1736,7 +1755,15 @@ function animate(){
     for(let i=0;i<steps;i++)updateGameSimulation(stepDt);
     updateGameFrame(Math.min(frameDt,MAX_PLAYER_PHYSICS_STEP_SEC));
   }else updatePausedNetwork();
-  const visualDt=Math.min(frameDt,.10);updateAim(visualDt);updateRemoteVisuals(visualDt);updateWeaponView(visualDt);updateBullets();updateThrowables(visualDt);updateTacticalFx(visualDt);updateSmokeClouds(visualDt);updateEquipmentTrajectory();
+  const visualDt=Math.min(frameDt,.10);updateAim(visualDt);updateRemoteVisuals(visualDt);updateWeaponView(visualDt);
+  // Cosmetic systems are fault-contained from the gameplay/simulation path.
+  // A malformed transient effect must be discarded rather than poisoning every
+  // following render frame and making the match appear frozen.
+  try{updateBullets();}catch(error){console.error('Tracer update failed; clearing transient tracers.',error);clearBullets();}
+  try{updateThrowables(visualDt);}catch(error){console.error('Throwable visual update failed; clearing transient throwables.',error);clearThrowables();}
+  try{updateTacticalFx(visualDt);}catch(error){console.error('Explosion visual update failed; clearing transient explosion FX.',error);clearTacticalFx();}
+  try{updateSmokeClouds(visualDt);}catch(error){console.error('Smoke visual update failed; clearing transient smoke FX.',error);clearSmokeClouds();}
+  updateEquipmentTrajectory();
   renderer.autoClear=true;renderer.render(scene,camera);
   if(shell.canPlay){renderer.autoClear=false;renderer.clearDepth();renderer.render(hudScene,hudCamera);renderer.autoClear=true;drawHud(performance.now());}
 }
@@ -1975,9 +2002,9 @@ function updateWeaponView(dt){
 function normalizeAngle(a){while(a>Math.PI)a-=Math.PI*2;while(a<-Math.PI)a+=Math.PI*2;return a;}
 
 function applyViewportSize(metrics=shell.viewport){
-  const nextW=Math.max(1,Math.round(metrics?.w||1)),nextH=Math.max(1,Math.round(metrics?.h||1));
-  const sizeChanged=nextW!==viewW||nextH!==viewH;
-  viewW=nextW;viewH=nextH;
+  const nextW=Math.max(1,Math.round(metrics?.w||1)),nextH=Math.max(1,Math.round(metrics?.h||1)),nextDpr=Math.max(.5,Math.min(4,Number(metrics?.dpr)||Number(devicePixelRatio)||1));
+  const sizeChanged=nextW!==viewW||nextH!==viewH,dprChanged=Math.abs(nextDpr-viewDpr)>.001;
+  viewW=nextW;viewH=nextH;viewDpr=nextDpr;
   if(!camera||!renderer)return;
   const aspect=viewW/viewH;
   camera.aspect=aspect;
@@ -1986,7 +2013,11 @@ function applyViewportSize(metrics=shell.viewport){
   baseFov=THREE.MathUtils.clamp(landscapeVFov,58,72);
   if(adsBlend<.01)camera.fov=baseFov;
   camera.updateProjectionMatrix();
-  if(sizeChanged){renderer.setSize(viewW,viewH,false);resizeHudOverlay();}
+  if(sizeChanged||dprChanged){
+    const ratio=targetPixelRatio();if(Math.abs(renderer.getPixelRatio()-ratio)>.001)renderer.setPixelRatio(ratio);
+    renderer.setSize(viewW,viewH,false);resizeHudOverlay();minimapStaticCache=null;scoreboardPanel=null;scoreboardDrag=null;hudLastDraw=0;
+    if(isTouch)resetTouchInput();
+  }
   hudLayout=computeHudLayout();
 }
 

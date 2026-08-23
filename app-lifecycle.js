@@ -7,8 +7,9 @@ function standaloneMode(){
   return navigator.standalone===true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
 }
 function measure(el){
-  const r=el.getBoundingClientRect();
-  return {w:Math.max(1,Math.round(r.width||innerWidth||1)),h:Math.max(1,Math.round(r.height||innerHeight||1))};
+  const r=el.getBoundingClientRect(),vv=globalThis.visualViewport;
+  const w=r.width||el.clientWidth||vv?.width||globalThis.innerWidth||1,h=r.height||el.clientHeight||vv?.height||globalThis.innerHeight||1;
+  return {w:Math.max(1,Math.round(w)),h:Math.max(1,Math.round(h)),dpr:Math.max(.5,Math.min(4,Number(globalThis.devicePixelRatio)||1))};
 }
 export function detectInputPlatform(){
   const touchPoints=Math.max(0,Number(navigator.maxTouchPoints)||0),touchCapable=touchPoints>0;
@@ -85,15 +86,26 @@ export function createSessionShell({
     if(lastCanPlay&&!s.canPlay)onSuspend(reason,s);lastCanPlay=s.canPlay;onStateChange(s,reason);return s;
   }
 
-  function syncViewport(){
-    const next=measure(stage);if(next.w===viewport.w&&next.h===viewport.h)return false;
+  function syncViewport(force=false){
+    const next=measure(stage),changed=next.w!==viewport.w||next.h!==viewport.h||Math.abs(next.dpr-viewport.dpr)>.001;
+    if(!changed&&!force)return false;
     viewport=next;onViewport({...viewport});
     if(platform.touchControls&&immersive()&&!landscapeReady()&&inMatch()&&!paused){paused=true;pauseReason='orientation';panel=SHELL_PANEL.NONE;}
     return true;
   }
-  const viewportChanged=()=>{if(syncViewport())render('viewport');};
+  const raf=globalThis.requestAnimationFrame?.bind(globalThis)||((fn)=>setTimeout(fn,0));
+  const caf=globalThis.cancelAnimationFrame?.bind(globalThis)||clearTimeout;
+  let viewportFrame=0,viewportSettleTimer=0;
+  function scheduleViewport(reason='viewport'){
+    if(!viewportFrame)viewportFrame=raf(()=>{viewportFrame=0;if(syncViewport())render(reason);});
+    clearTimeout(viewportSettleTimer);viewportSettleTimer=setTimeout(()=>{viewportSettleTimer=0;if(syncViewport(true))render(`${reason}-settled`);},90);
+  }
+  const viewportChanged=()=>scheduleViewport('viewport');
   const resizeObserver=typeof ResizeObserver==='function'?new ResizeObserver(viewportChanged):null;
-  resizeObserver?.observe(stage);if(!resizeObserver)addEventListener('resize',viewportChanged);
+  resizeObserver?.observe(stage);
+  addEventListener('resize',viewportChanged,{passive:true});
+  addEventListener('orientationchange',viewportChanged,{passive:true});
+  globalThis.visualViewport?.addEventListener?.('resize',viewportChanged,{passive:true});
 
   async function requestFullscreen(){
     if(platform.standalone||fullscreen())return true;if(!fullscreenSupported())return false;
@@ -186,7 +198,7 @@ export function createSessionShell({
 
   function fullscreenChanged(){
     if(!immersive()){if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();unlockLandscape();}
-    syncViewport();render('fullscreen');
+    syncViewport(true);scheduleViewport('fullscreen');render('fullscreen');
   }
   function pointerLockChanged(){
     if(platform.touchControls)return;
@@ -199,10 +211,10 @@ export function createSessionShell({
   const fullscreenEvent=('fullscreenEnabled'in document||'fullscreenElement'in document)?'fullscreenchange':'webkitfullscreenchange';
   document.addEventListener(fullscreenEvent,fullscreenChanged);document.addEventListener('pointerlockchange',pointerLockChanged);document.addEventListener('pointerlockerror',()=>{onPointerLockUnavailable();});document.addEventListener('visibilitychange',visibilityChanged);addEventListener('pagehide',visibilityChanged);
 
-  function start(){syncViewport();onViewport({...viewport});return render('start');}
+  function start(){syncViewport(true);return render('start');}
   return {
     platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
     enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
-    destroy(){resizeObserver?.disconnect();if(!resizeObserver)removeEventListener('resize',viewportChanged);document.removeEventListener(fullscreenEvent,fullscreenChanged);document.removeEventListener('pointerlockchange',pointerLockChanged);document.removeEventListener('visibilitychange',visibilityChanged);removeEventListener('pagehide',visibilityChanged);}
+    destroy(){resizeObserver?.disconnect();if(viewportFrame)caf(viewportFrame);clearTimeout(viewportSettleTimer);removeEventListener('resize',viewportChanged);removeEventListener('orientationchange',viewportChanged);globalThis.visualViewport?.removeEventListener?.('resize',viewportChanged);document.removeEventListener(fullscreenEvent,fullscreenChanged);document.removeEventListener('pointerlockchange',pointerLockChanged);document.removeEventListener('visibilitychange',visibilityChanged);removeEventListener('pagehide',visibilityChanged);}
   };
 }
