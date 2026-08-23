@@ -2,19 +2,19 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.29.2';
+} from './world-geometry.js?v=1.29.3';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.29.2';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.29.2';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.29.2';
-import { createAudioEngine } from './audio-engine.js?v=1.29.2';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.29.2';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.29.2';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.29.2';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.29.2';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.29.2';
+} from './game-config.js?v=1.29.3';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.29.3';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.29.3';
+import { createAudioEngine } from './audio-engine.js?v=1.29.3';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.29.3';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.29.3';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.29.3';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.29.3';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.29.3';
 
 let THREE = null;
 
@@ -265,7 +265,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.29.2';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.29.3';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1139,6 +1139,7 @@ function handleMessage(m){
   if(m.t==='correction'){applyServerCorrection(m);return;}
   if(m.t==='botState'){for(const b of m.bots||[])upsertRemote(b,false);return;}
   if(m.t==='shot'){handleShot(m);return;}
+  if(m.t==='projectileState'){updateLauncherProjectileState(m);return;}
   if(m.t==='bulletEnd'){removeBullet(m.id);return;}
   if(m.t==='equipment'){equipment=normalizeEquipment(m.equipment);return;}
   if(m.t==='throwable'){spawnThrowableVisual(m);return;}
@@ -1149,7 +1150,7 @@ function handleMessage(m){
   if(m.t==='flashDetonate'){soundTacticalDetonation('flash',m);spawnDetonationFx('flash',m);removeThrowableVisual(m.id);return;}
   if(m.t==='smokeDetonate'){soundTacticalDetonation('smoke',m);spawnSmokeCloud(m);removeThrowableVisual(m.id);return;}
   if(m.t==='flashEffect'){applyFlashEffect(m);return;}
-  if(m.t==='explosion'){soundTacticalDetonation(m.kind||'sticky',m);spawnDetonationFx(m.kind||'sticky',m);removeThrowableVisual(m.id);return;}
+  if(m.t==='explosion'){const projectile=bullets.get(m.id);if(projectile?.type==='launcher')projectile.root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);soundTacticalDetonation(m.kind||'sticky',m);spawnDetonationFx(m.kind||'sticky',m);removeBullet(m.id);removeThrowableVisual(m.id);return;}
   if(m.t==='loadout'){applyAuthoritativeLoadout(m);syncLobby();return;}
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';r.swapStartedAt=performance.now();syncRemoteWeapon(r);}return;}
   if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;if(r.reloadWeapon!=='shotgun'&&r.reloadUntil)playSpatialCue(reloadSoundId(r.reloadWeapon),r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
@@ -1638,31 +1639,64 @@ function tracerHash(id){let h=0;for(const ch of String(id||''))h=(h*33+ch.charCo
 function shotPacketPrimary(m){return m.primaryShot===true||(m.primaryShot==null&&m.consumeAmmo!==false);}
 function shouldShowTracer(m){if(['sniper','pistol','grenadeLauncher','rpg'].includes(m.weapon))return true;if(m.weapon==='shotgun'||m.weapon==='semiShotgun')return shotPacketPrimary(m);return tracerHash(m.id)%2===0;}
 function createTracer(m){
-  if(!shouldShowTracer(m))return null;
+  if(!shouldShowTracer(m)||['grenadeLauncher','rpg'].includes(m.weapon))return null;
   const velocity=new THREE.Vector3(Number(m.vx)||0,Number(m.vy)||0,Number(m.vz)||0),speed=Math.max(.01,velocity.length()),dir=velocity.clone().multiplyScalar(1/speed),serverStart=new THREE.Vector3(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0),start=serverStart.clone();
   if(m.ownerId===clientId){const muzzle=localMuzzleObject(m.weapon);if(muzzle){camera.updateMatrixWorld(true);muzzle.getWorldPosition(start);}}
-  let visualDir=dir.clone();if(m.ownerId===clientId){const converge=serverStart.clone().addScaledVector(dir,['grenadeLauncher','rpg'].includes(m.weapon)?5.5:9);visualDir=converge.sub(start).normalize();}
+  let visualDir=dir.clone();if(m.ownerId===clientId){const converge=serverStart.clone().addScaledVector(dir,9);visualDir=converge.sub(start).normalize();}
   const geometry=new THREE.BufferGeometry(),positions=new Float32Array(6);geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
-  const color=m.weapon==='sniper'?0xb8efff:m.weapon==='rpg'?0xffa55c:m.weapon==='grenadeLauncher'?0xffbc68:(m.weapon==='shotgun'||m.weapon==='semiShotgun')?0xffc482:(m.weapon==='assault'||m.weapon==='ump')?0xffdc96:0xffedbd,line=new THREE.Line(geometry,tracerMaterial(color));line.frustumCulled=false;scene.add(line);
-  const gravity=Math.max(0,Number(m.gravity)||0),launcher=['grenadeLauncher','rpg'].includes(m.weapon);
-  return{mesh:line,geometry,start,dir:visualDir,speed,gravity,born:performance.now(),lifeMs:launcher?Math.min(700,Number(m.lifetimeMs)||700):m.weapon==='sniper'?125:m.weapon==='pistol'?105:(m.weapon==='shotgun'||m.weapon==='semiShotgun')?62:92,length:launcher?1.05:m.weapon==='sniper'?2.8:(m.weapon==='assault'||m.weapon==='ump')?1.55:m.weapon==='pistol'?.95:.75};
+  const color=m.weapon==='sniper'?0xb8efff:(m.weapon==='shotgun'||m.weapon==='semiShotgun')?0xffc482:(m.weapon==='assault'||m.weapon==='ump')?0xffdc96:0xffedbd,line=new THREE.Line(geometry,tracerMaterial(color));line.frustumCulled=false;scene.add(line);
+  const gravity=Math.max(0,Number(m.gravity)||0);
+  return{type:'tracer',mesh:line,geometry,start,dir:visualDir,speed,gravity,born:performance.now(),lifeMs:m.weapon==='sniper'?125:m.weapon==='pistol'?105:(m.weapon==='shotgun'||m.weapon==='semiShotgun')?62:92,length:m.weapon==='sniper'?2.8:(m.weapon==='assault'||m.weapon==='ump')?1.55:m.weapon==='pistol'?.95:.75};
 }
-
+function createLauncherProjectile(m){
+  if(!scene||!THREE)return null;
+  const weapon=m.weapon==='rpg'?'rpg':'grenadeLauncher',root=new THREE.Group(),bodyColor=weapon==='grenadeLauncher'?0x536140:0x50534d,bandColor=weapon==='grenadeLauncher'?0xc5aa62:0x8a8d87;
+  // Launcher rounds are intentionally oversized in first/third person so the
+  // player can read their arc and impact point, like an arcade/CoD-style 40 mm
+  // grenade rather than a thin rifle tracer.
+  if(weapon==='grenadeLauncher'){
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(.115,.125,.34,12),new THREE.MeshBasicMaterial({color:bodyColor}));root.add(body);
+    const nose=new THREE.Mesh(new THREE.SphereGeometry(.118,10,7),new THREE.MeshBasicMaterial({color:0x626f4f}));nose.scale.y=.75;nose.position.y=.20;root.add(nose);
+    const band=new THREE.Mesh(new THREE.CylinderGeometry(.132,.132,.055,12),new THREE.MeshBasicMaterial({color:bandColor}));band.position.y=-.07;root.add(band);
+  }else{
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(.075,.09,.48,12),new THREE.MeshBasicMaterial({color:bodyColor}));root.add(body);
+    const nose=new THREE.Mesh(new THREE.ConeGeometry(.09,.22,12),new THREE.MeshBasicMaterial({color:0x6d716b}));nose.position.y=.35;root.add(nose);
+    const tail=new THREE.Mesh(new THREE.CylinderGeometry(.11,.075,.12,10),new THREE.MeshBasicMaterial({color:0x343733}));tail.position.y=-.30;root.add(tail);
+  }
+  const serverPos=new THREE.Vector3(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0),velocity=new THREE.Vector3(Number(m.vx)||0,Number(m.vy)||0,Number(m.vz)||0),visualStart=serverPos.clone();
+  if(m.ownerId===clientId){const muzzle=localMuzzleObject(weapon);if(muzzle){camera.updateMatrixWorld(true);muzzle.getWorldPosition(visualStart);}}
+  root.position.copy(visualStart);scene.add(root);
+  return{type:'launcher',weapon,mesh:root,root,snapshotPos:serverPos,snapshotVel:velocity,snapshotAt:Number(m.at)||serverNow(),gravity:Math.max(0,Number(m.gravity)||0),born:performance.now(),lifeMs:Math.max(900,Number(m.lifetimeMs)||3000),visualVelocity:velocity.clone()};
+}
+function updateLauncherProjectileState(m){
+  const b=bullets.get(m?.id);if(!b||b.type!=='launcher')return;
+  const at=Number(m.at)||serverNow();if(at+2<b.snapshotAt)return;
+  b.snapshotPos.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);b.snapshotVel.set(Number(m.vx)||0,Number(m.vy)||0,Number(m.vz)||0);b.snapshotAt=at;b.gravity=Math.max(0,Number(m.gravity)||b.gravity||0);
+}
 function handleShot(m){
   if(!m?.id||bullets.has(m.id))return;const packetAge=Number.isFinite(Number(m.at))?Math.max(0,serverNow()-Number(m.at)):0;if(packetAge>520)return;
-  const tracer=createTracer(m);if(tracer)bullets.set(m.id,tracer);
+  const projectile=['grenadeLauncher','rpg'].includes(m.weapon)?createLauncherProjectile(m):createTracer(m);if(projectile)bullets.set(m.id,projectile);
   if(m.ownerId===clientId){
     const w=m.weapon||currentWeapon,primary=shotPacketPrimary(m);if(primary&&!godMode){ammo[w]=Math.max(0,(ammo[w]||0)-1);}if(primary){lastShotVisualAt=performance.now();soundShot(w);if(w==='shotgun'){shotgunPumpStartedAt=performance.now();shotgunPumpSoundPlayed=false;}const flash=localMuzzleObject(w);if(flash)flash.material.opacity=1;}
   }else if(shotPacketPrimary(m)){
     const r=remotes.get(m.ownerId);if(r){r.fireKickUntil=performance.now()+170;r.revealedUntil=performance.now()+1500;playSpatialCue(weaponShotSoundId(m.weapon),m.x,m.y,m.z,95,.95);}
   }
 }
-function removeBullet(id){const b=bullets.get(id);if(!b)return;scene.remove(b.mesh);b.geometry?.dispose?.();b.mesh?.material?.dispose?.();bullets.delete(id);}
+function removeBullet(id){const b=bullets.get(id);if(!b)return;bullets.delete(id);const root=b.root||b.mesh;try{scene?.remove(root);}catch{}if(b.type==='launcher')disposeObject3D(root);else{try{b.geometry?.dispose?.();}catch{}disposeMaterialResources(b.mesh?.material);}}
 function clearBullets(){for(const id of [...bullets.keys()])removeBullet(id);}
-function updateBullets(){
-  const now=performance.now();for(const [id,b] of bullets){const age=now-b.born;if(age>b.lifeMs){removeBullet(id);continue;}const t=Math.max(.001,age/1000),tailT=Math.max(0,t-b.length/Math.max(.01,b.speed)),pointAt=(time)=>b.start.clone().addScaledVector(b.dir,b.speed*time).add(new THREE.Vector3(0,-.5*b.gravity*time*time,0)),head=pointAt(t),tail=pointAt(tailT),p=b.geometry.getAttribute('position');p.setXYZ(0,tail.x,tail.y,tail.z);p.setXYZ(1,head.x,head.y,head.z);p.needsUpdate=true;b.mesh.material.opacity=.82*Math.max(0,1-age/b.lifeMs);}
+function updateBullets(dt=1/60){
+  const now=performance.now(),srv=serverNow(),up=new THREE.Vector3(0,1,0);
+  for(const [id,b] of bullets){
+    const age=now-b.born;if(age>b.lifeMs+250){removeBullet(id);continue;}
+    if(b.type==='launcher'){
+      const predictionAge=Math.max(0,Math.min(.12,(srv-b.snapshotAt)/1000)),target=b.snapshotPos.clone().addScaledVector(b.snapshotVel,predictionAge);target.y-=.5*b.gravity*predictionAge*predictionAge;
+      const error=b.root.position.distanceTo(target),blend=error>1.5?1:1-Math.exp(-Math.max(.001,dt)*28);b.root.position.lerp(target,blend);
+      b.visualVelocity.copy(b.snapshotVel);b.visualVelocity.y-=b.gravity*predictionAge;if(b.visualVelocity.lengthSq()>.0001)b.root.quaternion.setFromUnitVectors(up,b.visualVelocity.clone().normalize());
+      continue;
+    }
+    const t=Math.max(.001,age/1000),tailT=Math.max(0,t-b.length/Math.max(.01,b.speed)),pointAt=(time)=>b.start.clone().addScaledVector(b.dir,b.speed*time).add(new THREE.Vector3(0,-.5*b.gravity*time*time,0)),head=pointAt(t),tail=pointAt(tailT),p=b.geometry.getAttribute('position');p.setXYZ(0,tail.x,tail.y,tail.z);p.setXYZ(1,head.x,head.y,head.z);p.needsUpdate=true;b.mesh.material.opacity=.82*Math.max(0,1-age/b.lifeMs);
+  }
 }
-
 
 function equipmentFuseMs(kind){return kind==='sticky'?1850:kind==='frag'?2300:kind==='smoke'?1300:1650;}
 function spawnThrowableVisual(m){
@@ -1718,40 +1752,47 @@ function updateThrowables(dt){
 
 function spawnDetonationFx(kind,m){
   if(!scene||!THREE)return;
-  const sticky=kind==='sticky',launcher=kind==='rpg'||kind==='grenadeLauncher',root=new THREE.Group();root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);
-  // Explosion FX must stay cosmetic. The old effect added/removes a real PointLight
-  // per blast, which changes Three.js lighting programs and can force broad shader
-  // recompilation exactly when a GL/RPG detonates. Keep the flash fully unlit so
-  // detonation never changes the renderer's light count or blocks gameplay.
-  const coreColor=sticky?0xff8a35:launcher?0xffb05d:0xffffff,ringColor=sticky?0xffb15c:launcher?0xffd19a:0xeafaff;
+  const sticky=kind==='sticky',frag=kind==='frag',launcher=kind==='rpg'||kind==='grenadeLauncher',damaging=sticky||frag||launcher;
+  const blastRadius=damaging?Math.max(1,Number(m?.radius)||6):5.5,root=new THREE.Group();root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);
+  // The outer ring is scaled from the authoritative damage radius. This keeps
+  // what the player sees consistent with the actual splash volume.
+  const coreColor=sticky?0xff8a35:launcher?0xffb05d:frag?0xffc77a:0xffffff,ringColor=sticky?0xffb15c:launcher?0xffd19a:frag?0xffddb0:0xeafaff;
   const core=new THREE.Mesh(new THREE.SphereGeometry(1,12,8),new THREE.MeshBasicMaterial({color:coreColor,transparent:true,opacity:1,depthWrite:false,blending:THREE.AdditiveBlending}));core.scale.setScalar(.08);root.add(core);
-  const ring=new THREE.Mesh(new THREE.RingGeometry(.62,.82,24),new THREE.MeshBasicMaterial({color:ringColor,transparent:true,opacity:.92,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));ring.rotation.x=-Math.PI/2;ring.scale.setScalar(.15);root.add(ring);
-  const count=sticky?18:launcher?16:10,positions=new Float32Array(count*3),velocities=new Float32Array(count*3),geometry=new THREE.BufferGeometry();
-  for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,e=.15+Math.random()*.8,speed=(sticky?4.5:launcher?6.4:6)+Math.random()*(sticky?7:launcher?6.5:5),j=i*3;velocities[j]=Math.cos(a)*Math.cos(e)*speed;velocities[j+1]=Math.sin(e)*speed;velocities[j+2]=Math.sin(a)*Math.cos(e)*speed;}
+  const ring=new THREE.Mesh(new THREE.RingGeometry(.82,1,28),new THREE.MeshBasicMaterial({color:ringColor,transparent:true,opacity:.92,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));ring.rotation.x=-Math.PI/2;ring.scale.setScalar(.12);root.add(ring);
+  const count=sticky?18:launcher?22:frag?16:10,positions=new Float32Array(count*3),velocities=new Float32Array(count*3),geometry=new THREE.BufferGeometry(),duration=sticky?.72:launcher?.68:frag?.60:.48;
+  for(let i=0;i<count;i++){const a=Math.random()*Math.PI*2,e=.12+Math.random()*.92,targetSpeed=(blastRadius*(.62+Math.random()*.28))/duration,j=i*3;velocities[j]=Math.cos(a)*Math.cos(e)*targetSpeed;velocities[j+1]=Math.sin(e)*targetSpeed*.72;velocities[j+2]=Math.sin(a)*Math.cos(e)*targetSpeed;}
   geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
-  const particleMaterial=new THREE.PointsMaterial({color:sticky?0xffae68:launcher?0xffc17a:0xffffff,size:sticky?.10:launcher?.12:.08,sizeAttenuation:true,transparent:true,opacity:.92,depthWrite:false,blending:THREE.AdditiveBlending});
+  const particleMaterial=new THREE.PointsMaterial({color:sticky?0xffae68:launcher?0xffc17a:frag?0xffd19a:0xffffff,size:sticky?.10:launcher?.13:frag?.10:.08,sizeAttenuation:true,transparent:true,opacity:.92,depthWrite:false,blending:THREE.AdditiveBlending});
   const particles=new THREE.Points(geometry,particleMaterial);particles.frustumCulled=false;root.add(particles);scene.add(root);
-  tacticalFx.push({kind,root,core,ring,particles,velocities,age:0,duration:sticky?.72:launcher?.56:.48});
+  tacticalFx.push({kind,root,core,ring,particles,velocities,age:0,duration,blastRadius});
 }
 function updateTacticalFx(dt){
   for(let i=tacticalFx.length-1;i>=0;i--){
-    const f=tacticalFx[i];f.age+=dt;const p=Math.min(1,f.age/f.duration),sticky=f.kind==='sticky',launcher=f.kind==='rpg'||f.kind==='grenadeLauncher';
-    f.core.scale.setScalar((sticky?3.8:launcher?6.4:5.5)*(1-Math.pow(1-p,3))+.05);f.core.material.opacity=(1-p)*(sticky?.62:launcher?.78:.88);
-    f.ring.scale.setScalar(.2+p*(sticky?7.5:launcher?11.5:10));f.ring.material.opacity=(1-p)*(sticky?.72:launcher?.82:.86);
+    const f=tacticalFx[i];f.age+=dt;const p=Math.min(1,f.age/f.duration),sticky=f.kind==='sticky',frag=f.kind==='frag',launcher=f.kind==='rpg'||f.kind==='grenadeLauncher',radius=Math.max(1,f.blastRadius||5.5);
+    f.core.scale.setScalar(radius*(sticky?.46:launcher?.52:frag?.48:.42)*(1-Math.pow(1-p,3))+.05);f.core.material.opacity=(1-p)*(sticky?.62:launcher?.74:frag?.68:.88);
+    f.ring.scale.setScalar(radius*Math.min(1,Math.pow(p,.62)));f.ring.material.opacity=(1-p)*(sticky?.70:launcher?.78:frag?.74:.86);
     const attr=f.particles.geometry.getAttribute('position'),pos=attr.array,v=f.velocities;
     for(let j=0;j<pos.length;j+=3){v[j+1]-=9*dt;pos[j]+=v[j]*dt;pos[j+1]+=v[j+1]*dt;pos[j+2]+=v[j+2]*dt;}
-    attr.needsUpdate=true;f.particles.material.opacity=Math.max(0,1-p);f.particles.material.size=(sticky?.10:launcher?.12:.08)*(1+p*1.25);
+    attr.needsUpdate=true;f.particles.material.opacity=Math.max(0,1-p);f.particles.material.size=(sticky?.10:launcher?.13:frag?.10:.08)*(1+p*1.1);
     if(p>=1){tacticalFx.splice(i,1);try{scene?.remove(f.root);}catch{}disposeObject3D(f.root);}
   }
 }
 function clearTacticalFx(){const pending=tacticalFx.splice(0);for(const f of pending){try{scene?.remove(f.root);}catch{}disposeObject3D(f.root);}}
 function spawnSmokeCloud(m){
   if(!scene||!THREE||!m?.id)return;const existing=smokeClouds.get(m.id);if(existing){existing.expiresAt=Math.max(existing.expiresAt,Number(m.expiresAt)||serverNow()+SMOKE_DURATION_MS);return;}
-  const root=new THREE.Group();root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);const puffs=[];
-  for(let i=0;i<13;i++){const mat=new THREE.MeshBasicMaterial({color:i%3===0?0x7e8588:0x686f72,transparent:true,opacity:.0,depthWrite:false});const mesh=new THREE.Mesh(new THREE.SphereGeometry(.75+Math.random()*.42,10,7),mat);const a=Math.random()*Math.PI*2,r=.25+Math.random()*2.3;mesh.position.set(Math.cos(a)*r,(Math.random()-.25)*1.45,Math.sin(a)*r);root.add(mesh);puffs.push(mesh);}
-  scene.add(root);smokeClouds.set(m.id,{root,puffs,born:performance.now(),expiresAt:Number(m.expiresAt)||serverNow()+SMOKE_DURATION_MS,radius:Math.max(1,Number(m.radius)||6.8)});
+  const radius=Math.max(4,Number(m.radius)||9.6),root=new THREE.Group();root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);const puffs=[];
+  // Build the smoke from the same radius the server uses for bot LOS. Puffs are
+  // broad and overlapping so the grenade creates an actual sight-blocking wall
+  // rather than the old ~3 m decorative cluster inside a much larger logic sphere.
+  const count=24;
+  for(let i=0;i<count;i++){
+    const mat=new THREE.MeshBasicMaterial({color:i%4===0?0x858b8d:i%3===0?0x747a7d:0x656b6e,transparent:true,opacity:0,depthWrite:false});
+    const puffRadius=radius*(.15+Math.random()*.09),mesh=new THREE.Mesh(new THREE.SphereGeometry(puffRadius,9,7),mat),a=Math.random()*Math.PI*2,radiusBias=Math.sqrt(Math.random())*radius*.70;
+    mesh.position.set(Math.cos(a)*radiusBias,(Math.random()-.22)*radius*.30,Math.sin(a)*radiusBias);mesh.scale.y=.78+Math.random()*.55;root.add(mesh);puffs.push(mesh);
+  }
+  scene.add(root);smokeClouds.set(m.id,{root,puffs,born:performance.now(),expiresAt:Number(m.expiresAt)||serverNow()+SMOKE_DURATION_MS,radius});
 }
-function updateSmokeClouds(dt){const now=performance.now(),srv=serverNow();for(const [id,c] of smokeClouds){const age=Math.max(0,(now-c.born)/1000),remaining=c.expiresAt-srv;if(remaining<=0){smokeClouds.delete(id);try{scene?.remove(c.root);}catch{}disposeObject3D(c.root);continue;}const grow=Math.min(1,age/1.1),fade=Math.min(1,remaining/1800);c.root.scale.setScalar(.45+.55*grow);for(let i=0;i<c.puffs.length;i++){const puff=c.puffs[i];puff.material.opacity=(.23+.07*Math.sin(now*.001+i))*grow*fade;puff.rotation.y+=dt*.08*(i%2?1:-1);}}}
+function updateSmokeClouds(dt){const now=performance.now(),srv=serverNow();for(const [id,c] of smokeClouds){const age=Math.max(0,(now-c.born)/1000),remaining=c.expiresAt-srv;if(remaining<=0){smokeClouds.delete(id);try{scene?.remove(c.root);}catch{}disposeObject3D(c.root);continue;}const grow=Math.min(1,age/1.35),fade=Math.min(1,remaining/2200);c.root.scale.setScalar(.62+.38*grow);for(let i=0;i<c.puffs.length;i++){const puff=c.puffs[i];puff.material.opacity=(.34+.08*Math.sin(now*.0008+i*.7))*grow*fade;puff.rotation.y+=dt*.055*(i%2?1:-1);puff.position.y+=Math.sin(now*.00035+i)*dt*.025;}}}
 function clearSmokeClouds(){const pending=[...smokeClouds.values()];smokeClouds.clear();for(const c of pending){try{scene?.remove(c.root);}catch{}disposeObject3D(c.root);}}
 
 function applyFlashEffect(m){const power=Math.max(0,Math.min(1,Number(m.power)||0));if(power<=0)return;const now=performance.now(),duration=Math.max(350,Number(m.durationMs)||700+power*2600);flashPeakUntil=Math.max(flashPeakUntil,now+180+power*520);flashUntil=Math.max(flashUntil,now+duration);}
@@ -1775,7 +1816,7 @@ function animate(){
   // Cosmetic systems are fault-contained from the gameplay/simulation path.
   // A malformed transient effect must be discarded rather than poisoning every
   // following render frame and making the match appear frozen.
-  try{updateBullets();}catch(error){console.error('Tracer update failed; clearing transient tracers.',error);clearBullets();}
+  try{updateBullets(visualDt);}catch(error){console.error('Tracer update failed; clearing transient tracers.',error);clearBullets();}
   try{updateThrowables(visualDt);}catch(error){console.error('Throwable visual update failed; clearing transient throwables.',error);clearThrowables();}
   try{updateTacticalFx(visualDt);}catch(error){console.error('Explosion visual update failed; clearing transient explosion FX.',error);clearTacticalFx();}
   try{updateSmokeClouds(visualDt);}catch(error){console.error('Smoke visual update failed; clearing transient smoke FX.',error);clearSmokeClouds();}
