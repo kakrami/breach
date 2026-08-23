@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.34.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.34.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.34.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.34.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.34.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.34.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.34.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.34.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.35.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.35.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.35.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.35.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.35.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.35.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.35.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.35.0';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.34.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.34.0';
-import { createAudioEngine } from './audio-engine.js?v=1.34.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.34.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.34.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.34.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.34.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.34.0';
+} from './game-config.js?v=1.35.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.35.0';
+import { createAudioEngine } from './audio-engine.js?v=1.35.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.35.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.35.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.35.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.35.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.35.0';
 
 let THREE = null;
 
@@ -34,7 +34,7 @@ const CLIENT_WORLD_BUNDLES=Object.freeze({
 let currentMapId=DEFAULT_MAP_ID;
 let worldGeometry=HighlandsGeometry;
 let activeWorldCollision=HighlandsWorldCollision;
-let STATIC_BOXES=worldGeometry.STATIC_BOXES,BUILDINGS=worldGeometry.BUILDINGS,PYRAMIDS=worldGeometry.PYRAMIDS,NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;
+let STATIC_BOXES=worldGeometry.STATIC_BOXES,BUILDINGS=worldGeometry.BUILDINGS,PYRAMIDS=worldGeometry.PYRAMIDS,NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES,LADDERS=worldGeometry.LADDERS||[];
 let TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE,TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS,BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY,BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
 let terrainHeight=worldGeometry.terrainHeight,naturalGroundBase=worldGeometry.naturalGroundBase,worldSupportHeight=worldGeometry.worldSupportHeight,worldStepUpHeight=worldGeometry.worldStepUpHeight,resolveCeilingCollision=worldGeometry.resolveCeilingCollision;
 function worldBlockedAt(...args){return activeWorldCollision.worldBlockedAt(...args);}
@@ -252,7 +252,7 @@ function setActiveMap(value,{rebuild=true}={}){
   const bundle=CLIENT_WORLD_BUNDLES[nextId]||CLIENT_WORLD_BUNDLES[DEFAULT_MAP_ID];
   worldGeometry=bundle.geometry;
   activeWorldCollision=bundle.collision;
-  STATIC_BOXES=worldGeometry.STATIC_BOXES;BUILDINGS=worldGeometry.BUILDINGS;PYRAMIDS=worldGeometry.PYRAMIDS;NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;
+  STATIC_BOXES=worldGeometry.STATIC_BOXES;BUILDINGS=worldGeometry.BUILDINGS;PYRAMIDS=worldGeometry.PYRAMIDS;NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;LADDERS=worldGeometry.LADDERS||[];
   TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE;TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS;BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY;BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
   terrainHeight=worldGeometry.terrainHeight;naturalGroundBase=worldGeometry.naturalGroundBase;worldSupportHeight=worldGeometry.worldSupportHeight;worldStepUpHeight=worldGeometry.worldStepUpHeight;resolveCeilingCollision=worldGeometry.resolveCeilingCollision;
   rebuildTrajectoryCollision();minimapStaticCache=null;hudLastDraw=0;
@@ -313,7 +313,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.34.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.35.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -709,7 +709,7 @@ function buildWorldVisuals(){
   const blockMat=new THREE.MeshStandardMaterial({color:rig?0x756a59:(yard?0x6f777a:(depot?0x697983:0xb8c0c5)),roughness:.85});
   const pyramidMat=new THREE.MeshStandardMaterial({color:rig?0x9b8058:(depot?0x88775f:0xc8a86b),roughness:.92});addStaticBoxesBatch(blockMat);addPyramidsBatch(pyramidMat);
   const trunkMat=new THREE.MeshStandardMaterial({color:0x60452f,roughness:1}),leafMat=new THREE.MeshStandardMaterial({color:depot?0x405b3f:0x315f37,roughness:1}),bushMat=new THREE.MeshStandardMaterial({color:depot?0x53664b:0x3f7441,roughness:1}),rockMat=new THREE.MeshStandardMaterial({color:rig?0x8b7459:(depot?0x777b78:0x6b706f),roughness:.96});
-  addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat);addBuildingsBatch();
+  addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat);addBuildingsBatch();addLaddersBatch();
   const markerMat=new THREE.MeshStandardMaterial({color:depot?0x303a40:0x49606f,roughness:.75});if(!yard&&!rig)addMarkersBatch(markerMat);
   minimapStaticCache=null;
 }
@@ -774,32 +774,65 @@ function addBoundaryWallsBatch(mat){
   }
   addStaticInstancedMesh(new THREE.BoxGeometry(1,1,1),mat,transforms);
 }
-function addStaticBoxesBatch(mat){
-  const unit=new THREE.BoxGeometry(1,1,1);
-  if(currentMapId==='yard'||currentMapId==='rig'){
-    const palette=currentMapId==='rig'?{
-      boundary:new THREE.MeshStandardMaterial({color:0x5a4f41,roughness:.95}),
-      pipe:new THREE.MeshStandardMaterial({color:0x6d665d,roughness:.72,metalness:.18}),
-      tank:new THREE.MeshStandardMaterial({color:0x82755f,roughness:.76,metalness:.10}),
-      shed:new THREE.MeshStandardMaterial({color:0x765744,roughness:.88}),
-      barrier:new THREE.MeshStandardMaterial({color:0x9a8b70,roughness:.94}),
-      crate:new THREE.MeshStandardMaterial({color:0x755437,roughness:.94}),
-      default:mat,
-    }:{
-      boundary:new THREE.MeshStandardMaterial({color:0x3d4448,roughness:.94}),
-      containerBlue:new THREE.MeshStandardMaterial({color:0x385f78,roughness:.82}),
-      containerRed:new THREE.MeshStandardMaterial({color:0x8a473f,roughness:.84}),
-      containerGreen:new THREE.MeshStandardMaterial({color:0x4f6d58,roughness:.86}),
-      containerTan:new THREE.MeshStandardMaterial({color:0x847457,roughness:.88}),
-      crate:new THREE.MeshStandardMaterial({color:0x80684a,roughness:.94}),
-      default:mat,
-    };
-    const groups=new Map();for(const o of STATIC_BOXES){const kind=o.kind||'default';if(!groups.has(kind))groups.set(kind,[]);groups.get(kind).push({x:o.x,y:terrainHeight(o.x,o.z)+o.h/2,z:o.z,sx:o.w,sy:o.h,sz:o.d});}
-    for(const [kind,transforms] of groups)addStaticInstancedMesh(unit,palette[kind]||mat,transforms);
+function addCompoundPropBox(group,mat,x,y,z,sx,sy,sz,ry=0){
+  const mesh=new THREE.Mesh(new THREE.BoxGeometry(sx,sy,sz),mat);mesh.position.set(x,y,z);mesh.rotation.y=ry;mesh.castShadow=!isTouch;mesh.receiveShadow=!isTouch;group.add(mesh);return mesh;
+}
+function addVehicleProp(o){
+  const ground=terrainHeight(o.x,o.z),longX=o.w>=o.d,ry=longX?0:Math.PI/2,length=Math.max(o.w,o.d),width=Math.min(o.w,o.d),group=new THREE.Group();group.position.set(o.x,ground,o.z);group.rotation.y=ry;worldRoot.add(group);
+  const charred=new THREE.MeshStandardMaterial({color:0x252728,roughness:.92,metalness:.12}),rust=new THREE.MeshStandardMaterial({color:0x5f4030,roughness:.96}),glass=new THREE.MeshStandardMaterial({color:0x171d20,roughness:.48,metalness:.05}),rubber=new THREE.MeshStandardMaterial({color:0x111213,roughness:1});
+  const bus=o.kind==='burntBus',bodyH=bus?1.90:.72,bodyY=bus?.97:.46;
+  addCompoundPropBox(group,charred,0,bodyY,0,length*.96,bodyH,width*.94);
+  if(bus){
+    addCompoundPropBox(group,rust,0,2.30,0,length*.90,.92,width*.88);addCompoundPropBox(group,glass,0,2.34,-width*.455,length*.74,.54,.035);addCompoundPropBox(group,glass,0,2.34,width*.455,length*.74,.54,.035);addCompoundPropBox(group,charred,0,2.83,0,length*.92,.14,width*.90);
   }else{
-    const transforms=STATIC_BOXES.map(o=>({x:o.x,y:terrainHeight(o.x,o.z)+o.h/2,z:o.z,sx:o.w,sy:o.h,sz:o.d}));
-    addStaticInstancedMesh(unit,mat,transforms);
+    addCompoundPropBox(group,rust,-length*.03,1.05,0,length*.47,.54,width*.84);addCompoundPropBox(group,glass,-length*.03,1.12,-width*.425,length*.34,.30,.035);addCompoundPropBox(group,glass,-length*.03,1.12,width*.425,length*.34,.30,.035);
+    addCompoundPropBox(group,charred,length*.33,.70,0,length*.25,.30,width*.88);addCompoundPropBox(group,charred,-length*.36,.66,0,length*.20,.25,width*.86);
   }
+  const wheelR=bus?.42:.33,wheelW=bus?.26:.22,wheelX=length*(bus?.34:.32),wheelZ=width*.48;
+  for(const sx of [-1,1])for(const sz of [-1,1]){const wheel=new THREE.Mesh(new THREE.CylinderGeometry(wheelR,wheelR,wheelW,10),rubber);wheel.rotation.x=Math.PI/2;wheel.position.set(sx*wheelX,wheelR*.92,sz*wheelZ);group.add(wheel);}
+}
+function addSpecialStaticProps(){
+  const metal=new THREE.MeshStandardMaterial({color:0x485056,roughness:.84,metalness:.18}),darkMetal=new THREE.MeshStandardMaterial({color:0x303438,roughness:.90,metalness:.12}),concrete=new THREE.MeshStandardMaterial({color:0x8e8a80,roughness:.98}),sand=new THREE.MeshStandardMaterial({color:0x8b7753,roughness:1}),rust=new THREE.MeshStandardMaterial({color:0x76523a,roughness:.95,metalness:.05});
+  for(const o of STATIC_BOXES){
+    if(o.kind==='burntCar'||o.kind==='burntBus'){addVehicleProp(o);continue;}
+    const ground=terrainHeight(o.x,o.z);
+    if(o.kind==='dumpster'){
+      const g=new THREE.Group();g.position.set(o.x,ground,o.z);worldRoot.add(g);addCompoundPropBox(g,darkMetal,0,o.h*.45,0,o.w,o.h*.84,o.d);addCompoundPropBox(g,metal,0,o.h*.91,0,o.w*1.02,.12,o.d*1.03,Math.PI*.02);continue;
+    }
+    if(o.kind==='fuelTank'){
+      const longX=o.w>=o.d,length=Math.max(o.w,o.d),radius=Math.min(o.w,o.d)*.46,tank=new THREE.Mesh(new THREE.CylinderGeometry(radius,radius,length,14),metal);tank.rotation.z=Math.PI/2;tank.rotation.y=longX?0:Math.PI/2;tank.position.set(o.x,ground+o.h/2,o.z);tank.scale.y=.86;worldRoot.add(tank);continue;
+    }
+    if(o.kind==='checkpoint'){
+      const g=new THREE.Group();g.position.set(o.x,ground,o.z);worldRoot.add(g);addCompoundPropBox(g,rust,0,o.h*.46,0,o.w,o.h*.92,o.d);addCompoundPropBox(g,darkMetal,0,o.h*.68,-o.d*.505,o.w*.66,.58,.05);addCompoundPropBox(g,darkMetal,0,o.h*.68,o.d*.505,o.w*.66,.58,.05);addCompoundPropBox(g,metal,0,o.h+.10,0,o.w*1.10,.20,o.d*1.10);continue;
+    }
+    if(o.kind==='sandbag'){
+      const g=new THREE.Group();g.position.set(o.x,ground,o.z);worldRoot.add(g);const longX=o.w>=o.d,length=Math.max(o.w,o.d),count=Math.max(4,Math.floor(length/.72)),step=length/count,rows=Math.max(2,Math.round(o.h/.38));
+      for(let row=0;row<rows;row++)for(let i=0;i<Math.max(2,count-row);i++){const bag=new THREE.Mesh(new THREE.CapsuleGeometry(.23,.38,3,6),sand);bag.rotation.z=Math.PI/2;bag.rotation.y=longX?0:Math.PI/2;const rowCount=Math.max(2,count-row),rowStep=length/rowCount,along=-length/2+rowStep*(i+.5);bag.position.set(longX?along:0,.23+row*.38,longX?0:along);g.add(bag);}continue;
+    }
+    if(o.kind==='brokenWall'){
+      const g=new THREE.Group();g.position.set(o.x,ground,o.z);worldRoot.add(g);const longX=o.w>=o.d,length=Math.max(o.w,o.d),depth=Math.min(o.w,o.d),pieces=5,seg=length/pieces;
+      addCompoundPropBox(g,concrete,0,o.h/2,0,o.w,o.h,o.d);for(let i=0;i<pieces;i++){const along=-length/2+seg*(i+.5),chunkH=.12+.08*Math.abs(Math.sin((i+1)*1.73));addCompoundPropBox(g,rust,longX?along:0,o.h+chunkH/2,longX?0:along,longX?seg*.72:depth*.90,chunkH,longX?depth*.90:seg*.72,(i%2?1:-1)*.05);}continue;
+    }
+  }
+}
+function addLaddersBatch(){
+  if(!LADDERS.length)return;const metal=new THREE.MeshStandardMaterial({color:0x8d8170,roughness:.80,metalness:.35});
+  for(const ladder of LADDERS){const g=new THREE.Group(),height=Math.max(.8,ladder.topY-ladder.bottomY),cx=ladder.x+ladder.nx*.05,cz=ladder.z+ladder.nz*.05;g.position.set(cx,ladder.bottomY,cz);worldRoot.add(g);const horizontal=Math.abs(ladder.tx)>.5;
+    const railOffset=ladder.width*.43;for(const side of [-1,1]){const rail=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,height,8),metal);rail.position.set(ladder.tx*railOffset*side,height/2,ladder.tz*railOffset*side);g.add(rail);}
+    const rungCount=Math.max(4,Math.floor(height/.34));for(let i=0;i<=rungCount;i++){const rung=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,ladder.width*.90,8),metal);rung.position.y=.18+(height-.36)*(i/rungCount);if(horizontal)rung.rotation.z=Math.PI/2;else rung.rotation.x=Math.PI/2;g.add(rung);}
+  }
+}
+function addStaticBoxesBatch(mat){
+  const unit=new THREE.BoxGeometry(1,1,1),customKinds=new Set(['burntCar','burntBus','dumpster','fuelTank','checkpoint','sandbag','brokenWall']);
+  const palette={
+    boundary:new THREE.MeshStandardMaterial({color:currentMapId==='yard'?0x3d4448:currentMapId==='rig'?0x5a4f41:0x626a6e,roughness:.95}),
+    pipe:new THREE.MeshStandardMaterial({color:0x6d665d,roughness:.72,metalness:.18}),tank:new THREE.MeshStandardMaterial({color:0x82755f,roughness:.76,metalness:.10}),shed:new THREE.MeshStandardMaterial({color:0x765744,roughness:.88}),barrier:new THREE.MeshStandardMaterial({color:0x9a8b70,roughness:.94}),crate:new THREE.MeshStandardMaterial({color:0x755437,roughness:.94}),
+    containerBlue:new THREE.MeshStandardMaterial({color:0x385f78,roughness:.82}),containerRed:new THREE.MeshStandardMaterial({color:0x8a473f,roughness:.84}),containerGreen:new THREE.MeshStandardMaterial({color:0x4f6d58,roughness:.86}),containerTan:new THREE.MeshStandardMaterial({color:0x847457,roughness:.88}),
+    default:mat,
+  };
+  const groups=new Map();for(const o of STATIC_BOXES){if(customKinds.has(o.kind))continue;const kind=o.kind||'default';if(!groups.has(kind))groups.set(kind,[]);groups.get(kind).push({x:o.x,y:terrainHeight(o.x,o.z)+o.h/2,z:o.z,sx:o.w,sy:o.h,sz:o.d});}
+  for(const [kind,transforms] of groups)addStaticInstancedMesh(unit,palette[kind]||mat,transforms);
+  addSpecialStaticProps();
   for(const o of STATIC_BOXES)mapObstacles.push({type:'box',x:o.x,z:o.z,w:o.w,d:o.d});
 }
 function addPyramidsBatch(mat){
@@ -829,10 +862,14 @@ function addBuildingsBatch(){
   const unitBox=new THREE.BoxGeometry(1,1,1);
   for(let index=0;index<BUILDINGS.length;index++){
     const b=BUILDINGS[index],geometry=BUILDING_GEOMETRY[index];
+    const buildingStyle={
+      plaster:[0xb6afa2,0x5b5751,0x706b64],brick:[0x8a6555,0x403b38,0x665d57],stone:[0x8c8c83,0x454a49,0x676862],office:[0x91999d,0x343d43,0x626a6d],industrial:[0x767f82,0x30383d,0x555d60],
+      warehouse:[0x8e9393,0x3f474b,0x5c6263],tower:[0x6f6250,0x3b3229,0x5b5145],utility:[0x89735b,0x514336,0x5b5145],
+    }[b.style]||null;
     const materials={
-      wall:new THREE.MeshStandardMaterial({color:currentMapId==='rig'?(b.tall?0x6f6250:0x89735b):(currentMapId==='depot'?(b.tall?0x7d8589:0x919698):(b.tall?0x929aa0:0xa8adb0)),roughness:.9}),
-      trim:new THREE.MeshStandardMaterial({color:currentMapId==='rig'?(b.tall?0x3b3229:0x514336):(currentMapId==='depot'?(b.tall?0x30383d:0x41494e):(b.tall?0x39444d:0x4f5961)),roughness:.75}),
-      floor:new THREE.MeshStandardMaterial({color:currentMapId==='rig'?0x5b5145:(currentMapId==='depot'?0x5d6264:0x6d7478),roughness:.95}),
+      wall:new THREE.MeshStandardMaterial({color:buildingStyle?buildingStyle[0]:(currentMapId==='rig'?(b.tall?0x6f6250:0x89735b):(currentMapId==='depot'?(b.tall?0x7d8589:0x919698):(b.tall?0x929aa0:0xa8adb0))),roughness:.9}),
+      trim:new THREE.MeshStandardMaterial({color:buildingStyle?buildingStyle[1]:(currentMapId==='rig'?(b.tall?0x3b3229:0x514336):(currentMapId==='depot'?(b.tall?0x30383d:0x41494e):(b.tall?0x39444d:0x4f5961))),roughness:.75}),
+      floor:new THREE.MeshStandardMaterial({color:buildingStyle?buildingStyle[2]:(currentMapId==='rig'?0x5b5145:(currentMapId==='depot'?0x5d6264:0x6d7478)),roughness:.95}),
     };
     const groups={wall:[],trim:[],floor:[]};
     for(const part of geometry.parts){
@@ -1590,7 +1627,7 @@ function beginTraversal(candidate,direction,{playJump=false}={}){
   sendCurrentState(true);send({t:'traverse',seq,dirX:round3(direction.x),dirZ:round3(direction.z)});if(playJump)soundJump();return true;
 }
 function tryTraversal({vaultOnly=false}={}){
-  const direction=traversalDirection(),candidate=traversalCandidate(direction,!onGround);if(!candidate||vaultOnly&&candidate.mode!=='vault')return false;return beginTraversal(candidate,direction,{playJump:onGround});
+  const direction=traversalDirection(),candidate=traversalCandidate(direction,!onGround);if(!candidate||vaultOnly&&(candidate.mode!=='vault'&&candidate.mode!=='ladder'))return false;return beginTraversal(candidate,direction,{playJump:onGround});
 }
 function updateTraversal(now){
   if(!traversal)return false;const pose=traversalPose(traversal,now);if(!pose){traversal=null;return false;}
@@ -2176,7 +2213,7 @@ function updateGameFrame(dt){
     // from the previous free-movement frame must not shift the camera sideways
     // into a wall/window frame. Duck the first-person eye through the opening
     // and also respect the exact portal ceiling supplied by collision geometry.
-    const duck=traversal?.role==='window'?0.24:traversal?.mode==='mantle'?0.15:0.11;
+    const duck=traversal?.role==='window'?0.24:traversal?.mode==='ladder'?0.07:traversal?.mode==='mantle'?0.15:0.11;
     cameraY-=duck*traverseWave;
     if(traversal?.viewMaxY!=null&&Number.isFinite(Number(traversal.viewMaxY)))cameraY=Math.min(cameraY,Number(traversal.viewMaxY));
   }
@@ -2318,12 +2355,12 @@ function updateWeaponView(dt){
   if(mantleHands){
     mantleHands.visible=!!traversePoseNow;
     if(traversePoseNow){
-      const reach=smoothstep01(Math.min(1,traverseP/.42)),pull=smoothstep01(Math.max(0,(traverseP-.42)/.58)),vault=traversal?.mode==='vault';
+      const reach=smoothstep01(Math.min(1,traverseP/.42)),pull=smoothstep01(Math.max(0,(traverseP-.42)/.58)),vault=traversal?.mode==='vault',ladder=traversal?.mode==='ladder';
       // Hands rise from the lower corners and reach forward. No traversal
       // geometry is allowed closer than ~0.55 m to the eye, so camera pitch or
       // mantle motion cannot expose the inside of a forearm mesh.
       mantleHands.position.set(0,-.015+pull*.035,-.03-reach*.07+pull*.025);mantleHands.rotation.x=-.045-reach*.055+pull*.07;
-      mantleHands.children.forEach((limb,i)=>{const side=limb.userData.side|| (i?1:-1),stagger=vault?(i?-.055:.035):0,wave=Math.sin(Math.PI*THREE.MathUtils.clamp(traverseP+stagger,0,1));limb.position.x=side*(.27-.025*reach);limb.position.y=-.34+.085*reach-.035*pull+(vault?side*.012*wave:0);limb.position.z=-.82-.10*reach+.055*pull;limb.rotation.x=(vault?side*.07:0)*wave;limb.rotation.z=side*(.06-.08*reach);});
+      mantleHands.children.forEach((limb,i)=>{const side=limb.userData.side|| (i?1:-1),stagger=vault?(i?-.055:.035):0,wave=Math.sin(Math.PI*THREE.MathUtils.clamp(traverseP+stagger,0,1));limb.position.x=side*(.27-.025*reach);limb.position.y=-.34+.085*reach-.035*pull+(vault?side*.012*wave:0)+(ladder?side*.055*Math.sin(traverseP*Math.PI*6):0);limb.position.z=-.82-.10*reach+.055*pull;limb.rotation.x=(vault?side*.07:ladder?side*.05)*wave;limb.rotation.z=side*(.06-.08*reach);});
     }
   }
   for(const flash of [pistolFlash,assaultFlash,umpFlash,shotgunFlash,semiShotgunFlash,sniperFlash,grenadeLauncherFlash,rpgFlash])if(flash)flash.material.opacity=Math.max(0,flash.material.opacity-dt*20);
