@@ -80,7 +80,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.37.11: one owner for menu density, overflow and responsive layout. */
+/* Breach UI contract v1.37.12: one owner for menu density, overflow and responsive layout. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -375,4 +375,102 @@ body{font-size:var(--ui-md)}
   .lobby-host-setup:not(.hide){display:block;overflow:visible}
   .lobby-host-setup .lobby-match-grid,.lobby-loadout-body{overflow:visible;height:auto}
   .lobby-editor-actions{position:sticky;bottom:0;z-index:3;margin-top:6px;padding:5px 0 0;background:linear-gradient(to bottom,rgba(7,10,12,.88),#070a0c 28%)}
+}
+/* v1.37.12 lobby ownership + action consistency */
+/* All staged editors share one action geometry; primary emphasis changes color, not size. */
+.modal-foot>button,.lobby-editor-actions>button,
+.settings-actions .primary,.loadout-foot .primary,.admin-shell .modal-foot .primary{
+  height:40px;min-width:92px;padding:0 14px;font-size:11px;border-radius:8px
+}
+
+/* Loadout cards show one useful weapon/equipment name. The former abbreviation + name + description stack was redundant. */
+.loadout-choice,.loadout-fixed{
+  display:flex;align-items:center;justify-content:center;min-height:50px;padding:7px 8px;text-align:center
+}
+.loadout-choice strong,.loadout-fixed strong{
+  display:block;width:100%;font-size:10.5px;line-height:1.12;text-align:center;white-space:normal;
+  overflow:visible;text-overflow:clip;overflow-wrap:normal
+}
+.loadout-choice b,.loadout-choice small,.loadout-fixed b,.loadout-fixed small,.loadout-fixed>div{display:none!important}
+
+/* Lobby navigation owns pre-match configuration. Host-only tabs collapse completely for guests. */
+.lobby-side-tabs{display:flex;grid-template-columns:none}
+.lobby-side-tab{flex:1 1 0;min-width:0}
+.lobby-gameplay-view.active,.lobby-weapons-view.active{display:block;min-height:0;overflow:hidden}
+.lobby-tuning-panel,.lobby-weapons-panel{
+  height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;
+  padding:8px;border:1px solid var(--line);border-radius:10px;background:rgba(14,19,23,.94);overflow:hidden
+}
+.lobby-gameplay-mount,.lobby-weapons-mount{min-height:0;overflow:auto;overscroll-behavior:contain;padding-top:5px}
+#lobbyGameplayHostMount>.admin-page,#lobbyWeaponsHostMount>.admin-page{
+  display:block!important;min-height:0;padding:0;overflow:visible;background:transparent
+}
+#lobbyGameplayHostMount>.admin-page.hide,#lobbyWeaponsHostMount>.admin-page.hide{display:block!important}
+#lobbyGameplayHostMount .admin-bot-card{display:none!important}
+
+/* Gameplay tuning is the same control set used by in-match Host Control, docked here only while in the lobby. */
+#lobbyGameplayHostMount .settings-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;padding:0;overflow:visible}
+#lobbyGameplayHostMount .setting{min-height:54px;padding:6px;gap:4px}
+#lobbyGameplayHostMount .setting>span{overflow-wrap:normal;word-break:normal;hyphens:none}
+
+/* Weapon tuning uses one selector plus one compact four-field row; redundant helper/card headings are hidden only in the lobby mount. */
+#lobbyWeaponsHostMount .admin-weapon-toolbar{display:block;margin:0 0 3px;padding:4px 6px}
+#lobbyWeaponsHostMount .admin-weapon-toolbar>span{display:none}
+#lobbyWeaponsHostMount .admin-weapon-toolbar label{
+  width:100%;display:grid;grid-template-columns:52px minmax(0,220px);align-items:center;gap:6px
+}
+#lobbyWeaponsHostMount .admin-weapon-toolbar label>span{margin:0}
+#lobbyWeaponsHostMount .admin-weapon-toolbar .input{max-width:none;width:100%}
+#lobbyWeaponsHostMount .weapon-settings-card{padding:4px 6px;gap:3px}
+#lobbyWeaponsHostMount .weapon-settings-card>strong{display:none}
+#lobbyWeaponsHostMount .weapon-fields{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+
+/* Players owns pre-match player administration; the separate lobby Host Control surface no longer exists. */
+.lobby-player{grid-template-columns:4px minmax(0,1fr) auto;align-items:center}
+.lobby-player-actions{display:flex;align-items:center;justify-content:flex-end;gap:4px;min-width:0;flex-wrap:nowrap}
+.lobby-admin-mini{height:28px;padding:0 7px;font-size:9px;white-space:nowrap}
+.lobby-admin-mini.active{border-color:rgba(215,255,88,.45);color:#e9ff98}
+
+@media (max-width:900px) and (orientation:landscape){
+  /* Seven simplified primary names fit cleanly across ordinary landscape phones/tablets. */
+  .loadout-choice-grid.primary-grid{grid-template-columns:repeat(7,minmax(0,1fr))}
+  .loadout-choice,.loadout-fixed{min-height:48px;padding:5px 6px}
+  .loadout-choice strong,.loadout-fixed strong{font-size:9.5px}
+}
+
+@media (max-width:620px){
+  .modal-foot>button,.lobby-editor-actions>button,
+  .settings-actions .primary,.loadout-foot .primary,.admin-shell .modal-foot .primary{
+    height:32px;min-width:70px;padding:0 9px;font-size:9px
+  }
+  .lobby-side-tab{font-size:8.5px;letter-spacing:.01em}
+  .lobby-tuning-panel,.lobby-weapons-panel{padding:5px}
+  .lobby-gameplay-mount,.lobby-weapons-mount{padding-top:3px}
+  #lobbyGameplayHostMount .settings-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+  #lobbyGameplayHostMount .setting{min-height:44px;padding:4px}
+  #lobbyWeaponsHostMount .admin-weapon-toolbar{margin-bottom:2px;padding:3px 5px}
+  #lobbyWeaponsHostMount .admin-weapon-toolbar label{grid-template-columns:48px minmax(0,210px);gap:4px}
+  #lobbyWeaponsHostMount .weapon-settings-card{padding:3px 5px;gap:2px}
+  #lobbyWeaponsHostMount .weapon-fields{gap:3px}
+  #lobbyWeaponsHostMount .weapon-settings-card label{gap:2px;font-size:8.5px}
+  #lobbyWeaponsHostMount .weapon-settings-card .game-control{height:28px}
+  .lobby-player{grid-template-columns:4px minmax(0,1fr) auto}
+  .lobby-player-actions{grid-column:auto;justify-content:flex-end;flex-wrap:nowrap;margin-top:0}
+  .lobby-admin-mini{height:24px;padding:0 5px;font-size:8px}
+  .loadout-choice,.loadout-fixed{min-height:36px;padding:3px 5px}
+  .loadout-choice-grid{gap:4px}
+  .loadout-section{margin-top:2px;gap:3px}
+}
+
+@media (max-width:430px){
+  .lobby-side-tab{font-size:7.5px;letter-spacing:0;padding:0 2px}
+  #lobbyGameplayHostMount .settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #lobbyWeaponsHostMount .weapon-fields{grid-template-columns:repeat(2,minmax(0,1fr))}
+  #lobbyWeaponsHostMount .admin-weapon-toolbar label{grid-template-columns:42px minmax(0,1fr)}
+  .lobby-player{grid-template-columns:4px minmax(0,1fr)}
+  .lobby-player-actions{grid-column:2;justify-content:flex-start;flex-wrap:wrap;margin-top:3px}
+  /* At very narrow widths, two columns remain readable; vertical scrolling is intentional and reachable. */
+  .loadout-choice-grid.primary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .loadout-choice,.loadout-fixed{min-height:44px;padding:4px 5px}
+  .loadout-section{margin-top:4px;gap:4px}
 }
