@@ -154,9 +154,10 @@ body{font-size:var(--ui-md)}
 
 /* Gamepad focus is visible and conventional on every DOM screen. */
 .controller-focus{outline:3px solid var(--accent)!important;outline-offset:3px!important;box-shadow:0 0 0 4px rgba(215,255,88,.12)!important}
+.controller-editing{outline-color:#fff!important;box-shadow:0 0 0 3px rgba(215,255,88,.2),0 0 0 6px rgba(255,255,255,.2)!important}.controller-editing .game-control-value{color:#fff}.controller-editing::after{content:'ADJUST';position:absolute;right:4px;top:2px;font-size:7px;line-height:1;color:var(--accent);letter-spacing:.08em;pointer-events:none}.controller-editing{position:relative}
 
 
-/* Breach v1.37.6 unified responsive layout contract.
+/* Breach v1.37.7 unified responsive layout contract.
    One set of rules owns density, overflow, and responsive behavior. Content is
    reflowed before scrolling and informative text is never removed to make room. */
 :root{--content-max:1100px;--field-max:280px}
@@ -271,6 +272,7 @@ body{font-size:var(--ui-md)}
 .admin-page{min-height:0;overflow:auto;overscroll-behavior:contain;padding:10px}
 .admin-page>.settings-grid{display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px;padding:0;overflow:visible}
 .admin-page>.settings-grid>.setting{flex:1 1 165px;min-width:145px;max-width:none}
+.admin-bot-card{margin-top:10px;padding:10px;border:1px solid var(--line);border-radius:10px;background:#0a0f12;display:grid;gap:9px}.admin-bot-head{display:flex;align-items:end;justify-content:space-between;gap:12px;padding-bottom:7px;border-bottom:1px solid var(--line)}.admin-bot-head>div{min-width:0;display:grid;gap:2px}.admin-bot-head strong{font-size:14px}.admin-bot-head small{display:block;color:var(--muted);font-size:10px;line-height:1.25}.admin-bot-summary{flex:none;color:var(--accent);font-size:10px;font-weight:950;letter-spacing:.04em}.admin-bot-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px}.admin-bot-controls label{min-width:0;display:grid;gap:5px;color:var(--muted);font-size:9px;font-weight:950;letter-spacing:.07em}.admin-bot-controls .game-control{width:100%;height:38px;border:1px solid var(--line);border-radius:8px;background:#090d10}
 .admin-weapon-toolbar{display:flex;align-items:end;justify-content:space-between;gap:12px;max-width:760px;margin:0 auto 10px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#0a0f12}
 .admin-weapon-toolbar label{display:grid;gap:5px;width:min(280px,100%)}
 .admin-weapon-toolbar label>span{color:var(--muted);font-size:10px;font-weight:950;letter-spacing:.08em}

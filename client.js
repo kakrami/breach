@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.6';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.6';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.6';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.6';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.6';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.6';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.6';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.6';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.7';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.7';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.7';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.7';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.7';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.7';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.7';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.7';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.6';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.6';
-import { createAudioEngine } from './audio-engine.js?v=1.37.6';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.6';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.6';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.6';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.6';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.6';
+} from './game-config.js?v=1.37.7';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.7';
+import { createAudioEngine } from './audio-engine.js?v=1.37.7';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.7';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.7';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.7';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.7';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.7';
 
 let THREE = null;
 
@@ -166,7 +166,7 @@ function initGameControls(){
       for(const key of ['min','max','step'])Object.defineProperty(el,key,{configurable:true,get(){return el.dataset[key]??'';}});
       el.value=initial;
       for(const btn of el.querySelectorAll('[data-control-step]'))btn.addEventListener('click',e=>{e.stopPropagation();adjustGameControl(el,Number(btn.dataset.controlStep)||0);});
-      el.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowDown'){e.preventDefault();adjustGameControl(el,-1);}else if(e.key==='ArrowRight'||e.key==='ArrowUp'){e.preventDefault();adjustGameControl(el,1);}});
+      el.addEventListener('keydown',e=>{if(controllerInputActive()){if(e.key.startsWith('Arrow'))e.preventDefault();return;}if(e.key==='ArrowLeft'||e.key==='ArrowDown'){e.preventDefault();adjustGameControl(el,-1);}else if(e.key==='ArrowRight'||e.key==='ArrowUp'){e.preventDefault();adjustGameControl(el,1);}});
       if(type==='slider'){
         const track=el.querySelector('[data-slider-track]');let dragging=false;
         const setPointer=e=>{const r=track.getBoundingClientRect();if(r.width<=0)return;const min=controlNumber(el,'min',0),max=controlNumber(el,'max',1),x=Math.max(0,Math.min(r.width,e.clientX-r.left)),raw=min+(max-min)*(x/r.width);setGameControlValue(el,raw,{emitInput:true,emitChange:false});};
@@ -273,7 +273,8 @@ const INPUT_MODE=Object.freeze({TOUCH:'touch',KEYBOARD_MOUSE:'keyboardMouse',CON
 let gamepadFrame=gamepadInput.poll();
 let activeInputMode=gamepadFrame.connected?INPUT_MODE.CONTROLLER:(isTouch?INPUT_MODE.TOUCH:INPUT_MODE.KEYBOARD_MOUSE);
 let gamepadFireDown=false,controllerOwnsAim=false,lastGamepadKey=gamepadFrame.connected?`${gamepadFrame.index}:${gamepadFrame.id}`:'';
-let controllerUiFocus=null;
+let controllerUiFocus=null,controllerUiEditing=null;
+let controllerUiAxisDirection='',controllerUiAxisNextAt=0;
 appRoot.dataset.inputMode=activeInputMode;
 
 function controllerInputActive(){return activeInputMode===INPUT_MODE.CONTROLLER&&gamepadFrame.connected;}
@@ -286,7 +287,7 @@ function clearControllerGameplayInput(){
 function setActiveInputMode(mode,{quiet=false}={}){
   if(!Object.values(INPUT_MODE).includes(mode)||mode===activeInputMode)return false;
   const previous=activeInputMode;
-  if(previous===INPUT_MODE.CONTROLLER){clearControllerGameplayInput();clearControllerUiFocus();}
+  if(previous===INPUT_MODE.CONTROLLER){clearControllerGameplayInput();clearControllerUiFocus();resetControllerUiAxis();}
   if(mode===INPUT_MODE.CONTROLLER){keys.clear();resetTouchInput();mouseFireDown=false;}
   else if(mode===INPUT_MODE.TOUCH){keys.clear();mouseFireDown=false;}
   else{resetTouchInput();}
@@ -382,7 +383,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.6';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.7';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1017,6 +1018,7 @@ function bindUI(){
   $('adminSaveBtn').addEventListener('click',saveAdminSettings);
   $('adminResetBtn').addEventListener('click',resetActiveAdminTab);
   $('adminWeaponSelect')?.addEventListener('change',()=>syncAdminWeaponEditor($('adminWeaponSelect').value));
+  for(const id of ['adminBlueBotCount','adminRedBotCount','adminFfaBotCount','adminBotDifficulty'])$(id)?.addEventListener('change',syncAdminBotDraftSummary);
   const adminTabs=[...document.querySelectorAll('[data-admin-tab]')];
   for(const tab of adminTabs){
     tab.addEventListener('click',()=>switchAdminTab(tab.dataset.adminTab));
@@ -1497,7 +1499,7 @@ function handleMessage(m){
   if(m.t==='blocked'){handleBlocked(m);return;}
   if(m.t==='kill'){handleKill(m);return;}
   if(m.t==='settings'){applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);if(typeof m.custom==='boolean')matchCustom=m.custom;const section=m.section==='advanced'?'advanced':'gameplay';if(shell.panel===SHELL_PANEL.ADMIN){if(m.by===clientId){if(section==='advanced')populateAdminWeapons(worldSettings);else populateAdminGameplay(worldSettings);setAdminStatus(section==='advanced'?'Weapons applied.':'Gameplay applied.','ok');}else if(activeAdminTab!==section){if(section==='advanced')populateAdminWeapons(worldSettings);else populateAdminGameplay(worldSettings);}}syncLobby();showToast(section==='advanced'?'WEAPON RULES UPDATED':'GAMEPLAY RULES UPDATED');return;}
-  if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncLobbyBots(m.bots||[]);if(shell.inMatch&&engineReady)syncBotRoster(m.bots||[]);syncLobby();if(shell.panel===SHELL_PANEL.ADMIN&&m.by===clientId)setAdminStatus('Bot settings updated in the lobby.','ok');showToast(`BOTS · ${botConfig.difficulty.toUpperCase()}`);return;}
+  if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncLobbyBots(m.bots||[]);if(shell.inMatch&&engineReady)syncBotRoster(m.bots||[]);syncLobby();if(shell.panel===SHELL_PANEL.ADMIN){populateAdminBots(botConfig);setAdminStatus(shell.inMatch?'Live bot roster updated.':'Lobby bot roster updated.','ok');}showToast(`BOTS · ${botConfig.difficulty.toUpperCase()}`);return;}
   if(m.t==='notice'){showToast(m.text||'Server notice');if(shell.panel===SHELL_PANEL.ADMIN)setAdminStatus(m.text||'Server notice',m.tone==='error'?'error':'');return;}
   if(m.t==='pong'){const echoed=Number(m.clientAt)||lastPingLocalAt;if(echoed&&Number.isFinite(Number(m.at))){const received=Date.now(),mid=echoed+(received-echoed)/2,estimate=Number(m.at)-mid;serverClockOffset=serverClockOffset*.7+estimate*.3;}return;}
   if(m.t==='health'){if(m.id===clientId){hp=Math.max(0,Math.min(100,Number(m.hp)||0));syncLocalStatus();}else{const r=remotes.get(m.id);if(r)r.hp=Math.max(0,Math.min(100,Number(m.hp)||0));}return;}
@@ -1538,7 +1540,20 @@ function switchAdminTab(tab){
   for(const b of document.querySelectorAll('[data-admin-tab]')){const active=b.dataset.adminTab===activeAdminTab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;}
   const players=activeAdminTab==='players';$('adminResetBtn').classList.toggle('hide',players);$('adminSaveBtn').classList.toggle('hide',players);document.querySelector('.admin-shell').dataset.page=activeAdminTab;if(players)renderAdminPlayers(true);
 }
-function populateAdminGameplay(value){const x=normalizeWorldSettings(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);}
+function syncAdminBotDraftSummary(){
+  const ffa=normalizeGameMode(matchState.mode)==='ffa',blue=Math.max(0,Math.floor(Number($('adminBlueBotCount')?.value)||0)),red=Math.max(0,Math.floor(Number($('adminRedBotCount')?.value)||0)),total=ffa?Math.max(0,Math.floor(Number($('adminFfaBotCount')?.value)||0)):blue+red,diff=String($('adminBotDifficulty')?.value||botConfig.difficulty||'normal');
+  if($('adminBotSummary'))$('adminBotSummary').textContent=`${Math.min(MAX_BOTS,total)} / ${MAX_BOTS} bots · ${diff.replace(/^./,c=>c.toUpperCase())}`;
+}
+function populateAdminBots(value=botConfig){
+  const cfg=normalizeBotConfig(value),ffa=normalizeGameMode(matchState.mode)==='ffa',total=Math.min(MAX_BOTS,cfg.blueBots+cfg.redBots);
+  $('adminBlueBotWrap')?.classList.toggle('hide',ffa);$('adminRedBotWrap')?.classList.toggle('hide',ffa);$('adminFfaBotWrap')?.classList.toggle('hide',!ffa);
+  if($('adminBlueBotCount'))$('adminBlueBotCount').value=String(cfg.blueBots);if($('adminRedBotCount'))$('adminRedBotCount').value=String(cfg.redBots);if($('adminFfaBotCount'))$('adminFfaBotCount').value=String(total);if($('adminBotDifficulty'))$('adminBotDifficulty').value=cfg.difficulty;
+  if($('adminBotHelp'))$('adminBotHelp').textContent=ffa?'Bot count changes apply to the live FFA roster immediately after Apply.':'Blue and Red bot counts reconcile the live match immediately after Apply.';syncAdminBotDraftSummary();
+}
+function collectAdminBotConfig(){
+  const ffa=normalizeGameMode(matchState.mode)==='ffa';let blue,red;if(ffa){const total=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number($('adminFfaBotCount')?.value)||0)));blue=Math.ceil(total/2);red=Math.floor(total/2);}else{blue=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number($('adminBlueBotCount')?.value)||0)));red=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number($('adminRedBotCount')?.value)||0)));if(blue+red>MAX_BOTS)return null;}return{blueBots:blue,redBots:red,difficulty:String($('adminBotDifficulty')?.value||'normal')};
+}
+function populateAdminGameplay(value){const x=normalizeWorldSettings(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);populateAdminBots(botConfig);}
 function populateAdminWeapons(value){const x=normalizeWorldSettings(value);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=(w.reloadMs/1000).toFixed(2);$(`set${cap}Cooldown`).value=Math.round(60000/w.cooldownMs);}}
 function populateAdminSettings(value){populateAdminGameplay(value);populateAdminWeapons(value);}
 function collectAdminGameplayPatch(){return{movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000}};}
@@ -1569,10 +1584,10 @@ function syncAdminWeaponEditor(name='assault'){
 }
 function openAdminPanel(initialTab='gameplay'){if(!isMatchAdmin){showToast('ADMIN ACCESS REQUIRED');return;}syncAdminContext();populateAdminSettings(worldSettings);switchAdminTab(initialTab);syncAdminWeaponEditor($('adminWeaponSelect')?.value||'assault');setAdminStatus(matchCustom?'CUSTOM tuning active.':'Advanced settings are unchanged.');shell.openPanel(SHELL_PANEL.ADMIN);renderAdminPlayers(true);}
 function closeAdminPanel(){shell.closePanel(SHELL_PANEL.ADMIN);}
-function resetActiveAdminTab(){if(activeAdminTab==='gameplay')populateAdminGameplay({...worldSettings,movement:DEFAULT_WORLD_SETTINGS.movement,combat:DEFAULT_WORLD_SETTINGS.combat});else if(activeAdminTab==='advanced')populateAdminWeapons({...worldSettings,weapons:DEFAULT_WORLD_SETTINGS.weapons});}
+function resetActiveAdminTab(){if(activeAdminTab==='gameplay'){populateAdminGameplay({...worldSettings,movement:DEFAULT_WORLD_SETTINGS.movement,combat:DEFAULT_WORLD_SETTINGS.combat});populateAdminBots(botConfig);}else if(activeAdminTab==='advanced')populateAdminWeapons({...worldSettings,weapons:DEFAULT_WORLD_SETTINGS.weapons});}
 function saveAdminSettings(){
   if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN){setAdminStatus('Admin connection unavailable.','error');return;}
-  if(activeAdminTab==='gameplay'){send({t:'adminSettings',section:'gameplay',patch:collectAdminGameplayPatch()});setAdminStatus('Applying gameplay…');return;}
+  if(activeAdminTab==='gameplay'){const bots=collectAdminBotConfig();if(!bots){setAdminStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}send({t:'adminSettings',section:'gameplay',patch:collectAdminGameplayPatch()});send({t:'adminBots',...bots});setAdminStatus('Applying gameplay and live bot roster…');return;}
   if(activeAdminTab==='advanced'){send({t:'adminSettings',section:'advanced',patch:collectAdminWeaponsPatch()});setAdminStatus('Applying weapons…');return;}
 }
 
@@ -2195,9 +2210,20 @@ function maintainNetwork(){
   lastPing=now;lastPingLocalAt=Date.now();send({t:'ping',clientAt:lastPingLocalAt});
 }
 function updatePausedNetwork(){if(traversal)updateTraversal(performance.now());maintainNetwork();}
+function clearControllerUiEditing(){
+  if(controllerUiEditing?.classList)controllerUiEditing.classList.remove('controller-editing');
+  controllerUiEditing=null;
+}
 function clearControllerUiFocus(){
+  clearControllerUiEditing();
   if(controllerUiFocus?.classList)controllerUiFocus.classList.remove('controller-focus');
   controllerUiFocus=null;
+}
+function resetControllerUiAxis(){controllerUiAxisDirection='';controllerUiAxisNextAt=0;}
+function controllerEditableField(el){return !!el?.matches?.('[data-game-control="cycle"],[data-game-control="stepper"],[data-game-control="slider"]');}
+function setControllerUiEditing(el){
+  if(!controllerEditableField(el))return false;
+  clearControllerUiEditing();controllerUiEditing=el;el.classList.add('controller-editing');return true;
 }
 function controllerUiSurface(){
   if(gameTextEditorTarget)return gameTextEditor;
@@ -2231,24 +2257,43 @@ function moveControllerUiFocus(dx,dy){
     if(dx<0&&vx>=-2||dx>0&&vx<=2||dy<0&&vy>=-2||dy>0&&vy<=2)continue;
     const primary=Math.abs(dx?vx:vy),cross=Math.abs(dx?vy:vx),score=primary+cross*1.65;if(score<bestScore){bestScore=score;best=el;}
   }
+  // Complex responsive grids can leave no geometric candidate in one direction.
+  // Fall back to document order so every visible control remains reachable.
+  if(!best){const index=list.indexOf(current),step=(dx>0||dy>0)?1:-1,next=index+step;if(next>=0&&next<list.length)best=list[next];}
   if(best)setControllerUiFocus(best);
 }
-function adjustControllerField(el,dir){if(!el||!dir)return false;return adjustGameControl(el,dir);}
+function adjustControllerField(el,dir){if(!el||!dir||controllerUiEditing!==el)return false;return adjustGameControl(el,dir);}
+function controllerAnalogUiDirection(){
+  const x=Number(gamepadFrame.moveX)||0,y=Number(gamepadFrame.moveY)||0,threshold=.62;let dx=0,dy=0;
+  if(Math.max(Math.abs(x),Math.abs(y))<threshold){resetControllerUiAxis();return null;}
+  if(Math.abs(x)>=Math.abs(y))dx=x>0?1:-1;else dy=y>0?1:-1;
+  const key=`${dx},${dy}`,now=performance.now();
+  if(key!==controllerUiAxisDirection){controllerUiAxisDirection=key;controllerUiAxisNextAt=now+320;return{dx,dy};}
+  if(now>=controllerUiAxisNextAt){controllerUiAxisNextAt=now+135;return{dx,dy};}
+  return null;
+}
 function handleControllerUiNavigation(pressed){
-  const surface=controllerUiSurface();if(!surface){clearControllerUiFocus();return false;}const focus=ensureControllerUiFocus();
+  const surface=controllerUiSurface();if(!surface){clearControllerUiFocus();resetControllerUiAxis();return false;}const focus=ensureControllerUiFocus();
   if(pressed[GAMEPAD_BUTTON.B]){
+    if(controllerUiEditing){clearControllerUiEditing();return true;}
     if(gameTextEditorTarget){cancelGameTextEditor();return true;}
     if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return true;}if(shell.panel===SHELL_PANEL.ADMIN){closeAdminPanel();return true;}if(shell.panel===SHELL_PANEL.LOADOUT){closeMatchLoadout();return true;}if(shell.paused){shell.resumeFromAlternateInput();clock?.getDelta();return true;}
   }
-  if(pressed[GAMEPAD_BUTTON.A]&&focus){if(focus.tagName==='BUTTON'){focus.click();return true;}focus.focus();return true;}
-  if(pressed[GAMEPAD_BUTTON.LB]||pressed[GAMEPAD_BUTTON.RB]){
+  if(pressed[GAMEPAD_BUTTON.A]&&focus){
+    if(controllerEditableField(focus)){if(controllerUiEditing===focus)clearControllerUiEditing();else setControllerUiEditing(focus);return true;}
+    if(focus.tagName==='BUTTON'||focus.dataset?.gameControl==='text'){focus.click();return true;}
+    focus.focus();return true;
+  }
+  if(!controllerUiEditing&&(pressed[GAMEPAD_BUTTON.LB]||pressed[GAMEPAD_BUTTON.RB])){
     const tablist=controllerUiFocus?.closest?.('[role=tablist]')||[...surface.querySelectorAll('[role=tablist]')].find(el=>!el.closest('[hidden],.hide'));
     const tabs=tablist?[...tablist.querySelectorAll('button:not([disabled])')].filter(el=>!el.closest('[hidden],.hide')):[];if(tabs.length){const cur=Math.max(0,tabs.indexOf(controllerUiFocus)),next=(cur+(pressed[GAMEPAD_BUTTON.RB]?1:-1)+tabs.length)%tabs.length;setControllerUiFocus(tabs[next]);tabs[next].click();return true;}
   }
-  if(pressed[GAMEPAD_BUTTON.DPAD_LEFT]){if(adjustControllerField(focus,-1))return true;moveControllerUiFocus(-1,0);return true;}
-  if(pressed[GAMEPAD_BUTTON.DPAD_RIGHT]){if(adjustControllerField(focus,1))return true;moveControllerUiFocus(1,0);return true;}
-  if(pressed[GAMEPAD_BUTTON.DPAD_UP]){moveControllerUiFocus(0,-1);return true;}
-  if(pressed[GAMEPAD_BUTTON.DPAD_DOWN]){moveControllerUiFocus(0,1);return true;}
+  let nav=null;
+  if(pressed[GAMEPAD_BUTTON.DPAD_LEFT])nav={dx:-1,dy:0};else if(pressed[GAMEPAD_BUTTON.DPAD_RIGHT])nav={dx:1,dy:0};else if(pressed[GAMEPAD_BUTTON.DPAD_UP])nav={dx:0,dy:-1};else if(pressed[GAMEPAD_BUTTON.DPAD_DOWN])nav={dx:0,dy:1};else nav=controllerAnalogUiDirection();
+  if(nav){
+    if(controllerUiEditing){const dir=nav.dx?nav.dx:-nav.dy;if(dir&&adjustControllerField(focus,dir))return true;return true;}
+    moveControllerUiFocus(nav.dx,nav.dy);return true;
+  }
   return false;
 }
 
