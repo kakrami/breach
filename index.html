@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.29.8">
-<title>Breach v1.29.8</title>
-<link rel="stylesheet" href="ui.css?v=1.29.8">
+<link rel="manifest" href="manifest.webmanifest?v=1.30.0">
+<title>Breach v1.30.0</title>
+<link rel="stylesheet" href="ui.css?v=1.30.0">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -29,11 +29,20 @@
     <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.5 1.5M16.5 16.5 18 18M18 6l-1.5 1.5M7.5 16.5 6 18"/><circle cx="12" cy="12" r="7"/></symbol>
     <symbol id="i-close" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></symbol>
     <symbol id="i-loadout" viewBox="0 0 24 24"><path d="M3 10h11l3-2h4v4h-4l-3-2H9v3H6v-3H3Z"/><path d="M9 13v4h4v-4M16 8V5"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 5.5h16v10H9l-5 3v-13Z"/><path d="M8 9h8M8 12h5"/></symbol>
   </defs>
 </svg>
 
 <main id="appRoot" class="app-root">
   <div id="gameStage" class="game-stage"><canvas id="game" draggable="false" aria-label="Breach gameplay"></canvas></div>
+
+  <div id="chatComposer" class="chat-composer hide" role="dialog" aria-label="Game chat">
+    <div class="chat-compose-shell">
+      <span class="chat-channel">ALL</span>
+      <input id="chatInput" class="chat-input" type="text" maxlength="120" inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="on" autocapitalize="sentences" spellcheck="true" aria-label="Chat message" placeholder="Message">
+      <button id="chatSendBtn" class="chat-send" type="button">SEND</button>
+    </div>
+  </div>
 
   <section id="entryScreen" class="entry-screen" aria-label="Enter Breach">
     <div class="entry-card">
@@ -280,6 +289,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.29.8"></script>
+<script type="module" src="client.js?v=1.30.0"></script>
 </body>
 </html>

@@ -55,6 +55,17 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .loadout-fixed{min-height:48px;padding:7px;border:1px solid var(--line);border-radius:8px;background:#10161a;display:flex;align-items:center;gap:8px}.loadout-fixed>b{min-width:30px;color:var(--text);font-size:9px;text-align:center}.loadout-fixed>div{min-width:0;display:grid;gap:2px}.loadout-fixed strong{font-size:8px}.loadout-fixed small{color:var(--dim);font-size:7px}
 .loadout-foot .primary{height:34px;padding:0 13px;font-size:8px}
 
+/* In-match room chat. The actual text box is a native HTML input so mobile
+   browsers open the OS QWERTY keyboard only after the player explicitly opens chat. */
+.chat-composer{position:fixed;z-index:68;left:50%;bottom:calc(var(--safe-bottom) + 18px);width:min(560px,calc(100vw - var(--safe-left) - var(--safe-right) - 24px));transform:translateX(-50%);pointer-events:auto}
+.chat-compose-shell{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;padding:6px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(7,10,12,.94);box-shadow:0 10px 34px rgba(0,0,0,.42);backdrop-filter:blur(8px)}
+.chat-channel{height:31px;display:grid;place-items:center;padding:0 8px;border-radius:6px;background:#171d21;color:var(--accent);font-size:8px;font-weight:1000;letter-spacing:.08em}
+.chat-input{min-width:0;height:31px;padding:0 9px;border:1px solid var(--line2);border-radius:6px;outline:0;background:#050809;color:#fff;font:800 12px system-ui,sans-serif;caret-color:var(--accent)}
+.chat-input:focus{border-color:rgba(215,255,88,.62);box-shadow:0 0 0 1px rgba(215,255,88,.18)}
+.chat-send{height:31px;padding:0 10px;border:1px solid rgba(215,255,88,.32);border-radius:6px;background:#1a2118;color:var(--accent);font-size:8px;font-weight:1000;letter-spacing:.06em;cursor:pointer}
+.touch .chat-composer{bottom:calc(var(--safe-bottom) + 6px);width:min(620px,calc(100vw - var(--safe-left) - var(--safe-right) - 12px))}
+.touch .chat-compose-shell{padding:4px;gap:4px}.touch .chat-channel,.touch .chat-input,.touch .chat-send{height:30px}.touch .chat-input{font-size:16px}
+
 .match-list,.lobby-roster,.admin-page,.pause-card,.settings-grid{scrollbar-width:thin;scrollbar-color:#303943 transparent}
 
 /* Touch landscape: every primary control remains reachable without page scrolling. */
