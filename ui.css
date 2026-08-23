@@ -162,3 +162,104 @@ body{font-size:var(--ui-md)}
 }
 
 .disabled-setting{opacity:.45}.disabled-setting .input{cursor:not-allowed}
+
+/* v1.31.1 navigation architecture: one screen at a time, tabs instead of menu scrolling. */
+.subtabs{display:flex;align-items:center;gap:5px;padding:4px;border:1px solid var(--line);border-radius:9px;background:#090d10}
+.subtab{flex:1 1 0;min-width:0;height:36px;padding:0 10px;border:0;border-radius:6px;background:transparent;color:var(--muted);font-size:11px;font-weight:950;letter-spacing:.06em;cursor:pointer;white-space:nowrap}
+.subtab:hover{background:#141b20;color:var(--text)}
+.subtab.active{background:var(--surface3);color:var(--accent)}
+.panel-tabs{margin:10px 14px 0}
+.panel-back{min-width:82px;height:38px}
+
+/* Secondary screens replace the previous screen instead of looking like a dialog stacked over it. */
+.modal-screen{place-items:stretch;padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 9px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 9px);background:radial-gradient(circle at 15% 10%,rgba(215,255,88,.06),transparent 30%),linear-gradient(135deg,#090d10,#050708 74%);backdrop-filter:none}
+.modal-shell{width:min(1180px,100%);height:100%;margin:auto;border:0;border-radius:0;background:transparent;box-shadow:none;overflow:hidden}
+.loadout-shell,.settings-shell{width:min(1180px,100%);height:100%;grid-template-rows:auto auto minmax(0,1fr) auto}
+.admin-shell{width:min(1180px,100%);height:100%;grid-template-rows:auto auto minmax(0,1fr) auto}
+.modal-head{padding:10px 4px 10px;border-bottom:1px solid var(--line)}
+.modal-head h2{font-size:22px}.modal-head p{font-size:12px;max-width:720px}
+.modal-foot{padding:8px 4px;background:transparent}
+.single-action-foot{grid-template-columns:minmax(0,1fr) auto}
+
+/* Lobby content is paged. Only the actual roster list scrolls. */
+.lobby-setup-panel,.lobby-loadout-panel{height:100%;overflow:hidden;display:grid;grid-template-rows:auto minmax(0,1fr)}
+.lobby-host-setup{min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);gap:9px;padding-top:9px}
+.lobby-match-page,.loadout-page,.settings-page,.admin-subpage{min-width:0;min-height:0}
+.lobby-match-page.active,.loadout-page.active,.settings-page.active,.admin-subpage.active{display:block}
+.lobby-match-page{align-self:start}
+.lobby-rules-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lobby-bots-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lobby-bot-help{margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:#090d10;color:var(--muted);font-size:11px;line-height:1.45}
+.lobby-host-tools,.lobby-host-player,.lobby-match-settings,.lobby-god-button{display:none!important}
+.lobby-header-actions{flex-wrap:nowrap}.lobby-header-actions .secondary-btn{white-space:nowrap}
+
+/* Loadout is two pages: weapon selection and equipment. */
+.lobby-loadout-panel>.subtabs{margin:9px 0 8px}
+.lobby-loadout-panel{grid-template-rows:auto auto minmax(0,1fr)}
+.lobby-loadout-panel>.loadout-page{overflow:hidden}
+.loadout-editor{min-height:0;overflow:hidden;padding:12px 14px;align-content:start}
+.loadout-editor>.loadout-page{height:100%;overflow:hidden}
+.loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.loadout-choice{min-height:68px}
+.loadout-columns{grid-template-columns:.8fr 1fr 1fr;gap:10px;align-items:start}
+.loadout-page .loadout-section{margin-top:0}
+.loadout-foot{grid-template-columns:minmax(0,1fr) auto}
+.loadout-foot .primary{min-width:220px;height:40px}
+
+/* Settings are direct pages; no vertical menu stack or Done + Close duplication. */
+.settings-pages{min-height:0;padding:14px;overflow:hidden}
+.settings-page{height:100%;overflow:hidden}
+.settings-page>.settings-grid{height:auto;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:0;overflow:visible;align-content:start}
+.settings-display-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+.setting{min-height:110px;justify-content:stretch}
+.setting-action{align-content:start}.setting-action .secondary-btn{height:40px;margin-top:4px}.setting-action small{color:var(--dim);font-size:10px;line-height:1.35;text-transform:none;letter-spacing:0}
+
+/* Host control is one destination. Gameplay and weapon pages are further split so the shell never needs menu scrolling. */
+.admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:9px 0;border-bottom:1px solid var(--line);background:transparent;overflow:hidden}
+.admin-tab{width:100%;height:38px}
+.admin-page{min-height:0;overflow:hidden;padding:12px 0}
+.admin-subtabs{width:min(650px,100%);margin-bottom:12px}
+.weapon-subtabs{width:min(820px,100%)}
+.admin-subpage{overflow:hidden}
+.admin-subpage>.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:0;overflow:visible}
+.admin-subpage[data-admin-gameplay-page="lifecycle"]>.settings-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+.weapon-settings-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;overflow:hidden}
+.weapon-group-three{grid-template-columns:repeat(3,minmax(0,1fr))}.weapon-group-single{grid-template-columns:minmax(280px,420px)}
+.weapon-settings-card{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px 10px;padding:11px}
+.weapon-settings-card strong{grid-column:1/-1}.weapon-settings-card label{font-size:10px}
+.players-page{overflow:hidden}.admin-player-list{height:100%;overflow:auto;align-content:start;padding-right:3px}
+
+/* Pause is a single action hub. Fullscreen lives only in Settings > Display. */
+.pause-card{overflow:visible}
+.pause-actions-system{grid-template-columns:repeat(2,minmax(0,1fr))}
+.pause-leave .secondary-btn{min-width:190px}
+
+/* Only data collections may scroll. */
+.front-content>.deploy-view,.lobby-setup-panel,.lobby-loadout-panel,.loadout-editor,.settings-pages,.settings-page,.admin-page,.admin-subpage,.pause-card{scrollbar-width:none}
+.front-content>.deploy-view:not(.front-live){overflow:hidden}
+.front-live{overflow:hidden!important}
+.match-list,.lobby-roster,.admin-player-list{scrollbar-width:thin;scrollbar-color:#303943 transparent}
+
+@media (max-width:900px) and (orientation:landscape){
+  .touch .modal-screen{padding:calc(var(--safe-top) + 4px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 4px) calc(var(--safe-left) + 6px)}
+  .touch .modal-shell{border-radius:0;height:100%}.touch .modal-head{padding:5px 2px 6px}.touch .modal-head h2{font-size:18px}.touch .panel-tabs{margin:5px 2px 0}.touch .subtab{height:30px;font-size:10px}
+  .touch .lobby-host-setup{gap:5px;padding-top:5px}.touch .lobby-loadout-panel>.subtabs{margin:5px 0}.touch .lobby-bot-help{margin-top:6px;padding:6px 8px;font-size:10px}
+  .touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.touch .loadout-choice{min-height:50px}.touch .loadout-editor{padding:6px 2px}.touch .loadout-columns{gap:5px}
+  .touch .settings-pages{padding:7px 2px}.touch .settings-page>.settings-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}.touch .settings-display-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.touch .setting{min-height:86px;padding:7px}.touch .setting-action .secondary-btn{height:34px}
+  .touch .admin-tabs{padding:5px 0}.touch .admin-tab{height:31px;font-size:10px}.touch .admin-page{padding:6px 0}.touch .admin-subtabs{margin-bottom:6px}.touch .admin-subpage>.settings-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}.touch .admin-subpage[data-admin-gameplay-page="lifecycle"]>.settings-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .touch .weapon-settings-grid,.touch .weapon-group-three{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}.touch .weapon-settings-grid:not(.weapon-group-three){grid-template-columns:repeat(2,minmax(0,1fr))}.touch .weapon-group-single{grid-template-columns:minmax(240px,360px)}.touch .weapon-settings-card{grid-template-columns:repeat(2,minmax(0,1fr));padding:6px;gap:4px 6px}.touch .weapon-settings-card input{height:31px}.touch .weapon-settings-card strong{padding-bottom:4px}
+}
+@media (max-width:700px) and (orientation:landscape){
+  .touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.touch .loadout-choice small{display:none}
+  .touch .lobby-rules-row,.touch .lobby-bots-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .touch .settings-page>.settings-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .touch .weapon-group-three{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media (max-width:700px) and (orientation:landscape){
+  .touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
+}
+@media (max-height:390px) and (orientation:landscape){
+  .touch .loadout-choice{min-height:44px;padding:5px}.touch .loadout-choice b{font-size:10px}.touch .loadout-choice strong{font-size:10px}
+  .touch .panel-tabs{margin-top:3px}.touch .subtab{height:28px}.touch .modal-head{padding-top:3px;padding-bottom:4px}.touch .modal-foot{padding-top:3px;padding-bottom:3px}
+  .touch .admin-tabs{padding-top:3px;padding-bottom:3px}.touch .admin-tab{height:29px}.touch .admin-page{padding-top:4px;padding-bottom:4px}.touch .admin-subtabs{margin-bottom:4px}
+}

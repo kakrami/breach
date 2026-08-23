@@ -2,19 +2,19 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.31.0';
+} from './world-geometry.js?v=1.31.1';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.31.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.31.0';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.31.0';
-import { createAudioEngine } from './audio-engine.js?v=1.31.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.31.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.31.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.31.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.31.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.31.0';
+} from './game-config.js?v=1.31.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.31.1';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.31.1';
+import { createAudioEngine } from './audio-engine.js?v=1.31.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.31.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.31.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.31.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.31.1';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.31.1';
 
 let THREE = null;
 
@@ -233,7 +233,7 @@ function suspendGameplayInput(){
 function handleShellState(state){
   if(chatOpen&&(!state.inMatch||state.paused||state.panel||state.connecting))void dismissChat({restorePointer:false});
   if(state.inMatch&&state.paused)syncPauseContext();
-  for(const id of ['exitAppBtn','lobbyExitFullscreenBtn']){const btn=$(id);if(btn)btn.disabled=state.standalone||!state.fullscreen;}
+  const fsBtn=$('settingsFullscreenBtn');if(fsBtn){fsBtn.textContent=state.standalone?'APP FULLSCREEN':state.fullscreen?'EXIT FULLSCREEN':'ENTER FULLSCREEN';fsBtn.disabled=state.standalone||(!state.fullscreen&&!state.fullscreenSupported);}
   if((state.location==='menu'||state.location==='lobby')&&(!state.touchControls||state.immersive)&&!document.hidden)startIntroMusic();else stopIntroMusic();
 }
 
@@ -259,7 +259,6 @@ const shell=createSessionShell({
     settings:$('settingsPanel'),
     admin:$('adminPanel'),
     loadout:$('loadoutPanel'),
-    fullscreenButton:$('fullBtn'),
   },
   onSuspend:suspendGameplayInput,
   onStateChange:handleShellState,
@@ -273,7 +272,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.31.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.31.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -365,7 +364,7 @@ function loadoutSummary(loadout=selectedLoadout()){return`${WEAPON_SPECS[loadout
 
 
 function syncMusicUI(){
-  for(const [useId,btnId] of [['musicIconUse','musicBtn'],['lobbyMusicIconUse','lobbyMusicBtn']]){const use=$(useId),btn=$(btnId);if(use)use.setAttribute('href',masterMuted?'#i-mute':'#i-sound');if(btn)btn.title=masterMuted?'Unmute audio':'Mute all audio';}
+  for(const [useId,btnId] of [['musicIconUse','musicBtn']]){const use=$(useId),btn=$(btnId);if(use)use.setAttribute('href',masterMuted?'#i-mute':'#i-sound');if(btn)btn.title=masterMuted?'Unmute audio':'Mute all audio';}
 }
 function toggleMasterMute(){masterMuted=!masterMuted;localStorage.setItem('breachMuted',masterMuted?'1':'0');syncMusicUI();if(masterMuted)stopIntroMusic();else if(!shell.inMatch)startIntroMusic();}
 
@@ -403,14 +402,13 @@ function lobbyBotTotal(){return Math.max(0,Math.min(MAX_BOTS,(botConfig.blueBots
 function syncLobby(){
   if(!shell.inLobby)return;const mode=currentGameMode(),spec=gameModeSpec(mode),host=!!isMatchAdmin,total=lobbyBotTotal();
   $('lobbyRoomCode').textContent=currentRoom||'----';$('lobbyModeBadge').textContent=spec.name;$('lobbyModeDescription').textContent=lobbyModeDescription(mode);
-  $('lobbyTeamGroup').classList.toggle('hide',!spec.teamBased);$('lobbyGodWrap').classList.toggle('hide',!host);$('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbyManagePlayersBtn').classList.toggle('hide',!host);$('lobbySetupOwnerLabel').textContent=host?'Admin controls':'Match info';
+  $('lobbyTeamGroup').classList.toggle('hide',!spec.teamBased);$('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbyHostControlBtn')?.classList.toggle('hide',!host);$('lobbySetupOwnerLabel').textContent=host?'Admin controls':'Match info';
   const startBtn=$('lobbyStartBtn');startBtn.classList.toggle('hide',!host);startBtn.disabled=!matchAllowsLobbyEdits(matchState);
   for(const btn of lobbyTeamButtons)btn.classList.toggle('active',spec.teamBased&&btn.dataset.lobbyTeamChoice===myTeam);
   for(const btn of lobbyPrimaryButtons)btn.classList.toggle('active',btn.dataset.lobbyPrimaryChoice===primaryWeapon);
   for(const btn of lobbyTacticalButtons)btn.classList.toggle('active',btn.dataset.lobbyTacticalChoice===tacticalEquipment);
   for(const btn of lobbyLethalButtons)btn.classList.toggle('active',btn.dataset.lobbyLethalChoice===lethalEquipment);
   for(const btn of lobbyModeButtons)btn.classList.toggle('active',btn.dataset.lobbyModeChoice===mode);
-  const godBtn=$('lobbyGodBtn');if(godBtn){godBtn.setAttribute('aria-pressed',String(godMode));godBtn.classList.toggle('active',godMode);}$('lobbyGodState').textContent=godMode?'ON':'OFF';
   const ffa=!spec.teamBased;$('lobbyBlueBotWrap').classList.toggle('hide',ffa);$('lobbyRedBotWrap').classList.toggle('hide',ffa);$('lobbyFfaBotWrap').classList.toggle('hide',!ffa);
   lobbyBlueBotCount.value=String(botConfig.blueBots||0);lobbyRedBotCount.value=String(botConfig.redBots||0);lobbyFfaBotCount.value=String(total);lobbyBotDifficulty.value=botConfig.difficulty||'normal';lobbyMinimapMode.value=matchState.minimapRevealAll?'all':'standard';
   const sandbox=spec.scoreType==='none';lobbyScoreLimit.value=sandbox?'':String(matchState.scoreLimit||spec.scoreLimit);lobbyTimeLimit.value=sandbox?'':String(Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000)));lobbyScoreLimit.disabled=sandbox;lobbyTimeLimit.disabled=sandbox;$('lobbyScoreWrap')?.classList.toggle('disabled-setting',sandbox);$('lobbyTimeWrap')?.classList.toggle('disabled-setting',sandbox);
@@ -447,6 +445,16 @@ function switchLobbySide(name='players'){
   const next=['players','match','loadout'].includes(name)?name:'players';
   for(const tab of lobbySideTabs){const active=tab.dataset.lobbySideTab===next;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));}
   for(const view of lobbySideViews){const active=view.dataset.lobbySideView===next;view.classList.toggle('active',active);view.hidden=!active;view.inert=!active;}
+}
+function switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,name){
+  const tabs=[...document.querySelectorAll(tabSelector)],pages=[...document.querySelectorAll(pageSelector)];if(!tabs.length||!pages.length)return;
+  const next=tabs.some(t=>t.getAttribute(tabAttr)===name)?name:tabs[0].getAttribute(tabAttr);
+  for(const tab of tabs){const active=tab.getAttribute(tabAttr)===next;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));tab.tabIndex=active?0:-1;}
+  for(const page of pages){const active=page.getAttribute(pageAttr)===next;page.classList.toggle('active',active);page.hidden=!active;page.inert=!active;}
+}
+function bindSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,initial){
+  const tabs=[...document.querySelectorAll(tabSelector)];for(const tab of tabs){tab.addEventListener('click',()=>switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,tab.getAttribute(tabAttr)));tab.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;e.preventDefault();const cur=Math.max(0,tabs.indexOf(tab)),next=e.key==='Home'?0:e.key==='End'?tabs.length-1:(cur+(e.key==='ArrowRight'?1:-1)+tabs.length)%tabs.length;tabs[next].focus();switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,tabs[next].getAttribute(tabAttr));});}
+  switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,initial);
 }
 function sendLobbyLoadout(next={}){
   const primary=PRIMARY_WEAPONS.includes(next.primaryWeapon)?next.primaryWeapon:primaryWeapon,tactical=normalizeTactical(next.tactical??tacticalEquipment),lethal=normalizeLethal(next.lethal??lethalEquipment);
@@ -525,7 +533,7 @@ function syncPlayerSettingsUI(){
   if($('playerGraphics'))$('playerGraphics').value=playerSettings.graphics;
 }
 function updatePlayerSettingFromUI(id,key){const el=$(id);if(!el)return;playerSettings={...playerSettings,[key]:Number(el.value)};savePlayerSettings();syncPlayerSettingsUI();if((key==='masterVolume'||key==='musicVolume')&&!shell.inMatch&&introMusicHandle){stopIntroMusic();if(!masterMuted)startIntroMusic();}}
-function openPlayerSettings(){syncPlayerSettingsUI();shell.openPanel(SHELL_PANEL.SETTINGS);}
+function openPlayerSettings(){syncPlayerSettingsUI();switchSubTabs('[data-settings-tab]','[data-settings-page]','data-settings-tab','data-settings-page','controls');shell.openPanel(SHELL_PANEL.SETTINGS);}
 function closePlayerSettings(){shell.closePanel(SHELL_PANEL.SETTINGS);}
 function resetPlayerSettings(){playerSettings={...DEFAULT_PLAYER_SETTINGS};savePlayerSettings();syncPlayerSettingsUI();applyGraphicsQuality();}
 
@@ -793,26 +801,29 @@ function bindUI(){
   };
   for(const tab of deployTabs)tab.addEventListener('click',()=>setDeployMode(tab.dataset.deployTab));
   setDeployMode(requestedRoom?'join':'create');
+  bindSubTabs('[data-lobby-match-tab]','[data-lobby-match-page]','data-lobby-match-tab','data-lobby-match-page','rules');
+  bindSubTabs('[data-lobby-loadout-tab]','[data-lobby-loadout-page]','data-lobby-loadout-tab','data-lobby-loadout-page','primary');
+  bindSubTabs('[data-match-loadout-tab]','[data-match-loadout-page]','data-match-loadout-tab','data-match-loadout-page','primary');
+  bindSubTabs('[data-settings-tab]','[data-settings-page]','data-settings-tab','data-settings-page','controls');
+  bindSubTabs('[data-admin-gameplay-tab]','[data-admin-gameplay-page]','data-admin-gameplay-tab','data-admin-gameplay-page','movement');
+  bindSubTabs('[data-admin-weapon-tab]','[data-admin-weapon-page]','data-admin-weapon-tab','data-admin-weapon-page','rifles');
 
   $('createBtn').addEventListener('click',createMatch);
   $('refreshBtn').addEventListener('click',refreshMatches);
   $('enterFullscreenBtn').addEventListener('click',()=>{ensureAudio();void shell.enterFullscreenFromGesture();});
-  $('exitAppBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
   $('musicBtn').addEventListener('click',()=>{ensureAudio();toggleMasterMute();});
-  $('lobbyMusicBtn').addEventListener('click',()=>{ensureAudio();toggleMasterMute();});
   $('settingsBtn').addEventListener('click',openPlayerSettings);
   $('lobbySettingsBtn').addEventListener('click',openPlayerSettings);
-  $('lobbyExitFullscreenBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
+  $('lobbyHostControlBtn').addEventListener('click',()=>openAdminPanel('gameplay'));
   $('pauseSettingsBtn').addEventListener('click',openPlayerSettings);
   $('pauseLoadoutBtn').addEventListener('click',openMatchLoadout);
   $('loadoutCloseBtn').addEventListener('click',closeMatchLoadout);
-  $('loadoutCancelBtn').addEventListener('click',closeMatchLoadout);
   $('loadoutSaveBtn').addEventListener('click',saveMatchLoadout);
   for(const btn of matchPrimaryButtons)btn.addEventListener('click',()=>{loadoutDraft=normalizeLoadoutChoice({...loadoutDraft,primaryWeapon:btn.dataset.matchPrimaryChoice});syncMatchLoadoutEditor();});
   for(const btn of matchTacticalButtons)btn.addEventListener('click',()=>{loadoutDraft=normalizeLoadoutChoice({...loadoutDraft,tactical:btn.dataset.matchTacticalChoice});syncMatchLoadoutEditor();});
   for(const btn of matchLethalButtons)btn.addEventListener('click',()=>{loadoutDraft=normalizeLoadoutChoice({...loadoutDraft,lethal:btn.dataset.matchLethalChoice});syncMatchLoadoutEditor();});
   $('settingsCloseBtn').addEventListener('click',closePlayerSettings);
-  $('settingsDoneBtn').addEventListener('click',closePlayerSettings);
+  $('settingsFullscreenBtn').addEventListener('click',async()=>{ensureAudio();if(shell.fullscreen)await shell.exitFullscreenFromGesture();else await shell.enterFullscreenFromGesture();});
   $('settingsDefaultsBtn').addEventListener('click',resetPlayerSettings);
   for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id).addEventListener('input',()=>updatePlayerSettingFromUI(id,key));
   $('playerGraphics').addEventListener('change',()=>{playerSettings={...playerSettings,graphics:$('playerGraphics').value};savePlayerSettings();applyGraphicsQuality();});
@@ -839,8 +850,6 @@ function bindUI(){
       tabs[next].focus();switchAdminTab(tabs[next].dataset.adminTab);
     });
   }
-  $('setBotDifficulty').addEventListener('change',()=>{$('botDifficultyHelp').textContent=botDifficultyDescription($('setBotDifficulty').value);});
-  $('fullBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
   $('leaveBtn').addEventListener('click',leaveMatch);
   $('lobbyLeaveBtn').addEventListener('click',leaveMatch);
   $('lobbyCopyBtn').addEventListener('click',copyInvite);
@@ -851,12 +860,9 @@ function bindUI(){
   for(const btn of lobbyTacticalButtons)btn.addEventListener('click',()=>sendLobbyLoadout({tactical:btn.dataset.lobbyTacticalChoice}));
   for(const btn of lobbyLethalButtons)btn.addEventListener('click',()=>sendLobbyLoadout({lethal:btn.dataset.lobbyLethalChoice}));
   for(const btn of lobbyModeButtons)btn.addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMode',mode:btn.dataset.lobbyModeChoice});});
-  $('lobbyGodBtn').addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN)send({t:'god',enabled:!godMode});});
   for(const el of [lobbyBlueBotCount,lobbyRedBotCount,lobbyFfaBotCount,lobbyBotDifficulty])el.addEventListener('change',sendLobbyBotConfig);
   for(const el of [lobbyScoreLimit,lobbyTimeLimit])el.addEventListener('change',sendLobbyMatchRules);
   lobbyMinimapMode.addEventListener('change',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMinimap',revealAll:lobbyMinimapMode.value==='all'});else syncLobby();});
-  $('lobbyMatchSettingsBtn').addEventListener('click',()=>openAdminPanel('gameplay'));
-  $('lobbyManagePlayersBtn').addEventListener('click',()=>openAdminPanel('players'));
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
     const button=$('lobbyStartBtn');button.disabled=true;$('lobbyStatus').textContent='Preparing match…';
@@ -1256,12 +1262,12 @@ function handleMessage(m){
   if(m.t==='god'){if(typeof m.custom==='boolean')matchCustom=m.custom;if(m.id===clientId){godMode=!!m.enabled;syncLobby();showToast(godMode?'GOD MODE ENABLED':'GOD MODE DISABLED');}else{const row=lobbyParticipants.get(String(m.id||''));if(row)row.godMode=!!m.enabled;const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}renderAdminPlayers();syncLobby();return;}
   if(m.t==='adminRole'){if(m.id===clientId){isMatchAdmin=!!m.enabled;syncPauseContext();if(!isMatchAdmin&&shell.panel===SHELL_PANEL.ADMIN)closeAdminPanel();showToast(isMatchAdmin?'ADMIN PRIVILEGES GRANTED':'ADMIN PRIVILEGES REMOVED');}else{const row=lobbyParticipants.get(String(m.id||''));if(row)row.admin=!!m.enabled;const r=remotes.get(m.id);if(r)r.admin=!!m.enabled;}renderAdminPlayers();syncLobby();return;}
   if(m.t==='teamQueued'){if(m.id===clientId){pendingTeam=m.pendingTeam||'';syncPauseContext();showToast(pendingTeam?`TEAM SWITCH QUEUED · ${pendingTeam.toUpperCase()}`:'TEAM SWITCH CANCELED');syncLobby();}return;}
-  if(m.t==='match'){applyClientMatchState(m.match);matchCustom=!!m.custom;if(shell.panel===SHELL_PANEL.ADMIN&&m.rulesUpdated){if(m.by===clientId||activeAdminTab!=='match')populateAdminMatch(matchState);if(m.by===clientId&&activeAdminTab==='match')setAdminStatus('Score / time applied.','ok');}if(matchAllowsLobbyEdits(matchState)){syncLobby();syncModeVisuals();}return;}
+  if(m.t==='match'){applyClientMatchState(m.match);matchCustom=!!m.custom;if(shell.panel===SHELL_PANEL.ADMIN&&m.rulesUpdated&&m.by===clientId)setAdminStatus('Match rules updated in the lobby.','ok');if(matchAllowsLobbyEdits(matchState)){syncLobby();syncModeVisuals();}return;}
   if(m.t==='matchReset'){applyClientMatchState(m.match);matchCustom=!!m.custom;myStats={kills:0,deaths:0};const players=m.players||[],bots=m.bots||[],self=players.find(pl=>pl?.id===clientId)||null;if(self){myTeam=self.team||myTeam;pendingTeam='';primaryWeapon=PRIMARY_WEAPONS.includes(self.primaryWeapon)?self.primaryWeapon:primaryWeapon;tacticalEquipment=normalizeTactical(self.tactical);lethalEquipment=normalizeLethal(self.lethal);pendingLoadout=null;rememberPrimary(primaryWeapon);rememberEquipment(tacticalEquipment,lethalEquipment);}pendingGameSnapshot=gameSnapshot(self,players,bots);replaceLobbyParticipants(players,bots);syncModeVisuals();if(shell.inLobby||!engineReady){void enterGame(pendingGameSnapshot,{resetRound:true});}else applyGameSnapshot(pendingGameSnapshot,{resetRound:true});showToast(`ROUND ${matchState.round}`);return;}
   if(m.t==='blocked'){handleBlocked(m);return;}
   if(m.t==='kill'){handleKill(m);return;}
   if(m.t==='settings'){applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);if(typeof m.custom==='boolean')matchCustom=m.custom;const section=m.section==='advanced'?'advanced':'gameplay';if(shell.panel===SHELL_PANEL.ADMIN){if(m.by===clientId){if(section==='advanced')populateAdminWeapons(worldSettings);else populateAdminGameplay(worldSettings);setAdminStatus(section==='advanced'?'Weapons applied.':'Gameplay applied.','ok');}else if(activeAdminTab!==section){if(section==='advanced')populateAdminWeapons(worldSettings);else populateAdminGameplay(worldSettings);}}syncLobby();showToast(section==='advanced'?'WEAPON RULES UPDATED':'GAMEPLAY RULES UPDATED');return;}
-  if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncLobbyBots(m.bots||[]);if(shell.inMatch&&engineReady)syncBotRoster(m.bots||[]);syncLobby();if(shell.panel===SHELL_PANEL.ADMIN){populateAdminBots(botConfig);if(activeAdminTab==='bots')setAdminStatus('Bot settings applied.','ok');}showToast(`BOTS · ${botConfig.difficulty.toUpperCase()}`);return;}
+  if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncLobbyBots(m.bots||[]);if(shell.inMatch&&engineReady)syncBotRoster(m.bots||[]);syncLobby();if(shell.panel===SHELL_PANEL.ADMIN&&m.by===clientId)setAdminStatus('Bot settings updated in the lobby.','ok');showToast(`BOTS · ${botConfig.difficulty.toUpperCase()}`);return;}
   if(m.t==='notice'){showToast(m.text||'Server notice');if(shell.panel===SHELL_PANEL.ADMIN)setAdminStatus(m.text||'Server notice',m.tone==='error'?'error':'');return;}
   if(m.t==='pong'){const echoed=Number(m.clientAt)||lastPingLocalAt;if(echoed&&Number.isFinite(Number(m.at))){const received=Date.now(),mid=echoed+(received-echoed)/2,estimate=Number(m.at)-mid;serverClockOffset=serverClockOffset*.7+estimate*.3;}return;}
   if(m.t==='health'){if(m.id===clientId){hp=Math.max(0,Math.min(100,Number(m.hp)||0));syncLocalStatus();}else{const r=remotes.get(m.id);if(r)r.hp=Math.max(0,Math.min(100,Number(m.hp)||0));}return;}
@@ -1286,22 +1292,14 @@ function leaveMatch(){
 
 function normalizeBotConfig(value){const v=value&&typeof value==='object'?value:{};const blueBots=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(v.blueBots)||0))),redBots=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(v.redBots)||0)));const diff=['easy','normal','hard','elite'].includes(String(v.difficulty||'normal').toLowerCase())?String(v.difficulty||'normal').toLowerCase():'normal';return{blueBots,redBots,difficulty:diff};}
 function botDifficultyDescription(diff){return({easy:'Forgiving aim and slower reactions.',normal:'Faster pressure, tighter aim and active strafing.',hard:'Aggressive pursuit, fast strafing and accurate sustained fire.',elite:'Relentless pursuit, evasive strafing, long range and near-instant reactions.'})[diff]||'Faster pressure and tighter aim.';}
-function populateAdminBots(value){const x=normalizeBotConfig(value),ffa=currentGameMode()==='ffa';$('adminBlueBotsWrap').classList.toggle('hide',ffa);$('adminRedBotsWrap').classList.toggle('hide',ffa);$('adminFfaBotsWrap').classList.toggle('hide',!ffa);$('setBlueBots').value=x.blueBots;$('setRedBots').value=x.redBots;$('setFfaBots').value=x.blueBots+x.redBots;$('setBotDifficulty').value=x.difficulty;$('botDifficultyHelp').textContent=botDifficultyDescription(x.difficulty);}
-function collectAdminBots(){if(currentGameMode()==='ffa'){const total=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number($('setFfaBots').value)||0)));return normalizeBotConfig({blueBots:Math.ceil(total/2),redBots:Math.floor(total/2),difficulty:$('setBotDifficulty').value});}return normalizeBotConfig({blueBots:$('setBlueBots').value,redBots:$('setRedBots').value,difficulty:$('setBotDifficulty').value});}
 function syncBotRoster(list){const incoming=new Set((list||[]).map(b=>b.id));for(const [id,r] of remotes){if(r.bot&&!incoming.has(id))removeRemote(id);}for(const b of list||[])upsertRemote(b,true);syncPauseContext();}
 function setAdminStatus(text,tone=''){const el=$('adminStatus');el.textContent=text;el.className=`admin-status ${tone}`;}
-let activeAdminTab='gameplay',adminPanelContext='settings';
+let activeAdminTab='gameplay';
 function availableAdminTabs(){return [...document.querySelectorAll('[data-admin-tab]')].filter(tab=>!tab.classList.contains('hide'));}
 function syncAdminContext(){
-  const inLobby=!!shell.inLobby,playersOnly=inLobby&&adminPanelContext==='players';
-  for(const tab of document.querySelectorAll('[data-admin-tab]')){
-    const id=tab.dataset.adminTab;
-    const hidden=playersOnly?id!=='players':id==='match'||id==='bots'||(inLobby&&id==='players');
-    tab.classList.toggle('hide',hidden);
-  }
-  $('adminEyebrow').textContent=inLobby?(playersOnly?'LOBBY ROSTER':'LOBBY'):'CUSTOM MATCH';
-  $('adminTitle').textContent=inLobby?(playersOnly?'Manage players':'Advanced tuning'):'Advanced match control';
-  $('adminDescription').textContent=inLobby?(playersOnly?'Manage player God Mode and admin access without mixing roster actions into match rules.':'Tune gameplay and weapons. Mode, bots, score, time and minimap stay in the Match tab.'):'Tune gameplay, weapons and player administration.';
+  $('adminEyebrow').textContent=shell.inLobby?'LOBBY HOST':'MATCH HOST';
+  $('adminTitle').textContent='Host control';
+  $('adminDescription').textContent=shell.inLobby?'Advanced tuning and player administration. Normal match setup stays in the Match tab.':'Advanced tuning and player administration.';
 }
 function switchAdminTab(tab){
   const tabs=availableAdminTabs(),requested=tabs.find(btn=>btn.dataset.adminTab===tab);
@@ -1310,8 +1308,6 @@ function switchAdminTab(tab){
   for(const b of document.querySelectorAll('[data-admin-tab]')){const active=b.dataset.adminTab===activeAdminTab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;}
   const players=activeAdminTab==='players';$('adminResetBtn').classList.toggle('hide',players);$('adminSaveBtn').classList.toggle('hide',players);document.querySelector('.admin-shell').dataset.page=activeAdminTab;if(players)renderAdminPlayers(true);
 }
-function populateAdminMatch(value=matchState){const m=normalizeClientMatch(value),spec=gameModeSpec(m.mode),sandbox=spec.scoreType==='none';$('setScoreLimit').value=sandbox?'':m.scoreLimit;$('setTimeLimit').value=sandbox?'':Math.round(m.timeLimitMs/60000);$('setScoreLimit').disabled=sandbox;$('setTimeLimit').disabled=sandbox;const note=$('adminMatchNote');if(note)note.textContent=sandbox?'Sandbox has no score limit or time limit.':m.mode==='ffa'?`Free For All: first to ${m.scoreLimit} eliminations or highest score after ${Math.round(m.timeLimitMs/60000)} minutes.`:`Team Deathmatch: first team to ${m.scoreLimit} eliminations or highest score after ${Math.round(m.timeLimitMs/60000)} minutes.`;}
-function collectAdminMatch(){const spec=currentModeSpec();if(spec.scoreType==='none')return{scoreLimit:0,timeLimitMs:0};return{scoreLimit:Math.max(5,Math.min(100,Math.round(Number($('setScoreLimit').value)||spec.scoreLimit))),timeLimitMs:Math.max(120000,Math.min(1800000,Math.round((Number($('setTimeLimit').value)||spec.timeLimitMs/60000)*60000)))}};
 function populateAdminGameplay(value){const x=normalizeWorldSettings(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);}
 function populateAdminWeapons(value){const x=normalizeWorldSettings(value);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=(w.reloadMs/1000).toFixed(2);$(`set${cap}Cooldown`).value=Math.round(60000/w.cooldownMs);}}
 function populateAdminSettings(value){populateAdminGameplay(value);populateAdminWeapons(value);}
@@ -1322,7 +1318,7 @@ function renderAdminPlayers(force=false){
   const root=$('adminPlayerList');if(!root)return;if(!force&&(shell.panel!==SHELL_PANEL.ADMIN||activeAdminTab!=='players'))return;root.innerHTML='';
   for(const pl of adminPlayerSnapshot()){
     const row=document.createElement('div');row.className='admin-player-row';const owner=pl.id===matchOwnerId,self=!!pl.self;
-    const godAction=shell.inLobby&&self?'':`<button class="btn admin-mini ${pl.godMode?'active':''}" data-admin-god="${pl.id}">${pl.godMode?'God Mode On':'God Mode Off'}</button>`;
+    const godAction=`<button class="btn admin-mini ${pl.godMode?'active':''}" data-admin-god="${pl.id}">${pl.godMode?'God Mode On':'God Mode Off'}</button>`;
     const roleAction=(owner||self)?`<button class="btn admin-mini ${pl.admin?'active':''}" disabled>${owner?'Owner':pl.admin?'Admin':'Player'}</button>`:`<button class="btn admin-mini ${pl.admin?'active':''}" data-admin-role="${pl.id}">${pl.admin?'Admin':'Make Admin'}</button>`;
     row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${currentModeSpec().teamBased?pl.team:'ffa'}"></span><div><strong>${escapeHtml(pl.name)}${self?' (You)':''}</strong><small>${owner?'MATCH OWNER':pl.admin?'ADMIN':'PLAYER'} · ${currentModeSpec().teamBased?String(pl.team||'blue').toUpperCase():'FFA'}</small></div></div><div class="admin-player-actions">${godAction}${roleAction}</div>`;root.appendChild(row);
   }
@@ -1332,15 +1328,13 @@ function renderAdminPlayers(force=false){
 function requestTeamChange(team){if(!shell.inMatch||socket?.readyState!==WebSocket.OPEN)return;const next=team==='red'?'red':'blue';send({t:'team',team:next});showToast(next===myTeam?'CANCELING TEAM SWITCH':`SWITCH TO ${next.toUpperCase()} ON RESPAWN`);}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function applyRemoteTeamVisual(r,team){if(!r)return;const next=team==='red'?'red':'blue';r.team=next;r.color=remoteDisplayColor(next);if(r.body?.material?.color)r.body.material.color.set(remoteDisplayColor(next));if(r.tag){r.group.remove(r.tag);r.tag.material?.map?.dispose?.();r.tag.material?.dispose?.();r.tag=makeNameTag(r.bot?`[BOT] ${r.name}`:r.name,remoteDisplayColor(next));r.tag.position.set(0,2.18,0);r.group.add(r.tag);}}
-function openAdminPanel(initialTab='gameplay'){if(!isMatchAdmin){showToast('ADMIN ACCESS REQUIRED');return;}adminPanelContext=shell.inLobby&&initialTab==='players'?'players':'settings';syncAdminContext();populateAdminMatch(matchState);populateAdminSettings(worldSettings);populateAdminBots(botConfig);switchAdminTab(initialTab);setAdminStatus(adminPanelContext==='players'?'Player changes apply immediately.':matchCustom?'CUSTOM rules active.':'Standard match rules active.');shell.openPanel(SHELL_PANEL.ADMIN);renderAdminPlayers(true);}
-function closeAdminPanel(){adminPanelContext='settings';shell.closePanel(SHELL_PANEL.ADMIN);}
-function resetActiveAdminTab(){if(activeAdminTab==='match'){const spec=currentModeSpec();populateAdminMatch({...matchState,mode:spec.id,scoreLimit:spec.scoreLimit,timeLimitMs:spec.timeLimitMs});}else if(activeAdminTab==='gameplay')populateAdminGameplay({...worldSettings,movement:DEFAULT_WORLD_SETTINGS.movement,combat:DEFAULT_WORLD_SETTINGS.combat});else if(activeAdminTab==='advanced')populateAdminWeapons({...worldSettings,weapons:DEFAULT_WORLD_SETTINGS.weapons});else if(activeAdminTab==='bots')populateAdminBots({blueBots:0,redBots:0,difficulty:'normal'});}
+function openAdminPanel(initialTab='gameplay'){if(!isMatchAdmin){showToast('ADMIN ACCESS REQUIRED');return;}syncAdminContext();populateAdminSettings(worldSettings);switchAdminTab(initialTab);switchSubTabs('[data-admin-gameplay-tab]','[data-admin-gameplay-page]','data-admin-gameplay-tab','data-admin-gameplay-page','movement');switchSubTabs('[data-admin-weapon-tab]','[data-admin-weapon-page]','data-admin-weapon-tab','data-admin-weapon-page','rifles');setAdminStatus(matchCustom?'CUSTOM tuning active.':'Advanced settings are unchanged.');shell.openPanel(SHELL_PANEL.ADMIN);renderAdminPlayers(true);}
+function closeAdminPanel(){shell.closePanel(SHELL_PANEL.ADMIN);}
+function resetActiveAdminTab(){if(activeAdminTab==='gameplay')populateAdminGameplay({...worldSettings,movement:DEFAULT_WORLD_SETTINGS.movement,combat:DEFAULT_WORLD_SETTINGS.combat});else if(activeAdminTab==='advanced')populateAdminWeapons({...worldSettings,weapons:DEFAULT_WORLD_SETTINGS.weapons});}
 function saveAdminSettings(){
   if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN){setAdminStatus('Admin connection unavailable.','error');return;}
-  if(activeAdminTab==='match'){send({t:'adminMatch',rules:collectAdminMatch()});setAdminStatus('Applying score / time…');return;}
   if(activeAdminTab==='gameplay'){send({t:'adminSettings',section:'gameplay',patch:collectAdminGameplayPatch()});setAdminStatus('Applying gameplay…');return;}
   if(activeAdminTab==='advanced'){send({t:'adminSettings',section:'advanced',patch:collectAdminWeaponsPatch()});setAdminStatus('Applying weapons…');return;}
-  if(activeAdminTab==='bots'){const bots=collectAdminBots();if(bots.blueBots+bots.redBots>MAX_BOTS){setAdminStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}send({t:'adminBots',...bots});setAdminStatus('Updating bots…');}
 }
 
 function openPause(){if(!shell.inMatch||shell.paused)return;shell.pause('user-pause');}
@@ -2012,7 +2006,8 @@ function handleControllerUiNavigation(pressed){
   }
   if(pressed[GAMEPAD_BUTTON.A]&&focus){if(focus.tagName==='BUTTON'){focus.click();return true;}focus.focus();return true;}
   if(pressed[GAMEPAD_BUTTON.LB]||pressed[GAMEPAD_BUTTON.RB]){
-    const tabs=[...surface.querySelectorAll('[role=tablist] button:not([disabled])')].filter(el=>!el.closest('[hidden],.hide'));if(tabs.length){const cur=Math.max(0,tabs.indexOf(controllerUiFocus)),next=(cur+(pressed[GAMEPAD_BUTTON.RB]?1:-1)+tabs.length)%tabs.length;setControllerUiFocus(tabs[next]);tabs[next].click();return true;}
+    const tablist=controllerUiFocus?.closest?.('[role=tablist]')||[...surface.querySelectorAll('[role=tablist]')].find(el=>!el.closest('[hidden],.hide'));
+    const tabs=tablist?[...tablist.querySelectorAll('button:not([disabled])')].filter(el=>!el.closest('[hidden],.hide')):[];if(tabs.length){const cur=Math.max(0,tabs.indexOf(controllerUiFocus)),next=(cur+(pressed[GAMEPAD_BUTTON.RB]?1:-1)+tabs.length)%tabs.length;setControllerUiFocus(tabs[next]);tabs[next].click();return true;}
   }
   if(pressed[GAMEPAD_BUTTON.DPAD_LEFT]){if(adjustControllerField(focus,-1))return true;moveControllerUiFocus(-1,0);return true;}
   if(pressed[GAMEPAD_BUTTON.DPAD_RIGHT]){if(adjustControllerField(focus,1))return true;moveControllerUiFocus(1,0);return true;}

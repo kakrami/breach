@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.31.0">
-<title>Breach v1.31.0</title>
-<link rel="stylesheet" href="ui.css?v=1.31.0">
+<link rel="manifest" href="manifest.webmanifest?v=1.31.1">
+<title>Breach v1.31.1</title>
+<link rel="stylesheet" href="ui.css?v=1.31.1">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -91,15 +91,14 @@
         <div class="menu-actions">
           <button id="musicBtn" class="square-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button>
           <button id="settingsBtn" class="square-btn" title="Settings" aria-label="Settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button>
-          <button id="exitAppBtn" class="square-btn" title="Exit fullscreen" aria-label="Exit fullscreen"><svg class="ui-icon"><use href="#i-exit"/></svg></button>
         </div>
       </header>
 
       <div class="front-body">
         <nav class="front-nav" aria-label="Multiplayer menu">
-          <button type="button" class="front-nav-button active" data-deploy-tab="create" aria-selected="true"><svg class="ui-icon"><use href="#i-plus"/></svg><span><strong>CREATE LOBBY</strong><small>Open a new match room</small></span></button>
-          <button type="button" class="front-nav-button" data-deploy-tab="join" aria-selected="false"><svg class="ui-icon"><use href="#i-enter"/></svg><span><strong>JOIN PRIVATE</strong><small>Enter a room code</small></span></button>
-          <button type="button" class="front-nav-button" data-deploy-tab="live" aria-selected="false"><span class="live-dot"></span><span><strong>LIVE MATCHES</strong><small>Browse open rooms</small></span><b id="matchCount" class="tab-count"></b></button>
+          <button type="button" class="front-nav-button active" data-deploy-tab="create" aria-selected="true"><svg class="ui-icon"><use href="#i-plus"/></svg><span><strong>HOST</strong><small>Create a new match room</small></span></button>
+          <button type="button" class="front-nav-button" data-deploy-tab="join" aria-selected="false"><svg class="ui-icon"><use href="#i-enter"/></svg><span><strong>JOIN</strong><small>Enter a private room code</small></span></button>
+          <button type="button" class="front-nav-button" data-deploy-tab="live" aria-selected="false"><span class="live-dot"></span><span><strong>BROWSE</strong><small>Find open matches</small></span><b id="matchCount" class="tab-count"></b></button>
         </nav>
 
         <section class="front-content">
@@ -133,11 +132,10 @@
           <p id="lobbyModeDescription">Teams compete for the elimination limit.</p>
         </div>
         <div class="lobby-header-actions">
-          <button id="lobbyMusicBtn" class="square-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="lobbyMusicIconUse" href="#i-sound"/></svg></button>
           <button id="lobbySettingsBtn" class="square-btn" title="Player settings" aria-label="Player settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button>
-          <button id="lobbyExitFullscreenBtn" class="square-btn" title="Exit fullscreen" aria-label="Exit fullscreen"><svg class="ui-icon"><use href="#i-exit"/></svg></button>
+          <button id="lobbyHostControlBtn" class="secondary-btn hide"><svg class="mini-icon"><use href="#i-shield"/></svg><span>HOST CONTROL</span></button>
           <button id="lobbyCopyBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-copy"/></svg><span>INVITE</span></button>
-          <button id="lobbyLeaveBtn" class="secondary-btn danger"><svg class="mini-icon"><use href="#i-exit"/></svg><span>LEAVE</span></button>
+          <button id="lobbyLeaveBtn" class="secondary-btn danger"><svg class="mini-icon"><use href="#i-exit"/></svg><span>LEAVE LOBBY</span></button>
         </div>
       </header>
 
@@ -150,7 +148,7 @@
           </div>
 
           <section class="lobby-side-view lobby-roster-panel active" data-lobby-side-view="players">
-          <div class="lobby-section-head"><div><span class="eyebrow">PLAYERS</span><h2>Roster</h2></div><div class="lobby-roster-actions"><span id="lobbyPlayerCount" class="lobby-count">1 / 8</span><button id="lobbyManagePlayersBtn" type="button" class="lobby-manage-players hide">MANAGE</button></div></div>
+          <div class="lobby-section-head"><div><span class="eyebrow">PLAYERS</span><h2>Roster</h2></div><div class="lobby-roster-actions"><span id="lobbyPlayerCount" class="lobby-count">1 / 8</span></div></div>
           <div id="lobbyTeamGroup" class="lobby-roster-team-control">
             <span>YOUR TEAM</span>
             <div class="lobby-team-picker"><button type="button" class="lobby-team-choice blue" data-lobby-team-choice="blue"><i></i><strong>BLUE</strong></button><button type="button" class="lobby-team-choice red" data-lobby-team-choice="red"><i></i><strong>RED</strong></button></div>
@@ -162,20 +160,27 @@
             <section class="lobby-setup-panel">
               <div class="lobby-section-head"><div><span class="eyebrow">MATCH SETUP</span><h2>Rules</h2></div><span id="lobbySetupOwnerLabel" class="lobby-secondary">Admin controls</span></div>
               <div id="lobbyHostSetup" class="lobby-host-setup hide">
-                <div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button type="button" data-lobby-mode-choice="tdm">TEAM DEATHMATCH</button><button type="button" data-lobby-mode-choice="ffa">FREE FOR ALL</button><button type="button" data-lobby-mode-choice="sandbox">SANDBOX</button></div></div>
-                <div class="lobby-setup-row">
-                  <label id="lobbyBlueBotWrap"><span>BLUE BOTS</span><select id="lobbyBlueBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-                  <label id="lobbyRedBotWrap"><span>RED BOTS</span><select id="lobbyRedBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-                  <label id="lobbyFfaBotWrap" class="hide"><span>BOTS</span><select id="lobbyFfaBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-                  <label><span>DIFFICULTY</span><select id="lobbyBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
-                  <label><span>MINIMAP</span><select id="lobbyMinimapMode" class="input"><option value="standard">Standard</option><option value="all">Show Everyone</option></select></label>
-                  <label id="lobbyScoreWrap"><span>SCORE LIMIT</span><input id="lobbyScoreLimit" class="input" type="number" min="5" max="100" step="5"></label>
-                  <label id="lobbyTimeWrap"><span>TIME LIMIT (MIN)</span><input id="lobbyTimeLimit" class="input" type="number" min="2" max="30" step="1"></label>
+                <div class="subtabs lobby-match-subtabs" role="tablist" aria-label="Match setup sections">
+                  <button type="button" class="subtab active" data-lobby-match-tab="rules" aria-selected="true">RULES</button>
+                  <button type="button" class="subtab" data-lobby-match-tab="bots" aria-selected="false">BOTS</button>
                 </div>
-                <div id="lobbyRuleSummary" class="lobby-rule-summary">First 30 · 8 min</div>
-                <div class="lobby-host-tools">
-                  <button id="lobbyMatchSettingsBtn" class="secondary-btn lobby-match-settings"><svg class="mini-icon"><use href="#i-settings"/></svg><span>MATCH CONTROL</span></button>
-                  <div id="lobbyGodWrap" class="lobby-control-group lobby-host-player hide"><button id="lobbyGodBtn" type="button" class="lobby-god-button" aria-pressed="false"><svg class="mini-icon"><use href="#i-shield"/></svg><strong>GOD MODE</strong><b id="lobbyGodState">OFF</b></button></div>
+                <div class="lobby-match-page active" data-lobby-match-page="rules">
+                  <div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button type="button" data-lobby-mode-choice="tdm">TEAM DEATHMATCH</button><button type="button" data-lobby-mode-choice="ffa">FREE FOR ALL</button><button type="button" data-lobby-mode-choice="sandbox">SANDBOX</button></div></div>
+                  <div class="lobby-setup-row lobby-rules-row">
+                    <label><span>MINIMAP</span><select id="lobbyMinimapMode" class="input"><option value="standard">Standard</option><option value="all">Show Everyone</option></select></label>
+                    <label id="lobbyScoreWrap"><span>SCORE LIMIT</span><input id="lobbyScoreLimit" class="input" type="number" min="5" max="100" step="5"></label>
+                    <label id="lobbyTimeWrap"><span>TIME LIMIT (MIN)</span><input id="lobbyTimeLimit" class="input" type="number" min="2" max="30" step="1"></label>
+                  </div>
+                  <div id="lobbyRuleSummary" class="lobby-rule-summary">First 30 · 8 min</div>
+                </div>
+                <div class="lobby-match-page" data-lobby-match-page="bots" hidden>
+                  <div class="lobby-setup-row lobby-bots-row">
+                    <label id="lobbyBlueBotWrap"><span>BLUE BOTS</span><select id="lobbyBlueBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+                    <label id="lobbyRedBotWrap"><span>RED BOTS</span><select id="lobbyRedBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+                    <label id="lobbyFfaBotWrap" class="hide"><span>BOTS</span><select id="lobbyFfaBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
+                    <label><span>DIFFICULTY</span><select id="lobbyBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
+                  </div>
+                  <div class="lobby-bot-help">Bot count and difficulty are part of normal match setup. Advanced tuning is under Host Control.</div>
                 </div>
               </div>
               <div id="lobbyGuestSetup" class="lobby-guest-setup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><span id="lobbyGuestRules">First 30 · 8 min</span><small>A lobby admin controls match rules. You can change your team and loadout while you wait.</small></div>
@@ -185,19 +190,27 @@
           <div class="lobby-side-view lobby-loadout-view" data-lobby-side-view="loadout" hidden>
             <section class="lobby-loadout-panel">
               <div class="lobby-section-head"><div><span class="eyebrow">YOUR LOADOUT</span><h2>Loadout</h2></div><span class="lobby-secondary">Applies immediately in lobby</span></div>
-              <div class="loadout-section"><span>PRIMARY</span><div class="loadout-choice-grid primary-grid">
-                <button type="button" class="loadout-choice" data-lobby-primary-choice="assault"><b>AR</b><strong>ASSAULT</strong><small>Balanced automatic rifle</small></button>
-                <button type="button" class="loadout-choice" data-lobby-primary-choice="ump"><b>UMP</b><strong>UMP</strong><small>Fast close-range SMG</small></button>
-                <button type="button" class="loadout-choice" data-lobby-primary-choice="shotgun"><b>SG</b><strong>PUMP SHOTGUN</strong><small>Heavy close-range pump</small></button>
-                <button type="button" class="loadout-choice" data-lobby-primary-choice="semiShotgun"><b>SAS</b><strong>SEMI-AUTO SG</strong><small>Faster follow-up shots</small></button>
-                <button type="button" class="loadout-choice" data-lobby-primary-choice="sniper"><b>SR</b><strong>SNIPER</strong><small>Long-range precision</small></button>
-                <button type="button" class="loadout-choice" data-lobby-primary-choice="grenadeLauncher"><b>GL</b><strong>NOOB TUBE</strong><small>Arcing explosive round</small></button>
-                <button type="button" class="loadout-choice" data-lobby-primary-choice="rpg"><b>RPG</b><strong>RPG</strong><small>Direct explosive rocket</small></button>
-              </div></div>
-              <div class="loadout-columns">
-                <div class="loadout-section"><span>SECONDARY</span><div class="loadout-fixed"><b>PST</b><div><strong>PISTOL</strong><small>Always available as backup</small></div></div></div>
-                <div class="loadout-section"><span>TACTICAL</span><div class="loadout-choice-grid equipment-grid"><button type="button" class="loadout-choice" data-lobby-tactical-choice="flash"><b>FL</b><strong>FLASHBANG</strong></button><button type="button" class="loadout-choice" data-lobby-tactical-choice="smoke"><b>SM</b><strong>SMOKE</strong></button></div></div>
-                <div class="loadout-section"><span>LETHAL</span><div class="loadout-choice-grid equipment-grid"><button type="button" class="loadout-choice" data-lobby-lethal-choice="sticky"><b>SX</b><strong>SEMTEX</strong></button><button type="button" class="loadout-choice" data-lobby-lethal-choice="frag"><b>FG</b><strong>FRAG</strong></button></div></div>
+              <div class="subtabs loadout-tabs" role="tablist" aria-label="Lobby loadout sections">
+                <button type="button" class="subtab active" data-lobby-loadout-tab="primary" aria-selected="true">PRIMARY</button>
+                <button type="button" class="subtab" data-lobby-loadout-tab="equipment" aria-selected="false">EQUIPMENT</button>
+              </div>
+              <div class="loadout-page active" data-lobby-loadout-page="primary">
+                <div class="loadout-choice-grid primary-grid">
+                  <button type="button" class="loadout-choice" data-lobby-primary-choice="assault"><b>AR</b><strong>ASSAULT</strong><small>Balanced automatic rifle</small></button>
+                  <button type="button" class="loadout-choice" data-lobby-primary-choice="ump"><b>UMP</b><strong>UMP</strong><small>Fast close-range SMG</small></button>
+                  <button type="button" class="loadout-choice" data-lobby-primary-choice="shotgun"><b>SG</b><strong>PUMP SHOTGUN</strong><small>Heavy close-range pump</small></button>
+                  <button type="button" class="loadout-choice" data-lobby-primary-choice="semiShotgun"><b>SAS</b><strong>SEMI-AUTO SG</strong><small>Faster follow-up shots</small></button>
+                  <button type="button" class="loadout-choice" data-lobby-primary-choice="sniper"><b>SR</b><strong>SNIPER</strong><small>Long-range precision</small></button>
+                  <button type="button" class="loadout-choice" data-lobby-primary-choice="grenadeLauncher"><b>GL</b><strong>NOOB TUBE</strong><small>Arcing explosive round</small></button>
+                  <button type="button" class="loadout-choice" data-lobby-primary-choice="rpg"><b>RPG</b><strong>RPG</strong><small>Direct explosive rocket</small></button>
+                </div>
+              </div>
+              <div class="loadout-page" data-lobby-loadout-page="equipment" hidden>
+                <div class="loadout-columns">
+                  <div class="loadout-section"><span>SECONDARY</span><div class="loadout-fixed"><b>PST</b><div><strong>PISTOL</strong><small>Always available as backup</small></div></div></div>
+                  <div class="loadout-section"><span>TACTICAL</span><div class="loadout-choice-grid equipment-grid"><button type="button" class="loadout-choice" data-lobby-tactical-choice="flash"><b>FL</b><strong>FLASHBANG</strong></button><button type="button" class="loadout-choice" data-lobby-tactical-choice="smoke"><b>SM</b><strong>SMOKE</strong></button></div></div>
+                  <div class="loadout-section"><span>LETHAL</span><div class="loadout-choice-grid equipment-grid"><button type="button" class="loadout-choice" data-lobby-lethal-choice="sticky"><b>SX</b><strong>SEMTEX</strong></button><button type="button" class="loadout-choice" data-lobby-lethal-choice="frag"><b>FG</b><strong>FRAG</strong></button></div></div>
+                </div>
               </div>
             </section>
           </div>
@@ -226,8 +239,7 @@
       </div></div>
       <div class="pause-section"><span>SYSTEM</span><div class="pause-actions pause-actions-system">
         <button id="pauseSettingsBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-settings"/></svg><span>Settings</span></button>
-        <button id="fullBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-exit"/></svg><span>Exit Fullscreen</span></button>
-        <button id="adminBtn" class="secondary-btn hide"><svg class="mini-icon"><use href="#i-shield"/></svg><span>Match Control</span></button>
+        <button id="adminBtn" class="secondary-btn hide"><svg class="mini-icon"><use href="#i-shield"/></svg><span>Host Control</span></button>
       </div></div>
       <div class="pause-leave"><button id="leaveBtn" class="secondary-btn danger"><svg class="mini-icon"><use href="#i-exit"/></svg><span>Leave Match</span></button></div>
     </div>
@@ -235,9 +247,10 @@
 
   <section id="loadoutPanel" class="modal-screen hide" aria-label="Change loadout">
     <div class="modal-shell loadout-shell">
-      <header class="modal-head"><div><div class="eyebrow">MATCH LOADOUT</div><h2>Change loadout</h2><p>Your current life stays unchanged. Saved changes equip automatically on your next spawn.</p></div><button id="loadoutCloseBtn" class="square-btn" aria-label="Close loadout"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
+      <header class="modal-head"><div><div class="eyebrow">MATCH LOADOUT</div><h2>Change loadout</h2><p>Your current life stays unchanged. Saved changes equip automatically on your next spawn.</p></div><button id="loadoutCloseBtn" class="secondary-btn panel-back" aria-label="Back from loadout">BACK</button></header>
+      <div class="subtabs panel-tabs loadout-tabs" role="tablist" aria-label="Match loadout sections"><button type="button" class="subtab active" data-match-loadout-tab="primary" aria-selected="true">PRIMARY</button><button type="button" class="subtab" data-match-loadout-tab="equipment" aria-selected="false">EQUIPMENT</button></div>
       <div class="loadout-editor">
-        <div class="loadout-section"><span>PRIMARY</span><div class="loadout-choice-grid primary-grid">
+        <div class="loadout-page active" data-match-loadout-page="primary"><div class="loadout-choice-grid primary-grid">
           <button type="button" class="loadout-choice" data-match-primary-choice="assault"><b>AR</b><strong>ASSAULT</strong><small>Balanced automatic rifle</small></button>
           <button type="button" class="loadout-choice" data-match-primary-choice="ump"><b>UMP</b><strong>UMP</strong><small>Fast close-range SMG</small></button>
           <button type="button" class="loadout-choice" data-match-primary-choice="shotgun"><b>SG</b><strong>PUMP SHOTGUN</strong><small>Heavy close-range pump</small></button>
@@ -246,57 +259,70 @@
           <button type="button" class="loadout-choice" data-match-primary-choice="grenadeLauncher"><b>GL</b><strong>NOOB TUBE</strong><small>Arcing explosive round</small></button>
           <button type="button" class="loadout-choice" data-match-primary-choice="rpg"><b>RPG</b><strong>RPG</strong><small>Direct explosive rocket</small></button>
         </div></div>
-        <div class="loadout-columns">
+        <div class="loadout-page" data-match-loadout-page="equipment" hidden><div class="loadout-columns">
           <div class="loadout-section"><span>SECONDARY</span><div class="loadout-fixed"><b>PST</b><div><strong>PISTOL</strong><small>Always available as backup</small></div></div></div>
           <div class="loadout-section"><span>TACTICAL</span><div class="loadout-choice-grid equipment-grid"><button type="button" class="loadout-choice" data-match-tactical-choice="flash"><b>FL</b><strong>FLASHBANG</strong></button><button type="button" class="loadout-choice" data-match-tactical-choice="smoke"><b>SM</b><strong>SMOKE</strong></button></div></div>
           <div class="loadout-section"><span>LETHAL</span><div class="loadout-choice-grid equipment-grid"><button type="button" class="loadout-choice" data-match-lethal-choice="sticky"><b>SX</b><strong>SEMTEX</strong></button><button type="button" class="loadout-choice" data-match-lethal-choice="frag"><b>FG</b><strong>FRAG</strong></button></div></div>
-        </div>
+        </div></div>
       </div>
-      <footer class="modal-foot loadout-foot"><span id="loadoutStatus" class="admin-status">Changes apply on your next spawn.</span><button id="loadoutCancelBtn" class="secondary-btn">CANCEL</button><button id="loadoutSaveBtn" class="primary">SAVE FOR NEXT SPAWN</button></footer>
+      <footer class="modal-foot loadout-foot"><span id="loadoutStatus" class="admin-status">Changes apply on your next spawn.</span><button id="loadoutSaveBtn" class="primary">SAVE FOR NEXT SPAWN</button></footer>
     </div>
   </section>
 
   <section id="settingsPanel" class="modal-screen hide" aria-label="Player settings">
     <div class="modal-shell settings-shell">
-      <header class="modal-head"><div><div class="eyebrow">PLAYER</div><h2>Settings</h2><p>Saved on this device and applied immediately.</p></div><button id="settingsCloseBtn" class="square-btn" aria-label="Close settings"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
-      <div class="settings-categories player-settings-grid">
-        <section class="settings-category"><div class="settings-category-head"><span class="eyebrow">CONTROLS</span><h3>Aim & input</h3></div><div class="settings-grid">
+      <header class="modal-head"><div><div class="eyebrow">PLAYER</div><h2>Settings</h2><p>Saved on this device and applied immediately.</p></div><button id="settingsCloseBtn" class="secondary-btn panel-back" aria-label="Back from settings">BACK</button></header>
+      <div class="subtabs panel-tabs settings-tabs" role="tablist" aria-label="Settings sections"><button type="button" class="subtab active" data-settings-tab="controls" aria-selected="true">CONTROLS</button><button type="button" class="subtab" data-settings-tab="audio" aria-selected="false">AUDIO</button><button type="button" class="subtab" data-settings-tab="display" aria-selected="false">DISPLAY</button></div>
+      <div class="settings-pages">
+        <section class="settings-page active" data-settings-page="controls"><div class="settings-grid">
           <label class="setting"><span>Look sensitivity</span><input id="playerLookSensitivity" type="range" min="0.5" max="2" step="0.05"><output id="playerLookSensitivityValue"></output></label>
           <label class="setting"><span>ADS sensitivity</span><input id="playerAdsSensitivity" type="range" min="0.35" max="1.25" step="0.05"><output id="playerAdsSensitivityValue"></output></label>
           <label class="setting touch-setting"><span>Touch sensitivity</span><input id="playerTouchSensitivity" type="range" min="0.5" max="2" step="0.05"><output id="playerTouchSensitivityValue"></output></label>
         </div></section>
-        <section class="settings-category"><div class="settings-category-head"><span class="eyebrow">AUDIO</span><h3>Sound</h3></div><div class="settings-grid">
+        <section class="settings-page" data-settings-page="audio" hidden><div class="settings-grid">
           <label class="setting"><span>Master volume</span><input id="playerMasterVolume" type="range" min="0" max="1" step="0.05"><output id="playerMasterVolumeValue"></output></label>
           <label class="setting"><span>SFX volume</span><input id="playerSfxVolume" type="range" min="0" max="1" step="0.05"><output id="playerSfxVolumeValue"></output></label>
           <label class="setting"><span>Music volume</span><input id="playerMusicVolume" type="range" min="0" max="1" step="0.05"><output id="playerMusicVolumeValue"></output></label>
         </div></section>
-        <section class="settings-category settings-category-display"><div class="settings-category-head"><span class="eyebrow">DISPLAY</span><h3>Graphics</h3></div><div class="settings-grid">
+        <section class="settings-page" data-settings-page="display" hidden><div class="settings-grid settings-display-grid">
           <label class="setting select-setting"><span>Graphics quality</span><select id="playerGraphics" class="input"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
+          <div class="setting setting-action"><span>Fullscreen</span><button id="settingsFullscreenBtn" type="button" class="secondary-btn">ENTER FULLSCREEN</button><small>Fullscreen is always user initiated.</small></div>
         </div></section>
       </div>
-      <footer class="modal-foot"><span></span><button id="settingsDefaultsBtn" class="secondary-btn">Defaults</button><button id="settingsDoneBtn" class="primary modal-action">Done</button></footer>
+      <footer class="modal-foot single-action-foot"><span></span><button id="settingsDefaultsBtn" class="secondary-btn">RESET ALL</button></footer>
     </div>
   </section>
 
-  <section id="adminPanel" class="modal-screen hide" aria-label="Match control">
+  <section id="adminPanel" class="modal-screen hide" aria-label="Host control">
     <div class="modal-shell admin-shell" data-page="gameplay">
-      <header class="modal-head"><div><div id="adminEyebrow" class="eyebrow">CUSTOM MATCH</div><h2 id="adminTitle">Match control</h2><p id="adminDescription">Server-authoritative room settings.</p></div><button id="adminCloseBtn" class="square-btn" aria-label="Close match control"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
-      <div class="admin-tabs" role="tablist"><button class="admin-tab hide" data-admin-tab="match">MATCH RULES</button><button class="admin-tab active" data-admin-tab="gameplay">GAMEPLAY</button><button class="admin-tab" data-admin-tab="advanced">WEAPONS</button><button class="admin-tab hide" data-admin-tab="bots">BOT TUNING</button><button class="admin-tab" data-admin-tab="players">PLAYERS</button></div>
-      <div id="adminMatch" class="admin-page hide" data-admin-page="match"><div class="settings-grid"><label class="setting"><span>Score limit</span><input id="setScoreLimit" type="number" min="5" max="100" step="5"></label><label class="setting"><span>Time limit (minutes)</span><input id="setTimeLimit" type="number" min="2" max="30" step="1"></label></div><div id="adminMatchNote" class="admin-note">Team Deathmatch: first team to 30 eliminations or highest score after 8 minutes.</div></div>
-      <div id="adminGameplay" class="admin-page" data-admin-page="gameplay"><div class="settings-grid"><label class="setting"><span>Run speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label><label class="setting"><span>ADS walk speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label><label class="setting"><span>Jump height</span><input id="setJumpHeight" type="number" min="0.4" max="5" step="0.1"></label><label class="setting"><span>Gravity</span><input id="setGravity" type="number" min="8" max="40" step="1"></label><label class="setting"><span>Health regen delay (s)</span><input id="setRegenDelay" type="number" min="0" max="15" step="0.5"></label><label class="setting"><span>Health regen / second</span><input id="setRegenRate" type="number" min="0" max="30" step="0.5"></label><label class="setting"><span>Respawn delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label></div></div>
-      <div id="adminAdvanced" class="admin-page hide" data-admin-page="advanced"><div class="weapon-settings-grid">
-        <section class="weapon-settings-card"><strong>PISTOL</strong><label>Damage<input id="setPistolDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setPistolSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setPistolReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setPistolCooldown" type="number" min="24" max="1200" step="5"></label></section>
-        <section class="weapon-settings-card assault"><strong>ASSAULT RIFLE</strong><label>Damage<input id="setAssaultDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setAssaultSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setAssaultReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setAssaultCooldown" type="number" min="24" max="1200" step="5"></label></section>
-        <section class="weapon-settings-card"><strong>UMP</strong><label>Damage<input id="setUmpDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setUmpSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setUmpReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setUmpCooldown" type="number" min="24" max="1200" step="5"></label></section>
-        <section class="weapon-settings-card"><strong>PUMP SHOTGUN</strong><label>Pellet damage<input id="setShotgunDamage" type="number" min="1" max="100" step="1"></label><label>Projectile velocity<input id="setShotgunSpeed" type="number" min="10" max="200" step="1"></label><label>Reload time (s)<input id="setShotgunReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setShotgunCooldown" type="number" min="24" max="600" step="5"></label></section>
-        <section class="weapon-settings-card"><strong>SEMI-AUTO SHOTGUN</strong><label>Pellet damage<input id="setSemiShotgunDamage" type="number" min="1" max="100" step="1"></label><label>Projectile velocity<input id="setSemiShotgunSpeed" type="number" min="10" max="200" step="1"></label><label>Reload time (s)<input id="setSemiShotgunReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setSemiShotgunCooldown" type="number" min="24" max="900" step="5"></label></section>
-        <section class="weapon-settings-card sniper"><strong>SNIPER</strong><label>Damage<input id="setSniperDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setSniperSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setSniperReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setSniperCooldown" type="number" min="24" max="1200" step="5"></label></section>
-        <section class="weapon-settings-card"><strong>GRENADE LAUNCHER</strong><label>Direct damage<input id="setGrenadeLauncherDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setGrenadeLauncherSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setGrenadeLauncherReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setGrenadeLauncherCooldown" type="number" min="24" max="600" step="5"></label></section>
-        <section class="weapon-settings-card"><strong>RPG</strong><label>Direct damage<input id="setRpgDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setRpgSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setRpgReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setRpgCooldown" type="number" min="24" max="600" step="5"></label></section>
-      </div></div>
-      <div id="adminBots" class="admin-page hide" data-admin-page="bots"><div class="settings-grid"><label id="adminBlueBotsWrap" class="setting"><span>Blue bots</span><input id="setBlueBots" type="number" min="0" max="8" step="1"></label><label id="adminRedBotsWrap" class="setting"><span>Red bots</span><input id="setRedBots" type="number" min="0" max="8" step="1"></label><label id="adminFfaBotsWrap" class="setting hide"><span>Bots</span><input id="setFfaBots" type="number" min="0" max="8" step="1"></label><label class="setting"><span>Difficulty</span><select id="setBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label><div class="setting"><span>Difficulty effect</span><div id="botDifficultyHelp" class="difficulty-help"></div></div></div></div>
-      <div id="adminPlayers" class="admin-page hide" data-admin-page="players"><div id="adminPlayerList" class="admin-player-list"></div></div>
-      <footer class="modal-foot"><div id="adminStatus" class="admin-status" role="status" aria-live="polite">Standard match rules are active.</div><button id="adminResetBtn" class="secondary-btn">Reset tab</button><button id="adminSaveBtn" class="primary modal-action">Apply</button></footer>
+      <header class="modal-head"><div><div id="adminEyebrow" class="eyebrow">HOST</div><h2 id="adminTitle">Host control</h2><p id="adminDescription">Advanced tuning and player administration.</p></div><button id="adminCloseBtn" class="secondary-btn panel-back" aria-label="Back from host control">BACK</button></header>
+      <div class="admin-tabs" role="tablist"><button class="admin-tab active" data-admin-tab="gameplay">GAMEPLAY</button><button class="admin-tab" data-admin-tab="advanced">WEAPONS</button><button class="admin-tab" data-admin-tab="players">PLAYERS</button></div>
+      <div id="adminGameplay" class="admin-page" data-admin-page="gameplay">
+        <div class="subtabs admin-subtabs" role="tablist" aria-label="Gameplay tuning sections"><button type="button" class="subtab active" data-admin-gameplay-tab="movement" aria-selected="true">MOVEMENT</button><button type="button" class="subtab" data-admin-gameplay-tab="lifecycle" aria-selected="false">HEALTH & SPAWN</button></div>
+        <div class="admin-subpage active" data-admin-gameplay-page="movement"><div class="settings-grid"><label class="setting"><span>Run speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label><label class="setting"><span>ADS walk speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label><label class="setting"><span>Jump height</span><input id="setJumpHeight" type="number" min="0.4" max="5" step="0.1"></label><label class="setting"><span>Gravity</span><input id="setGravity" type="number" min="8" max="40" step="1"></label></div></div>
+        <div class="admin-subpage" data-admin-gameplay-page="lifecycle" hidden><div class="settings-grid"><label class="setting"><span>Health regen delay (s)</span><input id="setRegenDelay" type="number" min="0" max="15" step="0.5"></label><label class="setting"><span>Health regen / second</span><input id="setRegenRate" type="number" min="0" max="30" step="0.5"></label><label class="setting"><span>Respawn delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label></div></div>
+      </div>
+      <div id="adminAdvanced" class="admin-page hide" data-admin-page="advanced">
+        <div class="subtabs admin-subtabs weapon-subtabs" role="tablist" aria-label="Weapon tuning sections"><button type="button" class="subtab active" data-admin-weapon-tab="rifles" aria-selected="true">RIFLES</button><button type="button" class="subtab" data-admin-weapon-tab="shotguns" aria-selected="false">SHOTGUNS</button><button type="button" class="subtab" data-admin-weapon-tab="launchers" aria-selected="false">LAUNCHERS</button><button type="button" class="subtab" data-admin-weapon-tab="sidearm" aria-selected="false">PISTOL</button></div>
+        <div class="admin-subpage active" data-admin-weapon-page="rifles"><div class="weapon-settings-grid weapon-group-three">
+          <section class="weapon-settings-card assault"><strong>ASSAULT RIFLE</strong><label>Damage<input id="setAssaultDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setAssaultSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setAssaultReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setAssaultCooldown" type="number" min="24" max="1200" step="5"></label></section>
+          <section class="weapon-settings-card"><strong>UMP</strong><label>Damage<input id="setUmpDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setUmpSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setUmpReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setUmpCooldown" type="number" min="24" max="1200" step="5"></label></section>
+          <section class="weapon-settings-card sniper"><strong>SNIPER</strong><label>Damage<input id="setSniperDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setSniperSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setSniperReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setSniperCooldown" type="number" min="24" max="1200" step="5"></label></section>
+        </div></div>
+        <div class="admin-subpage" data-admin-weapon-page="shotguns" hidden><div class="weapon-settings-grid">
+          <section class="weapon-settings-card"><strong>PUMP SHOTGUN</strong><label>Pellet damage<input id="setShotgunDamage" type="number" min="1" max="100" step="1"></label><label>Projectile velocity<input id="setShotgunSpeed" type="number" min="10" max="200" step="1"></label><label>Reload time (s)<input id="setShotgunReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setShotgunCooldown" type="number" min="24" max="600" step="5"></label></section>
+          <section class="weapon-settings-card"><strong>SEMI-AUTO SHOTGUN</strong><label>Pellet damage<input id="setSemiShotgunDamage" type="number" min="1" max="100" step="1"></label><label>Projectile velocity<input id="setSemiShotgunSpeed" type="number" min="10" max="200" step="1"></label><label>Reload time (s)<input id="setSemiShotgunReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setSemiShotgunCooldown" type="number" min="24" max="900" step="5"></label></section>
+        </div></div>
+        <div class="admin-subpage" data-admin-weapon-page="launchers" hidden><div class="weapon-settings-grid">
+          <section class="weapon-settings-card"><strong>GRENADE LAUNCHER</strong><label>Direct damage<input id="setGrenadeLauncherDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setGrenadeLauncherSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setGrenadeLauncherReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setGrenadeLauncherCooldown" type="number" min="24" max="600" step="5"></label></section>
+          <section class="weapon-settings-card"><strong>RPG</strong><label>Direct damage<input id="setRpgDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setRpgSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setRpgReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setRpgCooldown" type="number" min="24" max="600" step="5"></label></section>
+        </div></div>
+        <div class="admin-subpage" data-admin-weapon-page="sidearm" hidden><div class="weapon-settings-grid weapon-group-single">
+          <section class="weapon-settings-card"><strong>PISTOL</strong><label>Damage<input id="setPistolDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setPistolSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setPistolReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setPistolCooldown" type="number" min="24" max="1200" step="5"></label></section>
+        </div></div>
+      </div>
+      <div id="adminPlayers" class="admin-page hide players-page" data-admin-page="players"><div id="adminPlayerList" class="admin-player-list"></div></div>
+      <footer class="modal-foot"><div id="adminStatus" class="admin-status" role="status" aria-live="polite">Advanced settings are unchanged.</div><button id="adminResetBtn" class="secondary-btn">RESET PAGE</button><button id="adminSaveBtn" class="primary modal-action">APPLY</button></footer>
     </div>
   </section>
 </main>
@@ -319,6 +345,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.31.0"></script>
+<script type="module" src="client.js?v=1.31.1"></script>
 </body>
 </html>
