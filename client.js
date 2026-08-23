@@ -1,22 +1,36 @@
 window.__breachModuleBooted=true;
-import {
-  PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
-  terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.31.1';
+import * as HighlandsGeometry from './world-geometry.js?v=1.32.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.32.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.32.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.32.0';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
-  DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.31.1';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.31.1';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.31.1';
-import { createAudioEngine } from './audio-engine.js?v=1.31.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.31.1';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.31.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.31.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.31.1';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.31.1';
+  DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
+  DEFAULT_MAP_ID, normalizeMapId, mapSpec
+} from './game-config.js?v=1.32.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.32.0';
+import { createAudioEngine } from './audio-engine.js?v=1.32.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.32.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.32.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.32.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.32.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.32.0';
 
 let THREE = null;
+
+// A room owns one authoritative map. Both maps export the same world contract,
+// so movement, traversal, minimap, rendering and prediction switch together.
+const {PLAYER_HEIGHT,PLAYER_RADIUS,ARENA_LIMIT,MAX_STEP_HEIGHT}=HighlandsGeometry;
+let currentMapId=DEFAULT_MAP_ID;
+let worldGeometry=HighlandsGeometry;
+let activeWorldCollision=HighlandsWorldCollision;
+let STATIC_BOXES=worldGeometry.STATIC_BOXES,BUILDINGS=worldGeometry.BUILDINGS,PYRAMIDS=worldGeometry.PYRAMIDS,NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;
+let TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE,TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS,BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY,BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
+let terrainHeight=worldGeometry.terrainHeight,naturalGroundBase=worldGeometry.naturalGroundBase,worldSupportHeight=worldGeometry.worldSupportHeight,worldStepUpHeight=worldGeometry.worldStepUpHeight,resolveCeilingCollision=worldGeometry.resolveCeilingCollision;
+function worldBlockedAt(...args){return activeWorldCollision.worldBlockedAt(...args);}
+function worldMoveBlockedAt(...args){return activeWorldCollision.worldMoveBlockedAt(...args);}
+function worldHeightExpansionBlockedAt(...args){return activeWorldCollision.worldHeightExpansionBlockedAt(...args);}
+function findTraversalCandidate(...args){return activeWorldCollision.findTraversalCandidate(...args);}
 
 // Change only this line if Cloudflare gives your Worker a different URL.
 const GRENADE_LAUNCH_PITCH=(Number(WEAPON_SPECS.grenadeLauncher?.launchPitchDeg)||0)*Math.PI/180;
@@ -91,7 +105,7 @@ const nameInput=$('nameInput'),codeInput=$('codeInput'),menuStatus=$('menuStatus
 const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews=[...document.querySelectorAll('[data-deploy-view]')];
 const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
 const matchPrimaryButtons=[...document.querySelectorAll('[data-match-primary-choice]')],matchTacticalButtons=[...document.querySelectorAll('[data-match-tactical-choice]')],matchLethalButtons=[...document.querySelectorAll('[data-match-lethal-choice]')];
-const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
+const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMap=$('lobbyMap'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
 const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
 document.querySelectorAll('[data-app-version]').forEach(el=>{el.textContent=`Version ${APP_VERSION}`;});
 
@@ -108,7 +122,7 @@ let masterMuted=localStorage.getItem('breachMuted')==='1';
 const requestedRoom=new URL(location.href).searchParams.get('room');
 if(requestedRoom)codeInput.value=normalizeCode(requestedRoom);
 
-let scene, camera, renderer, clock, pistolGroup, pistolFlash, pistolMag, assaultGroup, assaultFlash, assaultMag, umpGroup, umpFlash, umpMag, shotgunGroup, shotgunFlash, shotgunPump, semiShotgunGroup, semiShotgunFlash, semiShotgunMag, sniperGroup, sniperFlash, sniperBolt, grenadeLauncherGroup, grenadeLauncherFlash, rpgGroup, rpgFlash, mantleHands;
+let scene, camera, renderer, clock, worldRoot, pistolGroup, pistolFlash, pistolMag, assaultGroup, assaultFlash, assaultMag, umpGroup, umpFlash, umpMag, shotgunGroup, shotgunFlash, shotgunPump, semiShotgunGroup, semiShotgunFlash, semiShotgunMag, sniperGroup, sniperFlash, sniperBolt, grenadeLauncherGroup, grenadeLauncherFlash, rpgGroup, rpgFlash, mantleHands;
 let hudScene, hudCamera, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0;
 let socket = null, reconnectTimer = null, reconnectAttempt = 0;
 let currentRoom = '', myName = '', myTeam = preferredTeam, selfColor = TEAM_COLORS.blue, godMode = false, isMatchAdmin = false, matchOwnerId = '', pendingTeam='';
@@ -165,7 +179,7 @@ const TRAJECTORY_RENDER_STEP=.04;
 const SIM_HEARTBEAT_MS=33;
 const SIM_LEADER_STALE_MS=750;
 let lastSimHeartbeat=0;
-const trajectoryCollision=createProjectileCollisionGrid({
+let trajectoryCollision=createProjectileCollisionGrid({
   staticBoxes:STATIC_BOXES,pyramids:PYRAMIDS,naturalObstacles:NATURAL_OBSTACLES,buildingParts:BUILDING_PARTS,
   terrainHeight,naturalGroundBase,cellSize:8,cellHeight:3
 });
@@ -218,6 +232,22 @@ let chatOpen=false,chatDraft='',chatShift=false;
 let minimapStaticCache=null;
 let hudLayout=null;
 let viewW=1,viewH=1,viewDpr=1;
+
+function rebuildTrajectoryCollision(){
+  trajectoryCollision=createProjectileCollisionGrid({staticBoxes:STATIC_BOXES,pyramids:PYRAMIDS,naturalObstacles:NATURAL_OBSTACLES,buildingParts:BUILDING_PARTS,terrainHeight,naturalGroundBase,cellSize:8,cellHeight:3});
+}
+function setActiveMap(value,{rebuild=true}={}){
+  const nextId=normalizeMapId(value),changed=nextId!==currentMapId;
+  currentMapId=nextId;
+  worldGeometry=nextId==='depot'?DepotGeometry:HighlandsGeometry;
+  activeWorldCollision=nextId==='depot'?DepotWorldCollision:HighlandsWorldCollision;
+  STATIC_BOXES=worldGeometry.STATIC_BOXES;BUILDINGS=worldGeometry.BUILDINGS;PYRAMIDS=worldGeometry.PYRAMIDS;NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;
+  TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE;TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS;BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY;BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
+  terrainHeight=worldGeometry.terrainHeight;naturalGroundBase=worldGeometry.naturalGroundBase;worldSupportHeight=worldGeometry.worldSupportHeight;worldStepUpHeight=worldGeometry.worldStepUpHeight;resolveCeilingCollision=worldGeometry.resolveCeilingCollision;
+  rebuildTrajectoryCollision();minimapStaticCache=null;hudLastDraw=0;
+  if(changed&&rebuild&&engineInitialized&&scene)rebuildWorldVisuals();
+  return changed;
+}
 
 function suspendGameplayInput(){
   keys.clear();
@@ -272,7 +302,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.31.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.32.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -410,9 +440,9 @@ function syncLobby(){
   for(const btn of lobbyLethalButtons)btn.classList.toggle('active',btn.dataset.lobbyLethalChoice===lethalEquipment);
   for(const btn of lobbyModeButtons)btn.classList.toggle('active',btn.dataset.lobbyModeChoice===mode);
   const ffa=!spec.teamBased;$('lobbyBlueBotWrap').classList.toggle('hide',ffa);$('lobbyRedBotWrap').classList.toggle('hide',ffa);$('lobbyFfaBotWrap').classList.toggle('hide',!ffa);
-  lobbyBlueBotCount.value=String(botConfig.blueBots||0);lobbyRedBotCount.value=String(botConfig.redBots||0);lobbyFfaBotCount.value=String(total);lobbyBotDifficulty.value=botConfig.difficulty||'normal';lobbyMinimapMode.value=matchState.minimapRevealAll?'all':'standard';
+  lobbyBlueBotCount.value=String(botConfig.blueBots||0);lobbyRedBotCount.value=String(botConfig.redBots||0);lobbyFfaBotCount.value=String(total);lobbyBotDifficulty.value=botConfig.difficulty||'normal';if(lobbyMap)lobbyMap.value=currentMapId;lobbyMinimapMode.value=matchState.minimapRevealAll?'all':'standard';
   const sandbox=spec.scoreType==='none';lobbyScoreLimit.value=sandbox?'':String(matchState.scoreLimit||spec.scoreLimit);lobbyTimeLimit.value=sandbox?'':String(Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000)));lobbyScoreLimit.disabled=sandbox;lobbyTimeLimit.disabled=sandbox;$('lobbyScoreWrap')?.classList.toggle('disabled-setting',sandbox);$('lobbyTimeWrap')?.classList.toggle('disabled-setting',sandbox);
-  const ruleSummary=spec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||spec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000))} min`,mapSummary=matchState.minimapRevealAll?'Minimap: Everyone':'Minimap: Standard';$('lobbyRuleSummary').textContent=`${ruleSummary} · ${mapSummary}${matchCustom?' · CUSTOM':''}`;$('lobbyGuestMode').textContent=spec.name;$('lobbyGuestBots').textContent=`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${ruleSummary} · ${mapSummary}${matchCustom?' · Custom rules':''}`;
+  const ruleSummary=spec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||spec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000))} min`,minimapSummary=matchState.minimapRevealAll?'Minimap: Everyone':'Minimap: Standard',mapName=mapSpec(currentMapId).name;$('lobbyRuleSummary').textContent=`${mapName} · ${ruleSummary} · ${minimapSummary}${matchCustom?' · CUSTOM':''}`;$('lobbyGuestMode').textContent=`${spec.name} · ${mapName}`;$('lobbyGuestBots').textContent=`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${ruleSummary} · ${minimapSummary}${matchCustom?' · Custom rules':''}`;
   $('lobbyStatus').textContent=host?'Lobby ready':'Waiting for admin';$('lobbyHint').textContent=host?'Configure the match, then start when everyone is ready.':'Choose your team and loadout while a lobby admin configures the match.';
   renderLobbyRoster();
 }
@@ -435,7 +465,7 @@ function sendLobbyMatchRules(){
 
 function syncPauseContext(){
   const spec=currentModeSpec(),badge=$('pauseTeamBadge');if(badge){badge.textContent=spec.teamBased?`${myTeam.toUpperCase()} TEAM`:spec.short;const color=spec.teamBased?TEAM_COLORS[myTeam]:HUD_ACCENT;badge.style.color=color;badge.style.borderColor=`${color}88`;badge.style.background=`${color}22`;}
-  if($('pauseRoom'))$('pauseRoom').textContent=`${spec.short} · ${currentRoom||'----'}`;
+  if($('pauseRoom'))$('pauseRoom').textContent=`${mapSpec(currentMapId).short} · ${spec.short} · ${currentRoom||'----'}`;
   if($('pauseLoadout'))$('pauseLoadout').textContent=`${loadoutSummary()} · ${Math.max(0,Math.floor(ammo[currentWeapon]||0))} rounds${pendingLoadout?' · CHANGE QUEUED':''}`;
   const adminBtn=$('adminBtn');if(adminBtn)adminBtn.classList.toggle('hide',!isMatchAdmin);
   const teamBtn=$('teamSwitchBtn');if(teamBtn)teamBtn.classList.toggle('hide',!spec.teamBased);const teamText=$('teamSwitchText');if(teamText)teamText.textContent=pendingTeam?`${pendingTeam.toUpperCase()} ON RESPAWN`:`Switch to ${myTeam==='blue'?'Red':'Blue'} on Respawn`;
@@ -560,27 +590,7 @@ function init3D(){
   const hemi = new THREE.HemisphereLight(0xdaf4ff, 0x52604c, 2.2); scene.add(hemi);
   const sun = new THREE.DirectionalLight(0xffffff, 2.15); sun.position.set(26,38,18);sun.castShadow=!isTouch;if(!isTouch){sun.shadow.mapSize.set(1536,1536);sun.shadow.camera.left=-125;sun.shadow.camera.right=125;sun.shadow.camera.top=125;sun.shadow.camera.bottom=-125;sun.shadow.camera.near=5;sun.shadow.camera.far=110;sun.shadow.bias=-.00035;} scene.add(sun);
 
-  addTerrain();
-
-  const wallMat = new THREE.MeshStandardMaterial({color:0xd8d4cc,roughness:.9});
-  addBoundaryWallsBatch(wallMat);
-
-  const blockMat = new THREE.MeshStandardMaterial({color:0xb8c0c5,roughness:.85});
-  const pyramidMat = new THREE.MeshStandardMaterial({color:0xc8a86b,roughness:.92});
-  addStaticBoxesBatch(blockMat);
-  addPyramidsBatch(pyramidMat);
-
-  // Natural cover and sight-line breakers. Collision remains fully independent
-  // from rendering, so static visuals can be instanced without changing gameplay.
-  const trunkMat=new THREE.MeshStandardMaterial({color:0x60452f,roughness:1});
-  const leafMat=new THREE.MeshStandardMaterial({color:0x315f37,roughness:1});
-  const bushMat=new THREE.MeshStandardMaterial({color:0x3f7441,roughness:1});
-  const rockMat=new THREE.MeshStandardMaterial({color:0x6b706f,roughness:.96});
-  addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat);
-  addBuildingsBatch();
-
-  const markerMat = new THREE.MeshStandardMaterial({color:0x49606f,roughness:.75});
-  addMarkersBatch(markerMat);
+  buildWorldVisuals();
 
 
   pistolGroup = new THREE.Group();
@@ -677,11 +687,33 @@ function init3D(){
 }
 
 
+function buildWorldVisuals(){
+  if(!scene||!THREE)return;
+  mapObstacles.length=0;
+  worldRoot=new THREE.Group();worldRoot.name=`world:${currentMapId}`;scene.add(worldRoot);
+  const depot=currentMapId==='depot';
+  const sky=depot?0x89979d:0x9acde6;scene.background=new THREE.Color(sky);scene.fog=new THREE.Fog(sky,depot?90:95,depot?260:285);
+  addTerrain();
+  const wallMat=new THREE.MeshStandardMaterial({color:depot?0x626a6e:0xd8d4cc,roughness:.9});addBoundaryWallsBatch(wallMat);
+  const blockMat=new THREE.MeshStandardMaterial({color:depot?0x697983:0xb8c0c5,roughness:.85});
+  const pyramidMat=new THREE.MeshStandardMaterial({color:depot?0x88775f:0xc8a86b,roughness:.92});addStaticBoxesBatch(blockMat);addPyramidsBatch(pyramidMat);
+  const trunkMat=new THREE.MeshStandardMaterial({color:0x60452f,roughness:1}),leafMat=new THREE.MeshStandardMaterial({color:depot?0x405b3f:0x315f37,roughness:1}),bushMat=new THREE.MeshStandardMaterial({color:depot?0x53664b:0x3f7441,roughness:1}),rockMat=new THREE.MeshStandardMaterial({color:depot?0x777b78:0x6b706f,roughness:.96});
+  addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat);addBuildingsBatch();
+  const markerMat=new THREE.MeshStandardMaterial({color:depot?0x303a40:0x49606f,roughness:.75});addMarkersBatch(markerMat);
+  minimapStaticCache=null;
+}
+function rebuildWorldVisuals(){
+  if(worldRoot){try{scene.remove(worldRoot);}catch{}disposeObject3D(worldRoot);worldRoot=null;}
+  buildWorldVisuals();
+  for(const r of remotes.values()){try{scene.remove(r.group);}catch{}disposeObject3D(r.group);}remotes.clear();
+  clearBullets();clearThrowables();clearSmokeClouds();clearTacticalFx();clearRocketTrailPuffs();
+}
+
 function addTerrain(){
   const size=TERRAIN_SIZE,segments=TERRAIN_SEGMENTS;
   const geo=new THREE.PlaneGeometry(size,size,segments,segments),pos=geo.attributes.position;
   const colors=[];
-  const low=new THREE.Color(0x587552),mid=new THREE.Color(0x78915f),high=new THREE.Color(0x807a65),peak=new THREE.Color(0x9a9586);
+  const depot=currentMapId==='depot',low=new THREE.Color(depot?0x62655f:0x587552),mid=new THREE.Color(depot?0x777972:0x78915f),high=new THREE.Color(depot?0x756d60:0x807a65),peak=new THREE.Color(depot?0x8b8375:0x9a9586);
   for(let i=0;i<pos.count;i++){
     const x=pos.getX(i),z=-pos.getY(i),h=terrainHeight(x,z);pos.setZ(i,h);
     const color=new THREE.Color();
@@ -694,21 +726,21 @@ function addTerrain(){
   geo.computeVertexNormals();
   const terrainTexture=makeTerrainTexture();
   const mat=new THREE.MeshStandardMaterial({vertexColors:true,map:terrainTexture,roughness:1,metalness:0});
-  const ground=new THREE.Mesh(geo,mat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=!isTouch;scene.add(ground);
+  const ground=new THREE.Mesh(geo,mat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=!isTouch;worldRoot.add(ground);
 }
 function makeTerrainTexture(){
   const size=256,c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');
-  const image=x.createImageData(size,size);let seed=0x51f15e;
+  const image=x.createImageData(size,size);const depot=currentMapId==='depot';let seed=depot?0x6d4f23:0x51f15e;
   const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
   for(let py=0;py<size;py++)for(let px=0;px<size;px++){
     const i=(py*size+px)*4,n=rand(),wave=Math.sin(px*.19+Math.sin(py*.07))*5+Math.cos(py*.15)*4;
-    const v=Math.max(168,Math.min(238,211+(n-.5)*30+wave));
-    image.data[i]=Math.round(v*.96);image.data[i+1]=Math.round(v);image.data[i+2]=Math.round(v*.88);image.data[i+3]=255;
+    const v=Math.max(depot?128:168,Math.min(depot?202:238,(depot?168:211)+(n-.5)*(depot?36:30)+wave));
+    image.data[i]=Math.round(v*(depot?.94:.96));image.data[i+1]=Math.round(v*(depot?.93:1));image.data[i+2]=Math.round(v*(depot?.89:.88));image.data[i+3]=255;
   }
   x.putImageData(image,0,0);
-  x.globalAlpha=.22;x.strokeStyle='#758064';x.lineWidth=1;
+  x.globalAlpha=depot?.28:.22;x.strokeStyle=depot?'#575d5b':'#758064';x.lineWidth=1;
   for(let i=0;i<34;i++){const y=(i*37)%size;x.beginPath();x.moveTo(0,y);x.bezierCurveTo(70,y+10,150,y-12,size,y+4);x.stroke();}
-  x.globalAlpha=.16;x.fillStyle='#5d674d';for(let i=0;i<520;i++){const px=rand()*size,py=rand()*size,r=.4+rand()*1.5;x.beginPath();x.arc(px,py,r,0,Math.PI*2);x.fill();}
+  x.globalAlpha=.16;x.fillStyle=depot?'#777064':'#5d674d';for(let i=0;i<520;i++){const px=rand()*size,py=rand()*size,r=.4+rand()*1.5;x.beginPath();x.arc(px,py,r,0,Math.PI*2);x.fill();}
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(28,28);tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy?.()||1);return tex;
 }
 function addStaticInstancedMesh(geometry,material,transforms,{castShadow=true,receiveShadow=true}={}){
@@ -717,7 +749,7 @@ function addStaticInstancedMesh(geometry,material,transforms,{castShadow=true,re
   for(let i=0;i<transforms.length;i++){
     const t=transforms[i];dummy.position.set(t.x||0,t.y||0,t.z||0);dummy.rotation.set(t.rx||0,t.ry||0,t.rz||0);dummy.scale.set(t.sx??1,t.sy??1,t.sz??1);dummy.updateMatrix();mesh.setMatrixAt(i,dummy.matrix);
   }
-  mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);mesh.instanceMatrix.needsUpdate=true;mesh.castShadow=castShadow&&!isTouch;mesh.receiveShadow=receiveShadow&&!isTouch;mesh.computeBoundingBox?.();mesh.computeBoundingSphere?.();scene.add(mesh);return mesh;
+  mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);mesh.instanceMatrix.needsUpdate=true;mesh.castShadow=castShadow&&!isTouch;mesh.receiveShadow=receiveShadow&&!isTouch;mesh.computeBoundingBox?.();mesh.computeBoundingSphere?.();worldRoot.add(mesh);return mesh;
 }
 function addBoundaryWallsBatch(mat){
   const pieces=16,span=ARENA_LIMIT*2,piece=span/pieces,edge=ARENA_LIMIT+1,transforms=[];
@@ -763,9 +795,9 @@ function addBuildingsBatch(){
   for(let index=0;index<BUILDINGS.length;index++){
     const b=BUILDINGS[index],geometry=BUILDING_GEOMETRY[index];
     const materials={
-      wall:new THREE.MeshStandardMaterial({color:b.tall?0x929aa0:0xa8adb0,roughness:.9}),
-      trim:new THREE.MeshStandardMaterial({color:b.tall?0x39444d:0x4f5961,roughness:.75}),
-      floor:new THREE.MeshStandardMaterial({color:0x6d7478,roughness:.95}),
+      wall:new THREE.MeshStandardMaterial({color:currentMapId==='depot'?(b.tall?0x7d8589:0x919698):(b.tall?0x929aa0:0xa8adb0),roughness:.9}),
+      trim:new THREE.MeshStandardMaterial({color:currentMapId==='depot'?(b.tall?0x30383d:0x41494e):(b.tall?0x39444d:0x4f5961),roughness:.75}),
+      floor:new THREE.MeshStandardMaterial({color:currentMapId==='depot'?0x5d6264:0x6d7478,roughness:.95}),
     };
     const groups={wall:[],trim:[],floor:[]};
     for(const part of geometry.parts){
@@ -839,6 +871,7 @@ function bindUI(){
   $('adminCloseBtn').addEventListener('click',closeAdminPanel);
   $('adminSaveBtn').addEventListener('click',saveAdminSettings);
   $('adminResetBtn').addEventListener('click',resetActiveAdminTab);
+  $('adminWeaponSelect')?.addEventListener('change',()=>syncAdminWeaponEditor($('adminWeaponSelect').value));
   const adminTabs=[...document.querySelectorAll('[data-admin-tab]')];
   for(const tab of adminTabs){
     tab.addEventListener('click',()=>switchAdminTab(tab.dataset.adminTab));
@@ -862,6 +895,7 @@ function bindUI(){
   for(const btn of lobbyModeButtons)btn.addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMode',mode:btn.dataset.lobbyModeChoice});});
   for(const el of [lobbyBlueBotCount,lobbyRedBotCount,lobbyFfaBotCount,lobbyBotDifficulty])el.addEventListener('change',sendLobbyBotConfig);
   for(const el of [lobbyScoreLimit,lobbyTimeLimit])el.addEventListener('change',sendLobbyMatchRules);
+  lobbyMap?.addEventListener('change',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMap',mapId:normalizeMapId(lobbyMap.value)});else syncLobby();});
   lobbyMinimapMode.addEventListener('change',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMinimap',revealAll:lobbyMinimapMode.value==='all'});else syncLobby();});
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
@@ -1149,7 +1183,7 @@ function renderMatches(rooms){
     const row=document.createElement('div');row.className='match';
     const left=document.createElement('div');const blue=Number(room.blue)||0,red=Number(room.red)||0,blueBots=Number(room.blueBots)||0,redBots=Number(room.redBots)||0;
     const codeEl=document.createElement('div');codeEl.className='match-code';codeEl.textContent=String(room.code||'');
-    const botMeta=document.createElement('div');botMeta.className='match-meta';const roomMode=normalizeGameMode(room.mode),roomSpec=gameModeSpec(roomMode),scoreText=roomSpec.scoreType==='team'?`${Number(room.blueScore)||0}-${Number(room.redScore)||0} / ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:roomSpec.scoreType==='player'?`First ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:'Open play';botMeta.textContent=`${room.custom?'CUSTOM · ':''}${roomSpec.short} · ${String(room.matchStatus||'waiting').toUpperCase()} · ${scoreText} · Bots ${blueBots+redBots}`;if(room.custom)codeEl.classList.add('custom-match');
+    const botMeta=document.createElement('div');botMeta.className='match-meta';const roomMode=normalizeGameMode(room.mode),roomSpec=gameModeSpec(roomMode),scoreText=roomSpec.scoreType==='team'?`${Number(room.blueScore)||0}-${Number(room.redScore)||0} / ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:roomSpec.scoreType==='player'?`First ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:'Open play';botMeta.textContent=`${room.custom?'CUSTOM · ':''}${mapSpec(room.mapId).short} · ${roomSpec.short} · ${String(room.matchStatus||'waiting').toUpperCase()} · ${scoreText} · Bots ${blueBots+redBots}`;if(room.custom)codeEl.classList.add('custom-match');
     const teamCounts=document.createElement('div');teamCounts.className='team-counts';
     if(roomSpec.teamBased){const blueChip=document.createElement('span');blueChip.className='team-chip blue';blueChip.textContent=`BLUE ${blue}`;const redChip=document.createElement('span');redChip.className='team-chip red';redChip.textContent=`RED ${red}`;teamCounts.append(blueChip,redChip);}else{const ffaChip=document.createElement('span');ffaChip.className='team-chip ffa';ffaChip.textContent=`COMBATANTS ${blue+red}`;teamCounts.append(ffaChip);}
     left.append(codeEl,botMeta,teamCounts);
@@ -1226,9 +1260,14 @@ function handleMessage(m){
   if(m.t==='welcome'){
     if(Number(m.protocol)!==PROTOCOL_VERSION){showToast('CLIENT / SERVER VERSION MISMATCH');leaveMatch();return;}
     if(Number.isFinite(Number(m.serverTime)))serverClockOffset=Number(m.serverTime)-Date.now();
-    currentRoom=m.code;isMatchAdmin=!!m.isAdmin;matchOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;myTeam=m.self.team||myTeam;rememberTeam(myTeam);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;moveVelocityX=moveVelocityZ=0;onGround=m.self.grounded!==false;lastGroundedAt=onGround?performance.now():0;jumpBufferedUntil=0;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));traversal=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;tacticalEquipment=normalizeTactical(m.self.tactical);lethalEquipment=normalizeLethal(m.self.lethal);pendingLoadout=m.self.pendingLoadout?normalizeLoadoutChoice(m.self.pendingLoadout):null;rememberPrimary(primaryWeapon);rememberEquipment(tacticalEquipment,lethalEquipment);pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon==='pistol'||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
+    setActiveMap(m.mapId,{rebuild:true});currentRoom=m.code;isMatchAdmin=!!m.isAdmin;matchOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;myTeam=m.self.team||myTeam;rememberTeam(myTeam);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;moveVelocityX=moveVelocityZ=0;onGround=m.self.grounded!==false;lastGroundedAt=onGround?performance.now():0;jumpBufferedUntil=0;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));traversal=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;tacticalEquipment=normalizeTactical(m.self.tactical);lethalEquipment=normalizeLethal(m.self.lethal);pendingLoadout=m.self.pendingLoadout?normalizeLoadoutChoice(m.self.pendingLoadout):null;rememberPrimary(primaryWeapon);rememberEquipment(tacticalEquipment,lethalEquipment);pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon==='pistol'||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
     yaw=m.self.yaw||0;pitch=m.self.pitch||0;viewRecoilPitch=viewRecoilYaw=0;pendingGameSnapshot=gameSnapshot(m.self,m.players||[],m.bots||[]);replaceLobbyParticipants(m.players||[],m.bots||[]);
     syncModeVisuals();syncLocalStatus();syncPauseContext();if(matchAllowsLobbyEdits(matchState))showLobby();else{void enterGame(pendingGameSnapshot);}return;
+  }
+  if(m.t==='map'){
+    const changed=setActiveMap(m.mapId,{rebuild:true}),players=Array.isArray(m.players)?m.players:[],bots=Array.isArray(m.bots)?m.bots:[],self=players.find(p=>samePlayerId(p.id,clientId));
+    pendingGameSnapshot=self?gameSnapshot(self,players,bots):pendingGameSnapshot;replaceLobbyParticipants(players,bots);syncLobby();
+    if(changed)showToast(`MAP · ${mapSpec(currentMapId).name}`);return;
   }
   if(m.t==='join'){upsertLobbyParticipant(m.player);if(shell.inMatch&&engineReady)upsertRemote(m.player,true);syncPauseContext();renderAdminPlayers();syncLobby();showToast(`${m.player.name} joined`);return;}
   if(m.t==='leave'){const lobbyRow=lobbyParticipants.get(String(m.id||'')),r=remotes.get(m.id);if((lobbyRow&&!lobbyRow.bot)||(r&&!r.bot))showToast(`${lobbyRow?.name||r?.name||'Player'} left`);removeLobbyParticipant(m.id);if(engineReady)removeRemote(m.id);syncPauseContext();renderAdminPlayers();syncLobby();return;}
@@ -1328,7 +1367,16 @@ function renderAdminPlayers(force=false){
 function requestTeamChange(team){if(!shell.inMatch||socket?.readyState!==WebSocket.OPEN)return;const next=team==='red'?'red':'blue';send({t:'team',team:next});showToast(next===myTeam?'CANCELING TEAM SWITCH':`SWITCH TO ${next.toUpperCase()} ON RESPAWN`);}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function applyRemoteTeamVisual(r,team){if(!r)return;const next=team==='red'?'red':'blue';r.team=next;r.color=remoteDisplayColor(next);if(r.body?.material?.color)r.body.material.color.set(remoteDisplayColor(next));if(r.tag){r.group.remove(r.tag);r.tag.material?.map?.dispose?.();r.tag.material?.dispose?.();r.tag=makeNameTag(r.bot?`[BOT] ${r.name}`:r.name,remoteDisplayColor(next));r.tag.position.set(0,2.18,0);r.group.add(r.tag);}}
-function openAdminPanel(initialTab='gameplay'){if(!isMatchAdmin){showToast('ADMIN ACCESS REQUIRED');return;}syncAdminContext();populateAdminSettings(worldSettings);switchAdminTab(initialTab);switchSubTabs('[data-admin-gameplay-tab]','[data-admin-gameplay-page]','data-admin-gameplay-tab','data-admin-gameplay-page','movement');switchSubTabs('[data-admin-weapon-tab]','[data-admin-weapon-page]','data-admin-weapon-tab','data-admin-weapon-page','rifles');setAdminStatus(matchCustom?'CUSTOM tuning active.':'Advanced settings are unchanged.');shell.openPanel(SHELL_PANEL.ADMIN);renderAdminPlayers(true);}
+function syncAdminWeaponEditor(name='assault'){
+  const select=$('adminWeaponSelect');
+  const next=WEAPON_ORDER.includes(name)?name:'assault';
+  if(select)select.value=next;
+  for(const card of document.querySelectorAll('[data-admin-weapon-editor]')){
+    const active=card.dataset.adminWeaponEditor===next;
+    card.hidden=!active;card.inert=!active;
+  }
+}
+function openAdminPanel(initialTab='gameplay'){if(!isMatchAdmin){showToast('ADMIN ACCESS REQUIRED');return;}syncAdminContext();populateAdminSettings(worldSettings);switchAdminTab(initialTab);syncAdminWeaponEditor($('adminWeaponSelect')?.value||'assault');setAdminStatus(matchCustom?'CUSTOM tuning active.':'Advanced settings are unchanged.');shell.openPanel(SHELL_PANEL.ADMIN);renderAdminPlayers(true);}
 function closeAdminPanel(){shell.closePanel(SHELL_PANEL.ADMIN);}
 function resetActiveAdminTab(){if(activeAdminTab==='gameplay')populateAdminGameplay({...worldSettings,movement:DEFAULT_WORLD_SETTINGS.movement,combat:DEFAULT_WORLD_SETTINGS.combat});else if(activeAdminTab==='advanced')populateAdminWeapons({...worldSettings,weapons:DEFAULT_WORLD_SETTINGS.weapons});}
 function saveAdminSettings(){
@@ -2428,7 +2476,7 @@ function drawWeapon(c,r){
 function minimapDotColor(rmt){return modeFriendly(rmt.team)?(!rmt.bot?'#62ef86':TEAM_COLORS[rmt.team]):TEAM_COLORS.red;}
 const MINIMAP_ZOOM=1.45;
 function getMinimapStatic(w=512,h=512){
-  const key=`${Math.round(w)}x${Math.round(h)}`;if(minimapStaticCache?.key===key)return minimapStaticCache.canvas;
+  const key=`${currentMapId}:${Math.round(w)}x${Math.round(h)}`;if(minimapStaticCache?.key===key)return minimapStaticCache.canvas;
   const q=document.createElement('canvas');q.width=Math.max(1,Math.round(w));q.height=Math.max(1,Math.round(h));const c=q.getContext('2d'),iw=q.width,ih=q.height,terrainCells=24,cellW=iw/terrainCells,cellH=ih/terrainCells;
   c.fillStyle='rgba(19,27,26,.94)';c.fillRect(0,0,iw,ih);for(let gy=0;gy<terrainCells;gy++)for(let gx=0;gx<terrainCells;gx++){const wx=-ARENA_LIMIT+(gx+.5)/terrainCells*ARENA_LIMIT*2,wz=-ARENA_LIMIT+(gy+.5)/terrainCells*ARENA_LIMIT*2,hv=terrainHeight(wx,wz),t=Math.max(0,Math.min(1,(hv+2.4)/16.2));c.fillStyle=`rgba(${Math.round(58+72*t)},${Math.round(78+46*t)},${Math.round(57+31*t)},${.34+.34*t})`;c.fillRect(gx*cellW,gy*cellH,cellW+.7,cellH+.7);}const toX=x=>(x+ARENA_LIMIT)/(ARENA_LIMIT*2)*iw,toY=z=>(z+ARENA_LIMIT)/(ARENA_LIMIT*2)*ih;c.fillStyle='rgba(205,213,218,.42)';for(const b of mapObstacles){if(b.type==='box'){const x1=toX(b.x-b.w/2),x2=toX(b.x+b.w/2),y1=toY(b.z-b.d/2),y2=toY(b.z+b.d/2);c.fillRect(x1,y1,x2-x1,y2-y1);}else if(b.type==='pyramid'){const px=toX(b.x),py=toY(b.z),rr=b.base/(ARENA_LIMIT*2)*iw*.55;c.beginPath();c.moveTo(px,py-rr);c.lineTo(px+rr,py+rr);c.lineTo(px-rr,py+rr);c.closePath();c.fill();}else{const px=toX(b.x),py=toY(b.z),rr=Math.max(1.6,(b.r||1)/(ARENA_LIMIT*2)*iw*1.6);c.beginPath();c.arc(px,py,rr,0,Math.PI*2);c.fillStyle=b.type==='tree'?'rgba(41,101,52,.82)':b.type==='bush'?'rgba(65,116,59,.72)':'rgba(148,154,153,.68)';c.fill();c.fillStyle='rgba(205,213,218,.42)';}}minimapStaticCache={key,canvas:q};return q;
 }
