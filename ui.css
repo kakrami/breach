@@ -441,7 +441,7 @@ body{font-size:var(--ui-md)}
 }
 
 
-/* v1.37.2 in-game controls: preserve the v1.36 layout footprint exactly. */
+/* v1.37.3 in-game controls: preserve the v1.36 layout footprint exactly. */
 .game-text-field{cursor:pointer;display:flex;align-items:center;text-align:left;user-select:none;-webkit-user-select:none}
 .game-text-field .game-control-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .game-text-field .game-control-value.placeholder{color:var(--dim)}
@@ -492,4 +492,18 @@ body{font-size:var(--ui-md)}
   .touch .lobby-map-choice-grid{grid-template-columns:1fr;gap:3px}.touch .lobby-map-choice{min-height:42px;padding:4px 6px}.touch .lobby-map-choice small{display:block;font-size:8px;line-height:1.1}
   .touch .lobby-map-toolbar{gap:5px}.touch .lobby-map-toolbar h2{font-size:15px}.touch .lobby-map-toolbar p{display:block;font-size:9px;line-height:1.15}
   .touch .lobby-map-legend{left:5px;right:5px;bottom:5px;padding:4px 5px;gap:5px 8px;font-size:8px}
+}
+
+
+/* v1.37.3 responsive contract: reflow/scroll instead of deleting option content. */
+.lobby-setup-panel,.lobby-loadout-panel,.settings-page,.admin-page{overflow:auto;overscroll-behavior:contain}
+.touch .loadout-choice,.touch .loadout-fixed{height:auto;min-height:56px;overflow:visible;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;align-content:center;text-align:left}
+.touch .loadout-choice b,.touch .loadout-fixed>b{display:block;grid-row:1/3;align-self:center}
+.touch .loadout-choice strong,.touch .loadout-fixed strong{display:block;white-space:normal;line-height:1.1;text-align:left}
+.touch .loadout-choice small,.touch .loadout-fixed small{display:block;white-space:normal;line-height:1.15;font-size:9px}
+.touch .lobby-card-title{display:flex}.touch .lobby-rule-summary{display:block}.touch .lobby-section-head .eyebrow{display:block}.touch .settings-page .settings-category-head{display:block}
+@media (max-height:390px) and (orientation:landscape){
+  .touch .lobby-match-card{padding:6px;gap:5px}.touch .lobby-mode-picker button{height:30px}.touch .lobby-match-card .input{height:31px}
+  .touch .loadout-choice,.touch .loadout-fixed{height:auto;min-height:52px}.touch .loadout-section{margin-top:4px}
+  .touch .settings-page .settings-category-head{padding:6px 2px 3px}
 }

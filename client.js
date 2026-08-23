@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.2';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.2';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.2';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.2';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.2';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.2';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.2';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.2';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.3';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.3';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.3';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.3';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.3';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.3';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.3';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.3';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.2';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.2';
-import { createAudioEngine } from './audio-engine.js?v=1.37.2';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.2';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.2';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.2';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.2';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.2';
+} from './game-config.js?v=1.37.3';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.3';
+import { createAudioEngine } from './audio-engine.js?v=1.37.3';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.3';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.3';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.3';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.3';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.3';
 
 let THREE = null;
 
@@ -182,7 +182,7 @@ const nameInput=$('nameInput'),codeInput=$('codeInput'),menuStatus=$('menuStatus
 const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews=[...document.querySelectorAll('[data-deploy-view]')];
 const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbyMapButtons=[...document.querySelectorAll('[data-lobby-map-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
 const matchPrimaryButtons=[...document.querySelectorAll('[data-match-primary-choice]')],matchTacticalButtons=[...document.querySelectorAll('[data-match-tactical-choice]')],matchLethalButtons=[...document.querySelectorAll('[data-match-lethal-choice]')];
-const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMapPreview=$('lobbyMapPreview'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
+const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMapPreview=$('lobbyMapPreview'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyMinimapMarkers=$('lobbyMinimapMarkers'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
 const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
 const gameTextEditor=$('gameTextEditor'),gameTextEditorTitle=$('gameTextEditorTitle'),gameTextEditorValue=$('gameTextEditorValue'),gameTextEditorPlaceholder=$('gameTextEditorPlaceholder'),gameTextKeyboard=$('gameTextKeyboard'),gameTextShiftBtn=$('gameTextShiftBtn');
 initGameControls();
@@ -205,7 +205,7 @@ let scene, camera, renderer, clock, worldRoot, pistolGroup, pistolFlash, pistolM
 let hudScene, hudCamera, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0;
 let socket = null, reconnectTimer = null, reconnectAttempt = 0;
 let currentRoom = '', myName = '', myTeam = preferredTeam, selfColor = TEAM_COLORS.blue, godMode = false, isMatchAdmin = false, matchOwnerId = '', pendingTeam='';
-let primaryWeapon=preferredPrimary,tacticalEquipment=preferredTactical,lethalEquipment=preferredLethal,pendingLoadout=null,loadoutDraft=null,matchState={status:'waiting',round:1,mode:DEFAULT_GAME_MODE,blueScore:0,redScore:0,scoreLimit:DEFAULT_MATCH_RULES.scoreLimit,timeLimitMs:DEFAULT_MATCH_RULES.timeLimitMs,minimapRevealAll:false,warmupEndsAt:0,endsAt:0,winner:'',winnerId:'',winnerName:'',reason:'',serverTime:0},matchCustom=false;
+let primaryWeapon=preferredPrimary,tacticalEquipment=preferredTactical,lethalEquipment=preferredLethal,pendingLoadout=null,loadoutDraft=null,matchState={status:'waiting',round:1,mode:DEFAULT_GAME_MODE,blueScore:0,redScore:0,scoreLimit:DEFAULT_MATCH_RULES.scoreLimit,timeLimitMs:DEFAULT_MATCH_RULES.timeLimitMs,minimapRevealAll:false,minimapDirectional:false,warmupEndsAt:0,endsAt:0,winner:'',winnerId:'',winnerName:'',reason:'',serverTime:0},matchCustom=false;
 let hp = 100, wastedUntil = 0, currentWeapon = preferredPrimary, ammo = freshClientAmmo(), equipment=freshClientEquipment(tacticalEquipment,lethalEquipment), reloadUntil = 0, reloadWeapon = '', reloadRequestPending=false, pendingWeapon='';
 let flashUntil=0,flashPeakUntil=0;
 let assaultFireMode=localStorage.getItem('breachAssaultFireMode')==='semi'?'semi':'auto';
@@ -382,7 +382,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.2';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.3';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -520,9 +520,9 @@ function syncLobby(){
   for(const btn of lobbyLethalButtons)btn.classList.toggle('active',btn.dataset.lobbyLethalChoice===lethalEquipment);
   for(const btn of lobbyModeButtons)btn.classList.toggle('active',btn.dataset.lobbyModeChoice===mode);
   const ffa=!spec.teamBased;$('lobbyBlueBotWrap').classList.toggle('hide',ffa);$('lobbyRedBotWrap').classList.toggle('hide',ffa);$('lobbyFfaBotWrap').classList.toggle('hide',!ffa);
-  lobbyBlueBotCount.value=String(botConfig.blueBots||0);lobbyRedBotCount.value=String(botConfig.redBots||0);lobbyFfaBotCount.value=String(total);lobbyBotDifficulty.value=botConfig.difficulty||'normal';lobbyMinimapMode.value=matchState.minimapRevealAll?'all':'standard';for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===currentMapId);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}const mapInfo=mapSpec(currentMapId);if($('lobbyMapName'))$('lobbyMapName').textContent=mapInfo.name;if($('lobbyMapDescription'))$('lobbyMapDescription').textContent=host?'Select a level. The full layout is shown at right.':'Selected by the lobby admin.';renderLobbyMapPreview();
+  lobbyBlueBotCount.value=String(botConfig.blueBots||0);lobbyRedBotCount.value=String(botConfig.redBots||0);lobbyFfaBotCount.value=String(total);lobbyBotDifficulty.value=botConfig.difficulty||'normal';lobbyMinimapMode.value=matchState.minimapRevealAll?'all':'standard';lobbyMinimapMarkers.value=matchState.minimapDirectional?'directional':'dots';for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===currentMapId);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}const mapInfo=mapSpec(currentMapId);if($('lobbyMapName'))$('lobbyMapName').textContent=mapInfo.name;if($('lobbyMapDescription'))$('lobbyMapDescription').textContent=host?'Select a level. The full layout is shown at right.':'Selected by the lobby admin.';renderLobbyMapPreview();
   const sandbox=spec.scoreType==='none';lobbyScoreLimit.value=sandbox?'':String(matchState.scoreLimit||spec.scoreLimit);lobbyTimeLimit.value=sandbox?'':String(Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000)));lobbyScoreLimit.disabled=sandbox;lobbyTimeLimit.disabled=sandbox;$('lobbyScoreWrap')?.classList.toggle('disabled-setting',sandbox);$('lobbyTimeWrap')?.classList.toggle('disabled-setting',sandbox);
-  const ruleSummary=spec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||spec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000))} min`,minimapSummary=matchState.minimapRevealAll?'Minimap: Everyone':'Minimap: Standard',mapName=mapSpec(currentMapId).name;$('lobbyRuleSummary').textContent=`${mapName} · ${ruleSummary} · ${minimapSummary}${matchCustom?' · CUSTOM':''}`;$('lobbyGuestMode').textContent=`${spec.name} · ${mapName}`;$('lobbyGuestBots').textContent=`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${ruleSummary} · ${minimapSummary}${matchCustom?' · Custom rules':''}`;
+  const ruleSummary=spec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||spec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000))} min`,minimapSummary=`Minimap: ${matchState.minimapRevealAll?'Everyone':'Standard'} · ${matchState.minimapDirectional?'Directional':'Dots'}`,mapName=mapSpec(currentMapId).name;$('lobbyRuleSummary').textContent=`${mapName} · ${ruleSummary} · ${minimapSummary}${matchCustom?' · CUSTOM':''}`;$('lobbyGuestMode').textContent=`${spec.name} · ${mapName}`;$('lobbyGuestBots').textContent=`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${ruleSummary} · ${minimapSummary}${matchCustom?' · Custom rules':''}`;
   $('lobbyStatus').textContent=host?'Lobby ready':'Waiting for admin';$('lobbyHint').textContent=host?'Configure the match, then start when everyone is ready.':'Choose your team and loadout while a lobby admin configures the match.';
   renderLobbyRoster();
 }
@@ -1042,6 +1042,7 @@ function bindUI(){
   for(const el of [lobbyScoreLimit,lobbyTimeLimit])el.addEventListener('change',sendLobbyMatchRules);
   for(const btn of lobbyMapButtons)btn.addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMap',mapId:normalizeMapId(btn.dataset.lobbyMapChoice)});else syncLobby();});
   lobbyMinimapMode.addEventListener('change',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMinimap',revealAll:lobbyMinimapMode.value==='all'});else syncLobby();});
+  lobbyMinimapMarkers.addEventListener('change',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMinimap',directional:lobbyMinimapMarkers.value==='directional'});else syncLobby();});
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
     const button=$('lobbyStartBtn');button.disabled=true;$('lobbyStatus').textContent='Preparing match…';
@@ -1190,7 +1191,7 @@ function handlePhysicalChatKey(e){
   return true;
 }
 function openChat(){
-  if(chatOpen||!shell.inMatch||shell.paused||shell.panel||shell.connecting)return false;
+  if(chatOpen||!shell.inMatch||shell.paused||shell.panel||shell.connecting||hp<=0||!matchAllowsMovement(matchState))return false;
   chatOpen=true;scoreboardOpen=false;chatShift=true;setChatDraft('');suspendGameplayInput();chatComposer.classList.remove('hide');
   if(!isTouch&&document.pointerLockElement===canvas)document.exitPointerLock?.();
   hudLastDraw=0;return true;
@@ -1213,7 +1214,7 @@ function drawChatFeed(c,L,w,h,now){
   const visible=chatMessages.filter(item=>chatOpen||item.until>now).slice(-(isTouch?3:5));if(!visible.length)return;
   const rowH=isTouch?17:19,boxH=visible.length*rowH+8;
   let boxW,x,y;
-  if(isTouch){const rightLimit=L.map.x-8;x=L.moveBoundary+8;boxW=Math.max(150,Math.min(246,rightLimit-x));y=L.team.y+L.team.h+7;}
+  if(isTouch){const rightLimit=L.map.x-8;x=L.moveBoundary+8;boxW=Math.max(64,Math.min(246,rightLimit-x));y=(L.kill.y>L.team.y?L.kill.y+L.kill.h+6:L.team.y+L.team.h+7);}
   else{boxW=Math.min(L.kill.w,300);x=L.kill.x;y=Math.min(h-L.safe.bottom-boxH-8,L.kill.y+L.kill.h+7);}
   c.save();roundRect(c,x,y,boxW,boxH,7,chatOpen?'rgba(5,8,10,.74)':'rgba(5,8,10,.42)',chatOpen?'rgba(255,255,255,.12)':null);let cy=y+6+rowH/2;
   for(const item of visible){const mine=samePlayerId(item.id,clientId),teamColor=currentModeSpec().teamBased?(TEAM_COLORS[item.team]||'#fff'):'#dfe8ee';c.textAlign='left';c.font=`900 ${isTouch?10:11}px system-ui`;c.fillStyle=mine?HUD_ACCENT:teamColor;const label=`${item.name}: `;c.fillText(label,x+7,cy);const lw=c.measureText(label).width;c.font=`800 ${isTouch?10:11}px system-ui`;c.fillStyle='#edf3f6';c.fillText(clipHudText(c,item.text,boxW-lw-15),x+7+lw,cy);cy+=rowH;}c.restore();
@@ -1248,9 +1249,9 @@ function onCanvasPointerDown(e){
   if(isTouch||directTouch){
     e.preventDefault();
     const layout=hudLayout||computeHudLayout();
-    // CHAT is a game-owned toggle. Handle it before pointer capture so the
-    // same HUD control cleanly opens and closes the Breach QWERTY composer.
-    if(pointInRect(p.x,p.y,layout.chat)){openChat();return;}
+    const liveHud=matchAllowsMovement(matchState)&&hp>0;
+    // Only interactive HUD regions that are actually drawn are touchable.
+    if(liveHud&&pointInRect(p.x,p.y,layout.chat)){openChat();return;}
     if(hp<=0&&layout.deathLoadout&&pointInRect(p.x,p.y,layout.deathLoadout)){openMatchLoadout();return;}
     try{canvas.setPointerCapture(e.pointerId)}catch{}
     if(scoreboardOpen){
@@ -1259,12 +1260,11 @@ function onCanvasPointerDown(e){
       if(panel&&pointInRect(p.x,p.y,panel)&&!touchRoleActive('scoreboard-scroll')){scoreboardDrag={startY:p.y,startScroll:scoreboardScroll};touchRoles.set(e.pointerId,'scoreboard-scroll');return;}
       return;
     }
-    if(!sniperScopeActive()&&pointInRect(p.x,p.y,layout.team)){touchRoles.set(e.pointerId,'scoreboard');toggleScoreboard();return;}
+    if(pointInRect(p.x,p.y,layout.team)){touchRoles.set(e.pointerId,'scoreboard');toggleScoreboard();return;}
     if(pointInRect(p.x,p.y,layout.menu)){
-      touchRoles.set(e.pointerId,'menu');
-      openPause();
-      return;
+      touchRoles.set(e.pointerId,'menu');openPause();return;
     }
+    if(!liveHud)return;
     if(pointInCircle(p.x,p.y,layout.aim)){touchRoles.set(e.pointerId,'aimtoggle');toggleAim();return;}
     if(pointInCircle(p.x,p.y,layout.leftFire)){
       touchVisual.fireUntil=performance.now()+150;pressTouchFire(e.pointerId);return;
@@ -2518,50 +2518,35 @@ function safeInsets(){
 
 function computeHudLayout(){
   const safe=safeInsets(),landscape=viewW>viewH,compact=isTouch&&landscape&&viewH<=520,margin=compact?8:12;
-  const mapSize=compact?96:(isTouch?112:140),menuW=compact?36:42,menuH=compact?32:36;
-  const teamW=compact?208:(isTouch?248:292),teamH=compact?32:36,joyR=compact?54:(isTouch?62:0);
-  const fireR=compact?37:43,leftFireR=compact?32:37,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=swapR,equipR=compact?23:27,crouchR=compact?22:26;
-  const bottom=safe.bottom+margin,weaponW=compact?158:(isTouch?174:198),weaponH=compact?50:(isTouch?54:58);
-  const baseKillW=compact?220:(isTouch?252:300),killH=compact?70:(isTouch?104:128);
-  const teamX=(viewW-teamW)/2,teamY=safe.top+margin,moveBoundary=viewW*MOBILE_MOVE_ZONE_RATIO,chatW=compact?42:48;
-  const killX=safe.left+margin,godX=teamX-31,killW=Math.max(118,Math.min(baseKillW,godX-killX-7));
-  const defaultJoyX=safe.left+joyR+margin;
-  const defaultJoyY=viewH-bottom-joyR;
-  const leftSpan=Math.max(120,moveBoundary-safe.left);
-  // Keep the established left FIRE position unchanged. Equipment now forms one
-  // row beneath it: Tactical, Lethal.
-  const leftFireX=Math.max(safe.left+leftFireR+8,Math.min(moveBoundary-leftFireR-10,safe.left+leftSpan*.30));
-  const leftFireY=Math.max(safe.top+leftFireR+52,Math.min(viewH-bottom-leftFireR-118,viewH*.31));
-  const equipGap=compact?8:10,equipOffset=equipR+equipGap/2;
-  const equipCenterX=Math.max(safe.left+equipR+equipOffset+8,Math.min(moveBoundary-equipR-equipOffset-10,leftFireX));
-  const flashX=equipCenterX-equipOffset,stickyX=equipCenterX+equipOffset;
-  const equipRowY=Math.max(safe.top+equipR+74,Math.min(viewH-bottom-equipR-62,leftFireY+leftFireR+equipR+9));
-  const flashY=equipRowY,stickyY=equipRowY;
-  // Right controls are a deliberate two-row grid, preserving every existing
-  // button radius: Jump / Swap / ADS, then Crouch / Reload / Fire.
-  const fireX=viewW-safe.right-margin-fireR,fireY=viewH-bottom-fireR;
-  const reloadX=fireX-fireR-reloadR-9,reloadY=fireY;
-  const crouchX=reloadX-reloadR-crouchR-9,crouchY=fireY;
-  const topRowY=fireY-fireR-Math.max(jumpR,swapR,aimR)-11;
-  const jumpX=crouchX,jumpY=topRowY;
-  const swapX=reloadX,swapY=topRowY;
-  const aimX=fireX,aimY=topRowY;
-  // Fire-mode remains a separate auxiliary control so it does not disturb the
-  // requested two-row combat-button order.
-  const modeX=crouchX-crouchR-modeR-9,modeY=(topRowY+fireY)/2;
-  const weaponLift=touchGameplayControlsVisible()?(fireR*3.75+8):0;
-  const mapX=viewW-safe.right-margin-mapSize,menuX=teamX+teamW+7,rightChatX=menuX+menuW+5,chatBesideMenu=rightChatX+chatW+5<=mapX;
+  const contentLeft=safe.left+margin,contentRight=viewW-safe.right-margin,contentW=Math.max(240,contentRight-contentLeft);
+  const desiredMap=compact?96:(isTouch?112:140),mapSize=Math.max(78,Math.min(desiredMap,contentW*.23));
+  const menuW=compact?34:40,menuH=compact?30:34,chatW=menuW;
+  const desiredTeamW=compact?208:(isTouch?248:292),teamW=Math.max(150,Math.min(desiredTeamW,contentW-mapSize-28)),teamH=compact?32:36;
+  const joyR=compact?54:(isTouch?62:0),fireR=compact?37:43,leftFireR=compact?32:37,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=swapR,equipR=compact?23:27,crouchR=compact?22:26;
+  const bottom=safe.bottom+margin,weaponW=compact?158:(isTouch?174:198),weaponH=compact?50:(isTouch?54:58),baseKillW=compact?220:(isTouch?252:300),killH=compact?58:(isTouch?88:112);
+  const mapX=contentRight-mapSize,mapY=safe.top+margin,teamY=mapY;
+  const desiredTeamX=(viewW-teamW)/2,maxTeamX=mapX-teamW-8,minTeamX=contentLeft;
+  const teamX=Math.max(minTeamX,Math.min(desiredTeamX,maxTeamX));
+  const topKillSpace=teamX-contentLeft-8,killBelow=topKillSpace<118;
+  const killX=contentLeft,killY=killBelow?teamY+teamH+7:mapY,killW=Math.max(96,Math.min(baseKillW,killBelow?mapX-contentLeft-8:topKillSpace));
+  const controlsY=mapY+mapSize+6,menuX=mapX,chatX=mapX+mapSize-chatW;
+  const moveBoundary=viewW*MOBILE_MOVE_ZONE_RATIO,defaultJoyX=safe.left+joyR+margin,defaultJoyY=viewH-bottom-joyR;
+  const leftSpan=Math.max(120,moveBoundary-safe.left),leftFireX=Math.max(safe.left+leftFireR+8,Math.min(moveBoundary-leftFireR-10,safe.left+leftSpan*.30));
+  const leftFireY=Math.max(safe.top+leftFireR+52,Math.min(viewH-bottom-leftFireR-118,viewH*.31)),equipGap=compact?8:10,equipOffset=equipR+equipGap/2;
+  const equipCenterX=Math.max(safe.left+equipR+equipOffset+8,Math.min(moveBoundary-equipR-equipOffset-10,leftFireX)),flashX=equipCenterX-equipOffset,stickyX=equipCenterX+equipOffset;
+  const equipRowY=Math.max(safe.top+equipR+74,Math.min(viewH-bottom-equipR-62,leftFireY+leftFireR+equipR+9)),flashY=equipRowY,stickyY=equipRowY;
+  const fireX=viewW-safe.right-margin-fireR,fireY=viewH-bottom-fireR,reloadX=fireX-fireR-reloadR-9,reloadY=fireY,crouchX=reloadX-reloadR-crouchR-9,crouchY=fireY;
+  const topRowY=fireY-fireR-Math.max(jumpR,swapR,aimR)-11,jumpX=crouchX,jumpY=topRowY,swapX=reloadX,swapY=topRowY,aimX=fireX,aimY=topRowY;
+  const modeX=crouchX-crouchR-modeR-9,modeY=(topRowY+fireY)/2,weaponLift=touchGameplayControlsVisible()?(fireR*3.75+8):0;
   return{compact,safe,moveBoundary,
-    map:{x:mapX,y:safe.top+margin,w:mapSize,h:mapSize},kill:{x:killX,y:safe.top+margin,w:killW,h:killH},
-    team:{x:teamX,y:teamY,w:teamW,h:teamH},god:{x:godX,y:teamY,w:25,h:teamH},chat:{x:chatBesideMenu?rightChatX:mapX+mapSize-chatW,y:chatBesideMenu?teamY:safe.top+margin+mapSize+6,w:chatW,h:menuH},menu:{x:menuX,y:teamY,w:menuW,h:menuH},
+    map:{x:mapX,y:mapY,w:mapSize,h:mapSize},kill:{x:killX,y:killY,w:killW,h:killH},
+    team:{x:teamX,y:teamY,w:teamW,h:teamH},chat:{x:chatX,y:controlsY,w:chatW,h:menuH},menu:{x:menuX,y:controlsY,w:menuW,h:menuH},
     weapon:{x:viewW-safe.right-margin-weaponW,y:viewH-bottom-weaponH-weaponLift,w:weaponW,h:weaponH},joy:{x:defaultJoyX,y:defaultJoyY,r:joyR},
     leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},crouch:{x:crouchX,y:crouchY,r:crouchR},flash:{x:flashX,y:flashY,r:equipR},sticky:{x:stickyX,y:stickyY,r:equipR},
-    fire:{x:fireX,y:fireY,r:fireR},aim:{x:aimX,y:aimY,r:aimR},jump:{x:jumpX,y:jumpY,r:jumpR},
-    reload:{x:reloadX,y:reloadY,r:reloadR},swap:{x:swapX,y:swapY,r:swapR},mode:{x:modeX,y:modeY,r:modeR},
+    fire:{x:fireX,y:fireY,r:fireR},aim:{x:aimX,y:aimY,r:aimR},jump:{x:jumpX,y:jumpY,r:jumpR},reload:{x:reloadX,y:reloadY,r:reloadR},swap:{x:swapX,y:swapY,r:swapR},mode:{x:modeX,y:modeY,r:modeR},
     deathLoadout:{x:viewW/2-92,y:viewH/2+52,w:184,h:34}
   };
 }
-
 function drawHud(now){
   const hudInterval=touchGameplayControlsVisible()?33:16;
   if(now-hudLastDraw<hudInterval)return;hudLastDraw=now;if(!hudLayout)hudLayout=computeHudLayout();
@@ -2572,22 +2557,20 @@ function drawHud(now){
   if(damageAlpha>.01){const g=c.createRadialGradient(w/2,h/2,Math.min(w,h)*.10,w/2,h/2,Math.max(w,h)*.72);g.addColorStop(0,'rgba(255,18,40,0)');g.addColorStop(.58,`rgba(255,18,40,${damageAlpha*.12})`);g.addColorStop(.82,`rgba(185,0,22,${damageAlpha*.42})`);g.addColorStop(1,`rgba(125,0,16,${damageAlpha})`);c.fillStyle=g;c.fillRect(0,0,w,h);}
   drawBloodSplatter(c,w,h,now,missingHealth);
   if(scoreboardOpen){drawScoreboard(c,L);hudTexture.needsUpdate=true;return;}
-  if(scoped)drawScopeMask(c,w,h);else{drawKillFeed(c,L.kill,now);drawMiniMap(c,L.map);drawTeamBar(c,L.team);}
-  if(godMode)drawGodBadge(c,L.god,now);drawMenuButton(c,L.menu);drawWeapon(c,L.weapon);
-  const headshotHit=now<headshotUntil;
-  if(scoped)drawScopeReticle(c,w,h,now<hitUntil,headshotHit);else drawWeaponCrosshair(c,w/2,h/2,currentWeapon,now<hitUntil,adsBlend,headshotHit);
-  drawDamageIndicators(c,w,h,now);
-  drawChatFeed(c,L,w,h,now);if(isTouch)drawChatButton(c,L.chat);
-  drawAnnouncer(c,w,h,now);drawMatchStatus(c,w,h);
-  if(touchGameplayControlsVisible())drawTouchControls(c,L,now);
-  if(killConfirmUntil>now)drawKillConfirm(c,w,h,now);
-  if(toastText&&now<toastUntil){c.font='800 11px system-ui';const tw=Math.min(w-30,c.measureText(toastText).width+24),tx=(w-tw)/2,ty=(scoped?L.safe.top+12:L.team.y+L.team.h+9);roundRect(c,tx,ty,tw,28,8,HUD_SURFACE,HUD_LINE);c.fillStyle='#fff';c.textAlign='center';c.fillText(toastText,w/2,ty+14);}
+  if(!matchAllowsMovement(matchState)){drawMatchStatus(c,w,h);drawScoreboardButton(c,L.team);drawMenuButton(c,L.menu);hudTexture.needsUpdate=true;return;}
   if(hp<=0){
-    c.fillStyle='rgba(24,3,8,.56)';c.fillRect(0,0,w,h);c.textAlign='center';c.fillStyle='#ff6676';c.font=`1000 ${L.compact?36:50}px system-ui`;c.fillText('ELIMINATED',w/2,h/2-34);
+    c.fillStyle='rgba(24,3,8,.64)';c.fillRect(0,0,w,h);drawTeamBar(c,L.team);drawMiniMap(c,L.map);drawMenuButton(c,L.menu);c.textAlign='center';c.fillStyle='#ff6676';c.font=`1000 ${L.compact?36:50}px system-ui`;c.fillText('ELIMINATED',w/2,h/2-34);
     c.font='900 13px system-ui';c.fillStyle='#ffd8dd';if(lastWastedBy)c.fillText(`Killed by ${lastWastedBy}${lastWastedWeapon?' · '+weaponLabel(lastWastedWeapon):''}`,w/2,h/2+2);
     c.font='800 12px system-ui';c.fillStyle='#c8b4b8';c.fillText(`Respawning in ${Math.max(1,Math.ceil((wastedUntil-serverNow())/1000))}`,w/2,h/2+25);
     const b=L.deathLoadout;roundRect(c,b.x,b.y,b.w,b.h,8,'rgba(13,18,22,.92)','rgba(255,255,255,.22)');c.fillStyle='#fff';c.font='900 11px system-ui';c.fillText(`${isTouch?'TAP':controllerInputActive()?'Y':'L'} · CHANGE LOADOUT`,w/2,b.y+b.h/2);
+    hudTexture.needsUpdate=true;return;
   }
+  if(scoped)drawScopeMask(c,w,h);else{drawKillFeed(c,L.kill,now);drawMiniMap(c,L.map);drawTeamBar(c,L.team);}
+  drawMenuButton(c,L.menu);drawWeapon(c,L.weapon);
+  const headshotHit=now<headshotUntil;if(scoped)drawScopeReticle(c,w,h,now<hitUntil,headshotHit);else drawWeaponCrosshair(c,w/2,h/2,currentWeapon,now<hitUntil,adsBlend,headshotHit);
+  drawDamageIndicators(c,w,h,now);drawChatFeed(c,L,w,h,now);if(isTouch)drawChatButton(c,L.chat);drawAnnouncer(c,w,h,now);
+  if(touchGameplayControlsVisible())drawTouchControls(c,L,now);if(killConfirmUntil>now)drawKillConfirm(c,w,h,now);
+  if(toastText&&now<toastUntil){c.font='800 11px system-ui';const tw=Math.min(w-30,c.measureText(toastText).width+24),tx=(w-tw)/2,ty=(scoped?L.safe.top+12:Math.max(L.team.y+L.team.h+9,L.kill.y>L.team.y?L.kill.y+L.kill.h+6:0));roundRect(c,tx,ty,tw,28,8,HUD_SURFACE,HUD_LINE);c.fillStyle='#fff';c.textAlign='center';c.fillText(toastText,w/2,ty+14);}
   hudTexture.needsUpdate=true;
 }
 function drawMatchStatus(c,w,h){
@@ -2599,7 +2582,7 @@ function drawMatchStatus(c,w,h){
     c.save();c.fillStyle='rgba(2,4,6,.62)';c.fillRect(0,0,w,h);roundRect(c,x,y,panelW,panelH,14,'rgba(8,12,15,.96)','rgba(255,255,255,.18)');c.textAlign='center';c.fillStyle=accent;c.font=`1000 ${Math.max(28,Math.min(42,h*.09))}px system-ui`;c.fillText(title,w/2,y+49);
     c.fillStyle='#fff';c.font='900 14px system-ui';if(teamMode){const t=teamScores();c.fillText(`${t.blue}  BLUE   ·   RED  ${t.red}`,w/2,y+88);}else c.fillText(matchState.winnerName?`${String(matchState.winnerName).toUpperCase()} WINS`:'ROUND COMPLETE',w/2,y+88);
     c.fillStyle='#c4ced5';c.font='800 12px system-ui';c.fillText(`Your result  ${myStats.kills||0} K  ·  ${myStats.deaths||0} D  ·  ${(myStats.deaths?(myStats.kills/myStats.deaths):myStats.kills||0).toFixed(2)} K/D`,w/2,y+121);
-    c.fillStyle=HUD_MUTED;c.font='800 11px system-ui';c.fillText(`Round ${matchState.round} · ${restart>0?`next round in ${restart}s`:'preparing next round'}`,w/2,y+151);c.fillText(`${controllerInputActive()?'VIEW':isTouch?'Tap score bar':'TAB'} for scoreboard`,w/2,y+176);c.restore();return;
+    c.fillStyle=HUD_MUTED;c.font='800 11px system-ui';c.fillText(`Round ${matchState.round} · ${restart>0?`next round in ${restart}s`:'preparing next round'}`,w/2,y+151);c.fillText(`${controllerInputActive()?'VIEW':isTouch?'Tap SCOREBOARD':'TAB'} for scoreboard`,w/2,y+176);c.restore();return;
   }
   const warm=matchState.status==='warmup',text=warm?matchClockText():'WAITING FOR MATCH',sub=warm?`Round ${matchState.round}`:'Waiting for players';
   const pw=Math.min(320,w-30),ph=78,x=(w-pw)/2,y=h*.31;c.save();roundRect(c,x,y,pw,ph,12,'rgba(6,9,12,.82)','rgba(255,255,255,.16)');c.textAlign='center';c.fillStyle='#fff';c.font='1000 22px system-ui';c.fillText(text,w/2,y+29);c.fillStyle=HUD_MUTED;c.font='850 11px system-ui';c.fillText(sub,w/2,y+54);c.restore();
@@ -2614,15 +2597,16 @@ function drawTeamBar(c,r){
   const spec=currentModeSpec(),mid=r.x+r.w/2,clock=matchClockText();roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);c.textBaseline='middle';
   if(spec.scoreType==='player'){
     const rows=allCombatStats(),leader=rows[0],limit=Math.max(1,matchState.scoreLimit||spec.scoreLimit);c.fillStyle=HUD_ACCENT;c.fillRect(r.x,r.y,3,r.h);c.fillStyle=TEAM_COLORS.red;c.fillRect(r.x+r.w-3,r.y,3,r.h);
-    c.textAlign='left';c.font=`900 ${r.h<=32?10:11}px system-ui`;c.fillStyle='#dfe8ee';c.fillText('YOU',r.x+10,r.y+r.h/2);c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(myStats.kills||0),r.x+37,r.y+r.h/2);
+    c.textAlign='left';c.font=`900 ${r.h<=32?10:11}px system-ui`;c.fillStyle='#dfe8ee';c.fillText(godMode?'◆ YOU':'YOU',r.x+10,r.y+r.h/2);c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(myStats.kills||0),r.x+37,r.y+r.h/2);
     c.textAlign='center';c.font='1000 10px system-ui';c.fillStyle=matchState.status==='ended'?HUD_ACCENT:'#dbe4ea';c.fillText(clock,mid,r.y+r.h/2-4);c.font='800 10px system-ui';c.fillStyle='#69747d';c.fillText(`FFA · FIRST ${limit}`,mid,r.y+r.h/2+7);
     c.textAlign='right';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(leader?.kills||0),r.x+r.w-37,r.y+r.h/2);c.font=`900 ${r.h<=32?10:11}px system-ui`;c.fillStyle='#ff9ca4';c.fillText('LEAD',r.x+r.w-10,r.y+r.h/2);return;
   }
   const rows=allCombatStats(),bluePlayers=rows.filter(p=>p.team==='blue').length,redPlayers=rows.filter(p=>p.team==='red').length,t=teamScores();c.fillStyle=TEAM_COLORS.blue;c.fillRect(r.x,r.y,3,r.h);c.fillStyle=TEAM_COLORS.red;c.fillRect(r.x+r.w-3,r.y,3,r.h);
-  c.textAlign='left';c.font=`900 ${r.h<=32?10:11}px system-ui`;c.fillStyle='#8fc8ff';c.fillText('BLUE',r.x+10,r.y+r.h/2);c.textAlign='right';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(spec.scoreType==='none'?bluePlayers:t.blue),mid-40,r.y+r.h/2);
+  c.textAlign='left';c.font=`900 ${r.h<=32?10:11}px system-ui`;c.fillStyle='#8fc8ff';c.fillText(godMode?'◆ BLUE':'BLUE',r.x+10,r.y+r.h/2);c.textAlign='right';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(spec.scoreType==='none'?bluePlayers:t.blue),mid-40,r.y+r.h/2);
   c.textAlign='center';c.font='1000 10px system-ui';c.fillStyle=matchState.status==='ended'?HUD_ACCENT:'#dbe4ea';c.fillText(clock,mid,r.y+r.h/2-4);c.font='800 10px system-ui';c.fillStyle='#69747d';c.fillText(spec.scoreType==='none'?'SANDBOX':`${matchCustom?'CUSTOM · ':''}FIRST ${Math.max(1,matchState.scoreLimit||spec.scoreLimit)}`,mid,r.y+r.h/2+7);
   c.textAlign='left';c.font=`1000 ${r.h<=32?14:16}px system-ui`;c.fillStyle='#fff';c.fillText(String(spec.scoreType==='none'?redPlayers:t.red),mid+40,r.y+r.h/2);c.textAlign='right';c.font=`900 ${r.h<=32?10:11}px system-ui`;c.fillStyle='#ff9ca4';c.fillText('RED',r.x+r.w-10,r.y+r.h/2);
 }
+function drawScoreboardButton(c,r){roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);c.textAlign='center';c.fillStyle='#e7eef2';c.font=`1000 ${r.h<=32?10:11}px system-ui`;c.fillText('SCOREBOARD',r.x+r.w/2,r.y+r.h/2);}
 function toggleScoreboard(){if(!shell.canPlay)return;scoreboardOpen=!scoreboardOpen;scoreboardDrag=null;if(scoreboardOpen){scoreboardScroll=0;touchRoles.clear();clearFireInput();cancelEquipmentAim();joy.x=joy.y=0;}}
 function drawScoreboard(c,L){
   const rows=allCombatStats(),w=Math.min(viewW-L.safe.left-L.safe.right-28,L.compact?500:620),rowH=L.compact?24:27,headH=43,maxH=viewH-L.safe.top-L.safe.bottom-34;
@@ -2648,7 +2632,7 @@ function drawWeapon(c,r){
   roundRect(c,r.x,r.y,r.w,r.h,8,HUD_SURFACE,HUD_LINE);c.fillStyle=accent;c.fillRect(r.x,r.y,2.5,r.h);
   const left=r.x+10,top=r.y+11,right=r.x+r.w-9,mode=currentWeapon==='assault'?assaultFireMode.toUpperCase():WEAPON_SPECS[currentWeapon]?.automatic?'AUTO':'SEMI';
   c.textAlign='left';c.fillStyle='#fff';c.font=`1000 ${r.w<180?10.5:12}px system-ui`;c.fillText(clipHudText(c,spec.name,Math.max(48,r.w-78)),left,top);
-  c.fillStyle=HUD_MUTED;c.font='850 10px system-ui';c.fillText(`${mode} · ${currentWeapon==='sniper'?sniperZoomLabel():(adsWanted?'ADS':'HIP')}`,left,top+13);
+  if(!isTouch){c.fillStyle=HUD_MUTED;c.font='850 10px system-ui';c.fillText(`${mode} · ${currentWeapon==='sniper'?sniperZoomLabel():(adsWanted?'ADS':'HIP')}`,left,top+13);}
   c.textAlign='right';c.fillStyle=unlimited?HUD_ACCENT:count<=3?'#ff747d':'#fff';c.font=`1000 ${r.h<=60?22:24}px system-ui`;c.fillText(unlimited?'∞':String(count),right-23,top+6);c.fillStyle='#69747d';c.font='900 10px system-ui';c.fillText(unlimited?'∞':`/ ${spec.mag}`,right,top+8);
   const bx=left,by=r.y+r.h-7,bw=r.w-19,bh=2.5;roundRect(c,bx,by,bw,bh,2,'rgba(255,255,255,.09)');
   if(unlimited)roundRect(c,bx,by,bw,bh,2,HUD_ACCENT);else if(reloadUntil){const total=weaponRules(reloadWeapon||currentWeapon).reloadMs,remain=Math.max(0,reloadUntil-serverNow()),q=Math.max(0,Math.min(1,1-remain/total));roundRect(c,bx,by,bw*q,bh,2,HUD_ACCENT);c.fillStyle=HUD_ACCENT;c.font='900 10px system-ui';c.textAlign='left';c.fillText('RELOADING',left,by-7);}else roundRect(c,bx,by,bw*(count/spec.mag),bh,2,accent);
@@ -2701,7 +2685,7 @@ function drawMiniMap(c,r){
   const toMap=(x,z)=>{const dx=(x-position.x)*ppm,dz=(z-position.z)*ppm;return{x:cx+dx*cosR-dz*sinR,y:cy+dx*sinR+dz*cosR};};
   const edgePad=8,edgeHalfW=Math.max(1,iw/2-edgePad),edgeHalfH=Math.max(1,ih/2-edgePad);
   const clampMinimapMarker=p=>{const dx=p.x-cx,dy=p.y-cy,inside=Math.abs(dx)<=edgeHalfW&&Math.abs(dy)<=edgeHalfH;if(inside)return{x:p.x,y:p.y,edge:false,angle:0};const sx=Math.abs(dx)>1e-6?edgeHalfW/Math.abs(dx):Infinity,sy=Math.abs(dy)>1e-6?edgeHalfH/Math.abs(dy):Infinity,k=Math.min(sx,sy);return{x:cx+dx*k,y:cy+dy*k,edge:true,angle:Math.atan2(dy,dx)};};
-  for(const rmt of remotes.values()){if(!matchState.minimapRevealAll&&!modeFriendly(rmt.team)&&now>=rmt.revealedUntil)continue;const p=clampMinimapMarker(toMap(rmt.group.position.x,rmt.group.position.z)),humanTeammate=!rmt.bot&&modeFriendly(rmt.team),color=minimapDotColor(rmt);if(p.edge){c.save();c.translate(p.x,p.y);c.rotate(p.angle+Math.PI/2);c.beginPath();c.moveTo(0,-4.8);c.lineTo(3.8,3.4);c.lineTo(0,2);c.lineTo(-3.8,3.4);c.closePath();c.fillStyle=color;c.fill();c.strokeStyle=modeFriendly(rmt.team)?(humanTeammate?'#d8ffe3':'#fff'):'rgba(255,255,255,.72)';c.lineWidth=1;c.stroke();c.restore();}else{c.beginPath();c.arc(p.x,p.y,3.3,0,Math.PI*2);c.fillStyle=color;c.fill();if(modeFriendly(rmt.team)){c.strokeStyle=humanTeammate?'#d8ffe3':'#fff';c.lineWidth=1;c.stroke();}}}
+  for(const rmt of remotes.values()){if(!matchState.minimapRevealAll&&!modeFriendly(rmt.team)&&now>=rmt.revealedUntil)continue;const p=clampMinimapMarker(toMap(rmt.group.position.x,rmt.group.position.z)),humanTeammate=!rmt.bot&&modeFriendly(rmt.team),color=minimapDotColor(rmt);if(p.edge){c.save();c.translate(p.x,p.y);c.rotate(p.angle+Math.PI/2);c.beginPath();c.moveTo(0,-4.8);c.lineTo(3.8,3.4);c.lineTo(0,2);c.lineTo(-3.8,3.4);c.closePath();c.fillStyle=color;c.fill();c.strokeStyle=modeFriendly(rmt.team)?(humanTeammate?'#d8ffe3':'#fff'):'rgba(255,255,255,.72)';c.lineWidth=1;c.stroke();c.restore();}else if(matchState.minimapDirectional){const markerYaw=Number.isFinite(rmt.targetYaw)?rmt.targetYaw:rmt.group.rotation.y,markerRotation=headingUp?yaw-markerYaw:-markerYaw;c.save();c.translate(p.x,p.y);c.rotate(markerRotation);c.beginPath();c.moveTo(0,-5.2);c.lineTo(3.8,4);c.lineTo(0,2.7);c.lineTo(-3.8,4);c.closePath();c.fillStyle=color;c.fill();c.strokeStyle=modeFriendly(rmt.team)?(humanTeammate?'#d8ffe3':'#fff'):'rgba(255,255,255,.72)';c.lineWidth=1;c.stroke();c.restore();}else{c.beginPath();c.arc(p.x,p.y,3.3,0,Math.PI*2);c.fillStyle=color;c.fill();if(modeFriendly(rmt.team)){c.strokeStyle=humanTeammate?'#d8ffe3':'#fff';c.lineWidth=1;c.stroke();}}}
   c.save();c.translate(cx,cy);if(!headingUp)c.rotate(-yaw);c.beginPath();c.moveTo(0,-6.5);c.lineTo(4.8,5.2);c.lineTo(0,3.2);c.lineTo(-4.8,5.2);c.closePath();c.fillStyle=selfColor;c.fill();c.strokeStyle='#fff';c.lineWidth=1.2;c.stroke();c.restore();
   const vignette=c.createRadialGradient(cx,cy,Math.min(iw,ih)*.28,cx,cy,Math.min(iw,ih)*.72);vignette.addColorStop(0,'rgba(5,9,12,0)');vignette.addColorStop(.68,'rgba(5,9,12,0)');vignette.addColorStop(.88,'rgba(5,9,12,.18)');vignette.addColorStop(1,'rgba(5,9,12,.72)');c.fillStyle=vignette;c.fillRect(ix,iy,iw,ih);
   const topFade=c.createLinearGradient(0,iy,0,iy+22);topFade.addColorStop(0,'rgba(5,9,12,.58)');topFade.addColorStop(1,'rgba(5,9,12,0)');c.fillStyle=topFade;c.fillRect(ix,iy,iw,22);
