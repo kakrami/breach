@@ -2,18 +2,18 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.26.2';
+} from './world-geometry.js?v=1.26.3';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.26.2';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.26.2';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.26.2';
-import { createAudioEngine } from './audio-engine.js?v=1.26.2';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.26.2';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.26.2';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.26.2';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.26.2';
+} from './game-config.js?v=1.26.3';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.26.3';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.26.3';
+import { createAudioEngine } from './audio-engine.js?v=1.26.3';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.26.3';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.26.3';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.26.3';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.26.3';
 
 let THREE = null;
 
@@ -228,7 +228,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.26.2';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.26.3';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1208,17 +1208,23 @@ function resetViewVertical(){viewFeetY=position?position.y:NaN;}
 function clearCorrectionView(){correctionViewX=0;correctionViewY=0;correctionViewZ=0;}
 function traversalPlanFromServer(m){
   const durationMs=Math.max(1,Number(m.durationMs)||1),elapsed=Math.max(0,serverNow()-(Number(m.startedAt)||serverNow()));
-  return {seq:Math.max(0,Math.floor(Number(m.seq)||0)),mode:m.mode==='vault'?'vault':'mantle',role:String(m.role||''),portalId:String(m.portalId||''),startX:Number(m.startX)||0,startY:Number(m.startY)||0,startZ:Number(m.startZ)||0,endX:Number(m.endX)||0,endY:Number(m.endY)||0,endZ:Number(m.endZ)||0,peakY:Number(m.peakY)||Number(m.endY)||0,durationMs,startedAt:performance.now()-Math.min(durationMs,elapsed),endGrounded:m.endGrounded!==false,exitVelocityY:Number.isFinite(Number(m.exitVelocityY))?Number(m.exitVelocityY):0};
+  return {seq:Math.max(0,Math.floor(Number(m.seq)||0)),mode:m.mode==='vault'?'vault':'mantle',role:String(m.role||''),portalId:String(m.portalId||''),startX:Number(m.startX)||0,startY:Number(m.startY)||0,startZ:Number(m.startZ)||0,endX:Number(m.endX)||0,endY:Number(m.endY)||0,endZ:Number(m.endZ)||0,peakY:Number(m.peakY)||Number(m.endY)||0,durationMs,startedAt:performance.now()-Math.min(durationMs,elapsed),endGrounded:m.endGrounded!==false,exitVelocityY:Number.isFinite(Number(m.exitVelocityY))?Number(m.exitVelocityY):0,viewMaxY:m.viewMaxY!=null&&Number.isFinite(Number(m.viewMaxY))?Number(m.viewMaxY):null};
 }
 function handleTraversalMessage(m){
   if(m.id===clientId){
     if(m.accepted===false){traversal=null;const x=Number(m.x),y=Number(m.y),z=Number(m.z);if(Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z)){position.set(x,y,z);clearCorrectionView();resetViewVertical();}return;}
-    traversal=traversalPlanFromServer(m);verticalVelocity=0;onGround=false;return;
+    traversal=traversalPlanFromServer(m);clearCorrectionView();resetViewVertical();verticalVelocity=0;onGround=false;return;
   }
   const r=remotes.get(m.id);if(!r||m.accepted===false)return;r.traversal=traversalPlanFromServer(m);
 }
 
 function applyServerCorrection(m){
+  // Once a traversal has been accepted, client and server are following the
+  // same deterministic plan. Late free-movement correction packets are stale
+  // visual data at this point and can pull the camera/body back into the wall
+  // being crossed. The authoritative traversal event/post-traversal state is
+  // the correction source until the forced move finishes.
+  if(traversal){clearCorrectionView();return;}
   const cx=Number(m.x),cy=Number(m.y),cz=Number(m.z);
   const nextX=Number.isFinite(cx)?cx:position.x,nextY=Number.isFinite(cy)?cy:position.y,nextZ=Number.isFinite(cz)?cz:position.z;
   const visualX=position.x+correctionViewX,visualY=Number.isFinite(viewFeetY)?viewFeetY:position.y+correctionViewY,visualZ=position.z+correctionViewZ;
@@ -1258,7 +1264,7 @@ function traversalCandidate(direction,airborne=!onGround){
 function beginTraversal(candidate,direction,{playJump=false}={}){
   if(!candidate||!direction||traversal||!shell.canPlay||hp<=0)return false;
   const now=performance.now(),seq=++traversalSeq,plan=createTraversalPlan(candidate,position.x,position.y,position.z,now,seq);if(!plan)return false;
-  traversal={...plan,dirX:direction.x,dirZ:direction.z};traversalConsumedIntentSeq=traversalIntentSeq;traversalIntentUntil=0;verticalVelocity=0;onGround=false;landingKick=0;setAim(false);clearFireInput();cancelEquipmentAim();
+  traversal={...plan,dirX:direction.x,dirZ:direction.z};traversalConsumedIntentSeq=traversalIntentSeq;traversalIntentUntil=0;clearCorrectionView();resetViewVertical();verticalVelocity=0;onGround=false;landingKick=0;setAim(false);clearFireInput();cancelEquipmentAim();
   sendCurrentState(true);send({t:'traverse',seq,dirX:round3(direction.x),dirZ:round3(direction.z)});if(playJump)soundJump();return true;
 }
 function tryTraversal({vaultOnly=false}={}){
@@ -1570,7 +1576,20 @@ function updatePausedNetwork(){if(traversal)updateTraversal(performance.now());m
 function updateGameSimulation(dt){const now=performance.now();if(hp>0){updateCrouchState(dt);updateMovement(dt);updateFireControl(now);}}
 function updateGameFrame(dt){
   const now=performance.now();updateCorrectionView(dt);updateViewRecoil(dt);
-  const deathP=hp<=0?THREE.MathUtils.clamp((now-(deathAnimStartedAt||now))/700,0,1):0,deathEase=deathP*deathP*(3-2*deathP),viewY=updateViewVertical(dt),stanceEase=smoothstep01(crouchBlend),traversePose=traversal?traversalPose(traversal,now):null,traverseWave=traversePose?Math.sin(Math.PI*traversePose.progress):0;camera.position.set(position.x+correctionViewX,viewY+THREE.MathUtils.lerp(PLAYER_HEIGHT,CROUCH_HEIGHT,stanceEase)-.42*deathEase-.055*traverseWave,position.z+correctionViewZ);camera.rotation.y=yaw+viewRecoilYaw;camera.rotation.x=pitch+viewRecoilPitch+.10*deathEase-.045*traverseWave;camera.rotation.z=.72*deathEase;
+  const deathP=hp<=0?THREE.MathUtils.clamp((now-(deathAnimStartedAt||now))/700,0,1):0,deathEase=deathP*deathP*(3-2*deathP),viewY=updateViewVertical(dt),stanceEase=smoothstep01(crouchBlend),traversePose=traversal?traversalPose(traversal,now):null,traverseWave=traversePose?Math.sin(Math.PI*traversePose.progress):0;
+  const stanceHeight=THREE.MathUtils.lerp(PLAYER_HEIGHT,CROUCH_HEIGHT,stanceEase);
+  let cameraY=viewY+stanceHeight-.42*deathEase;
+  if(traversePose){
+    // Traversal is a deterministic forced path. Prediction-correction offsets
+    // from the previous free-movement frame must not shift the camera sideways
+    // into a wall/window frame. Duck the first-person eye through the opening
+    // and also respect the exact portal ceiling supplied by collision geometry.
+    const duck=traversal?.role==='window'?0.24:traversal?.mode==='mantle'?0.15:0.11;
+    cameraY-=duck*traverseWave;
+    if(traversal?.viewMaxY!=null&&Number.isFinite(Number(traversal.viewMaxY)))cameraY=Math.min(cameraY,Number(traversal.viewMaxY));
+  }
+  const cameraCorrectionX=traversal?0:correctionViewX,cameraCorrectionZ=traversal?0:correctionViewZ;
+  camera.position.set(position.x+cameraCorrectionX,cameraY,position.z+cameraCorrectionZ);camera.rotation.y=yaw+viewRecoilYaw;camera.rotation.x=pitch+viewRecoilPitch+.10*deathEase-.045*traverseWave;camera.rotation.z=.72*deathEase;
   maintainNetwork();
 }
 function updateMovement(dt){
@@ -1588,7 +1607,11 @@ function updateMovement(dt){
   else if(len>.04){const next=approachVector(moveVelocityX,moveVelocityZ,targetX,targetZ,AIR_ACCELERATION*dt);moveVelocityX=next.x;moveVelocityZ=next.z;const airSpeed=Math.hypot(moveVelocityX,moveVelocityZ),airCap=movement.runSpeed;if(airSpeed>airCap){moveVelocityX=moveVelocityX/airSpeed*airCap;moveVelocityZ=moveVelocityZ/airSpeed*airCap;}}
   const knock=advanceKnockback(knockX,knockZ,dt),dx=moveVelocityX*dt+knock.dx,dz=moveVelocityZ*dt+knock.dz,startX=position.x,startZ=position.z;
   knockX=knock.xVelocity;knockZ=knock.zVelocity;
-  const horizontalMove=moveHorizontal(dx,dz);if(horizontalMove?.blocked){moveVelocityX*=.64;moveVelocityZ*=.64;}
+  // Collision resolution already removes the blocked displacement and slides
+  // the capsule along the free axis. Do not damp the full velocity merely
+  // because one contact occurred: that made continuous wall contact destroy
+  // tangential speed every simulation step and could reduce a run to a crawl.
+  const horizontalMove=moveHorizontal(dx,dz);
   const moved=Math.hypot(position.x-startX,position.z-startZ),wasGround=onGround,previousY=position.y;
   const verticalStep=advanceVerticalMotion(previousY,verticalVelocity,movement.gravity,dt);
   const vertical=resolveCeilingCollision(previousY,verticalStep.y,position.x,position.z,currentPlayerHeight());position.y=vertical.y;verticalVelocity=verticalStep.velocity;if(vertical.hit&&verticalVelocity>0)verticalVelocity=0;const ground=worldSupportHeight(position.x,position.z,position.y);
