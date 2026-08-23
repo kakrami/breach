@@ -2,19 +2,19 @@ window.__breachModuleBooted=true;
 import {
   PLAYER_HEIGHT, PLAYER_RADIUS, ARENA_LIMIT, MAX_STEP_HEIGHT, STATIC_BOXES, BUILDINGS, PYRAMIDS, NATURAL_OBSTACLES, TERRAIN_SIZE, TERRAIN_SEGMENTS,
   terrainHeight, naturalGroundBase, worldSupportHeight, worldStepUpHeight, resolveCeilingCollision, BUILDING_GEOMETRY, BUILDING_PARTS
-} from './world-geometry.js?v=1.27.1';
+} from './world-geometry.js?v=1.27.2';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, GROUND_FOLLOW_DROP
-} from './game-config.js?v=1.27.1';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.27.1';
-import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.27.1';
-import { createAudioEngine } from './audio-engine.js?v=1.27.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.27.1';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.27.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.27.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.27.1';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.27.1';
+} from './game-config.js?v=1.27.2';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.27.2';
+import { worldBlockedAt, worldMoveBlockedAt, worldHeightExpansionBlockedAt, findTraversalCandidate } from './world-collision.js?v=1.27.2';
+import { createAudioEngine } from './audio-engine.js?v=1.27.2';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.27.2';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.27.2';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.27.2';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.27.2';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.27.2';
 
 let THREE = null;
 
@@ -221,20 +221,8 @@ function suspendGameplayInput(){
 
 function handleShellState(state){
   if(state.inMatch&&state.paused)syncPauseContext();
-  for(const id of ['exitAppBtn','lobbyExitFullscreenBtn']){
-    const btn=$(id);if(!btn)continue;
-    btn.disabled=state.standalone||!state.fullscreenSupported;
-    const label=state.fullscreen?'Exit fullscreen':'Enter fullscreen';
-    btn.title=label;btn.setAttribute('aria-label',label);
-    btn.querySelector('use')?.setAttribute('href',state.fullscreen?'#i-exit':'#i-full');
-  }
-  const fullBtn=$('fullBtn');
-  if(fullBtn){
-    fullBtn.disabled=state.standalone||!state.fullscreenSupported;
-    fullBtn.querySelector('use')?.setAttribute('href',state.fullscreen?'#i-exit':'#i-full');
-    const span=fullBtn.querySelector('span');if(span)span.textContent=state.fullscreen?'Exit Fullscreen':'Enter Fullscreen';
-  }
-  if((state.location==='menu'||state.location==='lobby')&&!document.hidden)startIntroMusic();else stopIntroMusic();
+  for(const id of ['exitAppBtn','lobbyExitFullscreenBtn']){const btn=$(id);if(btn)btn.disabled=state.standalone||!state.fullscreen;}
+  if((state.location==='menu'||state.location==='lobby')&&(!state.touchControls||state.immersive)&&!document.hidden)startIntroMusic();else stopIntroMusic();
 }
 
 function handleViewportChange(metrics){
@@ -272,7 +260,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.27.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.27.2';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -718,12 +706,12 @@ function bindUI(){
   $('createBtn').addEventListener('click',createMatch);
   $('refreshBtn').addEventListener('click',refreshMatches);
   $('enterFullscreenBtn').addEventListener('click',()=>{ensureAudio();void shell.enterFullscreenFromGesture();});
-  $('exitAppBtn').addEventListener('click',()=>{void shell.toggleFullscreenFromGesture();});
+  $('exitAppBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
   $('musicBtn').addEventListener('click',()=>{ensureAudio();toggleMasterMute();});
   $('lobbyMusicBtn').addEventListener('click',()=>{ensureAudio();toggleMasterMute();});
   $('settingsBtn').addEventListener('click',openPlayerSettings);
   $('lobbySettingsBtn').addEventListener('click',openPlayerSettings);
-  $('lobbyExitFullscreenBtn').addEventListener('click',()=>{void shell.toggleFullscreenFromGesture();});
+  $('lobbyExitFullscreenBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
   $('pauseSettingsBtn').addEventListener('click',openPlayerSettings);
   $('settingsCloseBtn').addEventListener('click',closePlayerSettings);
   $('settingsDoneBtn').addEventListener('click',closePlayerSettings);
@@ -752,7 +740,7 @@ function bindUI(){
     });
   }
   $('setBotDifficulty').addEventListener('change',()=>{$('botDifficultyHelp').textContent=botDifficultyDescription($('setBotDifficulty').value);});
-  $('fullBtn').addEventListener('click',()=>{void shell.toggleFullscreenFromGesture();});
+  $('fullBtn').addEventListener('click',()=>{void shell.exitFullscreenFromGesture();});
   $('leaveBtn').addEventListener('click',leaveMatch);
   $('lobbyLeaveBtn').addEventListener('click',leaveMatch);
   $('lobbyCopyBtn').addEventListener('click',copyInvite);
@@ -767,9 +755,9 @@ function bindUI(){
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
     const button=$('lobbyStartBtn');button.disabled=true;$('lobbyStatus').textContent='Preparing match…';
-    // Capture only the input mode that needs a user gesture. Fullscreen is
-    // optional and is never entered automatically when a match starts.
-    if(!(await shell.prepareInputFromGesture())){button.disabled=false;$('lobbyStatus').textContent='Game input could not be captured.';return;}
+    // Fullscreen and pointer lock must be requested directly from this user
+    // gesture. Engine/audio preparation can safely continue after input is owned.
+    if(!(await shell.prepareInputFromGesture())){button.disabled=false;$('lobbyStatus').textContent='Fullscreen / game input is required to start.';return;}
     if(!(await prepareGameRuntime())){button.disabled=false;$('lobbyStatus').textContent='Game runtime could not be prepared.';return;}
     send({t:'startMatch'});$('lobbyStatus').textContent='Starting match…';
   });

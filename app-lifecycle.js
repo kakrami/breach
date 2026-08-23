@@ -50,9 +50,9 @@ export function createSessionShell({
   const fullscreenSupported=()=>platform.standalone||((document.fullscreenEnabled??document.webkitFullscreenEnabled)!==false&&!!(root.requestFullscreen||root.webkitRequestFullscreen));
 
   function snapshot(){
-    const entered=immersive(),landscape=landscapeReady(),match=inMatch(),blocked=platform.touchControls&&!landscape;
+    const entered=immersive(),landscape=landscapeReady(),match=inMatch(),blocked=entered&&platform.touchControls&&!landscape;
     const inputReady=platform.touchControls||pointerLocked()||alternateReady();
-    const playSurfaceReady=platform.touchControls?landscape:true;
+    const playSurfaceReady=platform.touchControls?(entered&&landscape):true;
     return Object.freeze({
       location,inMatch:match,inLobby:inLobby(),paused:match?paused:false,pauseReason:match?pauseReason:'',panel,connecting,connectionText,
       immersive:entered,fullscreen:fullscreen(),standalone:platform.standalone,touchControls:platform.touchControls,landscapeReady:landscape,orientationBlocked:blocked,
@@ -63,9 +63,9 @@ export function createSessionShell({
   const visible=(el,show)=>el?.classList.toggle('hide',!show);
 
   function render(reason='sync'){
-    const s=snapshot(),matchUsable=!s.orientationBlocked,frontUsable=true;
-    visible(elements.entry,false);
-    visible(elements.rotate,platform.touchControls&&s.inMatch&&s.orientationBlocked);
+    const s=snapshot(),matchUsable=platform.touchControls?(s.immersive&&!s.orientationBlocked):true,frontUsable=platform.touchControls?matchUsable:true;
+    visible(elements.entry,platform.touchControls&&!s.immersive);
+    visible(elements.rotate,platform.touchControls&&s.immersive&&s.orientationBlocked);
     visible(elements.menu,frontUsable&&s.location==='menu'&&!s.panel&&!s.connecting);
     visible(elements.lobby,frontUsable&&s.location==='lobby'&&!s.panel&&!s.connecting);
     visible(elements.pause,matchUsable&&s.inMatch&&s.paused&&!s.panel&&!s.connecting);
@@ -75,11 +75,11 @@ export function createSessionShell({
     if(elements.connectionText)elements.connectionText.textContent=s.connectionText||'Connecting…';
     if(elements.entryButton){
       const label=elements.entryButton.querySelector('span');
-      if(label)label.textContent='ENTER FULLSCREEN';
-      elements.entryButton.disabled=platform.standalone||!s.fullscreenSupported;
+      if(label)label.textContent=platform.standalone?'ENTER BREACH':'ENTER FULLSCREEN';
+      elements.entryButton.disabled=!platform.standalone&&!s.fullscreenSupported;
     }
     if(elements.entryStatus&&!s.fullscreenSupported&&!platform.standalone){elements.entryStatus.textContent='Fullscreen is not available in this browser.';elements.entryStatus.classList.add('error');}
-    if(elements.fullscreenButton)elements.fullscreenButton.disabled=platform.standalone||!s.fullscreenSupported;
+    if(elements.fullscreenButton)elements.fullscreenButton.disabled=platform.standalone||!s.fullscreen;
     root.dataset.location=s.location;root.dataset.paused=String(s.paused);root.dataset.immersive=String(s.immersive);
     if(lastCanPlay&&!s.canPlay)onSuspend(reason,s);lastCanPlay=s.canPlay;onStateChange(s,reason);return s;
   }
@@ -87,7 +87,7 @@ export function createSessionShell({
   function syncViewport(){
     const next=measure(stage);if(next.w===viewport.w&&next.h===viewport.h)return false;
     viewport=next;onViewport({...viewport});
-    if(platform.touchControls&&!landscapeReady()&&inMatch()&&!paused){paused=true;pauseReason='orientation';panel=SHELL_PANEL.NONE;}
+    if(platform.touchControls&&immersive()&&!landscapeReady()&&inMatch()&&!paused){paused=true;pauseReason='orientation';panel=SHELL_PANEL.NONE;}
     return true;
   }
   const viewportChanged=()=>{if(syncViewport())render('viewport');};
@@ -121,11 +121,9 @@ export function createSessionShell({
     await lockLandscape();return true;
   }
   async function exitFullscreenFromGesture(){
-    unlockLandscape();
-    const exited=await exitFullscreen();syncViewport();render(exited?'fullscreen-exit':'fullscreen-exit-failed');return exited;
-  }
-  async function toggleFullscreenFromGesture(){
-    return fullscreen()?exitFullscreenFromGesture():enterFullscreenFromGesture();
+    if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}
+    if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();unlockLandscape();
+    const exited=await exitFullscreen();if(!exited&&immersive())render('fullscreen-exit-failed');return exited;
   }
 
   function beginConnection(text='Connecting…'){connecting=true;connectionText=String(text||'Connecting…');panel=SHELL_PANEL.NONE;return render('connection-start');}
@@ -139,14 +137,19 @@ export function createSessionShell({
     return render('lobby');
   }
   async function prepareInputFromGesture(){
+    if(platform.touchControls&&!immersive()){
+      if(!(await requestFullscreen()))return false;
+      await lockLandscape();syncViewport();render('input-fullscreen');
+    }
     return platform.touchControls||alternateReady()?true:requestPointerLock();
   }
   async function capturePointerFromGesture(){return platform.touchControls?true:requestPointerLock();}
   async function enterMatch(){
     location='match';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
-    // Fullscreen is always optional. Touch gameplay only requires landscape;
-    // desktop gameplay may use pointer lock or an active controller.
-    if(platform.touchControls&&!landscapeReady()){paused=true;pauseReason='orientation';return render('match-blocked');}
+    // Touch play still requires the immersive landscape surface. Desktop play
+    // must not depend on browser-gated fullscreen/pointer-lock because remote
+    // players enter the match from a WebSocket event, not a user gesture.
+    if(platform.touchControls&&(!immersive()||!landscapeReady())){paused=true;pauseReason=!immersive()?'fullscreen':'orientation';return render('match-blocked');}
     paused=false;pauseReason='';return render('match-enter');
   }
   function pause(reason='pause'){
@@ -156,13 +159,17 @@ export function createSessionShell({
   async function resumeFromGesture(){
     if(!inMatch()||panel)return false;
     if(platform.touchControls){
+      if(!immersive()){
+        if(!(await requestFullscreen()))return false;
+        await lockLandscape();syncViewport();
+      }
       if(!landscapeReady())return false;
     }else if(!alternateReady()&&!(await requestPointerLock()))return false;
     paused=false;pauseReason='';render('resume');return true;
   }
   function resumeFromAlternateInput(){
     if(!inMatch()||panel||!alternateReady())return false;
-    if(platform.touchControls&&!landscapeReady())return false;
+    if(platform.touchControls&&(!immersive()||!landscapeReady()))return false;
     paused=false;pauseReason='';render('resume-alternate');return true;
   }
   function openPanel(name){
@@ -177,7 +184,7 @@ export function createSessionShell({
   }
 
   function fullscreenChanged(){
-    if(!immersive())unlockLandscape();
+    if(!immersive()){if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();unlockLandscape();}
     syncViewport();render('fullscreen');
   }
   function pointerLockChanged(){
@@ -194,7 +201,7 @@ export function createSessionShell({
   function start(){syncViewport();onViewport({...viewport});return render('start');}
   return {
     platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
-    enterFullscreenFromGesture,exitFullscreenFromGesture,toggleFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
+    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
     destroy(){resizeObserver?.disconnect();if(!resizeObserver)removeEventListener('resize',viewportChanged);document.removeEventListener(fullscreenEvent,fullscreenChanged);document.removeEventListener('pointerlockchange',pointerLockChanged);document.removeEventListener('visibilitychange',visibilityChanged);removeEventListener('pagehide',visibilityChanged);}
   };
 }

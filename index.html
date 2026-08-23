@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.27.1">
-<title>Breach v1.27.1</title>
-<link rel="stylesheet" href="ui.css?v=1.27.1">
+<link rel="manifest" href="manifest.webmanifest?v=1.27.2">
+<title>Breach v1.27.2</title>
+<link rel="stylesheet" href="ui.css?v=1.27.2">
 </head>
 <body>
 <svg class="svg-sprite" aria-hidden="true" focusable="false">
@@ -34,20 +34,20 @@
 <main id="appRoot" class="app-root">
   <div id="gameStage" class="game-stage"><canvas id="game" draggable="false" aria-label="Breach gameplay"></canvas></div>
 
-  <section id="entryScreen" class="entry-screen hide" aria-label="Enter Breach">
+  <section id="entryScreen" class="entry-screen" aria-label="Enter Breach">
     <div class="entry-card">
       <div class="entry-mark"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
       <div class="entry-brand">BREACH</div>
       <div class="entry-version" data-app-version></div>
       <button id="enterFullscreenBtn" class="entry-button" type="button"><svg class="ui-icon"><use href="#i-full"/></svg><span>ENTER FULLSCREEN</span></button>
-      <div id="entryStatus" class="entry-status">Fullscreen is optional and can be enabled from the game controls.</div>
+      <div id="entryStatus" class="entry-status">Fullscreen opens the game in landscape.</div>
     </div>
   </section>
 
   <section id="rotateGate" class="rotate-gate hide" aria-label="Rotate to landscape">
     <div class="rotate-card">
       <div class="rotate-phone" aria-hidden="true"><span></span></div>
-      <div><div class="eyebrow">LANDSCAPE REQUIRED</div><h1>Rotate to landscape</h1><p>Breach plays in landscape. Fullscreen is optional.</p></div>
+      <div><div class="eyebrow">FULLSCREEN ACTIVE</div><h1>Rotate to landscape</h1><p>Breach uses landscape after you enter fullscreen.</p></div>
     </div>
   </section>
 
@@ -225,6 +225,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.27.1"></script>
+<script type="module" src="client.js?v=1.27.2"></script>
 </body>
 </html>
