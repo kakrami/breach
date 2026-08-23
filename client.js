@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.3';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.3';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.3';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.3';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.3';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.3';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.3';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.3';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.6';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.6';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.6';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.6';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.6';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.6';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.6';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.6';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.3';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.3';
-import { createAudioEngine } from './audio-engine.js?v=1.37.3';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.3';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.3';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.3';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.3';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.3';
+} from './game-config.js?v=1.37.6';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.6';
+import { createAudioEngine } from './audio-engine.js?v=1.37.6';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.6';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.6';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.6';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.6';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.6';
 
 let THREE = null;
 
@@ -182,7 +182,7 @@ const nameInput=$('nameInput'),codeInput=$('codeInput'),menuStatus=$('menuStatus
 const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews=[...document.querySelectorAll('[data-deploy-view]')];
 const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbyMapButtons=[...document.querySelectorAll('[data-lobby-map-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
 const matchPrimaryButtons=[...document.querySelectorAll('[data-match-primary-choice]')],matchTacticalButtons=[...document.querySelectorAll('[data-match-tactical-choice]')],matchLethalButtons=[...document.querySelectorAll('[data-match-lethal-choice]')];
-const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMapPreview=$('lobbyMapPreview'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyMinimapMarkers=$('lobbyMinimapMarkers'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
+const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMapPreview=$('lobbyMapPreview'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
 const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
 const gameTextEditor=$('gameTextEditor'),gameTextEditorTitle=$('gameTextEditorTitle'),gameTextEditorValue=$('gameTextEditorValue'),gameTextEditorPlaceholder=$('gameTextEditorPlaceholder'),gameTextKeyboard=$('gameTextKeyboard'),gameTextShiftBtn=$('gameTextShiftBtn');
 initGameControls();
@@ -382,7 +382,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.3';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.6';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -520,9 +520,9 @@ function syncLobby(){
   for(const btn of lobbyLethalButtons)btn.classList.toggle('active',btn.dataset.lobbyLethalChoice===lethalEquipment);
   for(const btn of lobbyModeButtons)btn.classList.toggle('active',btn.dataset.lobbyModeChoice===mode);
   const ffa=!spec.teamBased;$('lobbyBlueBotWrap').classList.toggle('hide',ffa);$('lobbyRedBotWrap').classList.toggle('hide',ffa);$('lobbyFfaBotWrap').classList.toggle('hide',!ffa);
-  lobbyBlueBotCount.value=String(botConfig.blueBots||0);lobbyRedBotCount.value=String(botConfig.redBots||0);lobbyFfaBotCount.value=String(total);lobbyBotDifficulty.value=botConfig.difficulty||'normal';lobbyMinimapMode.value=matchState.minimapRevealAll?'all':'standard';lobbyMinimapMarkers.value=matchState.minimapDirectional?'directional':'dots';for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===currentMapId);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}const mapInfo=mapSpec(currentMapId);if($('lobbyMapName'))$('lobbyMapName').textContent=mapInfo.name;if($('lobbyMapDescription'))$('lobbyMapDescription').textContent=host?'Select a level. The full layout is shown at right.':'Selected by the lobby admin.';renderLobbyMapPreview();
+  lobbyBlueBotCount.value=String(botConfig.blueBots||0);lobbyRedBotCount.value=String(botConfig.redBots||0);lobbyFfaBotCount.value=String(total);lobbyBotDifficulty.value=botConfig.difficulty||'normal';lobbyMinimapMode.value=matchState.minimapDirectional?'directional':(matchState.minimapRevealAll?'all':'standard');for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===currentMapId);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}const mapInfo=mapSpec(currentMapId);if($('lobbyMapName'))$('lobbyMapName').textContent=mapInfo.name;if($('lobbyMapDescription'))$('lobbyMapDescription').textContent=host?'Select a level. The full layout is shown at right.':'Selected by the lobby admin.';renderLobbyMapPreview();
   const sandbox=spec.scoreType==='none';lobbyScoreLimit.value=sandbox?'':String(matchState.scoreLimit||spec.scoreLimit);lobbyTimeLimit.value=sandbox?'':String(Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000)));lobbyScoreLimit.disabled=sandbox;lobbyTimeLimit.disabled=sandbox;$('lobbyScoreWrap')?.classList.toggle('disabled-setting',sandbox);$('lobbyTimeWrap')?.classList.toggle('disabled-setting',sandbox);
-  const ruleSummary=spec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||spec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000))} min`,minimapSummary=`Minimap: ${matchState.minimapRevealAll?'Everyone':'Standard'} · ${matchState.minimapDirectional?'Directional':'Dots'}`,mapName=mapSpec(currentMapId).name;$('lobbyRuleSummary').textContent=`${mapName} · ${ruleSummary} · ${minimapSummary}${matchCustom?' · CUSTOM':''}`;$('lobbyGuestMode').textContent=`${spec.name} · ${mapName}`;$('lobbyGuestBots').textContent=`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${ruleSummary} · ${minimapSummary}${matchCustom?' · Custom rules':''}`;
+  const ruleSummary=spec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||spec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000))} min`,minimapSummary=`Minimap: ${matchState.minimapDirectional?'Directional':(matchState.minimapRevealAll?'Always On':'Standard')}`,mapName=mapSpec(currentMapId).name;$('lobbyRuleSummary').textContent=`${mapName} · ${ruleSummary} · ${minimapSummary}${matchCustom?' · CUSTOM':''}`;$('lobbyGuestMode').textContent=`${spec.name} · ${mapName}`;$('lobbyGuestBots').textContent=`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${ruleSummary} · ${minimapSummary}${matchCustom?' · Custom rules':''}`;
   $('lobbyStatus').textContent=host?'Lobby ready':'Waiting for admin';$('lobbyHint').textContent=host?'Configure the match, then start when everyone is ready.':'Choose your team and loadout while a lobby admin configures the match.';
   renderLobbyRoster();
 }
@@ -1041,8 +1041,7 @@ function bindUI(){
   for(const el of [lobbyBlueBotCount,lobbyRedBotCount,lobbyFfaBotCount,lobbyBotDifficulty])el.addEventListener('change',sendLobbyBotConfig);
   for(const el of [lobbyScoreLimit,lobbyTimeLimit])el.addEventListener('change',sendLobbyMatchRules);
   for(const btn of lobbyMapButtons)btn.addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMap',mapId:normalizeMapId(btn.dataset.lobbyMapChoice)});else syncLobby();});
-  lobbyMinimapMode.addEventListener('change',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMinimap',revealAll:lobbyMinimapMode.value==='all'});else syncLobby();});
-  lobbyMinimapMarkers.addEventListener('change',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState))send({t:'lobbyMinimap',directional:lobbyMinimapMarkers.value==='directional'});else syncLobby();});
+  lobbyMinimapMode.addEventListener('change',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN&&matchAllowsLobbyEdits(matchState)){const mode=lobbyMinimapMode.value;send({t:'lobbyMinimap',revealAll:mode!=='standard',directional:mode==='directional'});}else syncLobby();});
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
     const button=$('lobbyStartBtn');button.disabled=true;$('lobbyStatus').textContent='Preparing match…';
@@ -1250,10 +1249,13 @@ function onCanvasPointerDown(e){
     e.preventDefault();
     const layout=hudLayout||computeHudLayout();
     const liveHud=matchAllowsMovement(matchState)&&hp>0;
-    // Only interactive HUD regions that are actually drawn are touchable.
-    if(liveHud&&pointInRect(p.x,p.y,layout.chat)){openChat();return;}
-    if(hp<=0&&layout.deathLoadout&&pointInRect(p.x,p.y,layout.deathLoadout)){openMatchLoadout();return;}
+    // Any canvas control that reveals a DOM surface is armed on press and
+    // committed on pointerup. This keeps one physical gesture on one UI
+    // surface and prevents the release/click from falling through into a
+    // control that did not exist when the press began.
     try{canvas.setPointerCapture(e.pointerId)}catch{}
+    if(liveHud&&pointInRect(p.x,p.y,layout.chat)){touchRoles.set(e.pointerId,'open-chat');return;}
+    if(hp<=0&&layout.deathLoadout&&pointInRect(p.x,p.y,layout.deathLoadout)){touchRoles.set(e.pointerId,'open-loadout');return;}
     if(scoreboardOpen){
       const panel=scoreboardPanel;
       if(panel?.close&&pointInRect(p.x,p.y,panel.close)){scoreboardOpen=false;scoreboardDrag=null;touchRoles.set(e.pointerId,'scoreboard-close');return;}
@@ -1262,7 +1264,7 @@ function onCanvasPointerDown(e){
     }
     if(pointInRect(p.x,p.y,layout.team)){touchRoles.set(e.pointerId,'scoreboard');toggleScoreboard();return;}
     if(pointInRect(p.x,p.y,layout.menu)){
-      touchRoles.set(e.pointerId,'menu');openPause();return;
+      touchRoles.set(e.pointerId,'open-menu');return;
     }
     if(!liveHud)return;
     if(pointInCircle(p.x,p.y,layout.aim)){touchRoles.set(e.pointerId,'aimtoggle');toggleAim();return;}
@@ -1330,6 +1332,14 @@ function onCanvasPointerEnd(e){
   if(role==='equipment')releaseEquipmentAim();
   if(role==='scoreboard-scroll')scoreboardDrag=null;
   if(!isTouch&&e.button===0)mouseFireDown=false;
+  // Never commit a surface transition from pointercancel/lostpointercapture.
+  // pointerup is the completed gesture; pointer capture keeps its target on
+  // the canvas until the gesture is finished, so no newly shown DOM button
+  // can receive the same release.
+  if(e.type!=='pointerup')return;
+  if(role==='open-menu'){openPause();return;}
+  if(role==='open-chat'){openChat();return;}
+  if(role==='open-loadout')openMatchLoadout();
 }
 
 function resetTouchInput(){
@@ -2518,10 +2528,10 @@ function safeInsets(){
 
 function computeHudLayout(){
   const safe=safeInsets(),landscape=viewW>viewH,compact=isTouch&&landscape&&viewH<=520,margin=compact?8:12;
-  const contentLeft=safe.left+margin,contentRight=viewW-safe.right-margin,contentW=Math.max(240,contentRight-contentLeft);
-  const desiredMap=compact?96:(isTouch?112:140),mapSize=Math.max(78,Math.min(desiredMap,contentW*.23));
+  const contentLeft=safe.left+margin,contentRight=viewW-safe.right-margin,contentW=Math.max(180,contentRight-contentLeft);
+  const desiredMap=compact?96:(isTouch?112:140),mapSize=Math.max(72,Math.min(desiredMap,contentW*.23));
   const menuW=compact?34:40,menuH=compact?30:34,chatW=menuW;
-  const desiredTeamW=compact?208:(isTouch?248:292),teamW=Math.max(150,Math.min(desiredTeamW,contentW-mapSize-28)),teamH=compact?32:36;
+  const maxTeamSpace=Math.max(130,contentW-mapSize-20),desiredTeamW=compact?208:(isTouch?248:292),teamW=Math.min(desiredTeamW,maxTeamSpace),teamH=compact?32:36;
   const joyR=compact?54:(isTouch?62:0),fireR=compact?37:43,leftFireR=compact?32:37,aimR=compact?27:31,jumpR=compact?29:33,reloadR=compact?21:24,swapR=compact?23:26,modeR=swapR,equipR=compact?23:27,crouchR=compact?22:26;
   const bottom=safe.bottom+margin,weaponW=compact?158:(isTouch?174:198),weaponH=compact?50:(isTouch?54:58),baseKillW=compact?220:(isTouch?252:300),killH=compact?58:(isTouch?88:112);
   const mapX=contentRight-mapSize,mapY=safe.top+margin,teamY=mapY;
@@ -2560,7 +2570,7 @@ function drawHud(now){
   if(!matchAllowsMovement(matchState)){drawMatchStatus(c,w,h);drawScoreboardButton(c,L.team);drawMenuButton(c,L.menu);hudTexture.needsUpdate=true;return;}
   if(hp<=0){
     c.fillStyle='rgba(24,3,8,.64)';c.fillRect(0,0,w,h);drawTeamBar(c,L.team);drawMiniMap(c,L.map);drawMenuButton(c,L.menu);c.textAlign='center';c.fillStyle='#ff6676';c.font=`1000 ${L.compact?36:50}px system-ui`;c.fillText('ELIMINATED',w/2,h/2-34);
-    c.font='900 13px system-ui';c.fillStyle='#ffd8dd';if(lastWastedBy)c.fillText(`Killed by ${lastWastedBy}${lastWastedWeapon?' · '+weaponLabel(lastWastedWeapon):''}`,w/2,h/2+2);
+    c.font='900 13px system-ui';c.fillStyle='#ffd8dd';if(lastWastedBy){const deathLine=`Killed by ${lastWastedBy}${lastWastedWeapon?' · '+weaponLabel(lastWastedWeapon):''}`;c.fillText(clipHudText(c,deathLine,Math.max(120,w-40)),w/2,h/2+2);}
     c.font='800 12px system-ui';c.fillStyle='#c8b4b8';c.fillText(`Respawning in ${Math.max(1,Math.ceil((wastedUntil-serverNow())/1000))}`,w/2,h/2+25);
     const b=L.deathLoadout;roundRect(c,b.x,b.y,b.w,b.h,8,'rgba(13,18,22,.92)','rgba(255,255,255,.22)');c.fillStyle='#fff';c.font='900 11px system-ui';c.fillText(`${isTouch?'TAP':controllerInputActive()?'Y':'L'} · CHANGE LOADOUT`,w/2,b.y+b.h/2);
     hudTexture.needsUpdate=true;return;
@@ -2570,7 +2580,7 @@ function drawHud(now){
   const headshotHit=now<headshotUntil;if(scoped)drawScopeReticle(c,w,h,now<hitUntil,headshotHit);else drawWeaponCrosshair(c,w/2,h/2,currentWeapon,now<hitUntil,adsBlend,headshotHit);
   drawDamageIndicators(c,w,h,now);drawChatFeed(c,L,w,h,now);if(isTouch)drawChatButton(c,L.chat);drawAnnouncer(c,w,h,now);
   if(touchGameplayControlsVisible())drawTouchControls(c,L,now);if(killConfirmUntil>now)drawKillConfirm(c,w,h,now);
-  if(toastText&&now<toastUntil){c.font='800 11px system-ui';const tw=Math.min(w-30,c.measureText(toastText).width+24),tx=(w-tw)/2,ty=(scoped?L.safe.top+12:Math.max(L.team.y+L.team.h+9,L.kill.y>L.team.y?L.kill.y+L.kill.h+6:0));roundRect(c,tx,ty,tw,28,8,HUD_SURFACE,HUD_LINE);c.fillStyle='#fff';c.textAlign='center';c.fillText(toastText,w/2,ty+14);}
+  if(toastText&&now<toastUntil){c.font='800 11px system-ui';const toastLabel=clipHudText(c,toastText,Math.max(80,w-54)),tw=Math.min(w-30,c.measureText(toastLabel).width+24),tx=(w-tw)/2,ty=(scoped?L.safe.top+12:Math.max(L.team.y+L.team.h+9,L.kill.y>L.team.y?L.kill.y+L.kill.h+6:0));roundRect(c,tx,ty,tw,28,8,HUD_SURFACE,HUD_LINE);c.fillStyle='#fff';c.textAlign='center';c.fillText(toastLabel,w/2,ty+14);}
   hudTexture.needsUpdate=true;
 }
 function drawMatchStatus(c,w,h){
@@ -2618,11 +2628,11 @@ function drawScoreboard(c,L){
   roundRect(c,x+w-40,y+6,28,25,7,'rgba(255,255,255,.08)','rgba(255,255,255,.14)');c.fillStyle='#fff';c.font='1000 13px system-ui';c.textAlign='center';c.fillText('×',x+w-26,y+18.5);
   const nameX=x+14,kX=x+w-112,dX=x+w-67,kdX=x+w-18;c.fillStyle='#737e87';c.font='900 10px system-ui';c.textAlign='right';c.fillText('K',kX,y+35);c.fillText('D',dX,y+35);c.fillText('K/D',kdX,y+35);
   c.save();c.beginPath();c.rect(x+7,bodyTop,w-14,bodyH);c.clip();let ry=bodyTop-scoreboardScroll;
-  for(const p of rows){if(ry+rowH>=bodyTop&&ry<=bodyTop+bodyH){const self=p.id===clientId;if(self){c.fillStyle='rgba(255,255,255,.06)';c.fillRect(x+7,ry,w-14,rowH-1);}c.fillStyle=p.id===clientId?HUD_ACCENT:(currentModeSpec().teamBased?(TEAM_COLORS[p.team]||'#fff'):TEAM_COLORS.red);c.fillRect(x+8,ry+5,3,rowH-10);c.textAlign='left';c.font=`${self?'1000':'850'} 11px system-ui`;c.fillStyle=self?'#fff':'#d6e0e8';c.fillText(`${p.godMode?'◆ ':''}${p.bot?'[BOT] ':''}${p.name}`,nameX,ry+rowH/2);c.textAlign='right';c.fillStyle='#fff';c.fillText(String(p.kills),kX,ry+rowH/2);c.fillStyle='#b9c5cf';c.fillText(String(p.deaths),dX,ry+rowH/2);c.fillText(p.deaths?(p.kills/p.deaths).toFixed(2):p.kills?String(p.kills):'0.00',kdX,ry+rowH/2);}ry+=rowH;}c.restore();
+  for(const p of rows){if(ry+rowH>=bodyTop&&ry<=bodyTop+bodyH){const self=p.id===clientId;if(self){c.fillStyle='rgba(255,255,255,.06)';c.fillRect(x+7,ry,w-14,rowH-1);}c.fillStyle=p.id===clientId?HUD_ACCENT:(currentModeSpec().teamBased?(TEAM_COLORS[p.team]||'#fff'):TEAM_COLORS.red);c.fillRect(x+8,ry+5,3,rowH-10);c.textAlign='left';c.font=`${self?'1000':'850'} 11px system-ui`;c.fillStyle=self?'#fff':'#d6e0e8';const playerLabel=`${p.godMode?'◆ ':''}${p.bot?'[BOT] ':''}${p.name}`,playerNameBudget=Math.max(60,kX-nameX-14);c.fillText(clipHudText(c,playerLabel,playerNameBudget),nameX,ry+rowH/2);c.textAlign='right';c.fillStyle='#fff';c.fillText(String(p.kills),kX,ry+rowH/2);c.fillStyle='#b9c5cf';c.fillText(String(p.deaths),dX,ry+rowH/2);c.fillText(p.deaths?(p.kills/p.deaths).toFixed(2):p.kills?String(p.kills):'0.00',kdX,ry+rowH/2);}ry+=rowH;}c.restore();
   if(maxScroll>0){const trackY=bodyTop+3,trackH=bodyH-6,thumbH=Math.max(24,trackH*(bodyH/contentH)),thumbY=trackY+(trackH-thumbH)*(scoreboardScroll/maxScroll);roundRect(c,x+w-6,trackY,2,trackH,1,'rgba(255,255,255,.08)');roundRect(c,x+w-7,thumbY,4,thumbH,2,'rgba(255,255,255,.35)');}
 }
 
-function drawKillConfirm(c,w,h,now){const remain=Math.max(0,Math.min(1,(killConfirmUntil-now)/1450)),a=Math.min(1,remain*2.5);c.save();c.globalAlpha=a;c.textAlign='center';c.fillStyle='#fff';c.font='1000 16px system-ui';c.fillText('ELIMINATED',w/2,h/2+48);c.fillStyle=killConfirmHeadshot?'#ffd36d':'#f0c96a';c.font='900 10px system-ui';const extra=killConfirmHeadshot?' · HEADSHOT':'';c.fillText(`${killConfirmName}${killConfirmWeapon?' · '+weaponLabel(killConfirmWeapon):''}${extra}`,w/2,h/2+68);c.restore();}
+function drawKillConfirm(c,w,h,now){const remain=Math.max(0,Math.min(1,(killConfirmUntil-now)/1450)),a=Math.min(1,remain*2.5);c.save();c.globalAlpha=a;c.textAlign='center';c.fillStyle='#fff';c.font='1000 16px system-ui';c.fillText('ELIMINATED',w/2,h/2+48);c.fillStyle=killConfirmHeadshot?'#ffd36d':'#f0c96a';c.font='900 10px system-ui';const extra=killConfirmHeadshot?' · HEADSHOT':'',detail=`${killConfirmName}${killConfirmWeapon?' · '+weaponLabel(killConfirmWeapon):''}${extra}`;c.fillText(clipHudText(c,detail,Math.max(120,w-40)),w/2,h/2+68);c.restore();}
 function queueAnnouncer(title,subtitle='',duration=1500,priority=1){const item={title:String(title||''),subtitle:String(subtitle||''),duration,priority};if(!item.title)return;if(announcerCurrent&&priority>announcerCurrent.priority){announcerQueue.unshift(announcerCurrent);announcerCurrent=null;}announcerQueue.push(item);announcerQueue.sort((a,b)=>b.priority-a.priority);}
 function drawAnnouncer(c,w,h,now){if(announcerCurrent&&now>=announcerCurrent.until)announcerCurrent=null;if(!announcerCurrent&&announcerQueue.length){const next=announcerQueue.shift();announcerCurrent={...next,start:now,until:now+next.duration};soundAnnouncer(next.priority); }if(!announcerCurrent)return;const a=announcerCurrent,life=(now-a.start)/a.duration,fade=Math.min(1,life*6,(1-life)*5),scale=1+Math.max(0,.12-life*.45);c.save();c.translate(w/2,Math.max(62,h*.28));c.scale(scale,scale);c.globalAlpha=Math.max(0,fade);c.textAlign='center';c.shadowColor='rgba(0,0,0,.75)';c.shadowBlur=10;c.fillStyle='#fff';c.font=`1000 ${Math.max(20,Math.min(32,h*.065))}px system-ui`;c.fillText(a.title,0,0);if(a.subtitle){c.fillStyle=HUD_ACCENT;c.font=`900 ${Math.max(10,Math.min(14,h*.032))}px system-ui`;c.fillText(a.subtitle,0,25);}c.restore();}
 function weaponLabel(w){return WEAPON_SPECS[w]?.name||EQUIPMENT_SPECS[w]?.name||'PISTOL';}

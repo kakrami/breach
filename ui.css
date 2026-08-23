@@ -73,7 +73,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 #chatShiftBtn.active{border-color:var(--accent);color:var(--accent);background:#263019}
 .touch .chat-composer{bottom:calc(var(--safe-bottom) + 5px);width:min(760px,calc(100vw - var(--safe-left) - var(--safe-right) - 10px));gap:4px}
 .touch .chat-compose-shell{padding:4px;gap:4px}.touch .chat-channel,.touch .chat-input,.touch .chat-send{height:29px}.touch .chat-input{font-size:11px;line-height:29px}.touch .chat-keyboard{gap:3px;padding:4px}.touch .chat-key-row{gap:3px}.touch .chat-key{height:30px;max-width:none;border-radius:5px;font-size:11px}.touch .chat-key-wide,.touch .chat-key-command{font-size:12px}
-@media(max-height:390px) and (orientation:landscape){.touch .chat-key-row-numbers{display:none}.touch .chat-key{height:28px}.touch .chat-composer{gap:3px}.touch .chat-keyboard{gap:3px}}
+@media(max-height:390px) and (orientation:landscape){.touch .chat-key{height:28px}.touch .chat-composer{gap:3px}.touch .chat-keyboard{gap:3px}}
 
 .match-list,.lobby-roster,.admin-page,.pause-card,.settings-grid{scrollbar-width:thin;scrollbar-color:#303943 transparent}
 
@@ -155,293 +155,148 @@ body{font-size:var(--ui-md)}
 /* Gamepad focus is visible and conventional on every DOM screen. */
 .controller-focus{outline:3px solid var(--accent)!important;outline-offset:3px!important;box-shadow:0 0 0 4px rgba(215,255,88,.12)!important}
 
-/* Phone/tablet landscape uses different compositions rather than shrunken desktop. */
-@media (max-width:900px) and (orientation:landscape){
-  .menu-screen,.lobby-screen{padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 7px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 7px)}
-  .touch .front-shell{grid-template-rows:48px minmax(0,1fr) 20px;gap:6px}.touch .front-header{grid-template-columns:auto minmax(150px,1fr) auto;gap:8px}.touch .menu-logo{width:34px;height:34px;padding:8px}.touch .menu-brand strong{font-size:15px}.touch .menu-brand [data-app-version]{display:none}.touch .front-profile{padding:3px 8px}.touch .front-profile label{grid-template-columns:1fr}.touch .front-profile label>span{display:none}.touch .front-profile .input{height:32px;font-size:12px}.touch .square-btn{width:34px;min-width:34px;height:34px}
-  .touch .front-body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:6px}.touch .front-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:4px;gap:4px}.touch .front-nav-button{height:42px;display:flex;justify-content:center;padding:0 8px;text-align:center}.touch .front-nav-button>span{display:block}.touch .front-nav-button strong{font-size:11px}.touch .front-nav-button small{display:none}.touch .front-nav-button .ui-icon,.touch .front-nav-button .live-dot{display:none}.touch .front-content>.deploy-view{padding:12px}.touch .front-hero{grid-template-columns:1fr auto;gap:12px}.touch .front-hero h1{font-size:22px}.touch .front-hero p,.touch .join-panel p{font-size:11px}.touch .front-hero .deploy-button{width:165px;height:44px}.touch .join-panel{grid-template-columns:minmax(0,1fr) minmax(260px,.9fr);gap:16px}
-  .touch .lobby-shell{grid-template-rows:48px minmax(0,1fr) 44px;gap:5px}.touch .lobby-room-line h1{font-size:18px}.touch .lobby-title p,.touch .lobby-version{display:none}.touch .lobby-mode-badge{font-size:10px}.touch .lobby-header-actions{gap:4px}.touch .lobby-header-actions .secondary-btn{height:34px;padding:0 9px;font-size:10px}.touch .lobby-header-actions .square-btn{width:34px;min-width:34px;height:34px}.touch .lobby-side-tabs{padding:3px}.touch .lobby-side-tab{height:32px;font-size:11px}.touch .lobby-roster-panel.active,.touch .lobby-setup-panel,.touch .lobby-loadout-panel{padding:8px}.touch .lobby-section-head{padding-bottom:6px}.touch .lobby-section-head h2{font-size:15px}.touch .lobby-roster-team-control{grid-template-columns:auto minmax(190px,340px);padding:5px 7px}.touch .lobby-team-choice{height:31px}.touch .lobby-player{padding:6px 8px}.touch .lobby-player-copy strong{font-size:11px}.touch .lobby-player-copy small{font-size:10px}.touch .lobby-team-title{height:29px}.touch .lobby-mode-picker button{height:34px;font-size:10px}.touch .lobby-setup-row{grid-template-columns:repeat(4,minmax(92px,1fr));gap:5px;margin-top:7px}.touch .lobby-setup-row .input{height:34px;font-size:11px}.touch .lobby-rule-summary{margin-top:7px;padding:6px}.touch .lobby-host-tools{margin-top:6px;gap:5px}.touch .lobby-match-settings,.touch .lobby-god-button{height:34px;font-size:10px}.touch .lobby-footer{padding:4px 7px}.touch .lobby-footer strong{font-size:11px}.touch .lobby-footer span{font-size:10px}.touch .lobby-start{height:36px;min-width:170px;font-size:11px}
-  .touch .loadout-section{margin-top:6px}.touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.touch .loadout-choice{min-height:48px;padding:6px}.touch .loadout-choice b{min-width:28px;font-size:11px}.touch .loadout-choice strong{font-size:10px}.touch .loadout-choice small{font-size:10px}.touch .loadout-fixed{min-height:48px}.touch .loadout-fixed small{display:none}
-  .touch .modal-screen{padding:5px}.touch .modal-shell{height:100%;border-radius:10px}.touch .modal-head{padding:8px 10px 6px}.touch .modal-head h2{font-size:17px}.touch .modal-head p{font-size:10px}.touch .settings-categories{padding:7px;gap:7px}.touch .settings-category-head{padding:6px 8px 5px}.touch .settings-category-head h3{font-size:13px}.touch .settings-category .settings-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:6px}.touch .setting{padding:7px;gap:5px}.touch .setting .input,.touch .setting input{height:34px}.touch .weapon-settings-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.touch .weapon-settings-card{padding:7px;gap:5px}.touch .modal-foot{padding:5px 7px}
-  .touch .pause-card{width:min(680px,100%);padding:12px}.touch .pause-card h1{font-size:20px}.touch .resume-btn{height:42px;margin-top:8px}.touch .pause-section{margin-top:8px;gap:4px}.touch .pause-actions{gap:5px}.touch .pause-actions .secondary-btn{height:36px;font-size:10px}.touch .pause-leave{margin-top:8px;padding-top:7px}.touch .pause-leave .secondary-btn{height:36px}
-  .touch .chat-composer{bottom:calc(var(--safe-bottom) + 5px);width:min(820px,calc(100vw - var(--safe-left) - var(--safe-right) - 10px));gap:4px}.touch .chat-compose-shell{padding:5px;gap:4px}.touch .chat-channel,.touch .chat-input,.touch .chat-send{height:32px}.touch .chat-input{font-size:12px;line-height:32px}.touch .chat-keyboard{gap:4px;padding:5px}.touch .chat-key-row{gap:4px}.touch .chat-key{height:36px;max-width:none;border-radius:5px;font-size:11px}.touch .chat-key-wide,.touch .chat-key-command{font-size:10px}
-}
-@media (max-width:700px) and (orientation:landscape){
-  .touch .menu-brand strong{font-size:13px}.touch .menu-actions{gap:3px}.touch .front-profile{max-width:180px}.touch .front-content>.deploy-view{padding:8px}.touch .front-hero p{display:none}.touch .join-panel{grid-template-columns:1fr;gap:8px}.touch .join-panel>div:first-child p{display:none}.touch .join-controls{grid-template-columns:1fr auto}
-  .touch .lobby-header-actions .secondary-btn span{display:none}.touch .lobby-header-actions .secondary-btn{width:34px;min-width:34px;padding:0}.touch .lobby-secondary{display:none}.touch .lobby-roster{grid-template-columns:1fr 1fr}.touch .lobby-setup-row{grid-template-columns:repeat(2,minmax(0,1fr))}.touch .lobby-host-tools{grid-template-columns:1fr 1fr}.touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.touch .loadout-choice small{display:block;line-height:1.15}.touch .loadout-columns{grid-template-columns:1fr 1fr 1fr;gap:5px}
-  .touch .modal-head p{display:none}.touch .settings-category .settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.touch .settings-category-display .settings-grid{grid-template-columns:1fr}.touch .admin-page>.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (max-height:390px) and (orientation:landscape){
-  .touch .chat-key-row-numbers{display:none}.touch .chat-key{height:31px}.touch .chat-keyboard{gap:3px;padding:4px}.touch .chat-key-row{gap:3px}
-  .touch .lobby-shell{grid-template-rows:44px minmax(0,1fr) 40px}.touch .lobby-side-tab{height:29px}.touch .lobby-roster-team-control{padding:4px 6px}.touch .lobby-team-choice{height:28px}.touch .lobby-section-head h2{font-size:14px}.touch .lobby-setup-row .input{height:31px}.touch .lobby-mode-picker button{height:31px}.touch .loadout-choice{min-height:43px}
-}
 
-.disabled-setting{opacity:.45}.disabled-setting .input{cursor:not-allowed}
-
-/* v1.31.2 UI coherence pass: fixed configuration screens fit by design. */
+/* Breach v1.37.6 unified responsive layout contract.
+   One set of rules owns density, overflow, and responsive behavior. Content is
+   reflowed before scrolling and informative text is never removed to make room. */
 :root{--content-max:1100px;--field-max:280px}
 
-/* Fixed menu surfaces do not scroll. Data lists may scroll independently. */
+/* Only genuinely variable-length data lists scroll by default. */
 .front-content>.deploy-view{overflow:auto;overscroll-behavior:contain}
 .front-live{overflow:hidden}
 .match-list,.lobby-roster,.admin-player-list{overflow:auto;overscroll-behavior:contain}
-.pause-card{overflow:hidden}.lobby-setup-panel,.lobby-loadout-panel,.loadout-editor,.settings-categories,.admin-page{overflow:auto;overscroll-behavior:contain}
+.menu-status,.admin-status{white-space:normal;overflow:visible;text-overflow:clip;line-height:1.25}
+.lobby-player-copy strong,.lobby-player-copy small,.admin-player-identity strong{white-space:normal;overflow:visible;text-overflow:clip;overflow-wrap:anywhere;line-height:1.2}
 
-/* Main menu: navigation names are destinations; actions stay inside the page. */
+/* Main menu keeps identity and explanations visible at every supported size. */
 .front-hero,.join-panel{max-width:820px}
-.front-profile{max-width:280px}
+.front-profile{max-width:300px}
 .front-profile .input{min-width:0}
 
-/* Lobby: one full-width page at a time. No internal menu nesting. */
+/* Lobby: one full-width page at a time. */
+.lobby-shell{grid-template-rows:auto minmax(0,1fr) auto}
+.lobby-main,.lobby-side-stack{height:100%;min-height:0}
+.lobby-side-stack{display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px}
+.lobby-side-tabs{padding:4px;gap:5px;border-radius:10px}
+.lobby-side-tab{height:38px;font-weight:950}
 .lobby-side-view.active{display:block;height:100%;min-height:0;overflow:hidden}
-.lobby-roster-panel.active{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:10px;height:100%}
-.lobby-setup-panel,.lobby-loadout-panel{height:100%;min-height:0;overflow:auto;overscroll-behavior:contain}
-.lobby-match-grid{height:100%;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:12px;align-items:stretch;padding-top:2px}
-.lobby-match-card{min-width:0;min-height:0;padding:12px;border:1px solid var(--line);border-radius:10px;background:#0a0f12;display:grid;align-content:start;gap:10px}
-.lobby-card-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px solid var(--line)}
+.lobby-roster-panel.active{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:10px;height:100%;padding:12px}
+.lobby-setup-panel,.lobby-loadout-panel{width:100%;height:100%;min-height:0;margin:0;padding:6px 4px;border:0;background:transparent;overflow:auto;overscroll-behavior:contain}
+.lobby-section-head{align-items:center;padding-bottom:9px}
+.lobby-section-head h2{font-size:18px;margin-top:2px}
+.lobby-roster-team-control{display:grid;grid-template-columns:auto minmax(240px,420px);align-items:center;justify-content:start;gap:12px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;background:#090d10}
+.lobby-roster-team-control>span{font-size:10px;font-weight:950;letter-spacing:.08em;color:var(--muted)}
+.lobby-team-choice{height:38px;font-weight:950}
+.lobby-roster{gap:10px}
+.lobby-team-title{height:36px;padding:0 10px}
+.lobby-player{padding:10px 11px;gap:9px}
+.lobby-empty-team{font-size:11px;padding:16px 10px}
+
+/* Match setup balances both cards and fills rows with the controls they contain. */
+.lobby-match-grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);gap:10px;align-items:start;padding-top:2px}
+.lobby-match-card{min-width:0;padding:11px;border:1px solid var(--line);border-radius:10px;background:#0a0f12;display:grid;align-content:start;gap:9px}
+.lobby-card-title{display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:7px;border-bottom:1px solid var(--line)}
 .lobby-card-title strong{font-size:14px}
 .lobby-match-card .lobby-control-group{margin:0}
-.lobby-rules-row{grid-template-columns:repeat(4,minmax(120px,190px));justify-content:start}
-.lobby-bots-row{grid-template-columns:repeat(2,minmax(120px,190px));justify-content:start}
-.lobby-match-card .lobby-setup-row{margin-top:0;gap:8px}
-.lobby-match-card .input{width:100%;max-width:190px}
-.lobby-rule-summary{margin-top:0;justify-self:start;min-width:220px}
-.lobby-header-actions{flex-wrap:nowrap}
-.lobby-header-actions .secondary-btn{white-space:nowrap}
+.lobby-mode-picker{gap:6px}
+.lobby-mode-picker button{height:38px;white-space:normal;line-height:1.05;padding:0 6px}
+.lobby-match-card .lobby-setup-row{margin-top:0;gap:7px}
+.lobby-rules-row{grid-template-columns:repeat(3,minmax(105px,1fr))}
+.lobby-bots-row{grid-template-columns:repeat(auto-fit,minmax(105px,1fr))}
+.lobby-match-card .input{width:100%;max-width:none}
+.lobby-rule-summary{margin-top:0;width:100%;min-width:0;justify-self:stretch;text-align:left;line-height:1.25}
 
-/* Loadout: all choices fit in one screen; no nested tabs and no vertical scrolling. */
+/* Map: controls occupy one compact row; the level overview owns the remaining area. */
+.lobby-map-view.active{display:block;height:100%;min-height:0;overflow:hidden}
+.lobby-map-panel{height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px;padding:8px}
+.lobby-map-toolbar{min-width:0;display:grid;grid-template-columns:minmax(125px,190px) minmax(0,1fr);align-items:end;gap:10px;overflow:visible}
+.lobby-map-toolbar h2{margin:2px 0;font-size:18px}
+.lobby-map-toolbar p{margin:0;color:var(--muted);font-size:10px;line-height:1.25}
+.lobby-map-choice-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.lobby-map-choice{min-width:0;min-height:48px;padding:6px 8px;border:1px solid var(--line);border-radius:8px;background:#090d10;color:var(--muted);display:grid;align-content:center;gap:2px;text-align:left;cursor:pointer}
+.lobby-map-choice strong{color:var(--text);font-size:10px;letter-spacing:.03em;white-space:normal;line-height:1.1}
+.lobby-map-choice small{display:block;font-size:9px;color:var(--muted);white-space:normal;line-height:1.1}
+.lobby-map-choice.active{border-color:var(--accent);background:#1a2118}.lobby-map-choice.active strong{color:var(--accent)}
+.lobby-map-choice:disabled{opacity:.72;cursor:default}.lobby-map-choice:disabled.active{opacity:1}
+.lobby-map-canvas-wrap{position:relative;min-width:0;min-height:0;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#080d10}
+#lobbyMapPreview{display:block;width:100%;height:100%;min-height:150px;object-fit:contain}
+
+/* Loadout: readable information wins over squeezing seven buttons into one line. */
 .lobby-loadout-panel,.loadout-editor{display:grid;align-content:start}
-.loadout-editor{padding:16px 18px}
-.loadout-choice-grid.primary-grid{grid-template-columns:repeat(7,minmax(86px,1fr))}
-.loadout-choice{min-height:68px}
-.loadout-columns{grid-template-columns:minmax(150px,.72fr) minmax(230px,1fr) minmax(230px,1fr);align-items:start}
-.loadout-section{margin-top:10px}
+.loadout-editor{padding:14px}
+.loadout-section{gap:6px;margin-top:9px}
+.loadout-choice-grid{gap:6px}
+.loadout-choice-grid.primary-grid{grid-template-columns:repeat(auto-fit,minmax(145px,1fr))}
+.loadout-choice-grid.equipment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+.loadout-choice,.loadout-fixed{height:auto;min-height:62px;overflow:visible;padding:8px 9px}
+.loadout-choice{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;column-gap:8px;align-content:center;text-align:left}
+.loadout-choice b{display:block;grid-row:1/3;align-self:center;min-width:34px;font-size:12px}
+.loadout-choice strong,.loadout-fixed strong{display:block;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.15;text-align:left}
+.loadout-choice small,.loadout-fixed small{display:block;white-space:normal;overflow:visible;text-overflow:clip;line-height:1.2;font-size:10px}
+.loadout-columns{display:grid;grid-template-columns:minmax(150px,.75fr) minmax(220px,1fr) minmax(220px,1fr);gap:8px;align-items:start}
+.loadout-fixed{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px}
+.loadout-fixed>b{min-width:34px;font-size:12px;text-align:center}
+.loadout-fixed>div{min-width:0;display:grid;gap:2px}
+
+/* Utility panels size to their content first and scroll only when the viewport is truly shorter. */
+.modal-screen{place-items:center;padding:calc(var(--safe-top) + 8px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 8px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.86);backdrop-filter:blur(8px)}
+.modal-shell{width:min(var(--content-max),100%);height:auto;max-height:100%;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden;border:1px solid var(--line2);border-radius:12px;background:#0d1216;box-shadow:var(--shadow)}
+.modal-head{padding:10px 12px 8px}
+.modal-head p{display:block;line-height:1.3}
+.modal-foot{padding:7px 10px}
+.panel-back{min-width:82px}
+.loadout-shell{width:min(1040px,100%);height:min(500px,100%)}
+.loadout-editor{min-height:0;overflow:auto;overscroll-behavior:contain}
 .loadout-foot{grid-template-columns:minmax(0,1fr) auto}
 
-/* Secondary screens are full utility surfaces, not cards floating inside another menu. */
-.modal-screen{place-items:stretch;padding:calc(var(--safe-top) + 8px) calc(var(--safe-right) + 12px) calc(var(--safe-bottom) + 8px) calc(var(--safe-left) + 12px);background:linear-gradient(135deg,#090d10,#050708 78%);backdrop-filter:none}
-.modal-shell{width:min(var(--content-max),100%);height:100%;margin:auto;border:0;border-radius:0;background:transparent;box-shadow:none}
-.modal-head{padding:10px 4px 9px}
-.modal-foot{padding:8px 4px;background:transparent}
-.panel-back{min-width:86px}
-
-/* Settings: top-level categories only. Each category fits without scrolling. */
-.settings-shell{width:min(900px,100%);height:100%;grid-template-rows:auto auto minmax(0,1fr) auto}
-.settings-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:7px 0;border-bottom:1px solid var(--line)}
-.settings-tab{height:40px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted);font-size:12px;font-weight:950;letter-spacing:.06em;cursor:pointer}
+/* Settings have only three choices per category, so do not reserve a large empty canvas. */
+.settings-shell{width:min(850px,100%);height:auto;max-height:100%;grid-template-rows:auto auto minmax(0,1fr) auto}
+.settings-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:6px 10px;border-bottom:1px solid var(--line);background:#090d10}
+.settings-tab{height:38px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted);font-size:11px;font-weight:950;letter-spacing:.05em;cursor:pointer}
 .settings-tab:hover{background:#151c21;color:var(--text)}
 .settings-tab.active{border-color:rgba(215,255,88,.28);background:#192016;color:var(--accent)}
-.settings-categories{min-height:0;padding:0;display:block}
-.settings-page{height:100%;min-height:0;border:0;background:transparent;overflow:auto;overscroll-behavior:contain}
-.settings-page .settings-category-head{padding:14px 2px 8px;border-bottom:0}
-.settings-page .settings-category-head h3{font-size:18px}
-.settings-page .settings-grid{display:grid;grid-template-columns:repeat(3,minmax(180px,var(--field-max)));justify-content:center;align-content:start;gap:12px;padding:14px 0;overflow:visible}
-.settings-page .setting{width:100%;min-width:0;padding:12px}
-.settings-page .setting .input,.settings-page .setting input{width:100%;max-width:100%}
-.setting-action{align-content:start}
-.setting-action .secondary-btn{width:100%;height:40px}
+.settings-categories{min-height:0;padding:0;display:block;overflow:hidden}
+.settings-page{min-height:0;border:0;background:transparent;overflow:auto;overscroll-behavior:contain}
+.settings-page .settings-category-head{display:block;padding:10px 12px 4px;border-bottom:0}
+.settings-page .settings-category-head h3{margin:0;font-size:15px}
+.settings-page .settings-grid{display:grid;grid-template-columns:repeat(3,minmax(170px,1fr));gap:8px;padding:8px 10px 10px;overflow:visible}
+.settings-page .setting{width:100%;min-width:0;padding:9px}
+.setting-action{align-content:start}.setting-action .secondary-btn{width:100%;height:40px}
 .settings-shell .modal-foot{grid-template-columns:1fr auto}
 
-/* Host control: one level of tabs. Gameplay fits; Weapons edits one selected weapon. */
-.admin-shell{width:min(980px,100%);height:100%;grid-template-rows:auto auto minmax(0,1fr) auto}
-.admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));overflow:hidden;padding:7px 0;background:transparent}
-.admin-tab{width:100%;height:40px}
-.admin-page{padding:14px 0;min-height:0}
-.admin-page>.settings-grid{grid-template-columns:repeat(4,minmax(150px,220px));justify-content:center;align-content:start;gap:10px;padding:0;overflow:hidden}
-.admin-weapon-toolbar{display:flex;align-items:end;justify-content:space-between;gap:14px;max-width:760px;margin:0 auto 14px;padding:11px 12px;border:1px solid var(--line);border-radius:9px;background:#0a0f12}
+/* Host control fills incomplete final rows instead of leaving an arbitrary empty column. */
+.admin-shell{width:min(980px,100%);height:min(500px,100%);grid-template-rows:auto auto minmax(0,1fr) auto}
+.admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:6px 10px;overflow:visible;border-bottom:1px solid var(--line);background:#090d10}
+.admin-tab{width:100%;height:38px;padding:0 10px}
+.admin-page{min-height:0;overflow:auto;overscroll-behavior:contain;padding:10px}
+.admin-page>.settings-grid{display:flex;flex-wrap:wrap;align-content:flex-start;gap:8px;padding:0;overflow:visible}
+.admin-page>.settings-grid>.setting{flex:1 1 165px;min-width:145px;max-width:none}
+.admin-weapon-toolbar{display:flex;align-items:end;justify-content:space-between;gap:12px;max-width:760px;margin:0 auto 10px;padding:9px 10px;border:1px solid var(--line);border-radius:9px;background:#0a0f12}
 .admin-weapon-toolbar label{display:grid;gap:5px;width:min(280px,100%)}
 .admin-weapon-toolbar label>span{color:var(--muted);font-size:10px;font-weight:950;letter-spacing:.08em}
-.admin-weapon-toolbar>span{color:var(--muted);font-size:11px;text-align:right}
+.admin-weapon-toolbar>span{display:block;color:var(--muted);font-size:10px;text-align:right;line-height:1.25}
 .admin-weapon-toolbar .input{max-width:280px}
 .weapon-settings-grid{display:block;max-width:760px;margin:auto}
-.weapon-settings-card{width:100%;grid-template-columns:repeat(4,minmax(130px,1fr));align-items:end;gap:10px;padding:14px}
-.weapon-settings-card strong{grid-column:1/-1;font-size:15px}
-.weapon-settings-card label{min-width:0}
-.weapon-settings-card input{width:100%;max-width:190px}
+.weapon-settings-card{width:100%;display:grid;align-content:start;gap:9px;padding:12px}
+.weapon-settings-card strong{font-size:14px;padding-bottom:6px;margin-bottom:0}
+.weapon-fields{display:grid;grid-template-columns:repeat(4,minmax(125px,1fr));gap:8px}
+.weapon-settings-card input{width:100%;max-width:none}
 .admin-page.players-page,.admin-page[data-admin-page="players"]{overflow:hidden}
-.admin-player-list{height:100%;min-height:0;padding-right:4px}
+.admin-player-list{height:100%;min-height:0;padding-right:3px}
 
-/* Pause is a single action screen and never scrolls. */
-.pause-card{max-height:none;overflow:hidden}
+/* Pause uses its horizontal room instead of stacking two short action groups vertically. */
+.pause-card{width:min(680px,100%);max-height:100%;overflow:auto;padding:16px;display:grid;grid-template-columns:minmax(0,1.4fr) minmax(180px,.6fr);gap:0 10px}
+.pause-card>header,.pause-card>.resume-btn,.pause-card>.pause-leave{grid-column:1/-1}
+.pause-card header .eyebrow,.pause-context{display:flex}
+.resume-btn{margin-top:11px}
+.pause-section{display:grid;align-content:start;gap:6px;margin-top:10px}
+.pause-actions{display:grid;grid-template-columns:1fr;gap:6px;margin:0}
+.pause-actions-player{grid-template-columns:repeat(3,minmax(0,1fr));grid-column:1/-1}
 .pause-actions-system{grid-template-columns:repeat(2,minmax(0,1fr))}
-.pause-actions-system .secondary-btn:last-child:nth-child(odd){grid-column:auto}
+.pause-actions .secondary-btn{min-width:0;height:38px;white-space:normal;line-height:1.1;padding:0 7px}
+.pause-leave{margin-top:11px;padding-top:9px}
 
-/* Prevent arbitrary full-width controls on large screens. */
-.lobby-setup-row .input,.setting .input,.setting input,.weapon-settings-card input{min-width:0}
-
-@media (max-width:900px) and (orientation:landscape){
-  .front-content>.deploy-view{overflow:auto;overscroll-behavior:contain}
-  .touch .lobby-shell{grid-template-rows:48px minmax(0,1fr) 42px}
-  .touch .lobby-match-grid{grid-template-columns:minmax(0,1.2fr) minmax(230px,.8fr);gap:7px}
-  .touch .lobby-match-card{padding:8px;gap:6px}
-  .touch .lobby-card-title{padding-bottom:5px}
-  .touch .lobby-card-title strong{font-size:12px}
-  .touch .lobby-rules-row{grid-template-columns:repeat(4,minmax(88px,1fr))}
-  .touch .lobby-bots-row{grid-template-columns:repeat(2,minmax(88px,1fr))}
-  .touch .lobby-match-card .input{max-width:none;height:33px}
-  .touch .lobby-rule-summary{min-width:0;width:100%;padding:5px 7px}
-  .touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(7,minmax(68px,1fr));gap:5px}
-  .touch .loadout-choice{min-height:48px;padding:5px 6px;display:flex;justify-content:center;text-align:center}
-  .touch .loadout-choice b{display:none}
-  .touch .loadout-choice strong{font-size:10px;white-space:normal;line-height:1.05;text-align:center}
-  .touch .loadout-choice small{display:none}
-  .touch .loadout-columns{grid-template-columns:minmax(110px,.65fr) 1fr 1fr;gap:6px}
-  .touch .loadout-fixed{min-height:48px;padding:6px}
-  .touch .loadout-fixed>b{display:none}
-  .touch .loadout-fixed strong{font-size:10px}
-  .touch .modal-screen{padding:calc(var(--safe-top) + 4px) calc(var(--safe-right) + 7px) calc(var(--safe-bottom) + 4px) calc(var(--safe-left) + 7px)}
-  .touch .modal-shell{height:100%;border-radius:0}
-  .touch .modal-head{padding:5px 2px}.touch .modal-head h2{font-size:17px}.touch .modal-head p{font-size:10px;margin-top:2px}
-  .touch .panel-back{height:34px;min-width:72px;font-size:10px}
-  .touch .settings-tabs,.touch .admin-tabs{padding:4px 0;gap:4px}.touch .settings-tab,.touch .admin-tab{height:34px;font-size:10px}
-  .touch .settings-page .settings-category-head{padding:7px 2px 3px}.touch .settings-page .settings-category-head h3{font-size:14px}
-  .touch .settings-page .settings-grid{grid-template-columns:repeat(3,minmax(120px,220px));gap:6px;padding:6px 0}.touch .settings-page .setting{padding:7px;gap:5px}.touch .settings-page .setting .input,.touch .settings-page .setting input,.touch .setting-action .secondary-btn{height:34px;font-size:11px}
-  .touch .admin-page{padding:6px 0}.touch .admin-page>.settings-grid{grid-template-columns:repeat(4,minmax(105px,1fr));gap:6px}.touch .setting{padding:7px}
-  .touch .admin-weapon-toolbar{max-width:none;margin:0 0 6px;padding:6px 8px;gap:8px}.touch .admin-weapon-toolbar label{width:min(230px,45%)}.touch .admin-weapon-toolbar>span{font-size:10px}.touch .admin-weapon-toolbar .input{height:32px;font-size:11px}
-  .touch .weapon-settings-grid{max-width:none}.touch .weapon-settings-card{grid-template-columns:repeat(4,minmax(100px,1fr));gap:6px;padding:7px}.touch .weapon-settings-card strong{font-size:12px;padding-bottom:3px}.touch .weapon-settings-card input{height:32px;max-width:none;font-size:11px}
-  .touch .modal-foot{padding:4px 2px}.touch .loadout-editor{padding:6px 2px}.touch .loadout-section{margin-top:5px;gap:4px}
-  .touch .pause-card{max-height:calc(100vh - var(--safe-top) - var(--safe-bottom) - 12px)}
-}
-
-@media (max-width:700px) and (orientation:landscape){
-  .touch .lobby-header-actions .secondary-btn span{display:none}
-  .touch #lobbyHostControlBtn,.touch #lobbyCopyBtn,.touch #lobbyLeaveBtn{width:34px;min-width:34px;padding:0}
-  .touch .lobby-match-grid{grid-template-columns:1fr 1fr}
-  .touch .lobby-rules-row{grid-template-columns:repeat(4,minmax(72px,1fr))}
-  .touch .lobby-bots-row{grid-template-columns:repeat(2,minmax(72px,1fr))}
-  .touch .lobby-mode-picker button{font-size:10px;padding:0 3px}
-  .touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(7,minmax(58px,1fr));gap:3px}
-  .touch .loadout-choice{padding:4px 3px}.touch .loadout-choice strong{font-size:10px}
-  .touch .settings-page .settings-grid{grid-template-columns:repeat(3,minmax(100px,1fr))}
-  .touch .admin-page>.settings-grid{grid-template-columns:repeat(4,minmax(90px,1fr))}
-  .touch .admin-weapon-toolbar>span{display:none}.touch .admin-weapon-toolbar label{width:min(260px,100%)}
-}
-
-@media (max-height:390px) and (orientation:landscape){
-  .touch .lobby-shell{grid-template-rows:44px minmax(0,1fr) 38px}
-  .touch .lobby-side-tab{height:28px}
-  .touch .lobby-section-head{padding-bottom:4px}.touch .lobby-section-head .eyebrow{display:none}.touch .lobby-section-head h2{font-size:13px}
-  .touch .lobby-match-card{padding:5px;gap:4px}.touch .lobby-card-title{display:none}.touch .lobby-mode-picker button{height:28px}.touch .lobby-match-card .input{height:29px}.touch .lobby-rule-summary{display:none}
-  .touch .loadout-section>span{font-size:10px}.touch .loadout-choice{min-height:40px}.touch .loadout-fixed{min-height:40px}.touch .loadout-section{margin-top:3px}
-  .touch .modal-head p{display:none}.touch .settings-page .settings-category-head{display:none}.touch .settings-page .settings-grid{padding:5px 0}.touch .setting{gap:3px}.touch .settings-page .setting{padding:5px}.touch .admin-page>.settings-grid{gap:4px}.touch .admin-weapon-toolbar{margin-bottom:4px}
-  .touch .pause-card{padding:8px}.touch .pause-card header .eyebrow,.touch .pause-context{display:none}.touch .pause-card h1{font-size:18px}.touch .resume-btn{margin-top:6px;height:36px}.touch .pause-section{margin-top:6px}.touch .pause-actions .secondary-btn,.touch .pause-leave .secondary-btn{height:32px}.touch .pause-leave{margin-top:6px;padding-top:5px}
-}
-
-/* v1.31.2 layout correction: remove dead bordered space and keep control widths intentional. */
-.lobby-side-view[data-lobby-side-view="match"].active,.lobby-side-view[data-lobby-side-view="loadout"].active{padding:2px 4px;align-content:start}
-.lobby-setup-panel,.lobby-loadout-panel{height:auto;max-height:100%;margin:0 auto;border:0;background:transparent;padding:8px 4px}
-.lobby-setup-panel{width:min(980px,100%)}
-.lobby-loadout-panel{width:min(1080px,100%)}
-.loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(140px,1fr))}
-.loadout-choice{min-height:72px}
-
-.modal-screen{place-items:center}
-.settings-shell{height:min(390px,100%)}
-.loadout-shell{height:min(470px,100%)}
-.admin-shell{height:min(470px,100%)}
-
-.weapon-settings-grid{max-width:680px}
-.weapon-settings-card{display:grid;grid-template-columns:repeat(2,minmax(180px,1fr));gap:10px 12px;padding:14px}
-.weapon-settings-card strong{grid-column:1/-1}
-.weapon-settings-card input{max-width:none}
-.admin-weapon-toolbar{max-width:680px}
-
-@media (max-width:900px) and (orientation:landscape){
-  .touch .lobby-header-actions .secondary-btn span{display:none}
-  .touch #lobbyHostControlBtn,.touch #lobbyCopyBtn,.touch #lobbyLeaveBtn{width:34px;min-width:34px;padding:0}
-  .touch .lobby-setup-panel,.touch .lobby-loadout-panel{padding:4px 2px}
-  .touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(110px,1fr));gap:5px}
-  .touch .loadout-choice{min-height:45px}
-  .touch .settings-shell,.touch .loadout-shell,.touch .admin-shell{height:100%}
-  .touch .weapon-settings-card{grid-template-columns:repeat(4,minmax(100px,1fr));gap:6px;padding:7px}
-  .touch .weapon-settings-card strong{grid-column:1/-1}
-}
-@media (max-width:700px) and (orientation:landscape){
-  .touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(90px,1fr))}
-  .touch .loadout-choice strong{font-size:10px}
-  .touch .lobby-match-grid{gap:5px}
-}
-@media (max-height:390px) and (orientation:landscape){
-  .touch .loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(80px,1fr))}
-  .touch .loadout-choice{min-height:38px}
-  .touch .loadout-columns{gap:4px}
-}
-
-/* Stable weapon editor geometry: header + one explicit field row. */
-.weapon-settings-card{display:block;padding:14px}
-.weapon-settings-card strong{display:block;padding-bottom:9px;margin-bottom:10px;border-bottom:1px solid var(--line)}
-.weapon-fields{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:10px}
-.weapon-fields label{min-width:0}
-.weapon-fields input{width:100%;max-width:none}
-.settings-shell .modal-foot{display:flex;justify-content:flex-end;align-items:center;gap:8px}
-.settings-shell .modal-foot #settingsDefaultsBtn{width:auto;min-width:120px}
-@media (max-width:900px) and (orientation:landscape){
-  .touch .weapon-settings-card{padding:7px}
-  .touch .weapon-settings-card strong{margin-bottom:5px;padding-bottom:5px}
-  .touch .weapon-fields{grid-template-columns:repeat(4,minmax(88px,1fr));gap:5px}
-}
-
-/* Loadout cards use explicit heights so resize never collapses their content. */
-.loadout-choice,.loadout-fixed{height:72px;min-height:72px;overflow:hidden}
-@media (max-width:900px) and (orientation:landscape){
-  .touch .loadout-choice,.touch .loadout-fixed{height:46px;min-height:46px}
-}
-@media (max-height:390px) and (orientation:landscape){
-  .touch .loadout-choice,.touch .loadout-fixed{height:40px;min-height:40px}
-}
-
-/* Responsive layout follows viewport width on desktop too; touch only affects ergonomics. */
-.pause-actions-system{display:flex;flex-wrap:wrap;gap:8px}
-.pause-actions-system .secondary-btn{flex:0 1 220px;min-width:160px}
-
-@media (max-width:820px){
-  .front-header{grid-template-columns:auto minmax(150px,1fr) auto;gap:8px}
-  .front-body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:6px}
-  .front-nav{grid-template-columns:repeat(3,minmax(0,1fr));align-content:stretch;padding:4px}
-  .front-nav-button{height:44px;display:flex;justify-content:center;text-align:center;padding:0 8px}
-  .front-nav-button small,.front-nav-button .ui-icon,.front-nav-button .live-dot{display:none}
-  .front-hero{grid-template-columns:1fr auto;gap:12px}.front-hero h1{font-size:23px}
-  .join-panel{grid-template-columns:minmax(0,1fr) minmax(230px,.9fr);gap:14px}
-  .lobby-header-actions .secondary-btn span{display:none}
-  #lobbyHostControlBtn,#lobbyCopyBtn,#lobbyLeaveBtn{width:36px;min-width:36px;padding:0}
-  .lobby-match-grid{grid-template-columns:minmax(0,1.2fr) minmax(220px,.8fr);gap:7px}
-  .lobby-match-card{padding:8px;gap:6px}
-  .lobby-rules-row{grid-template-columns:repeat(4,minmax(80px,1fr))}
-  .lobby-bots-row{grid-template-columns:repeat(2,minmax(80px,1fr))}
-  .lobby-match-card .input{max-width:none}
-  .loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(100px,1fr))}
-  .loadout-columns{grid-template-columns:minmax(110px,.65fr) 1fr 1fr;gap:6px}
-  .settings-page .settings-grid{grid-template-columns:repeat(3,minmax(120px,220px));gap:8px}
-  .admin-page>.settings-grid{grid-template-columns:repeat(4,minmax(100px,1fr));gap:6px}
-  .admin-weapon-toolbar{max-width:none}
-  .weapon-settings-grid{max-width:none}.weapon-fields{grid-template-columns:repeat(4,minmax(90px,1fr));gap:6px}
-}
-@media (max-width:620px){
-  .menu-brand [data-app-version]{display:none}
-  .front-profile{max-width:180px;padding:4px 7px}.front-profile label>span{display:none}.front-profile label{grid-template-columns:1fr}
-  .front-hero p,.join-panel p{display:none}.join-panel{grid-template-columns:1fr;gap:8px}
-  .lobby-title p,.lobby-version{display:none}
-  .lobby-match-grid{grid-template-columns:1fr;gap:6px}
-  .lobby-card-title{padding-bottom:5px}
-  .loadout-choice-grid.primary-grid{grid-template-columns:repeat(2,minmax(120px,1fr))}
-  .loadout-columns{grid-template-columns:1fr 1fr;gap:6px}.loadout-columns>.loadout-section:first-child{grid-column:1/-1}
-  .settings-page .settings-grid{grid-template-columns:repeat(2,minmax(120px,1fr))}
-  .admin-page>.settings-grid{grid-template-columns:repeat(2,minmax(120px,1fr))}
-  .admin-weapon-toolbar>span{display:none}.admin-weapon-toolbar label{width:100%;max-width:280px}
-  .weapon-fields{grid-template-columns:repeat(2,minmax(120px,1fr))}
-  .pause-actions{grid-template-columns:repeat(2,minmax(0,1fr))}
-}
-@media (max-height:430px) and (orientation:landscape){
-  .modal-head{padding-top:5px;padding-bottom:5px}.modal-head p{display:none}
-  .settings-tabs,.admin-tabs{padding:4px 0}.settings-tab,.admin-tab{height:34px}
-  .settings-page .settings-category-head{padding:6px 2px 3px}.settings-page .settings-grid{padding:5px 0}
-  .admin-page{padding:6px 0}.admin-weapon-toolbar{margin-bottom:6px;padding:6px 8px}
-  .weapon-settings-card{padding:7px}.weapon-settings-card strong{padding-bottom:5px;margin-bottom:5px}
-  .loadout-editor{padding-top:5px;padding-bottom:5px}.loadout-section{margin-top:4px}
-}
-
-
-/* v1.37.3 in-game controls: preserve the v1.36 layout footprint exactly. */
+/* In-game custom fields preserve option text and use one consistent footprint. */
 .game-text-field{cursor:pointer;display:flex;align-items:center;text-align:left;user-select:none;-webkit-user-select:none}
 .game-text-field .game-control-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .game-text-field .game-control-value.placeholder{color:var(--dim)}
@@ -450,60 +305,71 @@ body{font-size:var(--ui-md)}
 .game-control:focus-visible,.game-text-field:focus-visible,.game-slider-control:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.08);outline:0}
 .game-control.disabled{opacity:.42;pointer-events:none}
 .game-control-arrow{width:100%;height:100%;display:grid;place-items:center;padding:0;border:0;border-radius:0;background:#12191e;color:var(--muted);font-size:17px;font-weight:950;cursor:pointer}
-.game-control-arrow:hover{background:#1b242a;color:var(--text)}
-.game-control-arrow:active{background:#253027;color:var(--accent)}
+.game-control-arrow:hover{background:#1b242a;color:var(--text)}.game-control-arrow:active{background:#253027;color:var(--accent)}
 .game-control-value{min-width:0;padding:0 4px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);font-weight:900;letter-spacing:.01em}
-.game-cycle .game-control-value{font-size:11px;text-transform:uppercase}
-.game-stepper .game-control-value{font-variant-numeric:tabular-nums;color:var(--accent)}
+.game-cycle .game-control-value{font-size:11px;text-transform:uppercase}.game-stepper .game-control-value{font-variant-numeric:tabular-nums;color:var(--accent)}
 .disabled-setting .game-control{cursor:not-allowed;opacity:.45}
 .controller-focus.game-control,.controller-focus.game-text-field,.controller-focus.game-slider-control{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.12)}
-/* Native ranges were thin. Keep the custom slider thin too instead of turning it into another field row. */
-.game-slider-control{width:100%;min-width:0;height:18px;padding:2px 0;display:flex;align-items:center;outline:0;user-select:none;-webkit-user-select:none;touch-action:none}
+.game-slider-control{width:100%;min-width:0;height:30px;padding:6px 0;display:flex;align-items:center;outline:0;user-select:none;-webkit-user-select:none;touch-action:none}
 .game-slider-track{position:relative;width:100%;height:8px;border:1px solid #344149;border-radius:99px;background:#050708;cursor:pointer;touch-action:none}
 .game-slider-fill{position:absolute;inset:1px auto 1px 1px;width:0;border-radius:99px;background:var(--accent)}
 .game-slider-knob{position:absolute;top:50%;left:0;width:14px;height:14px;border:2px solid #111605;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(215,255,88,.45)}
-/* The editor is a standalone Breach surface and does not participate in menu layout. */
+
+/* Standalone in-game text editor. */
 .game-text-editor{position:fixed;inset:0;z-index:125;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.92);backdrop-filter:blur(10px)}
-.game-text-editor-shell{width:min(760px,100%);display:grid;gap:8px;padding:10px;border:1px solid var(--line2);border-radius:12px;background:#0d1216;box-shadow:var(--shadow)}
+.game-text-editor-shell{width:min(760px,100%);max-height:100%;display:grid;gap:8px;padding:10px;border:1px solid var(--line2);border-radius:12px;background:#0d1216;box-shadow:var(--shadow)}
 .game-text-editor-shell>header{display:flex;align-items:center;justify-content:space-between;gap:10px}.game-text-editor-shell h2{margin:2px 0 0;font-size:18px}
 .game-text-editor-display{position:relative;height:42px;padding:0 12px;display:flex;align-items:center;border:1px solid rgba(215,255,88,.5);border-radius:7px;background:#050809;color:#fff;font-size:15px;font-weight:900;letter-spacing:.04em;overflow:hidden}
 .game-text-editor-placeholder{position:absolute;left:12px;color:var(--dim);font-weight:750;pointer-events:none}
 .game-text-keyboard.code-mode [data-editor-action="shift"],.game-text-keyboard.code-mode [data-editor-action="space"],.game-text-keyboard.code-mode [data-editor-char="-"]{opacity:.25;pointer-events:none}
-/* Match the responsive heights that the original native fields used. */
-.touch .settings-page .setting .game-control,.touch .weapon-settings-card .game-control{height:34px;font-size:11px}
-@media(max-width:980px){.game-control{grid-template-columns:25px minmax(0,1fr) 25px}}
-.touch .game-text-editor{padding:5px}.touch .game-text-editor-shell{height:100%;align-content:center;padding:6px;gap:5px}.touch .game-text-editor-display{height:34px;font-size:13px}.touch .game-text-editor-shell>header h2{font-size:15px}
-@media(max-height:390px) and (orientation:landscape){.touch .game-text-editor-shell{align-content:stretch}.touch .game-text-editor-shell>header{height:32px}.touch .game-text-editor-display{height:30px}.touch .game-text-editor .chat-key-row-numbers{display:flex}}
 
-.setting .game-control{height:40px}.weapon-settings-card .game-control{height:38px}
-.touch .setting .game-control,.touch .weapon-settings-card .game-control{height:34px}
-
-.touch .game-slider-control{height:34px;padding:8px 0}
-.game-slider-control{margin:2px}
-
+/* Tablet and phone landscape: reduce chrome, never delete informative content. */
 @media (max-width:900px) and (orientation:landscape){
-  .touch .lobby-map-panel{grid-template-columns:minmax(180px,230px) minmax(0,1fr);gap:7px;padding:7px}
-  .touch .lobby-map-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}
-  .touch .lobby-map-choice{min-height:44px;padding:5px 7px}.touch .lobby-map-choice small{font-size:9px}
-  .touch #lobbyMapPreview{min-height:170px}
+  .menu-screen,.lobby-screen{padding:calc(var(--safe-top) + 5px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 5px) calc(var(--safe-left) + 6px)}
+  .front-shell{grid-template-rows:auto minmax(0,1fr) auto;gap:5px}
+  .front-header{grid-template-columns:auto minmax(150px,260px) auto;gap:7px;padding-bottom:4px}
+  .menu-logo{width:32px;height:32px;padding:7px}.menu-brand strong{font-size:14px}.menu-brand [data-app-version]{display:inline;font-size:9px}.front-profile{max-width:260px;padding:3px 7px}.front-profile label{grid-template-columns:auto minmax(0,1fr);gap:6px}.front-profile label>span{display:block;font-size:9px}.front-profile .input{height:30px;font-size:11px}.square-btn{width:32px;min-width:32px;height:32px}
+  .front-body{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr);gap:5px}.front-nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:3px;gap:3px}.front-nav-button{height:42px;display:grid;grid-template-columns:auto minmax(0,1fr) auto;justify-content:stretch;padding:0 7px;text-align:left}.front-nav-button .ui-icon{width:14px;height:14px}.front-nav-button strong{font-size:10px}.front-nav-button small{display:block;font-size:8.5px;line-height:1.1}.front-nav-button .live-dot{display:block}
+  .front-content>.deploy-view{padding:8px 10px}.front-hero{grid-template-columns:minmax(0,1fr) auto;gap:10px}.front-hero h1{font-size:20px}.front-hero p,.join-panel p{display:block;font-size:10px;line-height:1.3}.front-hero .deploy-button{width:155px;height:40px}.join-panel{grid-template-columns:minmax(0,1fr) minmax(240px,.9fr);gap:12px}.join-panel h1{font-size:19px}
+
+  .lobby-header{gap:7px;padding-bottom:3px}.lobby-room-line{gap:6px;flex-wrap:wrap}.lobby-room-line h1{font-size:16px}.lobby-mode-badge{font-size:9px;padding:3px 5px}.lobby-title p{display:block;font-size:9px;line-height:1.15}.lobby-version{display:inline;font-size:9px}.lobby-header-actions{gap:3px;flex-wrap:wrap;justify-content:flex-end}.lobby-header-actions .secondary-btn{height:30px;padding:0 7px;font-size:9px}.lobby-header-actions .square-btn{width:30px;min-width:30px;height:30px}.lobby-side-stack{gap:5px}.lobby-side-tabs{padding:3px;gap:3px}.lobby-side-tab{height:30px;font-size:10px}.lobby-roster-panel.active,.lobby-setup-panel,.lobby-loadout-panel{padding:7px}.lobby-section-head{padding-bottom:5px}.lobby-section-head .eyebrow{display:block}.lobby-section-head h2{font-size:14px}.lobby-secondary{display:block;font-size:9px}.lobby-roster-team-control{grid-template-columns:auto minmax(180px,320px);gap:7px;padding:4px 6px}.lobby-team-choice{height:29px}.lobby-player{padding:5px 7px}.lobby-team-title{height:27px}.lobby-footer{padding:4px 7px}.lobby-footer strong{font-size:10px}.lobby-footer span{font-size:9px}.lobby-start{height:34px;min-width:150px;font-size:10px}
+  .lobby-match-grid{grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr);gap:6px}.lobby-match-card{padding:6px;gap:5px}.lobby-card-title{display:flex;padding-bottom:4px}.lobby-card-title strong{font-size:11px}.lobby-mode-picker button{height:30px;font-size:9px;padding:0 3px}.lobby-match-card .lobby-setup-row{gap:4px}.lobby-rules-row{grid-template-columns:repeat(3,minmax(74px,1fr))}.lobby-bots-row{grid-template-columns:repeat(auto-fit,minmax(74px,1fr))}.lobby-setup-row label>span{font-size:8.5px}.lobby-match-card .input{height:31px;font-size:10px}.lobby-rule-summary{display:block;padding:4px 6px;font-size:9px}
+  .lobby-map-panel{gap:5px;padding:5px}.lobby-map-toolbar{grid-template-columns:minmax(105px,145px) minmax(0,1fr);gap:6px}.lobby-map-toolbar h2{font-size:14px}.lobby-map-toolbar p{display:block;font-size:8.5px}.lobby-map-choice-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}.lobby-map-choice{min-height:40px;padding:4px 5px}.lobby-map-choice strong{font-size:8.5px}.lobby-map-choice small{display:block;font-size:8px}.lobby-map-legend{left:5px;right:5px;bottom:5px;padding:4px 5px;gap:5px 8px;font-size:8px}
+  .loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(105px,1fr))}.loadout-choice,.loadout-fixed{min-height:54px;padding:5px 6px}.loadout-choice b,.loadout-fixed>b{display:block;min-width:27px;font-size:10px}.loadout-choice strong,.loadout-fixed strong{display:block;font-size:9.5px}.loadout-choice small,.loadout-fixed small{display:block;font-size:8.5px}.loadout-columns{grid-template-columns:minmax(110px,.7fr) 1fr 1fr;gap:5px}
+
+  .modal-screen{padding:calc(var(--safe-top) + 4px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 4px) calc(var(--safe-left) + 6px)}.modal-shell{max-height:100%;border-radius:9px}.modal-head{padding:5px 7px 4px}.modal-head h2{font-size:15px}.modal-head p{display:block;font-size:9px;margin-top:2px}.panel-back{height:30px;min-width:66px;font-size:9px}.settings-tabs,.admin-tabs{padding:3px 6px;gap:3px}.settings-tab,.admin-tab{height:30px;font-size:9px}.settings-page .settings-category-head{display:block;padding:5px 7px 2px}.settings-page .settings-category-head h3{font-size:12px}.settings-page .settings-grid{grid-template-columns:repeat(3,minmax(115px,1fr));gap:5px;padding:5px 7px 7px}.settings-page .setting{padding:6px;gap:4px}.setting .game-control,.weapon-settings-card .game-control{height:32px;font-size:10px}.game-slider-control{height:28px;padding:6px 0}.modal-foot{padding:4px 7px}
+  .admin-page{padding:6px}.admin-page>.settings-grid{gap:5px}.admin-page>.settings-grid>.setting{flex-basis:120px;min-width:105px;padding:6px}.admin-weapon-toolbar{max-width:none;margin-bottom:5px;padding:5px 7px;gap:6px}.admin-weapon-toolbar label{width:min(220px,48%)}.admin-weapon-toolbar>span{display:block;font-size:8.5px}.weapon-settings-grid{max-width:none}.weapon-settings-card{padding:6px;gap:5px}.weapon-settings-card strong{font-size:11px;padding-bottom:3px}.weapon-fields{grid-template-columns:repeat(4,minmax(90px,1fr));gap:5px}
+
+  .pause-card{width:min(700px,100%);padding:8px}.pause-card h1{font-size:17px}.pause-card header .eyebrow{display:block}.pause-context{display:flex;font-size:9px;margin-top:3px}.pause-team{font-size:9px;padding:3px 6px}.resume-btn{height:34px;margin-top:5px}.pause-section{margin-top:5px;gap:4px}.pause-section>span{font-size:8.5px}.pause-actions{gap:4px}.pause-actions .secondary-btn{height:31px;font-size:9px}.pause-leave{margin-top:5px;padding-top:4px}.pause-leave .secondary-btn{height:31px}
+
+  .chat-composer{bottom:calc(var(--safe-bottom) + 4px);width:min(820px,calc(100vw - var(--safe-left) - var(--safe-right) - 8px));gap:3px}.chat-compose-shell{padding:4px;gap:3px}.chat-channel,.chat-input,.chat-send{height:29px}.chat-input{font-size:11px;line-height:29px}.chat-keyboard{gap:3px;padding:4px}.chat-key-row{gap:3px}.chat-key-row-numbers{display:flex}.chat-key{height:29px;max-width:none;border-radius:5px;font-size:10px}.chat-key-wide,.chat-key-command{font-size:9px}
+  .game-text-editor{padding:4px}.game-text-editor-shell{padding:6px;gap:4px}.game-text-editor-display{height:31px;font-size:12px}.game-text-editor-shell>header h2{font-size:14px}
 }
+
 @media (max-width:700px) and (orientation:landscape){
-  .touch .lobby-map-panel{grid-template-columns:minmax(155px,200px) minmax(0,1fr);gap:5px;padding:5px}
-  .touch .lobby-map-choice-grid{grid-template-columns:1fr;gap:3px}.touch .lobby-map-choice{min-height:42px;padding:4px 6px}.touch .lobby-map-choice small{display:block;font-size:8px;line-height:1.1}
-  .touch .lobby-map-toolbar{gap:5px}.touch .lobby-map-toolbar h2{font-size:15px}.touch .lobby-map-toolbar p{display:block;font-size:9px;line-height:1.15}
-  .touch .lobby-map-legend{left:5px;right:5px;bottom:5px;padding:4px 5px;gap:5px 8px;font-size:8px}
+  .front-header{grid-template-columns:auto minmax(135px,1fr) auto}.menu-brand strong{font-size:12px}.menu-brand [data-app-version]{font-size:8px}.front-profile{max-width:190px}.front-profile label>span{font-size:8px}.front-profile .input{font-size:10px}.front-nav-button{padding:0 5px}.front-nav-button small{font-size:8px}.front-hero{grid-template-columns:minmax(0,1fr) auto}.front-hero h1{font-size:17px}.front-hero p,.join-panel p{display:block;font-size:9px}.join-panel{grid-template-columns:minmax(0,1fr) minmax(210px,.9fr);gap:8px}.join-controls{grid-template-columns:minmax(100px,1fr) auto}
+  .lobby-header{display:grid;grid-template-columns:minmax(0,1fr) auto}.lobby-header-actions .secondary-btn span{display:inline}.lobby-header-actions .secondary-btn{width:auto;min-width:0;padding:0 5px;font-size:8px}.lobby-secondary{display:block}.lobby-roster{grid-template-columns:1fr 1fr}.lobby-match-grid{grid-template-columns:1fr 1fr}.lobby-mode-picker button{font-size:8.5px}.lobby-rules-row{grid-template-columns:repeat(3,minmax(66px,1fr))}.lobby-bots-row{grid-template-columns:repeat(auto-fit,minmax(66px,1fr))}
+  .lobby-map-toolbar{grid-template-columns:minmax(90px,120px) minmax(0,1fr)}.lobby-map-choice{min-height:38px;padding:3px 4px}.lobby-map-choice strong{font-size:8px}.lobby-map-choice small{font-size:7.5px}
+  .loadout-choice-grid.primary-grid{grid-template-columns:repeat(4,minmax(88px,1fr))}.loadout-columns{grid-template-columns:.75fr 1fr 1fr}.loadout-choice,.loadout-fixed{min-height:50px}.loadout-choice small,.loadout-fixed small{font-size:8px}
+  .settings-page .settings-grid{grid-template-columns:repeat(3,minmax(100px,1fr))}.admin-weapon-toolbar label{width:min(210px,52%)}.weapon-fields{grid-template-columns:repeat(4,minmax(78px,1fr))}
 }
 
-
-/* v1.37.3 responsive contract: reflow/scroll instead of deleting option content. */
-.lobby-setup-panel,.lobby-loadout-panel,.settings-page,.admin-page{overflow:auto;overscroll-behavior:contain}
-.touch .loadout-choice,.touch .loadout-fixed{height:auto;min-height:56px;overflow:visible;display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-rows:auto auto;align-content:center;text-align:left}
-.touch .loadout-choice b,.touch .loadout-fixed>b{display:block;grid-row:1/3;align-self:center}
-.touch .loadout-choice strong,.touch .loadout-fixed strong{display:block;white-space:normal;line-height:1.1;text-align:left}
-.touch .loadout-choice small,.touch .loadout-fixed small{display:block;white-space:normal;line-height:1.15;font-size:9px}
-.touch .lobby-card-title{display:flex}.touch .lobby-rule-summary{display:block}.touch .lobby-section-head .eyebrow{display:block}.touch .settings-page .settings-category-head{display:block}
 @media (max-height:390px) and (orientation:landscape){
-  .touch .lobby-match-card{padding:6px;gap:5px}.touch .lobby-mode-picker button{height:30px}.touch .lobby-match-card .input{height:31px}
-  .touch .loadout-choice,.touch .loadout-fixed{height:auto;min-height:52px}.touch .loadout-section{margin-top:4px}
-  .touch .settings-page .settings-category-head{padding:6px 2px 3px}
+  .front-shell{gap:4px}.front-header{padding-bottom:2px}.front-content>.deploy-view{padding-top:5px;padding-bottom:5px}.front-nav-button{height:36px}.front-hero h1,.join-panel h1{margin-top:1px;margin-bottom:3px}.front-hero .deploy-button{height:36px}
+  .lobby-side-stack{gap:4px}.lobby-side-tab{height:27px}.lobby-section-head{padding-bottom:3px}.lobby-section-head .eyebrow{display:block;font-size:8px}.lobby-section-head h2{font-size:12px}.lobby-card-title{display:flex}.lobby-match-card{padding:5px;gap:4px}.lobby-mode-picker button{height:27px}.lobby-match-card .input{height:28px}.lobby-rule-summary{display:block;padding:3px 5px}.lobby-footer{padding-top:3px;padding-bottom:3px}.lobby-start{height:31px}
+  .lobby-map-panel{padding:4px;gap:4px}.lobby-map-toolbar{gap:4px}.lobby-map-choice{min-height:34px}.lobby-map-toolbar h2{font-size:12px}.lobby-map-toolbar p{font-size:7.5px}#lobbyMapPreview{min-height:120px}
+  .loadout-section{margin-top:4px;gap:3px}.loadout-choice,.loadout-fixed{min-height:47px;padding-top:4px;padding-bottom:4px}.loadout-choice small,.loadout-fixed small{display:block;font-size:7.5px}.loadout-editor{padding-top:5px;padding-bottom:5px}
+  .modal-head{padding-top:3px;padding-bottom:3px}.modal-head p{display:block;font-size:8px}.settings-page .settings-category-head{display:block;padding-top:3px}.settings-page .settings-grid{padding-top:3px;padding-bottom:4px}.settings-page .setting{padding:4px;gap:3px}.admin-page{padding:4px}.admin-weapon-toolbar{margin-bottom:3px;padding-top:4px;padding-bottom:4px}.weapon-settings-card{padding:5px}.modal-foot{padding-top:3px;padding-bottom:3px}
+  .pause-card{padding:6px}.pause-card header .eyebrow,.pause-context{display:flex}.pause-card h1{font-size:15px}.resume-btn{height:30px}.pause-actions .secondary-btn,.pause-leave .secondary-btn{height:28px}
+  .chat-key-row-numbers{display:flex!important}.chat-key{height:25px}.chat-keyboard{gap:2px;padding:3px}.chat-key-row{gap:2px}.chat-composer{gap:2px}.chat-channel,.chat-input,.chat-send{height:27px}.chat-input{line-height:27px}
+  .game-text-editor-shell{align-content:start}.game-text-editor-shell>header{min-height:28px}.game-text-editor-display{height:28px}
+}
+
+@media (max-width:620px){
+  .front-profile{max-width:180px}.front-hero,.join-panel{width:100%}
+  .lobby-map-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lobby-map-toolbar{grid-template-columns:minmax(90px,120px) minmax(0,1fr)}
+  .loadout-choice-grid.primary-grid{grid-template-columns:repeat(3,minmax(95px,1fr))}.loadout-columns{grid-template-columns:1fr 1fr}.loadout-columns>.loadout-section:first-child{grid-column:1/-1}
+  .settings-page .settings-grid{grid-template-columns:repeat(2,minmax(120px,1fr))}
+  .weapon-fields{grid-template-columns:repeat(2,minmax(120px,1fr))}
+  .pause-card{grid-template-columns:1fr}.pause-card>header,.pause-card>.resume-btn,.pause-card>.pause-leave{grid-column:1}.pause-actions-player{grid-template-columns:repeat(3,minmax(0,1fr))}
 }

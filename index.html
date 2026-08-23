@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.37.3" rel="manifest"/>
-<title>Breach v1.37.3</title>
-<link href="ui.css?v=1.37.3" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.37.6" rel="manifest"/>
+<title>Breach v1.37.6</title>
+<link href="ui.css?v=1.37.6" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -165,8 +165,7 @@
 <div class="lobby-card-title"><span class="eyebrow">RULES</span><strong>Match</strong></div>
 <div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button data-lobby-mode-choice="tdm" type="button">TEAM DEATHMATCH</button><button data-lobby-mode-choice="ffa" type="button">FREE FOR ALL</button><button data-lobby-mode-choice="sandbox" type="button">SANDBOX</button></div></div>
 <div class="lobby-setup-row lobby-rules-row">
-<label><span>MINIMAP PLAYERS</span><div aria-label="Minimap player visibility" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"standard","label":"Standard"},{"value":"all","label":"Show Everyone"}]' data-value="standard" id="lobbyMinimapMode" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Standard</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
-<label><span>MINIMAP MARKERS</span><div aria-label="Minimap marker style" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"dots","label":"Dots"},{"value":"directional","label":"Directional"}]' data-value="dots" id="lobbyMinimapMarkers" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Dots</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label><span>MINIMAP</span><div aria-label="Minimap mode" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"standard","label":"Standard"},{"value":"all","label":"Always On"},{"value":"directional","label":"Directional"}]' data-value="standard" id="lobbyMinimapMode" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Standard</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <label id="lobbyScoreWrap"><span>SCORE LIMIT</span><div class="input game-control game-stepper" data-game-control="stepper" data-max="100" data-min="5" data-step="5" data-value="5" id="lobbyScoreLimit" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">5</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label>
 <label id="lobbyTimeWrap"><span>TIME LIMIT</span><div class="input game-control game-stepper" data-game-control="stepper" data-max="30" data-min="2" data-step="1" data-value="2" id="lobbyTimeLimit" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">2</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label>
 </div>
@@ -328,6 +327,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.37.3" type="module"></script>
+<script src="client.js?v=1.37.6" type="module"></script>
 </body>
 </html>

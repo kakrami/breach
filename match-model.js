@@ -1,5 +1,5 @@
-import { DEFAULT_MATCH_RULES, gameModeSpec, normalizeGameMode } from './game-config.js?v=1.37.3';
-import { normalizeMatchStatus } from './gameplay-phase.js?v=1.37.3';
+import { DEFAULT_MATCH_RULES, gameModeSpec, normalizeGameMode } from './game-config.js?v=1.37.6';
+import { normalizeMatchStatus } from './gameplay-phase.js?v=1.37.6';
 
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const finiteNumber=(value,fallback=0)=>{const n=Number(value);return Number.isFinite(n)?n:fallback;};
@@ -7,7 +7,7 @@ const finiteNumber=(value,fallback=0)=>{const n=Number(value);return Number.isFi
 export function normalizeMatchRules(value){
   const v=value&&typeof value==='object'?value:{};
   const mode=normalizeGameMode(v.mode??DEFAULT_MATCH_RULES.mode),spec=gameModeSpec(mode);
-  const minimapRevealAll=!!v.minimapRevealAll,minimapDirectional=!!v.minimapDirectional;
+  const minimapDirectional=!!v.minimapDirectional,minimapRevealAll=minimapDirectional||!!v.minimapRevealAll;
   if(spec.scoreType==='none')return{mode,scoreLimit:0,timeLimitMs:0,minimapRevealAll,minimapDirectional};
   return{
     mode,
