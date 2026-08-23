@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.35.1';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.35.1';
-import * as YardGeometry from './world-geometry-yard.js?v=1.35.1';
-import * as RigGeometry from './world-geometry-rig.js?v=1.35.1';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.35.1';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.35.1';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.35.1';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.35.1';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.0';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.35.1';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.35.1';
-import { createAudioEngine } from './audio-engine.js?v=1.35.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.35.1';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.35.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.35.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.35.1';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.35.1';
+} from './game-config.js?v=1.37.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.0';
+import { createAudioEngine } from './audio-engine.js?v=1.37.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.0';
 
 let THREE = null;
 
@@ -110,6 +110,73 @@ let worldSettings=normalizeWorldSettings(DEFAULT_WORLD_SETTINGS);
 const LONG_SHOT_DISTANCE = 30;
 
 const $ = (id) => document.getElementById(id);
+
+// Breach-owned UI controls. No native browser inputs, selects or range widgets are used.
+function controlNumber(el,key,fallback){const n=Number(el?.dataset?.[key]);return Number.isFinite(n)?n:fallback;}
+function controlDecimals(step){const raw=String(step??'1');return raw.includes('.')?Math.min(3,raw.split('.')[1].length):0;}
+function gameCycleOptions(el){try{return JSON.parse(el?.dataset?.options||'[]');}catch{return[];}}
+function renderGameControl(el){
+  if(!el)return;
+  const type=el.dataset?.gameControl,value=String(el.__gameValue??el.dataset?.value??'');
+  if(type==='cycle'){
+    const option=gameCycleOptions(el).find(o=>String(o.value)===value)||gameCycleOptions(el)[0];
+    const out=el.querySelector('[data-control-value]');if(out)out.textContent=option?.label??value;
+  }else if(type==='stepper'){
+    const out=el.querySelector('[data-control-value]');if(out){const step=controlNumber(el,'step',1);out.textContent=Number.isFinite(Number(value))?Number(value).toFixed(controlDecimals(step)):value;}
+    el.setAttribute('aria-valuenow',value);
+  }else if(type==='slider'){
+    const min=controlNumber(el,'min',0),max=controlNumber(el,'max',1),n=Math.max(min,Math.min(max,Number(value)||0)),pct=max>min?(n-min)/(max-min)*100:0;
+    const fill=el.querySelector('[data-slider-fill]'),knob=el.querySelector('[data-slider-knob]');if(fill)fill.style.width=`${pct}%`;if(knob)knob.style.left=`${pct}%`;
+    el.setAttribute('aria-valuenow',String(n));
+  }else if(type==='text'){
+    const out=el.querySelector('[data-control-value]');if(out){out.textContent=value||el.dataset.placeholder||'';out.classList.toggle('placeholder',!value);}
+  }
+}
+function setGameControlValue(el,value,{emitInput=false,emitChange=false}={}){
+  if(!el)return false;const type=el.dataset?.gameControl;
+  let next=String(value??'');
+  if(type==='cycle'){
+    const opts=gameCycleOptions(el);if(opts.length&&!opts.some(o=>String(o.value)===next))next=String(opts[0].value);
+  }else if(type==='stepper'||type==='slider'){
+    const min=controlNumber(el,'min',-Infinity),max=controlNumber(el,'max',Infinity),step=controlNumber(el,'step',1);let n=Number(next);if(!Number.isFinite(n))n=Number.isFinite(min)?min:0;n=Math.max(min,Math.min(max,n));if(Number.isFinite(step)&&step>0&&Number.isFinite(min))n=min+Math.round((n-min)/step)*step;next=String(Number(n.toFixed(Math.max(0,controlDecimals(step)))));
+  }else if(type==='text'){
+    next=next.slice(0,Math.max(1,Number(el.dataset.maxlength)||64));
+  }
+  const previous=String(el.value??el.__gameValue??el.dataset?.value??'');el.value=next;const changed=next!==previous;
+  if(emitInput)el.dispatchEvent(new Event('input',{bubbles:true}));if(emitChange&&changed)el.dispatchEvent(new Event('change',{bubbles:true}));return changed;
+}
+function adjustGameControl(el,dir,{commit=true}={}){
+  if(!el||!dir||el.disabled||el.classList?.contains('disabled'))return false;const type=el.dataset?.gameControl;
+  if(type==='cycle'){
+    const opts=gameCycleOptions(el);if(!opts.length)return false;const cur=Math.max(0,opts.findIndex(o=>String(o.value)===String(el.value))),next=Math.max(0,Math.min(opts.length-1,cur+(dir>0?1:-1)));if(next===cur)return true;setGameControlValue(el,opts[next].value,{emitInput:true,emitChange:commit});return true;
+  }
+  if(type==='stepper'||type==='slider'){
+    const step=controlNumber(el,'step',1);setGameControlValue(el,(Number(el.value)||0)+step*(dir>0?1:-1),{emitInput:true,emitChange:commit});return true;
+  }
+  return false;
+}
+function initGameControls(){
+  for(const el of document.querySelectorAll('[data-game-control]')){
+    const type=el.dataset.gameControl,initial=el.dataset.value??'';
+    if(type==='text'){
+      let current=initial;Object.defineProperty(el,'value',{configurable:true,get(){return current;},set(v){current=String(v??'').slice(0,Math.max(1,Number(el.dataset.maxlength)||64));el.__gameValue=current;el.dataset.value=current;renderGameControl(el);}});el.value=initial;
+    }else{
+      let current=initial;Object.defineProperty(el,'value',{configurable:true,get(){return current;},set(v){current=String(v??'');el.__gameValue=current;el.dataset.value=current;renderGameControl(el);}});
+      Object.defineProperty(el,'disabled',{configurable:true,get(){return el.classList.contains('disabled');},set(v){el.classList.toggle('disabled',!!v);el.setAttribute('aria-disabled',v?'true':'false');for(const b of el.querySelectorAll('button'))b.disabled=!!v;}});
+      for(const key of ['min','max','step'])Object.defineProperty(el,key,{configurable:true,get(){return el.dataset[key]??'';}});
+      el.value=initial;
+      for(const btn of el.querySelectorAll('[data-control-step]'))btn.addEventListener('click',e=>{e.stopPropagation();adjustGameControl(el,Number(btn.dataset.controlStep)||0);});
+      el.addEventListener('keydown',e=>{if(e.key==='ArrowLeft'||e.key==='ArrowDown'){e.preventDefault();adjustGameControl(el,-1);}else if(e.key==='ArrowRight'||e.key==='ArrowUp'){e.preventDefault();adjustGameControl(el,1);}});
+      if(type==='slider'){
+        const track=el.querySelector('[data-slider-track]');let dragging=false;
+        const setPointer=e=>{const r=track.getBoundingClientRect();if(r.width<=0)return;const min=controlNumber(el,'min',0),max=controlNumber(el,'max',1),x=Math.max(0,Math.min(r.width,e.clientX-r.left)),raw=min+(max-min)*(x/r.width);setGameControlValue(el,raw,{emitInput:true,emitChange:false});};
+        track?.addEventListener('pointerdown',e=>{if(el.disabled)return;e.preventDefault();dragging=true;track.setPointerCapture?.(e.pointerId);setPointer(e);});
+        track?.addEventListener('pointermove',e=>{if(dragging)setPointer(e);});
+        const end=e=>{if(!dragging)return;dragging=false;setPointer(e);el.dispatchEvent(new Event('change',{bubbles:true}));};track?.addEventListener('pointerup',end);track?.addEventListener('pointercancel',()=>{dragging=false;});
+      }
+    }
+  }
+}
 const appRoot=$('appRoot'), gameStage=$('gameStage'), entryScreen=$('entryScreen'), rotateGate=$('rotateGate'), menu=$('menu'), lobbyScreen=$('lobbyScreen'), pause=$('pause');
 const nameInput=$('nameInput'),codeInput=$('codeInput'),menuStatus=$('menuStatus');
 const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews=[...document.querySelectorAll('[data-deploy-view]')];
@@ -117,6 +184,8 @@ const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')
 const matchPrimaryButtons=[...document.querySelectorAll('[data-match-primary-choice]')],matchTacticalButtons=[...document.querySelectorAll('[data-match-tactical-choice]')],matchLethalButtons=[...document.querySelectorAll('[data-match-lethal-choice]')];
 const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMap=$('lobbyMap'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
 const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
+const gameTextEditor=$('gameTextEditor'),gameTextEditorTitle=$('gameTextEditorTitle'),gameTextEditorValue=$('gameTextEditorValue'),gameTextEditorPlaceholder=$('gameTextEditorPlaceholder'),gameTextKeyboard=$('gameTextKeyboard'),gameTextShiftBtn=$('gameTextShiftBtn');
+initGameControls();
 document.querySelectorAll('[data-app-version]').forEach(el=>{el.textContent=`Version ${APP_VERSION}`;});
 
 const platform=detectInputPlatform();
@@ -313,7 +382,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.35.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -405,7 +474,7 @@ function loadoutSummary(loadout=selectedLoadout()){return`${WEAPON_SPECS[loadout
 
 
 function syncMusicUI(){
-  for(const [useId,btnId] of [['musicIconUse','musicBtn']]){const use=$(useId),btn=$(btnId);if(use)use.setAttribute('href',masterMuted?'#i-mute':'#i-sound');if(btn)btn.title=masterMuted?'Unmute audio':'Mute all audio';}
+  for(const [useId,btnId] of [['musicIconUse','musicBtn']]){const use=$(useId),btn=$(btnId);if(use)use.setAttribute('href',masterMuted?'#i-mute':'#i-sound');if(btn)btn.setAttribute('aria-label',masterMuted?'Unmute audio':'Mute all audio');}
 }
 function toggleMasterMute(){masterMuted=!masterMuted;localStorage.setItem('breachMuted',masterMuted?'1':'0');syncMusicUI();if(masterMuted)stopIntroMusic();else if(!shell.inMatch)startIntroMusic();}
 
@@ -934,8 +1003,10 @@ function bindUI(){
   chatSendBtn.addEventListener('click',submitChat);
   chatKeyboard.addEventListener('pointerdown',e=>{const btn=e.target.closest?.('[data-chat-char],[data-chat-action]');if(!btn||!chatOpen)return;e.preventDefault();handleChatKeyboardButton(btn);});
   $('joinBtn').addEventListener('click', () => joinMatch(normalizeCode(codeInput.value)));
-  codeInput.addEventListener('blur', () => { codeInput.value = normalizeCode(codeInput.value); });
-  codeInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); joinMatch(normalizeCode(codeInput.value)); } });
+  nameInput.addEventListener('click',()=>openGameTextEditor(nameInput));
+  codeInput.addEventListener('click',()=>openGameTextEditor(codeInput));
+  $('gameTextEditorCancel')?.addEventListener('click',cancelGameTextEditor);
+  for(const btn of gameTextKeyboard?.querySelectorAll('[data-editor-char],[data-editor-action]')||[])btn.addEventListener('click',()=>handleGameTextEditorButton(btn));
   $('resumeBtn').addEventListener('click', resumeFromGesture);
   $('copyBtn').addEventListener('click', copyInvite);
   $('teamSwitchBtn').addEventListener('click',()=>requestTeamChange(pendingTeam?myTeam:(myTeam==='blue'?'red':'blue')));
@@ -999,6 +1070,7 @@ function bindUI(){
     const sens=aimSensitivityScale()*playerSettings.lookSensitivity;yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
   });
   document.addEventListener('keydown', e => {
+    if(gameTextEditorTarget){handlePhysicalGameTextKey(e);return;}
     if(chatOpen){handlePhysicalChatKey(e);return;}
     if(isEditableTarget(e.target)) return;
     if(controllerInputActive()&&(e.code==='Space'||e.code==='Escape'||e.code.startsWith('Arrow'))){e.preventDefault();return;}
@@ -1044,6 +1116,42 @@ function bindUI(){
   document.addEventListener('selectstart',e=>{if(!isEditableTarget(e.target))e.preventDefault();});
   document.addEventListener('dragstart',e=>e.preventDefault());
   canvas.addEventListener('wheel',onScoreboardWheel,{passive:false});
+}
+
+let gameTextEditorTarget=null,gameTextEditorDraft='',gameTextEditorShift=true;
+function gameTextMode(){return gameTextEditorTarget?.dataset?.textMode||'callsign';}
+function normalizeGameTextDraft(value){
+  let text=String(value??'').replace(/[<>\u0000-\u001f\u007f]/g,'');
+  if(gameTextMode()==='code')text=text.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,ROOM_CODE_LENGTH);
+  else text=text.replace(/\s+/g,' ').slice(0,Math.max(1,Number(gameTextEditorTarget?.dataset?.maxlength)||18));
+  return text;
+}
+function renderGameTextEditor(){
+  if(!gameTextEditorTarget)return;gameTextEditorValue.textContent=gameTextEditorDraft;gameTextEditorPlaceholder.textContent=gameTextEditorDraft?'':(gameTextEditorTarget.dataset.placeholder||'');gameTextShiftBtn?.classList.toggle('active',gameTextEditorShift);
+  gameTextKeyboard?.classList.toggle('code-mode',gameTextMode()==='code');
+}
+function openGameTextEditor(target){
+  if(!target||target.disabled)return false;gameTextEditorTarget=target;gameTextEditorDraft=String(target.value||'');gameTextEditorShift=gameTextMode()==='callsign';
+  gameTextEditorTitle.textContent=gameTextMode()==='code'?'ROOM CODE':'CALLSIGN';$('gameTextEditorEyebrow').textContent=gameTextMode()==='code'?'JOIN MATCH':'PLAYER PROFILE';
+  gameTextEditor.classList.remove('hide');renderGameTextEditor();clearControllerUiFocus();return true;
+}
+function closeGameTextEditor(commit){
+  if(!gameTextEditorTarget)return;const target=gameTextEditorTarget;if(commit){target.value=normalizeGameTextDraft(gameTextEditorDraft);target.dispatchEvent(new Event('change',{bubbles:true}));}
+  gameTextEditorTarget=null;gameTextEditorDraft='';gameTextEditor.classList.add('hide');clearControllerUiFocus();
+}
+function cancelGameTextEditor(){closeGameTextEditor(false);}
+function commitGameTextEditor(){closeGameTextEditor(true);}
+function appendGameTextChar(char){
+  if(!gameTextEditorTarget)return;let out=String(char||'');if(gameTextMode()==='code'){out=out.toUpperCase();if(!/^[A-Z0-9]$/.test(out))return;}else if(/^[a-z]$/i.test(out)){out=gameTextEditorShift?out.toUpperCase():out.toLowerCase();if(gameTextEditorShift)gameTextEditorShift=false;}
+  const max=gameTextMode()==='code'?ROOM_CODE_LENGTH:Math.max(1,Number(gameTextEditorTarget.dataset.maxlength)||18);if(gameTextEditorDraft.length>=max)return;gameTextEditorDraft=normalizeGameTextDraft(gameTextEditorDraft+out);renderGameTextEditor();
+}
+function backspaceGameText(){if(!gameTextEditorTarget||!gameTextEditorDraft)return;gameTextEditorDraft=Array.from(gameTextEditorDraft).slice(0,-1).join('');renderGameTextEditor();}
+function handleGameTextEditorButton(btn){
+  if(!gameTextEditorTarget)return;const char=btn.dataset.editorChar,action=btn.dataset.editorAction;if(char!=null){appendGameTextChar(char);return;}if(action==='shift'){gameTextEditorShift=!gameTextEditorShift;renderGameTextEditor();return;}if(action==='backspace'){backspaceGameText();return;}if(action==='space'){if(gameTextMode()!=='code')appendGameTextChar(' ');return;}if(action==='done')commitGameTextEditor();
+}
+function handlePhysicalGameTextKey(e){
+  if(!gameTextEditorTarget)return false;e.preventDefault();e.stopPropagation();if(e.key==='Escape'){cancelGameTextEditor();return true;}if(e.key==='Enter'){commitGameTextEditor();return true;}if(e.key==='Backspace'){backspaceGameText();return true;}if(e.key===' '){if(gameTextMode()!=='code')appendGameTextChar(' ');return true;}
+  if(!e.ctrlKey&&!e.metaKey&&!e.altKey&&e.key?.length===1){if(gameTextMode()==='code')appendGameTextChar(e.key);else{const max=Math.max(1,Number(gameTextEditorTarget.dataset.maxlength)||18);if(gameTextEditorDraft.length<max){gameTextEditorDraft=normalizeGameTextDraft(gameTextEditorDraft+e.key);renderGameTextEditor();}}}return true;
 }
 
 function cleanChatText(value){return String(value??'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,CHAT_MAX_LENGTH);}
@@ -1112,9 +1220,8 @@ function drawChatButton(c,r){
   if(!r)return;const active=chatOpen;roundRect(c,r.x,r.y,r.w,r.h,7,active?'rgba(215,255,88,.18)':HUD_SURFACE,active?'rgba(215,255,88,.55)':HUD_LINE);c.save();c.textAlign='center';c.fillStyle=active?HUD_ACCENT:'#dbe4ea';c.font='1000 10px system-ui';c.fillText('CHAT',r.x+r.w/2,r.y+r.h/2);c.restore();
 }
 
-function isEditableTarget(target){
-  return !!target && (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement || target instanceof HTMLSelectElement || target.isContentEditable);
-}
+function isEditableTarget(target){return !!target?.isContentEditable;}
+
 function getViewSize(){const v=shell.viewport;return {w:v.w,h:v.h};}
 async function resumeFromGesture(){
   ensureAudio();
@@ -1260,7 +1367,7 @@ function renderMatches(rooms){
     if(roomSpec.teamBased){const blueChip=document.createElement('span');blueChip.className='team-chip blue';blueChip.textContent=`BLUE ${blue}`;const redChip=document.createElement('span');redChip.className='team-chip red';redChip.textContent=`RED ${red}`;teamCounts.append(blueChip,redChip);}else{const ffaChip=document.createElement('span');ffaChip.className='team-chip ffa';ffaChip.textContent=`COMBATANTS ${blue+red}`;teamCounts.append(ffaChip);}
     left.append(codeEl,botMeta,teamCounts);
     const meta=document.createElement('div');meta.className='match-meta';meta.textContent=`${Number(room.players)||0}/${Number(room.maxPlayers)||0}`;
-    const btn=document.createElement('button');btn.className='btn icon-btn';btn.title=`Join ${room.code}`;btn.setAttribute('aria-label',`Join ${room.code}`);btn.innerHTML='<svg class="ui-icon"><use href="#i-enter"/></svg>';btn.addEventListener('click',()=>joinMatch(room.code));
+    const btn=document.createElement('button');btn.className='btn icon-btn';btn.setAttribute('aria-label',`Join ${room.code}`);btn.innerHTML='<svg class="ui-icon"><use href="#i-enter"/></svg>';btn.addEventListener('click',()=>joinMatch(room.code));
     row.append(left,meta,btn);matchList.append(row);
   }
   
@@ -2081,6 +2188,7 @@ function clearControllerUiFocus(){
   controllerUiFocus=null;
 }
 function controllerUiSurface(){
+  if(gameTextEditorTarget)return gameTextEditor;
   if(chatOpen)return null;
   if(shell.panel===SHELL_PANEL.SETTINGS)return $('settingsPanel');
   if(shell.panel===SHELL_PANEL.ADMIN)return $('adminPanel');
@@ -2093,7 +2201,7 @@ function controllerUiSurface(){
 }
 function controllerFocusableElements(){
   const surface=controllerUiSurface();if(!surface)return[];
-  return [...surface.querySelectorAll('button:not([disabled]),input:not([disabled]),select:not([disabled])')].filter(el=>{
+  return [...surface.querySelectorAll('button:not([disabled]):not([tabindex="-1"]),[data-game-control][tabindex="0"]:not(.disabled)')].filter(el=>{
     if(el.closest('[hidden],.hide'))return false;const r=el.getBoundingClientRect();return r.width>2&&r.height>2;
   });
 }
@@ -2113,15 +2221,11 @@ function moveControllerUiFocus(dx,dy){
   }
   if(best)setControllerUiFocus(best);
 }
-function adjustControllerField(el,dir){
-  if(!el||!dir)return false;
-  if(el.tagName==='SELECT'){const opts=[...el.options].filter(o=>!o.disabled);const cur=Math.max(0,opts.indexOf(el.selectedOptions?.[0])),next=Math.max(0,Math.min(opts.length-1,cur+dir));if(opts[next]&&opts[next]!==opts[cur]){el.value=opts[next].value;el.dispatchEvent(new Event('change',{bubbles:true}));}return true;}
-  if(el instanceof HTMLInputElement&&(el.type==='range'||el.type==='number')){const step=Number(el.step)||1,min=Number.isFinite(Number(el.min))?Number(el.min):-Infinity,max=Number.isFinite(Number(el.max))?Number(el.max):Infinity;el.value=String(Math.max(min,Math.min(max,Number(el.value||0)+step*dir)));el.dispatchEvent(new Event('input',{bubbles:true}));el.dispatchEvent(new Event('change',{bubbles:true}));return true;}
-  return false;
-}
+function adjustControllerField(el,dir){if(!el||!dir)return false;return adjustGameControl(el,dir);}
 function handleControllerUiNavigation(pressed){
   const surface=controllerUiSurface();if(!surface){clearControllerUiFocus();return false;}const focus=ensureControllerUiFocus();
   if(pressed[GAMEPAD_BUTTON.B]){
+    if(gameTextEditorTarget){cancelGameTextEditor();return true;}
     if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return true;}if(shell.panel===SHELL_PANEL.ADMIN){closeAdminPanel();return true;}if(shell.panel===SHELL_PANEL.LOADOUT){closeMatchLoadout();return true;}if(shell.paused){shell.resumeFromAlternateInput();clock?.getDelta();return true;}
   }
   if(pressed[GAMEPAD_BUTTON.A]&&focus){if(focus.tagName==='BUTTON'){focus.click();return true;}focus.focus();return true;}

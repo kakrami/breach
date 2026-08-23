@@ -424,3 +424,55 @@ body{font-size:var(--ui-md)}
   .weapon-settings-card{padding:7px}.weapon-settings-card strong{padding-bottom:5px;margin-bottom:5px}
   .loadout-editor{padding-top:5px;padding-bottom:5px}.loadout-section{margin-top:4px}
 }
+
+/* v1.37.0 — Breach-owned controls. No browser-native form widgets. */
+.game-field{min-width:0;display:grid;gap:4px}
+.front-profile .game-field>span,.lobby-setup-row .game-field>span,.admin-weapon-toolbar .game-field>span{color:var(--muted);font-size:11px;font-weight:950;letter-spacing:.08em}
+.game-text-field,.game-control{width:100%;min-width:0;height:38px;border:1px solid var(--line);border-radius:8px;background:#090d10;color:var(--text);font-size:11px;font-weight:850;outline:0}
+.game-text-field{padding:0 10px;display:flex;align-items:center;text-align:left;cursor:pointer}
+.game-text-field .game-control-value{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.game-text-field .game-control-value.placeholder{color:var(--dim)}
+.game-control{display:grid;grid-template-columns:34px minmax(0,1fr) 34px;align-items:center;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.game-control:focus-visible,.game-text-field:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.08);outline:0}
+.game-control.disabled{opacity:.42;pointer-events:none}
+.game-control-arrow{width:100%;height:100%;display:grid;place-items:center;background:#12191e;color:var(--muted);font-size:19px;font-weight:900;cursor:pointer;border-radius:0}
+.game-control-arrow:hover{background:#1b242a;color:var(--text)}
+.game-control-arrow:active{background:#253027;color:var(--accent)}
+.game-control-value{min-width:0;padding:0 7px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text);font-weight:900;letter-spacing:.02em}
+.game-cycle .game-control-value{font-size:11px;text-transform:uppercase}
+.game-stepper .game-control-value{font-variant-numeric:tabular-nums;color:var(--accent)}
+.game-slider{grid-template-columns:32px minmax(70px,1fr) 32px;padding:0}
+.game-slider-track{position:relative;height:12px;margin:0 8px;border:1px solid #344149;border-radius:99px;background:#050708;cursor:pointer;touch-action:none}
+.game-slider-fill{position:absolute;inset:1px auto 1px 1px;width:0;border-radius:99px;background:var(--accent)}
+.game-slider-knob{position:absolute;top:50%;left:0;width:16px;height:16px;border:2px solid #111605;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(215,255,88,.45)}
+.setting .game-control{height:38px}
+.setting output{justify-self:end;color:var(--accent);font-size:11px;font-weight:900}
+.weapon-settings-card .game-field{color:var(--muted);font-size:11px;font-weight:850;text-transform:uppercase}
+.weapon-fields .game-control{height:38px}
+.front-profile .game-text-field{height:32px}
+.code-input{justify-content:center;text-align:center;text-transform:uppercase;letter-spacing:.16em;font-size:16px}
+.lobby-setup-row .game-control{height:31px;font-size:11px}
+.lobby-match-card .game-control{width:100%;max-width:190px}
+.admin-weapon-toolbar .game-field{width:min(280px,100%)}
+.admin-weapon-toolbar .game-control{max-width:280px}
+.disabled-setting .game-control{cursor:not-allowed;opacity:.45}
+.controller-focus.game-control,.controller-focus.game-text-field{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.12)}
+
+.game-text-editor{position:fixed;inset:0;z-index:125;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.92);backdrop-filter:blur(10px)}
+.game-text-editor-shell{width:min(760px,100%);display:grid;gap:8px;padding:10px;border:1px solid var(--line2);border-radius:12px;background:#0d1216;box-shadow:var(--shadow)}
+.game-text-editor-shell>header{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.game-text-editor-shell h2{margin:2px 0 0;font-size:18px}
+.game-text-editor-display{position:relative;height:42px;padding:0 12px;display:flex;align-items:center;border:1px solid rgba(215,255,88,.5);border-radius:7px;background:#050809;color:#fff;font-size:15px;font-weight:900;letter-spacing:.04em;overflow:hidden}
+.game-text-editor-placeholder{position:absolute;left:12px;color:var(--dim);font-weight:750;pointer-events:none}
+.game-text-keyboard.code-mode [data-editor-action="shift"],.game-text-keyboard.code-mode [data-editor-action="space"],.game-text-keyboard.code-mode [data-editor-char="-"]{opacity:.25;pointer-events:none}
+
+@media(max-width:760px){
+  .lobby-match-card .game-control{max-width:none}
+  .settings-page .game-control,.weapon-settings-card .game-control{height:34px}
+  .game-control{grid-template-columns:31px minmax(0,1fr) 31px}
+  .game-slider{grid-template-columns:30px minmax(60px,1fr) 30px}
+}
+.touch .lobby-setup-row .game-control{height:34px}
+.touch .settings-page .game-control,.touch .weapon-settings-card .game-control{height:34px;font-size:11px}
+.touch .game-text-editor{padding:5px}.touch .game-text-editor-shell{height:100%;align-content:center;padding:6px;gap:5px}.touch .game-text-editor-display{height:34px;font-size:13px}.touch .game-text-editor-shell>header h2{font-size:15px}
+@media(max-height:390px) and (orientation:landscape){.touch .game-text-editor-shell{align-content:stretch}.touch .game-text-editor-shell>header{height:32px}.touch .game-text-editor-display{height:30px}.touch .game-text-editor .chat-key-row-numbers{display:flex}}
