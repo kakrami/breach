@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.37.12" rel="manifest"/>
-<title>Breach v1.37.12</title>
-<link href="ui.css?v=1.37.12" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.37.13" rel="manifest"/>
+<title>Breach v1.37.13</title>
+<link href="ui.css?v=1.37.13" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -160,7 +160,7 @@
 </section>
 <div class="lobby-side-view" data-lobby-side-view="match" hidden="">
 <section class="lobby-setup-panel">
-<div class="lobby-section-head"><div><h2>Match setup</h2></div><span class="lobby-secondary" id="lobbySetupOwnerLabel">Admin controls</span></div>
+<div class="lobby-section-head"><div><h2>Match setup</h2></div><span class="lobby-secondary" id="lobbySetupOwnerLabel">Host controls</span></div>
 <div class="lobby-host-setup hide" id="lobbyHostSetup">
 <div class="lobby-match-grid">
 <section class="lobby-match-card lobby-match-rules-card">
@@ -182,16 +182,16 @@
 </div>
 </section>
 </div>
-<div class="lobby-editor-actions" id="lobbyMatchActions"><span class="lobby-edit-status" id="lobbyMatchDraftStatus">No unsaved changes</span><button class="secondary-btn" id="lobbyMatchResetBtn" type="button">RESET</button><button class="primary" id="lobbyMatchApplyBtn" type="button">APPLY</button></div>
+
 </div>
-<div class="lobby-guest-setup" id="lobbyGuestSetup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><span id="lobbyGuestRules">First 30 · 8 min</span><small>A lobby admin controls match rules. You can change your team and loadout while you wait.</small></div>
+<div class="lobby-guest-setup" id="lobbyGuestSetup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><span id="lobbyGuestRules">First 30 · 8 min</span><small>The host controls match rules. You can change your team and loadout while you wait.</small></div>
 </section>
 </div>
 <div class="lobby-side-view lobby-gameplay-view" data-lobby-side-view="gameplay" hidden="">
 <section class="lobby-tuning-panel">
-<div class="lobby-section-head"><div><h2>Gameplay tuning</h2></div><span class="lobby-secondary">Host only</span></div>
+<div class="lobby-section-head"><div><h2>Gameplay tuning</h2></div><span class="lobby-secondary">Host</span></div>
 <div class="lobby-host-control-mount lobby-gameplay-mount" id="lobbyGameplayHostMount"></div>
-<div class="lobby-editor-actions" id="lobbyGameplayActions"><span class="lobby-edit-status" id="lobbyGameplayDraftStatus">Saved</span><button class="secondary-btn" id="lobbyGameplayResetBtn" type="button">RESET</button><button class="primary" id="lobbyGameplayApplyBtn" type="button">APPLY</button></div>
+
 </section>
 </div>
 <div class="lobby-side-view lobby-map-view" data-lobby-side-view="map" hidden="">
@@ -206,7 +206,7 @@
 </div>
 </div>
 <div class="lobby-map-canvas-wrap"><canvas aria-label="Full map overview" id="lobbyMapPreview"></canvas><div class="lobby-map-legend"><span><i class="map-legend-building"></i>STRUCTURE</span><span><i class="map-legend-natural"></i>TERRAIN / COVER</span><span>NORTH ↑</span></div></div>
-<div class="lobby-editor-actions hide" id="lobbyMapActions"><span class="lobby-edit-status" id="lobbyMapDraftStatus">No unsaved changes</span><button class="secondary-btn" id="lobbyMapResetBtn" type="button">RESET</button><button class="primary" id="lobbyMapApplyBtn" type="button">APPLY</button></div>
+
 </section>
 </div>
 <div class="lobby-side-view lobby-loadout-view" data-lobby-side-view="loadout" hidden="">
@@ -228,21 +228,28 @@
 <div class="loadout-section"><span>LETHAL</span><div class="loadout-choice-grid equipment-grid"><button class="loadout-choice" data-lobby-lethal-choice="sticky" type="button"><strong>SEMTEX</strong></button><button class="loadout-choice" data-lobby-lethal-choice="frag" type="button"><strong>FRAG</strong></button></div></div>
 </div>
 </div>
-<div class="lobby-editor-actions" id="lobbyLoadoutActions"><span class="lobby-edit-status" id="lobbyLoadoutDraftStatus">Saved loadout</span><button class="secondary-btn" id="lobbyLoadoutResetBtn" type="button">RESET</button><button class="primary" id="lobbyLoadoutSaveBtn" type="button">SAVE</button></div>
+
 </section>
 </div>
 <div class="lobby-side-view lobby-weapons-view" data-lobby-side-view="weapons" hidden="">
 <section class="lobby-weapons-panel">
-<div class="lobby-section-head"><div><h2>Weapon tuning</h2></div><span class="lobby-secondary">Host only</span></div>
+<div class="lobby-section-head"><div><h2>Weapon tuning</h2></div><span class="lobby-secondary">Host</span></div>
 <div class="lobby-host-control-mount lobby-weapons-mount" id="lobbyWeaponsHostMount"></div>
-<div class="lobby-editor-actions" id="lobbyWeaponsActions"><span class="lobby-edit-status" id="lobbyWeaponsDraftStatus">Saved</span><button class="secondary-btn" id="lobbyWeaponsResetBtn" type="button">RESET</button><button class="primary" id="lobbyWeaponsApplyBtn" type="button">APPLY</button></div>
+
 </section>
 </div>
 </div>
 </div>
 <footer class="lobby-footer">
-<div><strong id="lobbyStatus">Waiting in lobby</strong><span id="lobbyHint">Choose your team and loadout.</span></div>
+<div class="lobby-footer-copy"><strong id="lobbyStatus">Waiting in lobby</strong><span id="lobbyHint">Choose your team and loadout.</span></div>
+<div class="lobby-footer-actions">
+<div class="lobby-footer-editor hide" data-lobby-footer-editor="match" id="lobbyMatchActions"><span class="lobby-edit-status" id="lobbyMatchDraftStatus">Saved</span><button class="secondary-btn" id="lobbyMatchResetBtn" type="button">RESET</button><button class="primary" id="lobbyMatchApplyBtn" type="button">APPLY</button></div>
+<div class="lobby-footer-editor hide" data-lobby-footer-editor="gameplay" id="lobbyGameplayActions"><span class="lobby-edit-status" id="lobbyGameplayDraftStatus">Saved</span><button class="secondary-btn" id="lobbyGameplayResetBtn" type="button">RESET</button><button class="primary" id="lobbyGameplayApplyBtn" type="button">APPLY</button></div>
+<div class="lobby-footer-editor hide" data-lobby-footer-editor="map" id="lobbyMapActions"><span class="lobby-edit-status" id="lobbyMapDraftStatus">Saved</span><button class="secondary-btn" id="lobbyMapResetBtn" type="button">RESET</button><button class="primary" id="lobbyMapApplyBtn" type="button">APPLY</button></div>
+<div class="lobby-footer-editor hide" data-lobby-footer-editor="loadout" id="lobbyLoadoutActions"><span class="lobby-edit-status" id="lobbyLoadoutDraftStatus">Saved</span><button class="secondary-btn" id="lobbyLoadoutResetBtn" type="button">RESET</button><button class="primary" id="lobbyLoadoutSaveBtn" type="button">SAVE</button></div>
+<div class="lobby-footer-editor hide" data-lobby-footer-editor="weapons" id="lobbyWeaponsActions"><span class="lobby-edit-status" id="lobbyWeaponsDraftStatus">Saved</span><button class="secondary-btn" id="lobbyWeaponsResetBtn" type="button">RESET</button><button class="primary" id="lobbyWeaponsApplyBtn" type="button">APPLY</button></div>
 <button class="primary lobby-start hide" id="lobbyStartBtn"><svg class="ui-icon"><use href="#i-play"></use></svg><span>START MATCH</span></button>
+</div>
 </footer>
 </div>
 </section>
@@ -347,6 +354,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.37.12" type="module"></script>
+<script src="client.js?v=1.37.13" type="module"></script>
 </body>
 </html>
