@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.18';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.18';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.18';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.18';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.18';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.18';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.18';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.18';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.19';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.19';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.19';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.19';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.19';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.19';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.19';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.19';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.18';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.18';
-import { createAudioEngine } from './audio-engine.js?v=1.37.18';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.18';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.18';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.18';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.18';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.18';
+} from './game-config.js?v=1.37.19';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.19';
+import { createAudioEngine } from './audio-engine.js?v=1.37.19';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.19';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.19';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.19';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.19';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.19';
 
 let THREE = null;
 
@@ -259,11 +259,11 @@ let localRecoilStep = Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));
 let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,grounded:true,moveX:0,moveZ:0}, localEquipmentCooldownUntil=0;
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0,nextFootstepAt=0,footstepSide=0,shotgunPumpStartedAt=0,shotgunPumpSoundPlayed=false;
 let gameAudioPreloadPromise=null,gameAudioPreparePromise=null,audioUnlockPromise=null,gameAudioReady=false;
-const DEFAULT_PLAYER_SETTINGS=Object.freeze({lookSensitivity:1,adsSensitivity:1,touchSensitivity:1,masterVolume:.85,sfxVolume:.9,musicVolume:.55,graphics:isTouch?'medium':'high',minimapOrientation:'heading'});
+const DEFAULT_PLAYER_SETTINGS=Object.freeze({lookSensitivity:1,adsSensitivity:1,touchSensitivity:1,controllerVerticalSensitivity:1,controllerResponseCurve:'dynamic',controllerAimAssist:'on',controllerMoveDeadzone:.10,controllerLookDeadzone:.07,masterVolume:.85,sfxVolume:.9,musicVolume:.55,graphics:isTouch?'medium':'high',minimapOrientation:'heading'});
 function loadPlayerSettings(){
   let saved={};try{saved=JSON.parse(localStorage.getItem('breachPlayerSettings')||'{}')||{}}catch{}
   const numeric=(key,min,max)=>{const raw=saved[key];if(raw===null||raw===undefined||raw==='')return DEFAULT_PLAYER_SETTINGS[key];const value=Number(raw);return Number.isFinite(value)?Math.max(min,Math.min(max,value)):DEFAULT_PLAYER_SETTINGS[key];};
-  return {lookSensitivity:numeric('lookSensitivity',.5,2),adsSensitivity:numeric('adsSensitivity',.35,1.25),touchSensitivity:numeric('touchSensitivity',.5,2),masterVolume:numeric('masterVolume',0,1),sfxVolume:numeric('sfxVolume',0,1),musicVolume:numeric('musicVolume',0,1),graphics:['low','medium','high'].includes(saved.graphics)?saved.graphics:DEFAULT_PLAYER_SETTINGS.graphics,minimapOrientation:['heading','north'].includes(saved.minimapOrientation)?saved.minimapOrientation:DEFAULT_PLAYER_SETTINGS.minimapOrientation};
+  return {lookSensitivity:numeric('lookSensitivity',.5,2),adsSensitivity:numeric('adsSensitivity',.35,1.25),touchSensitivity:numeric('touchSensitivity',.5,2),controllerVerticalSensitivity:numeric('controllerVerticalSensitivity',.5,1.5),controllerResponseCurve:['dynamic','standard','linear'].includes(saved.controllerResponseCurve)?saved.controllerResponseCurve:DEFAULT_PLAYER_SETTINGS.controllerResponseCurve,controllerAimAssist:saved.controllerAimAssist==='off'?'off':'on',controllerMoveDeadzone:numeric('controllerMoveDeadzone',.02,.25),controllerLookDeadzone:numeric('controllerLookDeadzone',.02,.25),masterVolume:numeric('masterVolume',0,1),sfxVolume:numeric('sfxVolume',0,1),musicVolume:numeric('musicVolume',0,1),graphics:['low','medium','high'].includes(saved.graphics)?saved.graphics:DEFAULT_PLAYER_SETTINGS.graphics,minimapOrientation:['heading','north'].includes(saved.minimapOrientation)?saved.minimapOrientation:DEFAULT_PLAYER_SETTINGS.minimapOrientation};
 }
 let playerSettings=loadPlayerSettings();
 let playerSettingsDraft=null;
@@ -320,7 +320,7 @@ appRoot.dataset.inputMode=activeInputMode;
 function controllerInputActive(){return activeInputMode===INPUT_MODE.CONTROLLER&&gamepadFrame.connected;}
 function touchGameplayControlsVisible(){return isTouch&&activeInputMode===INPUT_MODE.TOUCH&&!chatOpen&&!scoreboardOpen&&!shell.paused&&!shell.panel;}
 function clearControllerGameplayInput(){
-  gamepadFireDown=false;
+  gamepadFireDown=false;resetControllerAimMotion();
   if(controllerOwnsAim){controllerOwnsAim=false;setAim(false);}
   if(equipmentAim.kind)cancelEquipmentAim();
 }
@@ -424,7 +424,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.18';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.19';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -503,6 +503,94 @@ function applyWorldSettings(value){
 }
 function weaponRules(name){return worldSettings.weapons[name]||DEFAULT_WORLD_SETTINGS.weapons[name];}
 function aimSensitivityScale(){if(!adsWanted)return 1;const base=currentWeapon==='sniper'?(sniperZoomLevel>=2?.14:.28):.62;return base*playerSettings.adsSensitivity;}
+function controllerRadialAxes(rawX,rawY,minDeadzone,outerDeadzone=.98){
+  const x=THREE.MathUtils.clamp(Number(rawX)||0,-1,1),y=THREE.MathUtils.clamp(Number(rawY)||0,-1,1),len=Math.hypot(x,y);
+  const inner=THREE.MathUtils.clamp(Number(minDeadzone)||.07,.01,.45),outer=Math.max(inner+.05,THREE.MathUtils.clamp(Number(outerDeadzone)||.98,.75,1));
+  if(len<=inner)return{x:0,y:0,length:0};
+  const normalized=THREE.MathUtils.clamp((len-inner)/(outer-inner),0,1),scale=normalized/Math.max(len,1e-6);
+  return{x:x*scale,y:y*scale,length:normalized};
+}
+function controllerResponseMagnitude(value,curve=playerSettings.controllerResponseCurve){
+  const t=THREE.MathUtils.clamp(Number(value)||0,0,1);
+  if(curve==='linear')return t;
+  if(curve==='standard')return Math.pow(t,1.35);
+  // Dynamic keeps fine input more alive than the old power curve, stays
+  // controlled through the middle, and still reaches full turn rate quickly.
+  return t*(.72+.28*t*t);
+}
+function controllerMoveAxes(){
+  const rawX=Number.isFinite(gamepadFrame.rawMoveX)?gamepadFrame.rawMoveX:gamepadFrame.moveX,rawY=Number.isFinite(gamepadFrame.rawMoveY)?gamepadFrame.rawMoveY:gamepadFrame.moveY;
+  return controllerRadialAxes(rawX,rawY,playerSettings.controllerMoveDeadzone,.98);
+}
+function controllerLookAxes(){
+  const rawX=Number.isFinite(gamepadFrame.rawLookX)?gamepadFrame.rawLookX:gamepadFrame.lookX,rawY=Number.isFinite(gamepadFrame.rawLookY)?gamepadFrame.rawLookY:gamepadFrame.lookY;
+  const radial=controllerRadialAxes(rawX,rawY,playerSettings.controllerLookDeadzone,.98);if(!radial.length)return radial;
+  const shaped=controllerResponseMagnitude(radial.length),scale=shaped/Math.max(radial.length,1e-6);
+  return{x:radial.x*scale,y:radial.y*scale,length:shaped};
+}
+function controllerAdsSensitivityScale(){
+  const blend=smoothstep01(adsBlend);if(blend<=.001)return 1;
+  const targetFov=currentWeapon==='sniper'&&sniperZoomLevel>=2?9.5:(WEAPON_SPECS[currentWeapon]?.adsFov||baseFov);
+  const baseTan=Math.max(.001,Math.tan(baseFov*Math.PI/360)),adsTan=Math.max(.001,Math.tan(targetFov*Math.PI/360));
+  const fovRatio=THREE.MathUtils.clamp(adsTan/baseTan,.08,1),scoped=Math.pow(fovRatio,.72)*playerSettings.adsSensitivity;
+  return THREE.MathUtils.lerp(1,scoped,blend);
+}
+function controllerAssistRadiusDeg(){
+  if(currentWeapon==='sniper'&&adsBlend>.2)return sniperZoomLevel>=2?1.2:1.8;
+  return THREE.MathUtils.lerp(4.2,2.8,smoothstep01(adsBlend));
+}
+function controllerAssistMaxDistance(){return currentWeapon==='sniper'&&adsBlend>.2?180:THREE.MathUtils.lerp(72,115,smoothstep01(adsBlend));}
+function remoteControllerAimPoint(remote,out){
+  out.copy(remote.group.position);out.y+=THREE.MathUtils.lerp(1.36,1.03,THREE.MathUtils.clamp(remote.crouchBlend||0,0,1));return out;
+}
+let controllerAimVelocityX=0,controllerAimVelocityY=0,controllerTurnBoost=0,controllerAssistTargetId='',controllerAssistNextScanAt=0,controllerAssistRaycaster=null,controllerAssistOrigin=null,controllerAssistForward=null,controllerAssistVector=null,controllerAssistPoint=null,controllerAssistProjected=null;
+function ensureControllerAimScratch(){
+  if(!controllerAssistRaycaster)controllerAssistRaycaster=new THREE.Raycaster();
+  controllerAssistOrigin ||= new THREE.Vector3();controllerAssistForward ||= new THREE.Vector3();controllerAssistVector ||= new THREE.Vector3();controllerAssistPoint ||= new THREE.Vector3();controllerAssistProjected ||= new THREE.Vector3();
+}
+function controllerTargetLineVisible(point,distance){
+  if(!worldRoot||!camera)return false;ensureControllerAimScratch();camera.getWorldPosition(controllerAssistOrigin);controllerAssistVector.copy(point).sub(controllerAssistOrigin);const dist=distance||controllerAssistVector.length();if(dist<=.05)return true;
+  controllerAssistRaycaster.set(controllerAssistOrigin,controllerAssistVector.normalize());controllerAssistRaycaster.near=.05;controllerAssistRaycaster.far=Math.max(.05,dist-.28);
+  if(controllerAssistRaycaster.intersectObject(worldRoot,true)[0])return false;
+  // Dense smoke is visual cover, so controller assistance must not track a
+  // target the player cannot actually see through it.
+  const ox=controllerAssistOrigin.x,oy=controllerAssistOrigin.y,oz=controllerAssistOrigin.z,dx=point.x-ox,dy=point.y-oy,dz=point.z-oz,d2=dx*dx+dy*dy+dz*dz;
+  if(d2>.001)for(const cloud of smokeClouds.values()){const cp=cloud?.root?.position;if(!cp)continue;const t=THREE.MathUtils.clamp(((cp.x-ox)*dx+(cp.y-oy)*dy+(cp.z-oz)*dz)/d2,0,1);if(t<=.03||t>=.98)continue;const px=ox+dx*t,py=oy+dy*t,pz=oz+dz*t,r=Math.max(2.8,(Number(cloud.radius)||9.6)*.55);if((cp.x-px)**2+(cp.y-py)**2+(cp.z-pz)**2<r*r)return false;}
+  return true;
+}
+function controllerTargetMetrics(remote,radiusDeg,maxDistance){
+  if(!remote||remote.hp<=0||modeFriendly(remote.team)||!camera)return null;ensureControllerAimScratch();remoteControllerAimPoint(remote,controllerAssistPoint);camera.getWorldPosition(controllerAssistOrigin);controllerAssistVector.copy(controllerAssistPoint).sub(controllerAssistOrigin);const distance=controllerAssistVector.length();if(distance<.35||distance>maxDistance)return null;
+  camera.getWorldDirection(controllerAssistForward);const angle=Math.acos(THREE.MathUtils.clamp(controllerAssistForward.dot(controllerAssistVector.normalize()),-1,1))*180/Math.PI;if(angle>radiusDeg)return null;
+  return{remote,angle,distance,radiusDeg};
+}
+function scanControllerAimAssist(now=performance.now()){
+  if(playerSettings.controllerAimAssist==='off'||!controllerInputActive()||!shell.canPlay||hp<=0||!camera||!worldRoot){controllerAssistTargetId='';return null;}
+  if(now<controllerAssistNextScanAt&&controllerAssistTargetId){const held=[...remotes.values()].find(r=>samePlayerId(r.id,controllerAssistTargetId));if(held&&held.hp>0)return held;}
+  controllerAssistNextScanAt=now+30;const enterRadius=controllerAssistRadiusDeg(),exitRadius=enterRadius*1.34,maxDistance=controllerAssistMaxDistance();
+  const current=[...remotes.values()].find(r=>samePlayerId(r.id,controllerAssistTargetId));if(current){const metric=controllerTargetMetrics(current,exitRadius,maxDistance*1.08);if(metric){remoteControllerAimPoint(current,controllerAssistPoint);if(controllerTargetLineVisible(controllerAssistPoint,metric.distance))return current;}}
+  const candidates=[];for(const remote of remotes.values()){const metric=controllerTargetMetrics(remote,enterRadius,maxDistance);if(metric)candidates.push(metric);}candidates.sort((a,b)=>(a.angle/enterRadius+a.distance/maxDistance*.035)-(b.angle/enterRadius+b.distance/maxDistance*.035));
+  for(const metric of candidates.slice(0,3)){remoteControllerAimPoint(metric.remote,controllerAssistPoint);if(controllerTargetLineVisible(controllerAssistPoint,metric.distance)){controllerAssistTargetId=String(metric.remote.id);return metric.remote;}}
+  controllerAssistTargetId='';return null;
+}
+function currentControllerAimAssist(now=performance.now()){
+  const remote=scanControllerAimAssist(now);if(!remote)return null;ensureControllerAimScratch();const radius=controllerAssistRadiusDeg()*1.34,maxDistance=controllerAssistMaxDistance()*1.08,metric=controllerTargetMetrics(remote,radius,maxDistance);if(!metric){controllerAssistTargetId='';return null;}
+  remoteControllerAimPoint(remote,controllerAssistPoint);controllerAssistProjected.copy(controllerAssistPoint).project(camera);if(controllerAssistProjected.z<-1||controllerAssistProjected.z>1){controllerAssistTargetId='';return null;}
+  const normalized=THREE.MathUtils.clamp(metric.angle/Math.max(.01,controllerAssistRadiusDeg()),0,1.34),strength=1-smoothstep01(THREE.MathUtils.clamp((normalized-.08)/.92,0,1));
+  return{remote,strength,ndcX:controllerAssistProjected.x,ndcY:controllerAssistProjected.y,angle:metric.angle};
+}
+function resetControllerAimMotion(){controllerAimVelocityX=controllerAimVelocityY=0;controllerTurnBoost=0;controllerAssistTargetId='';controllerAssistNextScanAt=0;}
+function applyControllerAim(dt){
+  const input=controllerLookAxes(),now=performance.now(),assist=currentControllerAimAssist(now),breakout=1-smoothstep01(THREE.MathUtils.clamp((input.length-.80)/.20,0,1)),assistStrength=(assist?.strength||0)*breakout;
+  if(input.length>.86)controllerTurnBoost=Math.min(1,controllerTurnBoost+dt/.28);else controllerTurnBoost=Math.max(0,controllerTurnBoost-dt/.09);
+  const ads=smoothstep01(adsBlend),turnMultiplier=1+controllerTurnBoost*.38*(1-ads*.72),adsScale=controllerAdsSensitivityScale();
+  const minSlow=currentWeapon==='sniper'&&ads>.2?(sniperZoomLevel>=2?.48:.52):THREE.MathUtils.lerp(.66,.56,ads),slowdown=assist?THREE.MathUtils.lerp(1,minSlow,assistStrength):1;
+  const targetYaw=input.x*CONTROLLER_LOOK_YAW_RATE*playerSettings.lookSensitivity*adsScale*turnMultiplier*slowdown;
+  const targetPitch=input.y*CONTROLLER_LOOK_PITCH_RATE*playerSettings.lookSensitivity*playerSettings.controllerVerticalSensitivity*adsScale*turnMultiplier*slowdown;
+  const smoothing=1-Math.exp(-dt/.032);controllerAimVelocityX+= (targetYaw-controllerAimVelocityX)*smoothing;controllerAimVelocityY+=(targetPitch-controllerAimVelocityY)*smoothing;
+  yaw-=controllerAimVelocityX*dt;pitch-=controllerAimVelocityY*dt;
+  if(assist&&assistStrength>.01){const move=controllerMoveAxes(),strafe=THREE.MathUtils.clamp(move.length/.72,0,1),rotWeight=assistStrength*strafe;if(rotWeight>.001){yaw-=THREE.MathUtils.clamp(assist.ndcX,-.75,.75)*.72*rotWeight*dt;pitch+=THREE.MathUtils.clamp(assist.ndcY,-.75,.75)*.54*rotWeight*dt;}}
+  pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
+}
 function currentShotHeat(weapon=currentWeapon,now=performance.now()){
   const last=localShotHeatAt[weapon]||0,heat=weaponHeatAfterDelay(weapon,localShotHeat[weapon]||0,last?now-last:0);
   if(heat<.002)return 0;return heat;
@@ -739,6 +827,11 @@ function normalizePlayerSettingsValue(value={}){
     lookSensitivity:clamp(value.lookSensitivity,.5,2,DEFAULT_PLAYER_SETTINGS.lookSensitivity),
     adsSensitivity:clamp(value.adsSensitivity,.35,1.25,DEFAULT_PLAYER_SETTINGS.adsSensitivity),
     touchSensitivity:clamp(value.touchSensitivity,.5,2,DEFAULT_PLAYER_SETTINGS.touchSensitivity),
+    controllerVerticalSensitivity:clamp(value.controllerVerticalSensitivity,.5,1.5,DEFAULT_PLAYER_SETTINGS.controllerVerticalSensitivity),
+    controllerResponseCurve:['dynamic','standard','linear'].includes(value.controllerResponseCurve)?value.controllerResponseCurve:DEFAULT_PLAYER_SETTINGS.controllerResponseCurve,
+    controllerAimAssist:value.controllerAimAssist==='off'?'off':'on',
+    controllerMoveDeadzone:clamp(value.controllerMoveDeadzone,.02,.25,DEFAULT_PLAYER_SETTINGS.controllerMoveDeadzone),
+    controllerLookDeadzone:clamp(value.controllerLookDeadzone,.02,.25,DEFAULT_PLAYER_SETTINGS.controllerLookDeadzone),
     masterVolume:clamp(value.masterVolume,0,1,DEFAULT_PLAYER_SETTINGS.masterVolume),
     sfxVolume:clamp(value.sfxVolume,0,1,DEFAULT_PLAYER_SETTINGS.sfxVolume),
     musicVolume:clamp(value.musicVolume,0,1,DEFAULT_PLAYER_SETTINGS.musicVolume),
@@ -749,9 +842,9 @@ function normalizePlayerSettingsValue(value={}){
 function setSettingsStatus(text,tone=''){const el=$('settingsStatus');if(!el)return;el.textContent=text;el.className=`admin-status ${tone}`.trim();}
 function playerSettingsEqual(a,b){const x=normalizePlayerSettingsValue(a),y=normalizePlayerSettingsValue(b);return Object.keys(x).every(k=>x[k]===y[k]);}
 function syncPlayerSettingsUI(value=playerSettingsDraft||playerSettings){
-  const source=normalizePlayerSettingsValue(value),values=[['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']];
-  for(const [id,key] of values){const el=$(id),out=$(`${id}Value`);if(el)el.value=source[key];if(out)out.textContent=key.includes('Volume')?`${Math.round(source[key]*100)}%`:`${Number(source[key]).toFixed(2)}×`;}
-  if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;
+  const source=normalizePlayerSettingsValue(value),values=[['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerControllerVerticalSensitivity','controllerVerticalSensitivity'],['playerControllerMoveDeadzone','controllerMoveDeadzone'],['playerControllerLookDeadzone','controllerLookDeadzone'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']];
+  for(const [id,key] of values){const el=$(id),out=$(`${id}Value`);if(el)el.value=source[key];if(out)out.textContent=key.includes('Volume')?`${Math.round(source[key]*100)}%`:key.includes('Deadzone')?`${Math.round(source[key]*100)}%`:`${Number(source[key]).toFixed(2)}×`;}
+  if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;if($('playerControllerResponseCurve'))$('playerControllerResponseCurve').value=source.controllerResponseCurve;if($('playerControllerAimAssist'))$('playerControllerAimAssist').value=source.controllerAimAssist;
   const dirty=!playerSettingsEqual(source,playerSettings);if($('settingsResetBtn'))$('settingsResetBtn').disabled=!dirty;if($('settingsSaveBtn'))$('settingsSaveBtn').disabled=!dirty;
 }
 function stagePlayerSettingFromUI(id,key){const el=$(id);if(!el)return;if(!playerSettingsDraft)playerSettingsDraft={...playerSettings};playerSettingsDraft=normalizePlayerSettingsValue({...playerSettingsDraft,[key]:Number(el.value)});syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus(playerSettingsEqual(playerSettingsDraft,playerSettings)?'Saved settings':'Unsaved changes');}
@@ -1116,9 +1209,11 @@ function bindUI(){
   $('settingsSaveBtn').addEventListener('click',savePlayerSettingsDraft);
   $('settingsFullscreenBtn').addEventListener('click',async()=>{ensureAudio();if(shell.fullscreen)await shell.exitFullscreenFromGesture();else await shell.enterFullscreenFromGesture();});
   $('settingsResetBtn').addEventListener('click',resetPlayerSettings);
-  for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id).addEventListener('input',()=>stagePlayerSettingFromUI(id,key));
+  for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerControllerVerticalSensitivity','controllerVerticalSensitivity'],['playerControllerMoveDeadzone','controllerMoveDeadzone'],['playerControllerLookDeadzone','controllerLookDeadzone'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id)?.addEventListener('input',()=>stagePlayerSettingFromUI(id,key));
   $('playerGraphics').addEventListener('change',()=>stagePlayerChoice('graphics',$('playerGraphics').value));
   $('playerMinimapOrientation')?.addEventListener('change',()=>stagePlayerChoice('minimapOrientation',$('playerMinimapOrientation').value));
+  $('playerControllerResponseCurve')?.addEventListener('change',()=>stagePlayerChoice('controllerResponseCurve',$('playerControllerResponseCurve').value));
+  $('playerControllerAimAssist')?.addEventListener('change',()=>stagePlayerChoice('controllerAimAssist',$('playerControllerAimAssist').value));
   chatSendBtn.addEventListener('click',submitChat);
   chatKeyboard.addEventListener('pointerdown',e=>{const btn=e.target.closest?.('[data-chat-char],[data-chat-action]');if(!btn||!chatOpen)return;e.preventDefault();handleChatKeyboardButton(btn);});
   $('joinBtn').addEventListener('click', () => joinMatch(normalizeCode(codeInput.value)));
@@ -1935,7 +2030,7 @@ function tryJump(){
 function movementInput(){
   let mx=0,mz=0;
   if(!chatOpen&&shell.canPlay&&matchAllowsMovement(matchState)&&hp>0){
-    if(controllerInputActive()){mx=gamepadFrame.moveX;mz=gamepadFrame.moveY;}
+    if(controllerInputActive()){const controllerMove=controllerMoveAxes();mx=controllerMove.x;mz=controllerMove.y;}
     else if(touchGameplayControlsVisible()){mx=joy.x;mz=joy.y;}
     else{if(keys.has('KeyA'))mx--;if(keys.has('KeyD'))mx++;if(keys.has('KeyW'))mz--;if(keys.has('KeyS'))mz++;}
   }
@@ -2554,7 +2649,7 @@ function updateGamepadInput(dt){
     if(shell.paused){if(shell.resumeFromAlternateInput()){clock?.getDelta();return;}showToast('RETURN TO GAME VIEW');return;}
     openPause();return;
   }
-  if(!shell.canPlay){gamepadFireDown=false;if(controllerOwnsAim){controllerOwnsAim=false;setAim(false);}handleControllerUiNavigation(pressed);return;}
+  if(!shell.canPlay){gamepadFireDown=false;resetControllerAimMotion();if(controllerOwnsAim){controllerOwnsAim=false;setAim(false);}handleControllerUiNavigation(pressed);return;}
   clearControllerUiFocus();
   if(hp<=0&&pressed[GAMEPAD_BUTTON.Y]){openMatchLoadout();return;}
   if(hp>0&&pressed[GAMEPAD_BUTTON.LS]){openChat();return;}
@@ -2562,16 +2657,11 @@ function updateGamepadInput(dt){
   if(pressed[GAMEPAD_BUTTON.VIEW]){scoreboardOpen=true;scoreboardScroll=0;clearFireInput();cancelEquipmentAim();}
   if(released[GAMEPAD_BUTTON.VIEW])scoreboardOpen=false;
   if(scoreboardOpen&&scoreboardPanel&&Math.abs(gamepadFrame.lookY)>.02)scoreboardScroll=Math.max(0,Math.min(scoreboardPanel.maxScroll,scoreboardScroll+gamepadFrame.lookY*620*dt));
-  else if(!scoreboardOpen&&hp>0){
-    const sens=aimSensitivityScale()*playerSettings.lookSensitivity;
-    yaw-=gamepadFrame.lookX*CONTROLLER_LOOK_YAW_RATE*dt*sens;
-    pitch-=gamepadFrame.lookY*CONTROLLER_LOOK_PITCH_RATE*dt*sens;
-    pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
-  }
-  if(scoreboardOpen){gamepadFireDown=buttons[GAMEPAD_BUTTON.RT]>=CONTROLLER_TRIGGER_THRESHOLD;return;}
+  if(scoreboardOpen){gamepadFireDown=buttons[GAMEPAD_BUTTON.RT]>=CONTROLLER_TRIGGER_THRESHOLD;resetControllerAimMotion();return;}
 
   const adsHeld=buttons[GAMEPAD_BUTTON.LT]>=CONTROLLER_TRIGGER_THRESHOLD;
   if(adsHeld){controllerOwnsAim=true;if(!adsWanted)setAim(true);}else if(controllerOwnsAim){controllerOwnsAim=false;setAim(false);}
+  if(hp>0)applyControllerAim(dt);else resetControllerAimMotion();
   const fireHeld=buttons[GAMEPAD_BUTTON.RT]>=CONTROLLER_TRIGGER_THRESHOLD;
   if(fireHeld&&!gamepadFireDown){gamepadFireDown=true;requestShot();}else if(!fireHeld)gamepadFireDown=false;
 

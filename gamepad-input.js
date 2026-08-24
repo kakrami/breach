@@ -6,7 +6,7 @@ export const GAMEPAD_BUTTON = Object.freeze({
 const EMPTY_BUTTONS=Object.freeze(Array.from({length:18},()=>0));
 const EMPTY_HELD=Object.freeze(Array.from({length:18},()=>false));
 const EMPTY_FRAME=Object.freeze({
-  connected:false,index:-1,id:'',mapping:'',moveX:0,moveY:0,lookX:0,lookY:0,
+  connected:false,index:-1,id:'',mapping:'',moveX:0,moveY:0,lookX:0,lookY:0,rawMoveX:0,rawMoveY:0,rawLookX:0,rawLookY:0,
   buttons:EMPTY_BUTTONS,held:EMPTY_HELD,pressed:EMPTY_HELD,released:EMPTY_HELD,meaningful:false,
 });
 
@@ -69,9 +69,11 @@ export function createGamepadInput({stickDeadzone=.16,lookDeadzone=.14,lookCurve
     const buttons=Array.from({length:18},(_,i)=>buttonValue(pad.buttons?.[i]));
     const held=buttons.map(value=>value>=buttonThreshold),pressed=held.map((value,i)=>value&&!lastHeld[i]),released=held.map((value,i)=>!value&&lastHeld[i]);
     lastHeld=held.slice();
-    const move=radialDeadzone(pad.axes?.[0],pad.axes?.[1],stickDeadzone,1),look=radialDeadzone(pad.axes?.[2],pad.axes?.[3],lookDeadzone,lookCurve);
+    const rawMoveX=clamp(Number(pad.axes?.[0])||0,-1,1),rawMoveY=clamp(Number(pad.axes?.[1])||0,-1,1);
+    const rawLookX=clamp(Number(pad.axes?.[2])||0,-1,1),rawLookY=clamp(Number(pad.axes?.[3])||0,-1,1);
+    const move=radialDeadzone(rawMoveX,rawMoveY,stickDeadzone,1),look=radialDeadzone(rawLookX,rawLookY,lookDeadzone,lookCurve);
     const meaningful=move.length>.015||look.length>.015||buttons.some(value=>value>.12);
-    return Object.freeze({connected:true,index:pad.index,id:String(pad.id||'Gamepad'),mapping:String(pad.mapping||''),moveX:move.x,moveY:move.y,lookX:look.x,lookY:look.y,buttons:Object.freeze(buttons),held:Object.freeze(held),pressed:Object.freeze(pressed),released:Object.freeze(released),meaningful});
+    return Object.freeze({connected:true,index:pad.index,id:String(pad.id||'Gamepad'),mapping:String(pad.mapping||''),moveX:move.x,moveY:move.y,lookX:look.x,lookY:look.y,rawMoveX,rawMoveY,rawLookX,rawLookY,buttons:Object.freeze(buttons),held:Object.freeze(held),pressed:Object.freeze(pressed),released:Object.freeze(released),meaningful});
   }
   function destroy(){destroyed=true;if(typeof window!=='undefined'){window.removeEventListener?.('gamepadconnected',connected);window.removeEventListener?.('gamepaddisconnected',disconnected);}reset();}
   return Object.freeze({poll,hasConnected,reset,destroy});

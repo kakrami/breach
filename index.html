@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.37.18" rel="manifest"/>
-<title>Breach v1.37.18</title>
-<link href="ui.css?v=1.37.18" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.37.19" rel="manifest"/>
+<title>Breach v1.37.19</title>
+<link href="ui.css?v=1.37.19" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -305,6 +305,12 @@
 <label class="setting"><span>Look sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="2" data-min="0.5" data-step="0.05" data-value="0.5" id="playerLookSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerLookSensitivityValue"></output></label>
 <label class="setting"><span>ADS sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="1.25" data-min="0.35" data-step="0.05" data-value="0.35" id="playerAdsSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerAdsSensitivityValue"></output></label>
 <label class="setting touch-setting"><span>Touch sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="2" data-min="0.5" data-step="0.05" data-value="0.5" id="playerTouchSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerTouchSensitivityValue"></output></label>
+</div><div class="settings-category-head"><h3>Controller aiming</h3></div><div class="settings-grid">
+<label class="setting"><span>Vertical sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="1.5" data-min="0.5" data-step="0.05" data-value="1" id="playerControllerVerticalSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerControllerVerticalSensitivityValue"></output></label>
+<label class="setting select-setting"><span>Aim response curve</span><div aria-label="Aim response curve" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"dynamic","label":"Dynamic"},{"value":"standard","label":"Standard"},{"value":"linear","label":"Linear"}]' data-value="dynamic" id="playerControllerResponseCurve" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Dynamic</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label class="setting select-setting"><span>Aim assist</span><div aria-label="Aim assist" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"on","label":"On"},{"value":"off","label":"Off"}]' data-value="on" id="playerControllerAimAssist" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">On</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label class="setting"><span>Left stick min deadzone</span><div class="game-slider-control" data-game-control="slider" data-max="0.25" data-min="0.02" data-step="0.01" data-value="0.1" id="playerControllerMoveDeadzone" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerControllerMoveDeadzoneValue"></output></label>
+<label class="setting"><span>Right stick min deadzone</span><div class="game-slider-control" data-game-control="slider" data-max="0.25" data-min="0.02" data-step="0.01" data-value="0.07" id="playerControllerLookDeadzone" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerControllerLookDeadzoneValue"></output></label>
 </div></section>
 <section class="settings-page" data-settings-page="audio" hidden="" inert=""><div class="settings-category-head"><h3>Sound</h3></div><div class="settings-grid">
 <label class="setting"><span>Master volume</span><div class="game-slider-control" data-game-control="slider" data-max="1" data-min="0" data-step="0.05" data-value="0" id="playerMasterVolume" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerMasterVolumeValue"></output></label>
@@ -357,6 +363,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.37.18" type="module"></script>
+<script src="client.js?v=1.37.19" type="module"></script>
 </body>
 </html>
