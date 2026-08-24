@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.37.13" rel="manifest"/>
-<title>Breach v1.37.13</title>
-<link href="ui.css?v=1.37.13" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.37.14" rel="manifest"/>
+<title>Breach v1.37.14</title>
+<link href="ui.css?v=1.37.14" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -197,7 +197,7 @@
 <div class="lobby-side-view lobby-map-view" data-lobby-side-view="map" hidden="">
 <section class="lobby-map-panel">
 <div class="lobby-map-toolbar">
-<div><h2>Map selection</h2><p id="lobbyMapDescription">Select a level, then Apply.</p></div>
+<div><h2>Map selection</h2><p id="lobbyMapDescription">Select a level. Changes save automatically.</p></div>
 <div class="lobby-map-choice-grid" aria-label="Map selection">
 <button class="lobby-map-choice" data-lobby-map-choice="highlands" type="button"><strong>HIGHLANDS</strong><small>Open terrain</small></button>
 <button class="lobby-map-choice" data-lobby-map-choice="depot" type="button"><strong>FREIGHT DEPOT</strong><small>Industrial lanes</small></button>
@@ -243,11 +243,6 @@
 <footer class="lobby-footer">
 <div class="lobby-footer-copy"><strong id="lobbyStatus">Waiting in lobby</strong><span id="lobbyHint">Choose your team and loadout.</span></div>
 <div class="lobby-footer-actions">
-<div class="lobby-footer-editor hide" data-lobby-footer-editor="match" id="lobbyMatchActions"><span class="lobby-edit-status" id="lobbyMatchDraftStatus">Saved</span><button class="secondary-btn" id="lobbyMatchResetBtn" type="button">RESET</button><button class="primary" id="lobbyMatchApplyBtn" type="button">APPLY</button></div>
-<div class="lobby-footer-editor hide" data-lobby-footer-editor="gameplay" id="lobbyGameplayActions"><span class="lobby-edit-status" id="lobbyGameplayDraftStatus">Saved</span><button class="secondary-btn" id="lobbyGameplayResetBtn" type="button">RESET</button><button class="primary" id="lobbyGameplayApplyBtn" type="button">APPLY</button></div>
-<div class="lobby-footer-editor hide" data-lobby-footer-editor="map" id="lobbyMapActions"><span class="lobby-edit-status" id="lobbyMapDraftStatus">Saved</span><button class="secondary-btn" id="lobbyMapResetBtn" type="button">RESET</button><button class="primary" id="lobbyMapApplyBtn" type="button">APPLY</button></div>
-<div class="lobby-footer-editor hide" data-lobby-footer-editor="loadout" id="lobbyLoadoutActions"><span class="lobby-edit-status" id="lobbyLoadoutDraftStatus">Saved</span><button class="secondary-btn" id="lobbyLoadoutResetBtn" type="button">RESET</button><button class="primary" id="lobbyLoadoutSaveBtn" type="button">SAVE</button></div>
-<div class="lobby-footer-editor hide" data-lobby-footer-editor="weapons" id="lobbyWeaponsActions"><span class="lobby-edit-status" id="lobbyWeaponsDraftStatus">Saved</span><button class="secondary-btn" id="lobbyWeaponsResetBtn" type="button">RESET</button><button class="primary" id="lobbyWeaponsApplyBtn" type="button">APPLY</button></div>
 <button class="primary lobby-start hide" id="lobbyStartBtn"><svg class="ui-icon"><use href="#i-play"></use></svg><span>START MATCH</span></button>
 </div>
 </footer>
@@ -354,6 +349,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.37.13" type="module"></script>
+<script src="client.js?v=1.37.14" type="module"></script>
 </body>
 </html>
