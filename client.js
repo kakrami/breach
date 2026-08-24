@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.12';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.12';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.12';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.12';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.12';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.12';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.12';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.12';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.18';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.18';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.18';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.18';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.18';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.18';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.18';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.18';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.16';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.12';
-import { createAudioEngine } from './audio-engine.js?v=1.37.12';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.12';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.12';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.12';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.12';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.12';
+} from './game-config.js?v=1.37.18';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.18';
+import { createAudioEngine } from './audio-engine.js?v=1.37.18';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.18';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.18';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.18';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.18';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.18';
 
 let THREE = null;
 
@@ -313,7 +313,7 @@ const INPUT_MODE=Object.freeze({TOUCH:'touch',KEYBOARD_MOUSE:'keyboardMouse',CON
 let gamepadFrame=gamepadInput.poll();
 let activeInputMode=gamepadFrame.connected?INPUT_MODE.CONTROLLER:(isTouch?INPUT_MODE.TOUCH:INPUT_MODE.KEYBOARD_MOUSE);
 let gamepadFireDown=false,controllerOwnsAim=false,lastGamepadKey=gamepadFrame.connected?`${gamepadFrame.index}:${gamepadFrame.id}`:'';
-let controllerUiFocus=null,controllerUiEditing=null;
+let controllerUiFocus=null,controllerUiEditing=null,controllerUiFocusKey='';
 let controllerUiAxisDirection='',controllerUiAxisNextAt=0;
 appRoot.dataset.inputMode=activeInputMode;
 
@@ -424,7 +424,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.12';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.18';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -460,6 +460,13 @@ async function prepareGameRuntime(){
 }
 
 bindUI();
+let controllerUiFrameLast=performance.now();
+function runPreEngineControllerFrame(now){
+  requestAnimationFrame(runPreEngineControllerFrame);
+  if(engineInitialized){controllerUiFrameLast=now;return;}
+  const dt=Math.min(.10,Math.max(0,(now-controllerUiFrameLast)/1000));controllerUiFrameLast=now;updateGamepadInput(dt);
+}
+requestAnimationFrame(runPreEngineControllerFrame);
 refreshMatches();
 setInterval(() => { if (!shell.inMatch) refreshMatches(); }, 7000);
 void preloadGameAudioAssets();
@@ -541,15 +548,13 @@ function lobbySnapshot(){
   for(const row of lobbyParticipants.values())rows.push({...row,self:false});
   return rows;
 }
-let lobbyManagedPlayerId='';
 function renderLobbyRoster(){
   if(!lobbyRoster)return;const rows=lobbySnapshot(),mode=currentGameMode(),teamBased=gameModeSpec(mode).teamBased;
-  if(lobbyManagedPlayerId&&!rows.some(p=>p.id===lobbyManagedPlayerId&&!p.bot))lobbyManagedPlayerId='';
   const humanCount=rows.filter(x=>!x.bot).length,botCount=rows.filter(x=>x.bot).length;$('lobbyPlayerCount').textContent=`${humanCount} / ${MAX_PLAYERS} · ${botCount} bots`;
-  const hostActions=p=>{if(!isMatchAdmin||p.bot)return'';const owner=p.id===matchOwnerId,self=!!p.self,open=p.id===lobbyManagedPlayerId,god=`<button class="btn lobby-admin-mini ${p.godMode?'active':''}" data-lobby-admin-god="${p.id}" type="button">${p.godMode?'God Mode On':'God Mode'}</button>`,role=(owner||self)?`<button class="btn lobby-admin-mini ${p.admin?'active':''}" disabled type="button">${owner?'Host':p.admin?'Admin':'Player'}</button>`:`<button class="btn lobby-admin-mini ${p.admin?'active':''}" data-lobby-admin-role="${p.id}" type="button">${p.admin?'Admin':'Make Admin'}</button>`;return`<button class="lobby-player-manage ${open?'active':''}" data-lobby-player-manage="${p.id}" aria-expanded="${open}" type="button">${open?'DONE':'MANAGE'}</button><div class="lobby-player-actions ${open?'open':''}">${god}${role}</div>`;};
-  const playerRow=p=>{const owner=p.id===matchOwnerId,role=owner?' · HOST':p.admin?' · ADMIN':'';return`<div class="lobby-player ${p.self?'self':''}"><span class="lobby-player-color ${teamBased?p.team:'ffa'}"></span><div class="lobby-player-copy"><strong>${escapeHtml(p.bot?'[BOT] '+p.name:p.name)}${p.self?' · YOU':''}</strong><small>${teamBased?String(p.team||'blue').toUpperCase()+' · ':''}${escapeHtml(WEAPON_SPECS[p.primaryWeapon]?.name||'ASSAULT RIFLE')}${role}${p.godMode?' · GOD MODE':''}</small></div>${hostActions(p)}</div>`;};
+  const toggle=(label,attr,id,enabled)=>`<button aria-pressed="${enabled}" class="lobby-admin-toggle ${enabled?'active':''}" ${attr}="${id}" type="button"><span>${label}</span><i aria-hidden="true"></i></button>`;
+  const hostActions=p=>{if(!isMatchAdmin||p.bot)return'';const owner=p.id===matchOwnerId,self=!!p.self,god=toggle('GOD','data-lobby-admin-god',p.id,!!p.godMode),role=owner?'<span class="lobby-role-chip">HOST</span>':self?`<span class="lobby-role-chip">${p.admin?'ADMIN':'PLAYER'}</span>`:toggle('ADMIN','data-lobby-admin-role',p.id,!!p.admin);return`<div class="lobby-player-actions">${god}${role}</div>`;};
+  const playerRow=p=>{const owner=p.id===matchOwnerId,role=owner?' · HOST':p.admin?' · ADMIN':'';return`<div class="lobby-player ${p.self?'self':''}"><span class="lobby-player-color ${teamBased?p.team:'ffa'}"></span><div class="lobby-player-copy"><strong>${escapeHtml(p.bot?'[BOT] '+p.name:p.name)}${p.self?' · YOU':''}</strong><small>${teamBased?String(p.team||'blue').toUpperCase()+' · ':''}${escapeHtml(WEAPON_SPECS[p.primaryWeapon]?.name||'ASSAULT RIFLE')}${role}</small></div>${hostActions(p)}</div>`;};
   if(!teamBased){const body=rows.sort((a,b)=>Number(b.self)-Number(a.self)||a.name.localeCompare(b.name)).map(playerRow).join('');lobbyRoster.className='lobby-roster ffa';lobbyRoster.innerHTML=`<div class="lobby-team-column ffa"><div class="lobby-team-title"><span>FREE FOR ALL</span><b>${rows.length}</b></div><div class="lobby-team-players">${body||'<div class="lobby-empty-team">Open slot</div>'}</div></div>`;}else{lobbyRoster.className='lobby-roster';const column=team=>{const list=rows.filter(p=>p.team===team),name=team==='red'?'RED':'BLUE',body=list.map(playerRow).join('')||'<div class="lobby-empty-team">Open slot</div>';return `<div class="lobby-team-column ${team}"><div class="lobby-team-title"><span>${name}</span><b>${list.length}</b></div><div class="lobby-team-players">${body}</div></div>`;};lobbyRoster.innerHTML=column('blue')+column('red');}
-  for(const btn of lobbyRoster.querySelectorAll('[data-lobby-player-manage]'))btn.addEventListener('click',()=>{const id=btn.dataset.lobbyPlayerManage;lobbyManagedPlayerId=lobbyManagedPlayerId===id?'':id;renderLobbyRoster();});
   for(const btn of lobbyRoster.querySelectorAll('[data-lobby-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.lobbyAdminGod,pl=lobbySnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});
   for(const btn of lobbyRoster.querySelectorAll('[data-lobby-admin-role]'))btn.addEventListener('click',()=>{const id=btn.dataset.lobbyAdminRole,pl=lobbySnapshot().find(x=>x.id===id);if(pl&&!pl.self)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});
 }
@@ -570,7 +575,7 @@ let lobbyHostControlsDocked=false,lobbyGameplayApplying=false,lobbyWeaponsApplyi
 function restoreAdminTuningNode(nodeId,anchorId){const node=$(nodeId),anchor=$(anchorId);if(node&&anchor&&node.previousElementSibling!==anchor)anchor.after(node);}
 function syncLobbyHostControlPlacement(){
   const dock=!!shell.inLobby&&!!isMatchAdmin,gameplay=$('adminGameplay'),weapons=$('adminAdvanced');
-  $('lobbyGameplayTab')?.classList.toggle('hide',!dock);$('lobbyWeaponsTab')?.classList.toggle('hide',!dock);
+  $('lobbyCheatsTab')?.classList.toggle('hide',!dock);
   if(dock){
     if(!lobbyHostControlsDocked){$('lobbyGameplayHostMount')?.append(gameplay);$('lobbyWeaponsHostMount')?.append(weapons);gameplay?.classList.remove('hide');weapons?.classList.remove('hide');populateAdminGameplay(worldSettings);populateAdminWeapons(worldSettings);syncAdminWeaponEditor($('adminWeaponSelect')?.value||'assault');lobbyHostControlsDocked=true;}
     document.querySelector('.admin-bot-card')?.classList.add('hide');
@@ -579,7 +584,7 @@ function syncLobbyHostControlPlacement(){
     const liveBots=document.querySelector('.admin-bot-card');liveBots?.classList.toggle('hide',!shell.inMatch);
     if(shell.panel===SHELL_PANEL.ADMIN)switchAdminTab(activeAdminTab);
   }
-  if(!dock&&(document.querySelector('[data-lobby-side-tab="gameplay"]')?.classList.contains('active')||document.querySelector('[data-lobby-side-tab="weapons"]')?.classList.contains('active')))switchLobbySide('players');
+  if(!dock&&document.querySelector('[data-lobby-side-tab="cheats"]')?.classList.contains('active'))switchLobbySide('players');
 }
 function sameJson(a,b){return JSON.stringify(a)===JSON.stringify(b);}
 function lobbyGameplaySettingsFromControls(){const patch=collectAdminGameplayPatch();return normalizeWorldSettings({...worldSettings,movement:patch.movement,combat:patch.combat,weapons:worldSettings.weapons});}
@@ -611,7 +616,7 @@ function setLobbyActionState(){
 function syncLobby(){
   if(!shell.inLobby)return;refreshLobbyDraftOwnership();syncLobbyHostControlPlacement();const mode=currentGameMode(),spec=gameModeSpec(mode),host=!!isMatchAdmin,total=lobbyBotTotal(),draft=lobbyMatchDraft||committedLobbyMatchDraft(),draftSpec=gameModeSpec(draft.mode),draftLoadout=lobbyLoadoutDraft||normalizeLoadoutChoice(selectedLoadout());
   $('lobbyRoomCode').textContent=currentRoom||'----';$('lobbyModeBadge').textContent=spec.name;$('lobbyModeDescription').textContent=lobbyModeDescription(mode);
-  $('lobbyTeamGroup').classList.toggle('hide',!spec.teamBased);$('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbySetupOwnerLabel').textContent=host?'Host controls':'Match info';$('lobbyGameplayTab')?.classList.toggle('hide',!host);$('lobbyWeaponsTab')?.classList.toggle('hide',!host);
+  $('lobbyTeamGroup').classList.toggle('hide',!spec.teamBased);$('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbySetupOwnerLabel').textContent=host?'Host controls':'Match info';$('lobbyCheatsTab')?.classList.toggle('hide',!host);const godToggle=$('lobbyGodModeToggle');if(godToggle){godToggle.classList.toggle('active',!!godMode);godToggle.setAttribute('aria-checked',String(!!godMode));godToggle.disabled=!host||socket?.readyState!==WebSocket.OPEN;}
   const startBtn=$('lobbyStartBtn'),hostDraftPending=lobbyHasPendingChanges();startBtn.classList.toggle('hide',!host);startBtn.disabled=!matchAllowsLobbyEdits(matchState)||hostDraftPending;
   for(const btn of lobbyTeamButtons)btn.classList.toggle('active',spec.teamBased&&btn.dataset.lobbyTeamChoice===myTeam);
   for(const btn of lobbyPrimaryButtons)btn.classList.toggle('active',btn.dataset.lobbyPrimaryChoice===draftLoadout.primaryWeapon);for(const btn of lobbyTacticalButtons)btn.classList.toggle('active',btn.dataset.lobbyTacticalChoice===draftLoadout.tactical);for(const btn of lobbyLethalButtons)btn.classList.toggle('active',btn.dataset.lobbyLethalChoice===draftLoadout.lethal);
@@ -641,12 +646,12 @@ function syncPauseContext(){
   if($('pauseRoom'))$('pauseRoom').textContent=`${mapSpec(currentMapId).short} · ${spec.short} · ${currentRoom||'----'}`;
   if($('pauseLoadout'))$('pauseLoadout').textContent=`${loadoutSummary()} · ${Math.max(0,Math.floor(ammo[currentWeapon]||0))} rounds${pendingLoadout?' · CHANGE QUEUED':''}`;
   const adminBtn=$('adminBtn');if(adminBtn)adminBtn.classList.toggle('hide',!isMatchAdmin);
-  const teamBtn=$('teamSwitchBtn');if(teamBtn)teamBtn.classList.toggle('hide',!spec.teamBased);const teamText=$('teamSwitchText');if(teamText)teamText.textContent=pendingTeam?`${pendingTeam.toUpperCase()} ON RESPAWN`:`Switch to ${myTeam==='blue'?'Red':'Blue'} on Respawn`;
+  const teamBtn=$('teamSwitchBtn');if(teamBtn)teamBtn.classList.toggle('hide',!spec.teamBased);const teamText=$('teamSwitchText');if(teamText)teamText.textContent=godMode?`Switch to ${myTeam==='blue'?'Red':'Blue'} now`:(pendingTeam?`${pendingTeam.toUpperCase()} ON RESPAWN`:`Switch to ${myTeam==='blue'?'Red':'Blue'} on Respawn`);
 }
 
 function switchLobbySide(name='players'){
-  let next=['players','match','gameplay','map','loadout','weapons'].includes(name)?name:'players';
-  if((next==='gameplay'||next==='weapons')&&!isMatchAdmin)next='players';
+  let next=['players','match','map','loadout','cheats'].includes(name)?name:'players';
+  if(next==='cheats'&&!isMatchAdmin)next='players';
   for(const tab of lobbySideTabs){const active=tab.dataset.lobbySideTab===next;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));}
   for(const view of lobbySideViews){const active=view.dataset.lobbySideView===next;view.classList.toggle('active',active);view.hidden=!active;view.inert=!active;}
   if(next==='map')requestAnimationFrame(renderLobbyMapPreview);
@@ -670,14 +675,14 @@ function syncMatchLoadoutEditor(){
   for(const btn of matchPrimaryButtons)btn.classList.toggle('active',btn.dataset.matchPrimaryChoice===draft.primaryWeapon);
   for(const btn of matchTacticalButtons)btn.classList.toggle('active',btn.dataset.matchTacticalChoice===draft.tactical);
   for(const btn of matchLethalButtons)btn.classList.toggle('active',btn.dataset.matchLethalChoice===draft.lethal);
-  const dirty=!loadoutChoiceEqual(draft,loadoutBaseDraft||draft),status=$('loadoutStatus');if(status)status.textContent=dirty?'Unsaved changes':(pendingLoadout?'Queued loadout is saved for your next spawn.':'Saved loadout · equips on your next spawn.');if($('loadoutResetBtn'))$('loadoutResetBtn').disabled=!dirty;if($('loadoutSaveBtn'))$('loadoutSaveBtn').disabled=!dirty;
+  const dirty=!loadoutChoiceEqual(draft,loadoutBaseDraft||draft),status=$('loadoutStatus'),description=$('loadoutDescription');if(description)description.textContent=godMode?'God Mode is active. Save equips the new loadout immediately.':'Changes are staged until Save. Your current life stays unchanged.';if(status)status.textContent=dirty?'Unsaved changes':godMode?'Saved loadout · changes equip immediately.':(pendingLoadout?'Queued loadout is saved for your next spawn.':'Saved loadout · equips on your next spawn.');if($('loadoutResetBtn'))$('loadoutResetBtn').disabled=!dirty;if($('loadoutSaveBtn'))$('loadoutSaveBtn').disabled=!dirty;
 }
 function openMatchLoadout(){if(!shell.inMatch)return;loadoutBaseDraft=normalizeLoadoutChoice(pendingLoadout||selectedLoadout());loadoutDraft={...loadoutBaseDraft};syncMatchLoadoutEditor();shell.openPanel(SHELL_PANEL.LOADOUT);}
 function closeMatchLoadout(){loadoutDraft=null;loadoutBaseDraft=null;shell.closePanel(SHELL_PANEL.LOADOUT);}
 function resetMatchLoadout(){if(!loadoutBaseDraft)return;loadoutDraft={...loadoutBaseDraft};syncMatchLoadoutEditor();}
 function saveMatchLoadout(){
   if(socket?.readyState!==WebSocket.OPEN||!loadoutDraft)return;if(loadoutBaseDraft&&loadoutChoiceEqual(loadoutDraft,loadoutBaseDraft)){closeMatchLoadout();return;}
-  const next=normalizeLoadoutChoice(loadoutDraft);send({t:'loadout',...next});pendingLoadout=next;rememberPrimary(next.primaryWeapon);rememberEquipment(next.tactical,next.lethal);syncPauseContext();showToast(hp<=0?'LOADOUT SAVED FOR RESPAWN':'LOADOUT SAVED · NEXT SPAWN');closeMatchLoadout();
+  const next=normalizeLoadoutChoice(loadoutDraft);send({t:'loadout',...next});rememberPrimary(next.primaryWeapon);rememberEquipment(next.tactical,next.lethal);if(godMode){pendingLoadout=null;showToast('LOADOUT APPLIED');}else{pendingLoadout=next;showToast(hp<=0?'LOADOUT SAVED FOR RESPAWN':'LOADOUT SAVED · NEXT SPAWN');}syncPauseContext();closeMatchLoadout();
 }
 
 function weaponSoundCueIds(weapon=currentWeapon){return weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotShotgun','reloadShotgun']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='grenadeLauncher'||weapon==='rpg'?['shotShotgun','reloadSniper']:weapon==='assault'||weapon==='ump'?['shotAssault','reloadAssault']:['shotPistol','reloadPistol'];}
@@ -1091,6 +1096,7 @@ function bindUI(){
   for(const tab of deployTabs)tab.addEventListener('click',()=>setDeployMode(tab.dataset.deployTab));
   setDeployMode(requestedRoom?'join':'create');
   bindSubTabs('[data-settings-tab]','[data-settings-page]','data-settings-tab','data-settings-page','controls');
+  bindSubTabs('[data-lobby-cheat-tab]','[data-lobby-cheat-page]','data-lobby-cheat-tab','data-lobby-cheat-page','gameplay');
 
   $('createBtn').addEventListener('click',createMatch);
   $('refreshBtn').addEventListener('click',refreshMatches);
@@ -1121,7 +1127,7 @@ function bindUI(){
   for(const btn of gameTextKeyboard?.querySelectorAll('[data-editor-char],[data-editor-action]')||[])btn.addEventListener('click',()=>handleGameTextEditorButton(btn));
   $('resumeBtn').addEventListener('click', resumeFromGesture);
   $('copyBtn').addEventListener('click', copyInvite);
-  $('teamSwitchBtn').addEventListener('click',()=>requestTeamChange(pendingTeam?myTeam:(myTeam==='blue'?'red':'blue')));
+  $('teamSwitchBtn').addEventListener('click',()=>requestTeamChange(godMode?(myTeam==='blue'?'red':'blue'):(pendingTeam?myTeam:(myTeam==='blue'?'red':'blue'))));
   $('adminBtn').addEventListener('click',()=>openAdminPanel('gameplay'));
   $('adminCancelBtn').addEventListener('click',closeAdminPanel);
   $('adminSaveBtn').addEventListener('click',saveAdminSettings);
@@ -1143,6 +1149,7 @@ function bindUI(){
   $('lobbyLeaveBtn').addEventListener('click',leaveMatch);
   $('lobbyCopyBtn').addEventListener('click',copyInvite);
   for(const tab of lobbySideTabs)tab.addEventListener('click',()=>switchLobbySide(tab.dataset.lobbySideTab));
+  $('lobbyGodModeToggle')?.addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN)send({t:'god',enabled:!godMode});});
   switchLobbySide('players');
   for(const btn of lobbyTeamButtons)btn.addEventListener('click',()=>{if(socket?.readyState===WebSocket.OPEN)send({t:'team',team:btn.dataset.lobbyTeamChoice});});
   for(const btn of lobbyPrimaryButtons)btn.addEventListener('click',()=>setLobbyLoadoutDraft({primaryWeapon:btn.dataset.lobbyPrimaryChoice}));
@@ -1181,6 +1188,10 @@ function bindUI(){
     if(Math.abs(e.movementX)+Math.abs(e.movementY)>.01)setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
     const sens=aimSensitivityScale()*playerSettings.lookSensitivity;yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
   });
+  document.addEventListener('pointerdown',e=>{
+    if(e.pointerType==='touch'||e.pointerType==='pen'){activateTouchInputMode();setActiveInputMode(INPUT_MODE.TOUCH,{quiet:true});}
+    else if(e.pointerType==='mouse')setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
+  },{capture:true,passive:true});
   document.addEventListener('keydown', e => {
     if(gameTextEditorTarget){handlePhysicalGameTextKey(e);return;}
     if(chatOpen){handlePhysicalChatKey(e);return;}
@@ -1250,6 +1261,7 @@ function openGameTextEditor(target){
 function closeGameTextEditor(commit){
   if(!gameTextEditorTarget)return;const target=gameTextEditorTarget;if(commit){target.value=normalizeGameTextDraft(gameTextEditorDraft);target.dispatchEvent(new Event('change',{bubbles:true}));}
   gameTextEditorTarget=null;gameTextEditorDraft='';gameTextEditor.classList.add('hide');clearControllerUiFocus();
+  if(controllerInputActive())requestAnimationFrame(()=>setControllerUiFocus(target));
 }
 function cancelGameTextEditor(){closeGameTextEditor(false);}
 function commitGameTextEditor(){closeGameTextEditor(true);}
@@ -1616,7 +1628,7 @@ function handleMessage(m){
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';r.swapStartedAt=performance.now();syncRemoteWeapon(r);}return;}
   if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;if(r.reloadWeapon!=='shotgun'&&r.reloadUntil)playSpatialCue(reloadSoundId(r.reloadWeapon),r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
   if(m.t==='reloadShell'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=r.reloadUntil?serverNow():0;r.reloadWeapon=r.reloadUntil?'shotgun':'';playSpatialCue('reloadShotgun',r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
-  if(m.t==='god'){if(typeof m.custom==='boolean')matchCustom=m.custom;if(m.id===clientId){godMode=!!m.enabled;syncLobby();showToast(godMode?'GOD MODE ENABLED':'GOD MODE DISABLED',{priority:2,key:'god-mode-state'});}else{const row=lobbyParticipants.get(String(m.id||''));if(row)row.godMode=!!m.enabled;const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}renderAdminPlayers();syncLobby();return;}
+  if(m.t==='god'){if(typeof m.custom==='boolean')matchCustom=m.custom;if(m.id===clientId){godMode=!!m.enabled;syncLobby();syncPauseContext();if(shell.panel===SHELL_PANEL.LOADOUT)syncMatchLoadoutEditor();showToast(godMode?'GOD MODE ENABLED':'GOD MODE DISABLED',{priority:2,key:'god-mode-state'});}else{const row=lobbyParticipants.get(String(m.id||''));if(row)row.godMode=!!m.enabled;const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;}}renderAdminPlayers();syncLobby();return;}
   if(m.t==='adminRole'){if(m.id===clientId){isMatchAdmin=!!m.enabled;syncPauseContext();if(!isMatchAdmin&&shell.panel===SHELL_PANEL.ADMIN)closeAdminPanel();showToast(isMatchAdmin?'ADMIN PRIVILEGES GRANTED':'ADMIN PRIVILEGES REMOVED');}else{const row=lobbyParticipants.get(String(m.id||''));if(row)row.admin=!!m.enabled;const r=remotes.get(m.id);if(r)r.admin=!!m.enabled;}renderAdminPlayers();syncLobby();return;}
   if(m.t==='teamQueued'){if(m.id===clientId){pendingTeam=m.pendingTeam||'';syncPauseContext();showToast(pendingTeam?`TEAM SWITCH QUEUED · ${pendingTeam.toUpperCase()}`:'TEAM SWITCH CANCELED');syncLobby();}return;}
   if(m.t==='matchLobby'){handleMatchLobby(m);return;}
@@ -1697,7 +1709,7 @@ function renderAdminPlayers(force=false){
   for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});
   for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl&&!pl.self)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});
 }
-function requestTeamChange(team){if(!shell.inMatch||socket?.readyState!==WebSocket.OPEN)return;const next=team==='red'?'red':'blue';send({t:'team',team:next});showToast(next===myTeam?'CANCELING TEAM SWITCH':`SWITCH TO ${next.toUpperCase()} ON RESPAWN`);}
+function requestTeamChange(team){if(!shell.inMatch||socket?.readyState!==WebSocket.OPEN)return;const next=team==='red'?'red':'blue';send({t:'team',team:next});if(godMode)showToast(next===myTeam?`ALREADY ON ${next.toUpperCase()}`:`SWITCHING TO ${next.toUpperCase()}`);else showToast(next===myTeam?'CANCELING TEAM SWITCH':`SWITCH TO ${next.toUpperCase()} ON RESPAWN`);}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
 function applyRemoteTeamVisual(r,team){if(!r)return;const next=team==='red'?'red':'blue';r.team=next;r.color=remoteDisplayColor(next);if(r.body?.material?.color)r.body.material.color.set(remoteDisplayColor(next));if(r.tag){r.group.remove(r.tag);r.tag.material?.map?.dispose?.();r.tag.material?.dispose?.();r.tag=makeNameTag(r.bot?`[BOT] ${r.name}`:r.name,remoteDisplayColor(next));r.tag.position.set(0,2.18,0);r.tag.visible=r.hp>0&&(modeFriendly(next)||samePlayerId(r.id,aimedRemoteId));r.group.add(r.tag);}}
 function syncAdminWeaponEditor(name='assault'){
@@ -1709,7 +1721,7 @@ function syncAdminWeaponEditor(name='assault'){
     card.hidden=!active;card.inert=!active;
   }
 }
-function openAdminPanel(initialTab='gameplay'){if(!isMatchAdmin){showToast('HOST ACCESS REQUIRED');return;}if(shell.inLobby){syncLobbyHostControlPlacement();switchLobbySide(initialTab==='advanced'?'weapons':initialTab==='players'?'players':'gameplay');return;}syncLobbyHostControlPlacement();syncAdminContext();populateAdminSettings(worldSettings);switchAdminTab(initialTab);syncAdminWeaponEditor($('adminWeaponSelect')?.value||'assault');setAdminStatus(matchCustom?'CUSTOM tuning active.':'Advanced settings are unchanged.');shell.openPanel(SHELL_PANEL.ADMIN);renderAdminPlayers(true);}
+function openAdminPanel(initialTab='gameplay'){if(!isMatchAdmin){showToast('HOST ACCESS REQUIRED');return;}if(shell.inLobby){syncLobbyHostControlPlacement();if(initialTab==='players'){switchLobbySide('players');return;}switchLobbySide('cheats');switchSubTabs('[data-lobby-cheat-tab]','[data-lobby-cheat-page]','data-lobby-cheat-tab','data-lobby-cheat-page',initialTab==='advanced'?'weapons':'gameplay');return;}syncLobbyHostControlPlacement();syncAdminContext();populateAdminSettings(worldSettings);switchAdminTab(initialTab);syncAdminWeaponEditor($('adminWeaponSelect')?.value||'assault');setAdminStatus(matchCustom?'CUSTOM tuning active.':'Advanced settings are unchanged.');shell.openPanel(SHELL_PANEL.ADMIN);renderAdminPlayers(true);}
 function closeAdminPanel(){shell.closePanel(SHELL_PANEL.ADMIN);}
 function resetActiveAdminTab(){if(activeAdminTab==='gameplay'){populateAdminGameplay(worldSettings);populateAdminBots(botConfig);}else if(activeAdminTab==='advanced')populateAdminWeapons(worldSettings);setAdminStatus('Changes reset.');}
 function saveAdminSettings(){
@@ -2351,10 +2363,16 @@ function clearControllerUiEditing(){
   if(controllerUiEditing?.classList)controllerUiEditing.classList.remove('controller-editing');
   controllerUiEditing=null;
 }
+function controllerFocusKey(el){
+  if(!el)return'';if(el.id)return`id:${el.id}`;
+  const stableData=['deployTab','lobbySideTab','lobbyCheatTab','lobbyAdminGod','lobbyAdminRole','adminGod','adminRole','lobbyMapChoice','lobbyMode','loadoutChoice','matchPrimaryChoice','matchTacticalChoice','matchLethalChoice','settingsTab','adminTab','chatChar','chatAction','editorChar','editorAction','gameControl'];
+  for(const key of stableData){const value=el.dataset?.[key];if(value!=null&&value!=='')return`data:${key}:${value}`;}
+  const text=String(el.textContent||'').replace(/\s+/g,' ').trim().slice(0,48);return`${el.tagName||''}:${text}`;
+}
 function clearControllerUiFocus(){
   clearControllerUiEditing();
   if(controllerUiFocus?.classList)controllerUiFocus.classList.remove('controller-focus');
-  controllerUiFocus=null;
+  controllerUiFocus=null;controllerUiFocusKey='';
 }
 function resetControllerUiAxis(){controllerUiAxisDirection='';controllerUiAxisNextAt=0;}
 function controllerEditableField(el){return !!el?.matches?.('[data-game-control="cycle"],[data-game-control="stepper"],[data-game-control="slider"]');}
@@ -2364,7 +2382,7 @@ function setControllerUiEditing(el){
 }
 function controllerUiSurface(){
   if(gameTextEditorTarget)return gameTextEditor;
-  if(chatOpen)return null;
+  if(chatOpen)return chatComposer;
   if(shell.panel===SHELL_PANEL.SETTINGS)return $('settingsPanel');
   if(shell.panel===SHELL_PANEL.ADMIN)return $('adminPanel');
   if(shell.panel===SHELL_PANEL.LOADOUT)return $('loadoutPanel');
@@ -2374,30 +2392,80 @@ function controllerUiSurface(){
   if(!menu.classList.contains('hide'))return menu;
   return null;
 }
+function controllerElementVisible(el,surface){
+  if(!el||!surface||!surface.contains(el)||el.disabled)return false;
+  if(el.closest('[hidden],.hide,[aria-hidden="true"]'))return false;
+  const style=getComputedStyle(el);if(style.display==='none'||style.visibility==='hidden'||Number(style.opacity)===0)return false;
+  const r=el.getBoundingClientRect();if(r.width<=2||r.height<=2)return false;
+  return true;
+}
 function controllerFocusableElements(){
   const surface=controllerUiSurface();if(!surface)return[];
-  return [...surface.querySelectorAll('button:not([disabled]):not([tabindex="-1"]),[data-game-control][tabindex="0"]:not(.disabled)')].filter(el=>{
-    if(el.closest('[hidden],.hide'))return false;const r=el.getBoundingClientRect();return r.width>2&&r.height>2;
-  });
+  const selector='button:not([disabled]):not(.game-control-arrow),[role="tab"]:not([disabled]),[data-game-control][tabindex="0"]:not(.disabled),[data-controller-focusable="true"]';
+  return [...new Set(surface.querySelectorAll(selector))].filter(el=>controllerElementVisible(el,surface));
 }
 function setControllerUiFocus(el){
-  if(!el)return false;if(controllerUiFocus===el)return true;clearControllerUiFocus();controllerUiFocus=el;el.classList.add('controller-focus');el.focus?.({preventScroll:true});el.scrollIntoView?.({block:'nearest',inline:'nearest'});return true;
+  const surface=controllerUiSurface();if(!controllerElementVisible(el,surface))return false;
+  if(controllerUiFocus===el)return true;
+  clearControllerUiFocus();controllerUiFocus=el;controllerUiFocusKey=controllerFocusKey(el);el.classList.add('controller-focus');
+  try{el.focus?.({preventScroll:true});}catch{el.focus?.();}
+  el.scrollIntoView?.({block:'nearest',inline:'nearest'});return true;
+}
+function preferredControllerFocus(list,surface){
+  if(!list.length)return null;
+  const chatDefault=surface===chatComposer?list.find(el=>el.dataset?.chatChar==='q'):surface===gameTextEditor?list.find(el=>el.dataset?.editorChar==='q'):null;if(chatDefault)return chatDefault;
+  const activeTab=list.find(el=>el.closest?.('[role="tablist"]')&&el.getAttribute('aria-selected')==='true');if(activeTab)return activeTab;
+  const primary=list.find(el=>el.dataset?.controllerDefault==='true')||list.find(el=>el.classList?.contains('active'));if(primary)return primary;
+  const sr=surface.getBoundingClientRect(),sx=sr.left+sr.width/2,sy=sr.top+sr.height/2;
+  return list.reduce((best,el)=>{
+    const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
+    const score=(y-sr.top)*1.15+Math.abs(x-sx)*.12;
+    return !best||score<best.score?{el,score}:best;
+  },null)?.el||list[0];
 }
 function ensureControllerUiFocus(){
-  const list=controllerFocusableElements();if(!list.length){clearControllerUiFocus();return null;}
-  if(!list.includes(controllerUiFocus))setControllerUiFocus(list[0]);return controllerUiFocus;
+  const surface=controllerUiSurface(),list=controllerFocusableElements();if(!surface||!list.length){clearControllerUiFocus();return null;}
+  if(!list.includes(controllerUiFocus)){
+    const priorKey=controllerUiFocusKey||controllerFocusKey(controllerUiFocus);
+    const restored=priorKey?list.find(el=>controllerFocusKey(el)===priorKey):null;
+    setControllerUiFocus(restored||preferredControllerFocus(list,surface));
+  }
+  return controllerUiFocus;
+}
+function intervalGap(a0,a1,b0,b1){if(a1<b0)return b0-a1;if(b1<a0)return a0-b1;return 0;}
+function controllerDirectionScore(a,r,dx,dy){
+  const ax=a.left+a.width/2,ay=a.top+a.height/2,bx=r.left+r.width/2,by=r.top+r.height/2,vx=bx-ax,vy=by-ay;
+  if(dx<0&&vx>=-3||dx>0&&vx<=3||dy<0&&vy>=-3||dy>0&&vy<=3)return null;
+  const horizontal=dx!==0;
+  const primary=horizontal?Math.max(0,dx>0?r.left-a.right:a.left-r.right):Math.max(0,dy>0?r.top-a.bottom:a.top-r.bottom);
+  const crossGap=horizontal?intervalGap(a.top,a.bottom,r.top,r.bottom):intervalGap(a.left,a.right,r.left,r.right);
+  const crossCenter=horizontal?Math.abs(vy):Math.abs(vx);
+  const centerPrimary=horizontal?Math.abs(vx):Math.abs(vy);
+  const angleRatio=crossCenter/Math.max(1,centerPrimary);
+  const aligned=crossGap<=Math.max(8,(horizontal?Math.min(a.height,r.height):Math.min(a.width,r.width))*.18);
+  if(!aligned&&angleRatio>1.15)return null;
+  return {score:primary+crossGap*4.5+crossCenter*.22+centerPrimary*.035,aligned};
+}
+function moveControllerTabFocus(current,dx){
+  if(!current||!dx)return false;
+  const tablist=current.closest?.('[role="tablist"]');if(!tablist)return false;
+  const tabs=[...tablist.querySelectorAll('[role="tab"],button')].filter(el=>controllerElementVisible(el,controllerUiSurface())&&!el.disabled);
+  if(tabs.length<2)return false;const index=tabs.indexOf(current);if(index<0)return false;
+  const next=(index+(dx>0?1:-1)+tabs.length)%tabs.length;setControllerUiFocus(tabs[next]);tabs[next].click();return true;
 }
 function moveControllerUiFocus(dx,dy){
-  const list=controllerFocusableElements();if(!list.length)return;const current=ensureControllerUiFocus();if(!current)return;
-  const a=current.getBoundingClientRect(),ax=a.left+a.width/2,ay=a.top+a.height/2;let best=null,bestScore=Infinity;
-  for(const el of list){if(el===current)continue;const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,vx=x-ax,vy=y-ay;
-    if(dx<0&&vx>=-2||dx>0&&vx<=2||dy<0&&vy>=-2||dy>0&&vy<=2)continue;
-    const primary=Math.abs(dx?vx:vy),cross=Math.abs(dx?vy:vx),score=primary+cross*1.65;if(score<bestScore){bestScore=score;best=el;}
+  const list=controllerFocusableElements();if(!list.length)return false;const current=ensureControllerUiFocus();if(!current)return false;
+  if(dx&&moveControllerTabFocus(current,dx))return true;
+  if(dx>0&&controllerUiSurface()===menu&&current.closest?.('.front-nav')){
+    const activeView=menu.querySelector('.deploy-view:not([hidden]):not(.hide)');
+    if(activeView){const targets=list.filter(el=>activeView.contains(el));const target=preferredControllerFocus(targets,activeView);if(target){setControllerUiFocus(target);return true;}}
   }
-  // Complex responsive grids can leave no geometric candidate in one direction.
-  // Fall back to document order so every visible control remains reachable.
-  if(!best){const index=list.indexOf(current),step=(dx>0||dy>0)?1:-1,next=index+step;if(next>=0&&next<list.length)best=list[next];}
-  if(best)setControllerUiFocus(best);
+  const a=current.getBoundingClientRect();let alignedBest=null,alignedScore=Infinity,fallbackBest=null,fallbackScore=Infinity;
+  for(const el of list){if(el===current)continue;const result=controllerDirectionScore(a,el.getBoundingClientRect(),dx,dy);if(!result)continue;
+    if(result.aligned&&result.score<alignedScore){alignedBest=el;alignedScore=result.score;}
+    if(result.score<fallbackScore){fallbackBest=el;fallbackScore=result.score;}
+  }
+  const best=alignedBest||fallbackBest;if(best){setControllerUiFocus(best);return true;}return false;
 }
 function adjustControllerField(el,dir){if(!el||!dir||controllerUiEditing!==el)return false;return adjustGameControl(el,dir);}
 function controllerAnalogUiDirection(){
@@ -2409,27 +2477,42 @@ function controllerAnalogUiDirection(){
   if(now>=controllerUiAxisNextAt){controllerUiAxisNextAt=now+135;return{dx,dy};}
   return null;
 }
+function cycleControllerTabs(direction){
+  if(controllerUiEditing)return false;const surface=controllerUiSurface();if(!surface)return false;
+  const focusedList=controllerUiFocus?.closest?.('[role="tablist"]');
+  let tablist=focusedList;
+  if(!tablist){
+    const lists=[...surface.querySelectorAll('[role="tablist"]')].filter(el=>{const r=el.getBoundingClientRect(),style=getComputedStyle(el);return r.width>2&&r.height>2&&style.display!=='none'&&style.visibility!=='hidden'&&!el.closest('[hidden],.hide');});
+    if(lists.length){const fr=controllerUiFocus?.getBoundingClientRect?.()||surface.getBoundingClientRect(),fx=fr.left+fr.width/2,fy=fr.top+fr.height/2;tablist=lists.reduce((best,el)=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,score=Math.hypot((x-fx)*.55,y-fy);return!best||score<best.score?{el,score}:best;},null)?.el||null;}
+  }
+  if(!tablist)return false;
+  const tabs=[...tablist.querySelectorAll('[role="tab"],button')].filter(el=>controllerElementVisible(el,surface)&&!el.disabled);if(!tabs.length)return false;
+  let cur=tabs.indexOf(controllerUiFocus);if(cur<0)cur=Math.max(0,tabs.findIndex(el=>el.getAttribute('aria-selected')==='true'));
+  const next=(cur+direction+tabs.length)%tabs.length;setControllerUiFocus(tabs[next]);tabs[next].click();return true;
+}
 function handleControllerUiNavigation(pressed){
   const surface=controllerUiSurface();if(!surface){clearControllerUiFocus();resetControllerUiAxis();return false;}const focus=ensureControllerUiFocus();
   if(pressed[GAMEPAD_BUTTON.B]){
     if(controllerUiEditing){clearControllerUiEditing();return true;}
+    if(chatOpen){void dismissChat({restorePointer:false});return true;}
     if(gameTextEditorTarget){cancelGameTextEditor();return true;}
-    if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return true;}if(shell.panel===SHELL_PANEL.ADMIN){closeAdminPanel();return true;}if(shell.panel===SHELL_PANEL.LOADOUT){closeMatchLoadout();return true;}if(shell.paused){shell.resumeFromAlternateInput();clock?.getDelta();return true;}
+    if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return true;}
+    if(shell.panel===SHELL_PANEL.ADMIN){closeAdminPanel();return true;}
+    if(shell.panel===SHELL_PANEL.LOADOUT){closeMatchLoadout();return true;}
+    if(shell.paused){shell.resumeFromAlternateInput();clock?.getDelta();return true;}
   }
   if(pressed[GAMEPAD_BUTTON.A]&&focus){
     if(controllerEditableField(focus)){if(controllerUiEditing===focus)clearControllerUiEditing();else setControllerUiEditing(focus);return true;}
     if(focus.tagName==='BUTTON'||focus.dataset?.gameControl==='text'){focus.click();return true;}
-    focus.focus();return true;
+    focus.focus?.();return true;
   }
-  if(!controllerUiEditing&&(pressed[GAMEPAD_BUTTON.LB]||pressed[GAMEPAD_BUTTON.RB])){
-    const tablist=controllerUiFocus?.closest?.('[role=tablist]')||[...surface.querySelectorAll('[role=tablist]')].find(el=>!el.closest('[hidden],.hide'));
-    const tabs=tablist?[...tablist.querySelectorAll('button:not([disabled])')].filter(el=>!el.closest('[hidden],.hide')):[];if(tabs.length){const cur=Math.max(0,tabs.indexOf(controllerUiFocus)),next=(cur+(pressed[GAMEPAD_BUTTON.RB]?1:-1)+tabs.length)%tabs.length;setControllerUiFocus(tabs[next]);tabs[next].click();return true;}
-  }
+  if(pressed[GAMEPAD_BUTTON.LB]&&cycleControllerTabs(-1))return true;
+  if(pressed[GAMEPAD_BUTTON.RB]&&cycleControllerTabs(1))return true;
   let nav=null;
   if(pressed[GAMEPAD_BUTTON.DPAD_LEFT])nav={dx:-1,dy:0};else if(pressed[GAMEPAD_BUTTON.DPAD_RIGHT])nav={dx:1,dy:0};else if(pressed[GAMEPAD_BUTTON.DPAD_UP])nav={dx:0,dy:-1};else if(pressed[GAMEPAD_BUTTON.DPAD_DOWN])nav={dx:0,dy:1};else nav=controllerAnalogUiDirection();
   if(nav){
     if(controllerUiEditing){const dir=nav.dx?nav.dx:-nav.dy;if(dir&&adjustControllerField(focus,dir))return true;return true;}
-    moveControllerUiFocus(nav.dx,nav.dy);return true;
+    return moveControllerUiFocus(nav.dx,nav.dy);
   }
   return false;
 }
@@ -2455,9 +2538,14 @@ function updateGamepadInput(dt){
     if(activeInputMode===INPUT_MODE.CONTROLLER){clearControllerGameplayInput();setActiveInputMode(isTouch?INPUT_MODE.TOUCH:INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});if(shell.inMatch)showToast('CONTROLLER DISCONNECTED');}
   }else if(gamepadFrame.connected&&gamepadFrame.meaningful&&activeInputMode!==INPUT_MODE.CONTROLLER)setActiveInputMode(INPUT_MODE.CONTROLLER,{quiet:true});
   if(!controllerInputActive())return;
-  if(chatOpen){clearControllerGameplayInput();return;}
 
   const pressed=gamepadFrame.pressed,released=gamepadFrame.released,buttons=gamepadFrame.buttons;
+  if(chatOpen){
+    clearControllerGameplayInput();
+    handleControllerUiNavigation(pressed);
+    if(chatPanel?.maxScroll>0&&Math.abs(gamepadFrame.lookY)>.18){chatScroll=Math.max(0,Math.min(chatPanel.maxScroll,chatScroll-gamepadFrame.lookY*9*dt));hudLastDraw=0;}
+    return;
+  }
   if(shell.inMatch&&pressed[GAMEPAD_BUTTON.MENU]){
     clearFireInput();cancelEquipmentAim();
     if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return;}
@@ -2469,6 +2557,7 @@ function updateGamepadInput(dt){
   if(!shell.canPlay){gamepadFireDown=false;if(controllerOwnsAim){controllerOwnsAim=false;setAim(false);}handleControllerUiNavigation(pressed);return;}
   clearControllerUiFocus();
   if(hp<=0&&pressed[GAMEPAD_BUTTON.Y]){openMatchLoadout();return;}
+  if(hp>0&&pressed[GAMEPAD_BUTTON.LS]){openChat();return;}
 
   if(pressed[GAMEPAD_BUTTON.VIEW]){scoreboardOpen=true;scoreboardScroll=0;clearFireInput();cancelEquipmentAim();}
   if(released[GAMEPAD_BUTTON.VIEW])scoreboardOpen=false;

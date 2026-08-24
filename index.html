@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.37.16" rel="manifest"/>
-<title>Breach v1.37.16</title>
-<link href="ui.css?v=1.37.16" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.37.18" rel="manifest"/>
+<title>Breach v1.37.18</title>
+<link href="ui.css?v=1.37.18" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -145,10 +145,9 @@
 <div aria-label="Lobby panels" class="lobby-side-tabs" role="tablist">
 <button aria-selected="true" class="lobby-side-tab active" data-lobby-side-tab="players" type="button">PLAYERS</button>
 <button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="match" type="button">MATCH</button>
-<button aria-selected="false" class="lobby-side-tab hide" data-lobby-side-tab="gameplay" id="lobbyGameplayTab" type="button">GAMEPLAY</button>
 <button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="map" type="button">MAP</button>
 <button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="loadout" type="button">LOADOUT</button>
-<button aria-selected="false" class="lobby-side-tab hide" data-lobby-side-tab="weapons" id="lobbyWeaponsTab" type="button">WEAPONS</button>
+<button aria-selected="false" class="lobby-side-tab hide" data-lobby-side-tab="cheats" id="lobbyCheatsTab" type="button">CHEATS</button>
 </div>
 <section class="lobby-side-view lobby-roster-panel active" data-lobby-side-view="players">
 <div class="lobby-section-head"><div><h2>Roster</h2></div><div class="lobby-roster-actions"><span class="lobby-count" id="lobbyPlayerCount">1 / 8</span></div></div>
@@ -185,13 +184,6 @@
 
 </div>
 <div class="lobby-guest-setup" id="lobbyGuestSetup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><span id="lobbyGuestRules">First 30 · 8 min</span><small>The host controls match rules. You can change your team and loadout while you wait.</small></div>
-</section>
-</div>
-<div class="lobby-side-view lobby-gameplay-view" data-lobby-side-view="gameplay" hidden="">
-<section class="lobby-tuning-panel">
-<div class="lobby-section-head"><div><h2>Gameplay tuning</h2></div><span class="lobby-secondary">Host</span></div>
-<div class="lobby-host-control-mount lobby-gameplay-mount" id="lobbyGameplayHostMount"></div>
-
 </section>
 </div>
 <div class="lobby-side-view lobby-map-view" data-lobby-side-view="map" hidden="">
@@ -231,11 +223,27 @@
 
 </section>
 </div>
-<div class="lobby-side-view lobby-weapons-view" data-lobby-side-view="weapons" hidden="">
+<div class="lobby-side-view lobby-cheats-view" data-lobby-side-view="cheats" hidden="">
+<section class="lobby-cheats-panel">
+<div class="lobby-section-head"><div><h2>Cheats</h2></div><span class="lobby-secondary">Host only</span></div>
+<div class="lobby-cheats-toolbar">
+<div class="lobby-god-control"><div><strong>GOD MODE</strong><small>Invincibility, unlimited ammo, and instant team/loadout changes.</small></div><button aria-checked="false" aria-label="Toggle God Mode" class="switch-toggle" id="lobbyGodModeToggle" role="switch" type="button"><span></span></button></div>
+<div aria-label="Cheat categories" class="lobby-cheat-tabs" role="tablist"><button aria-selected="true" class="lobby-cheat-tab active" data-lobby-cheat-tab="gameplay" type="button">GAMEPLAY</button><button aria-selected="false" class="lobby-cheat-tab" data-lobby-cheat-tab="weapons" type="button">WEAPONS</button></div>
+</div>
+<div class="lobby-cheat-pages">
+<div class="lobby-cheat-page lobby-gameplay-view active" data-lobby-cheat-page="gameplay">
+<section class="lobby-tuning-panel">
+<div class="lobby-section-head"><div><h2>Gameplay tuning</h2></div></div>
+<div class="lobby-host-control-mount lobby-gameplay-mount" id="lobbyGameplayHostMount"></div>
+</section>
+</div>
+<div class="lobby-cheat-page lobby-weapons-view" data-lobby-cheat-page="weapons" hidden="" inert="">
 <section class="lobby-weapons-panel">
-<div class="lobby-section-head"><div><h2>Weapon tuning</h2></div><span class="lobby-secondary">Host</span></div>
+<div class="lobby-section-head"><div><h2>Weapon tuning</h2></div></div>
 <div class="lobby-host-control-mount lobby-weapons-mount" id="lobbyWeaponsHostMount"></div>
-
+</section>
+</div>
+</div>
 </section>
 </div>
 </div>
@@ -269,7 +277,7 @@
 </section>
 <section aria-label="Change loadout" class="modal-screen hide" id="loadoutPanel">
 <div class="modal-shell loadout-shell">
-<header class="modal-head"><div><h2>Loadout</h2><p>Changes are staged until Save. Your current life stays unchanged.</p></div></header>
+<header class="modal-head"><div><h2>Loadout</h2><p id="loadoutDescription">Changes are staged until Save. Your current life stays unchanged.</p></div></header>
 <div class="loadout-editor">
 <div class="loadout-section"><span>PRIMARY</span><div class="loadout-choice-grid primary-grid">
 <button class="loadout-choice" data-match-primary-choice="assault" type="button"><strong>ASSAULT RIFLE</strong></button>
@@ -286,7 +294,7 @@
 <div class="loadout-section"><span>LETHAL</span><div class="loadout-choice-grid equipment-grid"><button class="loadout-choice" data-match-lethal-choice="sticky" type="button"><strong>SEMTEX</strong></button><button class="loadout-choice" data-match-lethal-choice="frag" type="button"><strong>FRAG</strong></button></div></div>
 </div>
 </div>
-<footer class="modal-foot loadout-foot"><span class="admin-status" id="loadoutStatus">Saved changes equip on your next spawn.</span><button class="secondary-btn" id="loadoutResetBtn">RESET</button><button class="secondary-btn" id="loadoutCancelBtn">CANCEL</button><button class="primary" id="loadoutSaveBtn">SAVE</button></footer>
+<footer class="modal-foot loadout-foot"><span class="admin-status" id="loadoutStatus">Saved changes equip on your next spawn.</span><button class="secondary-btn" id="loadoutResetBtn">RESET</button><button class="secondary-btn" id="loadoutCancelBtn">CANCEL</button><button class="primary modal-action" id="loadoutSaveBtn">SAVE</button></footer>
 </div>
 </section>
 <section aria-label="Player settings" class="modal-screen hide" id="settingsPanel">
@@ -308,7 +316,7 @@
 <label class="setting select-setting"><span>Minimap orientation</span><div aria-label="Minimap orientation" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"heading","label":"Heading Up"},{"value":"north","label":"North Up"}]' data-value="heading" id="playerMinimapOrientation" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Heading Up</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <div class="setting setting-action"><span>FULLSCREEN</span><button class="secondary-btn" id="settingsFullscreenBtn" type="button">ENTER FULLSCREEN</button></div></div></section>
 </div>
-<footer class="modal-foot settings-actions"><span class="admin-status" id="settingsStatus">Saved settings</span><button class="secondary-btn" id="settingsResetBtn">RESET</button><button class="secondary-btn" id="settingsCancelBtn">CANCEL</button><button class="primary" id="settingsSaveBtn">SAVE</button></footer>
+<footer class="modal-foot settings-actions"><span class="admin-status" id="settingsStatus">Saved settings</span><button class="secondary-btn" id="settingsResetBtn">RESET</button><button class="secondary-btn" id="settingsCancelBtn">CANCEL</button><button class="primary modal-action" id="settingsSaveBtn">SAVE</button></footer>
 </div>
 </section>
 <section aria-label="Match control" class="modal-screen hide" id="adminPanel">
@@ -349,6 +357,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.37.16" type="module"></script>
+<script src="client.js?v=1.37.18" type="module"></script>
 </body>
 </html>
