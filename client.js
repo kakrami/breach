@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.25';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.25';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.25';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.25';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.25';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.25';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.25';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.25';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.26';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.26';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.26';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.26';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.26';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.26';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.26';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.26';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.25';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.25';
-import { createAudioEngine } from './audio-engine.js?v=1.37.25';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.25';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.25';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.25';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.25';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.25';
+} from './game-config.js?v=1.37.26';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.26';
+import { createAudioEngine } from './audio-engine.js?v=1.37.26';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.26';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.26';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.26';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.26';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.26';
 
 let THREE = null;
 
@@ -324,7 +324,7 @@ let gamepadFrame=gamepadInput.poll();
 let activeInputMode=gamepadFrame.connected?INPUT_MODE.CONTROLLER:(isTouch?INPUT_MODE.TOUCH:INPUT_MODE.KEYBOARD_MOUSE);
 let gamepadFireDown=false,controllerOwnsAim=false,lastGamepadKey=gamepadFrame.connected?`${gamepadFrame.index}:${gamepadFrame.id}`:'';
 let controllerUiFocus=null,controllerUiEditing=null,controllerUiFocusKey='';
-let controllerUiAxisDirection='',controllerUiAxisNextAt=0;
+let controllerUiAxisDirection='',controllerUiAxisNextAt=0,controllerUiAxisStartedAt=0,controllerUiAdjusting=null;
 appRoot.dataset.inputMode=activeInputMode;
 
 function controllerInputActive(){return activeInputMode===INPUT_MODE.CONTROLLER&&gamepadFrame.connected;}
@@ -434,7 +434,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.25';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.26';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2556,7 +2556,13 @@ function maintainNetwork(){
   lastPing=now;lastPingLocalAt=Date.now();send({t:'ping',clientAt:lastPingLocalAt});
 }
 function updatePausedNetwork(){if(traversal)updateTraversal(performance.now());maintainNetwork();}
+function finishControllerUiAdjustment(){
+  const state=controllerUiAdjusting;if(!state)return;
+  controllerUiAdjusting=null;state.el?.classList?.remove('controller-adjusting');
+  if(state.el&&String(state.el.value)!==state.startValue)state.el.dispatchEvent(new Event('change',{bubbles:true}));
+}
 function clearControllerUiEditing(){
+  finishControllerUiAdjustment();
   if(controllerUiEditing?.classList)controllerUiEditing.classList.remove('controller-editing');
   controllerUiEditing=null;
 }
@@ -2571,7 +2577,7 @@ function clearControllerUiFocus(){
   if(controllerUiFocus?.classList)controllerUiFocus.classList.remove('controller-focus');
   controllerUiFocus=null;controllerUiFocusKey='';
 }
-function resetControllerUiAxis(){controllerUiAxisDirection='';controllerUiAxisNextAt=0;}
+function resetControllerUiAxis(){controllerUiAxisDirection='';controllerUiAxisNextAt=0;controllerUiAxisStartedAt=0;}
 function controllerEditableField(el){return !!el?.matches?.('[data-game-control="cycle"],[data-game-control="stepper"],[data-game-control="slider"]');}
 function setControllerUiEditing(el){
   if(!controllerEditableField(el))return false;
@@ -2589,6 +2595,7 @@ function controllerUiSurface(){
   if(!menu.classList.contains('hide'))return menu;
   return null;
 }
+function controllerPrimaryTablist(surface){return surface?.querySelector?.('[data-controller-primary-tabs="true"]')||null;}
 function controllerElementVisible(el,surface){
   if(!el||!surface||!surface.contains(el)||el.disabled)return false;
   if(el.closest('[hidden],.hide,[aria-hidden="true"]'))return false;
@@ -2598,25 +2605,37 @@ function controllerElementVisible(el,surface){
 }
 function controllerFocusableElements(){
   const surface=controllerUiSurface();if(!surface)return[];
+  const primaryTabs=controllerPrimaryTablist(surface);
   const selector='button:not([disabled]):not(.game-control-arrow),[role="tab"]:not([disabled]),[data-game-control][tabindex="0"]:not(.disabled),[data-controller-focusable="true"]';
-  return [...new Set(surface.querySelectorAll(selector))].filter(el=>controllerElementVisible(el,surface));
+  return [...new Set(surface.querySelectorAll(selector))].filter(el=>controllerElementVisible(el,surface)&&!(primaryTabs&&primaryTabs.contains(el)));
 }
 function setControllerUiFocus(el){
   const surface=controllerUiSurface();if(!controllerElementVisible(el,surface))return false;
   if(controllerUiFocus===el)return true;
-  clearControllerUiFocus();controllerUiFocus=el;controllerUiFocusKey=controllerFocusKey(el);el.classList.add('controller-focus');
+  finishControllerUiAdjustment();
+  if(controllerUiFocus?.classList)controllerUiFocus.classList.remove('controller-focus');
+  controllerUiFocus=el;controllerUiFocusKey=controllerFocusKey(el);el.classList.add('controller-focus');
   try{el.focus?.({preventScroll:true});}catch{el.focus?.();}
   el.scrollIntoView?.({block:'nearest',inline:'nearest'});return true;
+}
+function controllerPreferredRegion(surface){
+  if(!surface)return null;
+  if(surface===lobbyScreen)return surface.querySelector('[data-lobby-side-view].active:not([hidden])')||surface;
+  if(surface===menu)return surface.querySelector('.deploy-view:not([hidden]):not(.hide)')||surface;
+  if(surface===$('settingsPanel'))return surface.querySelector('[data-settings-page].active:not([hidden])')||surface;
+  if(surface===$('adminPanel'))return surface.querySelector('[data-admin-page]:not([hidden]):not(.hide)')||surface;
+  if(surface===$('loadoutPanel'))return surface.querySelector('.loadout-grid,.loadout-body')||surface;
+  return surface;
 }
 function preferredControllerFocus(list,surface){
   if(!list.length)return null;
   const chatDefault=surface===chatComposer?list.find(el=>el.dataset?.chatChar==='q'):surface===gameTextEditor?list.find(el=>el.dataset?.editorChar==='q'):null;if(chatDefault)return chatDefault;
-  const activeTab=list.find(el=>el.closest?.('[role="tablist"]')&&el.getAttribute('aria-selected')==='true');if(activeTab)return activeTab;
+  const region=controllerPreferredRegion(surface),regionList=region&&region!==surface?list.filter(el=>region.contains(el)):list;if(regionList.length)list=regionList;
+  const activeNestedTab=list.find(el=>el.closest?.('[role="tablist"]')&&!el.closest?.('[data-controller-primary-tabs="true"]')&&el.getAttribute('aria-selected')==='true');if(activeNestedTab)return activeNestedTab;
   const primary=list.find(el=>el.dataset?.controllerDefault==='true')||list.find(el=>el.classList?.contains('active'));if(primary)return primary;
-  const sr=surface.getBoundingClientRect(),sx=sr.left+sr.width/2,sy=sr.top+sr.height/2;
+  const rr=(region||surface).getBoundingClientRect();
   return list.reduce((best,el)=>{
-    const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2;
-    const score=(y-sr.top)*1.15+Math.abs(x-sx)*.12;
+    const r=el.getBoundingClientRect(),top=Math.max(0,r.top-rr.top),left=Math.max(0,r.left-rr.left),score=top*1.2+left*.08;
     return !best||score<best.score?{el,score}:best;
   },null)?.el||list[0];
 }
@@ -2630,67 +2649,77 @@ function ensureControllerUiFocus(){
   return controllerUiFocus;
 }
 function intervalGap(a0,a1,b0,b1){if(a1<b0)return b0-a1;if(b1<a0)return a0-b1;return 0;}
+const CONTROLLER_NAV_GROUP_SELECTOR='.settings-grid,.weapon-fields,.loadout-choice-grid,.lobby-mode-picker,.lobby-setup-row,.lobby-team-picker,.admin-bot-controls,.pause-actions,.pause-actions-player,.pause-actions-system,.join-controls,.lobby-map-choice-grid,.lobby-cheat-tabs,.chat-key-row,.game-text-key-row';
+function controllerNavGroup(el){return el?.closest?.(CONTROLLER_NAV_GROUP_SELECTOR)||null;}
 function controllerDirectionScore(a,r,dx,dy){
   const ax=a.left+a.width/2,ay=a.top+a.height/2,bx=r.left+r.width/2,by=r.top+r.height/2,vx=bx-ax,vy=by-ay;
-  if(dx<0&&vx>=-3||dx>0&&vx<=3||dy<0&&vy>=-3||dy>0&&vy<=3)return null;
+  if((dx<0&&vx>=-3)||(dx>0&&vx<=3)||(dy<0&&vy>=-3)||(dy>0&&vy<=3))return null;
   const horizontal=dx!==0;
   const primary=horizontal?Math.max(0,dx>0?r.left-a.right:a.left-r.right):Math.max(0,dy>0?r.top-a.bottom:a.top-r.bottom);
   const crossGap=horizontal?intervalGap(a.top,a.bottom,r.top,r.bottom):intervalGap(a.left,a.right,r.left,r.right);
-  const crossCenter=horizontal?Math.abs(vy):Math.abs(vx);
-  const centerPrimary=horizontal?Math.abs(vx):Math.abs(vy);
+  const crossCenter=horizontal?Math.abs(vy):Math.abs(vx),centerPrimary=horizontal?Math.abs(vx):Math.abs(vy);
   const angleRatio=crossCenter/Math.max(1,centerPrimary);
   const aligned=crossGap<=Math.max(8,(horizontal?Math.min(a.height,r.height):Math.min(a.width,r.width))*.18);
-  if(!aligned&&angleRatio>1.15)return null;
-  return {score:primary+crossGap*4.5+crossCenter*.22+centerPrimary*.035,aligned};
-}
-function moveControllerTabFocus(current,dx){
-  if(!current||!dx)return false;
-  const tablist=current.closest?.('[role="tablist"]');if(!tablist)return false;
-  const tabs=[...tablist.querySelectorAll('[role="tab"],button')].filter(el=>controllerElementVisible(el,controllerUiSurface())&&!el.disabled);
-  if(tabs.length<2)return false;const index=tabs.indexOf(current);if(index<0)return false;
-  const next=(index+(dx>0?1:-1)+tabs.length)%tabs.length;setControllerUiFocus(tabs[next]);tabs[next].click();return true;
+  if(!aligned&&angleRatio>1.0)return null;
+  const direct=aligned||angleRatio<=.55;
+  return{score:primary+crossGap*5.5+crossCenter*.28+centerPrimary*.03,direct};
 }
 function moveControllerUiFocus(dx,dy){
   const list=controllerFocusableElements();if(!list.length)return false;const current=ensureControllerUiFocus();if(!current)return false;
-  if(dx&&moveControllerTabFocus(current,dx))return true;
-  if(dx>0&&controllerUiSurface()===menu&&current.closest?.('.front-nav')){
-    const activeView=menu.querySelector('.deploy-view:not([hidden]):not(.hide)');
-    if(activeView){const targets=list.filter(el=>activeView.contains(el));const target=preferredControllerFocus(targets,activeView);if(target){setControllerUiFocus(target);return true;}}
-  }
-  const a=current.getBoundingClientRect();let alignedBest=null,alignedScore=Infinity,fallbackBest=null,fallbackScore=Infinity;
+  const a=current.getBoundingClientRect(),group=controllerNavGroup(current);
+  let sameDirect=null,sameDirectScore=Infinity,direct=null,directScore=Infinity,sameFallback=null,sameFallbackScore=Infinity,fallback=null,fallbackScore=Infinity;
   for(const el of list){if(el===current)continue;const result=controllerDirectionScore(a,el.getBoundingClientRect(),dx,dy);if(!result)continue;
-    if(result.aligned&&result.score<alignedScore){alignedBest=el;alignedScore=result.score;}
-    if(result.score<fallbackScore){fallbackBest=el;fallbackScore=result.score;}
+    const sameGroup=!!group&&controllerNavGroup(el)===group;
+    if(result.direct&&sameGroup&&result.score<sameDirectScore){sameDirect=el;sameDirectScore=result.score;}
+    if(result.direct&&result.score<directScore){direct=el;directScore=result.score;}
+    if(sameGroup&&result.score<sameFallbackScore){sameFallback=el;sameFallbackScore=result.score;}
+    if(result.score<fallbackScore){fallback=el;fallbackScore=result.score;}
   }
-  const best=alignedBest||fallbackBest;if(best){setControllerUiFocus(best);return true;}return false;
+  const best=sameDirect||direct||sameFallback||fallback;if(best){setControllerUiFocus(best);return true;}return false;
 }
-function adjustControllerField(el,dir){if(!el||!dir||controllerUiEditing!==el)return false;return adjustGameControl(el,dir);}
-function controllerAnalogUiDirection(){
-  const x=Number(gamepadFrame.moveX)||0,y=Number(gamepadFrame.moveY)||0,threshold=.62;let dx=0,dy=0;
-  if(Math.max(Math.abs(x),Math.abs(y))<threshold){resetControllerUiAxis();return null;}
-  if(Math.abs(x)>=Math.abs(y))dx=x>0?1:-1;else dy=y>0?1:-1;
-  const key=`${dx},${dy}`,now=performance.now();
-  if(key!==controllerUiAxisDirection){controllerUiAxisDirection=key;controllerUiAxisNextAt=now+320;return{dx,dy};}
-  if(now>=controllerUiAxisNextAt){controllerUiAxisNextAt=now+135;return{dx,dy};}
+function controllerUiDirection(pressed){
+  const held=gamepadFrame.held||[],threshold=.62;let dx=0,dy=0,source='';
+  const dl=!!held[GAMEPAD_BUTTON.DPAD_LEFT],dr=!!held[GAMEPAD_BUTTON.DPAD_RIGHT],du=!!held[GAMEPAD_BUTTON.DPAD_UP],dd=!!held[GAMEPAD_BUTTON.DPAD_DOWN];
+  const ddx=(dr?1:0)-(dl?1:0),ddy=(dd?1:0)-(du?1:0);
+  if(ddx||ddy){
+    source='d';
+    if(ddx&&ddy){
+      const horizontalPressed=pressed[GAMEPAD_BUTTON.DPAD_LEFT]||pressed[GAMEPAD_BUTTON.DPAD_RIGHT],verticalPressed=pressed[GAMEPAD_BUTTON.DPAD_UP]||pressed[GAMEPAD_BUTTON.DPAD_DOWN];
+      if(horizontalPressed&&!verticalPressed)dx=ddx;else if(verticalPressed&&!horizontalPressed)dy=ddy;else if(controllerUiAxisDirection.endsWith(`${ddx},0`))dx=ddx;else dy=ddy;
+    }else{dx=ddx;dy=ddy;}
+  }else{
+    const x=Number(gamepadFrame.moveX)||0,y=Number(gamepadFrame.moveY)||0;
+    if(Math.max(Math.abs(x),Math.abs(y))>=threshold){source='s';if(Math.abs(x)>=Math.abs(y))dx=x>0?1:-1;else dy=y>0?1:-1;}
+  }
+  if(!dx&&!dy){resetControllerUiAxis();return null;}
+  const key=`${source}:${dx},${dy}`,now=performance.now(),justPressed=source==='d'&&(pressed[GAMEPAD_BUTTON.DPAD_LEFT]||pressed[GAMEPAD_BUTTON.DPAD_RIGHT]||pressed[GAMEPAD_BUTTON.DPAD_UP]||pressed[GAMEPAD_BUTTON.DPAD_DOWN]);
+  if(key!==controllerUiAxisDirection||justPressed){controllerUiAxisDirection=key;controllerUiAxisStartedAt=now;controllerUiAxisNextAt=now+360;return{dx,dy};}
+  if(now>=controllerUiAxisNextAt){const heldFor=now-controllerUiAxisStartedAt,delay=heldFor>=2400?55:heldFor>=1200?80:115;controllerUiAxisNextAt=now+delay;return{dx,dy};}
   return null;
 }
+function controllerEditAdjustHeld(){
+  const held=gamepadFrame.held||[];if(held[GAMEPAD_BUTTON.DPAD_LEFT]||held[GAMEPAD_BUTTON.DPAD_RIGHT]||held[GAMEPAD_BUTTON.DPAD_UP]||held[GAMEPAD_BUTTON.DPAD_DOWN])return true;
+  const x=Number(gamepadFrame.moveX)||0,y=Number(gamepadFrame.moveY)||0;return Math.max(Math.abs(x),Math.abs(y))>=.62;
+}
+function stepControllerField(el,dir){
+  if(!controllerEditableField(el)||!dir)return false;
+  if(controllerUiAdjusting?.el!==el){finishControllerUiAdjustment();controllerUiAdjusting={el,startValue:String(el.value)};el.classList.add('controller-adjusting');}
+  return adjustGameControl(el,dir,{commit:false});
+}
 function cycleControllerTabs(direction){
-  if(controllerUiEditing)return false;const surface=controllerUiSurface();if(!surface)return false;
-  const focusedList=controllerUiFocus?.closest?.('[role="tablist"]');
-  let tablist=focusedList;
-  if(!tablist){
-    const lists=[...surface.querySelectorAll('[role="tablist"]')].filter(el=>{const r=el.getBoundingClientRect(),style=getComputedStyle(el);return r.width>2&&r.height>2&&style.display!=='none'&&style.visibility!=='hidden'&&!el.closest('[hidden],.hide');});
-    if(lists.length){const fr=controllerUiFocus?.getBoundingClientRect?.()||surface.getBoundingClientRect(),fx=fr.left+fr.width/2,fy=fr.top+fr.height/2;tablist=lists.reduce((best,el)=>{const r=el.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,score=Math.hypot((x-fx)*.55,y-fy);return!best||score<best.score?{el,score}:best;},null)?.el||null;}
-  }
-  if(!tablist)return false;
-  const tabs=[...tablist.querySelectorAll('[role="tab"],button')].filter(el=>controllerElementVisible(el,surface)&&!el.disabled);if(!tabs.length)return false;
-  let cur=tabs.indexOf(controllerUiFocus);if(cur<0)cur=Math.max(0,tabs.findIndex(el=>el.getAttribute('aria-selected')==='true'));
-  const next=(cur+direction+tabs.length)%tabs.length;setControllerUiFocus(tabs[next]);tabs[next].click();return true;
+  const surface=controllerUiSurface();if(!surface)return false;const tablist=controllerPrimaryTablist(surface);if(!tablist)return false;
+  const tabs=[...tablist.querySelectorAll('[role="tab"],button')].filter(el=>controllerElementVisible(el,surface)&&!el.disabled);if(tabs.length<2)return false;
+  let cur=tabs.findIndex(el=>el.getAttribute('aria-selected')==='true'||el.classList.contains('active'));if(cur<0)cur=0;
+  const next=(cur+direction+tabs.length)%tabs.length;finishControllerUiAdjustment();tabs[next].click();
+  requestAnimationFrame(()=>{if(controllerUiSurface()!==surface)return;const list=controllerFocusableElements();const target=preferredControllerFocus(list,surface);if(target)setControllerUiFocus(target);});
+  return true;
 }
 function handleControllerUiNavigation(pressed){
   const surface=controllerUiSurface();if(!surface){clearControllerUiFocus();resetControllerUiAxis();return false;}const focus=ensureControllerUiFocus();
+  if(controllerUiAdjusting&&(controllerUiAdjusting.el!==focus||controllerUiEditing!==focus||!controllerEditAdjustHeld()))finishControllerUiAdjustment();
   if(pressed[GAMEPAD_BUTTON.B]){
     if(controllerUiEditing){clearControllerUiEditing();return true;}
+    finishControllerUiAdjustment();
     if(chatOpen){void dismissChat({restorePointer:false});return true;}
     if(gameTextEditorTarget){cancelGameTextEditor();return true;}
     if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return true;}
@@ -2698,18 +2727,18 @@ function handleControllerUiNavigation(pressed){
     if(shell.panel===SHELL_PANEL.LOADOUT){closeMatchLoadout();return true;}
     if(shell.paused){shell.resumeFromAlternateInput();clock?.getDelta();return true;}
   }
+  if(pressed[GAMEPAD_BUTTON.LB]){clearControllerUiEditing();if(cycleControllerTabs(-1))return true;}
+  if(pressed[GAMEPAD_BUTTON.RB]){clearControllerUiEditing();if(cycleControllerTabs(1))return true;}
   if(pressed[GAMEPAD_BUTTON.A]&&focus){
+    finishControllerUiAdjustment();
     if(controllerEditableField(focus)){if(controllerUiEditing===focus)clearControllerUiEditing();else setControllerUiEditing(focus);return true;}
     if(focus.tagName==='BUTTON'||focus.dataset?.gameControl==='text'){focus.click();return true;}
     focus.focus?.();return true;
   }
-  if(pressed[GAMEPAD_BUTTON.LB]&&cycleControllerTabs(-1))return true;
-  if(pressed[GAMEPAD_BUTTON.RB]&&cycleControllerTabs(1))return true;
-  let nav=null;
-  if(pressed[GAMEPAD_BUTTON.DPAD_LEFT])nav={dx:-1,dy:0};else if(pressed[GAMEPAD_BUTTON.DPAD_RIGHT])nav={dx:1,dy:0};else if(pressed[GAMEPAD_BUTTON.DPAD_UP])nav={dx:0,dy:-1};else if(pressed[GAMEPAD_BUTTON.DPAD_DOWN])nav={dx:0,dy:1};else nav=controllerAnalogUiDirection();
+  const nav=controllerUiDirection(pressed);
   if(nav){
-    if(controllerUiEditing){const dir=nav.dx?nav.dx:-nav.dy;if(dir&&adjustControllerField(focus,dir))return true;return true;}
-    return moveControllerUiFocus(nav.dx,nav.dy);
+    if(controllerUiEditing===focus){const dir=nav.dx?nav.dx:-nav.dy;if(dir)stepControllerField(focus,dir);return true;}
+    finishControllerUiAdjustment();return moveControllerUiFocus(nav.dx,nav.dy);
   }
   return false;
 }
