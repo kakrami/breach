@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.19';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.19';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.19';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.19';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.19';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.19';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.19';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.19';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.20';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.20';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.20';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.20';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.20';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.20';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.20';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.20';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.19';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.19';
-import { createAudioEngine } from './audio-engine.js?v=1.37.19';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.19';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.19';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.19';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.19';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.19';
+} from './game-config.js?v=1.37.20';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.20';
+import { createAudioEngine } from './audio-engine.js?v=1.37.20';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.20';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.20';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.20';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.20';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.20';
 
 let THREE = null;
 
@@ -424,7 +424,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.19';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.20';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2089,6 +2089,15 @@ function updateViewRecoil(dt){
   viewRecoilYaw=THREE.MathUtils.lerp(viewRecoilYaw,0,follow);
   if(Math.abs(viewRecoilPitch)<.00002)viewRecoilPitch=0;if(Math.abs(viewRecoilYaw)<.00002)viewRecoilYaw=0;
 }
+function presentLocalShot(weapon,now=performance.now()){
+  // Shooter-side prediction: weapon feedback must happen on the trigger frame,
+  // not after a WebSocket round trip. The server still owns acceptance, damage,
+  // hit detection and the authoritative ammo state returned in the fire ack.
+  if(!godMode)ammo[weapon]=Math.max(0,(ammo[weapon]||0)-1);
+  lastShotVisualAt=now;soundShot(weapon);
+  if(weapon==='shotgun'){shotgunPumpStartedAt=now;shotgunPumpSoundPlayed=false;}
+  const flash=localMuzzleObject(weapon);if(flash)flash.material.opacity=1;
+}
 function requestShot(){
   const now=performance.now(),interruptShotgunReload=!godMode&&currentWeapon==='shotgun'&&!!reloadUntil&&(ammo.shotgun||0)>0;
   if(!shell.canPlay||!matchAllowsCombat(matchState)||hp<=0||traversal||now<(fireReadyAt[currentWeapon]||0)||(!godMode&&(reloadRequestPending||(reloadUntil&&!interruptShotgunReload))))return false;
@@ -2098,7 +2107,9 @@ function requestShot(){
   // recoil already accumulated from previous rounds. Applying the new impulse
   // after sending means the first shot is precise and subsequent rounds climb.
   const shotYaw=round4(yaw+viewRecoilYaw),shotPitch=round4(THREE.MathUtils.clamp(pitch+viewRecoilPitch,-1.4,1.4)),preShotHeat=currentShotHeat(currentWeapon,now);
-  fireReadyAt[currentWeapon]=now+weaponRules(currentWeapon).cooldownMs;sendCurrentState(true);send({t:'fire',weapon:currentWeapon,yaw:shotYaw,pitch:shotPitch,adsAmount:round3(adsBlend)});
+  fireReadyAt[currentWeapon]=now+weaponRules(currentWeapon).cooldownMs;
+  presentLocalShot(currentWeapon,now);
+  sendCurrentState(true);send({t:'fire',weapon:currentWeapon,yaw:shotYaw,pitch:shotPitch,adsAmount:round3(adsBlend)});
   registerLocalShotHeat(currentWeapon,now);lastLocalShotAt=now;applyViewRecoil(currentWeapon,preShotHeat);return true;
 }
 function updateFireControl(now){const spec=WEAPON_SPECS[currentWeapon];if(fireInputHeld()&&spec?.automatic&&(currentWeapon!=='assault'||assaultFireMode==='auto')&&now>=(fireReadyAt[currentWeapon]||0))requestShot();}
@@ -2250,7 +2261,7 @@ function createTracer(m){
   const geometry=new THREE.BufferGeometry(),positions=new Float32Array(6);geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
   const color=m.weapon==='sniper'?0xb8efff:(m.weapon==='shotgun'||m.weapon==='semiShotgun')?0xffc482:(m.weapon==='assault'||m.weapon==='ump')?0xffdc96:0xffedbd,line=new THREE.Line(geometry,tracerMaterial(color));line.frustumCulled=false;scene.add(line);
   const gravity=Math.max(0,Number(m.gravity)||0);
-  return{type:'tracer',mesh:line,geometry,start,dir:visualDir,speed,gravity,born:performance.now(),lifeMs:m.weapon==='sniper'?125:m.weapon==='pistol'?105:(m.weapon==='shotgun'||m.weapon==='semiShotgun')?62:92,length:m.weapon==='sniper'?2.8:(m.weapon==='assault'||m.weapon==='ump')?1.55:m.weapon==='pistol'?.95:.75};
+  return{type:'tracer',mesh:line,geometry,start,dir:visualDir,speed,gravity,born:performance.now()-Math.min(500,Math.max(0,Number(m.visualAgeMs)||0)),lifeMs:m.weapon==='sniper'?125:m.weapon==='pistol'?105:(m.weapon==='shotgun'||m.weapon==='semiShotgun')?62:92,length:m.weapon==='sniper'?2.8:(m.weapon==='assault'||m.weapon==='ump')?1.55:m.weapon==='pistol'?.95:.75};
 }
 function getSharedSmokeTexture(){
   if(sharedSmokeTexture||!THREE)return sharedSmokeTexture;
@@ -2293,9 +2304,16 @@ function updateLauncherProjectileState(m){
 }
 function handleShot(m){
   if(!m?.id||bullets.has(m.id))return;const packetAge=Number.isFinite(Number(m.at))?Math.max(0,serverNow()-Number(m.at)):0;if(packetAge>520)return;
-  const projectile=['grenadeLauncher','rpg'].includes(m.weapon)?createLauncherProjectile(m):createTracer(m);if(projectile)bullets.set(m.id,projectile);
+  // Backdate tracer animation by packet age so network latency does not make a
+  // server-authoritative projectile appear to start traveling only after it
+  // reaches this client.
+  const visualPacket=packetAge>0?{...m,visualAgeMs:packetAge}:m;
+  const projectile=['grenadeLauncher','rpg'].includes(m.weapon)?createLauncherProjectile(visualPacket):createTracer(visualPacket);if(projectile)bullets.set(m.id,projectile);
   if(m.ownerId===clientId){
-    const w=m.weapon||currentWeapon,primary=shotPacketPrimary(m);if(primary&&!godMode){ammo[w]=Math.max(0,(ammo[w]||0)-1);}if(primary){lastShotVisualAt=performance.now();soundShot(w);if(w==='shotgun'){shotgunPumpStartedAt=performance.now();shotgunPumpSoundPlayed=false;}const flash=localMuzzleObject(w);if(flash)flash.material.opacity=1;}
+    // Local sound, muzzle flash, ammo presentation and weapon kick were already
+    // predicted on the trigger frame. The server echo is only authoritative
+    // projectile/reconciliation data; replaying feedback here caused the
+    // noticeable round-trip-time firing delay.
   }else if(shotPacketPrimary(m)){
     const r=remotes.get(m.ownerId);if(r){r.fireKickUntil=performance.now()+170;r.revealedUntil=performance.now()+1500;playSpatialCue(weaponShotSoundId(m.weapon),m.x,m.y,m.z,95,.95);}
   }
