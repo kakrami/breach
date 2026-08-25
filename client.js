@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.22';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.22';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.22';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.22';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.22';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.22';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.22';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.22';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.23';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.23';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.23';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.23';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.23';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.23';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.23';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.23';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.22';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.22';
-import { createAudioEngine } from './audio-engine.js?v=1.37.22';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.22';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.22';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.22';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.22';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.22';
+} from './game-config.js?v=1.37.23';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.23';
+import { createAudioEngine } from './audio-engine.js?v=1.37.23';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.23';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.23';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.23';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.23';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.23';
 
 let THREE = null;
 
@@ -424,7 +424,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.22';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.23';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2043,7 +2043,7 @@ function movementInput(){
   const len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;}
   moveInput.mx=mx;moveInput.mz=mz;moveInput.len=Math.min(1,len);return moveInput;
 }
-function statePayload(){const input=movementInput();return {t:'state',x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,crouched,grounded:onGround,jumpSeq,moveX:round3(input.mx),moveZ:round3(input.mz)};}
+function statePayload(){const input=movementInput();return {t:'state',at:Math.round(serverNow()),x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,crouched,grounded:onGround,jumpSeq,moveX:round3(input.mx),moveZ:round3(input.mz)};}
 function stateChanged(p){return !Number.isFinite(lastSentState.x)||Math.abs(p.x-lastSentState.x)>.008||Math.abs(p.y-lastSentState.y)>.008||Math.abs(p.z-lastSentState.z)>.008||Math.abs(normalizeAngle(p.yaw-lastSentState.yaw))>.0025||Math.abs(p.pitch-lastSentState.pitch)>.0025||Math.abs(p.moveX-lastSentState.moveX)>.02||Math.abs(p.moveZ-lastSentState.moveZ)>.02||p.ads!==lastSentState.ads||p.crouched!==lastSentState.crouched||p.grounded!==lastSentState.grounded;}
 function sendCurrentState(force=false){
   const now=performance.now(),p=statePayload(),changed=stateChanged(p),interval=changed?ACTIVE_STATE_INTERVAL:IDLE_STATE_INTERVAL;
@@ -2133,7 +2133,7 @@ function requestShot(){
   const shotYaw=round4(yaw+viewRecoilYaw),shotPitch=round4(THREE.MathUtils.clamp(pitch+viewRecoilPitch,-1.4,1.4)),preShotHeat=currentShotHeat(currentWeapon,now);
   fireReadyAt[currentWeapon]=now+weaponRules(currentWeapon).cooldownMs;
   presentLocalShot(currentWeapon,now);
-  sendCurrentState(true);send({t:'fire',weapon:currentWeapon,yaw:shotYaw,pitch:shotPitch,adsAmount:round3(adsBlend)});
+  sendCurrentState(true);send({t:'fire',weapon:currentWeapon,yaw:shotYaw,pitch:shotPitch,adsAmount:round3(adsBlend),shotAt:Math.round(serverNow())});
   registerLocalShotHeat(currentWeapon,now);lastLocalShotAt=now;applyViewRecoil(currentWeapon,preShotHeat);return true;
 }
 function updateFireControl(now){const spec=WEAPON_SPECS[currentWeapon];if(fireInputHeld()&&spec?.automatic&&(currentWeapon!=='assault'||assaultFireMode==='auto')&&now>=(fireReadyAt[currentWeapon]||0))requestShot();}
