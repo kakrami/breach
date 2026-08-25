@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.21';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.21';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.21';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.21';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.21';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.21';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.21';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.21';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.22';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.22';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.22';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.22';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.22';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.22';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.22';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.22';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.21';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.21';
-import { createAudioEngine } from './audio-engine.js?v=1.37.21';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.21';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.21';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.21';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.21';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.21';
+} from './game-config.js?v=1.37.22';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.22';
+import { createAudioEngine } from './audio-engine.js?v=1.37.22';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.22';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.22';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.22';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.22';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.22';
 
 let THREE = null;
 
@@ -424,7 +424,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.21';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.22';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -640,10 +640,9 @@ function renderLobbyRoster(){
   if(!lobbyRoster)return;const rows=lobbySnapshot(),mode=currentGameMode(),teamBased=gameModeSpec(mode).teamBased;
   const humanCount=rows.filter(x=>!x.bot).length,botCount=rows.filter(x=>x.bot).length;$('lobbyPlayerCount').textContent=`${humanCount} / ${MAX_PLAYERS} · ${botCount} bots`;
   const toggle=(label,attr,id,enabled)=>`<button aria-pressed="${enabled}" class="lobby-admin-toggle ${enabled?'active':''}" ${attr}="${id}" type="button"><span>${label}</span><i aria-hidden="true"></i></button>`;
-  const hostActions=p=>{if(!isMatchAdmin||p.bot)return'';const owner=p.id===matchOwnerId,self=!!p.self,god=toggle('GOD','data-lobby-admin-god',p.id,!!p.godMode),role=owner?'<span class="lobby-role-chip">HOST</span>':self?`<span class="lobby-role-chip">${p.admin?'ADMIN':'PLAYER'}</span>`:toggle('ADMIN','data-lobby-admin-role',p.id,!!p.admin);return`<div class="lobby-player-actions">${god}${role}</div>`;};
+  const hostActions=p=>{if(!isMatchAdmin||p.bot)return'';const owner=p.id===matchOwnerId,self=!!p.self,role=owner?'<span class="lobby-role-chip">HOST</span>':self?`<span class="lobby-role-chip">${p.admin?'ADMIN':'PLAYER'}</span>`:toggle('ADMIN','data-lobby-admin-role',p.id,!!p.admin);return`<div class="lobby-player-actions">${role}</div>`;};
   const playerRow=p=>{const owner=p.id===matchOwnerId,role=owner?' · HOST':p.admin?' · ADMIN':'';return`<div class="lobby-player ${p.self?'self':''}"><span class="lobby-player-color ${teamBased?p.team:'ffa'}"></span><div class="lobby-player-copy"><strong>${escapeHtml(p.bot?'[BOT] '+p.name:p.name)}${p.self?' · YOU':''}</strong><small>${teamBased?String(p.team||'blue').toUpperCase()+' · ':''}${escapeHtml(WEAPON_SPECS[p.primaryWeapon]?.name||'ASSAULT RIFLE')}${role}</small></div>${hostActions(p)}</div>`;};
   if(!teamBased){const body=rows.sort((a,b)=>Number(b.self)-Number(a.self)||a.name.localeCompare(b.name)).map(playerRow).join('');lobbyRoster.className='lobby-roster ffa';lobbyRoster.innerHTML=`<div class="lobby-team-column ffa"><div class="lobby-team-title"><span>FREE FOR ALL</span><b>${rows.length}</b></div><div class="lobby-team-players">${body||'<div class="lobby-empty-team">Open slot</div>'}</div></div>`;}else{lobbyRoster.className='lobby-roster';const column=team=>{const list=rows.filter(p=>p.team===team),name=team==='red'?'RED':'BLUE',body=list.map(playerRow).join('')||'<div class="lobby-empty-team">Open slot</div>';return `<div class="lobby-team-column ${team}"><div class="lobby-team-title"><span>${name}</span><b>${list.length}</b></div><div class="lobby-team-players">${body}</div></div>`;};lobbyRoster.innerHTML=column('blue')+column('red');}
-  for(const btn of lobbyRoster.querySelectorAll('[data-lobby-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.lobbyAdminGod,pl=lobbySnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});
   for(const btn of lobbyRoster.querySelectorAll('[data-lobby-admin-role]'))btn.addEventListener('click',()=>{const id=btn.dataset.lobbyAdminRole,pl=lobbySnapshot().find(x=>x.id===id);if(pl&&!pl.self)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});
 }
 function lobbyBotTotal(value=botConfig){return Math.max(0,Math.min(MAX_BOTS,(value.blueBots||0)+(value.redBots||0)));}
@@ -715,7 +714,7 @@ function syncLobby(){
   const committedRule=spec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||spec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000))} min`,committedMinimap=`Minimap: ${lobbyMinimapModeFromState()==='directional'?'Directional':(lobbyMinimapModeFromState()==='all'?'Always On':'Standard')}`,committedMap=mapSpec(currentMapId).name;$('lobbyGuestMode').textContent=`${spec.name} · ${committedMap}`;$('lobbyGuestBots').textContent=`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${committedRule} · ${committedMinimap}${matchCustom?' · Custom rules':''}`;
   setLobbyActionState();renderLobbyRoster();
 }
-function showLobby(){shell.enterLobby();refreshLobbyDraftOwnership();syncLobby();const url=new URL(location.href);url.searchParams.set('room',currentRoom);history.replaceState(null,'',url);}
+function showLobby(){const leave=$('leaveBtn');if(leave){leave.disabled=false;const label=leave.querySelector('span');if(label)label.textContent='Return to Lobby';}shell.enterLobby();refreshLobbyDraftOwnership();syncLobby();const url=new URL(location.href);url.searchParams.set('room',currentRoom);history.replaceState(null,'',url);}
 function updateLobbyMatchDraftFromControls(){
   if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState)||lobbyMatchApplying)return;if(!lobbyMatchDraft)lobbyMatchDraft=committedLobbyMatchDraft();const spec=gameModeSpec(lobbyMatchDraft.mode),ffa=!spec.teamBased;let blue=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(lobbyBlueBotCount.value)||0))),red=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(lobbyRedBotCount.value)||0))),ffaBots=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(lobbyFfaBotCount.value)||0)));if(!ffa&&blue+red>MAX_BOTS){showToast(`MAX ${MAX_BOTS} BOTS`);const committed=committedLobbyMatchDraft();blue=committed.blueBots;red=committed.redBots;}
   lobbyMatchDraft={...lobbyMatchDraft,blueBots:blue,redBots:red,ffaBots,difficulty:lobbyBotDifficulty.value,scoreLimit:spec.scoreType==='none'?lobbyMatchDraft.scoreLimit:Math.max(5,Math.min(100,Math.round(Number(lobbyScoreLimit.value)||spec.scoreLimit))),timeLimit:spec.scoreType==='none'?lobbyMatchDraft.timeLimit:Math.max(2,Math.min(30,Math.round(Number(lobbyTimeLimit.value)||spec.timeLimitMs/60000))),minimap:['standard','all','directional'].includes(lobbyMinimapMode.value)?lobbyMinimapMode.value:'standard'};lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());syncLobby();scheduleLobbyAutoSave();
@@ -1240,7 +1239,7 @@ function bindUI(){
       tabs[next].focus();switchAdminTab(tabs[next].dataset.adminTab);
     });
   }
-  $('leaveBtn').addEventListener('click',leaveMatch);
+  $('leaveBtn').addEventListener('click',returnToLobby);
   $('lobbyLeaveBtn').addEventListener('click',leaveMatch);
   $('lobbyCopyBtn').addEventListener('click',copyInvite);
   for(const tab of lobbySideTabs)tab.addEventListener('click',()=>switchLobbySide(tab.dataset.lobbySideTab));
@@ -1746,6 +1745,13 @@ async function enterGame(snapshot=pendingGameSnapshot,{resetRound=false}={}){
   if(snapshot)applyGameSnapshot(snapshot,{resetRound});
   await shell.enterMatch();syncPauseContext();disableMenu(false);setStatus('Ready.');
   const url=new URL(location.href);url.searchParams.set('room',currentRoom);history.replaceState(null,'',url);onResize();
+}
+
+function returnToLobby(){
+  if(!shell.inMatch)return;
+  if(socket?.readyState!==WebSocket.OPEN||!currentRoom){showToast('LOBBY CONNECTION UNAVAILABLE',{priority:3,key:'lobby-return-unavailable'});return;}
+  const button=$('leaveBtn');if(button){button.disabled=true;const label=button.querySelector('span');if(label)label.textContent='Returning…';}
+  send({t:'returnLobby'});showToast('RETURNING TO LOBBY',{duration:900,key:'returning-lobby'});
 }
 
 function leaveMatch(){
