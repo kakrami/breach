@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.23';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.23';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.23';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.23';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.23';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.23';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.23';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.23';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.24';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.24';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.24';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.24';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.24';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.24';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.24';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.24';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.23';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.23';
-import { createAudioEngine } from './audio-engine.js?v=1.37.23';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.23';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.23';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.23';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.23';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.23';
+} from './game-config.js?v=1.37.24';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.24';
+import { createAudioEngine } from './audio-engine.js?v=1.37.24';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.24';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.24';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity } from './movement-model.js?v=1.37.24';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.24';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.24';
 
 let THREE = null;
 
@@ -66,8 +66,9 @@ const ACTIVE_STATE_INTERVAL = 33;
 const IDLE_STATE_INTERVAL = 250;
 // Physical collision/support remains authoritative and discrete. These rates only smooth presentation.
 const CROUCH_VIEW_RATE = 13;
-const GROUND_VIEW_UP_RATE = 11.5;
-const GROUND_VIEW_DOWN_RATE = 9.0;
+const GROUND_VIEW_UP_RATE = 18;
+const GROUND_VIEW_DOWN_RATE = 16;
+const GROUND_VIEW_MAX_LAG = 0.055;
 const AIR_VIEW_RATE = 28;
 const VIEW_VERTICAL_SNAP_DISTANCE = 2.75;
 const CORRECTION_VIEW_RATE = 13.5;
@@ -424,7 +425,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.23';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.24';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1988,6 +1989,10 @@ function updateCorrectionView(dt){
 function updateViewVertical(dt){
   const target=position.y+correctionViewY;if(traversal){viewFeetY=target;return viewFeetY;}if(!Number.isFinite(viewFeetY)||Math.abs(target-viewFeetY)>VIEW_VERTICAL_SNAP_DISTANCE){viewFeetY=target;return viewFeetY;}
   const rate=onGround?(target>=viewFeetY?GROUND_VIEW_UP_RATE:GROUND_VIEW_DOWN_RATE):AIR_VIEW_RATE;viewFeetY=expFollow(viewFeetY,target,rate,dt);
+  // Ground support already uses continuous ramps for stairs. Keep only a very
+  // small visual filter here: allowing the camera to trail 30-50 cm behind a
+  // steep stair ramp caused a visible catch-up pop at the top/bottom of flights.
+  if(onGround){const lag=target-viewFeetY;if(lag>GROUND_VIEW_MAX_LAG)viewFeetY=target-GROUND_VIEW_MAX_LAG;else if(lag<-GROUND_VIEW_MAX_LAG)viewFeetY=target+GROUND_VIEW_MAX_LAG;}
   if(Math.abs(target-viewFeetY)<.0005)viewFeetY=target;return viewFeetY;
 }
 function updateCrouchState(dt=0){
