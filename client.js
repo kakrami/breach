@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.29';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.29';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.29';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.29';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.29';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.29';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.29';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.29';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.30';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.30';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.30';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.30';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.30';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.30';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.30';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.30';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.29';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.29';
-import { createAudioEngine } from './audio-engine.js?v=1.37.29';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.29';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.29';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.29';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.29';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.29';
+} from './game-config.js?v=1.37.30';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.30';
+import { createAudioEngine } from './audio-engine.js?v=1.37.30';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.30';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.30';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.30';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.30';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.30';
 
 let THREE = null;
 
@@ -261,7 +261,7 @@ let myStats={kills:0,deaths:0},scoreboardOpen=false,scoreboardScroll=0,scoreboar
 let headshotUntil=0,announcerCurrent=null;const announcerQueue=[];
 let yaw = 0, pitch = 0, viewRecoilPitch = 0, viewRecoilYaw = 0, viewRecoilPitchVelocity = 0, viewRecoilYawVelocity = 0, verticalVelocity = 0, moveVelocityX = 0, moveVelocityZ = 0, knockX = 0, knockZ = 0, jumpSeq = 0, lastGroundedAt = 0, jumpBufferedUntil = 0;
 let traversal=null,traversalSeq=0,traversalIntentUntil=0,traversalIntentSeq=0,traversalConsumedIntentSeq=0;
-let ladderState=null,ladderSeq=0;
+let ladderState=null,ladderSeq=0,ladderAttachLockId='',ladderAttachLockUntil=0,ladderAttachNeedsRelease=false;
 let onGround = true, lastShotVisualAt = 0, lastLocalShotAt = 0, fireReadyAt = freshClientFireReady(), lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0, remoteViewDelayMs=REMOTE_INTERPOLATION_MS, remoteDelayMeanMs=REMOTE_INTERPOLATION_MS, remoteDelayJitterMs=0, remoteDelaySamples=0;
 let localShotHeat = Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));
 let localShotHeatAt = Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));
@@ -435,7 +435,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.29';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.30';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2024,10 +2024,21 @@ function ladderInputAmount(){
   return raw;
 }
 function ladderDirection(){const input=movementInput();if(input.len<.20)return null;const sin=Math.sin(yaw),cos=Math.cos(yaw),dx=input.mx*cos+input.mz*sin,dz=-input.mx*sin+input.mz*cos,len=Math.hypot(dx,dz);return len>.001?{x:dx/len,z:dz/len}:null;}
+function lockLadderReattach(id){ladderAttachLockId=String(id||'');ladderAttachLockUntil=performance.now()+260;ladderAttachNeedsRelease=true;}
+function updateLadderAttachLock(now=performance.now()){
+  if(!ladderAttachLockId)return;
+  const input=movementInput();if(input.len<.12)ladderAttachNeedsRelease=false;
+  if(!ladderAttachNeedsRelease&&now>=ladderAttachLockUntil){ladderAttachLockId='';ladderAttachLockUntil=0;}
+}
+function ladderAttachLocked(id){return !!ladderAttachLockId&&String(id||'')===ladderAttachLockId&&(ladderAttachNeedsRelease||performance.now()<ladderAttachLockUntil);}
+function markLadderHandoff(){localPredictionHistory.length=0;lastCorrectionSeq=Math.max(lastCorrectionSeq,stateSeq);}
 function tryAttachLadder(){
   if(ladderState||traversal||!shell.canPlay||!matchAllowsMovement(matchState)||hp<=0||!onGround)return false;
   const direction=ladderDirection();if(!direction)return false;
-  const faceX=-Math.sin(yaw),faceZ=-Math.cos(yaw),entry=findLadderEntry({ladders:LADDERS,x:position.x,y:position.y,z:position.z,dirX:direction.x,dirZ:direction.z,faceX,faceZ,radius:PLAYER_RADIUS,grounded:onGround});if(!entry)return false;
+  const faceX=-Math.sin(yaw),faceZ=-Math.cos(yaw),entry=findLadderEntry({ladders:LADDERS,x:position.x,y:position.y,z:position.z,dirX:direction.x,dirZ:direction.z,faceX,faceZ,radius:PLAYER_RADIUS,grounded:onGround});if(!entry||ladderAttachLocked(entry.ladderId))return false;
+  // Send the current free-movement pose first. The server then validates the
+  // attach from the same position the client used instead of a stale network pose.
+  sendCurrentState(true);markLadderHandoff();
   const seq=++ladderSeq;
   ladderState={id:String(entry.ladderId),seq,phase:'climb',entry:entry.entry==='top'?'top':'bottom'};
   position.set(Number(entry.attachX),Number(entry.attachY),Number(entry.attachZ));
@@ -2035,13 +2046,19 @@ function tryAttachLadder(){
   send({t:'ladder',action:'attach',seq,at:Math.round(serverNow()),ladderId:entry.ladderId,dirX:round3(direction.x),dirZ:round3(direction.z)});return true;
 }
 function finishLadder(end){
-  if(!ladderState)return false;const ladder=activeLadder();if(!ladder)return false;const seq=++ladderSeq,target=end==='top'?ladderTopExitPoint(ladder,PLAYER_RADIUS):ladderBottomExitPoint(ladder,PLAYER_RADIUS);
-  position.set(target.x,target.y,target.z);ladderState=null;verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=true;lastGroundedAt=performance.now();clearCorrectionView();resetViewVertical();localMoveAmount=0;
+  if(!ladderState)return false;const ladder=activeLadder();if(!ladder)return false;
+  // Flush the final on-ladder pose before asking the server to dismount. This
+  // removes the old race where the server could reject an exit using an older y.
+  sendCurrentState(true);markLadderHandoff();
+  const seq=++ladderSeq,target=end==='top'?ladderTopExitPoint(ladder,PLAYER_RADIUS):ladderBottomExitPoint(ladder,PLAYER_RADIUS);
+  position.set(target.x,target.y,target.z);ladderState=null;lockLadderReattach(ladder.id);verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=true;lastGroundedAt=performance.now();clearCorrectionView();resetViewVertical();localMoveAmount=0;
   send({t:'ladder',action:'dismount',end,seq,at:Math.round(serverNow()),ladderId:String(ladder.id)});sendCurrentState(true);return true;
 }
 function detachLadder(){
-  if(!ladderState)return false;const ladder=activeLadder();if(!ladder)return false;const cp=ladderClimbPoint(ladder,PLAYER_RADIUS),seq=++ladderSeq;
-  position.x=cp.x+Number(ladder.nx)*.24;position.z=cp.z+Number(ladder.nz)*.24;ladderState=null;verticalVelocity=2.15;onGround=false;lastGroundedAt=0;clearCorrectionView();resetViewVertical();send({t:'ladder',action:'detach',seq,ladderId:String(ladder.id)});sendCurrentState(true);soundJump();return true;
+  if(!ladderState)return false;const ladder=activeLadder();if(!ladder)return false;
+  sendCurrentState(true);markLadderHandoff();
+  const cp=ladderClimbPoint(ladder,PLAYER_RADIUS),seq=++ladderSeq;
+  position.x=cp.x+Number(ladder.nx)*.24;position.z=cp.z+Number(ladder.nz)*.24;ladderState=null;lockLadderReattach(ladder.id);verticalVelocity=2.15;onGround=false;lastGroundedAt=0;clearCorrectionView();resetViewVertical();send({t:'ladder',action:'detach',seq,ladderId:String(ladder.id)});sendCurrentState(true);soundJump();return true;
 }
 function updateLadder(nowServer,dt){
   if(!ladderState)return false;const ladder=activeLadder();if(!ladder){ladderState=null;return false;}
@@ -2055,7 +2072,11 @@ function handleLadderMessage(m){
     if(m.accepted===false){const x=Number(m.x),y=Number(m.y),z=Number(m.z);ladderState=m.ladder?ladderStateFromServer(m.ladder):null;if(Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z)){position.set(x,y,z);clearCorrectionView();resetViewVertical();}return;}
     const x=Number(m.x),y=Number(m.y),z=Number(m.z);
     if(m.action==='dismount'){
-      ladderState=null;if(Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z))position.set(x,y,z);verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=true;lastGroundedAt=performance.now();clearCorrectionView();resetViewVertical();return;
+      const sameLocalAction=Number(m.seq)===Number(ladderSeq);ladderState=null;
+      // The local exit was already predicted to this exact server-defined point.
+      // Do not apply the same teleport a second time when its acknowledgement arrives.
+      if(!sameLocalAction&&Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z)){position.set(x,y,z);clearCorrectionView();resetViewVertical();}
+      verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=true;lastGroundedAt=performance.now();return;
     }
     if(m.action==='detach'){
       ladderState=null;const sameLocalAction=Number(m.seq)===Number(ladderSeq);if(!sameLocalAction&&Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z))position.set(x,y,z);verticalVelocity=Number.isFinite(Number(m.verticalVelocity))?Number(m.verticalVelocity):2.15;onGround=false;clearCorrectionView();resetViewVertical();return;
@@ -2898,6 +2919,7 @@ function updateMovement(dt){
   if(updateLadder(serverNow(),dt)){sendCurrentState();return;}
   if(updateTraversal(now)){localMoveAmount=THREE.MathUtils.lerp(localMoveAmount,0,Math.min(1,dt*10));moveVelocityX=moveVelocityZ=0;return;}
   if(onGround)lastGroundedAt=now;
+  updateLadderAttachLock(now);
   if(onGround&&tryAttachLadder()){sendCurrentState(true);return;}
   if((keys.has('Space')||touchRoleActive('jump')||(controllerInputActive()&&gamepadFrame.held[GAMEPAD_BUTTON.A]))&&traversalConsumedIntentSeq!==traversalIntentSeq)traversalIntentUntil=Math.max(traversalIntentUntil,now+110);
   const input=movementInput(),mx=input.mx,mz=input.mz,len=input.len,movement=worldSettings.movement;
