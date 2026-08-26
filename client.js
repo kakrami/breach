@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.28';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.28';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.28';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.28';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.28';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.28';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.28';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.28';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.29';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.29';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.29';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.29';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.29';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.29';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.29';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.29';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.28';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.28';
-import { createAudioEngine } from './audio-engine.js?v=1.37.28';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.28';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.28';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, findLadderEntry, createLadderMountState, createLadderDismountState, ladderTransitionPose, ladderClimbStep } from './movement-model.js?v=1.37.28';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.28';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.28';
+} from './game-config.js?v=1.37.29';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.29';
+import { createAudioEngine } from './audio-engine.js?v=1.37.29';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.29';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.29';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.29';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.29';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.29';
 
 let THREE = null;
 
@@ -435,7 +435,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.28';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.29';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1925,7 +1925,7 @@ function makeNameTag(name,color){
 function updateRemoteTarget(r,player,instant=false){
   const now=performance.now(),x=Number(player.x)||0,y=Number(player.y)||0,z=Number(player.z)||0,serverAt=Number.isFinite(Number(player.at))?Number(player.at):serverNow(),elapsed=Math.max(.016,(serverAt-r.lastNetServerAt)/1000),dist=Math.hypot(x-r.lastNetX,z-r.lastNetZ);
   if(Number.isFinite(Number(player.at)))observeRemoteNetworkTime(player.at);pushRemoteSnapshot(r,{...player,at:serverAt},{reset:instant});
-  r.moveSpeed=THREE.MathUtils.lerp(r.moveSpeed,Math.min(16,dist/elapsed),.55);if(Object.prototype.hasOwnProperty.call(player,'ladderId')){if(player.ladderId){if(!r.ladder||String(r.ladder.id)!==String(player.ladderId))r.ladder={id:String(player.ladderId),seq:0,phase:String(player.ladderPhase||'climb'),entry:'',startedAt:serverAt,durationMs:0,startX:x,startY:y,startZ:z,endX:x,endY:y,endZ:z};else r.ladder.phase=String(player.ladderPhase||r.ladder.phase||'climb');}else r.ladder=null;}r.airborne=!!r.ladder||y>worldSupportHeight(x,z,y)+.08;r.ads=player.ads??r.ads;r.crouched=player.crouched??r.crouched;r.lastNetAt=now;r.lastNetServerAt=serverAt;r.lastNetX=x;r.lastNetY=y;r.lastNetZ=z;r.target.set(x,y,z);r.targetYaw=Number(player.yaw)||0;r.lastSeen=now;
+  r.moveSpeed=THREE.MathUtils.lerp(r.moveSpeed,Math.min(16,dist/elapsed),.55);if(Object.prototype.hasOwnProperty.call(player,'ladderId')){if(player.ladderId){if(!r.ladder||String(r.ladder.id)!==String(player.ladderId))r.ladder={id:String(player.ladderId),seq:0,phase:'climb',entry:''};}else r.ladder=null;}r.airborne=!!r.ladder||y>worldSupportHeight(x,z,y)+.08;r.ads=player.ads??r.ads;r.crouched=player.crouched??r.crouched;r.lastNetAt=now;r.lastNetServerAt=serverAt;r.lastNetX=x;r.lastNetY=y;r.lastNetZ=z;r.target.set(x,y,z);r.targetYaw=Number(player.yaw)||0;r.lastSeen=now;
   if(Number(player.reloadAt)>0){r.reloadUntil=Number(player.reloadAt);r.reloadWeapon=player.reloadWeapon||r.weapon;if(!r.reloadStartedAt)r.reloadStartedAt=serverNow();}
   if(instant){r.group.position.copy(r.target);r.group.rotation.y=r.targetYaw;}
 }
@@ -2008,49 +2008,61 @@ function handleTraversalMessage(m){
 
 function ladderStateFromServer(value){
   const state=value&&typeof value==='object'?value:null;if(!state?.id)return null;
-  return {id:String(state.id),seq:Math.max(0,Math.floor(Number(state.seq)||0)),phase:String(state.phase||'climb'),entry:String(state.entry||''),startedAt:Number(state.startedAt)||serverNow(),durationMs:Math.max(0,Number(state.durationMs)||0),startX:Number(state.startX)||0,startY:Number(state.startY)||0,startZ:Number(state.startZ)||0,endX:Number(state.endX)||0,endY:Number(state.endY)||0,endZ:Number(state.endZ)||0,startYaw:state.startYaw!=null&&Number.isFinite(Number(state.startYaw))?Number(state.startYaw):null,endYaw:state.endYaw!=null&&Number.isFinite(Number(state.endYaw))?Number(state.endYaw):null};
+  return {id:String(state.id),seq:Math.max(0,Math.floor(Number(state.seq)||0)),phase:'climb',entry:state.entry==='top'?'top':'bottom'};
 }
 function activeLadder(){return ladderById(LADDERS,ladderState?.id);}
-function ladderInputAmount(){const input=movementInput(),raw=THREE.MathUtils.clamp(-input.mz,-1,1);if(ladderState?.phase==='climb'&&ladderState.entry==='top'){if(Math.abs(raw)<.12){ladderState.entry='';return 0;}if(raw>0)return -raw;ladderState.entry='';}return raw;}
+function ladderInputAmount(){
+  const input=movementInput(),raw=THREE.MathUtils.clamp(-input.mz,-1,1);
+  // A top entry starts by continuing downward while the player keeps holding
+  // the same forward input used to step onto the ladder. Once released, the
+  // ladder uses the normal rule everywhere: forward = up, back = down.
+  if(ladderState?.entry==='top'){
+    if(Math.abs(raw)<.12){ladderState.entry='';return 0;}
+    if(raw>0)return -raw;
+    ladderState.entry='';
+  }
+  return raw;
+}
 function ladderDirection(){const input=movementInput();if(input.len<.20)return null;const sin=Math.sin(yaw),cos=Math.cos(yaw),dx=input.mx*cos+input.mz*sin,dz=-input.mx*sin+input.mz*cos,len=Math.hypot(dx,dz);return len>.001?{x:dx/len,z:dz/len}:null;}
 function tryAttachLadder(){
   if(ladderState||traversal||!shell.canPlay||!matchAllowsMovement(matchState)||hp<=0||!onGround)return false;
   const direction=ladderDirection();if(!direction)return false;
   const faceX=-Math.sin(yaw),faceZ=-Math.cos(yaw),entry=findLadderEntry({ladders:LADDERS,x:position.x,y:position.y,z:position.z,dirX:direction.x,dirZ:direction.z,faceX,faceZ,radius:PLAYER_RADIUS,grounded:onGround});if(!entry)return false;
-  const seq=++ladderSeq,state=createLadderMountState(entry,position.x,position.y,position.z,serverNow(),seq,yaw,true);if(!state)return false;
-  ladderState=state;clearCorrectionView();resetViewVertical();verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=false;landingKick=0;setAim(false);clearFireInput();cancelEquipmentAim();
+  const seq=++ladderSeq;
+  ladderState={id:String(entry.ladderId),seq,phase:'climb',entry:entry.entry==='top'?'top':'bottom'};
+  position.set(Number(entry.attachX),Number(entry.attachY),Number(entry.attachZ));
+  clearCorrectionView();resetViewVertical();verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=false;landingKick=0;crouchWanted=false;crouched=false;setAim(false);cancelEquipmentAim();
   send({t:'ladder',action:'attach',seq,at:Math.round(serverNow()),ladderId:entry.ladderId,dirX:round3(direction.x),dirZ:round3(direction.z)});return true;
 }
-function beginLadderDismount(end){
-  if(!ladderState||ladderState.phase!=='climb')return false;const ladder=activeLadder();if(!ladder)return false;const seq=++ladderSeq,state=createLadderDismountState(ladder,end,position.x,position.y,position.z,serverNow(),seq,PLAYER_RADIUS);if(!state)return false;
-  ladderState=state;clearCorrectionView();resetViewVertical();moveVelocityX=moveVelocityZ=0;verticalVelocity=0;send({t:'ladder',action:'dismount',end,seq,at:Math.round(serverNow()),ladderId:String(ladder.id)});return true;
+function finishLadder(end){
+  if(!ladderState)return false;const ladder=activeLadder();if(!ladder)return false;const seq=++ladderSeq,target=end==='top'?ladderTopExitPoint(ladder,PLAYER_RADIUS):ladderBottomExitPoint(ladder,PLAYER_RADIUS);
+  position.set(target.x,target.y,target.z);ladderState=null;verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=true;lastGroundedAt=performance.now();clearCorrectionView();resetViewVertical();localMoveAmount=0;
+  send({t:'ladder',action:'dismount',end,seq,at:Math.round(serverNow()),ladderId:String(ladder.id)});sendCurrentState(true);return true;
 }
 function detachLadder(){
-  if(!ladderState||ladderState.phase!=='climb')return false;const ladder=activeLadder();if(!ladder)return false;const cp=ladderClimbPoint(ladder,PLAYER_RADIUS),seq=++ladderSeq;
+  if(!ladderState)return false;const ladder=activeLadder();if(!ladder)return false;const cp=ladderClimbPoint(ladder,PLAYER_RADIUS),seq=++ladderSeq;
   position.x=cp.x+Number(ladder.nx)*.24;position.z=cp.z+Number(ladder.nz)*.24;ladderState=null;verticalVelocity=2.15;onGround=false;lastGroundedAt=0;clearCorrectionView();resetViewVertical();send({t:'ladder',action:'detach',seq,ladderId:String(ladder.id)});sendCurrentState(true);soundJump();return true;
 }
 function updateLadder(nowServer,dt){
   if(!ladderState)return false;const ladder=activeLadder();if(!ladder){ladderState=null;return false;}
-  if(ladderState.phase==='climb'){
-    const cp=ladderClimbPoint(ladder,PLAYER_RADIUS),input=ladderInputAmount();position.x=cp.x;position.z=cp.z;position.y=ladderClimbStep(ladder,position.y,input,dt);verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=false;localMoveAmount=THREE.MathUtils.lerp(localMoveAmount,Math.abs(input),Math.min(1,dt*12));
-    if(input>.18&&position.y>=Number(ladder.topY)-.105){beginLadderDismount('top');return true;}
-    if(input<-.18&&position.y<=Number(ladder.bottomY)+.005){beginLadderDismount('bottom');return true;}
-    return true;
-  }
-  const pose=ladderTransitionPose(ladderState,nowServer);if(!pose){ladderState=null;return false;}position.set(pose.x,pose.y,pose.z);if(Number.isFinite(Number(pose.yaw)))yaw=Number(pose.yaw);verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=false;localMoveAmount=0;
-  if(pose.done){
-    if(ladderState.phase==='mount'){ladderState={id:String(ladderState.id),seq:ladderState.seq,phase:'climb',entry:String(ladderState.entry||''),startedAt:nowServer,durationMs:0,startX:pose.x,startY:pose.y,startZ:pose.z,endX:pose.x,endY:pose.y,endZ:pose.z};}
-    else{position.set(ladderState.endX,ladderState.endY,ladderState.endZ);ladderState=null;onGround=true;lastGroundedAt=performance.now();landingKick=.18;nextFootstepAt=performance.now()+120;soundLanding(.18);sendCurrentState(true);}
-  }
+  const cp=ladderClimbPoint(ladder,PLAYER_RADIUS),input=ladderInputAmount();position.x=cp.x;position.z=cp.z;position.y=ladderClimbStep(ladder,position.y,input,dt);verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=false;localMoveAmount=THREE.MathUtils.lerp(localMoveAmount,Math.abs(input),Math.min(1,dt*12));
+  if(input>.18&&position.y>=Number(ladder.topY)-.105){finishLadder('top');return true;}
+  if(input<-.18&&position.y<=Number(ladder.bottomY)+.005){finishLadder('bottom');return true;}
   return true;
 }
 function handleLadderMessage(m){
   if(samePlayerId(m.id,clientId)){
     if(m.accepted===false){const x=Number(m.x),y=Number(m.y),z=Number(m.z);ladderState=m.ladder?ladderStateFromServer(m.ladder):null;if(Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z)){position.set(x,y,z);clearCorrectionView();resetViewVertical();}return;}
-    if(m.action==='detach'){ladderState=null;const sameLocalAction=Number(m.seq)===Number(ladderSeq),x=Number(m.x),y=Number(m.y),z=Number(m.z);if(!sameLocalAction&&Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z))position.set(x,y,z);verticalVelocity=Number.isFinite(Number(m.verticalVelocity))?Number(m.verticalVelocity):2.15;onGround=false;clearCorrectionView();resetViewVertical();return;}
-    const authoritative=ladderStateFromServer(m.ladder);if(!ladderState||Number(ladderState.seq)!==Number(m.seq))ladderState=authoritative;clearCorrectionView();resetViewVertical();verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=false;return;
+    const x=Number(m.x),y=Number(m.y),z=Number(m.z);
+    if(m.action==='dismount'){
+      ladderState=null;if(Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z))position.set(x,y,z);verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=true;lastGroundedAt=performance.now();clearCorrectionView();resetViewVertical();return;
+    }
+    if(m.action==='detach'){
+      ladderState=null;const sameLocalAction=Number(m.seq)===Number(ladderSeq);if(!sameLocalAction&&Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z))position.set(x,y,z);verticalVelocity=Number.isFinite(Number(m.verticalVelocity))?Number(m.verticalVelocity):2.15;onGround=false;clearCorrectionView();resetViewVertical();return;
+    }
+    const authoritative=ladderStateFromServer(m.ladder);if(!ladderState||Number(ladderState.seq)!==Number(m.seq)){ladderState=authoritative;if(Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(z))position.set(x,y,z);}clearCorrectionView();resetViewVertical();verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=false;return;
   }
-  const r=remotes.get(m.id);if(!r||m.accepted===false)return;r.ladder=m.ladder?ladderStateFromServer(m.ladder):null;if(m.action==='detach')r.ladder=null;
+  const r=remotes.get(m.id);if(!r||m.accepted===false)return;r.ladder=m.ladder?ladderStateFromServer(m.ladder):null;if(m.action==='detach'||m.action==='dismount')r.ladder=null;
 }
 
 function predictionStateForSeq(seq){for(let i=localPredictionHistory.length-1;i>=0;i--)if(localPredictionHistory[i].seq===seq)return localPredictionHistory[i];return null;}
@@ -2059,7 +2071,7 @@ function resetLocalPredictionHistory(){localPredictionHistory.length=0;stateSeq=
 function applyServerCorrection(m){
   // Traversal is deterministic once accepted. A correction for an earlier
   // free-movement state must not pull the player back into the obstacle.
-  if(traversal||(ladderState&&ladderState.phase!=='climb')){clearCorrectionView();return;}
+  if(traversal){clearCorrectionView();return;}
   const cx=Number(m.x),cy=Number(m.y),cz=Number(m.z),seq=Math.max(0,Math.floor(Number(m.seq)||0));
   if(seq&&seq<=lastCorrectionSeq)return;
   const serverX=Number.isFinite(cx)?cx:position.x,serverY=Number.isFinite(cy)?cy:position.y,serverZ=Number.isFinite(cz)?cz:position.z;
@@ -2148,7 +2160,7 @@ function movementInput(){
   const len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;}
   moveInput.mx=mx;moveInput.mz=mz;moveInput.len=Math.min(1,len);return moveInput;
 }
-function statePayload(seq=stateSeq){const input=movementInput(),ladderMove=ladderState?.phase==='climb'?ladderInputAmount():0;return {t:'state',seq:Math.max(0,Math.floor(Number(seq)||0)),at:Math.round(serverNow()),x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,crouched,grounded:onGround,jumpSeq,moveX:round3(input.mx),moveZ:round3(input.mz),ladderId:ladderState?.id||'',ladderMove:round3(ladderMove)};}
+function statePayload(seq=stateSeq){const input=movementInput(),ladderMove=ladderState?ladderInputAmount():0;return {t:'state',seq:Math.max(0,Math.floor(Number(seq)||0)),at:Math.round(serverNow()),x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,crouched,grounded:onGround,jumpSeq,moveX:round3(input.mx),moveZ:round3(input.mz),ladderId:ladderState?.id||'',ladderMove:round3(ladderMove)};}
 function stateChanged(p){return !Number.isFinite(lastSentState.x)||Math.abs(p.x-lastSentState.x)>.008||Math.abs(p.y-lastSentState.y)>.008||Math.abs(p.z-lastSentState.z)>.008||Math.abs(normalizeAngle(p.yaw-lastSentState.yaw))>.0025||Math.abs(p.pitch-lastSentState.pitch)>.0025||Math.abs(p.moveX-lastSentState.moveX)>.02||Math.abs(p.moveZ-lastSentState.moveZ)>.02||Math.abs((p.ladderMove||0)-(lastSentState.ladderMove||0))>.02||String(p.ladderId||'')!==String(lastSentState.ladderId||'')||p.ads!==lastSentState.ads||p.crouched!==lastSentState.crouched||p.grounded!==lastSentState.grounded;}
 function rememberPredictionState(p,now=performance.now()){
   localPredictionHistory.push({seq:p.seq,at:p.at,localAt:now,x:p.x,y:p.y,z:p.z,grounded:p.grounded,crouched:p.crouched});
@@ -2233,7 +2245,7 @@ function presentLocalShot(weapon,now=performance.now()){
 }
 function requestShot(){
   const now=performance.now(),interruptShotgunReload=!godMode&&currentWeapon==='shotgun'&&!!reloadUntil&&(ammo.shotgun||0)>0;
-  if(!shell.canPlay||!matchAllowsCombat(matchState)||hp<=0||traversal||(ladderState&&ladderState.phase!=='climb')||now<(fireReadyAt[currentWeapon]||0)||(!godMode&&(reloadRequestPending||(reloadUntil&&!interruptShotgunReload))))return false;
+  if(!shell.canPlay||!matchAllowsCombat(matchState)||hp<=0||traversal||now<(fireReadyAt[currentWeapon]||0)||(!godMode&&(reloadRequestPending||(reloadUntil&&!interruptShotgunReload))))return false;
   if(!godMode&&(ammo[currentWeapon]||0)<=0){doReload();return false;}
   if(interruptShotgunReload){reloadUntil=0;reloadWeapon='';reloadStartedAt=0;reloadRequestPending=false;}
   // The reticle is authoritative: fire along the exact camera aim including
@@ -3010,7 +3022,7 @@ function updateWeaponView(dt){
   if(umpMag)umpMag.position.y=-.22-(reloading&&currentWeapon==='ump'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.26:0);
   if(semiShotgunMag)semiShotgunMag.position.y=-.17-(reloading&&currentWeapon==='semiShotgun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.22:0);
   if(sniperBolt)sniperBolt.position.z=-.12+(reloading&&currentWeapon==='sniper'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.20)/.55,0,1))*.18:0);
-  const ladderClimbing=ladderState?.phase==='climb',traversalViewActive=!!traversePoseNow||(!!ladderState&&!ladderClimbing);sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&adsBlend<.94;shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';
+  const traversalViewActive=!!traversePoseNow;sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&adsBlend<.94;shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';
   if(shotgunPump){
     let pumpOffset=reloading&&currentWeapon==='shotgun'?Math.sin(Math.PI*reloadP)*.10:0;
     if(shotgunPumpStartedAt){
@@ -3021,9 +3033,8 @@ function updateWeaponView(dt){
     shotgunPump.position.z=-.48-pumpOffset;
   }
   if(mantleHands){
-    mantleHands.visible=!!traversePoseNow||!!ladderState&&!ladderClimbing;
-    if(ladderState&&!ladderClimbing){const climb=false,wave=Math.sin(now*.012);mantleHands.position.set(0,-.01,-.05);mantleHands.rotation.x=-.05;mantleHands.children.forEach((limb,i)=>{const side=limb.userData.side||(i?1:-1);limb.position.x=side*.25;limb.position.y=-.25+(climb?side*.045*wave:0);limb.position.z=-.88;limb.rotation.x=climb?side*.045*wave:0;limb.rotation.z=side*.02;});}
-    else if(traversePoseNow){
+    mantleHands.visible=!!traversePoseNow;
+    if(traversePoseNow){
       const reach=smoothstep01(Math.min(1,traverseP/.42)),pull=smoothstep01(Math.max(0,(traverseP-.42)/.58)),vault=traversal?.mode==='vault';
       // Hands rise from the lower corners and reach forward. No traversal
       // geometry is allowed closer than ~0.55 m to the eye, so camera pitch or
