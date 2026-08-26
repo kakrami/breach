@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.32';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.32';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.32';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.32';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.32';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.32';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.32';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.32';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.33';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.33';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.33';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.33';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.33';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.33';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.33';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.33';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.32';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.32';
-import { createAudioEngine } from './audio-engine.js?v=1.37.32';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.32';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.32';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.32';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.32';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.32';
+} from './game-config.js?v=1.37.33';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.33';
+import { createAudioEngine } from './audio-engine.js?v=1.37.33';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.33';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.33';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.33';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.33';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.33';
 
 let THREE = null;
 
@@ -445,7 +445,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.32';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.33';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2908,10 +2908,10 @@ function updateGamepadInput(dt){
   if(!shell.canPlay){gamepadFireDown=false;resetControllerAimMotion();if(controllerOwnsAim){controllerOwnsAim=false;setAim(false);}handleControllerUiNavigation(pressed);return;}
   clearControllerUiFocus();
   if(hp<=0&&pressed[GAMEPAD_BUTTON.Y]){openMatchLoadout();return;}
-  if(hp>0&&pressed[GAMEPAD_BUTTON.LS]){
-    const move=controllerMoveAxes();
-    if(move.length>.20)toggleSprint();else{openChat();return;}
-  }
+  // Gameplay controller contract: LS owns sprint exclusively. D-pad is kept
+  // free of weapon-swap duplicates; Down is the single chat shortcut.
+  if(hp>0&&pressed[GAMEPAD_BUTTON.LS])toggleSprint();
+  if(hp>0&&pressed[GAMEPAD_BUTTON.DPAD_DOWN]){openChat();return;}
 
   if(pressed[GAMEPAD_BUTTON.VIEW]){scoreboardOpen=true;scoreboardScroll=0;clearFireInput();cancelEquipmentAim();}
   if(released[GAMEPAD_BUTTON.VIEW])scoreboardOpen=false;
@@ -2933,10 +2933,6 @@ function updateGamepadInput(dt){
   if(released[GAMEPAD_BUTTON.LB]&&equipmentAim.kind===tacticalEquipment)releaseEquipmentAim();
   if(released[GAMEPAD_BUTTON.RB]&&equipmentAim.kind===lethalEquipment)releaseEquipmentAim();
   if(pressed[GAMEPAD_BUTTON.RS])cycleControllerUtility();
-  if(pressed[GAMEPAD_BUTTON.DPAD_UP])switchWeapon(primaryWeapon);
-  if(pressed[GAMEPAD_BUTTON.DPAD_DOWN])switchWeapon('pistol');
-  if(pressed[GAMEPAD_BUTTON.DPAD_LEFT])toggleFireMode();
-  if(pressed[GAMEPAD_BUTTON.DPAD_RIGHT])switchWeapon(nextWeapon(currentWeapon));
 }
 function updateGameSimulation(dt){const now=performance.now();if(hp>0){updateCrouchState(dt);updateMovement(dt);updateFireControl(now);}}
 function updateGameFrame(dt){
