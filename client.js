@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.27';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.27';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.27';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.27';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.27';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.27';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.27';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.27';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.28';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.28';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.28';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.28';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.28';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.28';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.28';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.28';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.27';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.27';
-import { createAudioEngine } from './audio-engine.js?v=1.37.27';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.27';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.27';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, findLadderEntry, createLadderMountState, createLadderDismountState, ladderTransitionPose, ladderClimbStep } from './movement-model.js?v=1.37.27';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.27';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.27';
+} from './game-config.js?v=1.37.28';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.28';
+import { createAudioEngine } from './audio-engine.js?v=1.37.28';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.28';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.28';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, findLadderEntry, createLadderMountState, createLadderDismountState, ladderTransitionPose, ladderClimbStep } from './movement-model.js?v=1.37.28';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.28';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.28';
 
 let THREE = null;
 
@@ -435,7 +435,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.27';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.28';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2017,7 +2017,7 @@ function tryAttachLadder(){
   if(ladderState||traversal||!shell.canPlay||!matchAllowsMovement(matchState)||hp<=0||!onGround)return false;
   const direction=ladderDirection();if(!direction)return false;
   const faceX=-Math.sin(yaw),faceZ=-Math.cos(yaw),entry=findLadderEntry({ladders:LADDERS,x:position.x,y:position.y,z:position.z,dirX:direction.x,dirZ:direction.z,faceX,faceZ,radius:PLAYER_RADIUS,grounded:onGround});if(!entry)return false;
-  const seq=++ladderSeq,state=createLadderMountState(entry,position.x,position.y,position.z,serverNow(),seq,yaw);if(!state)return false;
+  const seq=++ladderSeq,state=createLadderMountState(entry,position.x,position.y,position.z,serverNow(),seq,yaw,true);if(!state)return false;
   ladderState=state;clearCorrectionView();resetViewVertical();verticalVelocity=0;moveVelocityX=moveVelocityZ=0;onGround=false;landingKick=0;setAim(false);clearFireInput();cancelEquipmentAim();
   send({t:'ladder',action:'attach',seq,at:Math.round(serverNow()),ladderId:entry.ladderId,dirX:round3(direction.x),dirZ:round3(direction.z)});return true;
 }
@@ -2233,7 +2233,7 @@ function presentLocalShot(weapon,now=performance.now()){
 }
 function requestShot(){
   const now=performance.now(),interruptShotgunReload=!godMode&&currentWeapon==='shotgun'&&!!reloadUntil&&(ammo.shotgun||0)>0;
-  if(!shell.canPlay||!matchAllowsCombat(matchState)||hp<=0||traversal||ladderState||now<(fireReadyAt[currentWeapon]||0)||(!godMode&&(reloadRequestPending||(reloadUntil&&!interruptShotgunReload))))return false;
+  if(!shell.canPlay||!matchAllowsCombat(matchState)||hp<=0||traversal||(ladderState&&ladderState.phase!=='climb')||now<(fireReadyAt[currentWeapon]||0)||(!godMode&&(reloadRequestPending||(reloadUntil&&!interruptShotgunReload))))return false;
   if(!godMode&&(ammo[currentWeapon]||0)<=0){doReload();return false;}
   if(interruptShotgunReload){reloadUntil=0;reloadWeapon='';reloadStartedAt=0;reloadRequestPending=false;}
   // The reticle is authoritative: fire along the exact camera aim including
@@ -3010,7 +3010,7 @@ function updateWeaponView(dt){
   if(umpMag)umpMag.position.y=-.22-(reloading&&currentWeapon==='ump'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.26:0);
   if(semiShotgunMag)semiShotgunMag.position.y=-.17-(reloading&&currentWeapon==='semiShotgun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.22:0);
   if(sniperBolt)sniperBolt.position.z=-.12+(reloading&&currentWeapon==='sniper'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.20)/.55,0,1))*.18:0);
-  const traversalViewActive=!!traversePoseNow||!!ladderState;sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&adsBlend<.94;shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';
+  const ladderClimbing=ladderState?.phase==='climb',traversalViewActive=!!traversePoseNow||(!!ladderState&&!ladderClimbing);sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&adsBlend<.94;shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';
   if(shotgunPump){
     let pumpOffset=reloading&&currentWeapon==='shotgun'?Math.sin(Math.PI*reloadP)*.10:0;
     if(shotgunPumpStartedAt){
@@ -3021,8 +3021,8 @@ function updateWeaponView(dt){
     shotgunPump.position.z=-.48-pumpOffset;
   }
   if(mantleHands){
-    mantleHands.visible=!!traversePoseNow||!!ladderState;
-    if(ladderState){const climb=ladderState.phase==='climb',wave=Math.sin(now*.012);mantleHands.position.set(0,-.01,-.05);mantleHands.rotation.x=-.05;mantleHands.children.forEach((limb,i)=>{const side=limb.userData.side||(i?1:-1);limb.position.x=side*.25;limb.position.y=-.25+(climb?side*.045*wave:0);limb.position.z=-.88;limb.rotation.x=climb?side*.045*wave:0;limb.rotation.z=side*.02;});}
+    mantleHands.visible=!!traversePoseNow||!!ladderState&&!ladderClimbing;
+    if(ladderState&&!ladderClimbing){const climb=false,wave=Math.sin(now*.012);mantleHands.position.set(0,-.01,-.05);mantleHands.rotation.x=-.05;mantleHands.children.forEach((limb,i)=>{const side=limb.userData.side||(i?1:-1);limb.position.x=side*.25;limb.position.y=-.25+(climb?side*.045*wave:0);limb.position.z=-.88;limb.rotation.x=climb?side*.045*wave:0;limb.rotation.z=side*.02;});}
     else if(traversePoseNow){
       const reach=smoothstep01(Math.min(1,traverseP/.42)),pull=smoothstep01(Math.max(0,(traverseP-.42)/.58)),vault=traversal?.mode==='vault';
       // Hands rise from the lower corners and reach forward. No traversal
