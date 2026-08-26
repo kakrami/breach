@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.44';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.44';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.44';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.44';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.44';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.44';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.44';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.44';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.47';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.47';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.47';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.47';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.47';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.47';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.47';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.47';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.44';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.44';
-import { createAudioEngine } from './audio-engine.js?v=1.37.44';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.44';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.44';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.44';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.44';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.44';
+} from './game-config.js?v=1.37.47';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.47';
+import { createAudioEngine } from './audio-engine.js?v=1.37.47';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.47';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.47';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.47';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.47';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.47';
 
 let THREE = null;
 
@@ -95,36 +95,50 @@ const CORRECTION_VIEW_RATE = 13.5;
 const CORRECTION_MAX_HORIZONTAL = 0.72;
 const CORRECTION_MAX_VERTICAL = 0.55;
 const CORRECTION_HARD_SNAP_DISTANCE = 1.35;
-// Entire sound set is generated locally as lightweight 8-bit PCM WAV assets.
+// Entire sound set is generated locally as 16-bit PCM WAV assets.
 // No third-party or runtime-hosted audio is required.
 const SOUND_CUES = {
-  introMusic:{url:'audio/intro.wav',group:'Music',gain:.48,loop:true},
-  shotPistol:{url:'audio/shot-pistol.wav',group:'Gunfire',gain:.72},
-  shotAssault:{url:'audio/shot-assault.wav',group:'Gunfire',gain:.60},
-  shotShotgun:{url:'audio/shot-shotgun.wav',group:'Gunfire',gain:.82},
-  shotSniper:{url:'audio/shot-sniper.wav',group:'Gunfire',gain:.88},
-  reloadPistol:{url:'audio/reload-pistol.wav',group:'Weapon Handling',gain:.58},
-  reloadAssault:{url:'audio/reload-assault.wav',group:'Weapon Handling',gain:.58},
-  reloadShotgun:{url:'audio/reload-shotgun.wav',group:'Weapon Handling',gain:.62},
-  shotgunPump:{url:'audio/shotgun-pump.wav',group:'Weapon Handling',gain:.72},
-  reloadSniper:{url:'audio/reload-sniper.wav',group:'Weapon Handling',gain:.66},
-  hitmarker:{url:'audio/hitmarker.wav',group:'Feedback',gain:.54},
-  headshot:{url:'audio/headshot.wav',group:'Feedback',gain:.66},
-  kill:{url:'audio/kill.wav',group:'Feedback',gain:.62},
-  announcer:{url:'audio/announcer.wav',group:'Feedback',gain:.62},
-  shield:{url:'audio/shield.wav',group:'Feedback',gain:.56},
-  hurt:{url:'audio/hurt.wav',group:'Feedback',gain:.64},
-  jump:{url:'audio/jump.wav',group:'Movement',gain:.40},
-  footstepLeft:{url:'audio/footstep-left.wav',group:'Movement',gain:.38},
-  footstepRight:{url:'audio/footstep-right.wav',group:'Movement',gain:.38},
-  land:{url:'audio/land.wav',group:'Movement',gain:.62},
-  flashThrow:{url:'audio/flash-throw.wav',group:'Tactical',gain:.50},
-  stickyThrow:{url:'audio/sticky-throw.wav',group:'Tactical',gain:.50},
-  flashImpact:{url:'audio/flash-impact.wav',group:'Tactical',gain:.52},
-  stickyImpact:{url:'audio/sticky-impact.wav',group:'Tactical',gain:.58},
-  semtexBeep:{url:'audio/semtex-beep.wav',group:'Tactical',gain:.58},
-  flashDetonate:{url:'audio/flash-detonate.wav',group:'Explosions',gain:.86},
-  grenadeExplosion:{url:'audio/grenade-explosion.wav',group:'Explosions',gain:1},
+  introMusic:{url:'audio/intro.wav?v=1.37.47',group:'Music',gain:.40,loop:true},
+  shotPistol:{url:'audio/shot-pistol.wav?v=1.37.47',group:'Gunfire',gain:.78},
+  shotAssault:{url:'audio/shot-assault.wav?v=1.37.47',group:'Gunfire',gain:.72},
+  shotUmp:{url:'audio/shot-ump.wav?v=1.37.47',group:'Gunfire',gain:.70},
+  shotShotgun:{url:'audio/shot-shotgun.wav?v=1.37.47',group:'Gunfire',gain:.88},
+  shotSemiShotgun:{url:'audio/shot-semi-shotgun.wav?v=1.37.47',group:'Gunfire',gain:.82},
+  shotSniper:{url:'audio/shot-sniper.wav?v=1.37.47',group:'Gunfire',gain:.94},
+  shotGl:{url:'audio/shot-gl.wav?v=1.37.47',group:'Gunfire',gain:.82},
+  shotRpg:{url:'audio/shot-rpg.wav?v=1.37.47',group:'Gunfire',gain:.96},
+  reloadPistol:{url:'audio/reload-pistol.wav?v=1.37.47',group:'Weapon Handling',gain:.66},
+  reloadAssault:{url:'audio/reload-assault.wav?v=1.37.47',group:'Weapon Handling',gain:.64},
+  reloadUmp:{url:'audio/reload-ump.wav?v=1.37.47',group:'Weapon Handling',gain:.62},
+  reloadShotgun:{url:'audio/reload-shotgun.wav?v=1.37.47',group:'Weapon Handling',gain:.68},
+  reloadSemiShotgun:{url:'audio/reload-semi-shotgun.wav?v=1.37.47',group:'Weapon Handling',gain:.66},
+  shotgunPump:{url:'audio/shotgun-pump.wav?v=1.37.47',group:'Weapon Handling',gain:.78},
+  reloadSniper:{url:'audio/reload-sniper.wav?v=1.37.47',group:'Weapon Handling',gain:.72},
+  reloadGl:{url:'audio/reload-gl.wav?v=1.37.47',group:'Weapon Handling',gain:.72},
+  reloadRpg:{url:'audio/reload-rpg.wav?v=1.37.47',group:'Weapon Handling',gain:.76},
+  hitmarker:{url:'audio/hitmarker.wav?v=1.37.47',group:'Feedback',gain:.50},
+  headshot:{url:'audio/headshot.wav?v=1.37.47',group:'Feedback',gain:.58},
+  kill:{url:'audio/kill.wav?v=1.37.47',group:'Feedback',gain:.58},
+  announcer:{url:'audio/announcer.wav?v=1.37.47',group:'Feedback',gain:.54},
+  shield:{url:'audio/shield.wav?v=1.37.47',group:'Feedback',gain:.58},
+  hurt:{url:'audio/hurt.wav?v=1.37.47',group:'Feedback',gain:.60},
+  jump:{url:'audio/jump.wav?v=1.37.47',group:'Movement',gain:.34},
+  footstepLeft:{url:'audio/footstep-left.wav?v=1.37.47',group:'Movement',gain:.42},
+  footstepRight:{url:'audio/footstep-right.wav?v=1.37.47',group:'Movement',gain:.42},
+  land:{url:'audio/land.wav?v=1.37.47',group:'Movement',gain:.66},
+  slide:{url:'audio/slide.wav?v=1.37.47',group:'Movement',gain:.58},
+  impactWall:{url:'audio/impact-wall.wav?v=1.37.47',group:'Impacts',gain:.62},
+  impactPlayer:{url:'audio/impact-player.wav?v=1.37.47',group:'Impacts',gain:.60},
+  impactBlocked:{url:'audio/impact-blocked.wav?v=1.37.47',group:'Impacts',gain:.58},
+  flashThrow:{url:'audio/flash-throw.wav?v=1.37.47',group:'Tactical',gain:.52},
+  stickyThrow:{url:'audio/sticky-throw.wav?v=1.37.47',group:'Tactical',gain:.52},
+  flashImpact:{url:'audio/flash-impact.wav?v=1.37.47',group:'Tactical',gain:.58},
+  stickyImpact:{url:'audio/sticky-impact.wav?v=1.37.47',group:'Tactical',gain:.62},
+  semtexBeep:{url:'audio/semtex-beep.wav?v=1.37.47',group:'Tactical',gain:.60},
+  flashDetonate:{url:'audio/flash-detonate.wav?v=1.37.47',group:'Explosions',gain:.88},
+  grenadeExplosion:{url:'audio/grenade-explosion.wav?v=1.37.47',group:'Explosions',gain:1},
+  glExplosion:{url:'audio/gl-explosion.wav?v=1.37.47',group:'Explosions',gain:.94},
+  rpgExplosion:{url:'audio/rpg-explosion.wav?v=1.37.47',group:'Explosions',gain:1},
 };
 
 let worldSettings=normalizeWorldSettings(DEFAULT_WORLD_SETTINGS);
@@ -451,7 +465,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.44';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.47';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -639,8 +653,14 @@ function loadoutSummary(loadout=selectedLoadout()){return`${WEAPON_SPECS[loadout
 
 function syncMusicUI(){
   for(const [useId,btnId] of [['musicIconUse','musicBtn']]){const use=$(useId),btn=$(btnId);if(use)use.setAttribute('href',masterMuted?'#i-mute':'#i-sound');if(btn)btn.setAttribute('aria-label',masterMuted?'Unmute audio':'Mute all audio');}
+  const setting=$('playerMasterMute');if(setting)setGameControlValue(setting,masterMuted?'on':'off');
 }
-function toggleMasterMute(){masterMuted=!masterMuted;localStorage.setItem('breachMuted',masterMuted?'1':'0');syncMusicUI();if(masterMuted)stopIntroMusic();else if(!shell.inMatch)startIntroMusic();}
+function setMasterMuted(next){
+  const muted=!!next;if(masterMuted===muted){syncMusicUI();return;}
+  masterMuted=muted;localStorage.setItem('breachMuted',masterMuted?'1':'0');syncMusicUI();
+  if(masterMuted)stopIntroMusic();else{void ensureAudio();if(!shell.inMatch)startIntroMusic();}
+}
+function toggleMasterMute(){setMasterMuted(!masterMuted);}
 
 function currentGameMode(){return normalizeGameMode(matchState?.mode||DEFAULT_GAME_MODE);}
 function currentModeSpec(){return gameModeSpec(currentGameMode());}
@@ -809,7 +829,7 @@ function saveMatchLoadout(){
   const next=normalizeLoadoutChoice(loadoutDraft);send({t:'loadout',...next});rememberPrimary(next.primaryWeapon);rememberEquipment(next.tactical,next.lethal);if(godMode){pendingLoadout=null;showToast('LOADOUT APPLIED');}else{pendingLoadout=next;showToast(hp<=0?'LOADOUT SAVED FOR RESPAWN':'LOADOUT SAVED · NEXT SPAWN');}syncPauseContext();closeMatchLoadout();
 }
 
-function weaponSoundCueIds(weapon=currentWeapon){return weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotShotgun','reloadShotgun']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='grenadeLauncher'||weapon==='rpg'?['shotShotgun','reloadSniper']:weapon==='assault'||weapon==='ump'?['shotAssault','reloadAssault']:['shotPistol','reloadPistol'];}
+function weaponSoundCueIds(weapon=currentWeapon){return weapon==='assault'?['shotAssault','reloadAssault']:weapon==='ump'?['shotUmp','reloadUmp']:weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotSemiShotgun','reloadSemiShotgun']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='grenadeLauncher'?['shotGl','reloadGl','glExplosion']:weapon==='rpg'?['shotRpg','reloadRpg','rpgExplosion']:['shotPistol','reloadPistol'];}
 function warmWeaponAudio(weapon=currentWeapon){for(const id of weaponSoundCueIds(weapon))gameAudio.load(id);}
 function preloadGameAudioAssets(){
   if(gameAudioPreloadPromise)return gameAudioPreloadPromise;
@@ -880,7 +900,7 @@ function playerSettingsEqual(a,b){const x=normalizePlayerSettingsValue(a),y=norm
 function syncPlayerSettingsUI(value=playerSettingsDraft||playerSettings){
   const source=normalizePlayerSettingsValue(value),values=[['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerControllerVerticalSensitivity','controllerVerticalSensitivity'],['playerControllerMoveDeadzone','controllerMoveDeadzone'],['playerControllerLookDeadzone','controllerLookDeadzone'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']];
   for(const [id,key] of values){const el=$(id),out=$(`${id}Value`);if(el)el.value=source[key];if(out)out.textContent=key.includes('Volume')?`${Math.round(source[key]*100)}%`:key.includes('Deadzone')?`${Math.round(source[key]*100)}%`:`${Number(source[key]).toFixed(2)}×`;}
-  if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;if($('playerControllerResponseCurve'))$('playerControllerResponseCurve').value=source.controllerResponseCurve;if($('playerControllerAimAssist'))$('playerControllerAimAssist').value=source.controllerAimAssist;
+  if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;if($('playerControllerResponseCurve'))$('playerControllerResponseCurve').value=source.controllerResponseCurve;if($('playerControllerAimAssist'))$('playerControllerAimAssist').value=source.controllerAimAssist;syncMusicUI();
   const dirty=!playerSettingsEqual(source,playerSettings);if($('settingsResetBtn'))$('settingsResetBtn').disabled=!dirty;if($('settingsSaveBtn'))$('settingsSaveBtn').disabled=!dirty;
 }
 function stagePlayerSettingFromUI(id,key){const el=$(id);if(!el)return;if(!playerSettingsDraft)playerSettingsDraft={...playerSettings};playerSettingsDraft=normalizePlayerSettingsValue({...playerSettingsDraft,[key]:Number(el.value)});syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus(playerSettingsEqual(playerSettingsDraft,playerSettings)?'Saved settings':'Unsaved changes');}
@@ -1035,6 +1055,42 @@ function init3D(){
 }
 
 
+
+const WORLD_TEXTURE_DEFS=Object.freeze({
+  concrete:Object.freeze({file:'concrete.png',repeat:[2.4,2.4]}),
+  plaster:Object.freeze({file:'plaster.png',repeat:[2.8,2.8]}),
+  brick:Object.freeze({file:'brick.png',repeat:[2.0,2.0]}),
+  stone:Object.freeze({file:'stone.png',repeat:[2.2,2.2]}),
+  paintedMetal:Object.freeze({file:'painted_metal.png',repeat:[3.0,3.0]}),
+  corrugatedMetal:Object.freeze({file:'corrugated_metal.png',repeat:[4.0,2.0]}),
+  rustedMetal:Object.freeze({file:'rusted_metal.png',repeat:[3.0,3.0]}),
+  charredMetal:Object.freeze({file:'charred_metal.png',repeat:[3.0,3.0]}),
+  wood:Object.freeze({file:'wood.png',repeat:[2.0,3.0]}),
+  sandbag:Object.freeze({file:'sandbag_fabric.png',repeat:[4.0,4.0]}),
+  bark:Object.freeze({file:'bark.png',repeat:[2.0,3.0]}),
+  foliage:Object.freeze({file:'foliage.png',repeat:[3.0,3.0]}),
+  rock:Object.freeze({file:'rock.png',repeat:[2.0,2.0]}),
+  glass:Object.freeze({file:'glass_grime.png',repeat:[2.0,2.0]}),
+});
+const worldTextureCache=new Map();
+let worldTextureLoader=null;
+function getWorldTexture(name){
+  if(!THREE||!name)return null;
+  if(worldTextureCache.has(name))return worldTextureCache.get(name);
+  const def=WORLD_TEXTURE_DEFS[name];if(!def)return null;
+  worldTextureLoader ||= new THREE.TextureLoader();
+  const tex=worldTextureLoader.load(`textures/${def.file}?v=${APP_VERSION}`);
+  tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(def.repeat[0],def.repeat[1]);
+  tex.minFilter=THREE.LinearMipmapLinearFilter;tex.magFilter=THREE.LinearFilter;tex.anisotropy=Math.min(isTouch?4:8,renderer?.capabilities?.getMaxAnisotropy?.()||1);
+  tex.userData.preserveWorldTexture=true;worldTextureCache.set(name,tex);return tex;
+}
+function worldMat(color,texture,roughness=.9,metalness=0,extra={}){
+  return new THREE.MeshStandardMaterial({color,map:getWorldTexture(texture),roughness,metalness,...extra});
+}
+function buildingWallTexture(style){
+  return ({plaster:'plaster',brick:'brick',stone:'stone',office:'concrete',industrial:'corrugatedMetal',warehouse:'corrugatedMetal',tower:'stone',utility:'plaster'})[style]||'concrete';
+}
+
 function buildWorldVisuals(){
   if(!scene||!THREE)return;
   mapObstacles.length=0;
@@ -1042,12 +1098,12 @@ function buildWorldVisuals(){
   const depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig';
   const sky=rig?0xb9a27f:(yard?0x7e878d:(depot?0x89979d:0x9acde6));scene.background=new THREE.Color(sky);scene.fog=new THREE.Fog(sky,rig?72:(yard?58:(depot?90:95)),rig?205:(yard?145:(depot?260:285)));
   addTerrain();
-  const wallMat=new THREE.MeshStandardMaterial({color:rig?0x6d5d49:(yard?0x454c50:(depot?0x626a6e:0xd8d4cc)),roughness:.9});addBoundaryWallsBatch(wallMat);
-  const blockMat=new THREE.MeshStandardMaterial({color:rig?0x756a59:(yard?0x6f777a:(depot?0x697983:0xb8c0c5)),roughness:.85});
-  const pyramidMat=new THREE.MeshStandardMaterial({color:rig?0x9b8058:(depot?0x88775f:0xc8a86b),roughness:.92});addStaticBoxesBatch(blockMat);addPyramidsBatch(pyramidMat);
-  const trunkMat=new THREE.MeshStandardMaterial({color:0x60452f,roughness:1}),leafMat=new THREE.MeshStandardMaterial({color:depot?0x405b3f:0x315f37,roughness:1}),bushMat=new THREE.MeshStandardMaterial({color:depot?0x53664b:0x3f7441,roughness:1}),rockMat=new THREE.MeshStandardMaterial({color:rig?0x8b7459:(depot?0x777b78:0x6b706f),roughness:.96});
+  const wallMat=worldMat(rig?0x6d5d49:(yard?0x454c50:(depot?0x626a6e:0xd8d4cc)),yard?'paintedMetal':(rig?'stone':'concrete'),.9,yard?.08:0);addBoundaryWallsBatch(wallMat);
+  const blockMat=worldMat(rig?0x756a59:(yard?0x6f777a:(depot?0x697983:0xb8c0c5)),'concrete',.88,0);
+  const pyramidMat=worldMat(rig?0x9b8058:(depot?0x88775f:0xc8a86b),'stone',.94,0);addStaticBoxesBatch(blockMat);addPyramidsBatch(pyramidMat);
+  const trunkMat=worldMat(0x60452f,'bark',1,0),leafMat=worldMat(depot?0x405b3f:0x315f37,'foliage',1,0),bushMat=worldMat(depot?0x53664b:0x3f7441,'foliage',1,0),rockMat=worldMat(rig?0x8b7459:(depot?0x777b78:0x6b706f),'rock',.98,0);
   addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat);addBuildingsBatch();addLaddersBatch();
-  const markerMat=new THREE.MeshStandardMaterial({color:depot?0x303a40:0x49606f,roughness:.75});if(!yard&&!rig)addMarkersBatch(markerMat);
+  const markerMat=worldMat(depot?0x303a40:0x49606f,'paintedMetal',.78,.15);if(!yard&&!rig)addMarkersBatch(markerMat);
   minimapStaticCache=null;
 }
 function rebuildWorldVisuals(){
@@ -1116,7 +1172,7 @@ function addCompoundPropBox(group,mat,x,y,z,sx,sy,sz,ry=0){
 }
 function addVehicleProp(o){
   const ground=terrainHeight(o.x,o.z),longX=o.w>=o.d,ry=longX?0:Math.PI/2,length=Math.max(o.w,o.d),width=Math.min(o.w,o.d),group=new THREE.Group();group.position.set(o.x,ground,o.z);group.rotation.y=ry;worldRoot.add(group);
-  const charred=new THREE.MeshStandardMaterial({color:0x252728,roughness:.92,metalness:.12}),rust=new THREE.MeshStandardMaterial({color:0x5f4030,roughness:.96}),glass=new THREE.MeshStandardMaterial({color:0x171d20,roughness:.48,metalness:.05}),rubber=new THREE.MeshStandardMaterial({color:0x111213,roughness:1});
+  const charred=worldMat(0x252728,'charredMetal',.94,.12),rust=worldMat(0x5f4030,'rustedMetal',.97,.04),glass=worldMat(0x171d20,'glass',.48,.05),rubber=new THREE.MeshStandardMaterial({color:0x111213,roughness:1});
   const bus=o.kind==='burntBus',bodyH=bus?1.90:.72,bodyY=bus?.97:.46;
   addCompoundPropBox(group,charred,0,bodyY,0,length*.96,bodyH,width*.94);
   if(bus){
@@ -1129,7 +1185,7 @@ function addVehicleProp(o){
   for(const sx of [-1,1])for(const sz of [-1,1]){const wheel=new THREE.Mesh(new THREE.CylinderGeometry(wheelR,wheelR,wheelW,10),rubber);wheel.rotation.x=Math.PI/2;wheel.position.set(sx*wheelX,wheelR*.92,sz*wheelZ);group.add(wheel);}
 }
 function addSpecialStaticProps(){
-  const metal=new THREE.MeshStandardMaterial({color:0x485056,roughness:.84,metalness:.18}),darkMetal=new THREE.MeshStandardMaterial({color:0x303438,roughness:.90,metalness:.12}),concrete=new THREE.MeshStandardMaterial({color:0x8e8a80,roughness:.98}),sand=new THREE.MeshStandardMaterial({color:0x8b7753,roughness:1}),rust=new THREE.MeshStandardMaterial({color:0x76523a,roughness:.95,metalness:.05});
+  const metal=worldMat(0x485056,'paintedMetal',.84,.18),darkMetal=worldMat(0x303438,'charredMetal',.92,.12),concrete=worldMat(0x8e8a80,'concrete',.98,0),sand=worldMat(0x8b7753,'sandbag',1,0),rust=worldMat(0x76523a,'rustedMetal',.96,.05);
   for(const o of STATIC_BOXES){
     if(o.kind==='burntCar'||o.kind==='burntBus'){addVehicleProp(o);continue;}
     const ground=terrainHeight(o.x,o.z);
@@ -1153,7 +1209,7 @@ function addSpecialStaticProps(){
   }
 }
 function addLaddersBatch(){
-  if(!LADDERS.length)return;const metal=new THREE.MeshStandardMaterial({color:0x8d8170,roughness:.80,metalness:.35});
+  if(!LADDERS.length)return;const metal=worldMat(0x8d8170,'rustedMetal',.82,.35);
   for(const ladder of LADDERS){const g=new THREE.Group(),height=Math.max(.8,ladder.topY-ladder.bottomY),cx=ladder.x+ladder.nx*.05,cz=ladder.z+ladder.nz*.05;g.position.set(cx,ladder.bottomY,cz);worldRoot.add(g);const horizontal=Math.abs(ladder.tx)>.5;
     const railOffset=ladder.width*.43;for(const side of [-1,1]){const rail=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,height,8),metal);rail.position.set(ladder.tx*railOffset*side,height/2,ladder.tz*railOffset*side);g.add(rail);}
     const rungCount=Math.max(4,Math.floor(height/.34));for(let i=0;i<=rungCount;i++){const rung=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,ladder.width*.90,8),metal);rung.position.y=.18+(height-.36)*(i/rungCount);if(horizontal)rung.rotation.z=Math.PI/2;else rung.rotation.x=Math.PI/2;g.add(rung);}
@@ -1162,9 +1218,9 @@ function addLaddersBatch(){
 function addStaticBoxesBatch(mat){
   const unit=new THREE.BoxGeometry(1,1,1),customKinds=new Set(['burntCar','burntBus','dumpster','fuelTank','checkpoint','sandbag','brokenWall']);
   const palette={
-    boundary:new THREE.MeshStandardMaterial({color:currentMapId==='yard'?0x3d4448:currentMapId==='rig'?0x5a4f41:0x626a6e,roughness:.95}),
-    pipe:new THREE.MeshStandardMaterial({color:0x6d665d,roughness:.72,metalness:.18}),tank:new THREE.MeshStandardMaterial({color:0x82755f,roughness:.76,metalness:.10}),shed:new THREE.MeshStandardMaterial({color:0x765744,roughness:.88}),barrier:new THREE.MeshStandardMaterial({color:0x9a8b70,roughness:.94}),crate:new THREE.MeshStandardMaterial({color:0x755437,roughness:.94}),
-    containerBlue:new THREE.MeshStandardMaterial({color:0x385f78,roughness:.82}),containerRed:new THREE.MeshStandardMaterial({color:0x8a473f,roughness:.84}),containerGreen:new THREE.MeshStandardMaterial({color:0x4f6d58,roughness:.86}),containerTan:new THREE.MeshStandardMaterial({color:0x847457,roughness:.88}),
+    boundary:worldMat(currentMapId==='yard'?0x3d4448:currentMapId==='rig'?0x5a4f41:0x626a6e,currentMapId==='yard'?'paintedMetal':(currentMapId==='rig'?'stone':'concrete'),.95,currentMapId==='yard'?.08:0),
+    pipe:worldMat(0x6d665d,'rustedMetal',.76,.18),tank:worldMat(0x82755f,'rustedMetal',.80,.12),shed:worldMat(0x765744,'corrugatedMetal',.88,.08),barrier:worldMat(0x9a8b70,'concrete',.96,0),crate:worldMat(0x755437,'wood',.96,0),
+    containerBlue:worldMat(0x385f78,'corrugatedMetal',.82,.06),containerRed:worldMat(0x8a473f,'corrugatedMetal',.84,.06),containerGreen:worldMat(0x4f6d58,'corrugatedMetal',.86,.06),containerTan:worldMat(0x847457,'corrugatedMetal',.88,.05),
     default:mat,
   };
   const groups=new Map();for(const o of STATIC_BOXES){if(customKinds.has(o.kind))continue;const kind=o.kind||'default';if(!groups.has(kind))groups.set(kind,[]);groups.get(kind).push({x:o.x,y:terrainHeight(o.x,o.z)+o.h/2,z:o.z,sx:o.w,sy:o.h,sz:o.d});}
@@ -1204,9 +1260,9 @@ function addBuildingsBatch(){
       warehouse:[0x8e9393,0x3f474b,0x5c6263],tower:[0x6f6250,0x3b3229,0x5b5145],utility:[0x89735b,0x514336,0x5b5145],
     }[b.style]||null;
     const materials={
-      wall:new THREE.MeshStandardMaterial({color:buildingStyle?buildingStyle[0]:(currentMapId==='rig'?(b.tall?0x6f6250:0x89735b):(currentMapId==='depot'?(b.tall?0x7d8589:0x919698):(b.tall?0x929aa0:0xa8adb0))),roughness:.9}),
-      trim:new THREE.MeshStandardMaterial({color:buildingStyle?buildingStyle[1]:(currentMapId==='rig'?(b.tall?0x3b3229:0x514336):(currentMapId==='depot'?(b.tall?0x30383d:0x41494e):(b.tall?0x39444d:0x4f5961))),roughness:.75}),
-      floor:new THREE.MeshStandardMaterial({color:buildingStyle?buildingStyle[2]:(currentMapId==='rig'?0x5b5145:(currentMapId==='depot'?0x5d6264:0x6d7478)),roughness:.95}),
+      wall:worldMat(buildingStyle?buildingStyle[0]:(currentMapId==='rig'?(b.tall?0x6f6250:0x89735b):(currentMapId==='depot'?(b.tall?0x7d8589:0x919698):(b.tall?0x929aa0:0xa8adb0))),buildingWallTexture(b.style),.92,b.style==='industrial'||b.style==='warehouse'?.05:0),
+      trim:worldMat(buildingStyle?buildingStyle[1]:(currentMapId==='rig'?(b.tall?0x3b3229:0x514336):(currentMapId==='depot'?(b.tall?0x30383d:0x41494e):(b.tall?0x39444d:0x4f5961))),'paintedMetal',.78,.10),
+      floor:worldMat(buildingStyle?buildingStyle[2]:(currentMapId==='rig'?0x5b5145:(currentMapId==='depot'?0x5d6264:0x6d7478)),'concrete',.97,0),
     };
     const groups={wall:[],trim:[],floor:[]};
     for(const part of geometry.parts){
@@ -1263,6 +1319,7 @@ function bindUI(){
   $('settingsSaveBtn').addEventListener('click',savePlayerSettingsDraft);
   $('settingsFullscreenBtn').addEventListener('click',async()=>{ensureAudio();if(shell.fullscreen)await shell.exitFullscreenFromGesture();else await shell.enterFullscreenFromGesture();});
   $('settingsResetBtn').addEventListener('click',resetPlayerSettings);
+  $('playerMasterMute')?.addEventListener('change',()=>{setMasterMuted($('playerMasterMute').value==='on');setSettingsStatus(playerSettingsDraft&&!playerSettingsEqual(playerSettingsDraft,playerSettings)?'Unsaved changes':'Saved settings');});
   for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerControllerVerticalSensitivity','controllerVerticalSensitivity'],['playerControllerMoveDeadzone','controllerMoveDeadzone'],['playerControllerLookDeadzone','controllerLookDeadzone'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id)?.addEventListener('input',()=>stagePlayerSettingFromUI(id,key));
   $('playerGraphics').addEventListener('change',()=>stagePlayerChoice('graphics',$('playerGraphics').value));
   $('playerMinimapOrientation')?.addEventListener('change',()=>stagePlayerChoice('minimapOrientation',$('playerMinimapOrientation').value));
@@ -2203,7 +2260,7 @@ function startSlide(){
   const speed=Math.hypot(moveVelocityX,moveVelocityZ),movement=worldSettings.movement;if(speed<movement.runSpeed*.72)return false;
   const input=movementInput();if(input.len<.35)return false;
   const inv=speed>1e-5?1/speed:0;slideDirX=inv?moveVelocityX*inv:Math.sin(yaw)*-1;slideDirZ=inv?moveVelocityZ*inv:Math.cos(yaw)*-1;
-  slideRecoveryUntil=0;slideStartSpeed=Math.min(movement.runSpeed*SLIDE_START_SPEED_MULTIPLIER,Math.max(speed,movement.runSpeed*Math.min(SLIDE_START_SPEED_MULTIPLIER,1.44)));slideStartedAt=performance.now();sliding=true;crouchWanted=true;crouched=true;cancelSprint();setAim(false);sendCurrentState(true);return true;
+  slideRecoveryUntil=0;slideStartSpeed=Math.min(movement.runSpeed*SLIDE_START_SPEED_MULTIPLIER,Math.max(speed,movement.runSpeed*Math.min(SLIDE_START_SPEED_MULTIPLIER,1.44)));slideStartedAt=performance.now();sliding=true;crouchWanted=true;crouched=true;cancelSprint();setAim(false);soundSlide();sendCurrentState(true);return true;
 }
 function setCrouch(active){if(sliding&&!active)stopSlide({recover:true});crouchWanted=!!active;if(crouchWanted)crouched=true;else if(canStandHere())crouched=false;sendCurrentState(true);}
 function toggleCrouch(){
@@ -2608,7 +2665,7 @@ function handleShot(m){
     // projectile/reconciliation data; replaying feedback here caused the
     // noticeable round-trip-time firing delay.
   }else if(shotPacketPrimary(m)){
-    const r=remotes.get(m.ownerId);if(r){r.fireKickUntil=performance.now()+170;r.revealedUntil=performance.now()+1500;playSpatialCue(weaponShotSoundId(m.weapon),m.x,m.y,m.z,95,.95);}
+    const r=remotes.get(m.ownerId);if(r){r.fireKickUntil=performance.now()+170;r.revealedUntil=performance.now()+1500;{const v=weaponShotVariation(m.weapon);playSpatialCue(weaponShotSoundId(m.weapon),m.x,m.y,m.z,95,.95*v.volume,{playbackRate:v.playbackRate});}}
   }
 }
 function removeBullet(id){const b=bullets.get(id);if(!b)return;bullets.delete(id);const root=b.root||b.mesh;try{scene?.remove(root);}catch{}if(b.type==='launcher')disposeObject3D(root);else{try{b.geometry?.dispose?.();}catch{}disposeMaterialResources(b.mesh?.material);}}
@@ -2655,7 +2712,7 @@ function disposeMaterialResources(material){
     // Transient gameplay effects own their materials. Dispose any texture-like
     // resources defensively, then the material itself. Cleanup must never throw
     // into the animation loop.
-    for(const value of Object.values(mat)){if(value?.isTexture&&!value.userData?.preserveTransient){try{value.dispose?.();}catch{}}}
+    for(const value of Object.values(mat)){if(value?.isTexture&&!value.userData?.preserveTransient&&!value.userData?.preserveWorldTexture){try{value.dispose?.();}catch{}}}
     try{mat.dispose?.();}catch{}
   }
 }
@@ -2680,14 +2737,10 @@ function updateThrowables(dt){
   }
 }
 
-function playBulletImpactSound(kind,x,z){
-  const ctx=gameAudio.context?.();if(!ctx||ctx.state!=='running'||!position)return;
-  const dx=(Number(x)||0)-position.x,dz=(Number(z)||0)-position.z,distance=Math.hypot(dx,dz);if(distance>42)return;
-  const gainScale=Math.max(0,1-distance/42),now=ctx.currentTime,osc=ctx.createOscillator(),gain=ctx.createGain(),pan=ctx.createStereoPanner?ctx.createStereoPanner():null;
-  const playerHit=kind==='player',base=playerHit?155:1050+Math.random()*650;osc.type=playerHit?'sine':'triangle';osc.frequency.setValueAtTime(base,now);osc.frequency.exponentialRampToValueAtTime(playerHit?90:420,now+(playerHit?.055:.035));
-  gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime((playerHit?.035:.025)*gainScale,now+.004);gain.gain.exponentialRampToValueAtTime(.0001,now+(playerHit?.07:.05));
-  if(pan){pan.pan.value=Math.max(-.8,Math.min(.8,dx/Math.max(8,distance)));osc.connect(gain).connect(pan).connect(ctx.destination);}else osc.connect(gain).connect(ctx.destination);
-  try{osc.start(now);osc.stop(now+(playerHit?.075:.055));}catch{}
+function playBulletImpactSound(kind,x,y,z){
+  const cue=kind==='player'?'impactPlayer':kind==='blocked'?'impactBlocked':'impactWall';
+  const rate=kind==='player'?.97+Math.random()*.05:.94+Math.random()*.10;
+  playSpatialCue(cue,Number(x)||0,Number(y)||0,Number(z)||0,42,.92,{playbackRate:rate});
 }
 function spawnBulletImpactFx(m){
   if(!scene||!THREE)return;const kind=String(m?.kind||'world'),playerHit=kind==='player',blocked=kind==='blocked',x=Number(m?.x)||0,y=Number(m?.y)||0,z=Number(m?.z)||0,root=new THREE.Group();root.position.set(x,y,z);
@@ -2699,7 +2752,7 @@ function spawnBulletImpactFx(m){
   let mark=null;if(!playerHit){mark=new THREE.Mesh(new THREE.SphereGeometry(blocked?.025:.021,6,4),new THREE.MeshBasicMaterial({color:blocked?0xd9c76a:0x292724,transparent:true,opacity:blocked?.72:.84,depthWrite:false}));root.add(mark);}
   scene.add(root);bulletImpactFx.push({root,particles,velocities,mark,age:0,particleDuration:playerHit?.30:.24,duration:playerHit?.34:blocked?.55:4.6,playerHit,blocked});
   while(bulletImpactFx.length>84){const old=bulletImpactFx.shift();try{scene?.remove(old.root);}catch{}disposeObject3D(old.root);}
-  playBulletImpactSound(kind,x,z);
+  playBulletImpactSound(kind,x,y,z);
 }
 function updateBulletImpactFx(dt){
   for(let i=bulletImpactFx.length-1;i>=0;i--){const f=bulletImpactFx[i];f.age+=dt;const particleP=Math.min(1,f.age/f.particleDuration),attr=f.particles.geometry.getAttribute('position'),pos=attr.array,v=f.velocities;
@@ -3543,10 +3596,18 @@ function stopIntroMusic(){if(introMusicHandle){introMusicHandle.stop();introMusi
 
 
 
-function weaponShotSoundId(weapon='pistol'){return weapon==='shotgun'||weapon==='semiShotgun'||weapon==='grenadeLauncher'||weapon==='rpg'?'shotShotgun':weapon==='sniper'?'shotSniper':weapon==='assault'||weapon==='ump'?'shotAssault':'shotPistol';}
-function soundShot(weapon='pistol'){playSoundCue(weaponShotSoundId(weapon));}
-function reloadSoundId(weapon=currentWeapon){return weapon==='shotgun'||weapon==='semiShotgun'?'reloadShotgun':weapon==='sniper'||weapon==='grenadeLauncher'||weapon==='rpg'?'reloadSniper':weapon==='assault'||weapon==='ump'?'reloadAssault':'reloadPistol';}
-function soundReload(weapon=currentWeapon){playSoundCue(reloadSoundId(weapon));}
+function weaponShotSoundId(weapon='pistol'){
+  return weapon==='assault'?'shotAssault':weapon==='ump'?'shotUmp':weapon==='shotgun'?'shotShotgun':weapon==='semiShotgun'?'shotSemiShotgun':weapon==='sniper'?'shotSniper':weapon==='grenadeLauncher'?'shotGl':weapon==='rpg'?'shotRpg':'shotPistol';
+}
+function weaponShotVariation(weapon='pistol'){
+  const spread=(weapon==='assault'||weapon==='ump') ? .016 : (weapon==='shotgun'||weapon==='semiShotgun') ? .010 : .006;
+  return{playbackRate:1+(Math.random()*2-1)*spread,volume:.97+Math.random()*.06};
+}
+function soundShot(weapon='pistol'){const v=weaponShotVariation(weapon);playSoundCue(weaponShotSoundId(weapon),v.volume,{playbackRate:v.playbackRate});}
+function reloadSoundId(weapon=currentWeapon){
+  return weapon==='assault'?'reloadAssault':weapon==='ump'?'reloadUmp':weapon==='shotgun'?'reloadShotgun':weapon==='semiShotgun'?'reloadSemiShotgun':weapon==='sniper'?'reloadSniper':weapon==='grenadeLauncher'?'reloadGl':weapon==='rpg'?'reloadRpg':'reloadPistol';
+}
+function soundReload(weapon=currentWeapon){playSoundCue(reloadSoundId(weapon),1,{playbackRate:.99+Math.random()*.02});}
 function soundHitmarker(){playSoundCue('hitmarker');}
 function soundHeadshot(){playSoundCue('headshot');}
 function soundKill(){playSoundCue('kill');}
@@ -3554,15 +3615,16 @@ function soundAnnouncer(priority=1){playSoundCue('announcer',1,{playbackRate:pri
 function soundShield(){playSoundCue('shield');}
 function soundHurt(){playSoundCue('hurt');}
 function soundJump(){playSoundCue('jump');}
-function soundFootstep(side=0,volume=1){playSoundCue(side?'footstepRight':'footstepLeft',volume);}
-function soundLanding(volume=1){playSoundCue('land',volume);}
-function soundShotgunPump(){playSoundCue('shotgunPump');}
+function soundFootstep(side=0,volume=1){playSoundCue(side?'footstepRight':'footstepLeft',volume*(.96+Math.random()*.08),{playbackRate:.96+Math.random()*.08});}
+function soundLanding(volume=1){playSoundCue('land',volume,{playbackRate:.97+Math.random()*.05});}
+function soundSlide(){playSoundCue('slide',.92,{playbackRate:.97+Math.random()*.06});}
+function soundShotgunPump(){playSoundCue('shotgunPump',1,{playbackRate:.985+Math.random()*.03});}
 function soundThrowableThrow(kind='flash'){playSoundCue(kind==='sticky'||kind==='frag'?'stickyThrow':'flashThrow');}
 function soundThrowableImpact(kind='flash',m){if(!m)return;playSpatialCue(kind==='sticky'||kind==='frag'?'stickyImpact':'flashImpact',Number(m.x)||0,Number(m.y)||0,Number(m.z)||0,32,.85);}
 
 function semtexBeepInterval(remainingMs){const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1);return Math.round(THREE.MathUtils.lerp(360,85,Math.pow(p,1.22)));}
 function soundSemtexBeep(g,remainingMs){if(!g?.root)return;const p=1-THREE.MathUtils.clamp(Number(remainingMs||0)/1850,0,1),rate=1+p*.10,interval=semtexBeepInterval(remainingMs)/1000,pos=g.root.position;playSpatialCue('semtexBeep',pos.x,pos.y,pos.z,44,1,{playbackRate:rate,maxDuration:Math.max(.055,Math.min(.18,interval*.72))});}
 
-function soundTacticalDetonation(kind,m){if(!m)return;playSpatialCue(kind==='flash'||kind==='smoke'?'flashDetonate':'grenadeExplosion',Number(m.x)||0,Number(m.y)||0,Number(m.z)||0,kind==='sticky'?70:58,1);}
+function soundTacticalDetonation(kind,m){if(!m)return;const cue=kind==='flash'||kind==='smoke'?'flashDetonate':kind==='grenadeLauncher'?'glExplosion':kind==='rpg'?'rpgExplosion':'grenadeExplosion',distance=kind==='rpg'?86:kind==='grenadeLauncher'?72:kind==='sticky'?70:58;playSpatialCue(cue,Number(m.x)||0,Number(m.y)||0,Number(m.z)||0,distance,1,{playbackRate:.985+Math.random()*.03});}
 document.addEventListener('pointerdown',()=>{void ensureAudio();if(!shell.inMatch&&!masterMuted)startIntroMusic();},{capture:true});
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)void gameAudio.resume();});
