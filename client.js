@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.42';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.42';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.42';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.42';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.42';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.42';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.42';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.42';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.43';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.43';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.43';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.43';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.43';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.43';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.43';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.43';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.42';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.42';
-import { createAudioEngine } from './audio-engine.js?v=1.37.42';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.42';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.42';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.42';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.42';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.42';
+} from './game-config.js?v=1.37.43';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.43';
+import { createAudioEngine } from './audio-engine.js?v=1.37.43';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.43';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.43';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.43';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.43';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.43';
 
 let THREE = null;
 
@@ -309,6 +309,7 @@ let lobbyLoadoutDraft=null,lobbyLoadoutDirty=false,lobbyLoadoutRevision=0,lobbyL
 const bullets = new Map();
 const throwables = new Map();
 const tacticalFx = [];
+const bulletImpactFx = [];
 const smokeClouds = new Map();
 const rocketTrailPuffs = [];
 let sharedSmokeTexture = null;
@@ -449,7 +450,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.42';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.43';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1331,7 +1332,7 @@ function bindUI(){
   document.addEventListener('gestureend',suppressNativeUI,{passive:false,capture:true});
 
   document.addEventListener('mousemove', e => {
-    if(chatOpen||!shell.canPlay || hp<=0 || (!isTouch&&document.pointerLockElement!==canvas)) return;
+    if(chatOpen||!shell.canPlay||!matchAllowsMovement(matchState)||hp<=0||(!isTouch&&document.pointerLockElement!==canvas)) return;
     if(Math.abs(e.movementX)+Math.abs(e.movementY)>.01)setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
     const sens=aimSensitivityScale()*playerSettings.lookSensitivity;yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
   });
@@ -1760,6 +1761,7 @@ function handleMessage(m){
   if(m.t==='botState'){for(const b of m.bots||[])upsertRemote({...b,at:m.at},false);return;}
   if(m.t==='shot'){handleShot(m);return;}
   if(m.t==='projectileState'){updateLauncherProjectileState(m);return;}
+  if(m.t==='bulletImpact'){spawnBulletImpactFx(m);return;}
   if(m.t==='bulletEnd'){removeBullet(m.id);return;}
   if(m.t==='equipment'){equipment=normalizeEquipment(m.equipment);return;}
   if(m.t==='throwable'){spawnThrowableVisual(m);return;}
@@ -1811,7 +1813,7 @@ function returnToLobby(){
 function leaveMatch(){
   if(chatOpen)void dismissChat({restorePointer:false});chatMessages.length=0;
   shell.leaveToMenu();disableMenu(false);serverClockOffset=0;lastPingLocalAt=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left match')}catch{}}socket=null;currentRoom='';isMatchAdmin=false;matchOwnerId='';lobbyParticipants.clear();pendingGameSnapshot=null;lobbyMatchDraft=null;lobbyMatchDirty=false;lobbyMapDraft='';lobbyMapDirty=false;lobbyLoadoutDraft=null;lobbyLoadoutDirty=false;lobbyLoadoutRevision=0;lobbyLoadoutAckRevision=0;syncLobbyHostControlPlacement();applyWorldSettings(DEFAULT_WORLD_SETTINGS);
-  resetTouchInput();clearRemotes();clearBullets();clearRocketTrailPuffs();clearThrowables();clearTacticalFx();clearSmokeClouds();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;primaryWeapon=preferredPrimary;tacticalEquipment=preferredTactical;lethalEquipment=preferredLethal;pendingLoadout=null;currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();viewFeetY=NaN;verticalVelocity=moveVelocityX=moveVelocityZ=0;lastGroundedAt=0;jumpBufferedUntil=0;viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;ammo=freshClientAmmo();equipment=freshClientEquipment(tacticalEquipment,lethalEquipment);reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;clearToastNotifications();setAim(false);syncLocalWeaponModel();
+  resetTouchInput();clearRemotes();clearBullets();clearBulletImpactFx();clearRocketTrailPuffs();clearThrowables();clearTacticalFx();clearSmokeClouds();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;primaryWeapon=preferredPrimary;tacticalEquipment=preferredTactical;lethalEquipment=preferredLethal;pendingLoadout=null;currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();viewFeetY=NaN;verticalVelocity=moveVelocityX=moveVelocityZ=0;lastGroundedAt=0;jumpBufferedUntil=0;viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;ammo=freshClientAmmo();equipment=freshClientEquipment(tacticalEquipment,lethalEquipment);reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;clearToastNotifications();setAim(false);syncLocalWeaponModel();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshMatches();
 }
 
@@ -2393,7 +2395,7 @@ function switchWeapon(weapon){
   setAim(false);sniperZoomLevel=0;resetViewRecoil();currentWeapon=weapon;pendingWeapon=weapon;reloadRequestPending=false;reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=performance.now();delayFire(WEAPON_SWITCH_MS,weapon);warmWeaponAudio(weapon);syncLocalWeaponModel();send({t:'weapon',weapon});showToast(WEAPON_SPECS[weapon].name);
 }
 function setAim(active){
-  const canAim=!!active&&shell.canPlay&&hp>0&&!reloadUntil&&!traversal&&!ladderState;if(canAim&&sprinting){const delay=weaponSprintAdsMs(currentWeapon);cancelSprint({lockMs:delay+70});adsBlockedUntil=Math.max(adsBlockedUntil,performance.now()+delay);sendCurrentState(true);}adsWanted=canAim;if(!adsWanted){adsBlockedUntil=0;if(currentWeapon==='sniper')sniperZoomLevel=0;}else if(currentWeapon==='sniper'&&sniperZoomLevel===0)sniperZoomLevel=1;
+  const canAim=!!active&&shell.canPlay&&matchAllowsCombat(matchState)&&hp>0&&!reloadUntil&&!traversal&&!ladderState;if(canAim&&sprinting){const delay=weaponSprintAdsMs(currentWeapon);cancelSprint({lockMs:delay+70});adsBlockedUntil=Math.max(adsBlockedUntil,performance.now()+delay);sendCurrentState(true);}adsWanted=canAim;if(!adsWanted){adsBlockedUntil=0;if(currentWeapon==='sniper')sniperZoomLevel=0;}else if(currentWeapon==='sniper'&&sniperZoomLevel===0)sniperZoomLevel=1;
 }
 function toggleAim(){if(traversal||ladderState)return;if(currentWeapon==='sniper'&&shell.canPlay&&hp>0&&!reloadUntil){if(!adsWanted){setAim(true);if(adsWanted)showToast('SNIPER 4X');}else if(sniperZoomLevel===1){sniperZoomLevel=2;showToast('SNIPER 8X');}else{setAim(false);}return;}setAim(!adsWanted);}
 function toggleFireMode(){if(currentWeapon!=='assault'){showToast('FIRE MODE · ASSAULT ONLY');return;}assaultFireMode=assaultFireMode==='semi'?'auto':'semi';clearFireInput();touchVisual.modeUntil=performance.now()+180;localStorage.setItem('breachAssaultFireMode',assaultFireMode);showToast(assaultFireMode==='auto'?'ASSAULT · AUTO':'ASSAULT · SEMI');}
@@ -2653,6 +2655,36 @@ function updateThrowables(dt){
   }
 }
 
+function playBulletImpactSound(kind,x,z){
+  const ctx=gameAudio.context?.();if(!ctx||ctx.state!=='running'||!position)return;
+  const dx=(Number(x)||0)-position.x,dz=(Number(z)||0)-position.z,distance=Math.hypot(dx,dz);if(distance>42)return;
+  const gainScale=Math.max(0,1-distance/42),now=ctx.currentTime,osc=ctx.createOscillator(),gain=ctx.createGain(),pan=ctx.createStereoPanner?ctx.createStereoPanner():null;
+  const playerHit=kind==='player',base=playerHit?155:1050+Math.random()*650;osc.type=playerHit?'sine':'triangle';osc.frequency.setValueAtTime(base,now);osc.frequency.exponentialRampToValueAtTime(playerHit?90:420,now+(playerHit?.055:.035));
+  gain.gain.setValueAtTime(0,now);gain.gain.linearRampToValueAtTime((playerHit?.035:.025)*gainScale,now+.004);gain.gain.exponentialRampToValueAtTime(.0001,now+(playerHit?.07:.05));
+  if(pan){pan.pan.value=Math.max(-.8,Math.min(.8,dx/Math.max(8,distance)));osc.connect(gain).connect(pan).connect(ctx.destination);}else osc.connect(gain).connect(ctx.destination);
+  try{osc.start(now);osc.stop(now+(playerHit?.075:.055));}catch{}
+}
+function spawnBulletImpactFx(m){
+  if(!scene||!THREE)return;const kind=String(m?.kind||'world'),playerHit=kind==='player',blocked=kind==='blocked',x=Number(m?.x)||0,y=Number(m?.y)||0,z=Number(m?.z)||0,root=new THREE.Group();root.position.set(x,y,z);
+  const count=playerHit?8:blocked?7:6,positions=new Float32Array(count*3),velocities=new Float32Array(count*3),geometry=new THREE.BufferGeometry();
+  for(let i=0;i<count;i++){const j=i*3,a=Math.random()*Math.PI*2,speed=(playerHit?.42:blocked?1.20:.82)+Math.random()*(playerHit?.72:1.05);velocities[j]=Math.cos(a)*speed;velocities[j+1]=(playerHit?.10:.18)+Math.random()*(playerHit?.70:1.05);velocities[j+2]=Math.sin(a)*speed;}
+  geometry.setAttribute('position',new THREE.BufferAttribute(positions,3));
+  const color=playerHit?0x9e1828:blocked?0xe9d675:0xe1c49a,material=new THREE.PointsMaterial({color,size:playerHit?.055:.042,sizeAttenuation:true,transparent:true,opacity:playerHit?.72:.86,depthWrite:false,blending:playerHit?THREE.NormalBlending:THREE.AdditiveBlending});
+  const particles=new THREE.Points(geometry,material);particles.frustumCulled=false;root.add(particles);
+  let mark=null;if(!playerHit){mark=new THREE.Mesh(new THREE.SphereGeometry(blocked?.025:.021,6,4),new THREE.MeshBasicMaterial({color:blocked?0xd9c76a:0x292724,transparent:true,opacity:blocked?.72:.84,depthWrite:false}));root.add(mark);}
+  scene.add(root);bulletImpactFx.push({root,particles,velocities,mark,age:0,particleDuration:playerHit?.30:.24,duration:playerHit?.34:blocked?.55:4.6,playerHit,blocked});
+  while(bulletImpactFx.length>84){const old=bulletImpactFx.shift();try{scene?.remove(old.root);}catch{}disposeObject3D(old.root);}
+  playBulletImpactSound(kind,x,z);
+}
+function updateBulletImpactFx(dt){
+  for(let i=bulletImpactFx.length-1;i>=0;i--){const f=bulletImpactFx[i];f.age+=dt;const particleP=Math.min(1,f.age/f.particleDuration),attr=f.particles.geometry.getAttribute('position'),pos=attr.array,v=f.velocities;
+    if(particleP<1){for(let j=0;j<pos.length;j+=3){v[j+1]-=(f.playerHit?4.8:7.2)*dt;pos[j]+=v[j]*dt;pos[j+1]+=v[j+1]*dt;pos[j+2]+=v[j+2]*dt;}attr.needsUpdate=true;}f.particles.material.opacity=Math.max(0,1-particleP)*(f.playerHit?.72:.86);
+    if(f.mark){const fade=f.blocked?Math.max(0,1-f.age/f.duration):f.age<3.1?1:Math.max(0,1-(f.age-3.1)/(f.duration-3.1));f.mark.material.opacity=(f.blocked?.72:.84)*fade;}
+    if(f.age>=f.duration){bulletImpactFx.splice(i,1);try{scene?.remove(f.root);}catch{}disposeObject3D(f.root);}
+  }
+}
+function clearBulletImpactFx(){const pending=bulletImpactFx.splice(0);for(const f of pending){try{scene?.remove(f.root);}catch{}disposeObject3D(f.root);}}
+
 function spawnDetonationFx(kind,m){
   if(!scene||!THREE)return;
   const sticky=kind==='sticky',frag=kind==='frag',launcher=kind==='rpg'||kind==='grenadeLauncher',damaging=sticky||frag||launcher;
@@ -2727,6 +2759,7 @@ function animate(){
   try{updateRocketTrailPuffs(visualDt);}catch(error){console.error('Rocket trail update failed; clearing transient rocket smoke.',error);clearRocketTrailPuffs();}
   try{updateThrowables(visualDt);}catch(error){console.error('Throwable visual update failed; clearing transient throwables.',error);clearThrowables();}
   try{updateTacticalFx(visualDt);}catch(error){console.error('Explosion visual update failed; clearing transient explosion FX.',error);clearTacticalFx();}
+  try{updateBulletImpactFx(visualDt);}catch(error){console.error('Bullet impact visual update failed; clearing transient impact FX.',error);clearBulletImpactFx();}
   try{updateSmokeClouds(visualDt);}catch(error){console.error('Smoke visual update failed; clearing transient smoke FX.',error);clearSmokeClouds();}
   updateEquipmentTrajectory();
   renderer.autoClear=true;renderer.render(scene,camera);
@@ -2963,6 +2996,7 @@ function updateGamepadInput(dt){
     openPause();return;
   }
   if(!shell.canPlay){gamepadFireDown=false;resetControllerAimMotion();if(controllerOwnsAim){controllerOwnsAim=false;setAim(false);}handleControllerUiNavigation(pressed);return;}
+  if(!matchAllowsMovement(matchState)){clearControllerGameplayInput();clearControllerUiFocus();return;}
   clearControllerUiFocus();
   if(hp<=0&&pressed[GAMEPAD_BUTTON.Y]){openMatchLoadout();return;}
   // Gameplay controller contract: LS owns sprint exclusively. D-pad is kept
