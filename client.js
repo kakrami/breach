@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.55';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.55';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.55';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.55';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.55';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.55';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.55';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.55';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.56';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.56';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.56';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.56';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.56';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.56';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.56';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.56';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.55';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.55';
-import { createAudioEngine } from './audio-engine.js?v=1.37.55';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.55';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.55';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.55';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.55';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.55';
+} from './game-config.js?v=1.37.56';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.56';
+import { createAudioEngine } from './audio-engine.js?v=1.37.56';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.56';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.56';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.56';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.56';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.56';
 
 let THREE = null;
 
@@ -76,8 +76,8 @@ const IRON_SIGHT_WEAPONS = new Set(['pistol','assault','ump','shotgun','semiShot
 const CHAT_MAX_LENGTH=120,CHAT_VISIBLE_MS=9000,CHAT_MAX_MESSAGES=28;
 const ACTIVE_STATE_INTERVAL = 33;
 const IDLE_STATE_INTERVAL = 250;
-const LOCAL_PREDICTION_HISTORY_MS = 1500;
-const LOCAL_PREDICTION_MAX_SAMPLES = 64;
+const LOCAL_PREDICTION_HISTORY_MS = 5000;
+const LOCAL_PREDICTION_MAX_SAMPLES = 192;
 const REMOTE_INTERPOLATION_MS = 85;
 const REMOTE_INTERPOLATION_MIN_MS = 70;
 const REMOTE_INTERPOLATION_MAX_MS = 220;
@@ -466,7 +466,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.55';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.56';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2183,6 +2183,13 @@ function handleLadderMessage(m){
 }
 
 function predictionStateForSeq(seq){for(let i=localPredictionHistory.length-1;i>=0;i--)if(localPredictionHistory[i].seq===seq)return localPredictionHistory[i];return null;}
+function rebasePredictionsAfter(seq,dx,dy,dz){
+  if(!seq||(!dx&&!dy&&!dz))return;
+  for(const sample of localPredictionHistory){
+    if(sample.seq<=seq)continue;
+    sample.x+=dx;sample.y+=dy;sample.z+=dz;
+  }
+}
 function discardPredictionThrough(seq){while(localPredictionHistory.length&&localPredictionHistory[0].seq<=seq)localPredictionHistory.shift();}
 function resetLocalPredictionHistory(){localPredictionHistory.length=0;stateSeq=0;lastCorrectionSeq=0;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0};}
 function applyServerCorrection(m){
@@ -2201,6 +2208,11 @@ function applyServerCorrection(m){
   if(predicted){deltaX=serverX-predicted.x;deltaY=serverY-predicted.y;deltaZ=serverZ-predicted.z;}
   else{deltaX=serverX-position.x;deltaY=serverY-position.y;deltaZ=serverZ-position.z;}
   position.x+=deltaX;position.y+=deltaY;position.z+=deltaZ;
+  // Every prediction newer than the corrected snapshot was simulated in the
+  // same old coordinate frame. Rebase it once with the authoritative delta so
+  // later correction packets only contain NEW error instead of re-applying the
+  // same network correction over and over after a packet stall.
+  if(seq)rebasePredictionsAfter(seq,deltaX,deltaY,deltaZ);
   const correctionMagnitude=Math.hypot(deltaX,deltaY,deltaZ),recent=!seq||stateSeq-seq<=2;
   if(correctionMagnitude>CORRECTION_HARD_SNAP_DISTANCE||Math.abs(deltaY)>.9){clearCorrectionView();resetViewVertical();}
   else{
