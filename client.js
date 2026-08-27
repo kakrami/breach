@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.51';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.51';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.51';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.51';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.51';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.51';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.51';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.51';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.52';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.52';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.52';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.52';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.52';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.52';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.52';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.52';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.51';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.51';
-import { createAudioEngine } from './audio-engine.js?v=1.37.51';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.51';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.51';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.51';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.51';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.51';
+} from './game-config.js?v=1.37.52';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.52';
+import { createAudioEngine } from './audio-engine.js?v=1.37.52';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.52';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.52';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.52';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.52';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.52';
 
 let THREE = null;
 
@@ -98,47 +98,47 @@ const CORRECTION_HARD_SNAP_DISTANCE = 1.35;
 // Entire sound set is generated locally as 16-bit PCM WAV assets.
 // No third-party or runtime-hosted audio is required.
 const SOUND_CUES = {
-  introMusic:{url:'audio/intro.wav?v=1.37.51',group:'Music',gain:.40,loop:true},
-  shotPistol:{url:'audio/shot-pistol.wav?v=1.37.51',group:'Gunfire',gain:.78},
-  shotAssault:{url:'audio/shot-assault.wav?v=1.37.51',group:'Gunfire',gain:.72},
-  shotUmp:{url:'audio/shot-ump.wav?v=1.37.51',group:'Gunfire',gain:.70},
-  shotShotgun:{url:'audio/shot-shotgun.wav?v=1.37.51',group:'Gunfire',gain:.88},
-  shotSemiShotgun:{url:'audio/shot-semi-shotgun.wav?v=1.37.51',group:'Gunfire',gain:.82},
-  shotSniper:{url:'audio/shot-sniper.wav?v=1.37.51',group:'Gunfire',gain:.94},
-  shotGl:{url:'audio/shot-gl.wav?v=1.37.51',group:'Gunfire',gain:.82},
-  shotRpg:{url:'audio/shot-rpg.wav?v=1.37.51',group:'Gunfire',gain:.96},
-  reloadPistol:{url:'audio/reload-pistol.wav?v=1.37.51',group:'Weapon Handling',gain:.66},
-  reloadAssault:{url:'audio/reload-assault.wav?v=1.37.51',group:'Weapon Handling',gain:.64},
-  reloadUmp:{url:'audio/reload-ump.wav?v=1.37.51',group:'Weapon Handling',gain:.62},
-  reloadShotgun:{url:'audio/reload-shotgun.wav?v=1.37.51',group:'Weapon Handling',gain:.68},
-  reloadSemiShotgun:{url:'audio/reload-semi-shotgun.wav?v=1.37.51',group:'Weapon Handling',gain:.66},
-  shotgunPump:{url:'audio/shotgun-pump.wav?v=1.37.51',group:'Weapon Handling',gain:.78},
-  reloadSniper:{url:'audio/reload-sniper.wav?v=1.37.51',group:'Weapon Handling',gain:.72},
-  reloadGl:{url:'audio/reload-gl.wav?v=1.37.51',group:'Weapon Handling',gain:.72},
-  reloadRpg:{url:'audio/reload-rpg.wav?v=1.37.51',group:'Weapon Handling',gain:.76},
-  hitmarker:{url:'audio/hitmarker.wav?v=1.37.51',group:'Feedback',gain:.50},
-  headshot:{url:'audio/headshot.wav?v=1.37.51',group:'Feedback',gain:.58},
-  kill:{url:'audio/kill.wav?v=1.37.51',group:'Feedback',gain:.58},
-  announcer:{url:'audio/announcer.wav?v=1.37.51',group:'Feedback',gain:.54},
-  shield:{url:'audio/shield.wav?v=1.37.51',group:'Feedback',gain:.58},
-  hurt:{url:'audio/hurt.wav?v=1.37.51',group:'Feedback',gain:.60},
-  jump:{url:'audio/jump.wav?v=1.37.51',group:'Movement',gain:.34},
-  footstepLeft:{url:'audio/footstep-left.wav?v=1.37.51',group:'Movement',gain:.42},
-  footstepRight:{url:'audio/footstep-right.wav?v=1.37.51',group:'Movement',gain:.42},
-  land:{url:'audio/land.wav?v=1.37.51',group:'Movement',gain:.66},
-  slide:{url:'audio/slide.wav?v=1.37.51',group:'Movement',gain:.58},
-  impactWall:{url:'audio/impact-wall.wav?v=1.37.51',group:'Impacts',gain:.62},
-  impactPlayer:{url:'audio/impact-player.wav?v=1.37.51',group:'Impacts',gain:.60},
-  impactBlocked:{url:'audio/impact-blocked.wav?v=1.37.51',group:'Impacts',gain:.58},
-  flashThrow:{url:'audio/flash-throw.wav?v=1.37.51',group:'Tactical',gain:.52},
-  stickyThrow:{url:'audio/sticky-throw.wav?v=1.37.51',group:'Tactical',gain:.52},
-  flashImpact:{url:'audio/flash-impact.wav?v=1.37.51',group:'Tactical',gain:.58},
-  stickyImpact:{url:'audio/sticky-impact.wav?v=1.37.51',group:'Tactical',gain:.62},
-  semtexBeep:{url:'audio/semtex-beep.wav?v=1.37.51',group:'Tactical',gain:.60},
-  flashDetonate:{url:'audio/flash-detonate.wav?v=1.37.51',group:'Explosions',gain:.88},
-  grenadeExplosion:{url:'audio/grenade-explosion.wav?v=1.37.51',group:'Explosions',gain:1},
-  glExplosion:{url:'audio/gl-explosion.wav?v=1.37.51',group:'Explosions',gain:.94},
-  rpgExplosion:{url:'audio/rpg-explosion.wav?v=1.37.51',group:'Explosions',gain:1},
+  introMusic:{url:'audio/intro.wav?v=1.37.52',group:'Music',gain:.40,loop:true},
+  shotPistol:{url:'audio/shot-pistol.wav?v=1.37.52',group:'Gunfire',gain:.78},
+  shotAssault:{url:'audio/shot-assault.wav?v=1.37.52',group:'Gunfire',gain:.72},
+  shotUmp:{url:'audio/shot-ump.wav?v=1.37.52',group:'Gunfire',gain:.70},
+  shotShotgun:{url:'audio/shot-shotgun.wav?v=1.37.52',group:'Gunfire',gain:.88},
+  shotSemiShotgun:{url:'audio/shot-semi-shotgun.wav?v=1.37.52',group:'Gunfire',gain:.82},
+  shotSniper:{url:'audio/shot-sniper.wav?v=1.37.52',group:'Gunfire',gain:.94},
+  shotGl:{url:'audio/shot-gl.wav?v=1.37.52',group:'Gunfire',gain:.82},
+  shotRpg:{url:'audio/shot-rpg.wav?v=1.37.52',group:'Gunfire',gain:.96},
+  reloadPistol:{url:'audio/reload-pistol.wav?v=1.37.52',group:'Weapon Handling',gain:.66},
+  reloadAssault:{url:'audio/reload-assault.wav?v=1.37.52',group:'Weapon Handling',gain:.64},
+  reloadUmp:{url:'audio/reload-ump.wav?v=1.37.52',group:'Weapon Handling',gain:.62},
+  reloadShotgun:{url:'audio/reload-shotgun.wav?v=1.37.52',group:'Weapon Handling',gain:.68},
+  reloadSemiShotgun:{url:'audio/reload-semi-shotgun.wav?v=1.37.52',group:'Weapon Handling',gain:.66},
+  shotgunPump:{url:'audio/shotgun-pump.wav?v=1.37.52',group:'Weapon Handling',gain:.78},
+  reloadSniper:{url:'audio/reload-sniper.wav?v=1.37.52',group:'Weapon Handling',gain:.72},
+  reloadGl:{url:'audio/reload-gl.wav?v=1.37.52',group:'Weapon Handling',gain:.72},
+  reloadRpg:{url:'audio/reload-rpg.wav?v=1.37.52',group:'Weapon Handling',gain:.76},
+  hitmarker:{url:'audio/hitmarker.wav?v=1.37.52',group:'Feedback',gain:.50},
+  headshot:{url:'audio/headshot.wav?v=1.37.52',group:'Feedback',gain:.58},
+  kill:{url:'audio/kill.wav?v=1.37.52',group:'Feedback',gain:.58},
+  announcer:{url:'audio/announcer.wav?v=1.37.52',group:'Feedback',gain:.54},
+  shield:{url:'audio/shield.wav?v=1.37.52',group:'Feedback',gain:.58},
+  hurt:{url:'audio/hurt.wav?v=1.37.52',group:'Feedback',gain:.60},
+  jump:{url:'audio/jump.wav?v=1.37.52',group:'Movement',gain:.34},
+  footstepLeft:{url:'audio/footstep-left.wav?v=1.37.52',group:'Movement',gain:.42},
+  footstepRight:{url:'audio/footstep-right.wav?v=1.37.52',group:'Movement',gain:.42},
+  land:{url:'audio/land.wav?v=1.37.52',group:'Movement',gain:.66},
+  slide:{url:'audio/slide.wav?v=1.37.52',group:'Movement',gain:.58},
+  impactWall:{url:'audio/impact-wall.wav?v=1.37.52',group:'Impacts',gain:.62},
+  impactPlayer:{url:'audio/impact-player.wav?v=1.37.52',group:'Impacts',gain:.60},
+  impactBlocked:{url:'audio/impact-blocked.wav?v=1.37.52',group:'Impacts',gain:.58},
+  flashThrow:{url:'audio/flash-throw.wav?v=1.37.52',group:'Tactical',gain:.52},
+  stickyThrow:{url:'audio/sticky-throw.wav?v=1.37.52',group:'Tactical',gain:.52},
+  flashImpact:{url:'audio/flash-impact.wav?v=1.37.52',group:'Tactical',gain:.58},
+  stickyImpact:{url:'audio/sticky-impact.wav?v=1.37.52',group:'Tactical',gain:.62},
+  semtexBeep:{url:'audio/semtex-beep.wav?v=1.37.52',group:'Tactical',gain:.60},
+  flashDetonate:{url:'audio/flash-detonate.wav?v=1.37.52',group:'Explosions',gain:.88},
+  grenadeExplosion:{url:'audio/grenade-explosion.wav?v=1.37.52',group:'Explosions',gain:1},
+  glExplosion:{url:'audio/gl-explosion.wav?v=1.37.52',group:'Explosions',gain:.94},
+  rpgExplosion:{url:'audio/rpg-explosion.wav?v=1.37.52',group:'Explosions',gain:1},
 };
 
 let worldSettings=normalizeWorldSettings(DEFAULT_WORLD_SETTINGS);
@@ -465,7 +465,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.51';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.52';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -931,7 +931,7 @@ function addOpenIronSights(group,material,{rearZ=.12,frontZ=-.72,sightY=.118,rea
   const earW=.010,earTop=sightY-.003,earBottom=rearMountY+rearBaseH,earH=Math.max(.006,earTop-earBottom),rearL=new THREE.Mesh(new THREE.BoxGeometry(earW,earH,.022),material),rearR=rearL.clone();rearL.position.set(-(rearGap+earW/2),earBottom+earH/2,rearZ);rearR.position.set(rearGap+earW/2,earBottom+earH/2,rearZ);
   const frontBaseH=.009,frontBase=new THREE.Mesh(new THREE.BoxGeometry(.040,frontBaseH,.020),material);frontBase.position.set(0,frontMountY+frontBaseH/2,frontZ);
   const postBottom=frontMountY+frontBaseH,postH=Math.max(.006,sightY-postBottom),frontPost=new THREE.Mesh(new THREE.BoxGeometry(postWidth,postH,.016),material);frontPost.position.set(0,postBottom+postH/2,frontZ);
-  group.add(rearBase,rearL,rearR,frontBase,frontPost);group.userData.adsSightY=sightY;return sightY;
+  group.add(rearBase,rearL,rearR,frontBase,frontPost);group.userData.adsSightTip={x:0,y:sightY,z:frontZ};group.userData.adsSightY=sightY;return sightY;
 }
 function addShotgunSight(group,material,{rearZ=.08,frontZ=-.94,sightY=.108,rearMountY=.101,frontMountY=.081}={}){
   // Low-profile receiver notch + barrel-mounted bead.
@@ -939,7 +939,7 @@ function addShotgunSight(group,material,{rearZ=.08,frontZ=-.94,sightY=.108,rearM
   const earW=.009,earH=Math.max(.006,sightY-(rearMountY+rearBaseH)),rearL=new THREE.Mesh(new THREE.BoxGeometry(earW,earH,.020),material),rearR=rearL.clone();rearL.position.set(-.025,rearMountY+rearBaseH+earH/2,rearZ);rearR.position.set(.025,rearMountY+rearBaseH+earH/2,rearZ);
   const beadBaseH=Math.max(.006,sightY-frontMountY-.008),beadBase=new THREE.Mesh(new THREE.BoxGeometry(.022,beadBaseH,.018),material);beadBase.position.set(0,frontMountY+beadBaseH/2,frontZ);
   const bead=new THREE.Mesh(new THREE.SphereGeometry(.0065,8,6),material);bead.position.set(0,sightY,frontZ);
-  group.add(rearBase,rearL,rearR,beadBase,bead);group.userData.adsSightY=sightY;return sightY;
+  group.add(rearBase,rearL,rearR,beadBase,bead);group.userData.adsSightTip={x:0,y:sightY,z:frontZ};group.userData.adsSightY=sightY;return sightY;
 }
 function weaponUsesIronSights(weapon=currentWeapon){return IRON_SIGHT_WEAPONS.has(weapon);}
 
@@ -2322,7 +2322,9 @@ function movementInput(){
   const len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;}
   moveInput.mx=mx;moveInput.mz=mz;moveInput.len=Math.min(1,len);return moveInput;
 }
-function statePayload(seq=stateSeq){const input=movementInput(),ladderMove=ladderState?ladderInputAmount():0;return {t:'state',seq:Math.max(0,Math.floor(Number(seq)||0)),at:Math.round(serverNow()),x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:adsWanted,crouched,sprinting,sliding,grounded:onGround,jumpSeq,moveX:round3(input.mx),moveZ:round3(input.mz),ladderId:ladderState?.id||'',ladderMove:round3(ladderMove)};}
+function effectiveAimYaw(){return yaw+viewRecoilYaw;}
+function effectiveAimPitch(){return THREE.MathUtils.clamp(pitch+viewRecoilPitch,-1.40,1.40);}
+function statePayload(seq=stateSeq){const input=movementInput(),ladderMove=ladderState?ladderInputAmount():0;return {t:'state',seq:Math.max(0,Math.floor(Number(seq)||0)),at:Math.round(serverNow()),x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(effectiveAimYaw()),pitch:round3(effectiveAimPitch()),ads:adsWanted,crouched,sprinting,sliding,grounded:onGround,jumpSeq,moveX:round3(input.mx),moveZ:round3(input.mz),ladderId:ladderState?.id||'',ladderMove:round3(ladderMove)};}
 function stateChanged(p){return !Number.isFinite(lastSentState.x)||Math.abs(p.x-lastSentState.x)>.008||Math.abs(p.y-lastSentState.y)>.008||Math.abs(p.z-lastSentState.z)>.008||Math.abs(normalizeAngle(p.yaw-lastSentState.yaw))>.0025||Math.abs(p.pitch-lastSentState.pitch)>.0025||Math.abs(p.moveX-lastSentState.moveX)>.02||Math.abs(p.moveZ-lastSentState.moveZ)>.02||Math.abs((p.ladderMove||0)-(lastSentState.ladderMove||0))>.02||String(p.ladderId||'')!==String(lastSentState.ladderId||'')||p.ads!==lastSentState.ads||p.crouched!==lastSentState.crouched||p.sprinting!==lastSentState.sprinting||p.sliding!==lastSentState.sliding||p.grounded!==lastSentState.grounded;}
 function rememberPredictionState(p,now=performance.now()){
   localPredictionHistory.push({seq:p.seq,at:p.at,localAt:now,x:p.x,y:p.y,z:p.z,grounded:p.grounded,crouched:p.crouched});
@@ -2382,18 +2384,18 @@ function delayFire(ms,weapon=currentWeapon){weapon=WEAPON_SPECS[weapon]?weapon:c
 function pressMouseFire(){if(mouseFireDown)return;const wasHeld=fireInputHeld();mouseFireDown=true;if(!wasHeld)requestShot();}
 function pressTouchFire(pointerId){if(touchRoles.has(pointerId))return;const wasHeld=fireInputHeld();touchRoles.set(pointerId,'fire');if(!wasHeld)requestShot();}
 function recoilSpec(weapon){return WEAPON_SPECS[weapon]||WEAPON_SPECS.pistol;}
-// Automatic recoil follows a slow path instead of bouncing independently for
-// every bullet. Early rounds climb mostly vertically, then sustained fire
-// develops a mild horizontal drift that can be counter-steered by the player.
-const RECOIL_YAW_PATTERN=[0,.04,.10,.17,.24,.30,.32,.28,.20,.10,0,-.10,-.17,-.20,-.15,-.07,.02,.09];
+// Automatic recoil follows a predictable CoD-style path. The opening rounds
+// climb mostly vertically, then the path bends gently to the player's right.
+// The bend never reverses or terminates while the burst remains active.
+const RECOIL_SINGLE_YAW_PATTERN=[0,.04,.10,.17,.24,.30,.32,.28,.20,.10,0,-.10,-.17,-.20,-.15,-.07,.02,.09];
 function recoilYawShape(step,weapon=currentWeapon){
-  if(step<RECOIL_YAW_PATTERN.length)return RECOIL_YAW_PATTERN[Math.max(0,step)]||0;
-  // Sustained automatic fire keeps a small directional tendency plus a
-  // learnable weave. The non-zero bias is intentional: summing a pure sine
-  // would eventually oscillate inside a bounded band and make long bursts
-  // feel artificially stable.
-  const bias=weapon==='ump'?-0.055:0.085;
-  return bias+.15*Math.sin(step*.83+.45)+.09*Math.sin(step*1.91+1.20);
+  const s=Math.max(0,Number(step)||0);
+  if(automaticRecoilActive(weapon)){
+    const build=1-Math.exp(-Math.max(0,s-1)/5.2),strength=weapon==='assault'?.50:.30,variation=1+.055*Math.sin(s*.71+.25)+.030*Math.sin(s*1.47+.80);
+    // In this coordinate system negative yaw turns the reticle to the player's right.
+    return -strength*(.16+.84*build)*Math.max(.82,variation);
+  }
+  return RECOIL_SINGLE_YAW_PATTERN[Math.min(RECOIL_SINGLE_YAW_PATTERN.length-1,Math.floor(s))]||0;
 }
 function automaticRecoilActive(weapon){const r=recoilSpec(weapon);return !!r.automatic&&(weapon!=='assault'||assaultFireMode==='auto');}
 function resetViewRecoil(){viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;endRecoilBurst();weaponKickZ=weaponKickVelocity=0;}
@@ -2442,7 +2444,7 @@ function applyViewRecoil(weapon,preShotHeat=0,firstShot=false){
     // weapon's lateral tendency so a held burst keeps changing direction.
     const maxPitchOffset=Math.max(0,1.40-pitch),nextPitch=viewRecoilTargetPitch+pitchKick,overflow=Math.max(0,nextPitch-maxPitchOffset);
     viewRecoilTargetPitch=Math.min(maxPitchOffset,Math.max(0,nextPitch));
-    if(overflow>0){const spillSign=weapon==='ump'?-1:1;viewRecoilTargetYaw+=overflow*.42*spillSign;}
+    if(overflow>0){const spillScale=weapon==='assault'?.42:.28;viewRecoilTargetYaw-=overflow*spillScale;}
     viewRecoilTargetYaw+=yawKick;
   }else{
     viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch+pitchKick,0,hardPitch);
@@ -2504,7 +2506,7 @@ function requestShot(){
   // The reticle is authoritative: fire along the exact camera aim including
   // recoil already accumulated from previous rounds. Applying the new impulse
   // after sending means the first shot is precise and subsequent rounds climb.
-  const shotYaw=round4(yaw+viewRecoilYaw),shotPitch=round4(THREE.MathUtils.clamp(pitch+viewRecoilPitch,-1.4,1.4)),preShotHeat=currentShotHeat(weapon,now);
+  const shotYaw=round4(effectiveAimYaw()),shotPitch=round4(effectiveAimPitch()),preShotHeat=currentShotHeat(weapon,now);
   fireReadyAt[weapon]=now+weaponRules(weapon).cooldownMs;
   presentLocalShot(weapon,now);
   sendCurrentState(true);send({t:'fire',weapon,yaw:shotYaw,pitch:shotPitch,adsAmount:round3(adsBlend),shotAt:Math.round(serverNow()),viewDelayMs:Math.round(currentRemoteViewDelayMs())});
@@ -3179,7 +3181,7 @@ function updateGameFrame(dt){
     if(traversal?.viewMaxY!=null&&Number.isFinite(Number(traversal.viewMaxY)))cameraY=Math.min(cameraY,Number(traversal.viewMaxY));
   }
   const cameraCorrectionX=(traversal||ladderState)?0:correctionViewX,cameraCorrectionZ=(traversal||ladderState)?0:correctionViewZ;
-  camera.position.set(position.x+cameraCorrectionX,cameraY,position.z+cameraCorrectionZ);camera.rotation.y=yaw+viewRecoilYaw;camera.rotation.x=THREE.MathUtils.clamp(pitch+viewRecoilPitch+.10*deathEase-.045*traverseWave,-1.40,1.40);camera.rotation.z=.72*deathEase;
+  camera.position.set(position.x+cameraCorrectionX,cameraY,position.z+cameraCorrectionZ);camera.rotation.y=effectiveAimYaw();camera.rotation.x=THREE.MathUtils.clamp(effectiveAimPitch()+.10*deathEase-.045*traverseWave,-1.40,1.40);camera.rotation.z=.72*deathEase;
   maintainNetwork();
 }
 function updateMovement(dt){
@@ -3318,12 +3320,13 @@ function updateWeaponView(dt){
   const traversePoseNow=traversal?traversalPose(traversal,now):null,traverseP=traversePoseNow?traversePoseNow.progress:0,traverseCurve=traversePoseNow?Math.sin(Math.PI*traverseP):0;
   const mobilityLower=sprintViewBlend*(1-adsBlend),slideLower=slideViewBlend*(1-adsBlend*.35),idle=Math.sin(now*.0018)*.0035*(adsWanted?.25:1)*(1-sightLock*.94),commonX=bobX+mobilityLower*.10+slideLower*.035,commonY=bobY+jumpY+landY+idle+kickLift-reloadCurve*.19-swapCurve*.36-deathEase*.55-traverseCurve*.42-mobilityLower*.19-slideLower*.08,commonZ=reloadCurve*.08+swapCurve*.10+deathEase*.18+traverseCurve*.16+mobilityLower*.13+slideLower*.055;
   const reloadRoll=reloadCurve*(currentWeapon==='sniper'?.22:.48),swapRoll=swapCurve*.42,deathRoll=deathEase*.58,mobilityRoll=mobilityLower*.46+slideLower*.16;
-  const a=adsBlend;
-  pistolGroup.position.set(THREE.MathUtils.lerp(.33,0,a)+commonX,THREE.MathUtils.lerp(-.25,-(Number(pistolGroup.userData.adsSightY)||.112),a)+commonY,THREE.MathUtils.lerp(-.67,-.54,a)+kickZ+commonZ);pistolGroup.rotation.set(THREE.MathUtils.lerp(-.08,0,a)+reloadCurve*.18+kickPitch,THREE.MathUtils.lerp(-.08,0,a)-reloadCurve*.18+kickYaw,-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
-  assaultGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.27,-(Number(assaultGroup.userData.adsSightY)||.122),a)+commonY,THREE.MathUtils.lerp(-.52,-.45,a)+kickZ+commonZ);assaultGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+reloadCurve*.16+kickPitch,THREE.MathUtils.lerp(-.055,0,a)-reloadCurve*.14+kickYaw,-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
-  umpGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.27,-(Number(umpGroup.userData.adsSightY)||.122),a)+commonY,THREE.MathUtils.lerp(-.54,-.46,a)+kickZ+commonZ);umpGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+reloadCurve*.16+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.14+kickYaw,-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
-  shotgunGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-(Number(shotgunGroup.userData.adsSightY)||.122),a)+commonY,THREE.MathUtils.lerp(-.50,-.44,a)+kickZ+commonZ);shotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
-  semiShotgunGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-(Number(semiShotgunGroup.userData.adsSightY)||.124),a)+commonY,THREE.MathUtils.lerp(-.50,-.44,a)+kickZ+commonZ);semiShotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
+  const a=adsBlend,ironCommonX=commonX*(1-sightLock),ironCommonY=commonY*(1-sightLock);
+  const tip=(group,fallbackY)=>group.userData.adsSightTip||{x:0,y:fallbackY,z:0},pistolTip=tip(pistolGroup,.112),assaultTip=tip(assaultGroup,.122),umpTip=tip(umpGroup,.122),shotgunTip=tip(shotgunGroup,.122),semiShotgunTip=tip(semiShotgunGroup,.124);
+  pistolGroup.position.set(THREE.MathUtils.lerp(.33,-pistolTip.x,a)+ironCommonX,THREE.MathUtils.lerp(-.25,-pistolTip.y,a)+ironCommonY,THREE.MathUtils.lerp(-.67,-.54,a)+kickZ+commonZ);pistolGroup.rotation.set(THREE.MathUtils.lerp(-.08,0,a)+reloadCurve*.18+kickPitch,THREE.MathUtils.lerp(-.08,0,a)-reloadCurve*.18+kickYaw,-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
+  assaultGroup.position.set(THREE.MathUtils.lerp(.30,-assaultTip.x,a)+ironCommonX,THREE.MathUtils.lerp(-.27,-assaultTip.y,a)+ironCommonY,THREE.MathUtils.lerp(-.52,-.45,a)+kickZ+commonZ);assaultGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+reloadCurve*.16+kickPitch,THREE.MathUtils.lerp(-.055,0,a)-reloadCurve*.14+kickYaw,-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
+  umpGroup.position.set(THREE.MathUtils.lerp(.30,-umpTip.x,a)+ironCommonX,THREE.MathUtils.lerp(-.27,-umpTip.y,a)+ironCommonY,THREE.MathUtils.lerp(-.54,-.46,a)+kickZ+commonZ);umpGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+reloadCurve*.16+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.14+kickYaw,-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
+  shotgunGroup.position.set(THREE.MathUtils.lerp(.30,-shotgunTip.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,-shotgunTip.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,-.44,a)+kickZ+commonZ);shotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
+  semiShotgunGroup.position.set(THREE.MathUtils.lerp(.30,-semiShotgunTip.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,-semiShotgunTip.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,-.44,a)+kickZ+commonZ);semiShotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
   sniperGroup.position.set(THREE.MathUtils.lerp(.28,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.18,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);sniperGroup.rotation.set(THREE.MathUtils.lerp(-.055,0,a)+reloadCurve*.10+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.65-swapRoll-deathRoll-mobilityRoll+kickRoll);
   grenadeLauncherGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.20,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);grenadeLauncherGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+GRENADE_LAUNCH_PITCH+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
   rpgGroup.position.set(THREE.MathUtils.lerp(.34,.10,a)+commonX,THREE.MathUtils.lerp(-.16,-.105,a)+commonY,THREE.MathUtils.lerp(-.46,-.405,a)+kickZ+commonZ);rpgGroup.rotation.set(THREE.MathUtils.lerp(-.025,-.008,a)+reloadCurve*.11+kickPitch,THREE.MathUtils.lerp(-.07,-.018,a)-reloadCurve*.10+kickYaw,THREE.MathUtils.lerp(.015,0,a)-reloadRoll*.6-swapRoll-deathRoll-mobilityRoll+kickRoll);
