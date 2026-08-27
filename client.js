@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.54';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.54';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.54';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.54';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.54';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.54';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.54';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.54';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.55';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.55';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.55';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.55';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.55';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.55';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.55';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.55';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.54';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.54';
-import { createAudioEngine } from './audio-engine.js?v=1.37.54';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.54';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.54';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.54';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.54';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.54';
+} from './game-config.js?v=1.37.55';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.55';
+import { createAudioEngine } from './audio-engine.js?v=1.37.55';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.55';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.55';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.55';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.55';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.55';
 
 let THREE = null;
 
@@ -466,7 +466,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.54';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.55';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2371,17 +2371,46 @@ function delayFire(ms,weapon=currentWeapon){weapon=WEAPON_SPECS[weapon]?weapon:c
 function pressMouseFire(){if(mouseFireDown)return;const wasHeld=fireInputHeld();mouseFireDown=true;if(!wasHeld)requestShot();}
 function pressTouchFire(pointerId){if(touchRoles.has(pointerId))return;const wasHeld=fireInputHeld();touchRoles.set(pointerId,'fire');if(!wasHeld)requestShot();}
 function recoilSpec(weapon){return WEAPON_SPECS[weapon]||WEAPON_SPECS.pistol;}
-// Automatic recoil follows a predictable CoD-style path. The opening rounds
-// climb mostly vertically, then the path bends gently to the player's right.
-// The bend never reverses or terminates while the burst remains active.
+// Automatic recoil uses a bounded CoD-style envelope instead of climbing
+// forever. The first ~1 second climbs mostly vertically, the next section bends
+// right, then sustained fire moves around that elevated/rightward hold area.
+// The hold-area motion changes the real aim/bullet ray; it is not viewmodel-only.
 const RECOIL_SINGLE_YAW_PATTERN=[0,.04,.10,.17,.24,.30,.32,.28,.20,.10,0,-.10,-.17,-.20,-.15,-.07,.02,.09];
+function recoilSmooth01(v){v=Math.max(0,Math.min(1,Number(v)||0));return v*v*(3-2*v);}
+function automaticRecoilTarget(step,weapon,recoilScale=1,adsScale=1,heatScale=1){
+  const r=recoilSpec(weapon),s=Math.max(0,Number(step)||0),cooldown=Math.max(50,Number(weaponRules(weapon).cooldownMs)||100),elapsed=s*cooldown;
+  const climbMs=weapon==='assault'?1000:900,curveMs=weapon==='assault'?650:560;
+  const maxPitch=Math.max(.001,Number(r.recoilMaxPitch)||.08)*recoilScale*adsScale;
+  const maxYaw=Math.max(.001,Number(r.recoilMaxYaw)||.025)*recoilScale*adsScale;
+  const firstPitch=Math.max(0,Number(r.recoilPitch)||0)*recoilScale*adsScale*Math.max(.18,Math.min(1,Number(r.firstShotRecoilScale)||.5));
+  let pitchTarget,yawTarget;
+  if(elapsed<=climbMs){
+    const p=recoilSmooth01(elapsed/climbMs);
+    pitchTarget=firstPitch+(maxPitch*.78-firstPitch)*p;
+    yawTarget=-maxYaw*.08*p;
+  }else if(elapsed<=climbMs+curveMs){
+    const p=recoilSmooth01((elapsed-climbMs)/curveMs);
+    pitchTarget=maxPitch*(.78+.10*p);
+    yawTarget=-maxYaw*(.08+.72*p);
+  }else{
+    const h=(elapsed-climbMs-curveMs)/Math.max(60,cooldown);
+    const pitchWander=.055*Math.sin(h*.79+.35)+.030*Math.sin(h*1.73+1.10)+.018*Math.sin(h*2.41+.20);
+    const yawWander=.14*Math.sin(h*.63+.70)+.075*Math.sin(h*1.37+.15)+.045*Math.sin(h*2.11+1.30);
+    pitchTarget=maxPitch*(.88+pitchWander);
+    yawTarget=-maxYaw*(.80+yawWander);
+  }
+  // Sustained heat adds a little instability but does not move the hold area's
+  // center upward forever.
+  const heat=Math.max(1,Math.min(1.24,Number(heatScale)||1));
+  if(elapsed>climbMs+curveMs){
+    const extra=heat-1;
+    pitchTarget+=maxPitch*extra*.10*Math.sin(s*1.91+.40);
+    yawTarget+=maxYaw*extra*.18*Math.sin(s*1.57+.90);
+  }
+  return {pitch:Math.max(0,pitchTarget),yaw:yawTarget};
+}
 function recoilYawShape(step,weapon=currentWeapon){
   const s=Math.max(0,Number(step)||0);
-  if(automaticRecoilActive(weapon)){
-    const build=1-Math.exp(-Math.max(0,s-1)/5.2),strength=weapon==='assault'?.50:.30,variation=1+.055*Math.sin(s*.71+.25)+.030*Math.sin(s*1.47+.80);
-    // In this coordinate system negative yaw turns the reticle to the player's right.
-    return -strength*(.16+.84*build)*Math.max(.82,variation);
-  }
   return RECOIL_SINGLE_YAW_PATTERN[Math.min(RECOIL_SINGLE_YAW_PATTERN.length-1,Math.floor(s))]||0;
 }
 function automaticRecoilActive(weapon){const r=recoilSpec(weapon);return !!r.automatic&&(weapon!=='assault'||assaultFireMode==='auto');}
@@ -2409,35 +2438,23 @@ function registerLocalShotHeat(weapon,now){
   return {heat,firstShot};
 }
 function applyViewRecoil(weapon,preShotHeat=0,firstShot=false){
-  const r=recoilSpec(weapon),automatic=automaticRecoilActive(weapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(weapon).recoilScale)||0)/100)),adsScale=1-.20*Math.max(0,Math.min(1,adsBlend)),heatScale=1+Math.min(.24,Math.max(0,preShotHeat)*.04),step=localRecoilStep[weapon]||0,yawShape=recoilYawShape(step,weapon);
+  const r=recoilSpec(weapon),automatic=automaticRecoilActive(weapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(weapon).recoilScale)||0)/100)),adsScale=1-.20*Math.max(0,Math.min(1,adsBlend)),heatScale=1+Math.min(.24,Math.max(0,preShotHeat)*.04),step=localRecoilStep[weapon]||0;
   const basePitch=Math.max(0,Number(r.recoilPitch)||0)*recoilScale,baseYaw=Math.max(0,Number(r.recoilYaw)||0)*recoilScale,firstScale=firstShot?Math.max(.18,Math.min(1,Number(r.firstShotRecoilScale)||.5)):1;
-  const softPitch=Math.max(0,(Number(r.recoilMaxPitch)||Math.max(0,Number(r.recoilPitch)||0))*recoilScale),softYaw=Math.max(0,(Number(r.recoilMaxYaw)||.020)*recoilScale);
-  const hardPitch=softPitch*1.08,hardYaw=softYaw*(automatic?1.75:1.12);
-  let pitchKick=basePitch*adsScale*heatScale*firstScale,yawKick=baseYaw*adsScale*firstScale*yawShape;
-  if(automatic&&!firstShot){
-    // Continuous automatic fire ramps into its normal climb over the opening
-    // rounds. recoilMaxPitch is now a soft control band, not a hard wall: once
-    // reached, the burst keeps creeping upward and weaving horizontally.
-    const ramp=.74+Math.min(7,Math.max(0,step-1))*.045;
-    const aboveBand=softPitch>0&&viewRecoilTargetPitch>=softPitch;
-    const sustainedPulse=1+.14*Math.sin(step*1.37+.35);
-    pitchKick=basePitch*adsScale*heatScale*ramp*sustainedPulse*(aboveBand?.34:1);
-    yawKick=baseYaw*adsScale*yawShape*(aboveBand?1.62:1.18);
-  }
+  const softPitch=Math.max(0,(Number(r.recoilMaxPitch)||Math.max(0,Number(r.recoilPitch)||0))*recoilScale),softYaw=Math.max(0,(Number(r.recoilMaxYaw)||.020)*recoilScale),hardPitch=softPitch*1.08,hardYaw=softYaw*1.12;
   if(automatic){
-    // Never let accumulated recoil rotate the camera through vertical and make
-    // the view appear to reset downward. Pitch uses the same physical look
-    // boundary as normal aiming; any excess sustained climb spills into the
-    // weapon's lateral tendency so a held burst keeps changing direction.
-    const maxPitchOffset=Math.max(0,1.40-pitch),nextPitch=viewRecoilTargetPitch+pitchKick,overflow=Math.max(0,nextPitch-maxPitchOffset);
-    viewRecoilTargetPitch=Math.min(maxPitchOffset,Math.max(0,nextPitch));
-    if(overflow>0){const spillScale=weapon==='assault'?.42:.28;viewRecoilTargetYaw-=overflow*spillScale;}
-    viewRecoilTargetYaw+=yawKick;
-  }else{
-    viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch+pitchKick,0,hardPitch);
-    viewRecoilTargetYaw=THREE.MathUtils.clamp(viewRecoilTargetYaw+yawKick,-hardYaw,hardYaw);
+    const target=automaticRecoilTarget(step,weapon,recoilScale,adsScale,heatScale);
+    // Clamp only to the physical camera range. The recoil path itself is
+    // intentionally bounded around its hold area and keeps moving there for
+    // as long as the burst continues.
+    viewRecoilTargetPitch=Math.min(Math.max(0,1.40-pitch),target.pitch);
+    viewRecoilTargetYaw=target.yaw;
+    return;
   }
+  const yawShape=recoilYawShape(step,weapon),pitchKick=basePitch*adsScale*heatScale*firstScale,yawKick=baseYaw*adsScale*firstScale*yawShape;
+  viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch+pitchKick,0,hardPitch);
+  viewRecoilTargetYaw=THREE.MathUtils.clamp(viewRecoilTargetYaw+yawKick,-hardYaw,hardYaw);
 }
+
 function updateViewRecoil(dt){
   const r=recoilSpec(currentWeapon),automatic=automaticRecoilActive(currentWeapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(currentWeapon).recoilScale)||0)/100)),totalDt=Math.min(.05,Math.max(0,Number(dt)||0)),now=performance.now();
   // Automatic recoil owns its burst lifecycle explicitly. A release must remain
@@ -2454,17 +2471,13 @@ function updateViewRecoil(dt){
     const recovery=Math.max(5,Number(r.recoilRecovery)||12),pitchDecay=Math.exp(-recovery*.46*totalDt),yawDecay=Math.exp(-recovery*.58*totalDt);
     viewRecoilTargetPitch*=pitchDecay;viewRecoilTargetYaw*=yawDecay;
   }
-  // Do not clamp automatic vertical recoil to recoilMaxPitch. That value is the
-  // transition into sustained-fire behavior, not a hidden ceiling. The actual
-  // camera look limit is the only vertical boundary, so a held burst can never
-  // become stable and then be pulled back down by ordinary stick/assist input.
   if(!automatic){
     viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch,0,softPitch*1.08);
     viewRecoilTargetYaw=THREE.MathUtils.clamp(viewRecoilTargetYaw,-maxYaw,maxYaw);
   }else{
-    // Automatic yaw is deliberately unbounded while the burst is active.
-    // Recovery only begins after the burst ends, so held fire can never settle
-    // into a fixed direction after a few seconds.
+    // Automatic recoil is bounded by its path envelope, not accumulated without
+    // limit. While held, applyViewRecoil keeps supplying a changing target in
+    // that envelope; after release this same state recovers smoothly to zero.
     viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch,0,Math.max(0,1.40-pitch));
   }
   const followRate=automatic?18:24,follow=1-Math.exp(-followRate*totalDt);
