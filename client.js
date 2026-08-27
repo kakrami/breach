@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.53';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.53';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.53';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.53';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.53';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.53';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.53';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.53';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.54';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.54';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.54';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.54';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.54';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.54';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.54';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.54';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.53';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.53';
-import { createAudioEngine } from './audio-engine.js?v=1.37.53';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.53';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.53';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.53';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.53';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.53';
+} from './game-config.js?v=1.37.54';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.54';
+import { createAudioEngine } from './audio-engine.js?v=1.37.54';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.54';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.54';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.54';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.54';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.54';
 
 let THREE = null;
 
@@ -97,48 +97,49 @@ const CORRECTION_MAX_VERTICAL = 0.55;
 const CORRECTION_HARD_SNAP_DISTANCE = 1.35;
 // Entire sound set is generated locally as 16-bit PCM WAV assets.
 // No third-party or runtime-hosted audio is required.
+const AUDIO_ASSET_REV='audio-20260826-1';
 const SOUND_CUES = {
-  introMusic:{url:'audio/intro.wav?v=1.37.53',group:'Music',gain:.40,loop:true},
-  shotPistol:{url:'audio/shot-pistol.wav?v=1.37.53',group:'Gunfire',gain:.78},
-  shotAssault:{url:'audio/shot-assault.wav?v=1.37.53',group:'Gunfire',gain:.72},
-  shotUmp:{url:'audio/shot-ump.wav?v=1.37.53',group:'Gunfire',gain:.70},
-  shotShotgun:{url:'audio/shot-shotgun.wav?v=1.37.53',group:'Gunfire',gain:.88},
-  shotSemiShotgun:{url:'audio/shot-semi-shotgun.wav?v=1.37.53',group:'Gunfire',gain:.82},
-  shotSniper:{url:'audio/shot-sniper.wav?v=1.37.53',group:'Gunfire',gain:.94},
-  shotGl:{url:'audio/shot-gl.wav?v=1.37.53',group:'Gunfire',gain:.82},
-  shotRpg:{url:'audio/shot-rpg.wav?v=1.37.53',group:'Gunfire',gain:.96},
-  reloadPistol:{url:'audio/reload-pistol.wav?v=1.37.53',group:'Weapon Handling',gain:.66},
-  reloadAssault:{url:'audio/reload-assault.wav?v=1.37.53',group:'Weapon Handling',gain:.64},
-  reloadUmp:{url:'audio/reload-ump.wav?v=1.37.53',group:'Weapon Handling',gain:.62},
-  reloadShotgun:{url:'audio/reload-shotgun.wav?v=1.37.53',group:'Weapon Handling',gain:.68},
-  reloadSemiShotgun:{url:'audio/reload-semi-shotgun.wav?v=1.37.53',group:'Weapon Handling',gain:.66},
-  shotgunPump:{url:'audio/shotgun-pump.wav?v=1.37.53',group:'Weapon Handling',gain:.78},
-  reloadSniper:{url:'audio/reload-sniper.wav?v=1.37.53',group:'Weapon Handling',gain:.72},
-  reloadGl:{url:'audio/reload-gl.wav?v=1.37.53',group:'Weapon Handling',gain:.72},
-  reloadRpg:{url:'audio/reload-rpg.wav?v=1.37.53',group:'Weapon Handling',gain:.76},
-  hitmarker:{url:'audio/hitmarker.wav?v=1.37.53',group:'Feedback',gain:.50},
-  headshot:{url:'audio/headshot.wav?v=1.37.53',group:'Feedback',gain:.58},
-  kill:{url:'audio/kill.wav?v=1.37.53',group:'Feedback',gain:.58},
-  announcer:{url:'audio/announcer.wav?v=1.37.53',group:'Feedback',gain:.54},
-  shield:{url:'audio/shield.wav?v=1.37.53',group:'Feedback',gain:.58},
-  hurt:{url:'audio/hurt.wav?v=1.37.53',group:'Feedback',gain:.60},
-  jump:{url:'audio/jump.wav?v=1.37.53',group:'Movement',gain:.34},
-  footstepLeft:{url:'audio/footstep-left.wav?v=1.37.53',group:'Movement',gain:.42},
-  footstepRight:{url:'audio/footstep-right.wav?v=1.37.53',group:'Movement',gain:.42},
-  land:{url:'audio/land.wav?v=1.37.53',group:'Movement',gain:.66},
-  slide:{url:'audio/slide.wav?v=1.37.53',group:'Movement',gain:.58},
-  impactWall:{url:'audio/impact-wall.wav?v=1.37.53',group:'Impacts',gain:.62},
-  impactPlayer:{url:'audio/impact-player.wav?v=1.37.53',group:'Impacts',gain:.60},
-  impactBlocked:{url:'audio/impact-blocked.wav?v=1.37.53',group:'Impacts',gain:.58},
-  flashThrow:{url:'audio/flash-throw.wav?v=1.37.53',group:'Tactical',gain:.52},
-  stickyThrow:{url:'audio/sticky-throw.wav?v=1.37.53',group:'Tactical',gain:.52},
-  flashImpact:{url:'audio/flash-impact.wav?v=1.37.53',group:'Tactical',gain:.58},
-  stickyImpact:{url:'audio/sticky-impact.wav?v=1.37.53',group:'Tactical',gain:.62},
-  semtexBeep:{url:'audio/semtex-beep.wav?v=1.37.53',group:'Tactical',gain:.60},
-  flashDetonate:{url:'audio/flash-detonate.wav?v=1.37.53',group:'Explosions',gain:.88},
-  grenadeExplosion:{url:'audio/grenade-explosion.wav?v=1.37.53',group:'Explosions',gain:1},
-  glExplosion:{url:'audio/gl-explosion.wav?v=1.37.53',group:'Explosions',gain:.94},
-  rpgExplosion:{url:'audio/rpg-explosion.wav?v=1.37.53',group:'Explosions',gain:1},
+  introMusic:{url:`audio/intro.wav?rev=${AUDIO_ASSET_REV}`,group:'Music',gain:.40,loop:true},
+  shotPistol:{url:`audio/shot-pistol.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.78},
+  shotAssault:{url:`audio/shot-assault.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.72},
+  shotUmp:{url:`audio/shot-ump.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.70},
+  shotShotgun:{url:`audio/shot-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.88},
+  shotSemiShotgun:{url:`audio/shot-semi-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.82},
+  shotSniper:{url:`audio/shot-sniper.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.94},
+  shotGl:{url:`audio/shot-gl.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.82},
+  shotRpg:{url:`audio/shot-rpg.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.96},
+  reloadPistol:{url:`audio/reload-pistol.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.66},
+  reloadAssault:{url:`audio/reload-assault.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.64},
+  reloadUmp:{url:`audio/reload-ump.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.62},
+  reloadShotgun:{url:`audio/reload-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.68},
+  reloadSemiShotgun:{url:`audio/reload-semi-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.66},
+  shotgunPump:{url:`audio/shotgun-pump.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.78},
+  reloadSniper:{url:`audio/reload-sniper.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.72},
+  reloadGl:{url:`audio/reload-gl.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.72},
+  reloadRpg:{url:`audio/reload-rpg.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.76},
+  hitmarker:{url:`audio/hitmarker.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.50},
+  headshot:{url:`audio/headshot.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.58},
+  kill:{url:`audio/kill.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.58},
+  announcer:{url:`audio/announcer.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.54},
+  shield:{url:`audio/shield.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.58},
+  hurt:{url:`audio/hurt.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.60},
+  jump:{url:`audio/jump.wav?rev=${AUDIO_ASSET_REV}`,group:'Movement',gain:.34},
+  footstepLeft:{url:`audio/footstep-left.wav?rev=${AUDIO_ASSET_REV}`,group:'Movement',gain:.42},
+  footstepRight:{url:`audio/footstep-right.wav?rev=${AUDIO_ASSET_REV}`,group:'Movement',gain:.42},
+  land:{url:`audio/land.wav?rev=${AUDIO_ASSET_REV}`,group:'Movement',gain:.66},
+  slide:{url:`audio/slide.wav?rev=${AUDIO_ASSET_REV}`,group:'Movement',gain:.58},
+  impactWall:{url:`audio/impact-wall.wav?rev=${AUDIO_ASSET_REV}`,group:'Impacts',gain:.62},
+  impactPlayer:{url:`audio/impact-player.wav?rev=${AUDIO_ASSET_REV}`,group:'Impacts',gain:.60},
+  impactBlocked:{url:`audio/impact-blocked.wav?rev=${AUDIO_ASSET_REV}`,group:'Impacts',gain:.58},
+  flashThrow:{url:`audio/flash-throw.wav?rev=${AUDIO_ASSET_REV}`,group:'Tactical',gain:.52},
+  stickyThrow:{url:`audio/sticky-throw.wav?rev=${AUDIO_ASSET_REV}`,group:'Tactical',gain:.52},
+  flashImpact:{url:`audio/flash-impact.wav?rev=${AUDIO_ASSET_REV}`,group:'Tactical',gain:.58},
+  stickyImpact:{url:`audio/sticky-impact.wav?rev=${AUDIO_ASSET_REV}`,group:'Tactical',gain:.62},
+  semtexBeep:{url:`audio/semtex-beep.wav?rev=${AUDIO_ASSET_REV}`,group:'Tactical',gain:.60},
+  flashDetonate:{url:`audio/flash-detonate.wav?rev=${AUDIO_ASSET_REV}`,group:'Explosions',gain:.88},
+  grenadeExplosion:{url:`audio/grenade-explosion.wav?rev=${AUDIO_ASSET_REV}`,group:'Explosions',gain:1},
+  glExplosion:{url:`audio/gl-explosion.wav?rev=${AUDIO_ASSET_REV}`,group:'Explosions',gain:.94},
+  rpgExplosion:{url:`audio/rpg-explosion.wav?rev=${AUDIO_ASSET_REV}`,group:'Explosions',gain:1},
 };
 
 let worldSettings=normalizeWorldSettings(DEFAULT_WORLD_SETTINGS);
@@ -296,7 +297,7 @@ let localRecoilStep = Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));
 let lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0}, localEquipmentCooldownUntil=0, stateSeq=0, lastCorrectionSeq=0;
 const localPredictionHistory=[];
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0,nextFootstepAt=0,footstepSide=0,shotgunPumpStartedAt=0,shotgunPumpSoundPlayed=false;
-let gameAudioPreloadPromise=null,gameAudioPreparePromise=null,audioUnlockPromise=null,gameAudioReady=false;
+let audioUnlockPromise=null;
 const DEFAULT_PLAYER_SETTINGS=Object.freeze({lookSensitivity:1,adsSensitivity:1,touchSensitivity:1,controllerVerticalSensitivity:1,controllerResponseCurve:'dynamic',controllerAimAssist:'on',controllerMoveDeadzone:.10,controllerLookDeadzone:.07,masterVolume:.85,sfxVolume:.9,musicVolume:.55,graphics:isTouch?'medium':'high',minimapOrientation:'heading'});
 function loadPlayerSettings(){
   let saved={};try{saved=JSON.parse(localStorage.getItem('breachPlayerSettings')||'{}')||{}}catch{}
@@ -465,7 +466,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.53';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.54';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -491,12 +492,12 @@ async function ensureThreeEngine(){
 }
 
 async function prepareGameRuntime(){
-  // Audio starts unlocking immediately inside the click/tap, but audio readiness
-  // never blocks networking or 3D startup. Pending cues wait for the engine.
+  // Keep decoding work out of live gameplay. Only the small movement/current-
+  // weapon set is warmed before play; everything else stays lazy on first use.
   const unlockPromise=ensureAudio();
   const engineOk=await ensureThreeEngine();
   if(!engineOk)return false;
-  void unlockPromise.then(ok=>{if(ok)void ensureGameAudioReady();});
+  if(await unlockPromise)await warmGameplayAudio(currentWeapon);
   return true;
 }
 
@@ -510,7 +511,7 @@ function runPreEngineControllerFrame(now){
 requestAnimationFrame(runPreEngineControllerFrame);
 if(shell.location==='menu'&&$('menuShell')?.dataset.deployMode==='live')void refreshMatches();
 setInterval(()=>{if(shell.location==='menu'&&$('menuShell')?.dataset.deployMode==='live')void refreshMatches();},7000);
-void preloadGameAudioAssets();
+// Full-library audio preloading intentionally disabled; gameplay warms only essential cues.
 
 function getClientId(){
   let id = localStorage.getItem('breachClient');
@@ -837,30 +838,15 @@ function saveMatchLoadout(){
 
 function weaponSoundCueIds(weapon=currentWeapon){return weapon==='assault'?['shotAssault','reloadAssault']:weapon==='ump'?['shotUmp','reloadUmp']:weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotSemiShotgun','reloadSemiShotgun']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='grenadeLauncher'?['shotGl','reloadGl','glExplosion']:weapon==='rpg'?['shotRpg','reloadRpg','rpgExplosion']:['shotPistol','reloadPistol'];}
 function warmWeaponAudio(weapon=currentWeapon){for(const id of weaponSoundCueIds(weapon))gameAudio.load(id);}
-function preloadGameAudioAssets(){
-  if(gameAudioPreloadPromise)return gameAudioPreloadPromise;
-  gameAudioPreloadPromise=gameAudio.preloadAll().then(report=>{if(report.failed)console.warn(`Breach audio preload: ${report.failed}/${report.total} assets failed`);return report;}).finally(()=>{gameAudioPreloadPromise=null;});
-  return gameAudioPreloadPromise;
+const CORE_GAMEPLAY_AUDIO_IDS=Object.freeze(['footstepLeft','footstepRight','jump','land','slide','impactWall','impactPlayer','impactBlocked','hurt','hitmarker']);
+function ensureAudio(){audioUnlockPromise=gameAudio.unlock();return audioUnlockPromise;}
+async function warmGameplayAudio(weapon=currentWeapon){
+  if(masterMuted)return false;
+  const unlocked=await (audioUnlockPromise||ensureAudio());if(!unlocked)return false;
+  const ids=[...new Set([...CORE_GAMEPLAY_AUDIO_IDS,...weaponSoundCueIds(weapon)])];
+  const results=await Promise.all(ids.map(id=>gameAudio.load(id)));
+  return results.every(Boolean);
 }
-function ensureAudio(){
-  audioUnlockPromise=gameAudio.unlock();
-  void audioUnlockPromise.then(ok=>{if(ok)void prepareAllGameAudio();});
-  return audioUnlockPromise;
-}
-function prepareAllGameAudio(){
-  if(gameAudioReady)return Promise.resolve(true);
-  if(gameAudioPreparePromise)return gameAudioPreparePromise;
-  gameAudioPreparePromise=(async()=>{
-    const unlocked=await (audioUnlockPromise||Promise.resolve(false));
-    if(!unlocked)return false;
-    const report=await gameAudio.prepareAll();
-    gameAudioReady=report.failed===0&&report.decoded===report.total;
-    if(!gameAudioReady)console.warn(`Breach audio decode: ${report.failed}/${report.total} assets failed`);
-    return gameAudioReady;
-  })().finally(()=>{if(!gameAudioReady)gameAudioPreparePromise=null;});
-  return gameAudioPreparePromise;
-}
-async function ensureGameAudioReady(){if(gameAudioReady)return true;return prepareAllGameAudio();}
 function playSoundCue(cueId,volume=1,override={}){return gameAudio.play(cueId,volume,override);}
 function spatialAudioParams(x,y,z,maxDistance=60){
   if(!position)return{volume:.08,pan:0};
@@ -1078,6 +1064,7 @@ const WORLD_TEXTURE_DEFS=Object.freeze({
   rock:Object.freeze({file:'rock.png',repeat:[2.0,2.0]}),
   glass:Object.freeze({file:'glass_grime.png',repeat:[2.0,2.0]}),
 });
+const WORLD_TEXTURE_ASSET_REV='textures-20260826-1';
 const worldTextureCache=new Map();
 let worldTextureLoader=null;
 function getWorldTexture(name){
@@ -1085,9 +1072,9 @@ function getWorldTexture(name){
   if(worldTextureCache.has(name))return worldTextureCache.get(name);
   const def=WORLD_TEXTURE_DEFS[name];if(!def)return null;
   worldTextureLoader ||= new THREE.TextureLoader();
-  const tex=worldTextureLoader.load(`textures/${def.file}?v=${APP_VERSION}`);
+  const tex=worldTextureLoader.load(`textures/${def.file}?rev=${WORLD_TEXTURE_ASSET_REV}`);
   tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(def.repeat[0],def.repeat[1]);
-  tex.minFilter=THREE.LinearMipmapLinearFilter;tex.magFilter=THREE.LinearFilter;tex.anisotropy=Math.min(isTouch?4:8,renderer?.capabilities?.getMaxAnisotropy?.()||1);
+  tex.minFilter=THREE.LinearMipmapLinearFilter;tex.magFilter=THREE.LinearFilter;tex.anisotropy=Math.min(isTouch?1:8,renderer?.capabilities?.getMaxAnisotropy?.()||1);
   tex.userData.preserveWorldTexture=true;worldTextureCache.set(name,tex);return tex;
 }
 function worldMat(color,texture,roughness=.9,metalness=0,extra={}){
