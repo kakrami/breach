@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.49';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.49';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.49';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.49';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.49';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.49';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.49';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.49';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.50';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.50';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.50';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.50';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.50';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.50';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.50';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.50';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.49';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.49';
-import { createAudioEngine } from './audio-engine.js?v=1.37.49';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.49';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.49';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.49';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.49';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.49';
+} from './game-config.js?v=1.37.50';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.50';
+import { createAudioEngine } from './audio-engine.js?v=1.37.50';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.50';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.50';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.50';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.50';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.50';
 
 let THREE = null;
 
@@ -98,47 +98,47 @@ const CORRECTION_HARD_SNAP_DISTANCE = 1.35;
 // Entire sound set is generated locally as 16-bit PCM WAV assets.
 // No third-party or runtime-hosted audio is required.
 const SOUND_CUES = {
-  introMusic:{url:'audio/intro.wav?v=1.37.49',group:'Music',gain:.40,loop:true},
-  shotPistol:{url:'audio/shot-pistol.wav?v=1.37.49',group:'Gunfire',gain:.78},
-  shotAssault:{url:'audio/shot-assault.wav?v=1.37.49',group:'Gunfire',gain:.72},
-  shotUmp:{url:'audio/shot-ump.wav?v=1.37.49',group:'Gunfire',gain:.70},
-  shotShotgun:{url:'audio/shot-shotgun.wav?v=1.37.49',group:'Gunfire',gain:.88},
-  shotSemiShotgun:{url:'audio/shot-semi-shotgun.wav?v=1.37.49',group:'Gunfire',gain:.82},
-  shotSniper:{url:'audio/shot-sniper.wav?v=1.37.49',group:'Gunfire',gain:.94},
-  shotGl:{url:'audio/shot-gl.wav?v=1.37.49',group:'Gunfire',gain:.82},
-  shotRpg:{url:'audio/shot-rpg.wav?v=1.37.49',group:'Gunfire',gain:.96},
-  reloadPistol:{url:'audio/reload-pistol.wav?v=1.37.49',group:'Weapon Handling',gain:.66},
-  reloadAssault:{url:'audio/reload-assault.wav?v=1.37.49',group:'Weapon Handling',gain:.64},
-  reloadUmp:{url:'audio/reload-ump.wav?v=1.37.49',group:'Weapon Handling',gain:.62},
-  reloadShotgun:{url:'audio/reload-shotgun.wav?v=1.37.49',group:'Weapon Handling',gain:.68},
-  reloadSemiShotgun:{url:'audio/reload-semi-shotgun.wav?v=1.37.49',group:'Weapon Handling',gain:.66},
-  shotgunPump:{url:'audio/shotgun-pump.wav?v=1.37.49',group:'Weapon Handling',gain:.78},
-  reloadSniper:{url:'audio/reload-sniper.wav?v=1.37.49',group:'Weapon Handling',gain:.72},
-  reloadGl:{url:'audio/reload-gl.wav?v=1.37.49',group:'Weapon Handling',gain:.72},
-  reloadRpg:{url:'audio/reload-rpg.wav?v=1.37.49',group:'Weapon Handling',gain:.76},
-  hitmarker:{url:'audio/hitmarker.wav?v=1.37.49',group:'Feedback',gain:.50},
-  headshot:{url:'audio/headshot.wav?v=1.37.49',group:'Feedback',gain:.58},
-  kill:{url:'audio/kill.wav?v=1.37.49',group:'Feedback',gain:.58},
-  announcer:{url:'audio/announcer.wav?v=1.37.49',group:'Feedback',gain:.54},
-  shield:{url:'audio/shield.wav?v=1.37.49',group:'Feedback',gain:.58},
-  hurt:{url:'audio/hurt.wav?v=1.37.49',group:'Feedback',gain:.60},
-  jump:{url:'audio/jump.wav?v=1.37.49',group:'Movement',gain:.34},
-  footstepLeft:{url:'audio/footstep-left.wav?v=1.37.49',group:'Movement',gain:.42},
-  footstepRight:{url:'audio/footstep-right.wav?v=1.37.49',group:'Movement',gain:.42},
-  land:{url:'audio/land.wav?v=1.37.49',group:'Movement',gain:.66},
-  slide:{url:'audio/slide.wav?v=1.37.49',group:'Movement',gain:.58},
-  impactWall:{url:'audio/impact-wall.wav?v=1.37.49',group:'Impacts',gain:.62},
-  impactPlayer:{url:'audio/impact-player.wav?v=1.37.49',group:'Impacts',gain:.60},
-  impactBlocked:{url:'audio/impact-blocked.wav?v=1.37.49',group:'Impacts',gain:.58},
-  flashThrow:{url:'audio/flash-throw.wav?v=1.37.49',group:'Tactical',gain:.52},
-  stickyThrow:{url:'audio/sticky-throw.wav?v=1.37.49',group:'Tactical',gain:.52},
-  flashImpact:{url:'audio/flash-impact.wav?v=1.37.49',group:'Tactical',gain:.58},
-  stickyImpact:{url:'audio/sticky-impact.wav?v=1.37.49',group:'Tactical',gain:.62},
-  semtexBeep:{url:'audio/semtex-beep.wav?v=1.37.49',group:'Tactical',gain:.60},
-  flashDetonate:{url:'audio/flash-detonate.wav?v=1.37.49',group:'Explosions',gain:.88},
-  grenadeExplosion:{url:'audio/grenade-explosion.wav?v=1.37.49',group:'Explosions',gain:1},
-  glExplosion:{url:'audio/gl-explosion.wav?v=1.37.49',group:'Explosions',gain:.94},
-  rpgExplosion:{url:'audio/rpg-explosion.wav?v=1.37.49',group:'Explosions',gain:1},
+  introMusic:{url:'audio/intro.wav?v=1.37.50',group:'Music',gain:.40,loop:true},
+  shotPistol:{url:'audio/shot-pistol.wav?v=1.37.50',group:'Gunfire',gain:.78},
+  shotAssault:{url:'audio/shot-assault.wav?v=1.37.50',group:'Gunfire',gain:.72},
+  shotUmp:{url:'audio/shot-ump.wav?v=1.37.50',group:'Gunfire',gain:.70},
+  shotShotgun:{url:'audio/shot-shotgun.wav?v=1.37.50',group:'Gunfire',gain:.88},
+  shotSemiShotgun:{url:'audio/shot-semi-shotgun.wav?v=1.37.50',group:'Gunfire',gain:.82},
+  shotSniper:{url:'audio/shot-sniper.wav?v=1.37.50',group:'Gunfire',gain:.94},
+  shotGl:{url:'audio/shot-gl.wav?v=1.37.50',group:'Gunfire',gain:.82},
+  shotRpg:{url:'audio/shot-rpg.wav?v=1.37.50',group:'Gunfire',gain:.96},
+  reloadPistol:{url:'audio/reload-pistol.wav?v=1.37.50',group:'Weapon Handling',gain:.66},
+  reloadAssault:{url:'audio/reload-assault.wav?v=1.37.50',group:'Weapon Handling',gain:.64},
+  reloadUmp:{url:'audio/reload-ump.wav?v=1.37.50',group:'Weapon Handling',gain:.62},
+  reloadShotgun:{url:'audio/reload-shotgun.wav?v=1.37.50',group:'Weapon Handling',gain:.68},
+  reloadSemiShotgun:{url:'audio/reload-semi-shotgun.wav?v=1.37.50',group:'Weapon Handling',gain:.66},
+  shotgunPump:{url:'audio/shotgun-pump.wav?v=1.37.50',group:'Weapon Handling',gain:.78},
+  reloadSniper:{url:'audio/reload-sniper.wav?v=1.37.50',group:'Weapon Handling',gain:.72},
+  reloadGl:{url:'audio/reload-gl.wav?v=1.37.50',group:'Weapon Handling',gain:.72},
+  reloadRpg:{url:'audio/reload-rpg.wav?v=1.37.50',group:'Weapon Handling',gain:.76},
+  hitmarker:{url:'audio/hitmarker.wav?v=1.37.50',group:'Feedback',gain:.50},
+  headshot:{url:'audio/headshot.wav?v=1.37.50',group:'Feedback',gain:.58},
+  kill:{url:'audio/kill.wav?v=1.37.50',group:'Feedback',gain:.58},
+  announcer:{url:'audio/announcer.wav?v=1.37.50',group:'Feedback',gain:.54},
+  shield:{url:'audio/shield.wav?v=1.37.50',group:'Feedback',gain:.58},
+  hurt:{url:'audio/hurt.wav?v=1.37.50',group:'Feedback',gain:.60},
+  jump:{url:'audio/jump.wav?v=1.37.50',group:'Movement',gain:.34},
+  footstepLeft:{url:'audio/footstep-left.wav?v=1.37.50',group:'Movement',gain:.42},
+  footstepRight:{url:'audio/footstep-right.wav?v=1.37.50',group:'Movement',gain:.42},
+  land:{url:'audio/land.wav?v=1.37.50',group:'Movement',gain:.66},
+  slide:{url:'audio/slide.wav?v=1.37.50',group:'Movement',gain:.58},
+  impactWall:{url:'audio/impact-wall.wav?v=1.37.50',group:'Impacts',gain:.62},
+  impactPlayer:{url:'audio/impact-player.wav?v=1.37.50',group:'Impacts',gain:.60},
+  impactBlocked:{url:'audio/impact-blocked.wav?v=1.37.50',group:'Impacts',gain:.58},
+  flashThrow:{url:'audio/flash-throw.wav?v=1.37.50',group:'Tactical',gain:.52},
+  stickyThrow:{url:'audio/sticky-throw.wav?v=1.37.50',group:'Tactical',gain:.52},
+  flashImpact:{url:'audio/flash-impact.wav?v=1.37.50',group:'Tactical',gain:.58},
+  stickyImpact:{url:'audio/sticky-impact.wav?v=1.37.50',group:'Tactical',gain:.62},
+  semtexBeep:{url:'audio/semtex-beep.wav?v=1.37.50',group:'Tactical',gain:.60},
+  flashDetonate:{url:'audio/flash-detonate.wav?v=1.37.50',group:'Explosions',gain:.88},
+  grenadeExplosion:{url:'audio/grenade-explosion.wav?v=1.37.50',group:'Explosions',gain:1},
+  glExplosion:{url:'audio/gl-explosion.wav?v=1.37.50',group:'Explosions',gain:.94},
+  rpgExplosion:{url:'audio/rpg-explosion.wav?v=1.37.50',group:'Explosions',gain:1},
 };
 
 let worldSettings=normalizeWorldSettings(DEFAULT_WORLD_SETTINGS);
@@ -286,7 +286,7 @@ let sprintLatched=false,sprinting=false,sliding=false,slideStartedAt=0,slideDirX
 let correctionViewX=0,correctionViewY=0,correctionViewZ=0;
 let myStats={kills:0,deaths:0},scoreboardOpen=false,scoreboardScroll=0,scoreboardDrag=null,scoreboardPanel=null,killConfirmUntil=0,killConfirmName='',killConfirmWeapon='',killConfirmHeadshot=false,killConfirmDistance=0;
 let headshotUntil=0,announcerCurrent=null;const announcerQueue=[];
-let yaw = 0, pitch = 0, viewRecoilPitch = 0, viewRecoilYaw = 0, viewRecoilTargetPitch = 0, viewRecoilTargetYaw = 0, recoilBurstActive=false, recoilBurstWeapon='', weaponKickZ=0, weaponKickVelocity=0, verticalVelocity = 0, moveVelocityX = 0, moveVelocityZ = 0, knockX = 0, knockZ = 0, jumpSeq = 0, lastGroundedAt = 0, jumpBufferedUntil = 0;
+let yaw = 0, pitch = 0, viewRecoilPitch = 0, viewRecoilYaw = 0, viewRecoilTargetPitch = 0, viewRecoilTargetYaw = 0, recoilBurstActive=false, recoilBurstWeapon='', recoilBurstReleaseAt=0, recoilBurstEndedAt=0, weaponKickZ=0, weaponKickVelocity=0, verticalVelocity = 0, moveVelocityX = 0, moveVelocityZ = 0, knockX = 0, knockZ = 0, jumpSeq = 0, lastGroundedAt = 0, jumpBufferedUntil = 0;
 let traversal=null,traversalSeq=0,traversalIntentUntil=0,traversalIntentSeq=0,traversalConsumedIntentSeq=0;
 let ladderState=null,ladderSeq=0,ladderAttachLockId='',ladderAttachLockUntil=0,ladderAttachNeedsRelease=false;
 let onGround = true, lastShotVisualAt = 0, lastLocalShotAt = 0, fireReadyAt = freshClientFireReady(), lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0, remoteViewDelayMs=REMOTE_INTERPOLATION_MS, remoteDelayMeanMs=REMOTE_INTERPOLATION_MS, remoteDelayJitterMs=0, remoteDelaySamples=0;
@@ -465,7 +465,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.49';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.50';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -629,7 +629,13 @@ function applyControllerAim(dt){
   const targetPitch=input.y*CONTROLLER_LOOK_PITCH_RATE*playerSettings.lookSensitivity*playerSettings.controllerVerticalSensitivity*adsScale*turnMultiplier*slowdown;
   const smoothing=1-Math.exp(-dt/.032);controllerAimVelocityX+= (targetYaw-controllerAimVelocityX)*smoothing;controllerAimVelocityY+=(targetPitch-controllerAimVelocityY)*smoothing;
   yaw-=controllerAimVelocityX*dt;pitch-=controllerAimVelocityY*dt;
-  if(assist&&assistStrength>.01){const move=controllerMoveAxes(),strafe=THREE.MathUtils.clamp(move.length/.72,0,1),rotWeight=assistStrength*strafe;if(rotWeight>.001){yaw-=THREE.MathUtils.clamp(assist.ndcX,-.75,.75)*.72*rotWeight*dt;pitch+=THREE.MathUtils.clamp(assist.ndcY,-.75,.75)*.54*rotWeight*dt;}}
+  if(assist&&assistStrength>.01){const move=controllerMoveAxes(),strafe=THREE.MathUtils.clamp(move.length/.72,0,1),rotWeight=assistStrength*strafe;if(rotWeight>.001){yaw-=THREE.MathUtils.clamp(assist.ndcX,-.75,.75)*.72*rotWeight*dt;
+    // Rotational aim assist may help track horizontally, but it must never
+    // counter-steer sustained vertical recoil. Recoil control belongs to the
+    // player, as in controller FPS gunplay; otherwise the assist drags the base
+    // pitch down as the recoiling camera rises and looks like a recoil reset.
+    if(!(automaticRecoilActive(currentWeapon)&&recoilBurstActive&&recoilBurstWeapon===currentWeapon))pitch+=THREE.MathUtils.clamp(assist.ndcY,-.75,.75)*.54*rotWeight*dt;
+  }}
   pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
 }
 function currentShotHeat(weapon=currentWeapon,now=performance.now()){
@@ -1798,7 +1804,7 @@ function handleMessage(m){
     if(Number(m.protocol)!==PROTOCOL_VERSION){showToast('CLIENT / SERVER VERSION MISMATCH');leaveMatch();return;}
     if(Number.isFinite(Number(m.serverTime)))serverClockOffset=Number(m.serverTime)-Date.now();
     setActiveMap(m.mapId,{rebuild:true});currentRoom=m.code;isMatchAdmin=!!m.isAdmin;matchOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;myTeam=m.self.team||myTeam;rememberTeam(myTeam);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;moveVelocityX=moveVelocityZ=0;onGround=m.self.grounded!==false;lastGroundedAt=onGround?performance.now():0;jumpBufferedUntil=0;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;stopSlide();cancelSprint();jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;tacticalEquipment=normalizeTactical(m.self.tactical);lethalEquipment=normalizeLethal(m.self.lethal);pendingLoadout=m.self.pendingLoadout?normalizeLoadoutChoice(m.self.pendingLoadout):null;rememberPrimary(primaryWeapon);rememberEquipment(tacticalEquipment,lethalEquipment);pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon==='pistol'||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
-    yaw=m.self.yaw||0;pitch=m.self.pitch||0;viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';weaponKickZ=weaponKickVelocity=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();pendingGameSnapshot=gameSnapshot(m.self,m.players||[],m.bots||[],m.serverTime);replaceLobbyParticipants(m.players||[],m.bots||[]);
+    yaw=m.self.yaw||0;pitch=m.self.pitch||0;viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();pendingGameSnapshot=gameSnapshot(m.self,m.players||[],m.bots||[],m.serverTime);replaceLobbyParticipants(m.players||[],m.bots||[]);
     syncModeVisuals();syncLocalStatus();syncPauseContext();if(matchAllowsLobbyEdits(matchState))showLobby();else{void enterGame(pendingGameSnapshot);}return;
   }
   if(m.t==='join'){upsertLobbyParticipant(m.player);if(shell.inMatch&&engineReady)upsertRemote(m.player,true);syncPauseContext();renderAdminPlayers();if(shell.inLobby)renderLobbyRoster(lobbyDisplayMode());showToast(`${m.player.name} joined`);return;}
@@ -1872,7 +1878,7 @@ function returnToLobby(){
 function leaveMatch(){
   if(chatOpen)void dismissChat({restorePointer:false});chatMessages.length=0;
   shell.leaveToMenu();disableMenu(false);serverClockOffset=0;lastPingLocalAt=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left match')}catch{}}socket=null;currentRoom='';isMatchAdmin=false;matchOwnerId='';lobbyParticipants.clear();pendingGameSnapshot=null;lobbyMatchDraft=null;lobbyMatchDirty=false;lobbyMapDraft='';lobbyMapDirty=false;lobbyLoadoutDraft=null;lobbyLoadoutDirty=false;lobbyLoadoutRevision=0;lobbyLoadoutAckRevision=0;syncLobbyHostControlPlacement();applyWorldSettings(DEFAULT_WORLD_SETTINGS);
-  resetTouchInput();clearRemotes();clearBullets();clearBulletImpactFx();clearRocketTrailPuffs();clearThrowables();clearTacticalFx();clearSmokeClouds();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;primaryWeapon=preferredPrimary;tacticalEquipment=preferredTactical;lethalEquipment=preferredLethal;pendingLoadout=null;currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();viewFeetY=NaN;verticalVelocity=moveVelocityX=moveVelocityZ=0;lastGroundedAt=0;jumpBufferedUntil=0;viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;ammo=freshClientAmmo();equipment=freshClientEquipment(tacticalEquipment,lethalEquipment);reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;clearToastNotifications();setAim(false);syncLocalWeaponModel();
+  resetTouchInput();clearRemotes();clearBullets();clearBulletImpactFx();clearRocketTrailPuffs();clearThrowables();clearTacticalFx();clearSmokeClouds();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;primaryWeapon=preferredPrimary;tacticalEquipment=preferredTactical;lethalEquipment=preferredLethal;pendingLoadout=null;currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();viewFeetY=NaN;verticalVelocity=moveVelocityX=moveVelocityZ=0;lastGroundedAt=0;jumpBufferedUntil=0;viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;ammo=freshClientAmmo();equipment=freshClientEquipment(tacticalEquipment,lethalEquipment);reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAim();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;clearToastNotifications();setAim(false);syncLocalWeaponModel();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshMatches();
 }
 
@@ -2069,7 +2075,7 @@ function drawDamageIndicators(c,w,h,now){
     c.save();c.translate(x,y);c.rotate(rot);c.globalAlpha=Math.min(1,remain*2)*d.strength;c.strokeStyle='#ff334d';c.fillStyle='rgba(255,30,55,.28)';c.lineWidth=3.2;c.beginPath();c.moveTo(-18,8);c.lineTo(0,-9);c.lineTo(18,8);c.stroke();c.beginPath();c.moveTo(-13,6);c.lineTo(0,-5);c.lineTo(13,6);c.lineTo(0,1);c.closePath();c.fill();c.restore();
   }
 }
-function handleRespawn(player){viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));
+function handleRespawn(player){viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));
   if(!player?.id)return;
   if(player.id===clientId){resetLocalPredictionHistory();hp=Math.max(0,Math.min(100,Number(player.hp??100)||0));myStats={kills:Number(player.kills??myStats.kills)||0,deaths:Number(player.deaths??myStats.deaths)||0};wastedUntil=0;lastWastedBy='';lastWastedWeapon='';bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;localEquipmentCooldownUntil=0;myTeam=player.team||myTeam;pendingTeam=player.pendingTeam||'';selfColor=currentModeSpec().teamBased?(TEAM_COLORS[myTeam]||selfColor):TEAM_COLORS.blue;primaryWeapon=PRIMARY_WEAPONS.includes(player.primaryWeapon)?player.primaryWeapon:primaryWeapon;tacticalEquipment=normalizeTactical(player.tactical);lethalEquipment=normalizeLethal(player.lethal);pendingLoadout=null;rememberPrimary(primaryWeapon);rememberEquipment(tacticalEquipment,lethalEquipment);currentWeapon=(player.weapon==='pistol'||player.weapon===primaryWeapon)?player.weapon:primaryWeapon;sniperZoomLevel=0;adsWanted=false;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();ammo=normalizeClientAmmo(player.ammo);equipment=normalizeEquipment(player.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=player.reloadAt||0;reloadWeapon=player.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;deathAnimStartedAt=0;landingKick=0;nextFootstepAt=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();clearFireInput();warmWeaponAudio(currentWeapon);syncLocalWeaponModel();traversal=player.traversal?traversalPlanFromServer({id:clientId,accepted:true,...player.traversal}):null;ladderState=player.ladder?ladderStateFromServer(player.ladder):null;ladderSeq=Math.max(ladderSeq,Math.floor(Number(player.ladder?.seq)||0));traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;position.set(player.x,player.y,player.z);clearCorrectionView();resetViewVertical();verticalVelocity=Number.isFinite(Number(player.verticalVelocity))?Number(player.verticalVelocity):0;moveVelocityX=moveVelocityZ=0;onGround=player.grounded!==false;lastGroundedAt=onGround?performance.now():0;jumpBufferedUntil=0;jumpSeq=Math.max(jumpSeq,Math.floor(Number(player.jumpSeq)||0));knockX=knockZ=0;camera.rotation.z=0;syncLocalStatus();showToast('Back in');return;}
   upsertRemote(player,true);const r=remotes.get(player.id);if(r){r.hp=100;}
@@ -2353,14 +2359,24 @@ function touchRoleActive(role){for(const value of touchRoles.values())if(value==
 function fireInputHeld(){return mouseFireDown||touchRoleActive('fire')||gamepadFireDown;}
 function beginRecoilBurst(weapon=currentWeapon){
   if(!automaticRecoilActive(weapon))return;
+  // Any accepted round proves the burst is still alive. Cancel a pending
+  // trigger-release debounce before it can start recovery between shots.
+  recoilBurstReleaseAt=0;
   if(recoilBurstActive&&recoilBurstWeapon===weapon)return;
   recoilBurstActive=true;recoilBurstWeapon=weapon;localRecoilStep[weapon]=-1;
 }
 function endRecoilBurst(){
   if(recoilBurstWeapon&&localRecoilStep[recoilBurstWeapon]!==undefined)localRecoilStep[recoilBurstWeapon]=-1;
-  recoilBurstActive=false;recoilBurstWeapon='';
+  recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();
 }
-function endRecoilBurstIfReleased(){if(!fireInputHeld())endRecoilBurst();}
+function scheduleRecoilBurstRelease(){
+  if(!recoilBurstActive||!recoilBurstWeapon)return;
+  // Gamepad/touch release events can flicker for a frame on mobile browsers.
+  // Require a continuous release window before ending an automatic burst.
+  const cooldown=Math.max(50,Number(weaponRules(recoilBurstWeapon).cooldownMs)||100);
+  recoilBurstReleaseAt=Math.max(recoilBurstReleaseAt,performance.now()+Math.max(120,Math.min(190,cooldown*1.45)));
+}
+function endRecoilBurstIfReleased(){if(!fireInputHeld())scheduleRecoilBurstRelease();else recoilBurstReleaseAt=0;}
 function clearFireInput(){mouseFireDown=false;gamepadFireDown=false;for(const [id,role] of touchRoles)if(role==='fire')touchRoles.delete(id);endRecoilBurst();clearQueuedSprintShot();}
 function delayFire(ms,weapon=currentWeapon){weapon=WEAPON_SPECS[weapon]?weapon:currentWeapon;if(ms>0)fireReadyAt[weapon]=Math.max(fireReadyAt[weapon]||0,performance.now()+ms);}
 function pressMouseFire(){if(mouseFireDown)return;const wasHeld=fireInputHeld();mouseFireDown=true;if(!wasHeld)requestShot();}
@@ -2405,7 +2421,7 @@ function applyViewRecoil(weapon,preShotHeat=0,firstShot=false){
   const r=recoilSpec(weapon),automatic=automaticRecoilActive(weapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(weapon).recoilScale)||0)/100)),adsScale=1-.20*Math.max(0,Math.min(1,adsBlend)),heatScale=1+Math.min(.24,Math.max(0,preShotHeat)*.04),step=localRecoilStep[weapon]||0,yawShape=recoilYawShape(step);
   const basePitch=Math.max(0,Number(r.recoilPitch)||0)*recoilScale,baseYaw=Math.max(0,Number(r.recoilYaw)||0)*recoilScale,firstScale=firstShot?Math.max(.18,Math.min(1,Number(r.firstShotRecoilScale)||.5)):1;
   const softPitch=Math.max(0,(Number(r.recoilMaxPitch)||Math.max(0,Number(r.recoilPitch)||0))*recoilScale),softYaw=Math.max(0,(Number(r.recoilMaxYaw)||.020)*recoilScale);
-  const hardPitch=softPitch*(automatic?1.78:1.08),hardYaw=softYaw*(automatic?1.75:1.12);
+  const hardPitch=softPitch*1.08,hardYaw=softYaw*(automatic?1.75:1.12);
   let pitchKick=basePitch*adsScale*heatScale*firstScale,yawKick=baseYaw*adsScale*firstScale*yawShape;
   if(automatic&&!firstShot){
     // Continuous automatic fire ramps into its normal climb over the opening
@@ -2417,25 +2433,32 @@ function applyViewRecoil(weapon,preShotHeat=0,firstShot=false){
     pitchKick=basePitch*adsScale*heatScale*ramp*sustainedPulse*(aboveBand?.34:1);
     yawKick=baseYaw*adsScale*yawShape*(aboveBand?1.62:1.18);
   }
-  viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch+pitchKick,0,hardPitch);
+  viewRecoilTargetPitch=automatic?Math.max(0,viewRecoilTargetPitch+pitchKick):THREE.MathUtils.clamp(viewRecoilTargetPitch+pitchKick,0,hardPitch);
   viewRecoilTargetYaw=THREE.MathUtils.clamp(viewRecoilTargetYaw+yawKick,-hardYaw,hardYaw);
 }
 function updateViewRecoil(dt){
-  const r=recoilSpec(currentWeapon),automatic=automaticRecoilActive(currentWeapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(currentWeapon).recoilScale)||0)/100)),totalDt=Math.min(.05,Math.max(0,Number(dt)||0)),now=performance.now(),since=now-lastLocalShotAt;
-  // Automatic recoil is owned by an explicit burst latch. Raw input state is
-  // deliberately not sampled here: a transient touch/controller frame must not
-  // make a held burst recover and then restart. Only a real release, reload,
-  // weapon change, death or other explicit input clear ends the burst.
-  const reloadBreak=reloadRequestPending||!!reloadUntil||(!godMode&&(ammo[currentWeapon]||0)<=0),holdingBurst=automatic&&recoilBurstActive&&recoilBurstWeapon===currentWeapon&&!reloadBreak,delay=Math.max(0,Number(r.recoilRecoveryDelayMs)||0);
-  const softPitch=Math.max(0,(Number(r.recoilMaxPitch)||Math.max(0,Number(r.recoilPitch)||0))*recoilScale),softYaw=Math.max(0,(Number(r.recoilMaxYaw)||.020)*recoilScale),maxPitch=softPitch*(automatic?1.78:1.08),maxYaw=softYaw*(automatic?1.75:1.12);
-  if(!holdingBurst&&since>=delay){
-    // Trigger release and reload both use the same smooth, non-oscillating
-    // recovery. Reload duration normally gives the view enough time to return
-    // near neutral before the next magazine begins.
+  const r=recoilSpec(currentWeapon),automatic=automaticRecoilActive(currentWeapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(currentWeapon).recoilScale)||0)/100)),totalDt=Math.min(.05,Math.max(0,Number(dt)||0)),now=performance.now();
+  // Automatic recoil owns its burst lifecycle explicitly. A release must remain
+  // released through the debounce window; any resumed trigger or accepted shot
+  // cancels it before recovery can begin.
+  if(automatic&&recoilBurstActive&&recoilBurstWeapon===currentWeapon&&recoilBurstReleaseAt){
+    if(fireInputHeld())recoilBurstReleaseAt=0;
+    else if(now>=recoilBurstReleaseAt)endRecoilBurst();
+  }
+  const holdingBurst=automatic&&recoilBurstActive&&recoilBurstWeapon===currentWeapon;
+  const delay=Math.max(0,Number(r.recoilRecoveryDelayMs)||0),recoveryAge=automatic?now-recoilBurstEndedAt:now-lastLocalShotAt;
+  const softPitch=Math.max(0,(Number(r.recoilMaxPitch)||Math.max(0,Number(r.recoilPitch)||0))*recoilScale),softYaw=Math.max(0,(Number(r.recoilMaxYaw)||.020)*recoilScale),maxYaw=softYaw*(automatic?1.75:1.12);
+  if(!holdingBurst&&recoveryAge>=delay){
     const recovery=Math.max(5,Number(r.recoilRecovery)||12),pitchDecay=Math.exp(-recovery*.46*totalDt),yawDecay=Math.exp(-recovery*.58*totalDt);
     viewRecoilTargetPitch*=pitchDecay;viewRecoilTargetYaw*=yawDecay;
   }
-  viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch,0,maxPitch);viewRecoilTargetYaw=THREE.MathUtils.clamp(viewRecoilTargetYaw,-maxYaw,maxYaw);
+  // Do not clamp automatic vertical recoil to recoilMaxPitch. That value is the
+  // transition into sustained-fire behavior, not a hidden ceiling. The actual
+  // camera look limit is the only vertical boundary, so a held burst can never
+  // become stable and then be pulled back down by ordinary stick/assist input.
+  if(!automatic)viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch,0,softPitch*1.08);
+  else viewRecoilTargetPitch=Math.max(0,viewRecoilTargetPitch);
+  viewRecoilTargetYaw=THREE.MathUtils.clamp(viewRecoilTargetYaw,-maxYaw,maxYaw);
   const followRate=automatic?18:24,follow=1-Math.exp(-followRate*totalDt);
   viewRecoilPitch+= (viewRecoilTargetPitch-viewRecoilPitch)*follow;
   viewRecoilYaw+= (viewRecoilTargetYaw-viewRecoilYaw)*follow;
@@ -2466,7 +2489,7 @@ function requestShot(){
   fireReadyAt[weapon]=now+weaponRules(weapon).cooldownMs;
   presentLocalShot(weapon,now);
   sendCurrentState(true);send({t:'fire',weapon,yaw:shotYaw,pitch:shotPitch,adsAmount:round3(adsBlend),shotAt:Math.round(serverNow()),viewDelayMs:Math.round(currentRemoteViewDelayMs())});
-  beginRecoilBurst(weapon);const recoilShot=registerLocalShotHeat(weapon,now);lastLocalShotAt=now;applyViewRecoil(weapon,preShotHeat,recoilShot.firstShot);if(!godMode&&(ammo[weapon]||0)<=0)endRecoilBurst();clearQueuedSprintShot();return true;
+  beginRecoilBurst(weapon);recoilBurstReleaseAt=0;const recoilShot=registerLocalShotHeat(weapon,now);lastLocalShotAt=now;applyViewRecoil(weapon,preShotHeat,recoilShot.firstShot);if(!godMode&&(ammo[weapon]||0)<=0)endRecoilBurst();clearQueuedSprintShot();return true;
 }
 function updateFireControl(now){
   if(pendingSprintShot){if(now>pendingSprintShotExpiresAt||pendingSprintShot!==currentWeapon)clearQueuedSprintShot();else if(now>=sprintActionReadyAt){const queued=pendingSprintShot;clearQueuedSprintShot();if(queued===currentWeapon)requestShot();}}
