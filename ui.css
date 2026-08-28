@@ -56,7 +56,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .loadout-section-title>span{color:var(--text);font-size:10px;font-weight:950;letter-spacing:.09em}
 .loadout-section-title>small{color:var(--dim);font-size:9px;font-weight:750;white-space:nowrap}
 .loadout-choice-grid{display:grid;gap:6px;min-width:0}
-.loadout-choice-grid.primary-grid{grid-template-columns:repeat(5,minmax(0,1fr))}
+.loadout-choice-grid.primary-grid{grid-template-columns:repeat(6,minmax(0,1fr))}
 .loadout-choice-grid.secondary-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 .loadout-choice-grid.utility-grid{grid-template-columns:1fr;grid-template-rows:repeat(2,minmax(44px,1fr))}
 .loadout-lower-grid{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:stretch;min-width:0}
@@ -102,7 +102,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.37.64: one owner for layout, density, overflow and responsive behavior. */
+/* Breach UI contract v1.37.65: one owner for layout, density, overflow and responsive behavior. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
