@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.62';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.62';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.62';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.62';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.62';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.62';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.62';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.62';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.63';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.63';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.63';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.63';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.63';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.63';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.63';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.63';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.62';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.62';
-import { createAudioEngine } from './audio-engine.js?v=1.37.62';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.62';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.62';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.62';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.62';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.62';
+} from './game-config.js?v=1.37.63';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.63';
+import { createAudioEngine } from './audio-engine.js?v=1.37.63';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.63';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.63';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.63';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.63';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.63';
 
 let THREE = null;
 
@@ -495,7 +495,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.62';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.63';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2493,14 +2493,21 @@ function automaticRecoilTarget(step,weapon,recoilScale=1,adsScale=1,heatScale=1)
   const maxYaw=Math.max(.001,Number(r.recoilMaxYaw)||.025)*recoilScale*adsScale;
   const firstPitch=Math.max(0,Number(r.recoilPitch)||0)*recoilScale*adsScale*Math.max(.18,Math.min(1,Number(r.firstShotRecoilScale)||.5));
   let pitchTarget,yawTarget;
+  // A small deterministic spread is present from the first few rounds so the
+  // climb never traces a ruler-straight line. Keep it low-frequency/bounded:
+  // recoil should feel hand-driven and controllable, not randomly teleport.
+  const spreadRamp=recoilSmooth01(Math.min(1,s/3)),weaponSpread=weapon==='assault'?1:.72;
+  const earlyYawSpread=maxYaw*weaponSpread*spreadRamp*(.080*Math.sin(s*1.71+.55)+.035*Math.sin(s*2.83+1.15));
+  const earlyPitchSpread=maxPitch*weaponSpread*spreadRamp*(.018*Math.sin(s*1.37+.25)+.010*Math.sin(s*2.31+1.40));
   if(elapsed<=climbMs){
     const p=recoilSmooth01(elapsed/climbMs);
-    pitchTarget=firstPitch+(maxPitch*.78-firstPitch)*p;
-    yawTarget=-maxYaw*.08*p;
+    pitchTarget=firstPitch+(maxPitch*.78-firstPitch)*p+earlyPitchSpread;
+    yawTarget=-maxYaw*.08*p+earlyYawSpread;
   }else if(elapsed<=climbMs+curveMs){
     const p=recoilSmooth01((elapsed-climbMs)/curveMs);
-    pitchTarget=maxPitch*(.78+.10*p);
-    yawTarget=-maxYaw*(.08+.72*p);
+    const curveSpread=1-.35*p;
+    pitchTarget=maxPitch*(.78+.10*p)+earlyPitchSpread*curveSpread;
+    yawTarget=-maxYaw*(.08+.72*p)+earlyYawSpread*curveSpread;
   }else{
     const h=(elapsed-climbMs-curveMs)/Math.max(60,cooldown);
     const pitchWander=.055*Math.sin(h*.79+.35)+.030*Math.sin(h*1.73+1.10)+.018*Math.sin(h*2.41+.20);
@@ -3571,10 +3578,12 @@ function computeHudLayout(){
   const killX=contentLeft,killY=killBelow?teamY+teamH+7:mapY,killW=Math.max(96,Math.min(baseKillW,killBelow?mapX-contentLeft-8:topKillSpace));
   const controlsY=mapY+mapSize+6,menuX=mapX,chatX=mapX+mapSize-chatW;
   const moveBoundary=viewW*MOBILE_MOVE_ZONE_RATIO,defaultJoyX=safe.left+joyR+margin,defaultJoyY=viewH-bottom-joyR;
-  const leftSpan=Math.max(120,moveBoundary-safe.left),leftFireX=Math.max(safe.left+leftFireR+8,Math.min(moveBoundary-leftFireR-10,safe.left+leftSpan*.30));
-  const leftFireY=Math.max(safe.top+leftFireR+52,Math.min(viewH-bottom-leftFireR-118,viewH*.31)),equipGap=compact?8:10,equipOffset=equipR+equipGap/2;
-  const equipCenterX=Math.max(safe.left+equipR+equipOffset+8,Math.min(moveBoundary-equipR-equipOffset-10,leftFireX)),flashX=equipCenterX-equipOffset,stickyX=equipCenterX+equipOffset;
-  const equipRowY=Math.max(safe.top+equipR+74,Math.min(viewH-bottom-equipR-62,leftFireY+leftFireR+equipR+9)),flashY=equipRowY,stickyY=equipRowY;
+  // Restore the compact lower-left combat cluster: Fire on the upper row,
+  // Tactical/Lethal directly beneath it at the bottom edge. The movement stick
+  // remains dynamic and cannot spawn over these controls.
+  const equipGap=compact?8:10,flashX=safe.left+margin+equipR,stickyX=flashX+equipR*2+equipGap;
+  const equipRowY=viewH-bottom-equipR-(compact?4:6),flashY=equipRowY,stickyY=equipRowY;
+  const leftFireX=(flashX+stickyX)/2,leftFireY=Math.max(safe.top+leftFireR+52,equipRowY-equipR-leftFireR-(compact?8:10));
   const fireX=viewW-safe.right-margin-fireR,fireY=viewH-bottom-fireR,reloadX=fireX-fireR-reloadR-9,reloadY=fireY,crouchX=reloadX-reloadR-crouchR-9,crouchY=fireY;
   const topRowY=fireY-fireR-Math.max(jumpR,swapR,aimR)-11,jumpX=crouchX,jumpY=topRowY,swapX=reloadX,swapY=topRowY,aimX=fireX,aimY=topRowY;
   const modeX=crouchX-crouchR-modeR-9,modeY=(topRowY+fireY)/2,weaponLift=touchGameplayControlsVisible()?(fireR*3.75+8):0;
