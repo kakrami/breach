@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.37.58';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.37.58';
-import * as YardGeometry from './world-geometry-yard.js?v=1.37.58';
-import * as RigGeometry from './world-geometry-rig.js?v=1.37.58';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.37.58';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.58';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.37.58';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.37.58';
+import * as HighlandsGeometry from './world-geometry.js?v=1.37.60';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.37.60';
+import * as YardGeometry from './world-geometry-yard.js?v=1.37.60';
+import * as RigGeometry from './world-geometry-rig.js?v=1.37.60';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.37.60';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.37.60';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.37.60';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.37.60';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.37.58';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.58';
-import { createAudioEngine } from './audio-engine.js?v=1.37.58';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.58';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.58';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.58';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.58';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.58';
+} from './game-config.js?v=1.37.60';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.37.60';
+import { createAudioEngine } from './audio-engine.js?v=1.37.60';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.37.60';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.37.60';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.37.60';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.37.60';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.37.60';
 
 let THREE = null;
 
@@ -97,13 +97,14 @@ const CORRECTION_MAX_VERTICAL = 0.55;
 const CORRECTION_HARD_SNAP_DISTANCE = 1.35;
 // Entire sound set is generated locally as 16-bit PCM WAV assets.
 // No third-party or runtime-hosted audio is required.
-const AUDIO_ASSET_REV='audio-20260826-1';
+const AUDIO_ASSET_REV='audio-20260828-2';
 const SOUND_CUES = {
   introMusic:{url:`audio/intro.wav?rev=${AUDIO_ASSET_REV}`,group:'Music',gain:.40,loop:true},
   shotPistol:{url:`audio/shot-pistol.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.78},
   shotAssault:{url:`audio/shot-assault.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.72},
   shotUmp:{url:`audio/shot-ump.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.70},
   shotShotgun:{url:`audio/shot-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.88},
+  shot1887:{url:`audio/shot-1887.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.90},
   shotSemiShotgun:{url:`audio/shot-semi-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.82},
   shotSniper:{url:`audio/shot-sniper.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.94},
   shotGl:{url:`audio/shot-gl.wav?rev=${AUDIO_ASSET_REV}`,group:'Gunfire',gain:.82},
@@ -112,8 +113,10 @@ const SOUND_CUES = {
   reloadAssault:{url:`audio/reload-assault.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.64},
   reloadUmp:{url:`audio/reload-ump.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.62},
   reloadShotgun:{url:`audio/reload-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.68},
+  reload1887:{url:`audio/reload-1887.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.70},
   reloadSemiShotgun:{url:`audio/reload-semi-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.66},
   shotgunPump:{url:`audio/shotgun-pump.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.78},
+  action1887:{url:`audio/action-1887.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.80},
   reloadSniper:{url:`audio/reload-sniper.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.72},
   reloadGl:{url:`audio/reload-gl.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.72},
   reloadRpg:{url:`audio/reload-rpg.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.76},
@@ -468,7 +471,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.58';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.37.60';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -841,7 +844,7 @@ function saveMatchLoadout(){
   const next=normalizeLoadoutChoice(loadoutDraft);send({t:'loadout',...next});rememberPrimary(next.primaryWeapon);rememberSecondary(next.secondaryWeapon);rememberEquipment(next.tactical,next.lethal);if(godMode){pendingLoadout=null;showToast('LOADOUT APPLIED');}else{pendingLoadout=next;showToast(hp<=0?'LOADOUT SAVED FOR RESPAWN':'LOADOUT SAVED · NEXT SPAWN');}syncPauseContext();closeMatchLoadout();
 }
 
-function weaponSoundCueIds(weapon=currentWeapon){return weapon==='akimbo1887'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='assault'?['shotAssault','reloadAssault']:weapon==='ump'?['shotUmp','reloadUmp']:weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotSemiShotgun','reloadSemiShotgun']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='grenadeLauncher'?['shotGl','reloadGl','glExplosion']:weapon==='rpg'?['shotRpg','reloadRpg','rpgExplosion']:['shotPistol','reloadPistol'];}
+function weaponSoundCueIds(weapon=currentWeapon){return weapon==='akimbo1887'?['shot1887','reload1887','action1887']:weapon==='assault'?['shotAssault','reloadAssault']:weapon==='ump'?['shotUmp','reloadUmp']:weapon==='shotgun'?['shotShotgun','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotSemiShotgun','reloadSemiShotgun']:weapon==='sniper'?['shotSniper','reloadSniper']:weapon==='grenadeLauncher'?['shotGl','reloadGl','glExplosion']:weapon==='rpg'?['shotRpg','reloadRpg','rpgExplosion']:['shotPistol','reloadPistol'];}
 function warmWeaponAudio(weapon=currentWeapon){for(const id of weaponSoundCueIds(weapon))gameAudio.load(id);}
 const CORE_GAMEPLAY_AUDIO_IDS=Object.freeze(['footstepLeft','footstepRight','jump','land','slide','impactWall','impactPlayer','impactBlocked','hurt','hitmarker']);
 function ensureAudio(){audioUnlockPromise=gameAudio.unlock();return audioUnlockPromise;}
@@ -960,79 +963,112 @@ function init3D(){
 
 
   pistolGroup = new THREE.Group();
-  const gunMat = new THREE.MeshStandardMaterial({color:0x252a30,roughness:.46,metalness:.35});
-  const gripMat = new THREE.MeshStandardMaterial({color:0x4b3d35,roughness:.9});
-  const slide = new THREE.Mesh(new THREE.BoxGeometry(.18,.15,.55),gunMat); slide.position.set(0,.02,-.12);
-  const barrel = new THREE.Mesh(new THREE.CylinderGeometry(.038,.038,.34,10),gunMat); barrel.rotation.x=Math.PI/2;barrel.position.set(0,.015,-.45);
-  const grip = new THREE.Mesh(new THREE.BoxGeometry(.16,.32,.18),gripMat);grip.position.set(0,-.18,.03);grip.rotation.x=-.18;
-  pistolMag=new THREE.Mesh(new THREE.BoxGeometry(.105,.20,.12),gunMat);pistolMag.position.set(0,-.25,.025);pistolMag.rotation.x=-.18;
-  pistolFlash = new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:0}));pistolFlash.position.set(0,.015,-.66);
-  pistolGroup.add(slide,barrel,grip,pistolMag,pistolFlash);addOpenIronSights(pistolGroup,gunMat,{rearZ:.12,frontZ:-.36,sightY:.112,rearMountY:.095,frontMountY:.095,rearGap:.017,postWidth:.0065});pistolGroup.position.set(.33,-.25,-.67);pistolGroup.rotation.set(-.08,-.08,0);
+  const pistolMetal = new THREE.MeshStandardMaterial({color:0x20262c,roughness:.38,metalness:.48});
+  const pistolPoly = new THREE.MeshStandardMaterial({color:0x32383d,roughness:.72,metalness:.12});
+  const gripMat = new THREE.MeshStandardMaterial({color:0x47413a,roughness:.9,metalness:.04});
+  const glockSlide = new THREE.Mesh(new THREE.BoxGeometry(.17,.11,.46),pistolMetal);glockSlide.position.set(0,.055,-.11);
+  const glockFront = new THREE.Mesh(new THREE.BoxGeometry(.145,.095,.10),pistolMetal);glockFront.position.set(0,.047,-.39);
+  const glockFrame = new THREE.Mesh(new THREE.BoxGeometry(.16,.10,.30),pistolPoly);glockFrame.position.set(0,-.005,-.05);
+  const glockDust = new THREE.Mesh(new THREE.BoxGeometry(.14,.07,.15),pistolPoly);glockDust.position.set(0,-.045,-.23);
+  const glockBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.18,10),pistolMetal);glockBarrel.rotation.x=Math.PI/2;glockBarrel.position.set(0,.047,-.39);
+  const triggerGuard = new THREE.Mesh(new THREE.TorusGeometry(.045,.010,5,18,Math.PI),pistolPoly);triggerGuard.rotation.y=Math.PI/2;triggerGuard.rotation.z=Math.PI;triggerGuard.position.set(0,-.085,-.03);
+  const glockGrip = new THREE.Mesh(new THREE.BoxGeometry(.135,.30,.15),gripMat);glockGrip.position.set(0,-.185,.05);glockGrip.rotation.x=-.32;
+  const glockBackstrap = new THREE.Mesh(new THREE.BoxGeometry(.05,.16,.11),pistolPoly);glockBackstrap.position.set(0,-.125,.13);glockBackstrap.rotation.x=-.32;
+  pistolMag=new THREE.Mesh(new THREE.BoxGeometry(.090,.20,.11),pistolMetal);pistolMag.position.set(0,-.245,.045);pistolMag.rotation.x=-.32;
+  pistolFlash = new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:0}));pistolFlash.position.set(0,.047,-.51);
+  pistolGroup.add(glockSlide,glockFront,glockFrame,glockDust,glockBarrel,triggerGuard,glockGrip,glockBackstrap,pistolMag,pistolFlash);pistolGroup.userData.cyclePart=glockSlide;pistolGroup.userData.cycleBaseZ=-.11;pistolGroup.userData.cycleTravel=.075;addOpenIronSights(pistolGroup,pistolMetal,{rearZ:.10,frontZ:-.34,sightY:.106,rearMountY:.094,frontMountY:.085,rearGap:.017,postWidth:.0065});pistolGroup.position.set(.33,-.25,-.67);pistolGroup.rotation.set(-.08,-.08,0);
 
   const buildAkimbo1887=(side)=>{
-    const g=new THREE.Group(),metal=new THREE.MeshStandardMaterial({color:0x25292b,roughness:.43,metalness:.38}),wood=new THREE.MeshStandardMaterial({color:0x604632,roughness:.84}),leverMat=new THREE.MeshStandardMaterial({color:0x35393b,roughness:.40,metalness:.42});
-    const receiver=new THREE.Mesh(new THREE.BoxGeometry(.18,.16,.52),metal);receiver.position.set(0,.015,-.22);
-    const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.036,.036,.78,10),metal);barrel.rotation.x=Math.PI/2;barrel.position.set(0,.045,-.83);
-    const tube=new THREE.Mesh(new THREE.CylinderGeometry(.026,.026,.62,9),metal);tube.rotation.x=Math.PI/2;tube.position.set(0,-.035,-.74);
-    const forearm=new THREE.Mesh(new THREE.BoxGeometry(.17,.13,.32),wood);forearm.position.set(0,-.055,-.50);forearm.rotation.x=-.035;
-    const grip=new THREE.Mesh(new THREE.BoxGeometry(.15,.27,.18),wood);grip.position.set(0,-.17,.01);grip.rotation.x=-.32;
-    const lever=new THREE.Mesh(new THREE.TorusGeometry(.082,.012,6,20),leverMat);lever.rotation.x=Math.PI/2;lever.scale.set(1,.68,1);lever.position.set(0,-.135,-.015);
-    const hammer=new THREE.Mesh(new THREE.BoxGeometry(.055,.055,.09),metal);hammer.position.set(0,.075,.09);hammer.rotation.x=-.25;
-    const flash=new THREE.Mesh(new THREE.SphereGeometry(.082,8,6),new THREE.MeshBasicMaterial({color:0xffcf79,transparent:true,opacity:0}));flash.position.set(0,.045,-1.24);
-    g.add(receiver,barrel,tube,forearm,grip,lever,hammer,flash);g.userData.akimboSide=side;return{group:g,flash,lever};
+    const g=new THREE.Group(),metal=new THREE.MeshStandardMaterial({color:0x24282b,roughness:.40,metalness:.46}),wood=new THREE.MeshStandardMaterial({color:0x684933,roughness:.84}),leverMat=new THREE.MeshStandardMaterial({color:0x34383b,roughness:.36,metalness:.44});
+    const receiver=new THREE.Mesh(new THREE.BoxGeometry(.15,.14,.36),metal);receiver.position.set(0,.02,-.16);
+    const tang=new THREE.Mesh(new THREE.BoxGeometry(.06,.05,.16),metal);tang.position.set(0,.06,.05);
+    const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.022,.022,1.02,10),metal);barrel.rotation.x=Math.PI/2;barrel.position.set(0,.04,-.70);
+    const tube=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.88,9),metal);tube.rotation.x=Math.PI/2;tube.position.set(0,-.012,-.66);
+    const forearm=new THREE.Mesh(new THREE.BoxGeometry(.12,.095,.32),wood);forearm.position.set(0,-.005,-.43);forearm.rotation.x=-.03;
+    const grip=new THREE.Mesh(new THREE.BoxGeometry(.12,.22,.12),wood);grip.position.set(0,-.13,.05);grip.rotation.x=-.34;
+    const stock=new THREE.Mesh(new THREE.BoxGeometry(.11,.14,.38),wood);stock.position.set(0,-.005,.22);stock.rotation.x=-.12;
+    const butt=new THREE.Mesh(new THREE.BoxGeometry(.12,.16,.08),wood);butt.position.set(0,-.03,.42);butt.rotation.x=-.12;
+    const lever=new THREE.Mesh(new THREE.TorusGeometry(.072,.011,6,22),leverMat);lever.rotation.x=Math.PI/2;lever.scale.set(1,.68,1);lever.position.set(0,-.11,.00);
+    const hammer=new THREE.Mesh(new THREE.BoxGeometry(.040,.045,.07),metal);hammer.position.set(0,.08,.07);hammer.rotation.x=-.30;
+    const flash=new THREE.Mesh(new THREE.SphereGeometry(.082,8,6),new THREE.MeshBasicMaterial({color:0xffcf79,transparent:true,opacity:0}));flash.position.set(0,.04,-1.24);
+    g.add(receiver,tang,barrel,tube,forearm,grip,stock,butt,lever,hammer,flash);g.userData.akimboSide=side;return{group:g,flash,lever};
   };
   ({group:akimboLeftGroup,flash:akimboLeftFlash,lever:akimboLeftLever}=buildAkimbo1887('left'));({group:akimboRightGroup,flash:akimboRightFlash,lever:akimboRightLever}=buildAkimbo1887('right'));
   akimboLeftGroup.position.set(-.40,-.32,-.72);akimboLeftGroup.rotation.set(-.08,.18,-.035);akimboLeftGroup.visible=false;
   akimboRightGroup.position.set(.40,-.32,-.72);akimboRightGroup.rotation.set(-.08,-.18,.035);akimboRightGroup.visible=false;
 
   assaultGroup = new THREE.Group();
-  const arMat = new THREE.MeshStandardMaterial({color:0x242b31,roughness:.40,metalness:.38});
-  const arAccent = new THREE.MeshStandardMaterial({color:0x4b555d,roughness:.62,metalness:.22});
-  const arBody = new THREE.Mesh(new THREE.BoxGeometry(.18,.17,.72),arMat);arBody.position.set(0,.01,-.24);
-  const arBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.029,.029,.62,10),arMat);arBarrel.rotation.x=Math.PI/2;arBarrel.position.set(0,.015,-.87);
-  const arStock = new THREE.Mesh(new THREE.BoxGeometry(.17,.19,.34),arAccent);arStock.position.set(0,-.035,.31);arStock.rotation.x=-.10;
-  assaultMag = new THREE.Mesh(new THREE.BoxGeometry(.14,.29,.18),arAccent);assaultMag.position.set(0,-.20,-.10);assaultMag.rotation.x=.15;
-  assaultFlash = new THREE.Mesh(new THREE.SphereGeometry(.074,8,6),new THREE.MeshBasicMaterial({color:0xffd98d,transparent:true,opacity:0}));assaultFlash.position.set(0,.015,-1.18);
-  assaultGroup.add(arBody,arBarrel,arStock,assaultMag,assaultFlash);addOpenIronSights(assaultGroup,arAccent,{rearZ:.10,frontZ:-.82,sightY:.122,rearMountY:.095,frontMountY:.044,rearGap:.020,postWidth:.007});assaultGroup.position.set(.30,-.27,-.52);assaultGroup.rotation.set(-.06,-.055,0);assaultGroup.visible=false;
+  const arMat = new THREE.MeshStandardMaterial({color:0x23292f,roughness:.40,metalness:.42});
+  const arAccent = new THREE.MeshStandardMaterial({color:0x61574a,roughness:.74,metalness:.08});
+  const scarUpper = new THREE.Mesh(new THREE.BoxGeometry(.18,.11,.40),arMat);scarUpper.position.set(0,.05,-.24);
+  const scarLower = new THREE.Mesh(new THREE.BoxGeometry(.17,.10,.30),arMat);scarLower.position.set(0,-.03,-.10);
+  const scarRail = new THREE.Mesh(new THREE.BoxGeometry(.09,.03,.72),new THREE.MeshStandardMaterial({color:0x4a5158,roughness:.55,metalness:.30}));scarRail.position.set(0,.115,-.34);
+  const scarHandguard = new THREE.Mesh(new THREE.BoxGeometry(.16,.11,.36),new THREE.MeshStandardMaterial({color:0x7a6e5a,roughness:.82,metalness:.05}));scarHandguard.position.set(0,.015,-.56);
+  const arBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.021,.021,.54,10),arMat);arBarrel.rotation.x=Math.PI/2;arBarrel.position.set(0,.02,-.92);
+  const scarStockStem = new THREE.Mesh(new THREE.BoxGeometry(.045,.055,.22),arMat);scarStockStem.position.set(0,-.01,.22);scarStockStem.rotation.x=-.10;
+  const scarStock = new THREE.Mesh(new THREE.BoxGeometry(.15,.14,.18),arAccent);scarStock.position.set(0,-.01,.40);scarStock.rotation.x=-.10;
+  const scarGrip = new THREE.Mesh(new THREE.BoxGeometry(.11,.23,.12),arMat);scarGrip.position.set(0,-.17,.01);scarGrip.rotation.x=-.26;
+  const scarBolt=new THREE.Mesh(new THREE.BoxGeometry(.018,.035,.12),new THREE.MeshStandardMaterial({color:0x11161a,roughness:.28,metalness:.62}));scarBolt.position.set(.095,.055,-.21);
+  assaultMag = new THREE.Mesh(new THREE.BoxGeometry(.11,.29,.16),new THREE.MeshStandardMaterial({color:0x676f75,roughness:.62,metalness:.18}));assaultMag.position.set(0,-.19,-.15);assaultMag.rotation.x=.16;
+  assaultFlash = new THREE.Mesh(new THREE.SphereGeometry(.074,8,6),new THREE.MeshBasicMaterial({color:0xffd98d,transparent:true,opacity:0}));assaultFlash.position.set(0,.02,-1.20);
+  assaultGroup.add(scarUpper,scarLower,scarRail,scarHandguard,arBarrel,scarStockStem,scarStock,scarGrip,scarBolt,assaultMag,assaultFlash);assaultGroup.userData.cyclePart=scarBolt;assaultGroup.userData.cycleBaseZ=-.21;assaultGroup.userData.cycleTravel=.055;addOpenIronSights(assaultGroup,scarRail.material,{rearZ:.08,frontZ:-.82,sightY:.123,rearMountY:.118,frontMountY:.080,rearGap:.020,postWidth:.007});assaultGroup.position.set(.30,-.27,-.52);assaultGroup.rotation.set(-.06,-.055,0);assaultGroup.visible=false;
 
   umpGroup = new THREE.Group();
-  const umpMat=new THREE.MeshStandardMaterial({color:0x1f252a,roughness:.42,metalness:.34}),umpAccent=new THREE.MeshStandardMaterial({color:0x4a5155,roughness:.65});
-  const umpBody=new THREE.Mesh(new THREE.BoxGeometry(.19,.20,.50),umpMat);umpBody.position.set(0,0,-.17);
-  const umpBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,.34,9),umpMat);umpBarrel.rotation.x=Math.PI/2;umpBarrel.position.set(0,.01,-.58);
-  const umpStock=new THREE.Mesh(new THREE.BoxGeometry(.12,.13,.30),umpAccent);umpStock.position.set(0,-.01,.23);
-  umpMag=new THREE.Mesh(new THREE.BoxGeometry(.12,.30,.14),umpAccent);umpMag.position.set(0,-.22,-.10);umpMag.rotation.x=.12;
-  umpFlash=new THREE.Mesh(new THREE.SphereGeometry(.072,8,6),new THREE.MeshBasicMaterial({color:0xffd994,transparent:true,opacity:0}));umpFlash.position.set(0,.01,-.78);
-  umpGroup.add(umpBody,umpBarrel,umpStock,umpMag,umpFlash);addOpenIronSights(umpGroup,umpAccent,{rearZ:.06,frontZ:-.54,sightY:.122,rearMountY:.100,frontMountY:.042,rearGap:.020,postWidth:.007});umpGroup.position.set(.30,-.27,-.54);umpGroup.rotation.set(-.06,-.05,0);umpGroup.visible=false;
+  const umpMat=new THREE.MeshStandardMaterial({color:0x1f252a,roughness:.42,metalness:.34}),umpAccent=new THREE.MeshStandardMaterial({color:0x3f464b,roughness:.68,metalness:.12}),polyBlack=new THREE.MeshStandardMaterial({color:0x22272c,roughness:.84,metalness:.04});
+  const umpReceiver=new THREE.Mesh(new THREE.BoxGeometry(.18,.18,.38),umpMat);umpReceiver.position.set(0,.04,-.12);
+  const umpLower=new THREE.Mesh(new THREE.BoxGeometry(.17,.12,.24),polyBlack);umpLower.position.set(0,-.03,-.02);
+  const umpHandguard=new THREE.Mesh(new THREE.BoxGeometry(.15,.11,.22),polyBlack);umpHandguard.position.set(0,.00,-.42);
+  const umpTop=new THREE.Mesh(new THREE.BoxGeometry(.08,.025,.50),umpAccent);umpTop.position.set(0,.112,-.22);
+  const umpBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.24,9),umpMat);umpBarrel.rotation.x=Math.PI/2;umpBarrel.position.set(0,.02,-.63);
+  const umpGrip=new THREE.Mesh(new THREE.BoxGeometry(.11,.22,.12),polyBlack);umpGrip.position.set(0,-.17,.03);umpGrip.rotation.x=-.28;
+  const umpStockRodL=new THREE.Mesh(new THREE.BoxGeometry(.02,.02,.23),umpAccent);umpStockRodL.position.set(-.035,.045,.12);
+  const umpStockRodR=umpStockRodL.clone();umpStockRodR.position.x=.035;
+  const umpButt=new THREE.Mesh(new THREE.BoxGeometry(.12,.11,.06),umpAccent);umpButt.position.set(0,.03,.26);
+  const umpBolt=new THREE.Mesh(new THREE.BoxGeometry(.016,.032,.10),new THREE.MeshStandardMaterial({color:0x12171b,roughness:.30,metalness:.58}));umpBolt.position.set(.095,.045,-.13);
+  umpMag=new THREE.Mesh(new THREE.BoxGeometry(.10,.31,.12),polyBlack);umpMag.position.set(0,-.20,-.12);umpMag.rotation.x=.08;
+  umpFlash=new THREE.Mesh(new THREE.SphereGeometry(.072,8,6),new THREE.MeshBasicMaterial({color:0xffd994,transparent:true,opacity:0}));umpFlash.position.set(0,.02,-.77);
+  umpGroup.add(umpReceiver,umpLower,umpHandguard,umpTop,umpBarrel,umpGrip,umpStockRodL,umpStockRodR,umpButt,umpBolt,umpMag,umpFlash);umpGroup.userData.cyclePart=umpBolt;umpGroup.userData.cycleBaseZ=-.13;umpGroup.userData.cycleTravel=.050;addOpenIronSights(umpGroup,umpAccent,{rearZ:.02,frontZ:-.55,sightY:.122,rearMountY:.114,frontMountY:.060,rearGap:.020,postWidth:.007});umpGroup.position.set(.30,-.27,-.54);umpGroup.rotation.set(-.06,-.05,0);umpGroup.visible=false;
 
   shotgunGroup = new THREE.Group();
   const sgMat=new THREE.MeshStandardMaterial({color:0x2b3135,roughness:.48,metalness:.30});
   const sgWood=new THREE.MeshStandardMaterial({color:0x5a4636,roughness:.82});
-  const sgBody=new THREE.Mesh(new THREE.BoxGeometry(.19,.18,.82),sgMat);sgBody.position.set(0,.01,-.20);
-  const sgBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.04,.04,.78,10),sgMat);sgBarrel.rotation.x=Math.PI/2;sgBarrel.position.set(0,.04,-.90);
-  const sgStock=new THREE.Mesh(new THREE.BoxGeometry(.18,.22,.38),sgWood);sgStock.position.set(0,-.05,.36);sgStock.rotation.x=-.10;
-  shotgunPump=new THREE.Mesh(new THREE.BoxGeometry(.20,.16,.28),sgWood);shotgunPump.position.set(0,-.08,-.48);
-  shotgunFlash=new THREE.Mesh(new THREE.SphereGeometry(.09,8,6),new THREE.MeshBasicMaterial({color:0xffd181,transparent:true,opacity:0}));shotgunFlash.position.set(0,.04,-1.30);
-  shotgunGroup.add(sgBody,sgBarrel,sgStock,shotgunPump,shotgunFlash);addShotgunSight(shotgunGroup,sgMat,{rearZ:.10,frontZ:-1.00,sightY:.122,rearMountY:.100,frontMountY:.080});shotgunGroup.position.set(.30,-.28,-.50);shotgunGroup.rotation.set(-.06,-.05,0);shotgunGroup.visible=false;
+  const sgReceiver=new THREE.Mesh(new THREE.BoxGeometry(.17,.14,.36),sgMat);sgReceiver.position.set(0,.02,-.14);
+  const sgBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,1.00,10),sgMat);sgBarrel.rotation.x=Math.PI/2;sgBarrel.position.set(0,.035,-.72);
+  const sgTube=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.80,9),sgMat);sgTube.rotation.x=Math.PI/2;sgTube.position.set(0,-.02,-.64);
+  const sgStock=new THREE.Mesh(new THREE.BoxGeometry(.12,.16,.42),sgWood);sgStock.position.set(0,-.01,.22);sgStock.rotation.x=-.12;
+  const sgGrip=new THREE.Mesh(new THREE.BoxGeometry(.12,.21,.12),sgWood);sgGrip.position.set(0,-.13,.05);sgGrip.rotation.x=-.28;
+  shotgunPump=new THREE.Mesh(new THREE.BoxGeometry(.12,.10,.28),sgWood);shotgunPump.position.set(0,-.02,-.42);
+  shotgunFlash=new THREE.Mesh(new THREE.SphereGeometry(.09,8,6),new THREE.MeshBasicMaterial({color:0xffd181,transparent:true,opacity:0}));shotgunFlash.position.set(0,.035,-1.24);
+  shotgunGroup.add(sgReceiver,sgBarrel,sgTube,sgStock,sgGrip,shotgunPump,shotgunFlash);addShotgunSight(shotgunGroup,sgMat,{rearZ:.02,frontZ:-1.04,sightY:.116,rearMountY:.090,frontMountY:.060});shotgunGroup.position.set(.30,-.28,-.50);shotgunGroup.rotation.set(-.06,-.05,0);shotgunGroup.visible=false;
 
   semiShotgunGroup = new THREE.Group();
-  const sasMat=new THREE.MeshStandardMaterial({color:0x252d31,roughness:.43,metalness:.30}),sasAccent=new THREE.MeshStandardMaterial({color:0x39484d,roughness:.72});
-  const sasBody=new THREE.Mesh(new THREE.BoxGeometry(.19,.19,.72),sasMat);sasBody.position.set(0,.01,-.18);
-  const sasBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.039,.039,.67,10),sasMat);sasBarrel.rotation.x=Math.PI/2;sasBarrel.position.set(0,.035,-.78);
-  const sasStock=new THREE.Mesh(new THREE.BoxGeometry(.18,.20,.34),sasAccent);sasStock.position.set(0,-.04,.32);
-  semiShotgunMag=new THREE.Mesh(new THREE.BoxGeometry(.15,.22,.19),sasAccent);semiShotgunMag.position.set(0,-.17,-.10);
-  semiShotgunFlash=new THREE.Mesh(new THREE.SphereGeometry(.088,8,6),new THREE.MeshBasicMaterial({color:0xffd181,transparent:true,opacity:0}));semiShotgunFlash.position.set(0,.035,-1.12);
-  semiShotgunGroup.add(sasBody,sasBarrel,sasStock,semiShotgunMag,semiShotgunFlash);addShotgunSight(semiShotgunGroup,sasAccent,{rearZ:.09,frontZ:-.88,sightY:.124,rearMountY:.105,frontMountY:.074});semiShotgunGroup.position.set(.30,-.28,-.50);semiShotgunGroup.rotation.set(-.06,-.05,0);semiShotgunGroup.visible=false;
+  const sasMat=new THREE.MeshStandardMaterial({color:0x252d31,roughness:.43,metalness:.30}),sasAccent=new THREE.MeshStandardMaterial({color:0x454f45,roughness:.78,metalness:.08});
+  const sasReceiver=new THREE.Mesh(new THREE.BoxGeometry(.18,.14,.42),sasMat);sasReceiver.position.set(0,.03,-.14);
+  const sasHandguard=new THREE.Mesh(new THREE.BoxGeometry(.13,.10,.28),sasAccent);sasHandguard.position.set(0,-.005,-.42);
+  const sasBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.024,.024,.82,10),sasMat);sasBarrel.rotation.x=Math.PI/2;sasBarrel.position.set(0,.03,-.72);
+  const sasTube=new THREE.Mesh(new THREE.CylinderGeometry(.017,.017,.52,9),sasMat);sasTube.rotation.x=Math.PI/2;sasTube.position.set(0,-.015,-.56);
+  const sasStock=new THREE.Mesh(new THREE.BoxGeometry(.13,.16,.34),sasAccent);sasStock.position.set(0,-.01,.20);sasStock.rotation.x=-.12;
+  const sasGrip=new THREE.Mesh(new THREE.BoxGeometry(.11,.22,.12),sasMat);sasGrip.position.set(0,-.15,.00);sasGrip.rotation.x=-.25;
+  const sasBolt=new THREE.Mesh(new THREE.BoxGeometry(.018,.040,.13),new THREE.MeshStandardMaterial({color:0x12171a,roughness:.28,metalness:.62}));sasBolt.position.set(.095,.045,-.16);
+  semiShotgunMag=new THREE.Mesh(new THREE.BoxGeometry(.12,.18,.12),sasMat);semiShotgunMag.position.set(0,-.14,-.10);
+  semiShotgunFlash=new THREE.Mesh(new THREE.SphereGeometry(.088,8,6),new THREE.MeshBasicMaterial({color:0xffd181,transparent:true,opacity:0}));semiShotgunFlash.position.set(0,.03,-1.13);
+  semiShotgunGroup.add(sasReceiver,sasHandguard,sasBarrel,sasTube,sasStock,sasGrip,sasBolt,semiShotgunMag,semiShotgunFlash);semiShotgunGroup.userData.cyclePart=sasBolt;semiShotgunGroup.userData.cycleBaseZ=-.16;semiShotgunGroup.userData.cycleTravel=.070;addShotgunSight(semiShotgunGroup,sasMat,{rearZ:.04,frontZ:-.94,sightY:.118,rearMountY:.090,frontMountY:.060});semiShotgunGroup.position.set(.30,-.28,-.50);semiShotgunGroup.rotation.set(-.06,-.05,0);semiShotgunGroup.visible=false;
 
   sniperGroup = new THREE.Group();
-  const rifleMat = new THREE.MeshStandardMaterial({color:0x303842,roughness:.38,metalness:.42});
-  const stockMat = new THREE.MeshStandardMaterial({color:0x3e4a43,roughness:.8});
-  const rifleBody = new THREE.Mesh(new THREE.BoxGeometry(.17,.16,.78),rifleMat);rifleBody.position.set(0,.01,-.18);
-  const rifleBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,.78,10),rifleMat);rifleBarrel.rotation.x=Math.PI/2;rifleBarrel.position.set(0,.025,-.83);
-  const stock = new THREE.Mesh(new THREE.BoxGeometry(.18,.22,.36),stockMat);stock.position.set(0,-.06,.35);stock.rotation.x=-.12;
-  const scope = new THREE.Mesh(new THREE.CylinderGeometry(.055,.055,.28,12),rifleMat);scope.rotation.x=Math.PI/2;scope.position.set(0,.14,-.18);
-  sniperBolt=new THREE.Mesh(new THREE.BoxGeometry(.055,.055,.18),rifleMat);sniperBolt.position.set(.11,.065,-.12);
-  sniperFlash = new THREE.Mesh(new THREE.SphereGeometry(.085,8,6),new THREE.MeshBasicMaterial({color:0xffe6a6,transparent:true,opacity:0}));sniperFlash.position.set(0,.025,-1.23);
-  sniperGroup.add(rifleBody,rifleBarrel,stock,scope,sniperBolt,sniperFlash);sniperGroup.position.set(.28,-.28,-.48);sniperGroup.rotation.set(-.055,-.05,0);sniperGroup.visible=false;
+  const rifleMat = new THREE.MeshStandardMaterial({color:0x2f3438,roughness:.42,metalness:.40});
+  const stockMat = new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06});
+  const lensMat = new THREE.MeshStandardMaterial({color:0x7fd3ff,roughness:.08,metalness:.18,transparent:true,opacity:.72,emissive:0x154664,emissiveIntensity:.25});
+  const dragReceiver = new THREE.Mesh(new THREE.BoxGeometry(.16,.12,.46),rifleMat);dragReceiver.position.set(0,.04,-.18);
+  const dragHandguard = new THREE.Mesh(new THREE.BoxGeometry(.13,.10,.36),stockMat);dragHandguard.position.set(0,-.005,-.52);
+  const rifleBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.84,10),rifleMat);rifleBarrel.rotation.x=Math.PI/2;rifleBarrel.position.set(0,.025,-.82);
+  const stock = new THREE.Mesh(new THREE.BoxGeometry(.13,.17,.42),stockMat);stock.position.set(0,-.01,.23);stock.rotation.x=-.12;
+  const stockComb = new THREE.Mesh(new THREE.BoxGeometry(.11,.06,.22),stockMat);stockComb.position.set(0,.06,.20);stockComb.rotation.x=-.12;
+  const scope = new THREE.Mesh(new THREE.CylinderGeometry(.048,.048,.42,14),rifleMat);scope.rotation.x=Math.PI/2;scope.position.set(0,.14,-.16);
+  const scopeFrontLens = new THREE.Mesh(new THREE.CylinderGeometry(.043,.043,.01,14),lensMat);scopeFrontLens.rotation.x=Math.PI/2;scopeFrontLens.position.set(0,.14,-.37);
+  const scopeRearLens = new THREE.Mesh(new THREE.CylinderGeometry(.043,.043,.01,14),lensMat);scopeRearLens.rotation.x=Math.PI/2;scopeRearLens.position.set(0,.14,.05);
+  sniperBolt=new THREE.Mesh(new THREE.BoxGeometry(.050,.050,.16),rifleMat);sniperBolt.position.set(.10,.065,-.06);
+  sniperFlash = new THREE.Mesh(new THREE.SphereGeometry(.085,8,6),new THREE.MeshBasicMaterial({color:0xffe6a6,transparent:true,opacity:0}));sniperFlash.position.set(0,.025,-1.24);
+  sniperGroup.add(dragReceiver,dragHandguard,rifleBarrel,stock,stockComb,scope,scopeFrontLens,scopeRearLens,sniperBolt,sniperFlash);sniperGroup.userData.cyclePart=sniperBolt;sniperGroup.userData.cycleBaseZ=-.06;sniperGroup.userData.cycleTravel=.085;sniperGroup.position.set(.28,-.28,-.48);sniperGroup.rotation.set(-.055,-.05,0);sniperGroup.visible=false;
 
   grenadeLauncherGroup=new THREE.Group();
   const glMat=new THREE.MeshStandardMaterial({color:0x273126,roughness:.58,metalness:.26}),glTube=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.73,12),glMat);glTube.rotation.x=Math.PI/2;glTube.position.set(0,.01,-.40);
@@ -2021,16 +2057,26 @@ function makeRemote(player){
   const armL=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.52,4,7),skin);const armR=armL.clone();armL.position.set(-.44,1.05,0);armR.position.set(.44,1.05,0);armL.rotation.z=-.12;armR.rotation.z=.12;
   const legMat=new THREE.MeshStandardMaterial({color:player.bot?0x414b52:0x27333d,roughness:.92});
   const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.48,4,7),legMat);const legR=legL.clone();legL.position.set(-.18,.38,0);legR.position.set(.18,.38,0);
-  const gunMat=new THREE.MeshStandardMaterial({color:0x252a30,roughness:.5,metalness:.25});
-  const pistol=new THREE.Mesh(new THREE.BoxGeometry(.13,.10,.38),gunMat);pistol.position.set(.45,1.08,-.25);
-  const akimbo1887=new THREE.Group(),akL=new THREE.Group(),akR=new THREE.Group(),akWood=new THREE.MeshStandardMaterial({color:0x604632,roughness:.84});
-  for(const gun of [akL,akR]){const recv=new THREE.Mesh(new THREE.BoxGeometry(.13,.11,.42),gunMat.clone()),brl=new THREE.Mesh(new THREE.CylinderGeometry(.026,.026,.58,8),gunMat.clone()),grip=new THREE.Mesh(new THREE.BoxGeometry(.12,.20,.14),akWood.clone());recv.position.z=-.18;brl.rotation.x=Math.PI/2;brl.position.set(0,.02,-.68);grip.position.set(0,-.12,.02);grip.rotation.x=-.28;gun.add(recv,brl,grip);}
-  akL.position.set(-.32,1.08,-.25);akR.position.set(.32,1.08,-.25);akL.rotation.set(-.08,.14,-.03);akR.rotation.set(-.08,-.14,.03);akimbo1887.add(akL,akR);
-  const assault=new THREE.Mesh(new THREE.BoxGeometry(.13,.11,.66),gunMat.clone());assault.position.set(.45,1.09,-.38);assault.visible=false;
-  const ump=new THREE.Mesh(new THREE.BoxGeometry(.15,.14,.48),gunMat.clone());ump.position.set(.45,1.08,-.34);ump.visible=false;
-  const shotgun=new THREE.Mesh(new THREE.BoxGeometry(.15,.12,.74),gunMat.clone());shotgun.position.set(.45,1.10,-.41);shotgun.visible=false;
-  const semiShotgun=new THREE.Mesh(new THREE.BoxGeometry(.16,.13,.69),gunMat.clone());semiShotgun.position.set(.45,1.10,-.40);semiShotgun.visible=false;
-  const sniper=new THREE.Mesh(new THREE.BoxGeometry(.12,.10,.82),gunMat.clone());sniper.position.set(.45,1.10,-.45);sniper.visible=false;
+  const gunMat=new THREE.MeshStandardMaterial({color:0x252a30,roughness:.5,metalness:.25}),polyMat=new THREE.MeshStandardMaterial({color:0x31373c,roughness:.76,metalness:.10}),woodMat=new THREE.MeshStandardMaterial({color:0x654832,roughness:.84,metalness:.04}),lensMat=new THREE.MeshStandardMaterial({color:0x7fd3ff,roughness:.08,metalness:.18,transparent:true,opacity:.65,emissive:0x154664,emissiveIntensity:.24});
+  const pistol=new THREE.Group();
+  const pSlide=new THREE.Mesh(new THREE.BoxGeometry(.12,.075,.30),gunMat);pSlide.position.set(0,.04,.02);
+  const pFrame=new THREE.Mesh(new THREE.BoxGeometry(.11,.065,.18),polyMat);pFrame.position.set(0,0,.06);
+  const pBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.10,8),gunMat);pBarrel.rotation.x=Math.PI/2;pBarrel.position.set(0,.03,-.13);
+  const pGrip=new THREE.Mesh(new THREE.BoxGeometry(.10,.18,.10),polyMat);pGrip.position.set(0,-.10,.15);pGrip.rotation.x=-.30;
+  pistol.add(pSlide,pFrame,pBarrel,pGrip);
+  const akimbo1887=new THREE.Group(),akL=new THREE.Group(),akR=new THREE.Group();
+  const buildRemote1887=(gun)=>{const recv=new THREE.Mesh(new THREE.BoxGeometry(.11,.09,.24),gunMat.clone()),brl=new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,.54,8),gunMat.clone()),tube=new THREE.Mesh(new THREE.CylinderGeometry(.011,.011,.42,8),gunMat.clone()),fore=new THREE.Mesh(new THREE.BoxGeometry(.09,.07,.18),woodMat.clone()),grip=new THREE.Mesh(new THREE.BoxGeometry(.09,.15,.09),woodMat.clone()),stock=new THREE.Mesh(new THREE.BoxGeometry(.08,.10,.22),woodMat.clone()),lever=new THREE.Mesh(new THREE.TorusGeometry(.045,.008,5,14),gunMat.clone());recv.position.z=-.10;brl.rotation.x=Math.PI/2;brl.position.set(0,.02,-.43);tube.rotation.x=Math.PI/2;tube.position.set(0,-.01,-.39);fore.position.set(0,-.005,-.26);grip.position.set(0,-.09,.04);grip.rotation.x=-.30;stock.position.set(0,-.005,.16);stock.rotation.x=-.10;lever.rotation.x=Math.PI/2;lever.scale.set(1,.7,1);lever.position.set(0,-.07,.01);gun.add(recv,brl,tube,fore,grip,stock,lever);};
+  buildRemote1887(akL);buildRemote1887(akR);akL.position.set(-.32,1.08,-.25);akR.position.set(.32,1.08,-.25);akL.rotation.set(-.08,.14,-.03);akR.rotation.set(-.08,-.14,.03);akimbo1887.add(akL,akR);
+  const assault=new THREE.Group();
+  const arRecv=new THREE.Mesh(new THREE.BoxGeometry(.12,.085,.26),gunMat.clone()),arHand=new THREE.Mesh(new THREE.BoxGeometry(.11,.07,.20),new THREE.MeshStandardMaterial({color:0x7a6e5a,roughness:.82,metalness:.05})),arBar=new THREE.Mesh(new THREE.CylinderGeometry(.013,.013,.34,8),gunMat.clone()),arStock=new THREE.Mesh(new THREE.BoxGeometry(.10,.10,.16),new THREE.MeshStandardMaterial({color:0x61574a,roughness:.74,metalness:.08})),arGrip=new THREE.Mesh(new THREE.BoxGeometry(.08,.16,.08),gunMat.clone());arRecv.position.set(0,.01,.16);arHand.position.set(0,-.01,-.04);arBar.rotation.x=Math.PI/2;arBar.position.set(0,-.01,-.22);arStock.position.set(0,-.03,.35);arGrip.position.set(0,-.10,.29);arGrip.rotation.x=-.24;const arMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.08,.18,.10),new THREE.MeshStandardMaterial({color:0x676f75,roughness:.62,metalness:.18}));arMagRemote.position.set(0,-.10,.20);arMagRemote.rotation.x=.18;assault.add(arRecv,arHand,arBar,arStock,arGrip,arMagRemote);assault.visible=false;
+  const ump=new THREE.Group();
+  const uRecv=new THREE.Mesh(new THREE.BoxGeometry(.12,.10,.24),gunMat.clone()),uFront=new THREE.Mesh(new THREE.BoxGeometry(.10,.07,.14),polyMat.clone()),uBar=new THREE.Mesh(new THREE.CylinderGeometry(.013,.013,.16,8),gunMat.clone()),uGrip=new THREE.Mesh(new THREE.BoxGeometry(.08,.16,.08),polyMat.clone()),uStock=new THREE.Mesh(new THREE.BoxGeometry(.08,.08,.14),new THREE.MeshStandardMaterial({color:0x454b50,roughness:.68,metalness:.12}));uRecv.position.set(0,.01,.16);uFront.position.set(0,-.02,.01);uBar.rotation.x=Math.PI/2;uBar.position.set(0,-.01,-.14);uGrip.position.set(0,-.09,.24);uGrip.rotation.x=-.28;uStock.position.set(0,-.01,.35);const uMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.08,.19,.09),polyMat.clone());uMagRemote.position.set(0,-.10,.17);uMagRemote.rotation.x=.10;ump.add(uRecv,uFront,uBar,uGrip,uStock,uMagRemote);ump.visible=false;
+  const shotgun=new THREE.Group();
+  const sgRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.09,.24),gunMat.clone()),sgBar=new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,.58,8),gunMat.clone()),sgTube=new THREE.Mesh(new THREE.CylinderGeometry(.011,.011,.46,8),gunMat.clone()),sgStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.24),woodMat.clone()),sgGrip=new THREE.Mesh(new THREE.BoxGeometry(.09,.15,.09),woodMat.clone());sgRecv.position.set(0,.01,.23);sgBar.rotation.x=Math.PI/2;sgBar.position.set(0,.02,-.09);sgTube.rotation.x=Math.PI/2;sgTube.position.set(0,-.03,-.04);sgStock.position.set(0,-.03,.41);sgGrip.position.set(0,-.11,.33);sgGrip.rotation.x=-.26;const sgPumpRemote=new THREE.Mesh(new THREE.BoxGeometry(.09,.07,.16),woodMat.clone());sgPumpRemote.position.set(0,-.05,.09);shotgun.add(sgRecv,sgBar,sgTube,sgStock,sgGrip,sgPumpRemote);shotgun.visible=false;
+  const semiShotgun=new THREE.Group();
+  const ssRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.09,.24),gunMat.clone()),ssHand=new THREE.Mesh(new THREE.BoxGeometry(.09,.07,.16),new THREE.MeshStandardMaterial({color:0x4d5548,roughness:.78,metalness:.08})),ssBar=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.48,8),gunMat.clone()),ssTube=new THREE.Mesh(new THREE.CylinderGeometry(.010,.010,.30,8),gunMat.clone()),ssStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.20),new THREE.MeshStandardMaterial({color:0x4d5548,roughness:.78,metalness:.08})),ssGrip=new THREE.Mesh(new THREE.BoxGeometry(.08,.15,.08),gunMat.clone());ssRecv.position.set(0,.01,.22);ssHand.position.set(0,-.04,.06);ssBar.rotation.x=Math.PI/2;ssBar.position.set(0,.01,-.06);ssTube.rotation.x=Math.PI/2;ssTube.position.set(0,-.03,0);ssStock.position.set(0,-.03,.41);ssGrip.position.set(0,-.11,.33);ssGrip.rotation.x=-.25;const ssMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.08,.12,.09),gunMat.clone());ssMagRemote.position.set(0,-.09,.25);semiShotgun.add(ssRecv,ssHand,ssBar,ssTube,ssStock,ssGrip,ssMagRemote);semiShotgun.visible=false;
+  const sniper=new THREE.Group();
+  const snRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.08,.30),gunMat.clone()),snHand=new THREE.Mesh(new THREE.BoxGeometry(.08,.07,.22),new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06})),snBar=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.56,8),gunMat.clone()),snStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.24),new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06})),snScope=new THREE.Mesh(new THREE.CylinderGeometry(.026,.026,.18,10),gunMat.clone()),snLens=new THREE.Mesh(new THREE.CylinderGeometry(.023,.023,.008,10),lensMat.clone());snRecv.position.set(0,.01,.27);snHand.position.set(0,-.03,.05);snBar.rotation.x=Math.PI/2;snBar.position.set(0,.01,-.11);snStock.position.set(0,-.03,.47);snScope.rotation.x=Math.PI/2;snScope.position.set(0,.08,.27);snLens.rotation.x=Math.PI/2;snLens.position.set(0,.08,.18);const sniperBoltRemote=new THREE.Mesh(new THREE.BoxGeometry(.034,.034,.10),gunMat.clone());sniperBoltRemote.position.set(.07,.02,.33);sniper.add(snRecv,snHand,snBar,snStock,snScope,snLens,sniperBoltRemote);sniper.visible=false;
   const grenadeLauncher=new THREE.Mesh(new THREE.CylinderGeometry(.065,.065,.68,9),gunMat.clone());grenadeLauncher.rotation.x=Math.PI/2+GRENADE_LAUNCH_PITCH;grenadeLauncher.position.set(.45,1.08,-.40);grenadeLauncher.visible=false;
   const rpg=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.88,9),gunMat.clone());rpg.rotation.x=Math.PI/2;rpg.position.set(.38,1.42,-.43);rpg.visible=false;
   const godRing=new THREE.Mesh(new THREE.TorusGeometry(.42,.035,6,28),new THREE.MeshBasicMaterial({color:0xffdd67,transparent:true,opacity:.9}));godRing.rotation.x=Math.PI/2;godRing.position.y=2.03;godRing.visible=!!player.godMode;
@@ -2454,21 +2500,33 @@ function recoilYawShape(step,weapon=currentWeapon){
 }
 function automaticRecoilActive(weapon){const r=recoilSpec(weapon);return !!r.automatic&&(weapon!=='assault'||assaultFireMode==='auto');}
 function resetViewRecoil(){viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;endRecoilBurst();weaponKickZ=weaponKickVelocity=0;}
-function weaponKickImpulse(weapon){
-  // Visual/gun kick is intentionally stronger than view recoil. The camera
-  // follows the controllable recoil path while the weapon has a pronounced
-  // rearward impulse and return, as in modern CoD-style gun motion.
-  const base={pistol:1.28,assault:1.88,ump:1.30,shotgun:2.55,semiShotgun:2.08,sniper:2.78,grenadeLauncher:2.90,rpg:3.05}[weapon]??1.28;
-  const recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(weapon).recoilScale)||0)/100));
-  return base*recoilScale;
+function weaponVisualKickProfile(weapon=currentWeapon){
+  return ({
+    pistol:{impulse:1.72,stiffness:315,damping:28,maxTravel:.155,rear:1.02,lift:.24,pitch:.58,yaw:.010,roll:.014,adsRear:.90,actionMs:92},
+    assault:{impulse:2.28,stiffness:205,damping:20,maxTravel:.225,rear:1.18,lift:.29,pitch:.72,yaw:.008,roll:.012,adsRear:.94,actionMs:62},
+    ump:{impulse:1.56,stiffness:325,damping:28,maxTravel:.155,rear:.96,lift:.17,pitch:.43,yaw:.006,roll:.009,adsRear:.90,actionMs:48},
+    shotgun:{impulse:3.05,stiffness:165,damping:18,maxTravel:.270,rear:1.30,lift:.40,pitch:1.02,yaw:.010,roll:.016,adsRear:.95,actionMs:115},
+    semiShotgun:{impulse:2.52,stiffness:205,damping:21,maxTravel:.225,rear:1.18,lift:.32,pitch:.82,yaw:.009,roll:.014,adsRear:.94,actionMs:88},
+    akimbo1887:{impulse:1.18,stiffness:245,damping:23,maxTravel:.160,rear:.78,lift:.12,pitch:.20,yaw:0,roll:0,adsRear:1,actionMs:120},
+    sniper:{impulse:3.42,stiffness:140,damping:17,maxTravel:.295,rear:1.42,lift:.42,pitch:1.08,yaw:.008,roll:.012,adsRear:.96,actionMs:130},
+    grenadeLauncher:{impulse:3.15,stiffness:155,damping:18,maxTravel:.285,rear:1.35,lift:.34,pitch:.94,yaw:.006,roll:.010,adsRear:.96,actionMs:140},
+    rpg:{impulse:3.38,stiffness:135,damping:16,maxTravel:.305,rear:1.40,lift:.35,pitch:.92,yaw:.004,roll:.008,adsRear:.97,actionMs:150},
+  })[weapon]||{impulse:1.6,stiffness:250,damping:23,maxTravel:.18,rear:1,lift:.22,pitch:.55,yaw:.008,roll:.012,adsRear:.92,actionMs:80};
 }
-function addWeaponKick(weapon){weaponKickVelocity=Math.min(5.20,weaponKickVelocity+weaponKickImpulse(weapon));}
+function weaponKickImpulse(weapon){
+  const profile=weaponVisualKickProfile(weapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(weapon).recoilScale)||0)/100));
+  return profile.impulse*recoilScale;
+}
+function addWeaponKick(weapon){const profile=weaponVisualKickProfile(weapon);weaponKickVelocity=Math.min(7.2,weaponKickVelocity+weaponKickImpulse(weapon));weaponKickZ=Math.min(profile.maxTravel,weaponKickZ);}
 function updateWeaponKick(dt){
-  // Small fixed substeps keep the visual gun spring consistent across 30/60/120 Hz.
-  // A damped return gives visible rearward/forward travel without changing aim.
-  let remaining=Math.min(.05,Math.max(0,Number(dt)||0));const stiffness=220,damping=23;
-  while(remaining>.000001){const step=Math.min(1/120,remaining);weaponKickVelocity+=(-stiffness*weaponKickZ-damping*weaponKickVelocity)*step;weaponKickZ+=weaponKickVelocity*step;weaponKickZ=THREE.MathUtils.clamp(weaponKickZ,-.028,.225);remaining-=step;}
+  // Each weapon gets its own return-to-battery timing. This only moves the
+  // viewmodel; gameplay recoil remains in the authoritative aim path.
+  const profile=weaponVisualKickProfile(currentWeapon);let remaining=Math.min(.05,Math.max(0,Number(dt)||0));
+  while(remaining>.000001){const step=Math.min(1/120,remaining);weaponKickVelocity+=(-profile.stiffness*weaponKickZ-profile.damping*weaponKickVelocity)*step;weaponKickZ+=weaponKickVelocity*step;weaponKickZ=THREE.MathUtils.clamp(weaponKickZ,-.025,profile.maxTravel);remaining-=step;}
   if(Math.abs(weaponKickZ)<.00005&&Math.abs(weaponKickVelocity)<.001){weaponKickZ=0;weaponKickVelocity=0;}
+}
+function weaponActionPulse(weapon=currentWeapon,now=performance.now()){
+  const ms=weaponVisualKickProfile(weapon).actionMs,elapsed=now-(lastLocalShotAt||0);if(elapsed<0||elapsed>=ms)return 0;const p=elapsed/Math.max(1,ms);return Math.sin(Math.PI*p);
 }
 function registerLocalShotHeat(weapon,now){
   const previousAt=localShotHeatAt[weapon]||0,automatic=automaticRecoilActive(weapon),freshBurst=automatic&&(localRecoilStep[weapon]??-1)<0,firstShot=automatic?freshBurst:(!previousAt||now-previousAt>420),heat=weaponHeatAfterDelay(weapon,localShotHeat[weapon]||0,previousAt?now-previousAt:0);
@@ -3354,7 +3412,7 @@ function akimbo1887CycleState(startedAt,now,side){
   const p=THREE.MathUtils.clamp((now-startedAt)/AKIMBO_1887_CYCLE_MS,0,1);
   if(p>=1)return{active:false,p:1,kick:0,spin:0,lever:0,lift:0};
   const kickP=THREE.MathUtils.clamp(p/.17,0,1),spinP=smoothstep01((p-.09)/.73),actionP=THREE.MathUtils.clamp((p-.06)/.55,0,1);
-  return{active:true,p,kick:Math.sin(Math.PI*kickP),spin:(side==='left'?-1:1)*Math.PI*2*spinP,lever:Math.sin(Math.PI*actionP)*1.02,lift:Math.sin(Math.PI*spinP)*.065};
+  return{active:true,p,kick:Math.sin(Math.PI*kickP),spin:Math.PI*2*spinP,lever:Math.sin(Math.PI*actionP)*1.02,lift:Math.sin(Math.PI*spinP)*.065};
 }
 function updateWeaponView(dt){
   const now=performance.now();
@@ -3362,7 +3420,7 @@ function updateWeaponView(dt){
   const kickAds=smoothstep01(adsBlend),sightLock=weaponUsesIronSights(currentWeapon)?kickAds:0;updateWeaponKick(dt);
   // Keep the fore/aft recoil the user can feel, but do not throw the iron sight
   // sideways or rotate it away from the authoritative camera/bullet ray.
-  const kickZ=weaponKickZ*THREE.MathUtils.lerp(1,.92,kickAds),kickLift=weaponKickZ*THREE.MathUtils.lerp(.34,0,sightLock),kickStep=Math.max(0,localRecoilStep[currentWeapon]??0),kickSide=Math.sin((kickStep+1)*1.91+WEAPON_ORDER.indexOf(currentWeapon)*.73),kickPitch=weaponKickZ*THREE.MathUtils.lerp(.70,0,sightLock),kickYaw=weaponKickZ*kickSide*THREE.MathUtils.lerp(.025,0,sightLock),kickRoll=weaponKickZ*kickSide*THREE.MathUtils.lerp(.030,0,sightLock);
+  const kickProfile=weaponVisualKickProfile(currentWeapon),kickZ=weaponKickZ*kickProfile.rear*THREE.MathUtils.lerp(1,kickProfile.adsRear,kickAds),kickLift=weaponKickZ*kickProfile.lift*THREE.MathUtils.lerp(1,0,sightLock),kickStep=Math.max(0,localRecoilStep[currentWeapon]??0),kickSide=Math.sin((kickStep+1)*1.91+WEAPON_ORDER.indexOf(currentWeapon)*.73),kickPitch=weaponKickZ*kickProfile.pitch*THREE.MathUtils.lerp(1,0,sightLock),kickYaw=weaponKickZ*kickSide*kickProfile.yaw*THREE.MathUtils.lerp(1,0,sightLock),kickRoll=weaponKickZ*kickSide*kickProfile.roll*THREE.MathUtils.lerp(1,0,sightLock),actionPulse=weaponActionPulse(currentWeapon,now);
   const moving=hp>0&&onGround?THREE.MathUtils.clamp(localMoveAmount,0,1):0;if(moving>.03)moveBobPhase+=dt*(adsWanted?7.5:11.5)*(0.55+moving*.65);else moveBobPhase+=dt*1.8;
   landingKick=Math.max(0,landingKick-dt*4.2);const bobScale=moving*THREE.MathUtils.lerp(adsWanted?.18:1,.015,sightLock),bobX=Math.sin(moveBobPhase)*.018*bobScale,bobY=Math.abs(Math.cos(moveBobPhase))*-.016*bobScale;
   const jumpSpeed=Math.sqrt(2*worldSettings.movement.gravity*worldSettings.movement.jumpHeight),jumpNorm=onGround?0:THREE.MathUtils.clamp(verticalVelocity/Math.max(.1,jumpSpeed),-1,1),sightMotion=1-sightLock*.94,jumpY=(onGround?0:(jumpNorm>0?-.035:.025))*sightMotion,landY=-Math.sin(landingKick*Math.PI)*.055*sightMotion;
@@ -3378,8 +3436,8 @@ function updateWeaponView(dt){
   pistolGroup.position.set(THREE.MathUtils.lerp(.33,-pistolTip.x,a)+ironCommonX,THREE.MathUtils.lerp(-.25,-pistolTip.y,a)+ironCommonY,THREE.MathUtils.lerp(-.67,-.54,a)+kickZ+commonZ);pistolGroup.rotation.set(THREE.MathUtils.lerp(-.08,0,a)+reloadCurve*.18+kickPitch,THREE.MathUtils.lerp(-.08,0,a)-reloadCurve*.18+kickYaw,-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
   if(akimboLeftGroup&&akimboRightGroup){
     const left=akimbo1887CycleState(akimboLeftCycleStartedAt,now,'left'),right=akimbo1887CycleState(akimboRightCycleStartedAt,now,'right'),akReload=reloading&&currentWeapon==='akimbo1887'?reloadCurve:0;
-    if(left.active&&left.p>=.28&&!akimboCycleSoundPlayed.left){akimboCycleSoundPlayed.left=true;playSoundCue('shotgunPump',.86,{playbackRate:1.04,pan:-.42});}
-    if(right.active&&right.p>=.28&&!akimboCycleSoundPlayed.right){akimboCycleSoundPlayed.right=true;playSoundCue('shotgunPump',.86,{playbackRate:1.04,pan:.42});}
+    if(left.active&&left.p>=.28&&!akimboCycleSoundPlayed.left){akimboCycleSoundPlayed.left=true;playSoundCue('action1887',.90,{playbackRate:.99+Math.random()*.02,pan:-.42});}
+    if(right.active&&right.p>=.28&&!akimboCycleSoundPlayed.right){akimboCycleSoundPlayed.right=true;playSoundCue('action1887',.90,{playbackRate:.99+Math.random()*.02,pan:.42});}
     akimboLeftGroup.position.set(-.40+commonX*.42,-.32+commonY*.50-akReload*.18+left.lift,-.72+commonZ+left.kick*.18);
     akimboRightGroup.position.set(.40+commonX*.42,-.32+commonY*.50-akReload*.18+right.lift,-.72+commonZ+right.kick*.18);
     akimboLeftGroup.rotation.set(-.08+left.spin+akReload*.18,.18,-.035-akReload*.24);
@@ -3394,11 +3452,18 @@ function updateWeaponView(dt){
   sniperGroup.position.set(THREE.MathUtils.lerp(.28,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.18,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);sniperGroup.rotation.set(THREE.MathUtils.lerp(-.055,0,a)+reloadCurve*.10+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.65-swapRoll-deathRoll-mobilityRoll+kickRoll);
   grenadeLauncherGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.20,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);grenadeLauncherGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+GRENADE_LAUNCH_PITCH+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
   rpgGroup.position.set(THREE.MathUtils.lerp(.34,.10,a)+commonX,THREE.MathUtils.lerp(-.16,-.105,a)+commonY,THREE.MathUtils.lerp(-.46,-.405,a)+kickZ+commonZ);rpgGroup.rotation.set(THREE.MathUtils.lerp(-.025,-.008,a)+reloadCurve*.11+kickPitch,THREE.MathUtils.lerp(-.07,-.018,a)-reloadCurve*.10+kickYaw,THREE.MathUtils.lerp(.015,0,a)-reloadRoll*.6-swapRoll-deathRoll-mobilityRoll+kickRoll);
-  if(pistolMag)pistolMag.position.y=-.25-(reloading&&currentWeapon==='pistol'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.18)/.62,0,1))*.20:0);
-  if(assaultMag)assaultMag.position.y=-.20-(reloading&&currentWeapon==='assault'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.28:0);
-  if(umpMag)umpMag.position.y=-.22-(reloading&&currentWeapon==='ump'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.26:0);
-  if(semiShotgunMag)semiShotgunMag.position.y=-.17-(reloading&&currentWeapon==='semiShotgun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.22:0);
-  if(sniperBolt)sniperBolt.position.z=-.12+(reloading&&currentWeapon==='sniper'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.20)/.55,0,1))*.18:0);
+  // Mechanical cycling is separate from recoil: slide/bolt motion gives the shot
+  // visible life without changing the sight/bullet ray.
+  if(pistolGroup.userData.cyclePart)pistolGroup.userData.cyclePart.position.z=pistolGroup.userData.cycleBaseZ+pistolGroup.userData.cycleTravel*(currentWeapon==='pistol'?actionPulse:0);
+  if(assaultGroup.userData.cyclePart)assaultGroup.userData.cyclePart.position.z=assaultGroup.userData.cycleBaseZ+assaultGroup.userData.cycleTravel*(currentWeapon==='assault'?actionPulse:0);
+  if(umpGroup.userData.cyclePart)umpGroup.userData.cyclePart.position.z=umpGroup.userData.cycleBaseZ+umpGroup.userData.cycleTravel*(currentWeapon==='ump'?actionPulse:0);
+  if(semiShotgunGroup.userData.cyclePart)semiShotgunGroup.userData.cyclePart.position.z=semiShotgunGroup.userData.cycleBaseZ+semiShotgunGroup.userData.cycleTravel*(currentWeapon==='semiShotgun'?actionPulse:0);
+  if(sniperGroup.userData.cyclePart)sniperGroup.userData.cyclePart.position.z=sniperGroup.userData.cycleBaseZ+sniperGroup.userData.cycleTravel*(currentWeapon==='sniper'?actionPulse:0);
+  if(pistolMag)pistolMag.position.y=-.245-(reloading&&currentWeapon==='pistol'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.18)/.62,0,1))*.20:0);
+  if(assaultMag)assaultMag.position.y=-.19-(reloading&&currentWeapon==='assault'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.28:0);
+  if(umpMag)umpMag.position.y=-.20-(reloading&&currentWeapon==='ump'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.26:0);
+  if(semiShotgunMag)semiShotgunMag.position.y=-.14-(reloading&&currentWeapon==='semiShotgun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.22:0);
+  if(sniperBolt)sniperBolt.position.z=-.06+(currentWeapon==='sniper'?actionPulse*.085:0)+(reloading&&currentWeapon==='sniper'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.20)/.55,0,1))*.18:0);
   const traversalViewActive=!!traversePoseNow;sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&adsBlend<.94;shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';
   if(shotgunPump){
     let pumpOffset=reloading&&currentWeapon==='shotgun'?Math.sin(Math.PI*reloadP)*.10:0;
@@ -3725,7 +3790,7 @@ function stopIntroMusic(){if(introMusicHandle){introMusicHandle.stop();introMusi
 
 
 function weaponShotSoundId(weapon='pistol'){
-  return weapon==='assault'?'shotAssault':weapon==='ump'?'shotUmp':(weapon==='shotgun'||weapon==='akimbo1887')?'shotShotgun':weapon==='semiShotgun'?'shotSemiShotgun':weapon==='sniper'?'shotSniper':weapon==='grenadeLauncher'?'shotGl':weapon==='rpg'?'shotRpg':'shotPistol';
+  return weapon==='assault'?'shotAssault':weapon==='ump'?'shotUmp':weapon==='akimbo1887'?'shot1887':weapon==='shotgun'?'shotShotgun':weapon==='semiShotgun'?'shotSemiShotgun':weapon==='sniper'?'shotSniper':weapon==='grenadeLauncher'?'shotGl':weapon==='rpg'?'shotRpg':'shotPistol';
 }
 function weaponShotVariation(weapon='pistol'){
   const spread=(weapon==='assault'||weapon==='ump') ? .016 : (weapon==='shotgun'||weapon==='semiShotgun'||weapon==='akimbo1887') ? .010 : .006;
@@ -3733,7 +3798,7 @@ function weaponShotVariation(weapon='pistol'){
 }
 function soundShot(weapon='pistol',hand='right'){const v=weaponShotVariation(weapon),pan=weapon==='akimbo1887'?(hand==='left'?-0.42:.42):0;playSoundCue(weaponShotSoundId(weapon),v.volume,{playbackRate:v.playbackRate*(weapon==='akimbo1887'?1.04:1),pan});}
 function reloadSoundId(weapon=currentWeapon){
-  return weapon==='assault'?'reloadAssault':weapon==='ump'?'reloadUmp':(weapon==='shotgun'||weapon==='akimbo1887')?'reloadShotgun':weapon==='semiShotgun'?'reloadSemiShotgun':weapon==='sniper'?'reloadSniper':weapon==='grenadeLauncher'?'reloadGl':weapon==='rpg'?'reloadRpg':'reloadPistol';
+  return weapon==='assault'?'reloadAssault':weapon==='ump'?'reloadUmp':weapon==='akimbo1887'?'reload1887':weapon==='shotgun'?'reloadShotgun':weapon==='semiShotgun'?'reloadSemiShotgun':weapon==='sniper'?'reloadSniper':weapon==='grenadeLauncher'?'reloadGl':weapon==='rpg'?'reloadRpg':'reloadPistol';
 }
 function soundReload(weapon=currentWeapon){playSoundCue(reloadSoundId(weapon),1,{playbackRate:.99+Math.random()*.02});}
 function soundHitmarker(){playSoundCue('hitmarker');}
