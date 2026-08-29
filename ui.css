@@ -102,7 +102,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.39.3: one owner for layout, density, overflow and responsive behavior. */
+/* Breach UI contract v1.40.0: one owner for layout, density, overflow and responsive behavior. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -443,7 +443,7 @@ body{font-size:var(--ui-md)}
 .attachment-choice small{display:block;margin-top:2px;color:#76818a;font:700 7.5px/1.05 system-ui}.attachment-choice.active small{color:#9eae72}
 @media (max-width:700px) and (orientation:landscape){.attachment-editor{grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:5px}.attachment-slot{padding:5px}.attachment-choice{min-height:31px;font-size:8px}.attachment-choice small{display:none}}
 
-/* v1.39.3 focused loadout workspace: the selected weapon is the subject. */
+/* v1.40.0 focused loadout workspace: the selected weapon is the subject. */
 .loadout-workspace{display:grid!important;grid-template-columns:1fr;align-content:start;gap:7px;min-width:0}
 .loadout-weapon-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px;padding:3px;border:1px solid var(--line);border-radius:8px;background:rgba(0,0,0,.20)}
 .loadout-weapon-tab{height:38px;min-width:0;padding:4px 9px;border:1px solid transparent;border-radius:6px;background:transparent;color:var(--dim);text-align:left;display:grid;align-content:center;gap:1px}
