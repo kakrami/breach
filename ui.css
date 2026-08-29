@@ -78,7 +78,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.43.0: one owner for layout, density, overflow and responsive behavior. */
+/* Breach UI contract v1.43.1: one owner for layout, density, overflow and responsive behavior. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -407,8 +407,9 @@ body{font-size:var(--ui-md)}
 /* Controller navigation: focus follows the rendered spatial layout, not DOM order. */
 [data-input-mode="controller"] .controller-focus{position:relative;z-index:5}
 [data-input-mode="controller"] .controller-focus.lobby-admin-toggle,[data-input-mode="controller"] .controller-focus.toggle-control{outline-offset:2px!important}
-/* v1.43.0 Create-a-Class hierarchy and CoD-style Gunsmith density. */
+/* v1.43.1 Create-a-Class hierarchy and CoD-style Gunsmith density. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
+.lobby-side-view.lobby-loadout-view.active{overflow:hidden}.lobby-loadout-view.active .lobby-loadout-panel{height:100%!important;min-height:0!important;overflow:hidden!important;display:grid!important;grid-template-rows:minmax(0,1fr)!important}.lobby-loadout-view.active .class-flow-workspace{height:100%!important;min-height:0!important;overflow:hidden!important}
 .loadout-classes-view,.loadout-class-view,.loadout-item-view{height:100%;min-width:0;min-height:0;overflow:hidden}.loadout-classes-view[hidden],.loadout-class-view[hidden],.loadout-item-view[hidden]{display:none!important}
 .loadout-classes-view{display:grid;grid-template-rows:auto minmax(0,1fr);gap:7px}.class-browser-head,.loadout-view-nav{display:flex;align-items:end;justify-content:space-between;gap:10px;padding:2px 3px 6px;border-bottom:1px solid rgba(255,255,255,.08)}.class-browser-head span,.loadout-view-nav span{display:block;color:#748089;font:900 8px/1 system-ui;letter-spacing:.11em}.class-browser-head h3,.loadout-view-nav h3{margin:3px 0 0;color:var(--text);font:950 18px/1 system-ui}.class-browser-head small{color:#7e8a92;font:750 9px/1 system-ui}.gunsmith-back{height:32px;padding:0 11px;border:1px solid var(--line);border-radius:6px;background:#0b1013;color:#aeb9bf;font:900 9px/1 system-ui;letter-spacing:.06em}.gunsmith-back:hover,.gunsmith-back:focus-visible{border-color:var(--line2);color:#fff}
 /* Five classes use the whole page: three across, then two wider cards below. */

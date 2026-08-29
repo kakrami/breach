@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.43.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.43.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.43.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.43.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.43.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.43.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.43.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.43.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.43.1';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.43.1';
+import * as YardGeometry from './world-geometry-yard.js?v=1.43.1';
+import * as RigGeometry from './world-geometry-rig.js?v=1.43.1';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.43.1';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.43.1';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.43.1';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.43.1';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.43.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.43.0';
-import { createAudioEngine } from './audio-engine.js?v=1.43.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.43.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.43.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.43.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.43.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.43.0';
+} from './game-config.js?v=1.43.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.43.1';
+import { createAudioEngine } from './audio-engine.js?v=1.43.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.43.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.43.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.43.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.43.1';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.43.1';
 
 let THREE = null;
 
@@ -287,20 +287,20 @@ function loadoutSlotWeapon(draft,slot){return slot==='primary'?draft.primaryWeap
 function loadoutSlotAttachments(draft,slot){return slot==='primary'?draft.primaryAttachments:draft.secondaryAttachments;}
 function loadoutDraftForSurface(surface){return normalizeLoadoutChoice(surface==='lobby'?(lobbyLoadoutDraft||selectedLoadout()):(loadoutDraft||loadoutBaseDraft||pendingLoadout||selectedLoadout()));}
 function loadoutMetricClamp(v){return Math.max(0,Math.min(100,Number(v)||0));}
-function loadoutControlScore(spec,accuracy=null,pelletWeapon=false){if(pelletWeapon&&accuracy){return loadoutMetricClamp(100-(Number(accuracy.hipDeg)||0)*9.5-(Number(accuracy.fireDeg)||0)*7);}const recoil=Math.max(.001,Number(spec.recoilPitch)||0)+Math.max(0,Number(spec.recoilYaw)||0)*1.35;return loadoutMetricClamp(106-recoil*2350);}
-function loadoutAccuracyScore(accuracy){const ads=Math.max(0,Number(accuracy?.adsDeg)||0),hip=Math.max(0,Number(accuracy?.hipDeg)||0),fire=Math.max(0,Number(accuracy?.fireDeg)||0),move=Math.max(0,Number(accuracy?.moveDeg)||0),spread=ads*3.8+hip*.18+fire*1.7+move*.10;return loadoutMetricClamp(100-spread*14);}
+function loadoutControlScore(spec,accuracy=null,pelletWeapon=false){const recoil=Math.max(.001,Number(spec.recoilPitch)||0)+Math.max(0,Number(spec.recoilYaw)||0)*1.35;return loadoutMetricClamp(106-recoil*(pelletWeapon?1100:2350));}
+function loadoutAccuracyScore(accuracy,pelletWeapon=false){const ads=Math.max(0,Number(accuracy?.adsDeg)||0),hip=Math.max(0,Number(accuracy?.hipDeg)||0),fire=Math.max(0,Number(accuracy?.fireDeg)||0),move=Math.max(0,Number(accuracy?.moveDeg)||0);if(pelletWeapon){const spread=ads*1.6+hip*.8+fire*2+move*.25;return loadoutMetricClamp(100-spread*7);}const spread=ads*3.8+hip*.18+fire*1.7+move*.10;return loadoutMetricClamp(100-spread*14);}
 function loadoutMobilityScore(spec){const adsMove=Math.max(.5,Math.min(1,Number(spec.adsMoveSpeedScale)||1)),sprint=Math.max(80,Math.min(350,Number(spec.sprintOutMs)||180));return loadoutMetricClamp(adsMove*72+(1-(sprint-80)/270)*28);}
 function loadoutHandlingScore(spec){const ads=Math.max(0,Math.min(420,Number(spec.adsInMs)||0)),reload=Math.max(500,Math.min(4000,Number(spec.reloadMs)||1500));return loadoutMetricClamp((1-ads/420)*68+(1-(reload-500)/3500)*32);}
 function loadoutWeaponStats(weapon,attachments,comparisonAttachments={}){
-  const spec=resolveWeaponSpec(weapon,attachments),compare=resolveWeaponSpec(weapon,comparisonAttachments),pellets=Math.max(1,Number(spec.pellets)||1),accuracy=resolveWeaponAccuracy(weapon,attachments),compareAccuracy=resolveWeaponAccuracy(weapon,comparisonAttachments),pelletWeapon=pellets>1,control=loadoutControlScore(spec,accuracy,pelletWeapon),compareControl=loadoutControlScore(compare,compareAccuracy,pelletWeapon),accuracyScore=loadoutAccuracyScore(accuracy),compareAccuracyScore=loadoutAccuracyScore(compare);
+  const spec=resolveWeaponSpec(weapon,attachments),compare=resolveWeaponSpec(weapon,comparisonAttachments),pellets=Math.max(1,Number(spec.pellets)||1),accuracy=resolveWeaponAccuracy(weapon,attachments),compareAccuracy=resolveWeaponAccuracy(weapon,comparisonAttachments),pelletWeapon=pellets>1,control=loadoutControlScore(spec,accuracy,pelletWeapon),compareControl=loadoutControlScore(compare,compareAccuracy,pelletWeapon),accuracyScore=loadoutAccuracyScore(accuracy,pelletWeapon),compareAccuracyScore=loadoutAccuracyScore(compareAccuracy,pelletWeapon),mobility=loadoutMobilityScore(spec),compareMobility=loadoutMobilityScore(compare),handling=loadoutHandlingScore(spec),compareHandling=loadoutHandlingScore(compare);
   const damageValue=pellets>1?`${Math.round(spec.damage)}×${pellets}`:`${Math.round(spec.damage)}`,compareDamageValue=pellets>1?`${Math.round(compare.damage)}×${pellets}`:`${Math.round(compare.damage)}`;
   return[
     {label:'DAMAGE',value:damageValue,baseValue:compareDamageValue,score:loadoutMetricClamp((Number(spec.damage)||0)*(pellets>1?2.1:1.65)),baseScore:loadoutMetricClamp((Number(compare.damage)||0)*(pellets>1?2.1:1.65))},
     {label:'RANGE',value:`${Math.round(spec.falloffEnd||0)}M`,baseValue:`${Math.round(compare.falloffEnd||0)}M`,score:loadoutMetricClamp((Number(spec.falloffEnd)||0)/2.2),baseScore:loadoutMetricClamp((Number(compare.falloffEnd)||0)/2.2)},
     {label:'ACCURACY',value:`${Math.round(accuracyScore)}`,baseValue:`${Math.round(compareAccuracyScore)}`,score:accuracyScore,baseScore:compareAccuracyScore},
     {label:'CONTROL',value:`${Math.round(control)}`,baseValue:`${Math.round(compareControl)}`,score:control,baseScore:compareControl},
-    {label:'MOBILITY',value:`${Math.round(loadoutMobilityScore(spec))}`,baseValue:`${Math.round(loadoutMobilityScore(compare))}`,score:loadoutMobilityScore(spec),baseScore:loadoutMobilityScore(compare)},
-    {label:'HANDLING',value:`${Math.round(spec.adsInMs||0)}MS`,baseValue:`${Math.round(compare.adsInMs||0)}MS`,score:loadoutHandlingScore(spec),baseScore:loadoutHandlingScore(compare)},
+    {label:'MOBILITY',value:`${Math.round(mobility)}`,baseValue:`${Math.round(compareMobility)}`,score:mobility,baseScore:compareMobility},
+    {label:'HANDLING',value:`${Math.round(handling)}`,baseValue:`${Math.round(compareHandling)}`,score:handling,baseScore:compareHandling},
     {label:'MAGAZINE',value:`${Math.round(spec.mag||0)} ROUNDS`,baseValue:`${Math.round(compare.mag||0)} ROUNDS`,score:0,baseScore:0,capacity:true},
   ];
 }
@@ -608,7 +608,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.43.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.43.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
