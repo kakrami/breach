@@ -78,7 +78,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.42.2: one owner for layout, density, overflow and responsive behavior. */
+/* Breach UI contract v1.43.0: one owner for layout, density, overflow and responsive behavior. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -407,258 +407,32 @@ body{font-size:var(--ui-md)}
 /* Controller navigation: focus follows the rendered spatial layout, not DOM order. */
 [data-input-mode="controller"] .controller-focus{position:relative;z-index:5}
 [data-input-mode="controller"] .controller-focus.lobby-admin-toggle,[data-input-mode="controller"] .controller-focus.toggle-control{outline-offset:2px!important}
-/* v1.42.2 hierarchical Create-a-Class / weapon-anchored Gunsmith. */
+/* v1.43.0 Create-a-Class hierarchy and CoD-style Gunsmith density. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
 .loadout-classes-view,.loadout-class-view,.loadout-item-view{height:100%;min-width:0;min-height:0;overflow:hidden}.loadout-classes-view[hidden],.loadout-class-view[hidden],.loadout-item-view[hidden]{display:none!important}
-.loadout-classes-view{display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px}.class-browser-head,.loadout-view-nav{display:flex;align-items:end;justify-content:space-between;gap:10px;padding:2px 3px 6px;border-bottom:1px solid rgba(255,255,255,.08)}.class-browser-head span,.loadout-view-nav span{display:block;color:#748089;font:900 7px/1 system-ui;letter-spacing:.11em}.class-browser-head h3,.loadout-view-nav h3{margin:3px 0 0;color:var(--text);font:950 16px/1 system-ui}.class-browser-head small{color:#7e8a92;font:750 7.5px/1 system-ui}.gunsmith-back{height:30px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:#0b1013;color:#aeb9bf;font:900 8px/1 system-ui;letter-spacing:.06em}.gunsmith-back:hover,.gunsmith-back:focus-visible{border-color:var(--line2);color:#fff}
-.loadout-class-list{min-height:0;display:grid;grid-template-rows:repeat(5,minmax(0,1fr));gap:4px;overflow:hidden}.loadout-class-card{min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 34px;border:1px solid rgba(255,255,255,.08);border-radius:7px;background:linear-gradient(90deg,rgba(15,21,25,.96),rgba(7,10,12,.92));overflow:hidden}.loadout-class-card.selected{border-color:rgba(215,255,88,.36)}.loadout-class-card.equipped{box-shadow:inset 3px 0 0 rgba(215,255,88,.58)}.loadout-class-card.pending{box-shadow:inset 3px 0 0 #e1b965}.loadout-class-main{min-width:0;height:100%;padding:5px 8px;border:0;background:transparent;color:#dce5e9;text-align:left;display:grid;grid-template-columns:minmax(110px,.75fr) minmax(0,1.7fr) auto;align-items:center;gap:8px}.loadout-class-main:hover,.loadout-class-main:focus-visible{background:rgba(255,255,255,.035)}.loadout-class-card-head{min-width:0}.loadout-class-card-head strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:950 9px/1 system-ui}.loadout-class-card-head span{display:block;min-height:7px;margin-top:3px;color:var(--accent);font:900 5.5px/1 system-ui;letter-spacing:.08em}.loadout-class-card.dirty:not(.equipped):not(.pending) .loadout-class-card-head span{color:#e1b965}.loadout-class-weapons{min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.loadout-class-weapons span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#c5d0d5;font:850 7px/1 system-ui}.loadout-class-weapons b{display:block;margin-bottom:2px;color:#68757d;font:900 5.5px/1 system-ui;letter-spacing:.08em}.loadout-class-main>small{color:#7c8991;font:850 6px/1 system-ui;white-space:nowrap}.loadout-class-rename{width:34px;height:100%;padding:0;border:0;border-left:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.018);color:#78858d;font:900 13px/1 system-ui}.loadout-class-rename:hover,.loadout-class-rename:focus-visible{background:#182018;color:var(--accent)}
-.loadout-class-view{display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px}.loadout-view-nav{justify-content:flex-start;align-items:center}.loadout-view-nav>div{min-width:0}.class-detail-grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:minmax(0,1.25fr) minmax(0,.75fr);gap:7px}.class-item-card{position:relative;min-width:0;min-height:0;padding:10px 12px;border:1px solid rgba(255,255,255,.09);border-radius:9px;background:radial-gradient(circle at 78% 35%,rgba(92,108,114,.13),transparent 42%),#0b1013;color:#dce5e9;text-align:left;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;gap:5px}.class-item-card:hover,.class-item-card:focus-visible{border-color:rgba(215,255,88,.42);background-color:#101712}.class-item-card>span{color:#718089;font:950 7px/1 system-ui;letter-spacing:.10em}.class-item-card>strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:950 16px/1 system-ui}.class-item-card>small{color:#87949b;font:750 7.5px/1.2 system-ui}.class-item-card>i{align-self:end;color:var(--accent);font:950 7px/1 system-ui;letter-spacing:.08em;font-style:normal}.class-item-equipment>strong{font-size:13px}
-.loadout-item-view{display:grid;grid-template-rows:auto minmax(0,1fr);gap:5px}.item-view-nav{justify-content:flex-start}.loadout-item-pages{min-height:0;overflow:hidden}.loadout-weapon-page,.loadout-equipment-page{height:100%;min-width:0;min-height:0}.loadout-weapon-page[hidden],.loadout-equipment-page[hidden]{display:none!important}.gunsmith-layout{height:100%;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1.65fr) minmax(220px,.65fr);gap:6px}.gunsmith-weapon-column,.gunsmith-inspector{min-width:0;min-height:0;border:1px solid var(--line);border-radius:8px;background:linear-gradient(150deg,rgba(16,22,26,.96),rgba(6,9,11,.92));overflow:hidden}.gunsmith-weapon-column{display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:4px;padding:5px}.loadout-focus-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0}.loadout-focus-head>div:first-child{min-width:0}.loadout-focus-head span{display:block;color:#748089;font:900 6.5px/1 system-ui;letter-spacing:.10em}.loadout-focus-head h3{margin:2px 0 1px;color:var(--text);font:950 14px/1 system-ui}.loadout-focus-head small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#89959d;font:750 7px/1.1 system-ui}.gunsmith-head-actions{display:flex;align-items:center;gap:5px;flex:none}.gunsmith-head-actions>strong{color:var(--accent);font:950 7px/1 system-ui;letter-spacing:.04em}.gunsmith-change-weapon{height:25px;padding:0 7px;border:1px solid rgba(255,255,255,.10);border-radius:5px;background:#0d1316;color:#9aa6ad;font:900 6px/1 system-ui;letter-spacing:.06em}.gunsmith-change-weapon:hover,.gunsmith-change-weapon:focus-visible{border-color:rgba(215,255,88,.42);color:var(--accent)}
-.loadout-focus-stage{position:relative;min-width:0;min-height:0;overflow:hidden;border:1px solid rgba(255,255,255,.06);border-radius:8px;background:radial-gradient(circle at 50% 52%,rgba(95,112,118,.20),rgba(3,5,6,.75) 62%),linear-gradient(180deg,rgba(25,31,34,.62),rgba(5,8,9,.86))}.loadout-focus-stage:after{content:"";position:absolute;left:10%;right:10%;bottom:13%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);pointer-events:none}.loadout-focus-stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.loadout-focus-stage canvas:active{cursor:grabbing}.loadout-preview-hint{position:absolute;left:7px;bottom:6px;color:#637078;font:800 5.8px/1 system-ui;letter-spacing:.07em;pointer-events:none}.gunsmith-ads-preview{position:absolute;right:6px;bottom:5px;width:34px;height:25px;padding:0;border:1px solid rgba(215,255,88,.30);border-radius:6px;background:rgba(9,13,16,.88);color:#aab67f;font:950 7px/1 system-ui;letter-spacing:.05em;touch-action:none;z-index:5}.gunsmith-ads-preview:active,.gunsmith-ads-preview.active{border-color:var(--accent);background:#1b2419;color:var(--accent)}
-.gunsmith-callout-overlay{position:absolute;inset:0;z-index:4;pointer-events:none;transition:opacity .12s ease}.gunsmith-callout-overlay.ads-hidden{opacity:0}.gunsmith-callout-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}.gunsmith-callout-lines line{stroke:rgba(191,205,211,.58);stroke-width:1;vector-effect:non-scaling-stroke}.gunsmith-callout-lines circle{fill:#c6d4d9;stroke:#11181b;stroke-width:1;vector-effect:non-scaling-stroke}.gunsmith-callout{position:absolute;min-width:58px;max-width:82px;padding:4px 5px;border:1px solid rgba(255,255,255,.12);border-radius:5px;background:rgba(8,12,14,.90);color:#8d9aa2;text-align:left;pointer-events:auto;display:grid;gap:2px}.gunsmith-callout span{font:950 5.5px/1 system-ui;letter-spacing:.07em}.gunsmith-callout strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d6e0e4;font:900 6.5px/1 system-ui}.gunsmith-callout.active{border-color:var(--accent);background:#182018}.gunsmith-callout.active span,.gunsmith-callout.active strong{color:var(--accent)}.gunsmith-callout.equipped:not(.active){border-color:rgba(215,255,88,.28)}.gunsmith-callout-optic{top:6%;right:4%}.gunsmith-callout-muzzle{top:18%;left:3%}.gunsmith-callout-barrel{top:51%;left:3%}.gunsmith-callout-magazine{left:35%;bottom:9%}.gunsmith-callout-underbarrel{right:19%;bottom:9%}.gunsmith-callout-stock{top:49%;right:3%}
-.loadout-stat-row{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px;min-width:0}.loadout-stat{min-width:0;padding:4px;border:1px solid rgba(255,255,255,.07);border-radius:5px;background:rgba(0,0,0,.20)}.loadout-stat-head{display:flex;align-items:center;justify-content:space-between;gap:2px}.loadout-stat-head span{color:#78848c;font:900 5.5px/1 system-ui;letter-spacing:.04em}.loadout-stat-head strong{color:#e5ecef;font:900 6px/1 system-ui;white-space:nowrap}.loadout-stat-delta{margin-top:2px;min-height:6px;color:#65717a;font:800 5.5px/1 system-ui}.loadout-stat.better .loadout-stat-delta{color:#b9d97e}.loadout-stat.worse .loadout-stat-delta{color:#d8a078}.loadout-stat-bar{height:2px;margin-top:2px;border-radius:2px;background:#252c30;overflow:hidden}.loadout-stat-bar i{display:block;height:100%;width:50%;background:#8f9ca4}.loadout-stat.better .loadout-stat-bar i{background:#b1cf78}.loadout-stat.worse .loadout-stat-bar i{background:#cb906e}
-.gunsmith-inspector{padding:6px;background:#090e11}.attachment-editor{height:100%;min-width:0;min-height:0;margin:0!important;padding:0!important;border:0!important;background:transparent!important;display:grid!important;grid-template-rows:auto minmax(0,1fr) auto;gap:5px;overflow:hidden}.attachment-editor[hidden]{display:none!important}.gunsmith-inspector-intro,.gunsmith-inspector-empty{height:100%;display:grid;place-content:center;gap:6px;padding:12px;text-align:center}.gunsmith-inspector-intro>span{color:#68757d;font:900 6px/1 system-ui;letter-spacing:.10em}.gunsmith-inspector-intro>strong,.gunsmith-inspector-empty>strong{color:#dce5e9;font:950 12px/1 system-ui}.gunsmith-inspector-intro p,.gunsmith-inspector-empty span{margin:0;color:#7d8991;font:750 7px/1.3 system-ui}.gunsmith-inspector-intro small{color:var(--accent);font:900 6px/1 system-ui;letter-spacing:.05em}.gunsmith-attachment-head{display:flex;align-items:center;justify-content:space-between;gap:5px;padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,.07)}.gunsmith-attachment-head span{display:block;color:#6f7b84;font:900 5.5px/1 system-ui;letter-spacing:.08em}.gunsmith-attachment-head strong{display:block;margin-top:2px;color:#dce5e9;font:950 11px/1 system-ui}.gunsmith-tray-close{width:25px;height:25px;padding:0;border:0;border-radius:5px;background:transparent;color:#7f8b93;font:900 16px/1 system-ui}.gunsmith-tray-close:hover,.gunsmith-tray-close:focus-visible{background:#1b2328;color:#fff}.gunsmith-attachment-options{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(42px,1fr);gap:4px;overflow:hidden}.gunsmith-attachment-option{min-width:0;padding:6px;border:1px solid rgba(255,255,255,.08);border-radius:6px;background:#0c1114;color:#cdd7dc;text-align:left;display:grid;align-content:center;gap:3px}.gunsmith-attachment-option strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:900 7px/1 system-ui}.gunsmith-attachment-option small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#748089;font:700 5.7px/1 system-ui}.gunsmith-attachment-option.active{border-color:var(--accent);background:#182018}.gunsmith-attachment-option.active strong{color:var(--accent)}.gunsmith-attachment-detail{min-height:48px;padding:6px;border:1px solid rgba(255,255,255,.07);border-radius:6px;background:#10161a;display:grid;align-content:center;gap:3px}.gunsmith-attachment-detail strong{color:#dfe7ea;font:900 7px/1 system-ui}.gunsmith-attachment-detail span{color:#7d8991;font:700 6px/1.2 system-ui}.gunsmith-effect-tags{display:flex;gap:3px;flex-wrap:wrap}.gunsmith-effect-tag{padding:2px 4px;border-radius:4px;background:#20282d;color:#aab6bd;font:850 5.3px/1 system-ui;letter-spacing:.03em}.gunsmith-effect-tag.good{background:#1a2418;color:#bcd989}.gunsmith-effect-tag.bad{background:#281c18;color:#d7a17e}
-.gunsmith-weapon-picker{height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);gap:5px}.gunsmith-weapon-picker[hidden]{display:none!important}.gunsmith-weapon-picker header{padding-bottom:5px;border-bottom:1px solid rgba(255,255,255,.07)}.gunsmith-weapon-picker header strong{display:block;color:#dce5e9;font:950 9px/1 system-ui}.gunsmith-weapon-picker header small{display:block;margin-top:2px;color:#6f7b84;font:750 6px/1 system-ui}.gunsmith-weapon-picker .loadout-choice-grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(38px,1fr);gap:4px;overflow:hidden}.gunsmith-weapon-picker .loadout-choice{min-width:0;min-height:0;padding:5px}.gunsmith-weapon-picker .loadout-choice strong{font-size:6.5px;line-height:1.05}
-.loadout-equipment-page{display:grid;place-items:center}.equipment-editor-card{width:min(620px,100%);height:min(230px,100%);padding:12px;border:1px solid var(--line);border-radius:9px;background:linear-gradient(150deg,rgba(16,22,26,.96),rgba(6,9,11,.92));display:grid;grid-template-rows:auto minmax(0,1fr);gap:10px}.equipment-editor-card header span{color:#718089;font:950 7px/1 system-ui;letter-spacing:.10em}.equipment-editor-card header h3{margin:4px 0 0;color:#e1e8eb;font:950 15px/1 system-ui}.equipment-choice-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:7px!important}.equipment-choice-grid .loadout-choice{min-height:0;height:100%;font-size:10px}
-.loadout-shell{width:min(1000px,100%);height:min(630px,100%)}.loadout-foot{min-height:43px}.class-flow-workspace[data-view="item"] + .loadout-foot{display:none}.lobby-loadout-panel>.lobby-section-head{display:none}
-@media (max-width:760px) and (orientation:landscape){.class-flow-workspace{padding:3px!important}.class-browser-head,.loadout-view-nav{padding:1px 2px 4px}.class-browser-head h3,.loadout-view-nav h3{font-size:12px}.class-browser-head small{font-size:6px}.loadout-class-list{gap:2px}.loadout-class-card{grid-template-columns:minmax(0,1fr) 28px;border-radius:5px}.loadout-class-main{padding:3px 5px;grid-template-columns:minmax(78px,.7fr) minmax(0,1.7fr) auto;gap:5px}.loadout-class-card-head strong{font-size:7px}.loadout-class-card-head span{margin-top:1px;font-size:4.8px}.loadout-class-weapons{gap:4px}.loadout-class-weapons span{font-size:5.8px}.loadout-class-weapons b{font-size:4.8px}.loadout-class-main>small{font-size:5px}.loadout-class-rename{width:28px;font-size:11px}.class-detail-grid{gap:4px}.class-item-card{padding:6px 8px;gap:3px}.class-item-card>strong{font-size:12px}.class-item-equipment>strong{font-size:10px}.gunsmith-back{height:26px;padding:0 7px}.gunsmith-layout{grid-template-columns:minmax(0,1.75fr) minmax(170px,.62fr);gap:3px}.gunsmith-weapon-column,.gunsmith-inspector{padding:3px}.loadout-focus-head h3{font-size:10px}.loadout-focus-head small{font-size:5.5px}.gunsmith-head-actions>strong{font-size:5.5px}.gunsmith-change-weapon{height:22px;padding:0 5px}.loadout-stat{padding:2px}.loadout-stat-delta{display:none}.loadout-stat-bar{display:none}.gunsmith-callout{min-width:48px;max-width:64px;padding:3px}.gunsmith-callout span{font-size:4.7px}.gunsmith-callout strong{font-size:5.5px}.gunsmith-attachment-head strong{font-size:9px}.gunsmith-attachment-options{gap:3px}.gunsmith-attachment-option{padding:3px;min-height:31px}.gunsmith-attachment-option strong{font-size:6px}.gunsmith-attachment-option small{font-size:5px}.gunsmith-attachment-detail{min-height:38px;padding:4px}.gunsmith-attachment-detail span{font-size:5.3px}.gunsmith-effect-tag{font-size:4.8px}.gunsmith-weapon-picker .loadout-choice-grid{gap:3px;grid-auto-rows:minmax(30px,1fr)}.equipment-editor-card{height:min(180px,100%);padding:8px}}
-@media (max-width:560px) and (orientation:landscape){.class-browser-head small{display:none}.loadout-class-main{grid-template-columns:minmax(70px,.8fr) minmax(0,1.5fr)}.loadout-class-main>small{display:none}.gunsmith-layout{grid-template-columns:minmax(0,1.75fr) 145px}.gunsmith-callout{min-width:42px;max-width:54px}.gunsmith-callout-underbarrel{right:14%}.gunsmith-attachment-detail span{display:none}.gunsmith-attachment-options{grid-template-columns:1fr}.gunsmith-attachment-option small{display:none}}
-@media (orientation:portrait){.lobby-loadout-panel{overflow:auto;display:block}.class-flow-workspace{height:auto;min-height:640px;overflow:auto!important}.loadout-classes-view,.loadout-class-view,.loadout-item-view{height:auto;overflow:visible}.loadout-class-list{grid-template-rows:repeat(5,72px)}.loadout-class-main{grid-template-columns:1fr}.loadout-class-weapons{display:none}.class-detail-grid{grid-template-columns:1fr;grid-template-rows:repeat(4,120px)}.gunsmith-layout{grid-template-columns:1fr;grid-template-rows:360px 300px}.loadout-stat-row{grid-template-columns:repeat(3,minmax(0,1fr))}.gunsmith-inspector{min-height:280px}}
-
-
-@media (max-width:480px) and (max-height:270px) and (orientation:landscape){
-  .lobby-side-view.lobby-loadout-view.active{overflow:hidden!important;overscroll-behavior:none}
-  .lobby-loadout-panel{height:100%!important;min-height:0!important;overflow:hidden!important;display:block!important}
-  .class-flow-workspace{height:100%!important;min-height:0!important;overflow:hidden!important;padding:2px!important}
-  .loadout-classes-view,.loadout-class-view,.loadout-item-view{height:100%!important;min-height:0!important;overflow:hidden!important}
-  .class-browser-head,.loadout-view-nav{padding:0 2px 2px}.class-browser-head h3,.loadout-view-nav h3{font-size:10px}.class-browser-head span,.loadout-view-nav span{font-size:5px}
-  .loadout-class-list{gap:1px}.loadout-class-main{padding:2px 4px}.loadout-class-card-head strong{font-size:6.5px}.loadout-class-weapons span{font-size:5.2px}.loadout-class-weapons b{font-size:4.4px}
-  .class-detail-grid{gap:2px}.class-item-card{padding:4px 6px}.class-item-card>strong{font-size:10px}.class-item-card>small{font-size:5.5px}
-  .gunsmith-layout{gap:2px}.gunsmith-weapon-column,.gunsmith-inspector{padding:2px}.loadout-preview-hint{display:none}.loadout-stat-row{gap:1px}.loadout-stat{padding:1px}.loadout-stat-head span{font-size:4.6px}.loadout-stat-head strong{font-size:5px}
-}
-
-
-/* v1.42.2 landscape loadout sizing: the lobby footer owns its row; Create-a-Class
-   owns only the bounded main area above it. Never fall back to lobby page scroll. */
-@media (orientation:landscape){
-  .lobby-side-view.lobby-loadout-view.active{
-    height:100%;min-height:0;overflow:hidden!important;overscroll-behavior:none;scrollbar-gutter:auto
-  }
-  .lobby-loadout-view.active .lobby-loadout-panel{
-    width:100%;height:100%!important;min-height:0!important;padding:0!important;overflow:hidden!important;display:block!important
-  }
-  .lobby-loadout-view.active .class-flow-workspace{
-    width:100%;height:100%!important;min-height:0!important;overflow:hidden!important
-  }
-}
-
-/* Class cards must never compress their text rows into each other. */
-.class-item-card{
-  display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;overflow:hidden
-}
-.class-item-card>i{margin-top:auto;align-self:flex-start}
-
-/* Attachment choices are allowed to shrink with the inspector instead of forcing
-   the inspector below the viewport. Current attachment categories top out at four choices. */
-.gunsmith-attachment-options{grid-auto-rows:minmax(0,1fr)}
-
-/* Height, not device width, is the real constraint in phone landscape. */
+.loadout-classes-view{display:grid;grid-template-rows:auto minmax(0,1fr);gap:7px}.class-browser-head,.loadout-view-nav{display:flex;align-items:end;justify-content:space-between;gap:10px;padding:2px 3px 6px;border-bottom:1px solid rgba(255,255,255,.08)}.class-browser-head span,.loadout-view-nav span{display:block;color:#748089;font:900 8px/1 system-ui;letter-spacing:.11em}.class-browser-head h3,.loadout-view-nav h3{margin:3px 0 0;color:var(--text);font:950 18px/1 system-ui}.class-browser-head small{color:#7e8a92;font:750 9px/1 system-ui}.gunsmith-back{height:32px;padding:0 11px;border:1px solid var(--line);border-radius:6px;background:#0b1013;color:#aeb9bf;font:900 9px/1 system-ui;letter-spacing:.06em}.gunsmith-back:hover,.gunsmith-back:focus-visible{border-color:var(--line2);color:#fff}
+/* Five classes use the whole page: three across, then two wider cards below. */
+.loadout-class-list{min-height:0;display:grid;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:7px;overflow:hidden}.loadout-class-card{position:relative;min-width:0;min-height:0;border:1px solid rgba(255,255,255,.09);border-radius:9px;background:radial-gradient(circle at 82% 28%,rgba(91,109,116,.13),transparent 42%),linear-gradient(145deg,rgba(16,22,26,.97),rgba(7,10,12,.94));overflow:hidden}.loadout-class-card:nth-child(-n+3){grid-column:span 2}.loadout-class-card:nth-child(n+4){grid-column:span 3}.loadout-class-card.selected{border-color:rgba(215,255,88,.42)}.loadout-class-card.equipped{box-shadow:inset 4px 0 0 rgba(215,255,88,.62)}.loadout-class-card.pending{box-shadow:inset 4px 0 0 #e1b965}.loadout-class-main{width:100%;height:100%;min-width:0;padding:10px 42px 9px 12px;border:0;background:transparent;color:#dce5e9;text-align:left;display:grid;grid-template-rows:auto minmax(0,1fr) auto;gap:7px}.loadout-class-main:hover,.loadout-class-main:focus-visible{background:rgba(255,255,255,.035)}.loadout-class-card-head{min-width:0}.loadout-class-card-head strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:950 14px/1 system-ui}.loadout-class-card-head span{display:block;min-height:9px;margin-top:4px;color:var(--accent);font:900 7px/1 system-ui;letter-spacing:.08em}.loadout-class-card.dirty:not(.equipped):not(.pending) .loadout-class-card-head span{color:#e1b965}.loadout-class-weapons{min-width:0;display:grid;grid-template-rows:repeat(2,minmax(0,1fr));gap:5px;align-content:center}.loadout-class-weapons span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#d0d9dd;font:850 10px/1.15 system-ui}.loadout-class-weapons b,.loadout-class-equipment b{display:block;margin-bottom:2px;color:#718089;font:900 7px/1 system-ui;letter-spacing:.08em}.loadout-class-equipment{min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;padding-top:6px;border-top:1px solid rgba(255,255,255,.06)}.loadout-class-equipment span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#aeb9bf;font:850 8.5px/1.1 system-ui}.loadout-class-rename{position:absolute;top:7px;right:7px;width:30px;height:30px;padding:0;border:1px solid rgba(255,255,255,.07);border-radius:6px;background:rgba(8,12,14,.74);color:#8d9aa2;font:900 14px/1 system-ui}.loadout-class-rename:hover,.loadout-class-rename:focus-visible{border-color:rgba(215,255,88,.4);background:#182018;color:var(--accent)}
+/* Class view is deliberately simple: one decision level at a time. */
+.loadout-class-view{display:grid;grid-template-rows:auto minmax(0,1fr);gap:8px}.loadout-view-nav{justify-content:flex-start;align-items:center}.loadout-view-nav>div{min-width:0}.class-detail-grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:9px}.class-item-card{position:relative;min-width:0;min-height:0;padding:14px 16px;border:1px solid rgba(255,255,255,.09);border-radius:10px;background:radial-gradient(circle at 78% 35%,rgba(92,108,114,.13),transparent 42%),#0b1013;color:#dce5e9;text-align:left;display:flex;flex-direction:column;gap:7px}.class-item-card:hover,.class-item-card:focus-visible{border-color:rgba(215,255,88,.42);background-color:#101712}.class-item-card>span{color:#718089;font:950 9px/1 system-ui;letter-spacing:.10em}.class-item-card>strong{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:950 22px/1 system-ui}.class-item-card>small{color:#87949b;font:750 10px/1.25 system-ui}.class-item-card>i{margin-top:auto;color:var(--accent);font:950 9px/1 system-ui;letter-spacing:.08em;font-style:normal}.class-item-equipment>strong{font-size:18px}
+/* Weapon editor: weapon top-left, stats top-right, only selected attachment options below. */
+.loadout-item-view{display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px}.item-view-nav{justify-content:flex-start}.loadout-item-pages{min-height:0;overflow:hidden}.loadout-weapon-page,.loadout-equipment-page{height:100%;min-width:0;min-height:0}.loadout-weapon-page[hidden],.loadout-equipment-page[hidden]{display:none!important}.gunsmith-layout{height:100%;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1.46fr) minmax(250px,.72fr);grid-template-rows:32px minmax(0,1fr) 112px;gap:6px}.gunsmith-weapon-column{display:contents}.loadout-focus-head{grid-column:1;grid-row:1;display:flex;align-items:center;justify-content:space-between;gap:8px;min-width:0;padding:0 4px}.loadout-focus-head{justify-content:flex-end}.loadout-focus-head>div:first-child{display:none}.gunsmith-head-actions{display:flex;align-items:center;gap:7px;flex:none}.gunsmith-head-actions>strong{color:var(--accent);font:950 9px/1 system-ui;letter-spacing:.04em}.gunsmith-change-weapon{height:28px;padding:0 9px;border:1px solid rgba(255,255,255,.11);border-radius:6px;background:#0d1316;color:#aab5bb;font:900 8px/1 system-ui;letter-spacing:.06em}.gunsmith-change-weapon:hover,.gunsmith-change-weapon:focus-visible{border-color:rgba(215,255,88,.42);color:var(--accent)}
+.loadout-focus-stage{grid-column:1;grid-row:2;position:relative;min-width:0;min-height:0;overflow:hidden;border:1px solid rgba(255,255,255,.07);border-radius:9px;background:radial-gradient(circle at 50% 52%,rgba(95,112,118,.22),rgba(3,5,6,.75) 64%),linear-gradient(180deg,rgba(25,31,34,.62),rgba(5,8,9,.86))}.loadout-focus-stage:after{content:"";position:absolute;left:8%;right:8%;bottom:11%;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.13),transparent);pointer-events:none}.loadout-focus-stage canvas{display:block;width:100%;height:100%;touch-action:none;cursor:grab}.loadout-focus-stage canvas:active{cursor:grabbing}.loadout-preview-hint{position:absolute;left:9px;bottom:7px;color:#718089;font:800 7px/1 system-ui;letter-spacing:.07em;pointer-events:none}.gunsmith-ads-preview{position:absolute;right:8px;bottom:7px;width:42px;height:29px;padding:0;border:1px solid rgba(215,255,88,.32);border-radius:6px;background:rgba(9,13,16,.90);color:#b1bd88;font:950 8px/1 system-ui;letter-spacing:.05em;touch-action:none;z-index:5}.gunsmith-ads-preview:active,.gunsmith-ads-preview.active{border-color:var(--accent);background:#1b2419;color:var(--accent)}
+.gunsmith-callout-overlay{position:absolute;inset:0;z-index:4;pointer-events:none;transition:opacity .12s ease}.gunsmith-callout-overlay.ads-hidden{opacity:0}.gunsmith-callout-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}.gunsmith-callout-lines line{stroke:rgba(204,217,222,.67);stroke-width:1.2;vector-effect:non-scaling-stroke}.gunsmith-callout-lines circle{fill:#d1dde1;stroke:#11181b;stroke-width:1.2;vector-effect:non-scaling-stroke}.gunsmith-callout{position:absolute;min-width:70px;max-width:98px;padding:5px 7px;border:1px solid rgba(255,255,255,.13);border-radius:6px;background:rgba(8,12,14,.91);color:#9aa6ad;text-align:left;pointer-events:auto;display:grid;gap:2px}.gunsmith-callout span{font:950 7px/1 system-ui;letter-spacing:.07em}.gunsmith-callout strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#e0e7ea;font:900 8.5px/1 system-ui}.gunsmith-callout.active{border-color:var(--accent);background:#1a2219}.gunsmith-callout.active span,.gunsmith-callout.active strong{color:var(--accent)}.gunsmith-callout.equipped:not(.active){border-color:rgba(215,255,88,.30)}.gunsmith-callout-optic{top:5%;right:5%}.gunsmith-callout-muzzle{top:17%;left:3%}.gunsmith-callout-barrel{top:51%;left:3%}.gunsmith-callout-magazine{left:34%;bottom:8%}.gunsmith-callout-underbarrel{right:18%;bottom:8%}.gunsmith-callout-stock{top:48%;right:3%}
+/* The stats are a true visual comparison panel, not tiny numeric chips. */
+.loadout-stat-row{grid-column:2;grid-row:1 / 3;min-width:0;min-height:0;padding:8px 10px;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:linear-gradient(160deg,#0c1215,#070a0c);display:grid;grid-template-rows:repeat(6,minmax(0,1fr)) auto;gap:1px;overflow:hidden}.loadout-stat{min-width:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto 5px;align-content:center;column-gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.045)}.loadout-stat-head{grid-column:1;grid-row:1;min-width:0;display:flex;align-items:center;gap:8px}.loadout-stat-head span{color:#9aa6ad;font:900 9px/1 system-ui;letter-spacing:.05em}.loadout-stat-head strong{margin-left:auto;color:#edf2f4;font:950 10px/1 system-ui;white-space:nowrap}.loadout-stat-delta{grid-column:2;grid-row:1;align-self:center;color:#65717a;font:950 8px/1 system-ui;white-space:nowrap}.loadout-stat.better .loadout-stat-delta{color:#c5df8d}.loadout-stat.worse .loadout-stat-delta{color:#e0a181}.loadout-stat-bar{grid-column:1 / 3;grid-row:2;position:relative;height:5px;border-radius:3px;background:#252d31;overflow:hidden}.loadout-stat-bar .stat-neutral,.loadout-stat-bar .stat-change{position:absolute;top:0;bottom:0}.loadout-stat-bar .stat-neutral{left:0;background:#8f9da5}.loadout-stat-bar .stat-change{background:#9da9af}.loadout-stat.better .loadout-stat-bar .stat-change{background:#b9d77f}.loadout-stat.worse .loadout-stat-bar .stat-change{background:#d89372}.loadout-stat.capacity{grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto;border:0;border-top:1px solid rgba(255,255,255,.08);padding-top:7px}.loadout-stat.capacity .loadout-stat-head{grid-column:1}.loadout-stat.capacity .loadout-stat-head span{color:#c4cdd1}.loadout-stat.capacity .loadout-stat-head strong{font-size:11px;color:var(--accent)}.loadout-stat.capacity .loadout-stat-delta{grid-column:2;color:#89959c;font-size:7.5px}
+/* Bottom inspector only contains the active category's choices; categories live on the gun. */
+.gunsmith-inspector{grid-column:1 / 3;grid-row:3;min-width:0;min-height:0;padding:7px 9px;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:#090e11;overflow:hidden}.attachment-editor{height:100%;min-width:0;min-height:0;margin:0!important;padding:0!important;border:0!important;background:transparent!important;display:grid!important;grid-template-columns:120px minmax(0,1fr) minmax(205px,27%);grid-template-rows:minmax(0,1fr);gap:8px;overflow:hidden}.attachment-editor[hidden]{display:none!important}.gunsmith-inspector-intro,.gunsmith-inspector-empty{grid-column:1 / 4;height:100%;display:flex;align-items:center;justify-content:center;gap:12px;padding:8px;text-align:left}.gunsmith-inspector-intro>span{color:#718089;font:900 8px/1 system-ui;letter-spacing:.10em}.gunsmith-inspector-intro>strong,.gunsmith-inspector-empty>strong{color:#dce5e9;font:950 13px/1 system-ui}.gunsmith-inspector-intro p,.gunsmith-inspector-empty span{margin:0;color:#8a969d;font:750 9px/1.2 system-ui}.gunsmith-inspector-intro small{color:var(--accent);font:900 8px/1 system-ui;letter-spacing:.05em}.gunsmith-attachment-head{grid-column:1;display:flex;align-items:flex-start;justify-content:space-between;gap:5px;padding:5px 7px;border-right:1px solid rgba(255,255,255,.07)}.gunsmith-attachment-head span{display:block;color:#77838b;font:900 7px/1 system-ui;letter-spacing:.08em}.gunsmith-attachment-head strong{display:block;margin-top:4px;color:#e2e9ec;font:950 14px/1 system-ui}.gunsmith-tray-close{width:28px;height:28px;padding:0;border:0;border-radius:5px;background:transparent;color:#8a969d;font:900 18px/1 system-ui}.gunsmith-tray-close:hover,.gunsmith-tray-close:focus-visible{background:#1b2328;color:#fff}.gunsmith-attachment-options{grid-column:2;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));grid-auto-rows:1fr;gap:6px;overflow:hidden}.gunsmith-attachment-option{min-width:0;min-height:0;padding:8px 9px;border:1px solid rgba(255,255,255,.09);border-radius:7px;background:#0d1316;color:#d0d9dd;text-align:left;display:grid;align-content:center;gap:5px}.gunsmith-attachment-option strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:950 10px/1 system-ui}.gunsmith-attachment-option small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#859198;font:750 8px/1.1 system-ui}.gunsmith-attachment-option.active{border-color:var(--accent);background:#1a2219}.gunsmith-attachment-option.active strong{color:var(--accent)}.gunsmith-attachment-detail{grid-column:3;min-width:0;min-height:0;padding:8px 10px;border-left:1px solid rgba(255,255,255,.07);display:grid;align-content:center;gap:5px}.gunsmith-attachment-detail strong{color:#e2e9ec;font:950 11px/1 system-ui}.gunsmith-attachment-detail span{color:#8c989f;font:750 8.5px/1.2 system-ui}.gunsmith-effect-tags{display:flex;gap:4px;flex-wrap:wrap}.gunsmith-effect-tag{padding:3px 5px;border-radius:4px;background:#20282d;color:#b4c0c6;font:850 7px/1 system-ui;letter-spacing:.03em}.gunsmith-effect-tag.good{background:#1a2418;color:#c6df91}.gunsmith-effect-tag.bad{background:#281c18;color:#dfa484}
+.gunsmith-weapon-picker{height:100%;display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px}.gunsmith-weapon-picker[hidden]{display:none!important}.gunsmith-weapon-picker header{padding:8px;border-right:1px solid rgba(255,255,255,.07)}.gunsmith-weapon-picker header strong{display:block;color:#dce5e9;font:950 11px/1 system-ui}.gunsmith-weapon-picker header small{display:block;margin-top:4px;color:#78858d;font:750 8px/1.2 system-ui}.gunsmith-weapon-picker .loadout-choice-grid{min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:5px;overflow:hidden}.gunsmith-weapon-picker .loadout-choice{min-width:0;min-height:0;padding:7px}.gunsmith-weapon-picker .loadout-choice strong{font-size:9px;line-height:1.05}
+.loadout-equipment-page{display:grid;place-items:center}.equipment-editor-card{width:min(700px,100%);height:min(260px,100%);padding:15px;border:1px solid var(--line);border-radius:10px;background:linear-gradient(150deg,rgba(16,22,26,.96),rgba(6,9,11,.92));display:grid;grid-template-rows:auto minmax(0,1fr);gap:12px}.equipment-editor-card header span{color:#718089;font:950 9px/1 system-ui;letter-spacing:.10em}.equipment-editor-card header h3{margin:5px 0 0;color:#e1e8eb;font:950 19px/1 system-ui}.equipment-choice-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}.equipment-choice-grid .loadout-choice{min-height:0;height:100%;font-size:12px}
+.loadout-shell{width:min(1100px,100%);height:min(680px,100%)}.loadout-foot{min-height:43px}.class-flow-workspace[data-view="item"] + .loadout-foot{display:none}.lobby-loadout-panel>.lobby-section-head{display:none}
+/* Focused class/item editing owns the whole lobby canvas; class browser stays in normal lobby chrome. */
+.lobby-screen.loadout-focused .lobby-shell{grid-template-rows:minmax(0,1fr);gap:0}.lobby-screen.loadout-focused .lobby-header,.lobby-screen.loadout-focused .lobby-side-tabs,.lobby-screen.loadout-focused .lobby-footer{display:none!important}.lobby-screen.loadout-focused .lobby-main,.lobby-screen.loadout-focused .lobby-side-stack,.lobby-screen.loadout-focused .lobby-loadout-view.active,.lobby-screen.loadout-focused .lobby-loadout-panel,.lobby-screen.loadout-focused .class-flow-workspace{width:100%;height:100%!important;min-width:0;min-height:0!important}.lobby-screen.loadout-focused .lobby-side-stack{grid-template-rows:minmax(0,1fr);gap:0}.lobby-screen.loadout-focused .lobby-loadout-view.active,.lobby-screen.loadout-focused .lobby-loadout-panel,.lobby-screen.loadout-focused .class-flow-workspace{overflow:hidden!important}.lobby-screen.loadout-focused .class-flow-workspace{padding:6px!important}.lobby-screen.loadout-focused .loadout-class-view,.lobby-screen.loadout-focused .loadout-item-view{height:100%!important;min-height:0!important}.lobby-screen.loadout-focused .loadout-class-view{grid-template-rows:44px minmax(0,1fr);gap:8px}.lobby-screen.loadout-focused .loadout-item-view{grid-template-rows:38px minmax(0,1fr);gap:6px}.lobby-screen.loadout-focused .loadout-view-nav{min-height:38px;padding:2px 3px 6px}.lobby-screen.loadout-focused .loadout-view-nav h3{font-size:18px}.lobby-screen.loadout-focused .loadout-view-nav span{font-size:8px}.lobby-screen.loadout-focused .gunsmith-back{height:32px;font-size:9px}
+/* Height is the real constraint on phones in landscape; keep text readable rather than collapsing to fine print. */
 @media (max-height:440px) and (orientation:landscape){
-  .class-flow-workspace{padding:3px!important}
-  .class-browser-head,.loadout-view-nav{padding:1px 2px 3px;gap:6px}
-  .class-browser-head h3,.loadout-view-nav h3{margin-top:2px;font-size:12px}
-  .class-browser-head span,.loadout-view-nav span{font-size:5.5px}
-  .class-browser-head small{font-size:6px}
-  .gunsmith-back{height:25px;padding:0 7px;font-size:6.5px}
-
-  .loadout-class-list{gap:2px}
-  .loadout-class-card{grid-template-columns:minmax(0,1fr) 29px;border-radius:5px}
-  .loadout-class-main{padding:3px 5px;grid-template-columns:minmax(82px,.72fr) minmax(0,1.7fr) auto;gap:5px}
-  .loadout-class-card-head strong{font-size:7px}
-  .loadout-class-card-head span{min-height:5px;margin-top:1px;font-size:4.7px}
-  .loadout-class-weapons{gap:5px}.loadout-class-weapons span{font-size:5.7px}.loadout-class-weapons b{margin-bottom:1px;font-size:4.6px}
-  .loadout-class-main>small{font-size:4.8px}.loadout-class-rename{width:29px;font-size:10px}
-
-  .loadout-class-view{gap:3px}.class-detail-grid{gap:4px;grid-template-rows:minmax(0,1.28fr) minmax(0,.72fr)}
-  .class-item-card{padding:6px 8px;gap:3px;border-radius:6px}
-  .class-item-card>span{font-size:5.7px}.class-item-card>strong{font-size:11px;line-height:1.05}
-  .class-item-card>small{font-size:5.8px;line-height:1.05}.class-item-card>i{font-size:5.8px}
-  .class-item-equipment>strong{font-size:9px}.class-item-equipment>small{display:none}
-
-  .loadout-item-view{gap:3px}.gunsmith-layout{gap:4px;grid-template-columns:minmax(0,1.7fr) minmax(190px,.65fr)}
-  .gunsmith-weapon-column,.gunsmith-inspector{padding:3px;border-radius:6px}
-  .gunsmith-weapon-column{gap:2px}.loadout-focus-head{gap:5px}
-  .loadout-focus-head span{font-size:5px}.loadout-focus-head h3{margin:1px 0;font-size:10px}.loadout-focus-head small{font-size:5.3px}
-  .gunsmith-head-actions{gap:3px}.gunsmith-head-actions>strong{font-size:5.3px}.gunsmith-change-weapon{height:21px;padding:0 5px;font-size:5px}
-  .loadout-preview-hint{display:none}.gunsmith-ads-preview{width:31px;height:21px;right:4px;bottom:4px;font-size:5.8px}
-  .gunsmith-callout{min-width:46px;max-width:62px;padding:3px 4px}.gunsmith-callout span{font-size:4.5px}.gunsmith-callout strong{font-size:5.3px}
-  .loadout-stat-row{gap:2px}.loadout-stat{padding:2px}.loadout-stat-head span{font-size:4.5px}.loadout-stat-head strong{font-size:5px}.loadout-stat-delta{display:none}.loadout-stat-bar{display:none}
-
-  .gunsmith-inspector{padding:4px}.attachment-editor{gap:3px;grid-template-rows:auto minmax(0,1fr) auto}
-  .gunsmith-attachment-head{padding-bottom:3px}.gunsmith-attachment-head span{font-size:4.7px}.gunsmith-attachment-head strong{margin-top:1px;font-size:8.5px}.gunsmith-tray-close{width:21px;height:21px;font-size:14px}
-  .gunsmith-attachment-options{gap:3px;grid-auto-rows:minmax(0,1fr)}
-  .gunsmith-attachment-option{min-height:0;padding:4px;gap:2px}.gunsmith-attachment-option strong{font-size:5.8px}.gunsmith-attachment-option small{font-size:4.8px}
-  .gunsmith-attachment-detail{min-height:32px;padding:4px;gap:2px}.gunsmith-attachment-detail strong{font-size:5.8px}.gunsmith-attachment-detail span{font-size:4.9px;line-height:1.05}
-  .gunsmith-effect-tags{gap:2px}.gunsmith-effect-tag{padding:2px 3px;font-size:4.3px}
-  .gunsmith-weapon-picker{gap:3px}.gunsmith-weapon-picker header{padding-bottom:3px}.gunsmith-weapon-picker header strong{font-size:7px}.gunsmith-weapon-picker header small{font-size:5px}
-  .gunsmith-weapon-picker .loadout-choice-grid{gap:3px;grid-auto-rows:minmax(0,1fr)}.gunsmith-weapon-picker .loadout-choice{padding:3px}.gunsmith-weapon-picker .loadout-choice strong{font-size:5.6px}
-
-  .equipment-editor-card{height:100%;max-height:170px;padding:7px;gap:5px}.equipment-editor-card header h3{margin-top:2px;font-size:11px}.equipment-editor-card header span{font-size:5.5px}.equipment-choice-grid{gap:4px!important}
+  .class-flow-workspace{padding:4px!important}.loadout-classes-view{gap:4px}.class-browser-head{padding-bottom:4px}.class-browser-head h3{font-size:15px}.class-browser-head span{font-size:7px}.class-browser-head small{font-size:7.5px}.loadout-class-list{gap:4px}.loadout-class-main{padding:7px 36px 6px 9px;gap:4px}.loadout-class-card-head strong{font-size:12px}.loadout-class-card-head span{font-size:6px;margin-top:2px}.loadout-class-weapons{gap:3px}.loadout-class-weapons span{font-size:9px}.loadout-class-weapons b,.loadout-class-equipment b{font-size:6px}.loadout-class-equipment{padding-top:4px;gap:5px}.loadout-class-equipment span{font-size:8px}.loadout-class-rename{top:5px;right:5px;width:26px;height:26px;font-size:12px}
+  .lobby-screen.loadout-focused{padding:calc(var(--safe-top) + 3px) calc(var(--safe-right) + 5px) calc(var(--safe-bottom) + 3px) calc(var(--safe-left) + 5px)}.lobby-screen.loadout-focused .class-flow-workspace{padding:4px!important}.lobby-screen.loadout-focused .loadout-class-view{grid-template-rows:34px minmax(0,1fr);gap:5px}.lobby-screen.loadout-focused .loadout-item-view{grid-template-rows:32px minmax(0,1fr);gap:4px}.lobby-screen.loadout-focused .loadout-view-nav{min-height:32px;padding:1px 2px 4px;gap:8px}.lobby-screen.loadout-focused .loadout-view-nav h3{font-size:15px}.lobby-screen.loadout-focused .loadout-view-nav span{font-size:7px}.lobby-screen.loadout-focused .gunsmith-back{height:28px;padding:0 8px;font-size:8px}.class-detail-grid{gap:6px}.class-item-card{padding:10px 12px;gap:5px}.class-item-card>span{font-size:7px}.class-item-card>strong{font-size:17px}.class-item-card>small{font-size:8px}.class-item-card>i{font-size:7px}.class-item-equipment>strong{font-size:14px}
+  .gunsmith-layout{grid-template-columns:minmax(0,1.45fr) minmax(230px,.72fr);grid-template-rows:28px minmax(0,1fr) 98px;gap:4px}.loadout-focus-head{padding:0 2px}.gunsmith-head-actions{gap:4px}.gunsmith-head-actions>strong{font-size:7px}.gunsmith-change-weapon{height:24px;padding:0 7px;font-size:7px}.loadout-preview-hint{font-size:6px}.gunsmith-ads-preview{width:38px;height:25px;font-size:7px}.gunsmith-callout{min-width:62px;max-width:85px;padding:4px 6px}.gunsmith-callout span{font-size:7px}.gunsmith-callout strong{font-size:8.5px}.loadout-stat-row{padding:5px 7px}.loadout-stat{padding:3px 0}.loadout-stat-head span{font-size:9px}.loadout-stat-head strong{font-size:10px}.loadout-stat-delta{font-size:8px}.loadout-stat-bar{height:4px}.loadout-stat.capacity .loadout-stat-head strong{font-size:10px}.loadout-stat.capacity .loadout-stat-delta{font-size:6.5px}.gunsmith-inspector{padding:5px 7px}.attachment-editor{grid-template-columns:102px minmax(0,1fr) minmax(180px,25%);gap:5px}.gunsmith-attachment-head{padding:4px 5px}.gunsmith-attachment-head span{font-size:6px}.gunsmith-attachment-head strong{font-size:11px}.gunsmith-tray-close{width:23px;height:23px;font-size:15px}.gunsmith-attachment-options{grid-template-columns:repeat(auto-fit,minmax(90px,1fr));gap:4px}.gunsmith-attachment-option{padding:6px}.gunsmith-attachment-option strong{font-size:9px}.gunsmith-attachment-option small{font-size:7.5px}.gunsmith-attachment-detail{padding:5px 7px}.gunsmith-attachment-detail strong{font-size:10px}.gunsmith-attachment-detail span{font-size:8px}.gunsmith-effect-tag{font-size:6px;padding:2px 4px}.gunsmith-weapon-picker{grid-template-columns:102px minmax(0,1fr);gap:5px}.gunsmith-weapon-picker header{padding:6px}.gunsmith-weapon-picker header strong{font-size:9px}.gunsmith-weapon-picker header small{font-size:7px}.gunsmith-weapon-picker .loadout-choice{padding:5px}.gunsmith-weapon-picker .loadout-choice strong{font-size:7px}
 }
-
-
-/* v1.42.2 focused Create-a-Class: the root class browser stays in the lobby.
-   Editing a class or item temporarily owns the whole lobby canvas so unrelated
-   lobby chrome never competes with the editor for landscape height. */
-.lobby-screen.loadout-focused .lobby-shell{
-  grid-template-rows:minmax(0,1fr);gap:0
-}
-.lobby-screen.loadout-focused .lobby-header,
-.lobby-screen.loadout-focused .lobby-side-tabs,
-.lobby-screen.loadout-focused .lobby-footer{
-  display:none!important
-}
-.lobby-screen.loadout-focused .lobby-main,
-.lobby-screen.loadout-focused .lobby-side-stack,
-.lobby-screen.loadout-focused .lobby-loadout-view.active,
-.lobby-screen.loadout-focused .lobby-loadout-panel,
-.lobby-screen.loadout-focused .class-flow-workspace{
-  width:100%;height:100%!important;min-width:0;min-height:0!important
-}
-.lobby-screen.loadout-focused .lobby-side-stack{
-  grid-template-rows:minmax(0,1fr);gap:0
-}
-.lobby-screen.loadout-focused .lobby-loadout-view.active,
-.lobby-screen.loadout-focused .lobby-loadout-panel,
-.lobby-screen.loadout-focused .class-flow-workspace{
-  overflow:hidden!important
-}
-.lobby-screen.loadout-focused .class-flow-workspace{
-  padding:6px!important
-}
-.lobby-screen.loadout-focused .loadout-class-view,
-.lobby-screen.loadout-focused .loadout-item-view{
-  height:100%!important;min-height:0!important
-}
-
-/* The class editor can be comfortable again once the header/tabs/footer are gone. */
-.lobby-screen.loadout-focused .loadout-class-view{
-  grid-template-rows:42px minmax(0,1fr);gap:8px
-}
-.lobby-screen.loadout-focused .loadout-view-nav{
-  min-height:42px;padding:3px 4px 7px;gap:10px
-}
-.lobby-screen.loadout-focused .loadout-view-nav h3{
-  margin-top:3px;font-size:17px
-}
-.lobby-screen.loadout-focused .loadout-view-nav span{
-  font-size:7px
-}
-.lobby-screen.loadout-focused .gunsmith-back{
-  height:32px;padding:0 10px;font-size:8px
-}
-.lobby-screen.loadout-focused .class-detail-grid{
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  grid-template-rows:repeat(2,minmax(0,1fr));gap:8px
-}
-.lobby-screen.loadout-focused .class-item-card{
-  padding:12px 14px;gap:6px;border-radius:9px
-}
-.lobby-screen.loadout-focused .class-item-card>span{font-size:7px}
-.lobby-screen.loadout-focused .class-item-card>strong{font-size:18px}
-.lobby-screen.loadout-focused .class-item-card>small{font-size:8px;line-height:1.2}
-.lobby-screen.loadout-focused .class-item-card>i{font-size:7px}
-.lobby-screen.loadout-focused .class-item-equipment>strong{font-size:15px}
-
-/* Gunsmith gets the largest share of the screen. The inspector remains wide
-   enough for readable attachment choices, while the weapon stage owns the rest. */
-.lobby-screen.loadout-focused .loadout-item-view{
-  grid-template-rows:42px minmax(0,1fr);gap:6px
-}
-.lobby-screen.loadout-focused .gunsmith-layout{
-  grid-template-columns:minmax(0,1fr) minmax(250px,31%);gap:7px
-}
-.lobby-screen.loadout-focused .gunsmith-weapon-column,
-.lobby-screen.loadout-focused .gunsmith-inspector{
-  padding:6px;border-radius:8px
-}
-.lobby-screen.loadout-focused .gunsmith-weapon-column{gap:4px}
-.lobby-screen.loadout-focused .loadout-focus-head span{font-size:6.5px}
-.lobby-screen.loadout-focused .loadout-focus-head h3{margin:2px 0 1px;font-size:15px}
-.lobby-screen.loadout-focused .loadout-focus-head small{font-size:7px}
-.lobby-screen.loadout-focused .gunsmith-head-actions>strong{font-size:7px}
-.lobby-screen.loadout-focused .gunsmith-change-weapon{height:26px;padding:0 8px;font-size:6px}
-.lobby-screen.loadout-focused .loadout-preview-hint{display:block;font-size:5.8px}
-.lobby-screen.loadout-focused .gunsmith-ads-preview{width:36px;height:26px;font-size:7px}
-.lobby-screen.loadout-focused .loadout-stat-row{gap:3px}
-.lobby-screen.loadout-focused .loadout-stat{padding:4px}
-.lobby-screen.loadout-focused .loadout-stat-head span{font-size:5.5px}
-.lobby-screen.loadout-focused .loadout-stat-head strong{font-size:6px}
-.lobby-screen.loadout-focused .loadout-stat-delta{display:block;font-size:5.5px}
-.lobby-screen.loadout-focused .loadout-stat-bar{display:block}
-.lobby-screen.loadout-focused .gunsmith-callout{min-width:56px;max-width:76px;padding:4px 5px}
-.lobby-screen.loadout-focused .gunsmith-callout span{font-size:5px}
-.lobby-screen.loadout-focused .gunsmith-callout strong{font-size:6px}
-.lobby-screen.loadout-focused .attachment-editor{gap:5px}
-.lobby-screen.loadout-focused .gunsmith-attachment-head{padding-bottom:5px}
-.lobby-screen.loadout-focused .gunsmith-attachment-head span{font-size:5.5px}
-.lobby-screen.loadout-focused .gunsmith-attachment-head strong{font-size:11px}
-.lobby-screen.loadout-focused .gunsmith-tray-close{width:26px;height:26px;font-size:16px}
-.lobby-screen.loadout-focused .gunsmith-attachment-options{gap:5px}
-.lobby-screen.loadout-focused .gunsmith-attachment-option{padding:7px;min-height:0}
-.lobby-screen.loadout-focused .gunsmith-attachment-option strong{font-size:7px}
-.lobby-screen.loadout-focused .gunsmith-attachment-option small{font-size:5.7px}
-.lobby-screen.loadout-focused .gunsmith-attachment-detail{min-height:50px;padding:7px}
-.lobby-screen.loadout-focused .gunsmith-attachment-detail strong{font-size:7px}
-.lobby-screen.loadout-focused .gunsmith-attachment-detail span{display:block;font-size:6px}
-.lobby-screen.loadout-focused .gunsmith-effect-tag{font-size:5.3px}
-.lobby-screen.loadout-focused .equipment-editor-card{
-  height:100%;max-height:none;padding:14px
-}
-
-/* Short landscape still uses the full editor takeover, but only trims enough
-   to keep the focused editor readable without introducing scroll. */
-@media (max-height:440px) and (orientation:landscape){
-  .lobby-screen.loadout-focused{padding:calc(var(--safe-top) + 3px) calc(var(--safe-right) + 5px) calc(var(--safe-bottom) + 3px) calc(var(--safe-left) + 5px)}
-  .lobby-screen.loadout-focused .class-flow-workspace{padding:3px!important}
-  .lobby-screen.loadout-focused .loadout-class-view,
-  .lobby-screen.loadout-focused .loadout-item-view{grid-template-rows:32px minmax(0,1fr);gap:4px}
-  .lobby-screen.loadout-focused .loadout-view-nav{min-height:32px;padding:1px 2px 4px;gap:7px}
-  .lobby-screen.loadout-focused .loadout-view-nav h3{margin-top:1px;font-size:13px}
-  .lobby-screen.loadout-focused .loadout-view-nav span{font-size:5.5px}
-  .lobby-screen.loadout-focused .gunsmith-back{height:27px;padding:0 8px;font-size:6.5px}
-  .lobby-screen.loadout-focused .class-detail-grid{gap:5px}
-  .lobby-screen.loadout-focused .class-item-card{padding:8px 10px;gap:4px}
-  .lobby-screen.loadout-focused .class-item-card>span{font-size:5.8px}
-  .lobby-screen.loadout-focused .class-item-card>strong{font-size:13px}
-  .lobby-screen.loadout-focused .class-item-card>small{display:block;font-size:6px}
-  .lobby-screen.loadout-focused .class-item-card>i{font-size:6px}
-  .lobby-screen.loadout-focused .class-item-equipment>strong{font-size:11px}
-  .lobby-screen.loadout-focused .class-item-equipment>small{display:block}
-
-  .lobby-screen.loadout-focused .gunsmith-layout{grid-template-columns:minmax(0,1fr) minmax(205px,30%);gap:4px}
-  .lobby-screen.loadout-focused .gunsmith-weapon-column,
-  .lobby-screen.loadout-focused .gunsmith-inspector{padding:4px}
-  .lobby-screen.loadout-focused .loadout-focus-head h3{font-size:11px}
-  .lobby-screen.loadout-focused .loadout-focus-head small{font-size:5.5px}
-  .lobby-screen.loadout-focused .gunsmith-head-actions>strong{font-size:5.5px}
-  .lobby-screen.loadout-focused .gunsmith-change-weapon{height:22px;padding:0 6px;font-size:5px}
-  .lobby-screen.loadout-focused .loadout-preview-hint{display:none}
-  .lobby-screen.loadout-focused .gunsmith-ads-preview{width:32px;height:22px;font-size:6px}
-  .lobby-screen.loadout-focused .loadout-stat{padding:2px}
-  .lobby-screen.loadout-focused .loadout-stat-head span{font-size:4.8px}
-  .lobby-screen.loadout-focused .loadout-stat-head strong{font-size:5.2px}
-  .lobby-screen.loadout-focused .loadout-stat-delta{display:none}
-  .lobby-screen.loadout-focused .loadout-stat-bar{display:none}
-  .lobby-screen.loadout-focused .gunsmith-callout{min-width:49px;max-width:66px;padding:3px 4px}
-  .lobby-screen.loadout-focused .gunsmith-callout span{font-size:4.6px}
-  .lobby-screen.loadout-focused .gunsmith-callout strong{font-size:5.4px}
-  .lobby-screen.loadout-focused .gunsmith-attachment-options{gap:3px}
-  .lobby-screen.loadout-focused .gunsmith-attachment-option{padding:4px}
-  .lobby-screen.loadout-focused .gunsmith-attachment-option strong{font-size:6px}
-  .lobby-screen.loadout-focused .gunsmith-attachment-option small{font-size:4.9px}
-  .lobby-screen.loadout-focused .gunsmith-attachment-detail{min-height:36px;padding:4px}
-  .lobby-screen.loadout-focused .gunsmith-attachment-detail strong{font-size:6px}
-  .lobby-screen.loadout-focused .gunsmith-attachment-detail span{font-size:5px}
-  .lobby-screen.loadout-focused .gunsmith-effect-tag{font-size:4.6px}
-}
+@media (max-width:700px) and (orientation:landscape){.loadout-class-main{padding-left:8px}.loadout-class-card-head strong{font-size:10px}.loadout-class-weapons span{font-size:7.5px}.gunsmith-layout{grid-template-columns:minmax(0,1.35fr) minmax(205px,.75fr)}.attachment-editor{grid-template-columns:90px minmax(0,1fr) 165px}.gunsmith-attachment-option small{display:none}.gunsmith-attachment-detail span{display:none}}
+@media (orientation:portrait){.lobby-loadout-panel{overflow:auto;display:block}.class-flow-workspace{height:auto;min-height:720px;overflow:auto!important}.loadout-classes-view,.loadout-class-view,.loadout-item-view{height:auto;overflow:visible}.loadout-class-list{grid-template-columns:1fr;grid-template-rows:repeat(5,120px)}.loadout-class-card:nth-child(n){grid-column:auto}.class-detail-grid{grid-template-columns:1fr;grid-template-rows:repeat(4,130px)}.gunsmith-layout{grid-template-columns:1fr;grid-template-rows:32px 320px auto 260px}.loadout-focus-head{grid-column:1;grid-row:1}.loadout-focus-stage{grid-column:1;grid-row:2}.loadout-stat-row{grid-column:1;grid-row:3;min-height:260px}.gunsmith-inspector{grid-column:1;grid-row:4}.attachment-editor{grid-template-columns:1fr;grid-template-rows:auto minmax(0,1fr) auto}.gunsmith-attachment-head,.gunsmith-attachment-options,.gunsmith-attachment-detail{grid-column:1}.gunsmith-attachment-options{grid-template-columns:repeat(2,minmax(0,1fr))}}
