@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.38.1" rel="manifest"/>
-<title>Breach v1.38.1</title>
-<link href="ui.css?v=1.38.1" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.38.2" rel="manifest"/>
+<title>Breach v1.38.2</title>
+<link href="ui.css?v=1.38.2" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -204,10 +204,26 @@
 <div class="lobby-side-view lobby-loadout-view" data-lobby-side-view="loadout" hidden="">
 <section class="lobby-loadout-panel">
 <div class="lobby-section-head"><div><h2>Your loadout</h2></div></div>
-<div class="lobby-loadout-body">
-<section class="loadout-section loadout-section-primary"><header class="loadout-section-title"><span>PRIMARY</span><small>Main weapon</small></header><div class="loadout-choice-grid primary-grid" data-loadout-grid="lobby-primary"></div><div class="attachment-editor" data-attachment-editor="lobby-primary"></div></section>
-<div class="loadout-lower-grid">
-<section class="loadout-section loadout-section-secondary"><header class="loadout-section-title"><span>SECONDARY</span><small>Backup weapon</small></header><div class="loadout-choice-grid secondary-grid" data-loadout-grid="lobby-secondary"></div><div class="attachment-editor" data-attachment-editor="lobby-secondary"></div></section>
+<div class="lobby-loadout-body loadout-workspace" data-loadout-workspace="lobby">
+<div class="loadout-weapon-tabs" data-controller-primary-tabs="true" role="tablist" aria-label="Weapon slot">
+<button class="loadout-weapon-tab active" data-loadout-weapon-tab="lobby-primary" aria-selected="true" role="tab" type="button"><span>PRIMARY</span><small data-loadout-tab-summary="lobby-primary">Main weapon</small></button>
+<button class="loadout-weapon-tab" data-loadout-weapon-tab="lobby-secondary" aria-selected="false" role="tab" type="button"><span>SECONDARY</span><small data-loadout-tab-summary="lobby-secondary">Backup weapon</small></button>
+</div>
+<section class="loadout-weapon-page active" data-loadout-weapon-page="lobby-primary">
+<header class="loadout-focus-head"><div><span>PRIMARY WEAPON</span><h3 data-loadout-weapon-name="lobby-primary">ASSAULT RIFLE</h3><small data-loadout-weapon-role="lobby-primary">Balanced · Mid range</small></div><strong data-loadout-weapon-ammo="lobby-primary">30 ROUNDS</strong></header>
+<div class="loadout-focus-stage"><canvas data-loadout-preview="lobby-primary" aria-label="Primary weapon preview"></canvas><span class="loadout-preview-hint">DRAG TO ROTATE</span></div>
+<div class="loadout-stat-row" data-loadout-stats="lobby-primary"></div>
+<div class="loadout-picker-block"><span>SELECT WEAPON</span><div class="loadout-choice-grid primary-grid" data-loadout-grid="lobby-primary"></div></div>
+<div class="attachment-editor" data-attachment-editor="lobby-primary"></div>
+</section>
+<section class="loadout-weapon-page" data-loadout-weapon-page="lobby-secondary" hidden inert>
+<header class="loadout-focus-head"><div><span>SECONDARY WEAPON</span><h3 data-loadout-weapon-name="lobby-secondary">GLOCK</h3><small data-loadout-weapon-role="lobby-secondary">Reliable backup · Fast handling</small></div><strong data-loadout-weapon-ammo="lobby-secondary">15 ROUNDS</strong></header>
+<div class="loadout-focus-stage"><canvas data-loadout-preview="lobby-secondary" aria-label="Secondary weapon preview"></canvas><span class="loadout-preview-hint">DRAG TO ROTATE</span></div>
+<div class="loadout-stat-row" data-loadout-stats="lobby-secondary"></div>
+<div class="loadout-picker-block"><span>SELECT WEAPON</span><div class="loadout-choice-grid secondary-grid" data-loadout-grid="lobby-secondary"></div></div>
+<div class="attachment-editor" data-attachment-editor="lobby-secondary"></div>
+</section>
+<div class="loadout-equipment-row">
 <section class="loadout-section loadout-section-tactical"><header class="loadout-section-title"><span>TACTICAL</span><small>Utility</small></header><div class="loadout-choice-grid utility-grid" data-loadout-grid="lobby-tactical"></div></section>
 <section class="loadout-section loadout-section-lethal"><header class="loadout-section-title"><span>LETHAL</span><small>Explosive</small></header><div class="loadout-choice-grid utility-grid" data-loadout-grid="lobby-lethal"></div></section>
 </div>
@@ -270,15 +286,38 @@
 <section aria-label="Change loadout" class="modal-screen hide" id="loadoutPanel">
 <div class="modal-shell loadout-shell">
 <header class="modal-head"><div><h2>Loadout</h2><p id="loadoutDescription">Changes are staged until Save. Your current life stays unchanged.</p></div></header>
-<div class="loadout-editor">
-<section class="loadout-section loadout-section-primary"><header class="loadout-section-title"><span>PRIMARY</span><small>Main weapon</small></header><div class="loadout-choice-grid primary-grid" data-loadout-grid="match-primary"></div><div class="attachment-editor" data-attachment-editor="match-primary"></div></section>
-<div class="loadout-lower-grid">
-<section class="loadout-section loadout-section-secondary"><header class="loadout-section-title"><span>SECONDARY</span><small>Backup weapon</small></header><div class="loadout-choice-grid secondary-grid" data-loadout-grid="match-secondary"></div><div class="attachment-editor" data-attachment-editor="match-secondary"></div></section>
+<div class="loadout-editor loadout-workspace" data-loadout-workspace="match">
+<div class="loadout-weapon-tabs" data-controller-primary-tabs="true" role="tablist" aria-label="Weapon slot">
+<button class="loadout-weapon-tab active" data-loadout-weapon-tab="match-primary" aria-selected="true" role="tab" type="button"><span>PRIMARY</span><small data-loadout-tab-summary="match-primary">Main weapon</small></button>
+<button class="loadout-weapon-tab" data-loadout-weapon-tab="match-secondary" aria-selected="false" role="tab" type="button"><span>SECONDARY</span><small data-loadout-tab-summary="match-secondary">Backup weapon</small></button>
+</div>
+<section class="loadout-weapon-page active" data-loadout-weapon-page="match-primary">
+<header class="loadout-focus-head"><div><span>PRIMARY WEAPON</span><h3 data-loadout-weapon-name="match-primary">ASSAULT RIFLE</h3><small data-loadout-weapon-role="match-primary">Balanced · Mid range</small></div><strong data-loadout-weapon-ammo="match-primary">30 ROUNDS</strong></header>
+<div class="loadout-focus-stage"><canvas data-loadout-preview="match-primary" aria-label="Primary weapon preview"></canvas><span class="loadout-preview-hint">DRAG TO ROTATE</span></div>
+<div class="loadout-stat-row" data-loadout-stats="match-primary"></div>
+<div class="loadout-picker-block"><span>SELECT WEAPON</span><div class="loadout-choice-grid primary-grid" data-loadout-grid="match-primary"></div></div>
+<div class="attachment-editor" data-attachment-editor="match-primary"></div>
+</section>
+<section class="loadout-weapon-page" data-loadout-weapon-page="match-secondary" hidden inert>
+<header class="loadout-focus-head"><div><span>SECONDARY WEAPON</span><h3 data-loadout-weapon-name="match-secondary">GLOCK</h3><small data-loadout-weapon-role="match-secondary">Reliable backup · Fast handling</small></div><strong data-loadout-weapon-ammo="match-secondary">15 ROUNDS</strong></header>
+<div class="loadout-focus-stage"><canvas data-loadout-preview="match-secondary" aria-label="Secondary weapon preview"></canvas><span class="loadout-preview-hint">DRAG TO ROTATE</span></div>
+<div class="loadout-stat-row" data-loadout-stats="match-secondary"></div>
+<div class="loadout-picker-block"><span>SELECT WEAPON</span><div class="loadout-choice-grid secondary-grid" data-loadout-grid="match-secondary"></div></div>
+<div class="attachment-editor" data-attachment-editor="match-secondary"></div>
+</section>
+<div class="loadout-equipment-row">
 <section class="loadout-section loadout-section-tactical"><header class="loadout-section-title"><span>TACTICAL</span><small>Utility</small></header><div class="loadout-choice-grid utility-grid" data-loadout-grid="match-tactical"></div></section>
 <section class="loadout-section loadout-section-lethal"><header class="loadout-section-title"><span>LETHAL</span><small>Explosive</small></header><div class="loadout-choice-grid utility-grid" data-loadout-grid="match-lethal"></div></section>
 </div>
 </div>
 <footer class="modal-foot loadout-foot"><span class="admin-status" id="loadoutStatus">Saved changes equip on your next spawn.</span><button class="secondary-btn" id="loadoutResetBtn">RESET</button><button class="secondary-btn" id="loadoutCancelBtn">CANCEL</button><button class="primary modal-action" id="loadoutSaveBtn">SAVE</button></footer>
+</div>
+</section>
+<section aria-label="Attachment choices" class="attachment-sheet hide" id="attachmentSheet">
+<button class="attachment-sheet-backdrop" data-attachment-sheet-close="true" aria-label="Close attachment choices" type="button"></button>
+<div class="attachment-sheet-panel" role="dialog" aria-modal="true" aria-labelledby="attachmentSheetTitle">
+<header><div><span id="attachmentSheetSlot">ATTACHMENT</span><h3 id="attachmentSheetTitle">Select attachment</h3><p id="attachmentSheetDescription">Choose one option for this slot.</p></div><button class="attachment-sheet-close" id="attachmentSheetClose" aria-label="Close" type="button">×</button></header>
+<div class="attachment-sheet-options" id="attachmentSheetOptions"></div>
 </div>
 </section>
 <section aria-label="Player settings" class="modal-screen hide" id="settingsPanel">
@@ -348,6 +387,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.38.1" type="module"></script>
+<script src="client.js?v=1.38.2" type="module"></script>
 </body>
 </html>

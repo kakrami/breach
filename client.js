@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.38.1';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.38.1';
-import * as YardGeometry from './world-geometry-yard.js?v=1.38.1';
-import * as RigGeometry from './world-geometry-rig.js?v=1.38.1';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.38.1';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.38.1';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.38.1';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.38.1';
+import * as HighlandsGeometry from './world-geometry.js?v=1.38.2';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.38.2';
+import * as YardGeometry from './world-geometry-yard.js?v=1.38.2';
+import * as RigGeometry from './world-geometry-rig.js?v=1.38.2';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.38.2';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.38.2';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.38.2';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.38.2';
 import {
-  APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, resolveWeaponSpec, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
+  APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.38.1';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.38.1';
-import { createAudioEngine } from './audio-engine.js?v=1.38.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.38.1';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.38.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.38.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.38.1';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.38.1';
+} from './game-config.js?v=1.38.2';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.38.2';
+import { createAudioEngine } from './audio-engine.js?v=1.38.2';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.38.2';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.38.2';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.38.2';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.38.2';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.38.2';
 
 let THREE = null;
 
@@ -273,16 +273,51 @@ function renderLoadoutChoiceGrids(){
   }
 }
 renderLoadoutChoiceGrids();
-function renderAttachmentEditor(surface,weaponSlot,draft){
-  const host=document.querySelector(`[data-attachment-editor="${surface}-${weaponSlot}"]`);if(!host)return;
-  const weapon=weaponSlot==='primary'?draft.primaryWeapon:draft.secondaryWeapon,current=weaponSlot==='primary'?draft.primaryAttachments:draft.secondaryAttachments,groups=ATTACHMENT_SLOTS.map(slot=>[slot,attachmentOptionsForWeapon(weapon,slot)]).filter(([,items])=>items.length);
-  host.replaceChildren();host.classList.toggle('empty',groups.length===0);if(!groups.length)return;
-  for(const [slot,items] of groups){const card=document.createElement('div');card.className='attachment-slot';const head=document.createElement('div');head.className='attachment-slot-head';const label=document.createElement('strong');label.textContent=slot.toUpperCase();const chosen=document.createElement('small');chosen.textContent=current?.[slot]?ATTACHMENTS[current[slot]]?.short||'MOD':'NONE';head.append(label,chosen);const grid=document.createElement('div');grid.className='attachment-slot-grid';
-    for(const item of [null,...items]){const id=item?.id||'',btn=document.createElement('button');btn.type='button';btn.className='attachment-choice';btn.classList.toggle('active',(current?.[slot]||'')===id);btn.textContent=item?.name||'NONE';btn.title=item?.description||`Remove ${slot}`;if(item){const detail=document.createElement('small');detail.textContent=item.description;btn.append(detail);}btn.addEventListener('click',()=>{const key=weaponSlot==='primary'?'primaryAttachments':'secondaryAttachments',next={...(weaponSlot==='primary'?draft.primaryAttachments:draft.secondaryAttachments),[slot]:id};if(surface==='lobby')setLobbyLoadoutDraft({[key]:next});else{loadoutDraft=normalizeLoadoutChoice({...loadoutDraft,[key]:next});syncMatchLoadoutEditor();}});grid.append(btn);}
-    card.append(head,grid);host.append(card);
-  }
+const LOADOUT_WEAPON_ROLES=Object.freeze({
+  pistol:'Reliable backup · Fast handling',akimbo1887:'Akimbo · Very close range',assault:'Balanced · Mid range',ump:'Mobile · Close range',machineGun:'Sustained fire · Support',shotgun:'High impact · Close range',semiShotgun:'Fast follow-up · Close range',sniper:'Precision · Long range',grenadeLauncher:'Area denial · Explosive',rpg:'Heavy explosive · Anti-group'
+});
+const loadoutFocusSlot={lobby:'primary',match:'primary'},loadoutPreviewDesired=new Map(),loadoutPreviewContexts=new Map();let attachmentSheetState=null;
+function loadoutSlotWeapon(draft,slot){return slot==='primary'?draft.primaryWeapon:draft.secondaryWeapon;}
+function loadoutSlotAttachments(draft,slot){return slot==='primary'?draft.primaryAttachments:draft.secondaryAttachments;}
+function loadoutDraftForSurface(surface){return normalizeLoadoutChoice(surface==='lobby'?(lobbyLoadoutDraft||selectedLoadout()):(loadoutDraft||loadoutBaseDraft||pendingLoadout||selectedLoadout()));}
+function loadoutMetricClamp(v){return Math.max(0,Math.min(100,Number(v)||0));}
+function loadoutControlScore(spec,accuracy=null,pelletWeapon=false){if(pelletWeapon&&accuracy){return loadoutMetricClamp(100-(Number(accuracy.hipDeg)||0)*9.5-(Number(accuracy.fireDeg)||0)*7);}const recoil=Math.max(.001,Number(spec.recoilPitch)||0)+Math.max(0,Number(spec.recoilYaw)||0)*1.35;return loadoutMetricClamp(106-recoil*2350);}
+function loadoutMobilityScore(spec){const adsMove=Math.max(.5,Math.min(1,Number(spec.adsMoveSpeedScale)||1)),sprint=Math.max(80,Math.min(350,Number(spec.sprintOutMs)||180));return loadoutMetricClamp(adsMove*72+(1-(sprint-80)/270)*28);}
+function loadoutHandlingScore(spec){const ads=Math.max(0,Math.min(420,Number(spec.adsInMs)||0)),reload=Math.max(500,Math.min(4000,Number(spec.reloadMs)||1500));return loadoutMetricClamp((1-ads/420)*68+(1-(reload-500)/3500)*32);}
+function loadoutWeaponStats(weapon,attachments){
+  const base=WEAPON_SPECS[weapon]||WEAPON_SPECS.pistol,spec=resolveWeaponSpec(weapon,attachments),pellets=Math.max(1,Number(spec.pellets)||1),baseAccuracy=resolveWeaponAccuracy(weapon,{}),accuracy=resolveWeaponAccuracy(weapon,attachments),pelletWeapon=pellets>1;
+  const rows=[
+    {label:'DAMAGE',value:pellets>1?`${Math.round(spec.damage)}×${pellets}`:`${Math.round(spec.damage)}`,score:loadoutMetricClamp((Number(spec.damage)||0)*(pellets>1?2.1:1.65)),baseScore:loadoutMetricClamp((Number(base.damage)||0)*(pellets>1?2.1:1.65))},
+    {label:'RANGE',value:`${Math.round(spec.falloffEnd||0)}M`,score:loadoutMetricClamp((Number(spec.falloffEnd)||0)/2.2),baseScore:loadoutMetricClamp((Number(base.falloffEnd)||0)/2.2)},
+    {label:'CONTROL',value:`${Math.round(loadoutControlScore(spec,accuracy,pelletWeapon))}`,score:loadoutControlScore(spec,accuracy,pelletWeapon),baseScore:loadoutControlScore(base,baseAccuracy,pelletWeapon)},
+    {label:'MOBILITY',value:`${Math.round((Number(spec.adsMoveSpeedScale)||1)*100)}%`,score:loadoutMobilityScore(spec),baseScore:loadoutMobilityScore(base)},
+    {label:'HANDLING',value:`${Math.round(spec.adsInMs||0)}MS`,score:loadoutHandlingScore(spec),baseScore:loadoutHandlingScore(base)},
+    {label:'CAPACITY',value:`${Math.round(spec.mag||0)}`,score:loadoutMetricClamp(Number(spec.mag)||0),baseScore:loadoutMetricClamp(Number(base.mag)||0)},
+  ];
+  return rows;
 }
-function renderAttachmentEditors(surface,draft){renderAttachmentEditor(surface,'primary',draft);renderAttachmentEditor(surface,'secondary',draft);}
+function renderLoadoutStats(surface,slot,weapon,attachments){
+  const host=document.querySelector(`[data-loadout-stats="${surface}-${slot}"]`);if(!host)return;host.replaceChildren();
+  for(const row of loadoutWeaponStats(weapon,attachments)){const delta=row.score-row.baseScore,card=document.createElement('div');card.className='loadout-stat';if(delta>1.2)card.classList.add('better');else if(delta<-1.2)card.classList.add('worse');const head=document.createElement('div');head.className='loadout-stat-head';const label=document.createElement('span');label.textContent=row.label;const value=document.createElement('strong');value.textContent=row.value;head.append(label,value);const change=document.createElement('div');change.className='loadout-stat-delta';change.textContent=Math.abs(delta)>1.2?`${delta>0?'▲':'▼'} ${Math.abs(Math.round(delta))}`:'BASE';const bar=document.createElement('div');bar.className='loadout-stat-bar';const fill=document.createElement('i');fill.style.width=`${Math.max(3,row.score)}%`;bar.append(fill);card.append(head,change,bar);host.append(card);}
+}
+function syncLoadoutFocusedView(surface,draft){
+  const safe=normalizeLoadoutChoice(draft);for(const slot of ['primary','secondary']){const weapon=loadoutSlotWeapon(safe,slot),attachments=loadoutSlotAttachments(safe,slot),key=`${surface}-${slot}`,spec=resolveWeaponSpec(weapon,attachments),mods=ATTACHMENT_SLOTS.reduce((n,name)=>n+(attachments?.[name]?1:0),0),nameEl=document.querySelector(`[data-loadout-weapon-name="${key}"]`),roleEl=document.querySelector(`[data-loadout-weapon-role="${key}"]`),ammoEl=document.querySelector(`[data-loadout-weapon-ammo="${key}"]`),summary=document.querySelector(`[data-loadout-tab-summary="${key}"]`);if(nameEl)nameEl.textContent=spec.name||weapon;if(roleEl)roleEl.textContent=LOADOUT_WEAPON_ROLES[weapon]||'Weapon';if(ammoEl)ammoEl.textContent=`${spec.mag} ROUNDS`;if(summary)summary.textContent=`${spec.short||spec.name}${mods?` · ${mods} MOD${mods===1?'':'S'}`:''}`;renderLoadoutStats(surface,slot,weapon,attachments);loadoutPreviewDesired.set(key,{weapon,attachments:{...attachments},signature:`${weapon}:${JSON.stringify(attachments||{})}`});}
+  switchLoadoutWeaponTab(surface,loadoutFocusSlot[surface]||'primary',{ensurePreview:false});
+}
+function switchLoadoutWeaponTab(surface,slot='primary',{ensurePreview=true}={}){const safe=slot==='secondary'?'secondary':'primary';loadoutFocusSlot[surface]=safe;for(const tab of document.querySelectorAll(`[data-loadout-weapon-tab^="${surface}-"]`)){const active=tab.dataset.loadoutWeaponTab===`${surface}-${safe}`;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));}for(const page of document.querySelectorAll(`[data-loadout-weapon-page^="${surface}-"]`)){const active=page.dataset.loadoutWeaponPage===`${surface}-${safe}`;page.classList.toggle('active',active);page.hidden=!active;page.inert=!active;}if(ensurePreview){const key=`${surface}-${safe}`;requestAnimationFrame(()=>{if(loadoutPreviewDesired.has(key))void ensureLoadoutPreviewEngine();});}}
+function bindLoadoutWorkspaceTabs(){for(const tab of document.querySelectorAll('[data-loadout-weapon-tab]'))tab.addEventListener('click',()=>{const [surface,slot]=String(tab.dataset.loadoutWeaponTab||'').split('-');switchLoadoutWeaponTab(surface,slot);});$('attachmentSheetClose')?.addEventListener('click',closeAttachmentSheet);document.querySelector('[data-attachment-sheet-close]')?.addEventListener('click',closeAttachmentSheet);}
+function closeAttachmentSheet(){const sheet=$('attachmentSheet');if(sheet)sheet.classList.add('hide');attachmentSheetState=null;}
+function openAttachmentSheet(surface,weaponSlot,slot){
+  const draft=loadoutDraftForSurface(surface),weapon=loadoutSlotWeapon(draft,weaponSlot),current=loadoutSlotAttachments(draft,weaponSlot),items=attachmentOptionsForWeapon(weapon,slot),sheet=$('attachmentSheet'),options=$('attachmentSheetOptions');if(!sheet||!options||!items.length)return;attachmentSheetState={surface,weaponSlot,slot};$('attachmentSheetSlot').textContent=slot.toUpperCase();$('attachmentSheetTitle').textContent=`${WEAPON_SPECS[weapon]?.name||weapon} · ${slot.toUpperCase()}`;$('attachmentSheetDescription').textContent='One attachment per slot. Changes preview immediately.';options.replaceChildren();
+  for(const item of [null,...items]){const id=item?.id||'',button=document.createElement('button');button.type='button';button.className='attachment-sheet-option';button.classList.toggle('active',(current?.[slot]||'')===id);const title=document.createElement('strong');title.textContent=item?.name||'NONE';const detail=document.createElement('small');detail.textContent=item?.description||`Use the base ${slot}.`;button.append(title,detail);button.addEventListener('click',()=>{const live=loadoutDraftForSurface(surface),key=weaponSlot==='primary'?'primaryAttachments':'secondaryAttachments',next={...loadoutSlotAttachments(live,weaponSlot),[slot]:id};if(surface==='lobby')setLobbyLoadoutDraft({[key]:next});else{loadoutDraft=normalizeLoadoutChoice({...live,[key]:next});syncMatchLoadoutEditor();}closeAttachmentSheet();});options.append(button);}
+  sheet.classList.remove('hide');requestAnimationFrame(()=>options.querySelector('.active')?.focus?.());
+}
+function renderAttachmentEditor(surface,weaponSlot,draft){
+  const host=document.querySelector(`[data-attachment-editor="${surface}-${weaponSlot}"]`);if(!host)return;const weapon=loadoutSlotWeapon(draft,weaponSlot),current=loadoutSlotAttachments(draft,weaponSlot),groups=ATTACHMENT_SLOTS.map(slot=>[slot,attachmentOptionsForWeapon(weapon,slot)]).filter(([,items])=>items.length);host.replaceChildren();host.classList.toggle('empty',groups.length===0);if(!groups.length)return;
+  for(const [slot] of groups){const id=current?.[slot]||'',item=id?ATTACHMENTS[id]:null,button=document.createElement('button');button.type='button';button.className='attachment-slot-button';button.classList.toggle('equipped',!!item);const top=document.createElement('span'),label=document.createElement('b'),status=document.createElement('i');label.textContent=slot.toUpperCase();status.textContent=item?'EQUIPPED':'+';top.append(label,status);const title=document.createElement('strong');title.textContent=item?.name||'ADD ATTACHMENT';const detail=document.createElement('small');detail.textContent=item?.description||'Select compatible option';button.append(top,title,detail);button.addEventListener('click',()=>openAttachmentSheet(surface,weaponSlot,slot));host.append(button);}
+}
+function renderAttachmentEditors(surface,draft){renderAttachmentEditor(surface,'primary',draft);renderAttachmentEditor(surface,'secondary',draft);syncLoadoutFocusedView(surface,draft);}
+bindLoadoutWorkspaceTabs();
 function hydrateWeaponTuneSelector(){
   const control=$('adminWeaponSelect');if(!control)return;
   const options=WEAPON_ORDER.map(id=>({value:id,label:WEAPON_SPECS[id]?.name||id}));
@@ -542,7 +577,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.38.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.38.2';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -888,7 +923,7 @@ function switchLobbySide(name='players'){
   if(next==='cheats'&&!isMatchAdmin)next='players';
   for(const tab of lobbySideTabs){const active=tab.dataset.lobbySideTab===next;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));}
   for(const view of lobbySideViews){const active=view.dataset.lobbySideView===next;view.classList.toggle('active',active);view.hidden=!active;view.inert=!active;}
-  if(next==='map')requestAnimationFrame(renderLobbyMapPreview);
+  if(next==='map')requestAnimationFrame(renderLobbyMapPreview);if(next==='loadout'){renderAttachmentEditors('lobby',lobbyLoadoutDraft||normalizeLoadoutChoice(selectedLoadout()));requestAnimationFrame(()=>void ensureLoadoutPreviewEngine());}
 }
 function switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,name){
   const tabs=[...document.querySelectorAll(tabSelector)],pages=[...document.querySelectorAll(pageSelector)];if(!tabs.length||!pages.length)return;
@@ -913,8 +948,8 @@ function syncMatchLoadoutEditor(){
   for(const btn of matchLethalButtons)btn.classList.toggle('active',btn.dataset.matchLethalChoice===draft.lethal);
   const dirty=!loadoutChoiceEqual(draft,loadoutBaseDraft||draft),status=$('loadoutStatus'),description=$('loadoutDescription');if(description)description.textContent=godMode?'God Mode is active. Save equips the new loadout immediately.':'Changes are staged until Save. Your current life stays unchanged.';if(status)status.textContent=dirty?'Unsaved changes':godMode?'Saved loadout · changes equip immediately.':(pendingLoadout?'Queued loadout is saved for your next spawn.':'Saved loadout · equips on your next spawn.');if($('loadoutResetBtn'))$('loadoutResetBtn').disabled=!dirty;if($('loadoutSaveBtn'))$('loadoutSaveBtn').disabled=!dirty;
 }
-function openMatchLoadout(){if(!shell.inMatch)return;loadoutBaseDraft=normalizeLoadoutChoice(pendingLoadout||selectedLoadout());loadoutDraft={...loadoutBaseDraft};syncMatchLoadoutEditor();shell.openPanel(SHELL_PANEL.LOADOUT);}
-function closeMatchLoadout(){loadoutDraft=null;loadoutBaseDraft=null;shell.closePanel(SHELL_PANEL.LOADOUT);}
+function openMatchLoadout(){if(!shell.inMatch)return;loadoutBaseDraft=normalizeLoadoutChoice(pendingLoadout||selectedLoadout());loadoutDraft={...loadoutBaseDraft};syncMatchLoadoutEditor();shell.openPanel(SHELL_PANEL.LOADOUT);switchLoadoutWeaponTab('match',loadoutFocusSlot.match||'primary');requestAnimationFrame(()=>void ensureLoadoutPreviewEngine());}
+function closeMatchLoadout(){closeAttachmentSheet();loadoutDraft=null;loadoutBaseDraft=null;shell.closePanel(SHELL_PANEL.LOADOUT);}
 function resetMatchLoadout(){if(!loadoutBaseDraft)return;loadoutDraft={...loadoutBaseDraft};syncMatchLoadoutEditor();}
 function saveMatchLoadout(){
   if(socket?.readyState!==WebSocket.OPEN||!loadoutDraft)return;if(loadoutBaseDraft&&loadoutChoiceEqual(loadoutDraft,loadoutBaseDraft)){closeMatchLoadout();return;}
@@ -1066,6 +1101,26 @@ function registerWeaponHandAnchors(root,{right,left,reloadLeft,reloadRight}={}){
 }
 function activeFirstPersonWeaponGroup(weapon=currentWeapon){
   return weapon==='pistol'?pistolGroup:weapon==='akimbo1887'?null:weapon==='assault'?assaultGroup:weapon==='ump'?umpGroup:weapon==='machineGun'?machineGunGroup:weapon==='shotgun'?shotgunGroup:weapon==='semiShotgun'?semiShotgunGroup:weapon==='sniper'?sniperGroup:weapon==='grenadeLauncher'?grenadeLauncherGroup:weapon==='rpg'?rpgGroup:null;
+}
+function cloneLoadoutPreviewNode(source){
+  if(!source)return null;let clone;if(source.isMesh){clone=new THREE.Mesh(source.geometry,source.material);clone.castShadow=false;clone.receiveShadow=false;}else clone=new THREE.Group();clone.position.copy(source.position);clone.quaternion.copy(source.quaternion);clone.scale.copy(source.scale);clone.visible=source.visible;clone.renderOrder=source.renderOrder||0;for(const child of source.children||[]){const copy=cloneLoadoutPreviewNode(child);if(copy)clone.add(copy);}return clone;
+}
+function buildLoadoutPreviewModel(weapon,attachments){
+  const root=new THREE.Group(),sources=weapon==='akimbo1887'?[akimboLeftGroup,akimboRightGroup]:[activeFirstPersonWeaponGroup(weapon)].filter(Boolean);if(!sources.length)return root;
+  const changed=[];for(const source of sources){if(source?.userData?.attachmentWeapon){syncWeaponAttachmentVisuals(source,weapon,attachments);changed.push(source);}const copy=new THREE.Group();for(const child of source?.children||[]){const node=cloneLoadoutPreviewNode(child);if(node)copy.add(node);}root.add(copy);}
+  // Restore the live viewmodel immediately; draft attachments belong only to the preview until saved.
+  if(changed.length)syncLocalAttachmentVisuals();
+  if(weapon==='akimbo1887'&&root.children.length>=2){root.children[0].position.x=-.19;root.children[0].rotation.y=.08;root.children[1].position.x=.19;root.children[1].rotation.y=-.08;}
+  const box=new THREE.Box3().setFromObject(root),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3()),maxDim=Math.max(.01,size.x,size.y,size.z),scale=2.30/maxDim;root.position.sub(center);const wrapper=new THREE.Group();wrapper.add(root);wrapper.scale.setScalar(scale);return wrapper;
+}
+function createLoadoutPreviewContext(key,canvas){
+  const previewScene=new THREE.Scene(),previewCamera=new THREE.PerspectiveCamera(28,1,.05,20),previewRenderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'low-power'});previewRenderer.setPixelRatio(1);previewRenderer.outputColorSpace=THREE.SRGBColorSpace;previewRenderer.toneMapping=THREE.ACESFilmicToneMapping;previewRenderer.toneMappingExposure=1.08;previewRenderer.setClearColor(0x000000,0);previewCamera.position.set(0,.18,4.6);previewCamera.lookAt(0,0,0);previewScene.add(new THREE.HemisphereLight(0xeaf6ff,0x29322d,2.5));const keyLight=new THREE.DirectionalLight(0xffffff,2.3);keyLight.position.set(-3,4,4);previewScene.add(keyLight);const rim=new THREE.DirectionalLight(0x9bc7da,1.1);rim.position.set(4,1,-3);previewScene.add(rim);const pivot=new THREE.Group();previewScene.add(pivot);const ctx={key,canvas,scene:previewScene,camera:previewCamera,renderer:previewRenderer,pivot,signature:'',angle:.16,dragging:false,lastX:0,interacted:false,lastRenderedAt:0};
+  canvas.addEventListener('pointerdown',e=>{ctx.dragging=true;ctx.interacted=true;ctx.lastX=e.clientX;canvas.setPointerCapture?.(e.pointerId);});canvas.addEventListener('pointermove',e=>{if(!ctx.dragging)return;const dx=e.clientX-ctx.lastX;ctx.lastX=e.clientX;ctx.angle+=dx*.012;});const end=e=>{ctx.dragging=false;try{canvas.releasePointerCapture?.(e.pointerId);}catch{}};canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);return ctx;
+}
+async function ensureLoadoutPreviewEngine(){if(engineReady)return true;return ensureThreeEngine();}
+function updateLoadoutPreviewFrame(now,dt){
+  if(!engineReady||!THREE)return;for(const [key,desired] of loadoutPreviewDesired){const canvas=document.querySelector(`[data-loadout-preview="${key}"]`);if(!canvas||!canvas.getClientRects().length||canvas.closest('[hidden]'))continue;let ctx=loadoutPreviewContexts.get(key);if(!ctx){ctx=createLoadoutPreviewContext(key,canvas);loadoutPreviewContexts.set(key,ctx);}if(ctx.signature!==desired.signature){while(ctx.pivot.children.length)ctx.pivot.remove(ctx.pivot.children[0]);ctx.pivot.add(buildLoadoutPreviewModel(desired.weapon,desired.attachments));ctx.signature=desired.signature;}
+    const w=Math.max(2,Math.round(canvas.clientWidth||2)),h=Math.max(2,Math.round(canvas.clientHeight||2));if(canvas.width!==w||canvas.height!==h)ctx.renderer.setSize(w,h,false);ctx.camera.aspect=w/h;ctx.camera.updateProjectionMatrix();if(!ctx.dragging)ctx.angle+=Math.max(0,Number(dt)||0)*(ctx.interacted?.045:.10);ctx.pivot.rotation.set(-.10,Math.PI/2+ctx.angle,.02);ctx.renderer.render(ctx.scene,ctx.camera);ctx.lastRenderedAt=now;}
 }
 function createFirstPersonHand(side,gloveMat){
   const root=new THREE.Group(),palm=new THREE.Mesh(new THREE.BoxGeometry(.074,.050,.096),gloveMat),knuckles=new THREE.Mesh(new THREE.BoxGeometry(.078,.032,.052),gloveMat),thumb=new THREE.Mesh(new THREE.CapsuleGeometry(.012,.035,3,6),gloveMat);
@@ -1663,6 +1718,7 @@ function bindUI(){
     if(controllerInputActive()&&(e.code==='Space'||e.code==='Escape'||e.code.startsWith('Arrow'))){e.preventDefault();return;}
     if(!controllerInputActive()||isTouch||document.pointerLockElement===canvas)setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
     if(e.code==='Enter'&&!e.repeat&&shell.inMatch&&!shell.paused&&!shell.panel){e.preventDefault();openChat();return;}
+    if(e.code==='Escape'&&!e.repeat&&!$('attachmentSheet')?.classList.contains('hide')){e.preventDefault();closeAttachmentSheet();return;}
     if(e.code==='Escape'&&!e.repeat&&shell.panel){
       e.preventDefault();
       if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return;}
@@ -3294,7 +3350,7 @@ function applyFlashEffect(m){const power=Math.max(0,Math.min(1,Number(m.power)||
 function animate(){
   requestAnimationFrame(animate);
   const rawFrameDt=Math.max(0,clock.getDelta()),frameDt=Math.min(rawFrameDt,CLIENT_MAX_FRAME_SEC);recordNetFrame(rawFrameDt);
-  updateGamepadInput(frameDt);
+  updateGamepadInput(frameDt);updateLoadoutPreviewFrame(performance.now(),Math.min(rawFrameDt,.10));
   if(!shell.inMatch)return;
   if(shell.canPlay){
     // Keep prediction caught up without a fixed-step backlog. A render hitch used
@@ -3355,6 +3411,7 @@ function setControllerUiEditing(el){
   clearControllerUiEditing();controllerUiEditing=el;el.classList.add('controller-editing');return true;
 }
 function controllerUiSurface(){
+  if(!$('attachmentSheet')?.classList.contains('hide'))return $('attachmentSheet');
   if(gameTextEditorTarget)return gameTextEditor;
   if(chatOpen)return chatComposer;
   if(shell.panel===SHELL_PANEL.SETTINGS)return $('settingsPanel');
@@ -3420,7 +3477,7 @@ function ensureControllerUiFocus(){
   return controllerUiFocus;
 }
 function intervalGap(a0,a1,b0,b1){if(a1<b0)return b0-a1;if(b1<a0)return a0-b1;return 0;}
-const CONTROLLER_NAV_GROUP_SELECTOR='.settings-grid,.weapon-fields,.loadout-choice-grid,.attachment-slot-grid,.lobby-mode-picker,.lobby-setup-row,.lobby-team-picker,.admin-bot-controls,.pause-actions,.pause-actions-player,.pause-actions-system,.join-controls,.lobby-map-choice-grid,.lobby-cheat-tabs,.chat-key-row,.game-text-key-row';
+const CONTROLLER_NAV_GROUP_SELECTOR='.settings-grid,.weapon-fields,.loadout-choice-grid,.attachment-editor,.attachment-sheet-options,.loadout-weapon-tabs,.lobby-mode-picker,.lobby-setup-row,.lobby-team-picker,.admin-bot-controls,.pause-actions,.pause-actions-player,.pause-actions-system,.join-controls,.lobby-map-choice-grid,.lobby-cheat-tabs,.chat-key-row,.game-text-key-row';
 function controllerNavGroup(el){return el?.closest?.(CONTROLLER_NAV_GROUP_SELECTOR)||null;}
 function controllerDirectionScore(a,r,dx,dy){
   const ax=a.left+a.width/2,ay=a.top+a.height/2,bx=r.left+r.width/2,by=r.top+r.height/2,vx=bx-ax,vy=by-ay;
@@ -3490,7 +3547,7 @@ function handleControllerUiNavigation(pressed){
   if(controllerUiAdjusting&&(controllerUiAdjusting.el!==focus||controllerUiEditing!==focus||!controllerEditAdjustHeld()))finishControllerUiAdjustment();
   if(pressed[GAMEPAD_BUTTON.B]){
     if(controllerUiEditing){clearControllerUiEditing();return true;}
-    finishControllerUiAdjustment();
+    finishControllerUiAdjustment();if(!$('attachmentSheet')?.classList.contains('hide')){closeAttachmentSheet();return true;}
     if(chatOpen){void dismissChat({restorePointer:false});return true;}
     if(gameTextEditorTarget){cancelGameTextEditor();return true;}
     if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return true;}
