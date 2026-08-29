@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.39.2';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.39.2';
-import * as YardGeometry from './world-geometry-yard.js?v=1.39.2';
-import * as RigGeometry from './world-geometry-rig.js?v=1.39.2';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.39.2';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.39.2';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.39.2';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.39.2';
+import * as HighlandsGeometry from './world-geometry.js?v=1.39.3';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.39.3';
+import * as YardGeometry from './world-geometry-yard.js?v=1.39.3';
+import * as RigGeometry from './world-geometry-rig.js?v=1.39.3';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.39.3';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.39.3';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.39.3';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.39.3';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.39.2';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.39.2';
-import { createAudioEngine } from './audio-engine.js?v=1.39.2';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.39.2';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.39.2';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.39.2';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.39.2';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.39.2';
+} from './game-config.js?v=1.39.3';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.39.3';
+import { createAudioEngine } from './audio-engine.js?v=1.39.3';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.39.3';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.39.3';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.39.3';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.39.3';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.39.3';
 
 let THREE = null;
 
@@ -587,7 +587,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.39.2';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.39.3';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1346,8 +1346,8 @@ function init3D(){
   const sniperMag=new THREE.Mesh(new THREE.BoxGeometry(.095,.16,.12),rifleMat);sniperMag.position.set(0,-.075,-.16);sniperMag.rotation.x=.10;
   const scope = new THREE.Mesh(new THREE.CylinderGeometry(.048,.048,.42,18,1,true),rifleMat);scope.rotation.x=Math.PI/2;scope.position.set(0,.14,-.16);
   const scopeInner=new THREE.Mesh(new THREE.CylinderGeometry(.039,.039,.39,18,1,true),new THREE.MeshStandardMaterial({color:0x090c10,roughness:.96,metalness:.02,side:THREE.BackSide}));scopeInner.rotation.x=Math.PI/2;scopeInner.position.copy(scope.position);
-  const scopeFrontRing=new THREE.Mesh(new THREE.TorusGeometry(.043,.0055,8,20),rifleMat);scopeFrontRing.rotation.x=Math.PI/2;scopeFrontRing.position.set(0,.14,-.37);
-  const scopeRearRing=new THREE.Mesh(new THREE.TorusGeometry(.043,.0055,8,20),rifleMat);scopeRearRing.rotation.x=Math.PI/2;scopeRearRing.position.set(0,.14,.05);
+  const scopeFrontRing=new THREE.Mesh(new THREE.TorusGeometry(.043,.0055,8,20),rifleMat);scopeFrontRing.position.set(0,.14,-.37);
+  const scopeRearRing=new THREE.Mesh(new THREE.TorusGeometry(.043,.0055,8,20),rifleMat);scopeRearRing.position.set(0,.14,.05);
   const scopeFrontLens = new THREE.Mesh(new THREE.CircleGeometry(.0405,20),lensMat);scopeFrontLens.position.set(0,.14,-.366);
   const scopeRearLens = new THREE.Mesh(new THREE.CircleGeometry(.0405,20),lensMat);scopeRearLens.position.set(0,.14,.046);
   const scopeMountRear=new THREE.Mesh(new THREE.BoxGeometry(.065,.055,.032),rifleMat);scopeMountRear.position.set(0,.098,-.02);
@@ -2387,7 +2387,7 @@ function makeRemote(player){
   const ssRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.09,.24),gunMat.clone()),ssHand=new THREE.Mesh(new THREE.BoxGeometry(.09,.07,.16),new THREE.MeshStandardMaterial({color:0x4d5548,roughness:.78,metalness:.08})),ssBar=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.48,8),gunMat.clone()),ssTube=new THREE.Mesh(new THREE.CylinderGeometry(.010,.010,.30,8),gunMat.clone()),ssStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.20),new THREE.MeshStandardMaterial({color:0x4d5548,roughness:.78,metalness:.08})),ssGrip=new THREE.Mesh(new THREE.BoxGeometry(.08,.15,.08),gunMat.clone());ssRecv.position.set(0,.01,.22);ssHand.position.set(0,-.04,.06);ssBar.rotation.x=Math.PI/2;ssBar.position.set(0,.01,-.06);ssTube.rotation.x=Math.PI/2;ssTube.position.set(0,-.03,0);ssStock.position.set(0,-.03,.41);ssGrip.position.set(0,-.11,.33);ssGrip.rotation.x=-.25;const ssMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.08,.12,.09),gunMat.clone());ssMagRemote.position.set(0,-.09,.25);semiShotgun.add(ssRecv,ssHand,ssBar,ssTube,ssStock,ssGrip,ssMagRemote);semiShotgun.visible=false;
 
   const sniper=new THREE.Group();
-  const snRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.08,.30),gunMat.clone()),snHand=new THREE.Mesh(new THREE.BoxGeometry(.08,.07,.22),new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06})),snBar=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.56,8),gunMat.clone()),snStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.24),new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06})),snScope=new THREE.Mesh(new THREE.CylinderGeometry(.026,.026,.18,14,1,true),gunMat.clone());snRecv.position.set(0,.01,.27);snHand.position.set(0,-.03,.05);snBar.rotation.x=Math.PI/2;snBar.position.set(0,.01,-.11);snStock.position.set(0,-.03,.47);snScope.rotation.x=Math.PI/2;snScope.position.set(0,.08,.27);const snScopeInner=new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.17,14,1,true),new THREE.MeshStandardMaterial({color:0x090c10,roughness:.96,metalness:.02,side:THREE.BackSide}));snScopeInner.rotation.x=Math.PI/2;snScopeInner.position.copy(snScope.position);const snFrontRing=new THREE.Mesh(new THREE.TorusGeometry(.0225,.0035,8,18),gunMat.clone());snFrontRing.rotation.x=Math.PI/2;snFrontRing.position.set(0,.08,.18);const snRearRing=new THREE.Mesh(new THREE.TorusGeometry(.0225,.0035,8,18),gunMat.clone());snRearRing.rotation.x=Math.PI/2;snRearRing.position.set(0,.08,.36);const snFrontLens=new THREE.Mesh(new THREE.CircleGeometry(.021,18),lensMat.clone());snFrontLens.position.set(0,.08,.183);const snRearLens=new THREE.Mesh(new THREE.CircleGeometry(.021,18),lensMat.clone());snRearLens.position.set(0,.08,.357);const snScopeMountRear=new THREE.Mesh(new THREE.BoxGeometry(.042,.042,.020),gunMat.clone());snScopeMountRear.position.set(0,.045,.33);const snScopeMountFront=new THREE.Mesh(new THREE.BoxGeometry(.042,.042,.020),gunMat.clone());snScopeMountFront.position.set(0,.045,.22);const sniperBoltRemote=new THREE.Mesh(new THREE.BoxGeometry(.034,.034,.10),gunMat.clone());sniperBoltRemote.position.set(.07,.02,.33);const snMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.07,.11,.085),gunMat.clone());snMagRemote.position.set(0,-.075,.26);snMagRemote.rotation.x=.08;sniper.add(snRecv,snHand,snBar,snStock,snScopeMountRear,snScopeMountFront,snScope,snScopeInner,snFrontRing,snRearRing,snFrontLens,snRearLens,sniperBoltRemote,snMagRemote);sniper.visible=false;
+  const snRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.08,.30),gunMat.clone()),snHand=new THREE.Mesh(new THREE.BoxGeometry(.08,.07,.22),new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06})),snBar=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.56,8),gunMat.clone()),snStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.24),new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06})),snScope=new THREE.Mesh(new THREE.CylinderGeometry(.026,.026,.18,14,1,true),gunMat.clone());snRecv.position.set(0,.01,.27);snHand.position.set(0,-.03,.05);snBar.rotation.x=Math.PI/2;snBar.position.set(0,.01,-.11);snStock.position.set(0,-.03,.47);snScope.rotation.x=Math.PI/2;snScope.position.set(0,.08,.27);const snScopeInner=new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.17,14,1,true),new THREE.MeshStandardMaterial({color:0x090c10,roughness:.96,metalness:.02,side:THREE.BackSide}));snScopeInner.rotation.x=Math.PI/2;snScopeInner.position.copy(snScope.position);const snFrontRing=new THREE.Mesh(new THREE.TorusGeometry(.0225,.0035,8,18),gunMat.clone());snFrontRing.position.set(0,.08,.18);const snRearRing=new THREE.Mesh(new THREE.TorusGeometry(.0225,.0035,8,18),gunMat.clone());snRearRing.position.set(0,.08,.36);const snFrontLens=new THREE.Mesh(new THREE.CircleGeometry(.021,18),lensMat.clone());snFrontLens.position.set(0,.08,.183);const snRearLens=new THREE.Mesh(new THREE.CircleGeometry(.021,18),lensMat.clone());snRearLens.position.set(0,.08,.357);const snScopeMountRear=new THREE.Mesh(new THREE.BoxGeometry(.042,.042,.020),gunMat.clone());snScopeMountRear.position.set(0,.045,.33);const snScopeMountFront=new THREE.Mesh(new THREE.BoxGeometry(.042,.042,.020),gunMat.clone());snScopeMountFront.position.set(0,.045,.22);const sniperBoltRemote=new THREE.Mesh(new THREE.BoxGeometry(.034,.034,.10),gunMat.clone());sniperBoltRemote.position.set(.07,.02,.33);const snMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.07,.11,.085),gunMat.clone());snMagRemote.position.set(0,-.075,.26);snMagRemote.rotation.x=.08;sniper.add(snRecv,snHand,snBar,snStock,snScopeMountRear,snScopeMountFront,snScope,snScopeInner,snFrontRing,snRearRing,snFrontLens,snRearLens,sniperBoltRemote,snMagRemote);sniper.visible=false;
   const grenadeLauncher=new THREE.Mesh(new THREE.CylinderGeometry(.065,.065,.68,9),gunMat.clone());grenadeLauncher.rotation.x=Math.PI/2+GRENADE_LAUNCH_PITCH;grenadeLauncher.position.set(.45,1.08,-.40);grenadeLauncher.visible=false;
   const rpg=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.88,9),gunMat.clone());rpg.rotation.x=Math.PI/2;rpg.position.set(.38,1.42,-.43);rpg.visible=false;
   const godRing=new THREE.Mesh(new THREE.TorusGeometry(.42,.035,6,28),new THREE.MeshBasicMaterial({color:0xffdd67,transparent:true,opacity:.9}));godRing.rotation.x=Math.PI/2;godRing.position.y=2.03;godRing.visible=!!player.godMode;
