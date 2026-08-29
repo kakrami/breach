@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.42.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.42.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.42.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.42.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.42.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.42.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.42.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.42.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.42.1';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.42.1';
+import * as YardGeometry from './world-geometry-yard.js?v=1.42.1';
+import * as RigGeometry from './world-geometry-rig.js?v=1.42.1';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.42.1';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.42.1';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.42.1';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.42.1';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.42.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.42.0';
-import { createAudioEngine } from './audio-engine.js?v=1.42.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.42.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.42.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.42.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.42.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.42.0';
+} from './game-config.js?v=1.42.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.42.1';
+import { createAudioEngine } from './audio-engine.js?v=1.42.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.42.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.42.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.42.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.42.1';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.42.1';
 
 let THREE = null;
 
@@ -604,7 +604,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.42.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.42.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
