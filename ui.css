@@ -78,7 +78,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.1: one owner for layout, density, overflow and responsive behavior. */
+/* Breach UI contract v1.44.2: one owner for layout, density, overflow and responsive behavior. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -405,9 +405,9 @@ body{font-size:var(--ui-md)}
   .lobby-host-setup .lobby-match-grid,.lobby-loadout-body{overflow:visible;height:auto}
 }
 /* Controller navigation: focus follows the rendered spatial layout, not DOM order. */
-[data-input-mode="controller"] .controller-focus{position:relative;z-index:5}
+[data-input-mode="controller"] .controller-focus{z-index:5}
 [data-input-mode="controller"] .controller-focus.lobby-admin-toggle,[data-input-mode="controller"] .controller-focus.toggle-control{outline-offset:2px!important}
-/* v1.44.1 hierarchical Create-a-Class / weapon-anchored Gunsmith. */
+/* v1.44.2 hierarchical Create-a-Class / weapon-anchored Gunsmith. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
 .loadout-classes-view,.loadout-class-view,.loadout-item-view{height:100%;min-width:0;min-height:0;overflow:hidden}.loadout-classes-view[hidden],.loadout-class-view[hidden],.loadout-item-view[hidden]{display:none!important}
 .loadout-classes-view{display:grid;grid-template-rows:auto minmax(0,1fr);gap:6px}.class-browser-head,.loadout-view-nav{display:flex;align-items:end;justify-content:space-between;gap:10px;padding:2px 3px 6px;border-bottom:1px solid rgba(255,255,255,.08)}.class-browser-head span,.loadout-view-nav span{display:block;color:#748089;font:900 7px/1 system-ui;letter-spacing:.11em}.class-browser-head h3,.loadout-view-nav h3{margin:3px 0 0;color:var(--text);font:950 16px/1 system-ui}.class-browser-head small{color:#7e8a92;font:750 7.5px/1 system-ui}.gunsmith-back{height:30px;padding:0 9px;border:1px solid var(--line);border-radius:6px;background:#0b1013;color:#aeb9bf;font:900 8px/1 system-ui;letter-spacing:.06em}.gunsmith-back:hover,.gunsmith-back:focus-visible{border-color:var(--line2);color:#fff}
@@ -438,7 +438,7 @@ body{font-size:var(--ui-md)}
 }
 
 
-/* v1.44.1 landscape loadout sizing: the lobby footer owns its row; Create-a-Class
+/* v1.44.2 landscape loadout sizing: the lobby footer owns its row; Create-a-Class
    owns only the bounded main area above it. Never fall back to lobby page scroll. */
 @media (orientation:landscape){
   .lobby-side-view.lobby-loadout-view.active{
@@ -507,7 +507,7 @@ body{font-size:var(--ui-md)}
 }
 
 
-/* v1.44.1 focused Create-a-Class: the root class browser stays in the lobby.
+/* v1.44.2 focused Create-a-Class: the root class browser stays in the lobby.
    Editing a class or item temporarily owns the whole lobby canvas so unrelated
    lobby chrome never competes with the editor for landscape height. */
 .lobby-screen.loadout-focused .lobby-shell{
@@ -664,7 +664,7 @@ body{font-size:var(--ui-md)}
 }
 
 
-/* v1.44.1 Create-a-Class readability rebuild.
+/* v1.44.2 Create-a-Class readability rebuild.
    Use the available canvas before reducing typography. */
 @media (orientation:landscape){
   .class-browser-head{align-items:center;padding:4px 5px 9px;gap:14px}
@@ -876,7 +876,7 @@ body{font-size:var(--ui-md)}
   .equipment-choice-grid .loadout-choice strong{font-size:9px}
 }
 
-/* v1.44.1 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.2 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -888,3 +888,43 @@ body{font-size:var(--ui-md)}
 @media (orientation:landscape){
   .lobby-screen.loadout-focused .loadout-stat-bar{height:6px;min-height:6px;margin-top:4px}
 }
+
+/* v1.44.2 controller focus visuals: focus must never mutate Gunsmith geometry. */
+[data-input-mode="controller"] .gunsmith-callout.controller-focus,
+[data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
+  position:absolute!important;
+  transform:none!important;
+  outline:0!important;
+  background:linear-gradient(135deg,rgba(215,255,88,.20),rgba(19,29,22,.96))!important;
+  box-shadow:0 0 22px rgba(215,255,88,.22),inset 0 0 18px rgba(215,255,88,.08)!important;
+}
+[data-input-mode="controller"] .gunsmith-callout.controller-focus span,
+[data-input-mode="controller"] .gunsmith-callout.controller-focus strong{color:#efffc0!important}
+
+/* Class focus is a whole-card state rather than a thin controller outline. */
+.loadout-class-card.selected{
+  border-color:rgba(255,255,255,.08);
+  background:linear-gradient(135deg,rgba(215,255,88,.055),rgba(12,18,16,.98) 48%,rgba(7,10,12,.94));
+}
+.loadout-class-card.controller-card-focus{
+  border-color:rgba(255,255,255,.08);
+  background:radial-gradient(circle at 26% 24%,rgba(215,255,88,.15),transparent 48%),linear-gradient(135deg,rgba(25,35,26,.98),rgba(8,12,14,.96));
+  box-shadow:0 0 26px rgba(215,255,88,.16),inset 0 0 34px rgba(215,255,88,.055);
+  filter:brightness(1.12) saturate(1.05);
+}
+.loadout-class-card.controller-card-focus .loadout-class-card-head strong{color:#fff}
+.loadout-class-card.controller-card-focus .loadout-class-weapons span{color:#eef5f1}
+.loadout-class-card.controller-card-focus .loadout-class-main.controller-focus,
+.loadout-class-card.controller-card-focus .loadout-class-main.controller-focus:focus-visible{
+  outline:0!important;
+  box-shadow:none!important;
+  background:transparent!important;
+}
+.loadout-class-card.controller-card-focus .loadout-class-rename.controller-focus,
+.loadout-class-card.controller-card-focus .loadout-class-rename.controller-focus:focus-visible{
+  outline:0!important;
+  background:rgba(215,255,88,.16)!important;
+  color:#efffc0!important;
+  box-shadow:inset 0 0 16px rgba(215,255,88,.12)!important;
+}
+
