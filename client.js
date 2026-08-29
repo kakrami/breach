@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.43.3';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.43.3';
-import * as YardGeometry from './world-geometry-yard.js?v=1.43.3';
-import * as RigGeometry from './world-geometry-rig.js?v=1.43.3';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.43.3';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.43.3';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.43.3';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.43.3';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.0';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.43.3';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.43.3';
-import { createAudioEngine } from './audio-engine.js?v=1.43.3';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.43.3';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.43.3';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.43.3';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.43.3';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.43.3';
+} from './game-config.js?v=1.44.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.0';
+import { createAudioEngine } from './audio-engine.js?v=1.44.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.0';
 
 let THREE = null;
 
@@ -605,7 +605,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.43.3';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -3619,7 +3619,6 @@ const GUNSMITH_CONTROLLER_POINTS=Object.freeze({optic:[1,0],muzzle:[0,1],barrel:
 function controllerGridColumnCount(group){const raw=getComputedStyle(group).gridTemplateColumns||'';const cols=raw.split(/\s+/).filter(Boolean).length;return Math.max(1,cols||1);}
 function controllerGridMove(current,list,group,dx,dy){
   const items=list.filter(el=>controllerNavGroup(el)===group);if(items.length<2)return null;
-  if(group.classList.contains('loadout-class-list')){const cards=[...group.querySelectorAll('.loadout-class-card')],card=current.closest('.loadout-class-card'),row=cards.indexOf(card),role=current.classList.contains('loadout-class-rename')?'rename':'main';if(row<0)return current;if(dx){if(dx>0&&role==='main'){const target=card?.querySelector('.loadout-class-rename');return target&&items.includes(target)?target:current;}if(dx<0&&role==='rename'){const target=card?.querySelector('.loadout-class-main');return target&&items.includes(target)?target:current;}return current;}const next=cards[row+(dy>0?1:-1)];if(!next&&dy>0){const action=list.find(el=>el.id===(shell.inLobby?'lobbyStartBtn':'loadoutSaveBtn'));if(action)return action;}if(!next)return current;return next.querySelector(role==='rename'?'.loadout-class-rename':'.loadout-class-main')||current;}
   if(group.classList.contains('gunsmith-callout-overlay')){const slot=current.dataset?.calloutSlot,from=GUNSMITH_CONTROLLER_POINTS[slot];if(!from)return current;let best=null,bestScore=Infinity;for(const el of items){if(el===current)continue;const to=GUNSMITH_CONTROLLER_POINTS[el.dataset?.calloutSlot];if(!to)continue;const vx=to[0]-from[0],vy=to[1]-from[1];if((dx<0&&vx>=0)||(dx>0&&vx<=0)||(dy<0&&vy>=0)||(dy>0&&vy<=0))continue;const primary=dx?Math.abs(vx):Math.abs(vy),cross=dx?Math.abs(vy):Math.abs(vx),score=primary+cross*1.35;if(score<bestScore){best=el;bestScore=score;}}if(best)return best;const key=String(current.dataset?.controllerKey||'').match(/^gunsmith:(.+):slot:/)?.[1]||'';if(dy<0&&key){const change=list.find(el=>el.dataset?.controllerKey===`weapon-toggle:${key}`);if(change)return change;}if(dy>0&&key){const ads=list.find(el=>el.dataset?.controllerKey===`ads:${key}`);if(ads)return ads;}return current;}
   if(group.matches('.class-detail-grid,.gunsmith-attachment-options,.loadout-choice-grid,.equipment-choice-grid')){const cols=controllerGridColumnCount(group),idx=items.indexOf(current);if(idx<0)return current;let next=idx;if(dx)next=idx+(dx>0?1:-1);else if(dy)next=idx+(dy>0?cols:-cols);if(next<0||next>=items.length)return current;if(dx&&Math.floor(next/cols)!==Math.floor(idx/cols))return current;return items[next]||current;}
   return null;
