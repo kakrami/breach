@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.41.1" rel="manifest"/>
-<title>Breach v1.41.1</title>
-<link href="ui.css?v=1.41.1" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.42.0" rel="manifest"/>
+<title>Breach v1.42.0</title>
+<link href="ui.css?v=1.42.0" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -204,36 +204,51 @@
 <div class="lobby-side-view lobby-loadout-view" data-lobby-side-view="loadout" hidden="">
 <section class="lobby-loadout-panel">
 <div class="lobby-section-head"><div><h2>Create a Class</h2></div></div>
-<div class="loadout-editor loadout-workspace gunsmith-workspace" data-loadout-workspace="lobby">
-<div class="loadout-class-strip" data-loadout-class-strip="lobby" role="tablist" aria-label="Loadout classes"></div>
-<section class="loadout-class-overview active" data-loadout-overview="lobby">
-<header class="class-overview-head"><div><span>EDITING CLASS</span><h3 data-loadout-overview-name="lobby">CLASS 1</h3></div><small>Choose a weapon to open Gunsmith</small></header>
-<div class="class-overview-grid">
-<button class="class-overview-weapon" data-loadout-open-gunsmith="lobby-primary" type="button"><span>PRIMARY</span><strong data-loadout-overview-weapon="lobby-primary">ASSAULT RIFLE</strong><small data-loadout-overview-mods="lobby-primary">NO ATTACHMENTS</small><i>GUNSMITH ›</i></button>
-<button class="class-overview-weapon" data-loadout-open-gunsmith="lobby-secondary" type="button"><span>SECONDARY</span><strong data-loadout-overview-weapon="lobby-secondary">GLOCK</strong><small data-loadout-overview-mods="lobby-secondary">NO ATTACHMENTS</small><i>GUNSMITH ›</i></button>
-<div class="class-overview-equipment">
-<section class="loadout-section loadout-section-tactical"><header class="loadout-section-title"><span>TACTICAL</span></header><div class="loadout-choice-grid utility-grid" data-loadout-grid="lobby-tactical"></div></section>
-<section class="loadout-section loadout-section-lethal"><header class="loadout-section-title"><span>LETHAL</span></header><div class="loadout-choice-grid utility-grid" data-loadout-grid="lobby-lethal"></div></section>
-</div>
+<div class="loadout-editor loadout-workspace class-flow-workspace" data-loadout-workspace="lobby" data-view="classes">
+<section class="loadout-classes-view active" data-loadout-classes-view="lobby">
+<header class="class-browser-head"><div><span>CREATE A CLASS</span><h3>YOUR CLASSES</h3></div><small>Rename or select a class to edit</small></header>
+<div class="loadout-class-list" data-loadout-class-strip="lobby" role="list" aria-label="Loadout classes"></div>
+</section>
+<section class="loadout-class-view" data-loadout-class-view="lobby" hidden inert>
+<header class="loadout-view-nav"><button class="gunsmith-back" data-loadout-back-classes="lobby" type="button">‹ CLASSES</button><div><span>EDIT CLASS</span><h3 data-loadout-overview-name="lobby">CLASS 1</h3></div></header>
+<div class="class-detail-grid">
+<button class="class-item-card class-item-weapon" data-loadout-edit-item="lobby-primary" type="button"><span>PRIMARY</span><strong data-loadout-overview-weapon="lobby-primary">ASSAULT RIFLE</strong><small data-loadout-overview-mods="lobby-primary">NO ATTACHMENTS</small><i>EDIT ›</i></button>
+<button class="class-item-card class-item-weapon" data-loadout-edit-item="lobby-secondary" type="button"><span>SECONDARY</span><strong data-loadout-overview-weapon="lobby-secondary">GLOCK</strong><small data-loadout-overview-mods="lobby-secondary">NO ATTACHMENTS</small><i>EDIT ›</i></button>
+<button class="class-item-card class-item-equipment" data-loadout-edit-item="lobby-tactical" type="button"><span>TACTICAL</span><strong data-loadout-overview-equipment="lobby-tactical">FLASHBANG</strong><small>SELECT EQUIPMENT</small><i>EDIT ›</i></button>
+<button class="class-item-card class-item-equipment" data-loadout-edit-item="lobby-lethal" type="button"><span>LETHAL</span><strong data-loadout-overview-equipment="lobby-lethal">SEMTEX</strong><small>SELECT EQUIPMENT</small><i>EDIT ›</i></button>
 </div>
 </section>
-<section class="loadout-gunsmith-view" data-loadout-gunsmith="lobby" hidden inert>
-<header class="gunsmith-nav-bar"><button class="gunsmith-back" data-loadout-back-overview="lobby" type="button">‹ CLASS</button><div class="loadout-weapon-tabs gunsmith-weapon-tabs" data-controller-primary-tabs="true" role="tablist" aria-label="Weapon slot"><button class="loadout-weapon-tab active" data-loadout-weapon-tab="lobby-primary" aria-selected="true" role="tab" type="button"><span>PRIMARY</span><strong data-loadout-tab-summary="lobby-primary">Main weapon</strong></button><button class="loadout-weapon-tab" data-loadout-weapon-tab="lobby-secondary" aria-selected="false" role="tab" type="button"><span>SECONDARY</span><strong data-loadout-tab-summary="lobby-secondary">Backup weapon</strong></button></div></header>
-<div class="gunsmith-core">
-<section class="loadout-weapon-page active" data-loadout-weapon-page="lobby-primary">
+<section class="loadout-item-view" data-loadout-item-view="lobby" hidden inert>
+<header class="loadout-view-nav item-view-nav"><button class="gunsmith-back" data-loadout-back-class="lobby" type="button">‹ CLASS</button><div><span data-loadout-item-kicker="lobby">PRIMARY WEAPON</span><h3 data-loadout-item-title="lobby">ASSAULT RIFLE</h3></div></header>
+<div class="loadout-item-pages">
+<section class="loadout-weapon-page" data-loadout-weapon-page="lobby-primary" hidden inert>
+<div class="gunsmith-layout">
 <div class="gunsmith-weapon-column">
-<header class="loadout-focus-head"><div><span>PRIMARY WEAPON</span><h3 data-loadout-weapon-name="lobby-primary">ASSAULT RIFLE</h3><small data-loadout-weapon-role="lobby-primary">Balanced · Mid range</small></div><strong data-loadout-weapon-ammo="lobby-primary">30 ROUNDS</strong></header>
-<div class="gunsmith-focus-body"><div class="loadout-focus-stage"><canvas data-loadout-preview="lobby-primary" aria-label="Primary weapon preview"></canvas><span class="loadout-preview-hint">DRAG TO ROTATE</span><button class="gunsmith-ads-preview" data-loadout-ads-preview="lobby-primary" type="button" aria-label="Hold to preview aim down sights">ADS</button></div><div class="gunsmith-build-info"><div class="loadout-stat-row" data-loadout-stats="lobby-primary"></div><div class="loadout-picker-block"><span>WEAPON</span><div class="loadout-choice-grid primary-grid" data-loadout-grid="lobby-primary"></div></div></div></div>
+<header class="loadout-focus-head"><div><span>PRIMARY WEAPON</span><h3 data-loadout-weapon-name="lobby-primary">ASSAULT RIFLE</h3><small data-loadout-weapon-role="lobby-primary">Balanced · Mid range</small></div><div class="gunsmith-head-actions"><strong data-loadout-weapon-ammo="lobby-primary">30 ROUNDS</strong><button class="gunsmith-change-weapon" data-loadout-weapon-picker-toggle="lobby-primary" type="button">CHANGE</button></div></header>
+<div class="loadout-focus-stage"><canvas data-loadout-preview="lobby-primary" aria-label="Primary weapon preview"></canvas><div class="gunsmith-callout-overlay" data-gunsmith-callouts="lobby-primary"></div><span class="loadout-preview-hint">DRAG TO ROTATE · TAP A WEAPON PART</span><button class="gunsmith-ads-preview" data-loadout-ads-preview="lobby-primary" type="button" aria-label="Hold to preview aim down sights">ADS</button></div>
+<div class="loadout-stat-row" data-loadout-stats="lobby-primary"></div>
 </div>
+<aside class="gunsmith-inspector">
+<div class="gunsmith-weapon-picker" data-gunsmith-weapon-picker="lobby-primary" hidden><header><strong>PRIMARY WEAPON</strong><small>Choose a weapon</small></header><div class="loadout-choice-grid primary-grid" data-loadout-grid="lobby-primary"></div></div>
 <div class="attachment-editor" data-attachment-editor="lobby-primary"></div>
+</aside>
+</div>
 </section>
 <section class="loadout-weapon-page" data-loadout-weapon-page="lobby-secondary" hidden inert>
+<div class="gunsmith-layout">
 <div class="gunsmith-weapon-column">
-<header class="loadout-focus-head"><div><span>SECONDARY WEAPON</span><h3 data-loadout-weapon-name="lobby-secondary">GLOCK</h3><small data-loadout-weapon-role="lobby-secondary">Reliable backup · Fast handling</small></div><strong data-loadout-weapon-ammo="lobby-secondary">15 ROUNDS</strong></header>
-<div class="gunsmith-focus-body"><div class="loadout-focus-stage"><canvas data-loadout-preview="lobby-secondary" aria-label="Secondary weapon preview"></canvas><span class="loadout-preview-hint">DRAG TO ROTATE</span><button class="gunsmith-ads-preview" data-loadout-ads-preview="lobby-secondary" type="button" aria-label="Hold to preview aim down sights">ADS</button></div><div class="gunsmith-build-info"><div class="loadout-stat-row" data-loadout-stats="lobby-secondary"></div><div class="loadout-picker-block"><span>WEAPON</span><div class="loadout-choice-grid secondary-grid" data-loadout-grid="lobby-secondary"></div></div></div></div>
+<header class="loadout-focus-head"><div><span>SECONDARY WEAPON</span><h3 data-loadout-weapon-name="lobby-secondary">GLOCK</h3><small data-loadout-weapon-role="lobby-secondary">Reliable backup · Fast handling</small></div><div class="gunsmith-head-actions"><strong data-loadout-weapon-ammo="lobby-secondary">15 ROUNDS</strong><button class="gunsmith-change-weapon" data-loadout-weapon-picker-toggle="lobby-secondary" type="button">CHANGE</button></div></header>
+<div class="loadout-focus-stage"><canvas data-loadout-preview="lobby-secondary" aria-label="Secondary weapon preview"></canvas><div class="gunsmith-callout-overlay" data-gunsmith-callouts="lobby-secondary"></div><span class="loadout-preview-hint">DRAG TO ROTATE · TAP A WEAPON PART</span><button class="gunsmith-ads-preview" data-loadout-ads-preview="lobby-secondary" type="button" aria-label="Hold to preview aim down sights">ADS</button></div>
+<div class="loadout-stat-row" data-loadout-stats="lobby-secondary"></div>
 </div>
+<aside class="gunsmith-inspector">
+<div class="gunsmith-weapon-picker" data-gunsmith-weapon-picker="lobby-secondary" hidden><header><strong>SECONDARY WEAPON</strong><small>Choose a weapon</small></header><div class="loadout-choice-grid secondary-grid" data-loadout-grid="lobby-secondary"></div></div>
 <div class="attachment-editor" data-attachment-editor="lobby-secondary"></div>
+</aside>
+</div>
 </section>
+<section class="loadout-equipment-page" data-loadout-equipment-page="lobby-tactical" hidden inert><div class="equipment-editor-card"><header><span>TACTICAL</span><h3>Choose tactical equipment</h3></header><div class="loadout-choice-grid utility-grid equipment-choice-grid" data-loadout-grid="lobby-tactical"></div></div></section>
+<section class="loadout-equipment-page" data-loadout-equipment-page="lobby-lethal" hidden inert><div class="equipment-editor-card"><header><span>LETHAL</span><h3>Choose lethal equipment</h3></header><div class="loadout-choice-grid utility-grid equipment-choice-grid" data-loadout-grid="lobby-lethal"></div></div></section>
 </div>
 </section>
 </div>
@@ -295,36 +310,51 @@
 <section aria-label="Change loadout" class="modal-screen hide" id="loadoutPanel">
 <div class="modal-shell loadout-shell">
 <header class="modal-head"><div><h2>Create a Class</h2><p id="loadoutDescription">Choose a class or edit its loadout. Changes apply on your next spawn.</p></div></header>
-<div class="loadout-editor loadout-workspace gunsmith-workspace" data-loadout-workspace="match">
-<div class="loadout-class-strip" data-loadout-class-strip="match" role="tablist" aria-label="Loadout classes"></div>
-<section class="loadout-class-overview active" data-loadout-overview="match">
-<header class="class-overview-head"><div><span>EDITING CLASS</span><h3 data-loadout-overview-name="match">CLASS 1</h3></div><small>Choose a weapon to open Gunsmith</small></header>
-<div class="class-overview-grid">
-<button class="class-overview-weapon" data-loadout-open-gunsmith="match-primary" type="button"><span>PRIMARY</span><strong data-loadout-overview-weapon="match-primary">ASSAULT RIFLE</strong><small data-loadout-overview-mods="match-primary">NO ATTACHMENTS</small><i>GUNSMITH ›</i></button>
-<button class="class-overview-weapon" data-loadout-open-gunsmith="match-secondary" type="button"><span>SECONDARY</span><strong data-loadout-overview-weapon="match-secondary">GLOCK</strong><small data-loadout-overview-mods="match-secondary">NO ATTACHMENTS</small><i>GUNSMITH ›</i></button>
-<div class="class-overview-equipment">
-<section class="loadout-section loadout-section-tactical"><header class="loadout-section-title"><span>TACTICAL</span></header><div class="loadout-choice-grid utility-grid" data-loadout-grid="match-tactical"></div></section>
-<section class="loadout-section loadout-section-lethal"><header class="loadout-section-title"><span>LETHAL</span></header><div class="loadout-choice-grid utility-grid" data-loadout-grid="match-lethal"></div></section>
-</div>
+<div class="loadout-editor loadout-workspace class-flow-workspace" data-loadout-workspace="match" data-view="classes">
+<section class="loadout-classes-view active" data-loadout-classes-view="match">
+<header class="class-browser-head"><div><span>CREATE A CLASS</span><h3>YOUR CLASSES</h3></div><small>Rename or select a class to edit</small></header>
+<div class="loadout-class-list" data-loadout-class-strip="match" role="list" aria-label="Loadout classes"></div>
+</section>
+<section class="loadout-class-view" data-loadout-class-view="match" hidden inert>
+<header class="loadout-view-nav"><button class="gunsmith-back" data-loadout-back-classes="match" type="button">‹ CLASSES</button><div><span>EDIT CLASS</span><h3 data-loadout-overview-name="match">CLASS 1</h3></div></header>
+<div class="class-detail-grid">
+<button class="class-item-card class-item-weapon" data-loadout-edit-item="match-primary" type="button"><span>PRIMARY</span><strong data-loadout-overview-weapon="match-primary">ASSAULT RIFLE</strong><small data-loadout-overview-mods="match-primary">NO ATTACHMENTS</small><i>EDIT ›</i></button>
+<button class="class-item-card class-item-weapon" data-loadout-edit-item="match-secondary" type="button"><span>SECONDARY</span><strong data-loadout-overview-weapon="match-secondary">GLOCK</strong><small data-loadout-overview-mods="match-secondary">NO ATTACHMENTS</small><i>EDIT ›</i></button>
+<button class="class-item-card class-item-equipment" data-loadout-edit-item="match-tactical" type="button"><span>TACTICAL</span><strong data-loadout-overview-equipment="match-tactical">FLASHBANG</strong><small>SELECT EQUIPMENT</small><i>EDIT ›</i></button>
+<button class="class-item-card class-item-equipment" data-loadout-edit-item="match-lethal" type="button"><span>LETHAL</span><strong data-loadout-overview-equipment="match-lethal">SEMTEX</strong><small>SELECT EQUIPMENT</small><i>EDIT ›</i></button>
 </div>
 </section>
-<section class="loadout-gunsmith-view" data-loadout-gunsmith="match" hidden inert>
-<header class="gunsmith-nav-bar"><button class="gunsmith-back" data-loadout-back-overview="match" type="button">‹ CLASS</button><div class="loadout-weapon-tabs gunsmith-weapon-tabs" data-controller-primary-tabs="true" role="tablist" aria-label="Weapon slot"><button class="loadout-weapon-tab active" data-loadout-weapon-tab="match-primary" aria-selected="true" role="tab" type="button"><span>PRIMARY</span><strong data-loadout-tab-summary="match-primary">Main weapon</strong></button><button class="loadout-weapon-tab" data-loadout-weapon-tab="match-secondary" aria-selected="false" role="tab" type="button"><span>SECONDARY</span><strong data-loadout-tab-summary="match-secondary">Backup weapon</strong></button></div></header>
-<div class="gunsmith-core">
-<section class="loadout-weapon-page active" data-loadout-weapon-page="match-primary">
+<section class="loadout-item-view" data-loadout-item-view="match" hidden inert>
+<header class="loadout-view-nav item-view-nav"><button class="gunsmith-back" data-loadout-back-class="match" type="button">‹ CLASS</button><div><span data-loadout-item-kicker="match">PRIMARY WEAPON</span><h3 data-loadout-item-title="match">ASSAULT RIFLE</h3></div></header>
+<div class="loadout-item-pages">
+<section class="loadout-weapon-page" data-loadout-weapon-page="match-primary" hidden inert>
+<div class="gunsmith-layout">
 <div class="gunsmith-weapon-column">
-<header class="loadout-focus-head"><div><span>PRIMARY WEAPON</span><h3 data-loadout-weapon-name="match-primary">ASSAULT RIFLE</h3><small data-loadout-weapon-role="match-primary">Balanced · Mid range</small></div><strong data-loadout-weapon-ammo="match-primary">30 ROUNDS</strong></header>
-<div class="gunsmith-focus-body"><div class="loadout-focus-stage"><canvas data-loadout-preview="match-primary" aria-label="Primary weapon preview"></canvas><span class="loadout-preview-hint">DRAG TO ROTATE</span><button class="gunsmith-ads-preview" data-loadout-ads-preview="match-primary" type="button" aria-label="Hold to preview aim down sights">ADS</button></div><div class="gunsmith-build-info"><div class="loadout-stat-row" data-loadout-stats="match-primary"></div><div class="loadout-picker-block"><span>WEAPON</span><div class="loadout-choice-grid primary-grid" data-loadout-grid="match-primary"></div></div></div></div>
+<header class="loadout-focus-head"><div><span>PRIMARY WEAPON</span><h3 data-loadout-weapon-name="match-primary">ASSAULT RIFLE</h3><small data-loadout-weapon-role="match-primary">Balanced · Mid range</small></div><div class="gunsmith-head-actions"><strong data-loadout-weapon-ammo="match-primary">30 ROUNDS</strong><button class="gunsmith-change-weapon" data-loadout-weapon-picker-toggle="match-primary" type="button">CHANGE</button></div></header>
+<div class="loadout-focus-stage"><canvas data-loadout-preview="match-primary" aria-label="Primary weapon preview"></canvas><div class="gunsmith-callout-overlay" data-gunsmith-callouts="match-primary"></div><span class="loadout-preview-hint">DRAG TO ROTATE · TAP A WEAPON PART</span><button class="gunsmith-ads-preview" data-loadout-ads-preview="match-primary" type="button" aria-label="Hold to preview aim down sights">ADS</button></div>
+<div class="loadout-stat-row" data-loadout-stats="match-primary"></div>
 </div>
+<aside class="gunsmith-inspector">
+<div class="gunsmith-weapon-picker" data-gunsmith-weapon-picker="match-primary" hidden><header><strong>PRIMARY WEAPON</strong><small>Choose a weapon</small></header><div class="loadout-choice-grid primary-grid" data-loadout-grid="match-primary"></div></div>
 <div class="attachment-editor" data-attachment-editor="match-primary"></div>
+</aside>
+</div>
 </section>
 <section class="loadout-weapon-page" data-loadout-weapon-page="match-secondary" hidden inert>
+<div class="gunsmith-layout">
 <div class="gunsmith-weapon-column">
-<header class="loadout-focus-head"><div><span>SECONDARY WEAPON</span><h3 data-loadout-weapon-name="match-secondary">GLOCK</h3><small data-loadout-weapon-role="match-secondary">Reliable backup · Fast handling</small></div><strong data-loadout-weapon-ammo="match-secondary">15 ROUNDS</strong></header>
-<div class="gunsmith-focus-body"><div class="loadout-focus-stage"><canvas data-loadout-preview="match-secondary" aria-label="Secondary weapon preview"></canvas><span class="loadout-preview-hint">DRAG TO ROTATE</span><button class="gunsmith-ads-preview" data-loadout-ads-preview="match-secondary" type="button" aria-label="Hold to preview aim down sights">ADS</button></div><div class="gunsmith-build-info"><div class="loadout-stat-row" data-loadout-stats="match-secondary"></div><div class="loadout-picker-block"><span>WEAPON</span><div class="loadout-choice-grid secondary-grid" data-loadout-grid="match-secondary"></div></div></div></div>
+<header class="loadout-focus-head"><div><span>SECONDARY WEAPON</span><h3 data-loadout-weapon-name="match-secondary">GLOCK</h3><small data-loadout-weapon-role="match-secondary">Reliable backup · Fast handling</small></div><div class="gunsmith-head-actions"><strong data-loadout-weapon-ammo="match-secondary">15 ROUNDS</strong><button class="gunsmith-change-weapon" data-loadout-weapon-picker-toggle="match-secondary" type="button">CHANGE</button></div></header>
+<div class="loadout-focus-stage"><canvas data-loadout-preview="match-secondary" aria-label="Secondary weapon preview"></canvas><div class="gunsmith-callout-overlay" data-gunsmith-callouts="match-secondary"></div><span class="loadout-preview-hint">DRAG TO ROTATE · TAP A WEAPON PART</span><button class="gunsmith-ads-preview" data-loadout-ads-preview="match-secondary" type="button" aria-label="Hold to preview aim down sights">ADS</button></div>
+<div class="loadout-stat-row" data-loadout-stats="match-secondary"></div>
 </div>
+<aside class="gunsmith-inspector">
+<div class="gunsmith-weapon-picker" data-gunsmith-weapon-picker="match-secondary" hidden><header><strong>SECONDARY WEAPON</strong><small>Choose a weapon</small></header><div class="loadout-choice-grid secondary-grid" data-loadout-grid="match-secondary"></div></div>
 <div class="attachment-editor" data-attachment-editor="match-secondary"></div>
+</aside>
+</div>
 </section>
+<section class="loadout-equipment-page" data-loadout-equipment-page="match-tactical" hidden inert><div class="equipment-editor-card"><header><span>TACTICAL</span><h3>Choose tactical equipment</h3></header><div class="loadout-choice-grid utility-grid equipment-choice-grid" data-loadout-grid="match-tactical"></div></div></section>
+<section class="loadout-equipment-page" data-loadout-equipment-page="match-lethal" hidden inert><div class="equipment-editor-card"><header><span>LETHAL</span><h3>Choose lethal equipment</h3></header><div class="loadout-choice-grid utility-grid equipment-choice-grid" data-loadout-grid="match-lethal"></div></div></section>
 </div>
 </section>
 </div>
@@ -399,6 +429,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.41.1" type="module"></script>
+<script src="client.js?v=1.42.0" type="module"></script>
 </body>
 </html>
