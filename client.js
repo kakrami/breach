@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.7';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.7';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.7';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.7';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.7';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.7';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.7';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.7';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.8';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.8';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.8';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.8';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.8';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.8';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.8';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.8';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.7';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.7';
-import { createAudioEngine } from './audio-engine.js?v=1.44.7';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.7';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.7';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.7';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.7';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.7';
+} from './game-config.js?v=1.44.8';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.8';
+import { createAudioEngine } from './audio-engine.js?v=1.44.8';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.8';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.8';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.8';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.8';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.8';
 
 let THREE = null;
 
@@ -618,7 +618,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.7';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.8';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -821,16 +821,17 @@ function writeClassLoadout(classes,id,loadout){const normalized=normalizeLoadout
 function loadoutClassesForSurface(surface){return surface==='lobby'?normalizeLoadoutClasses(lobbyClassDrafts||loadoutClasses,selectedLoadout()):normalizeLoadoutClasses(matchClassDrafts||loadoutClasses,selectedLoadout());}
 function currentLobbyStartingClassId(){return normalizeLoadoutClassId(lobbyStartingClassId||activeClassId);}
 function markLobbyLoadoutDirty(){lobbyLoadoutDirty=!classSetEqual(lobbyClassDrafts||loadoutClasses,loadoutClasses)||currentLobbyStartingClassId()!==normalizeLoadoutClassId(activeClassId);}
-function sendLobbyClassState(classId,{activate=false}={}){
+function syncLobbyClassesToServer(){
   if(socket?.readyState!==WebSocket.OPEN)return;
-  const id=normalizeLoadoutClassId(classId),classes=normalizeLoadoutClasses(lobbyClassDrafts||loadoutClasses,selectedLoadout()),draft=classLoadout(classes,id),rev=++lobbyLoadoutRevision;
-  send({t:'loadout',rev,classId:id,activate:!!activate,loadoutClasses:classes,...draft});
+  const classes=normalizeLoadoutClasses(lobbyClassDrafts||loadoutClasses,selectedLoadout()),classId=currentLobbyStartingClassId(),start=classLoadout(classes,classId),rev=++lobbyLoadoutRevision;
+  // Keep the established server contract: the message always activates the starting class,
+  // while loadoutClasses carries edits for every class, including classes being edited off-screen.
+  send({t:'loadout',rev,classId,loadoutClasses:classes,...start});
 }
 function setLobbyStartingClass(id){
   if(!matchAllowsLobbyEdits(matchState))return;
   if(lobbyLoadoutDraft)lobbyClassDrafts=writeClassLoadout(lobbyClassDrafts||loadoutClasses,loadoutEditClass.lobby,lobbyLoadoutDraft);
-  lobbyStartingClassId=normalizeLoadoutClassId(id);markLobbyLoadoutDirty();renderLoadoutClassStrip('lobby');renderLoadoutOverview('lobby',lobbyLoadoutDraft||classLoadout(lobbyClassDrafts,lobbyStartingClassId));setLobbyActionState();
-  sendLobbyClassState(lobbyStartingClassId,{activate:true});
+  lobbyStartingClassId=normalizeLoadoutClassId(id);markLobbyLoadoutDirty();renderLoadoutClassStrip('lobby');renderLoadoutOverview('lobby',lobbyLoadoutDraft||classLoadout(lobbyClassDrafts,lobbyStartingClassId));setLobbyActionState();syncLobbyClassesToServer();
   showToast(`${loadoutClassById(lobbyClassDrafts||loadoutClasses,lobbyStartingClassId).name} · STARTING CLASS`,{duration:1200,key:'starting-class'});
 }
 function renameLoadoutClass(surface,id,value){
@@ -838,11 +839,9 @@ function renameLoadoutClass(surface,id,value){
   if(surface==='lobby'){
     if(lobbyLoadoutDraft)lobbyClassDrafts=writeClassLoadout(lobbyClassDrafts||loadoutClasses,loadoutEditClass.lobby,lobbyLoadoutDraft);
     const classes=normalizeLoadoutClasses(lobbyClassDrafts||loadoutClasses,selectedLoadout()),idx=classes.findIndex(c=>c.id===classId);if(idx<0)return;
-    classes[idx]={...classes[idx],name:normalizeLoadoutClassName(value,idx)};lobbyClassDrafts=classes;markLobbyLoadoutDirty();renderLoadoutClassStrip('lobby');renderLoadoutOverview('lobby',lobbyLoadoutDraft||classLoadout(classes,loadoutEditClass.lobby));setLobbyActionState();sendLobbyClassState(classId,{activate:false});
+    classes[idx]={...classes[idx],name:normalizeLoadoutClassName(value,idx)};lobbyClassDrafts=classes;markLobbyLoadoutDirty();renderLoadoutClassStrip('lobby');renderLoadoutOverview('lobby',lobbyLoadoutDraft||classLoadout(classes,loadoutEditClass.lobby));setLobbyActionState();syncLobbyClassesToServer();
   }else{
-    if(loadoutDraft)matchClassDrafts=writeClassLoadout(matchClassDrafts||loadoutClasses,loadoutEditClass.match,loadoutDraft);
-    const classes=normalizeLoadoutClasses(matchClassDrafts||loadoutClasses,selectedLoadout()),idx=classes.findIndex(c=>c.id===classId);if(idx<0)return;
-    classes[idx]={...classes[idx],name:normalizeLoadoutClassName(value,idx)};matchClassDrafts=classes;syncMatchLoadoutEditor();
+    if(loadoutDraft)matchClassDrafts=writeClassLoadout(matchClassDrafts||loadoutClasses,loadoutEditClass.match,loadoutDraft);const classes=normalizeLoadoutClasses(matchClassDrafts||loadoutClasses,selectedLoadout()),idx=classes.findIndex(c=>c.id===classId);if(idx<0)return;classes[idx]={...classes[idx],name:normalizeLoadoutClassName(value,idx)};matchClassDrafts=classes;syncMatchLoadoutEditor();
   }
 }
 function renderLoadoutClassStrip(surface){
@@ -853,8 +852,7 @@ function renderLoadoutClassStrip(surface){
     const base=loadoutClassById(baseline,item.id,selectedLoadout()),dirty=item.name!==base.name||!loadoutChoiceEqual(item,base),card=document.createElement('div');card.className='loadout-class-card';
     card.classList.toggle('selected',item.id===selected);card.classList.toggle('starting',surface==='lobby'&&item.id===starting);card.classList.toggle('equipped',surface!=='lobby'&&item.id===activeClassId);card.classList.toggle('pending',surface!=='lobby'&&item.id===pendingClassId&&!!pendingLoadout);card.classList.toggle('dirty',dirty);card.setAttribute('role','listitem');
     const main=document.createElement('button');main.type='button';main.className='loadout-class-main';main.dataset.loadoutClass=item.id;main.dataset.controllerKey=`class:${surface}:${item.id}:main`;
-    const head=document.createElement('div');head.className='loadout-class-card-head';const name=document.createElement('strong');name.textContent=item.name;const state=document.createElement('span');
-    state.textContent=surface==='lobby'&&item.id===starting?'STARTING':surface!=='lobby'&&item.id===pendingClassId&&pendingLoadout?'NEXT':surface!=='lobby'&&item.id===activeClassId?'ACTIVE':dirty?'EDITED':'';head.append(name,state);
+    const head=document.createElement('div');head.className='loadout-class-card-head';const name=document.createElement('strong');name.textContent=item.name;const state=document.createElement('span');state.textContent=surface==='lobby'&&item.id===starting?'STARTING':surface!=='lobby'&&item.id===pendingClassId&&pendingLoadout?'NEXT':surface!=='lobby'&&item.id===activeClassId?'ACTIVE':dirty?'EDITED':'';head.append(name,state);
     const weapons=document.createElement('div');weapons.className='loadout-class-weapons';const pmods=attachmentCount(item.primaryAttachments),smods=attachmentCount(item.secondaryAttachments);weapons.innerHTML=`<span><b>PRIMARY</b>${WEAPON_SPECS[item.primaryWeapon]?.name||item.primaryWeapon}${pmods?` · ${pmods} MOD${pmods===1?'':'S'}`:''}</span><span><b>SECONDARY</b>${WEAPON_SPECS[item.secondaryWeapon]?.name||item.secondaryWeapon}${smods?` · ${smods} MOD${smods===1?'':'S'}`:''}</span>`;
     const equipment=document.createElement('small');equipment.textContent=`${EQUIPMENT_SPECS[item.tactical]?.short||item.tactical} · ${EQUIPMENT_SPECS[item.lethal]?.short||item.lethal}`;main.append(head,weapons,equipment);main.addEventListener('click',()=>switchLoadoutClass(surface,item.id));
     const rename=document.createElement('button');rename.type='button';rename.className='loadout-class-rename';rename.dataset.controllerKey=`class:${surface}:${item.id}:rename`;rename.textContent='✎';rename.setAttribute('aria-label',`Rename ${item.name}`);rename.dataset.textMode='class';rename.dataset.maxlength='18';rename.dataset.placeholder=`CLASS ${classes.indexOf(item)+1}`;rename.value=item.name;rename.addEventListener('click',e=>{e.stopPropagation();openGameTextEditor(rename);});rename.addEventListener('change',()=>renameLoadoutClass(surface,item.id,rename.value));card.append(main,rename);host.append(card);
@@ -870,6 +868,7 @@ function switchLoadoutClass(surface,id){
   }
   setLoadoutWorkspaceMode(surface,'class',{ensurePreview:false});renderLoadoutOverview(surface,loadoutDraftForSurface(surface));queueControllerUiFocus(`class-item:${surface}-primary`);
 }
+function combatItemName(kind){return EQUIPMENT_SPECS[kind]?.name||WEAPON_SPECS[kind]?.name||String(kind||'').toUpperCase();}
 function selectedLoadout(){return{primaryWeapon,secondaryWeapon,primaryAttachments:normalizeWeaponAttachments(primaryWeapon,primaryAttachments),secondaryAttachments:normalizeWeaponAttachments(secondaryWeapon,secondaryAttachments),tactical:tacticalEquipment,lethal:lethalEquipment};}
 function applyAttachmentState(value={}){primaryAttachments=normalizeWeaponAttachments(primaryWeapon,value.primaryAttachments??primaryAttachments);secondaryAttachments=normalizeWeaponAttachments(secondaryWeapon,value.secondaryAttachments??secondaryAttachments);}
 function attachmentCount(value){return ATTACHMENT_SLOTS.reduce((n,slot)=>n+(value?.[slot]?1:0),0);}function loadoutSummary(loadout=selectedLoadout()){const mods=attachmentCount(loadout.primaryAttachments)+attachmentCount(loadout.secondaryAttachments);return`${WEAPON_SPECS[loadout.primaryWeapon]?.name||'Assault Rifle'} + ${WEAPON_SPECS[loadout.secondaryWeapon]?.name||'Pistol'}${mods?` · ${mods} MOD${mods===1?'':'S'}`:''} · ${combatItemName(loadout.tactical)} · ${combatItemName(loadout.lethal)}`;}
@@ -922,16 +921,12 @@ function committedLobbyMatchDraft(){const mode=currentGameMode(),spec=gameModeSp
 function sameLobbyMatchDraft(a,b){if(!a||!b)return false;return a.mode===b.mode&&Number(a.blueBots)===Number(b.blueBots)&&Number(a.redBots)===Number(b.redBots)&&Number(a.ffaBots)===Number(b.ffaBots)&&a.difficulty===b.difficulty&&Number(a.scoreLimit)===Number(b.scoreLimit)&&Number(a.timeLimit)===Number(b.timeLimit)&&a.minimap===b.minimap;}
 function sameLoadoutChoice(a,b){return loadoutChoiceEqual(a,b);}
 function refreshLobbyDraftOwnership(){
-  // Session-state ownership must stay independent from Create-a-Class rendering.
-  // Editing a class and choosing the class used at spawn are separate lobby states.
+  // Session-state ownership stays independent from Create-a-Class rendering.
   const committedMatch=committedLobbyMatchDraft();if(!lobbyMatchDraft||!lobbyMatchDirty)lobbyMatchDraft={...committedMatch};
   const committedMap=normalizeMapId(currentMapId);if(!lobbyMapDraft||!lobbyMapDirty)lobbyMapDraft=committedMap;
   const committedLoadout=normalizeLoadoutChoice(selectedLoadout());
-  if(!lobbyClassDrafts){
-    lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,committedLoadout);lobbyStartingClassId=normalizeLoadoutClassId(activeClassId);loadoutEditClass.lobby=normalizeLoadoutClassId(activeClassId);lobbyLoadoutDraft=classLoadout(lobbyClassDrafts,loadoutEditClass.lobby);
-  }else if(!lobbyLoadoutDirty){
-    lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,committedLoadout);lobbyStartingClassId=normalizeLoadoutClassId(activeClassId);loadoutEditClass.lobby=normalizeLoadoutClassId(loadoutEditClass.lobby||activeClassId);lobbyLoadoutDraft=classLoadout(lobbyClassDrafts,loadoutEditClass.lobby);
-  }
+  if(!lobbyClassDrafts){lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,committedLoadout);lobbyStartingClassId=normalizeLoadoutClassId(activeClassId);loadoutEditClass.lobby=normalizeLoadoutClassId(activeClassId);lobbyLoadoutDraft=classLoadout(lobbyClassDrafts,loadoutEditClass.lobby);}
+  else if(!lobbyLoadoutDirty){lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,committedLoadout);lobbyStartingClassId=normalizeLoadoutClassId(activeClassId);loadoutEditClass.lobby=normalizeLoadoutClassId(loadoutEditClass.lobby||activeClassId);lobbyLoadoutDraft=classLoadout(lobbyClassDrafts,loadoutEditClass.lobby);}
 }
 let lobbyHostControlsDocked=false;
 function restoreAdminTuningNode(nodeId,anchorId){const node=$(nodeId),anchor=$(anchorId);if(node&&anchor&&node.previousElementSibling!==anchor)anchor.after(node);}
@@ -957,8 +952,8 @@ function lobbyHasDraftChanges(){return lobbyMatchDirty||lobbyMapDirty||lobbyLoad
 function lobbyDisplayMode(){return isMatchAdmin?(lobbyMatchDraft?.mode||currentGameMode()):currentGameMode();}
 function setLobbyActionState(){
   if(!shell.inLobby)return;const dirty=lobbyHasDraftChanges(),status=$('lobbyStatus'),hint=$('lobbyHint');
-  if(isMatchAdmin){status.textContent=dirty?'Match setup ready':'Lobby ready';hint.textContent=dirty?'Changes apply once when you start the match.':`${loadoutClassById(lobbyClassDrafts||loadoutClasses,currentLobbyStartingClassId()).name} starts equipped · adjust setup, then start.`;}
-  else{status.textContent='Waiting for host';hint.textContent=lobbyLoadoutDirty?'Loadout syncing…':`${loadoutClassById(lobbyClassDrafts||loadoutClasses,currentLobbyStartingClassId()).name} starts equipped · choose team or edit classes while you wait.`;}
+  if(isMatchAdmin){status.textContent=dirty?'Match setup ready':'Lobby ready';hint.textContent=dirty?'Changes apply once when you start the match.':'Adjust match setup, then start when everyone is ready.';}
+  else{status.textContent='Waiting for host';hint.textContent=lobbyLoadoutDirty?'Loadout syncing…':'Choose your team and loadout while the host configures the match.';}
 }
 function collectLobbyStartSetup(){
   refreshLobbyDraftOwnership();
@@ -1012,7 +1007,7 @@ function setLobbyModeDraft(mode){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchS
 function setLobbyMapDraft(mapId){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;lobbyMapDraft=normalizeMapId(mapId);lobbyMapDirty=lobbyMapDraft!==normalizeMapId(currentMapId);renderLobbySetupControls();setLobbyActionState();}
 function setLobbyLoadoutDraft(next={}){
   if(!lobbyClassDrafts)lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,selectedLoadout());if(!lobbyLoadoutDraft)lobbyLoadoutDraft=classLoadout(lobbyClassDrafts,loadoutEditClass.lobby||activeClassId);
-  lobbyLoadoutDraft=normalizeLoadoutChoice({...lobbyLoadoutDraft,...next});const editId=normalizeLoadoutClassId(loadoutEditClass.lobby);lobbyClassDrafts=writeClassLoadout(lobbyClassDrafts,editId,lobbyLoadoutDraft);markLobbyLoadoutDirty();renderLobbySetupControls();setLobbyActionState();sendLobbyClassState(editId,{activate:editId===currentLobbyStartingClassId()});
+  lobbyLoadoutDraft=normalizeLoadoutChoice({...lobbyLoadoutDraft,...next});lobbyClassDrafts=writeClassLoadout(lobbyClassDrafts,loadoutEditClass.lobby,lobbyLoadoutDraft);markLobbyLoadoutDirty();renderLobbySetupControls();setLobbyActionState();syncLobbyClassesToServer();
 }
 
 function syncPauseContext(){
@@ -2283,7 +2278,7 @@ function resetMatchPresentationForLobby(){
 function handleMatchLobby(m){
   applyClientMatchState(m.match);matchCustom=!!m.custom;const players=Array.isArray(m.players)?m.players:[],bots=Array.isArray(m.bots)?m.bots:[],self=players.find(player=>samePlayerId(player?.id,clientId))||null;
   if(self){myTeam=self.team||myTeam;rememberTeam(myTeam);pendingTeam='';if(self.activeClassId)activeClassId=normalizeLoadoutClassId(self.activeClassId);pendingClassId=self.pendingClassId?normalizeLoadoutClassId(self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(self.primaryWeapon)?self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(self.secondaryWeapon)?self.secondaryWeapon:secondaryWeapon;applyAttachmentState(self);tacticalEquipment=normalizeTactical(self.tactical);lethalEquipment=normalizeLethal(self.lethal);pendingLoadout=null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);currentWeapon=primaryWeapon;godMode=!!self.godMode;hp=Math.max(0,Math.min(100,Number(self.hp??100)||0));myStats={kills:Number(self.kills)||0,deaths:Number(self.deaths)||0};ammo=normalizeClientAmmo(self.ammo);equipment=normalizeEquipment(self.equipment);selfColor=currentModeSpec().teamBased?(TEAM_COLORS[myTeam]||selfColor):TEAM_COLORS.blue;syncLocalWeaponModel();}
-  lobbyLoadoutDraft=null;lobbyClassDrafts=null;lobbyLoadoutDirty=false;loadoutEditClass.lobby=normalizeLoadoutClassId(activeClassId);rememberLoadoutClasses(loadoutClasses,activeClassId);pendingGameSnapshot=self?gameSnapshot(self,players,bots,m.match?.serverTime):null;replaceLobbyParticipants(players,bots);resetMatchPresentationForLobby();syncModeVisuals();syncPauseContext();showLobby();
+  lobbyLoadoutDraft=null;lobbyClassDrafts=null;lobbyLoadoutDirty=false;lobbyStartingClassId=normalizeLoadoutClassId(activeClassId);loadoutEditClass.lobby=normalizeLoadoutClassId(activeClassId);rememberLoadoutClasses(loadoutClasses,activeClassId);pendingGameSnapshot=self?gameSnapshot(self,players,bots,m.match?.serverTime):null;replaceLobbyParticipants(players,bots);resetMatchPresentationForLobby();syncModeVisuals();syncPauseContext();showLobby();
 }
 
 function handleMessage(m){
