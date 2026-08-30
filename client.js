@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.9';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.9';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.9';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.9';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.9';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.9';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.9';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.9';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.10';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.10';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.10';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.10';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.10';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.10';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.10';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.10';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.9';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.9';
-import { createAudioEngine } from './audio-engine.js?v=1.44.9';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.9';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.9';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.9';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.9';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.9';
+} from './game-config.js?v=1.44.10';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.10';
+import { createAudioEngine } from './audio-engine.js?v=1.44.10';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.10';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.10';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.10';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.10';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.10';
 
 let THREE = null;
 
@@ -322,7 +322,7 @@ function modifierTag(label,mult,{lowerBetter=false}={}){const n=Number(mult);if(
 function attachmentEffectTags(item,weapon){if(!item)return[];const tags=[],mods=attachmentModsForWeapon(item,weapon),accuracyMods=attachmentAccuracyModsForWeapon(item,weapon),adsMoveAdd=attachmentAdsMoveAddForWeapon(item,weapon),push=x=>{if(x&&tags.length<6)tags.push(x);};push(modifierTag('DAMAGE',mods.damage));push(modifierTag('VELOCITY',mods.bulletSpeed));push(modifierTag('RANGE',mods.falloffEnd));const recoilVals=[mods.recoilPitch,mods.recoilYaw].map(Number).filter(Number.isFinite);if(recoilVals.length){const avg=recoilVals.reduce((a,b)=>a+b,0)/recoilVals.length;push(modifierTag('RECOIL',avg,{lowerBetter:true}));}push(modifierTag('ADS TIME',mods.adsInMs,{lowerBetter:true}));push(modifierTag('SPRINT-OUT',mods.sprintOutMs,{lowerBetter:true}));push(modifierTag('RELOAD',mods.reloadMs,{lowerBetter:true}));if(adsMoveAdd)push({text:`ADS MOVE ${adsMoveAdd>0?'+':''}${Math.round(adsMoveAdd*100)}%`,good:adsMoveAdd>0});if(item.magAdd?.[weapon]){const add=Number(item.magAdd[weapon])||0;push({text:`MAG ${add>0?'+':''}${add}`,good:add>0});}if(accuracyMods){const vals=Object.values(accuracyMods).map(Number).filter(Number.isFinite);if(vals.length){const avg=vals.reduce((a,b)=>a+b,0)/vals.length;push(modifierTag('SPREAD',avg,{lowerBetter:true}));}}if(item.soundScale&&item.soundScale<1)push({text:'QUIETER / OFF RADAR',good:true});if(item.conditionalRecoilScale)push({text:`CROUCHED RECOIL -${Math.round((1-item.conditionalRecoilScale)*100)}%`,good:true});if(item.adsFov)push({text:`OPTIC ${Math.round(item.adsFov)} FOV`,good:true});return tags;}
 function loadoutOverviewAttachmentText(weapon,attachments){const names=ATTACHMENT_SLOTS.map(slot=>attachments?.[slot]?ATTACHMENTS[attachments[slot]]?.short||ATTACHMENTS[attachments[slot]]?.name:'').filter(Boolean);return names.length?names.join(' · '):'NO ATTACHMENTS';}
 function renderLoadoutOverview(surface,draft){
-  const safe=normalizeLoadoutChoice(draft),classes=surface==='lobby'?normalizeLoadoutClasses(lobbyClassDrafts||loadoutClasses,selectedLoadout()):normalizeLoadoutClasses(matchClassDrafts||loadoutClasses,selectedLoadout()),selected=normalizeLoadoutClassId(loadoutEditClass[surface]||activeClassId),classInfo=loadoutClassById(classes,selected,selectedLoadout()),name=document.querySelector(`[data-loadout-overview-name="${surface}"]`);if(name)name.textContent=classInfo.name;
+  const safe=normalizeLoadoutChoice(draft),classes=surface==='lobby'?normalizeLoadoutClasses(lobbyClassDrafts||loadoutClasses,selectedLoadout()):normalizeLoadoutClasses(matchClassDrafts||loadoutClasses,selectedLoadout()),selected=normalizeLoadoutClassId(loadoutEditClass[surface]||activeClassId),classInfo=loadoutClassById(classes,selected,selectedLoadout()),name=document.querySelector(`[data-loadout-overview-name="${surface}"]`);if(name){const label=document.createElement('span');label.textContent=classInfo.name;const icon=document.createElement('span');icon.className='class-name-edit-icon';icon.setAttribute('aria-hidden','true');icon.textContent='✎';name.replaceChildren(label,icon);}
   for(const slot of ['primary','secondary']){const key=`${surface}-${slot}`,weapon=loadoutSlotWeapon(safe,slot),attachments=loadoutSlotAttachments(safe,slot),spec=resolveWeaponSpec(weapon,attachments),weaponEl=document.querySelector(`[data-loadout-overview-weapon="${key}"]`),modsEl=document.querySelector(`[data-loadout-overview-mods="${key}"]`);if(weaponEl)weaponEl.textContent=spec.name||weapon;if(modsEl)modsEl.textContent=loadoutOverviewAttachmentText(weapon,attachments);}
   const tactical=document.querySelector(`[data-loadout-overview-equipment="${surface}-tactical"]`),lethal=document.querySelector(`[data-loadout-overview-equipment="${surface}-lethal"]`);if(tactical)tactical.textContent=EQUIPMENT_SPECS[safe.tactical]?.name||safe.tactical;if(lethal)lethal.textContent=EQUIPMENT_SPECS[safe.lethal]?.name||safe.lethal;
   const focus=loadoutFocusSlot[surface]||'primary',title=document.querySelector(`[data-loadout-item-title="${surface}"]`),kicker=document.querySelector(`[data-loadout-item-kicker="${surface}"]`);if(title){title.textContent=focus==='primary'||focus==='secondary'?(resolveWeaponSpec(loadoutSlotWeapon(safe,focus),loadoutSlotAttachments(safe,focus)).name||loadoutSlotWeapon(safe,focus)):(EQUIPMENT_SPECS[safe[focus]]?.name||safe[focus]);}if(kicker)kicker.textContent=focus==='primary'?'PRIMARY WEAPON':focus==='secondary'?'SECONDARY WEAPON':focus==='tactical'?'TACTICAL':'LETHAL';
@@ -618,7 +618,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.9';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.10';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -861,7 +861,7 @@ function renderLoadoutClassStrip(surface){
     const head=document.createElement('div');head.className='loadout-class-card-head';const name=document.createElement('strong');name.textContent=item.name;const state=document.createElement('span');state.textContent=surface==='lobby'&&item.id===starting?'STARTING':surface!=='lobby'&&item.id===pendingClassId&&pendingLoadout?'NEXT':surface!=='lobby'&&item.id===activeClassId?'ACTIVE':surface!=='lobby'&&item.id===selected&&item.id!==activeClassId?'SELECTED':dirty?'EDITED':'';head.append(name,state);
     const weapons=document.createElement('div');weapons.className='loadout-class-weapons';const pmods=attachmentCount(item.primaryAttachments),smods=attachmentCount(item.secondaryAttachments);weapons.innerHTML=`<span><b>PRIMARY</b>${WEAPON_SPECS[item.primaryWeapon]?.name||item.primaryWeapon}${pmods?` · ${pmods} MOD${pmods===1?'':'S'}`:''}</span><span><b>SECONDARY</b>${WEAPON_SPECS[item.secondaryWeapon]?.name||item.secondaryWeapon}${smods?` · ${smods} MOD${smods===1?'':'S'}`:''}</span>`;
     const equipment=document.createElement('small');equipment.textContent=`${EQUIPMENT_SPECS[item.tactical]?.short||item.tactical} · ${EQUIPMENT_SPECS[item.lethal]?.short||item.lethal}`;main.append(head,weapons,equipment);main.addEventListener('click',()=>selectLoadoutClass(surface,item.id));
-    const edit=document.createElement('button');edit.type='button';edit.className='loadout-class-edit';edit.dataset.controllerKey=`class:${surface}:${item.id}:edit`;edit.textContent='EDIT';edit.setAttribute('aria-label',`Edit ${item.name}`);edit.addEventListener('click',e=>{e.stopPropagation();switchLoadoutClass(surface,item.id);});card.append(main,edit);host.append(card);
+    const edit=document.createElement('button');edit.type='button';edit.className='loadout-class-edit';edit.dataset.controllerKey=`class:${surface}:${item.id}:edit`;edit.textContent='✎';edit.setAttribute('aria-label',`Edit ${item.name}`);edit.addEventListener('click',e=>{e.stopPropagation();switchLoadoutClass(surface,item.id);});card.append(main,edit);host.append(card);
   }
 }
 function switchLoadoutClass(surface,id){
