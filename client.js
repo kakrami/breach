@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.19';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.19';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.19';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.19';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.19';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.19';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.19';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.19';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.21';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.21';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.21';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.21';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.21';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.21';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.21';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.21';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.19';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.19';
-import { createAudioEngine } from './audio-engine.js?v=1.44.19';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.19';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.19';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.19';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.19';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.19';
+} from './game-config.js?v=1.44.21';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.21';
+import { createAudioEngine } from './audio-engine.js?v=1.44.21';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.21';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.21';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.21';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.21';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.21';
 
 let THREE = null;
 
@@ -497,9 +497,24 @@ function exportDiagnosticsRecording(){
   try{const json=JSON.stringify(diagnosticsExportPayload());const blob=new Blob([json],{type:'application/json'}),url=URL.createObjectURL(blob),stamp=new Date().toISOString().replace(/[:.]/g,'-'),a=document.createElement('a');a.href=url;a.download=`breach-diagnostics-${stamp}.json`;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('DIAGNOSTICS EXPORTED');}catch(error){console.error('Diagnostics export failed',error);showToast('DIAGNOSTICS EXPORT FAILED');}
 }
 function syncDiagnosticsSettingsUI(){
-  const el=$('diagnosticsStatus'),hasData=diagnosticsDataCount()>0;if(el){const seconds=Math.round(Math.max(0,performance.now()-diagnosticsRecorder.startedAt)/1000);el.textContent=diagnosticsRecordingEnabled()?`RECORDING · ${seconds}s · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:hasData?`STOPPED · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:'OFF';}
+  const active=diagnosticsRecordingEnabled(),el=$('diagnosticsStatus'),hasData=diagnosticsDataCount()>0,button=$('playerDiagnosticsBtn');
+  if(button){button.textContent=active?'STOP RECORDING':'START RECORDING';button.setAttribute('aria-pressed',active?'true':'false');button.classList.toggle('active',active);}
+  if(el){const seconds=Math.round(Math.max(0,performance.now()-diagnosticsRecorder.startedAt)/1000);el.textContent=active?`RECORDING · ${seconds}s · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:hasData?`STOPPED · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:'OFF';}
   if($('diagnosticsExportBtn'))$('diagnosticsExportBtn').disabled=!hasData;if($('diagnosticsClearBtn'))$('diagnosticsClearBtn').disabled=!hasData;
 }
+function setDiagnosticsRecording(enabled){
+  const next=!!enabled,before=diagnosticsRecordingEnabled();
+  if(before===next){syncDiagnosticsSettingsUI();return;}
+  if(before&&!next)diagnosticsRecordEvent('recording_stop',{samples:diagnosticsRecorder.samples.length,events:diagnosticsRecorder.events.length,incidents:diagnosticsRecorder.incidents.length});
+  playerSettings=normalizePlayerSettingsValue({...playerSettings,diagnostics:next?'on':'off'});
+  if(playerSettingsDraft)playerSettingsDraft=normalizePlayerSettingsValue({...playerSettingsDraft,diagnostics:next?'on':'off'});
+  savePlayerSettings();
+  if(next)resetDiagnosticsRecording();else{syncDiagnosticsSettingsUI();hudLastDraw=0;}
+  syncPlayerSettingsUI(playerSettingsDraft||playerSettings);
+  setSettingsStatus(next?'Diagnostics recording':'Diagnostics stopped',next?'ok':'');
+  showToast(next?'DIAGNOSTICS RECORDING':'DIAGNOSTICS STOPPED');
+}
+function toggleDiagnosticsRecording(){setDiagnosticsRecording(!diagnosticsRecordingEnabled());}
 
 const gameAudio=createAudioEngine({cues:SOUND_CUES,getVolumes:()=>({master:masterMuted?0:playerSettings.masterVolume,sfx:playerSettings.sfxVolume,music:playerSettings.musicVolume})});
 let introMusicHandle=null;
@@ -674,7 +689,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.19';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.21';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1178,7 +1193,7 @@ function playerSettingsEqual(a,b){const x=normalizePlayerSettingsValue(a),y=norm
 function syncPlayerSettingsUI(value=playerSettingsDraft||playerSettings){
   const source=normalizePlayerSettingsValue(value),values=[['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerControllerVerticalSensitivity','controllerVerticalSensitivity'],['playerControllerMoveDeadzone','controllerMoveDeadzone'],['playerControllerLookDeadzone','controllerLookDeadzone'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']];
   for(const [id,key] of values){const el=$(id),out=$(`${id}Value`);if(el)el.value=source[key];if(out)out.textContent=key.includes('Volume')?`${Math.round(source[key]*100)}%`:key.includes('Deadzone')?`${Math.round(source[key]*100)}%`:`${Number(source[key]).toFixed(2)}×`;}
-  if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;if($('playerControllerResponseCurve'))$('playerControllerResponseCurve').value=source.controllerResponseCurve;if($('playerControllerAimAssist'))$('playerControllerAimAssist').value=source.controllerAimAssist;if($('playerDiagnostics'))$('playerDiagnostics').value=source.diagnostics;syncMusicUI();syncDiagnosticsSettingsUI();
+  if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;if($('playerControllerResponseCurve'))$('playerControllerResponseCurve').value=source.controllerResponseCurve;if($('playerControllerAimAssist'))$('playerControllerAimAssist').value=source.controllerAimAssist;syncMusicUI();syncDiagnosticsSettingsUI();
   const dirty=!playerSettingsEqual(source,playerSettings);if($('settingsResetBtn'))$('settingsResetBtn').disabled=!dirty;if($('settingsSaveBtn'))$('settingsSaveBtn').disabled=!dirty;
 }
 function stagePlayerSettingFromUI(id,key){const el=$(id);if(!el)return;if(!playerSettingsDraft)playerSettingsDraft={...playerSettings};playerSettingsDraft=normalizePlayerSettingsValue({...playerSettingsDraft,[key]:Number(el.value)});syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus(playerSettingsEqual(playerSettingsDraft,playerSettings)?'Saved settings':'Unsaved changes');}
@@ -1189,10 +1204,9 @@ function closePlayerSettings(){cancelPlayerSettings();}
 function resetPlayerSettings(){playerSettingsDraft={...playerSettings};syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus('Saved settings');}
 function savePlayerSettingsDraft(){
   if(!playerSettingsDraft||playerSettingsEqual(playerSettingsDraft,playerSettings)){cancelPlayerSettings();return;}
-  const previous=playerSettings,diagBefore=diagnosticsRecordingEnabled(previous),nextSettings=normalizePlayerSettingsValue(playerSettingsDraft),diagAfter=diagnosticsRecordingEnabled(nextSettings);if(diagBefore&&!diagAfter)diagnosticsRecordEvent('recording_stop',{samples:diagnosticsRecorder.samples.length,events:diagnosticsRecorder.events.length,incidents:diagnosticsRecorder.incidents.length});playerSettings=nextSettings;playerSettingsDraft=null;savePlayerSettings();applyGraphicsQuality();hudLastDraw=0;
-  if(!diagBefore&&diagAfter)resetDiagnosticsRecording();else if(diagBefore&&!diagAfter)syncDiagnosticsSettingsUI();
+  const previous=playerSettings,nextSettings=normalizePlayerSettingsValue(playerSettingsDraft);playerSettings=nextSettings;playerSettingsDraft=null;savePlayerSettings();applyGraphicsQuality();hudLastDraw=0;
   if(!shell.inMatch&&introMusicHandle&&(previous.masterVolume!==playerSettings.masterVolume||previous.musicVolume!==playerSettings.musicVolume)){stopIntroMusic();if(!masterMuted)startIntroMusic();}
-  shell.closePanel(SHELL_PANEL.SETTINGS);showToast(diagAfter&&!diagBefore?'DIAGNOSTICS RECORDING':diagBefore&&!diagAfter?'DIAGNOSTICS STOPPED':'SETTINGS SAVED');
+  shell.closePanel(SHELL_PANEL.SETTINGS);showToast('SETTINGS SAVED');
 }
 
 
@@ -1884,7 +1898,7 @@ function bindUI(){
   $('playerMinimapOrientation')?.addEventListener('change',()=>stagePlayerChoice('minimapOrientation',$('playerMinimapOrientation').value));
   $('playerControllerResponseCurve')?.addEventListener('change',()=>stagePlayerChoice('controllerResponseCurve',$('playerControllerResponseCurve').value));
   $('playerControllerAimAssist')?.addEventListener('change',()=>stagePlayerChoice('controllerAimAssist',$('playerControllerAimAssist').value));
-  $('playerDiagnostics')?.addEventListener('change',()=>stagePlayerChoice('diagnostics',$('playerDiagnostics').value));
+  $('playerDiagnosticsBtn')?.addEventListener('click',toggleDiagnosticsRecording);
   $('diagnosticsExportBtn')?.addEventListener('click',exportDiagnosticsRecording);
   $('diagnosticsClearBtn')?.addEventListener('click',()=>{resetDiagnosticsRecording({markStart:diagnosticsRecordingEnabled()});showToast(diagnosticsRecordingEnabled()?'DIAGNOSTICS CLEARED · RECORDING':'DIAGNOSTICS CLEARED');});
   chatSendBtn.addEventListener('click',submitChat);
@@ -2688,8 +2702,11 @@ function drawDamageIndicators(c,w,h,now){
     c.globalAlpha=alpha*.72;c.beginPath();c.moveTo(-8,7);c.lineTo(0,0);c.lineTo(8,7);c.lineTo(0,4);c.closePath();c.fill();c.restore();
   }
 }
-function handleRespawn(player){viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));localWeaponShotSequence=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));
+function handleRespawn(player){
   if(!player?.id)return;
+  const selfRespawn=player.id===clientId;
+  diagnosticsRecordEvent('respawn',{playerId:String(player.id),self:selfRespawn,fireHeld:fireInputHeld(),recoilPitch:diagnosticsRound(viewRecoilPitch),recoilTarget:diagnosticsRound(viewRecoilTargetPitch),recoilBurst:!!recoilBurstActive,recoilStep:Number(localRecoilStep[currentWeapon]??-1)});
+  if(selfRespawn){viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));localWeaponShotSequence=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));}
   // Snapshot application also uses this entry point. A reconnect can legitimately
   // restore a player who is still inside the death/respawn window; do not treat
   // that snapshot as a respawn merely because the world is being rebuilt.
