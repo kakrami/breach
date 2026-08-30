@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.16';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.16';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.16';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.16';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.16';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.16';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.16';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.16';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.17';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.17';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.17';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.17';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.17';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.17';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.17';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.17';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.16';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.16';
-import { createAudioEngine } from './audio-engine.js?v=1.44.16';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.16';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.16';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.16';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.16';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.16';
+} from './game-config.js?v=1.44.17';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.17';
+import { createAudioEngine } from './audio-engine.js?v=1.44.17';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.17';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.17';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.17';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.17';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.17';
 
 let THREE = null;
 
@@ -621,7 +621,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.16';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.17';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -777,20 +777,25 @@ function currentControllerAimAssist(now=performance.now()){
 }
 function resetControllerAimMotion(){controllerAimVelocityX=controllerAimVelocityY=0;controllerTurnBoost=0;controllerAssistTargetId='';controllerAssistNextScanAt=0;}
 function applyControllerAim(dt){
+  // Camera input never catches up after a stalled render frame. Network/UI work or a
+  // browser hitch may delay a frame, but integrating the stick across the whole gap
+  // turns a small held vertical value into a sudden pitch jump. Physics can catch up;
+  // first-person look must remain frame-local and visually continuous.
+  const aimDt=Math.min(1/30,Math.max(0,Number(dt)||0));
   const input=controllerLookAxes(),now=performance.now(),assist=currentControllerAimAssist(now),breakout=1-smoothstep01(THREE.MathUtils.clamp((input.length-.80)/.20,0,1)),assistStrength=(assist?.strength||0)*breakout;
-  if(input.length>.86)controllerTurnBoost=Math.min(1,controllerTurnBoost+dt/.22);else controllerTurnBoost=Math.max(0,controllerTurnBoost-dt/.08);
+  if(input.length>.86)controllerTurnBoost=Math.min(1,controllerTurnBoost+aimDt/.22);else controllerTurnBoost=Math.max(0,controllerTurnBoost-aimDt/.08);
   const ads=smoothstep01(adsBlend),turnMultiplier=1+controllerTurnBoost*.30*(1-ads*.72),adsScale=controllerAdsSensitivityScale();
   const minSlow=currentWeapon==='sniper'&&ads>.2?(sniperZoomLevel>=2?.49:.53):THREE.MathUtils.lerp(.70,.60,ads),slowdown=assist?THREE.MathUtils.lerp(1,minSlow,assistStrength):1;
   const targetYaw=input.x*CONTROLLER_LOOK_YAW_RATE*playerSettings.lookSensitivity*adsScale*turnMultiplier*slowdown;
   const targetPitch=input.y*CONTROLLER_LOOK_PITCH_RATE*playerSettings.lookSensitivity*playerSettings.controllerVerticalSensitivity*adsScale*turnMultiplier*slowdown;
-  const smoothing=1-Math.exp(-dt/.024);controllerAimVelocityX+= (targetYaw-controllerAimVelocityX)*smoothing;controllerAimVelocityY+=(targetPitch-controllerAimVelocityY)*smoothing;
-  yaw-=controllerAimVelocityX*dt;pitch-=controllerAimVelocityY*dt;
-  if(assist&&assistStrength>.01){const move=controllerMoveAxes(),strafe=THREE.MathUtils.clamp(move.length/.72,0,1),rotWeight=assistStrength*strafe;if(rotWeight>.001){yaw-=THREE.MathUtils.clamp(assist.ndcX,-.75,.75)*.72*rotWeight*dt;
+  const smoothing=1-Math.exp(-aimDt/.024);controllerAimVelocityX+= (targetYaw-controllerAimVelocityX)*smoothing;controllerAimVelocityY+=(targetPitch-controllerAimVelocityY)*smoothing;
+  yaw-=controllerAimVelocityX*aimDt;pitch-=controllerAimVelocityY*aimDt;
+  if(assist&&assistStrength>.01){const move=controllerMoveAxes(),strafe=THREE.MathUtils.clamp(move.length/.72,0,1),rotWeight=assistStrength*strafe;if(rotWeight>.001){yaw-=THREE.MathUtils.clamp(assist.ndcX,-.75,.75)*.72*rotWeight*aimDt;
     // Rotational aim assist may help track horizontally, but it must never
     // counter-steer sustained vertical recoil. Recoil control belongs to the
     // player, as in controller FPS gunplay; otherwise the assist drags the base
     // pitch down as the recoiling camera rises and looks like a recoil reset.
-    if(!(automaticRecoilActive(currentWeapon)&&recoilBurstActive&&recoilBurstWeapon===currentWeapon))pitch+=THREE.MathUtils.clamp(assist.ndcY,-.75,.75)*.54*rotWeight*dt;
+    if(!(automaticRecoilActive(currentWeapon)&&recoilBurstActive&&recoilBurstWeapon===currentWeapon))pitch+=THREE.MathUtils.clamp(assist.ndcY,-.75,.75)*.54*rotWeight*aimDt;
   }}
   pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
 }
@@ -2345,6 +2350,7 @@ function handleMessage(m){
   if(m.t==='flashEffect'){applyFlashEffect(m);return;}
   if(m.t==='explosion'){const projectile=bullets.get(m.id);if(projectile?.type==='launcher')projectile.root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);soundTacticalDetonation(m.kind||'sticky',m);spawnDetonationFx(m.kind||'sticky',m);removeBullet(m.id);removeThrowableVisual(m.id);return;}
   if(m.t==='chat'){receiveChatMessage(m);return;}
+  if(m.t==='fireAck'){applyFireAck(m);return;}
   if(m.t==='loadout'){applyAuthoritativeLoadout(m);return;}
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';r.swapStartedAt=performance.now();syncRemoteWeapon(r);}return;}
   if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;if(r.reloadWeapon!=='shotgun'&&r.reloadUntil)playSpatialCue(reloadSoundId(r.reloadWeapon),r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
@@ -2914,6 +2920,17 @@ function sendCurrentState(force=false){
   if(!force&&now-lastStateSent<interval)return false;
   stateSeq+=1;preview.seq=stateSeq;recordNetStateSend(now);lastStateSent=now;lastSentState={x:preview.x,y:preview.y,z:preview.z,yaw:preview.yaw,pitch:preview.pitch,ads:preview.ads,adsAmount:preview.adsAmount||0,crouched:preview.crouched,sprinting:preview.sprinting,sliding:preview.sliding,grounded:preview.grounded,moveX:preview.moveX,moveZ:preview.moveZ,ladderId:preview.ladderId||'',ladderMove:preview.ladderMove||0};rememberPredictionState(preview,now);send(preview);return true;
 }
+function applyFireAck(m){
+  // A shot acknowledgement may reconcile authoritative ammo/reload timing only.
+  // It must never re-apply the loadout, current weapon, attachments, UI, ADS, or
+  // view state. Keeping combat acknowledgement separate prevents network jitter
+  // from injecting work into the camera path during sustained fire.
+  if(m?.accepted===false)recordNetReject('fire',m.reason||'rejected');
+  const ackWeapon=WEAPON_SPECS[m?.weapon]?m.weapon:'';if(ackWeapon&&Number.isFinite(Number(m.ammoCount)))ammo[ackWeapon]=Math.max(0,Math.min(weaponCapacity(ackWeapon),Math.floor(Number(m.ammoCount))));
+  if(Object.prototype.hasOwnProperty.call(m||{},'reloadAt')){reloadUntil=Math.max(0,Number(m.reloadAt)||0);reloadWeapon=m.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;reloadRequestPending=false;}
+  if(m?.accepted===false&&(m.reason==='cooldown'||m.reason==='weapon_switch'||m.reason==='sprint_out'))delayFire(Math.max(8,Math.min(180,Number(m.retryAfterMs)||35)),WEAPON_SPECS[m.weapon]?m.weapon:currentWeapon);
+}
+
 function applyAuthoritativeLoadout(m){
   if(m?.accepted===false&&m.action)recordNetReject(m.action,m.reason);
   const ackRev=Math.max(0,Math.floor(Number(m.rev)||0));
@@ -2933,7 +2950,6 @@ function applyAuthoritativeLoadout(m){
   reloadUntil=Math.max(0,Number(m.reloadAt)||0);reloadWeapon=m.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;reloadRequestPending=false;
   if(m.action==='weapon'&&m.accepted!==false)pendingWeapon='';
   if(m.action==='reloadShell')soundReload('shotgun');
-  if(m.action==='fire'&&m.accepted===false&&(m.reason==='cooldown'||m.reason==='weapon_switch'||m.reason==='sprint_out'))delayFire(Math.max(8,Math.min(180,Number(m.retryAfterMs)||35)),m.weapon);
   if(m.pending===true&&pendingLoadout){rememberLoadoutClasses(loadoutClasses,activeClassId);showToast(`${loadoutClassById(loadoutClasses,pendingClassId||activeClassId).name} QUEUED · NEXT SPAWN`);}
   if(shell.inLobby&&lobbyLoadoutDraft){if(Array.isArray(m.loadoutClasses))lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,selectedLoadout());markLobbyLoadoutDirty();}
   syncLocalWeaponModel();syncPauseContext();if(shell.inLobby){renderLobbySetupControls();setLobbyActionState();renderLobbyRoster(lobbyDisplayMode());}
