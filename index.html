@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.17" rel="manifest"/>
-<title>Breach v1.44.17</title>
-<link href="ui.css?v=1.44.17" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.44.19" rel="manifest"/>
+<title>Breach v1.44.19</title>
+<link href="ui.css?v=1.44.19" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -386,7 +386,11 @@
 <section class="settings-page" data-settings-page="display" hidden="" inert=""><div class="settings-category-head"><h3>Graphics</h3></div><div class="settings-grid">
 <label class="setting select-setting"><span>Graphics quality</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"low","label":"Low"},{"value":"medium","label":"Medium"},{"value":"high","label":"High"}]' data-value="low" id="playerGraphics" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Low</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <label class="setting select-setting"><span>Minimap orientation</span><div aria-label="Minimap orientation" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"heading","label":"Heading Up"},{"value":"north","label":"North Up"}]' data-value="heading" id="playerMinimapOrientation" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Heading Up</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
-<div class="setting setting-action"><span>FULLSCREEN</span><button class="secondary-btn" id="settingsFullscreenBtn" type="button">ENTER FULLSCREEN</button></div></div></section>
+<div class="setting setting-action"><span>FULLSCREEN</span><button class="secondary-btn" id="settingsFullscreenBtn" type="button">ENTER FULLSCREEN</button></div></div><div class="settings-category-head"><h3>Diagnostics</h3></div><div class="settings-grid diagnostics-settings-grid">
+<label class="setting select-setting"><span>Gameplay diagnostics</span><div aria-label="Gameplay diagnostics" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"off","label":"Off"},{"value":"on","label":"On"}]' data-value="off" id="playerDiagnostics" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Off</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<div class="setting diagnostics-status-card"><span>Recorder</span><output id="diagnosticsStatus">OFF</output><small>Records aim, input, recoil, camera, frame timing, corrections and fire/network events.</small></div>
+<div class="setting diagnostics-log-card"><span>Recording log</span><div class="diagnostics-log-actions"><button class="secondary-btn" id="diagnosticsExportBtn" type="button">EXPORT</button><button class="secondary-btn" id="diagnosticsClearBtn" type="button">CLEAR</button></div><small>After the jump happens, export the JSON and send it back here.</small></div>
+</div></section>
 </div>
 <footer class="modal-foot settings-actions"><span class="admin-status" id="settingsStatus">Saved settings</span><button class="secondary-btn" id="settingsResetBtn">RESET</button><button class="secondary-btn" id="settingsCancelBtn">CANCEL</button><button class="primary modal-action" id="settingsSaveBtn">SAVE</button></footer>
 </div>
@@ -429,6 +433,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.44.17" type="module"></script>
+<script src="client.js?v=1.44.19" type="module"></script>
 </body>
 </html>

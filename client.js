@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.17';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.17';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.17';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.17';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.17';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.17';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.17';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.17';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.19';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.19';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.19';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.19';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.19';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.19';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.19';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.19';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.17';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.17';
-import { createAudioEngine } from './audio-engine.js?v=1.44.17';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.17';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.17';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.17';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.17';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.17';
+} from './game-config.js?v=1.44.19';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.19';
+import { createAudioEngine } from './audio-engine.js?v=1.44.19';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.19';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.19';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.19';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.19';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.19';
 
 let THREE = null;
 
@@ -95,7 +95,7 @@ const CORRECTION_VIEW_RATE = 13.5;
 const CORRECTION_MAX_HORIZONTAL = 0.72;
 const CORRECTION_MAX_VERTICAL = 0.55;
 const CORRECTION_HARD_SNAP_DISTANCE = 1.35;
-const NET_DIAG_ENABLED = new URL(location.href).searchParams.get('netdiag')==='1';
+const NET_DIAG_URL_ENABLED = new URL(location.href).searchParams.get('netdiag')==='1';
 const NET_DIAG_FRAME_STALL_MS = 100;
 // Entire sound set is generated locally as 16-bit PCM WAV assets.
 // No third-party or runtime-hosted audio is required.
@@ -428,7 +428,7 @@ const netDiag={
   frameStalls:0,maxFrameMs:0,lastFrameMs:0,events:[]
 };
 function netDiagCount(map,key){const name=String(key||'unknown');map[name]=(map[name]||0)+1;}
-function netDiagEvent(type,data={}){netDiag.events.push({at:Math.round(performance.now()-netDiag.startedAt),type,...data});if(netDiag.events.length>24)netDiag.events.shift();}
+function netDiagEvent(type,data={}){netDiag.events.push({at:Math.round(performance.now()-netDiag.startedAt),type,...data});if(netDiag.events.length>24)netDiag.events.shift();diagnosticsRecordEvent(`net:${type}`,data);}
 function recordNetFrame(rawDt){const ms=Math.max(0,Number(rawDt)||0)*1000;netDiag.lastFrameMs=ms;netDiag.maxFrameMs=Math.max(netDiag.maxFrameMs,ms);if(ms>=NET_DIAG_FRAME_STALL_MS){netDiag.frameStalls++;if(ms>=180)netDiagEvent('frame',{ms:Math.round(ms)});}}
 function recordNetStateSend(now){if(netDiag.lastStateSendAt){const gap=Math.max(0,now-netDiag.lastStateSendAt);netDiag.lastStateGapMs=gap;netDiag.maxStateGapMs=Math.max(netDiag.maxStateGapMs,gap);if(gap>120)netDiag.stateGapOver120++;}netDiag.lastStateSendAt=now;}
 function recordNetPong(echoed,received,serverNet){const rtt=Math.max(0,received-echoed);netDiag.rttMs=rtt;if(netDiag.pingSamples===0){netDiag.rttMeanMs=rtt;netDiag.rttJitterMs=0;}else{const prior=netDiag.rttMeanMs;netDiag.rttMeanMs=prior+(rtt-prior)*.18;netDiag.rttJitterMs=netDiag.rttJitterMs+(Math.abs(rtt-prior)-netDiag.rttJitterMs)*.22;}netDiag.pingSamples++;if(serverNet&&typeof serverNet==='object'){netDiag.serverLastStateGapMs=Math.max(0,Number(serverNet.lastStateGapMs)||0);netDiag.serverMaxStateGapMs=Math.max(netDiag.serverMaxStateGapMs,Number(serverNet.maxStateGapMs)||0);netDiag.serverStateAgeMs=Math.max(0,Number(serverNet.stateAgeMs)||0);}}
@@ -440,14 +440,67 @@ window.breachNetworkDiagnostics=networkDiagnosticsSnapshot;
 window.resetBreachNetworkDiagnostics=resetNetworkDiagnostics;
 let localMoveAmount=0,moveBobPhase=0,landingKick=0,weaponSwapStartedAt=0,reloadStartedAt=0,deathAnimStartedAt=0,nextFootstepAt=0,footstepSide=0,shotgunPumpStartedAt=0,shotgunPumpSoundPlayed=false;
 let audioUnlockPromise=null;
-const DEFAULT_PLAYER_SETTINGS=Object.freeze({lookSensitivity:1,adsSensitivity:1,touchSensitivity:1,controllerVerticalSensitivity:1,controllerResponseCurve:'dynamic',controllerAimAssist:'on',controllerMoveDeadzone:.10,controllerLookDeadzone:.07,masterVolume:.85,sfxVolume:.9,musicVolume:.55,graphics:isTouch?'medium':'high',minimapOrientation:'heading'});
+const DEFAULT_PLAYER_SETTINGS=Object.freeze({lookSensitivity:1,adsSensitivity:1,touchSensitivity:1,controllerVerticalSensitivity:1,controllerResponseCurve:'dynamic',controllerAimAssist:'on',controllerMoveDeadzone:.10,controllerLookDeadzone:.07,masterVolume:.85,sfxVolume:.9,musicVolume:.55,graphics:isTouch?'medium':'high',minimapOrientation:'heading',diagnostics:'off'});
 function loadPlayerSettings(){
   let saved={};try{saved=JSON.parse(localStorage.getItem('breachPlayerSettings')||'{}')||{}}catch{}
   const numeric=(key,min,max)=>{const raw=saved[key];if(raw===null||raw===undefined||raw==='')return DEFAULT_PLAYER_SETTINGS[key];const value=Number(raw);return Number.isFinite(value)?Math.max(min,Math.min(max,value)):DEFAULT_PLAYER_SETTINGS[key];};
-  return {lookSensitivity:numeric('lookSensitivity',.5,2),adsSensitivity:numeric('adsSensitivity',.35,1.25),touchSensitivity:numeric('touchSensitivity',.5,2),controllerVerticalSensitivity:numeric('controllerVerticalSensitivity',.5,1.5),controllerResponseCurve:['dynamic','standard','linear'].includes(saved.controllerResponseCurve)?saved.controllerResponseCurve:DEFAULT_PLAYER_SETTINGS.controllerResponseCurve,controllerAimAssist:saved.controllerAimAssist==='off'?'off':'on',controllerMoveDeadzone:numeric('controllerMoveDeadzone',.02,.25),controllerLookDeadzone:numeric('controllerLookDeadzone',.02,.25),masterVolume:numeric('masterVolume',0,1),sfxVolume:numeric('sfxVolume',0,1),musicVolume:numeric('musicVolume',0,1),graphics:['low','medium','high'].includes(saved.graphics)?saved.graphics:DEFAULT_PLAYER_SETTINGS.graphics,minimapOrientation:['heading','north'].includes(saved.minimapOrientation)?saved.minimapOrientation:DEFAULT_PLAYER_SETTINGS.minimapOrientation};
+  return {lookSensitivity:numeric('lookSensitivity',.5,2),adsSensitivity:numeric('adsSensitivity',.35,1.25),touchSensitivity:numeric('touchSensitivity',.5,2),controllerVerticalSensitivity:numeric('controllerVerticalSensitivity',.5,1.5),controllerResponseCurve:['dynamic','standard','linear'].includes(saved.controllerResponseCurve)?saved.controllerResponseCurve:DEFAULT_PLAYER_SETTINGS.controllerResponseCurve,controllerAimAssist:saved.controllerAimAssist==='off'?'off':'on',controllerMoveDeadzone:numeric('controllerMoveDeadzone',.02,.25),controllerLookDeadzone:numeric('controllerLookDeadzone',.02,.25),masterVolume:numeric('masterVolume',0,1),sfxVolume:numeric('sfxVolume',0,1),musicVolume:numeric('musicVolume',0,1),graphics:['low','medium','high'].includes(saved.graphics)?saved.graphics:DEFAULT_PLAYER_SETTINGS.graphics,minimapOrientation:['heading','north'].includes(saved.minimapOrientation)?saved.minimapOrientation:DEFAULT_PLAYER_SETTINGS.minimapOrientation,diagnostics:saved.diagnostics==='on'?'on':'off'};
 }
 let playerSettings=loadPlayerSettings();
 let playerSettingsDraft=null;
+const DIAGNOSTICS_SAMPLE_INTERVAL_MS=33;
+const DIAGNOSTICS_MAX_SAMPLES=9000;
+const DIAGNOSTICS_MAX_EVENTS=2400;
+const DIAGNOSTICS_MAX_INCIDENTS=12;
+const DIAGNOSTICS_INCIDENT_HISTORY=150;
+const diagnosticsRecorder={startedAt:performance.now(),startedEpoch:Date.now(),lastSampleAt:0,lastFrameAt:0,lastEffectivePitch:NaN,lastBasePitch:NaN,lastCameraY:NaN,lastFireHeld:false,lastIncidentAt:0,samples:[],events:[],incidents:[]};
+const controllerDiagnostics={rawX:0,rawY:0,inputX:0,inputY:0,inputLength:0,assistStrength:0,assistTarget:'',targetYaw:0,targetPitch:0,velocityYaw:0,velocityPitch:0,deltaYaw:0,deltaPitch:0,dt:0};
+function diagnosticsRecordingEnabled(value=playerSettings){return NET_DIAG_URL_ENABLED||value?.diagnostics==='on';}
+function diagnosticsRound(value,digits=4){const n=Number(value);return Number.isFinite(n)?Number(n.toFixed(digits)):null;}
+function diagnosticsRelativeTime(now=performance.now()){return Math.max(0,Math.round(now-diagnosticsRecorder.startedAt));}
+function diagnosticsRecordEvent(type,data={}){
+  if(!diagnosticsRecordingEnabled())return;
+  const event={t:diagnosticsRelativeTime(),type:String(type||'event'),...data};diagnosticsRecorder.events.push(event);if(diagnosticsRecorder.events.length>DIAGNOSTICS_MAX_EVENTS)diagnosticsRecorder.events.splice(0,Math.min(300,diagnosticsRecorder.events.length));
+}
+function diagnosticsDataCount(){return diagnosticsRecorder.samples.length+diagnosticsRecorder.events.length+diagnosticsRecorder.incidents.length;}
+function resetDiagnosticsRecording({markStart=true}={}){
+  diagnosticsRecorder.startedAt=performance.now();diagnosticsRecorder.startedEpoch=Date.now();diagnosticsRecorder.lastSampleAt=0;diagnosticsRecorder.lastFrameAt=0;diagnosticsRecorder.lastEffectivePitch=NaN;diagnosticsRecorder.lastBasePitch=NaN;diagnosticsRecorder.lastCameraY=NaN;diagnosticsRecorder.lastFireHeld=false;diagnosticsRecorder.lastIncidentAt=0;diagnosticsRecorder.samples.length=0;diagnosticsRecorder.events.length=0;diagnosticsRecorder.incidents.length=0;resetNetworkDiagnostics();
+  if(markStart&&diagnosticsRecordingEnabled())diagnosticsRecordEvent('recording_start',{version:APP_VERSION,protocol:PROTOCOL_VERSION,inputMode:activeInputMode});syncDiagnosticsSettingsUI();hudLastDraw=0;
+}
+function diagnosticsControllerSnapshot(){return{rawX:diagnosticsRound(gamepadFrame?.rawLookX??gamepadFrame?.lookX),rawY:diagnosticsRound(gamepadFrame?.rawLookY??gamepadFrame?.lookY),x:diagnosticsRound(controllerDiagnostics.inputX),y:diagnosticsRound(controllerDiagnostics.inputY),len:diagnosticsRound(controllerDiagnostics.inputLength),rt:diagnosticsRound(gamepadFrame?.buttons?.[GAMEPAD_BUTTON.RT]||0,3),lt:diagnosticsRound(gamepadFrame?.buttons?.[GAMEPAD_BUTTON.LT]||0,3),assist:diagnosticsRound(controllerDiagnostics.assistStrength,3),assistTarget:controllerDiagnostics.assistTarget||'',targetPitch:diagnosticsRound(controllerDiagnostics.targetPitch),velocityPitch:diagnosticsRound(controllerDiagnostics.velocityPitch),pitchDelta:diagnosticsRound(controllerDiagnostics.deltaPitch),dt:diagnosticsRound(controllerDiagnostics.dt,5)};}
+function diagnosticsFrameState(now,rawFrameDt){
+  const effectivePitch=effectiveAimPitch(),effectiveYaw=effectiveAimYaw(),cameraY=Number(camera?.position?.y),fire=fireInputHeld();
+  return{t:diagnosticsRelativeTime(now),dtMs:diagnosticsRound((Number(rawFrameDt)||0)*1000,2),mode:activeInputMode,fire,mouseFire:!!mouseFireDown,touchFire:touchRoleActive('fire'),gamepadFire:!!gamepadFireDown,weapon:currentWeapon,ads:diagnosticsRound(adsBlend,3),yaw:diagnosticsRound(yaw),pitch:diagnosticsRound(pitch),effectiveYaw:diagnosticsRound(effectiveYaw),effectivePitch:diagnosticsRound(effectivePitch),recoilPitch:diagnosticsRound(viewRecoilPitch),recoilPitchTarget:diagnosticsRound(viewRecoilTargetPitch),recoilYaw:diagnosticsRound(viewRecoilYaw),recoilYawTarget:diagnosticsRound(viewRecoilTargetYaw),recoilBurst:!!recoilBurstActive,recoilStep:Number(localRecoilStep[currentWeapon]??-1),cameraX:diagnosticsRound(camera?.position?.x,3),cameraY:diagnosticsRound(cameraY,3),cameraZ:diagnosticsRound(camera?.position?.z,3),positionY:diagnosticsRound(position?.y,3),viewFeetY:diagnosticsRound(viewFeetY,3),correctionY:diagnosticsRound(correctionViewY,3),verticalVelocity:diagnosticsRound(verticalVelocity,3),grounded:!!onGround,stateSeq,correctionSeq:lastCorrectionSeq,rttMs:diagnosticsRound(netDiag.rttMs,1),lastCorrectionM:diagnosticsRound(netDiag.lastCorrectionM,3),touchLook:touchRoleActive('look'),controller:diagnosticsControllerSnapshot()};
+}
+function diagnosticsCaptureIncident(kind,sample,data={}){
+  const now=performance.now();if(now-diagnosticsRecorder.lastIncidentAt<250)return;diagnosticsRecorder.lastIncidentAt=now;
+  const incident={t:sample.t,kind,details:data,before:diagnosticsRecorder.samples.slice(-DIAGNOSTICS_INCIDENT_HISTORY),at:sample};diagnosticsRecorder.incidents.push(incident);if(diagnosticsRecorder.incidents.length>DIAGNOSTICS_MAX_INCIDENTS)diagnosticsRecorder.incidents.shift();diagnosticsRecordEvent('incident',{kind,...data});
+}
+function captureGameplayDiagnostics(rawFrameDt,now=performance.now()){
+  if(!diagnosticsRecordingEnabled()||!shell.inMatch||!shell.canPlay||!camera||!position){diagnosticsRecorder.lastFrameAt=0;diagnosticsRecorder.lastEffectivePitch=NaN;diagnosticsRecorder.lastBasePitch=NaN;diagnosticsRecorder.lastCameraY=NaN;diagnosticsRecorder.lastFireHeld=false;return;}
+  const sample=diagnosticsFrameState(now,rawFrameDt),effective=Number(sample.effectivePitch),base=Number(sample.pitch),cameraY=Number(sample.cameraY),fire=!!sample.fire;
+  if(fire!==diagnosticsRecorder.lastFireHeld)diagnosticsRecordEvent(fire?'fire_hold_start':'fire_hold_end',{weapon:currentWeapon,pitch:sample.pitch,effectivePitch:sample.effectivePitch,rawLookY:sample.controller.rawY,rt:sample.controller.rt});
+  if(fire&&diagnosticsRecorder.lastFireHeld&&Number.isFinite(diagnosticsRecorder.lastEffectivePitch)&&Number.isFinite(effective)){
+    const effectiveDelta=effective-diagnosticsRecorder.lastEffectivePitch,baseDelta=base-diagnosticsRecorder.lastBasePitch,cameraYDelta=cameraY-diagnosticsRecorder.lastCameraY;
+    if(effectiveDelta<-.055)diagnosticsCaptureIncident('aim_pitch_down',sample,{effectiveDelta:diagnosticsRound(effectiveDelta),baseDelta:diagnosticsRound(baseDelta),cameraYDelta:diagnosticsRound(cameraYDelta,3),rawLookY:sample.controller.rawY,processedLookY:sample.controller.y,recoilDelta:diagnosticsRound((Number(sample.recoilPitch)||0)-(diagnosticsRecorder.samples.at(-1)?.recoilPitch||0))});
+    else if(cameraYDelta<-.22)diagnosticsCaptureIncident('camera_drop',sample,{effectiveDelta:diagnosticsRound(effectiveDelta),baseDelta:diagnosticsRound(baseDelta),cameraYDelta:diagnosticsRound(cameraYDelta,3),correctionY:sample.correctionY,lastCorrectionM:sample.lastCorrectionM});
+  }
+  diagnosticsRecorder.lastFrameAt=now;diagnosticsRecorder.lastEffectivePitch=effective;diagnosticsRecorder.lastBasePitch=base;diagnosticsRecorder.lastCameraY=cameraY;diagnosticsRecorder.lastFireHeld=fire;
+  if(now-diagnosticsRecorder.lastSampleAt>=DIAGNOSTICS_SAMPLE_INTERVAL_MS){diagnosticsRecorder.lastSampleAt=now;diagnosticsRecorder.samples.push(sample);if(diagnosticsRecorder.samples.length>DIAGNOSTICS_MAX_SAMPLES)diagnosticsRecorder.samples.splice(0,Math.min(600,diagnosticsRecorder.samples.length));}
+}
+function diagnosticsExportPayload(){
+  const settings=normalizePlayerSettingsValue(playerSettings);delete settings.masterVolume;delete settings.sfxVolume;delete settings.musicVolume;
+  return{format:'breach-diagnostics-v1',exportedAt:new Date().toISOString(),appVersion:APP_VERSION,protocolVersion:PROTOCOL_VERSION,recording:diagnosticsRecordingEnabled(),startedAt:new Date(diagnosticsRecorder.startedEpoch).toISOString(),durationMs:Math.max(0,performance.now()-diagnosticsRecorder.startedAt),environment:{userAgent:navigator.userAgent||'',platform:navigator.platform||'',touch:!!isTouch,inputMode:activeInputMode,viewport:{w:viewW||0,h:viewH||0},map:currentMapId||'',matchMode:matchState?.mode||''},playerSettings:settings,network:networkDiagnosticsSnapshot(),sampleIntervalMs:DIAGNOSTICS_SAMPLE_INTERVAL_MS,samples:diagnosticsRecorder.samples,events:diagnosticsRecorder.events,incidents:diagnosticsRecorder.incidents};
+}
+function exportDiagnosticsRecording(){
+  if(!diagnosticsDataCount()){showToast('NO DIAGNOSTICS RECORDED');return;}
+  try{const json=JSON.stringify(diagnosticsExportPayload());const blob=new Blob([json],{type:'application/json'}),url=URL.createObjectURL(blob),stamp=new Date().toISOString().replace(/[:.]/g,'-'),a=document.createElement('a');a.href=url;a.download=`breach-diagnostics-${stamp}.json`;a.style.display='none';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);showToast('DIAGNOSTICS EXPORTED');}catch(error){console.error('Diagnostics export failed',error);showToast('DIAGNOSTICS EXPORT FAILED');}
+}
+function syncDiagnosticsSettingsUI(){
+  const el=$('diagnosticsStatus'),hasData=diagnosticsDataCount()>0;if(el){const seconds=Math.round(Math.max(0,performance.now()-diagnosticsRecorder.startedAt)/1000);el.textContent=diagnosticsRecordingEnabled()?`RECORDING · ${seconds}s · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:hasData?`STOPPED · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:'OFF';}
+  if($('diagnosticsExportBtn'))$('diagnosticsExportBtn').disabled=!hasData;if($('diagnosticsClearBtn'))$('diagnosticsClearBtn').disabled=!hasData;
+}
+
 const gameAudio=createAudioEngine({cues:SOUND_CUES,getVolumes:()=>({master:masterMuted?0:playerSettings.masterVolume,sfx:playerSettings.sfxVolume,music:playerSettings.musicVolume})});
 let introMusicHandle=null;
 
@@ -621,7 +674,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.17';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.19';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -777,27 +830,23 @@ function currentControllerAimAssist(now=performance.now()){
 }
 function resetControllerAimMotion(){controllerAimVelocityX=controllerAimVelocityY=0;controllerTurnBoost=0;controllerAssistTargetId='';controllerAssistNextScanAt=0;}
 function applyControllerAim(dt){
-  // Camera input never catches up after a stalled render frame. Network/UI work or a
-  // browser hitch may delay a frame, but integrating the stick across the whole gap
-  // turns a small held vertical value into a sudden pitch jump. Physics can catch up;
-  // first-person look must remain frame-local and visually continuous.
-  const aimDt=Math.min(1/30,Math.max(0,Number(dt)||0));
-  const input=controllerLookAxes(),now=performance.now(),assist=currentControllerAimAssist(now),breakout=1-smoothstep01(THREE.MathUtils.clamp((input.length-.80)/.20,0,1)),assistStrength=(assist?.strength||0)*breakout;
-  if(input.length>.86)controllerTurnBoost=Math.min(1,controllerTurnBoost+aimDt/.22);else controllerTurnBoost=Math.max(0,controllerTurnBoost-aimDt/.08);
+  const beforeYaw=yaw,beforePitch=pitch,input=controllerLookAxes(),now=performance.now(),assist=currentControllerAimAssist(now),breakout=1-smoothstep01(THREE.MathUtils.clamp((input.length-.80)/.20,0,1)),assistStrength=(assist?.strength||0)*breakout;
+  if(input.length>.86)controllerTurnBoost=Math.min(1,controllerTurnBoost+dt/.22);else controllerTurnBoost=Math.max(0,controllerTurnBoost-dt/.08);
   const ads=smoothstep01(adsBlend),turnMultiplier=1+controllerTurnBoost*.30*(1-ads*.72),adsScale=controllerAdsSensitivityScale();
   const minSlow=currentWeapon==='sniper'&&ads>.2?(sniperZoomLevel>=2?.49:.53):THREE.MathUtils.lerp(.70,.60,ads),slowdown=assist?THREE.MathUtils.lerp(1,minSlow,assistStrength):1;
   const targetYaw=input.x*CONTROLLER_LOOK_YAW_RATE*playerSettings.lookSensitivity*adsScale*turnMultiplier*slowdown;
   const targetPitch=input.y*CONTROLLER_LOOK_PITCH_RATE*playerSettings.lookSensitivity*playerSettings.controllerVerticalSensitivity*adsScale*turnMultiplier*slowdown;
-  const smoothing=1-Math.exp(-aimDt/.024);controllerAimVelocityX+= (targetYaw-controllerAimVelocityX)*smoothing;controllerAimVelocityY+=(targetPitch-controllerAimVelocityY)*smoothing;
-  yaw-=controllerAimVelocityX*aimDt;pitch-=controllerAimVelocityY*aimDt;
-  if(assist&&assistStrength>.01){const move=controllerMoveAxes(),strafe=THREE.MathUtils.clamp(move.length/.72,0,1),rotWeight=assistStrength*strafe;if(rotWeight>.001){yaw-=THREE.MathUtils.clamp(assist.ndcX,-.75,.75)*.72*rotWeight*aimDt;
+  const smoothing=1-Math.exp(-dt/.024);controllerAimVelocityX+= (targetYaw-controllerAimVelocityX)*smoothing;controllerAimVelocityY+=(targetPitch-controllerAimVelocityY)*smoothing;
+  yaw-=controllerAimVelocityX*dt;pitch-=controllerAimVelocityY*dt;
+  if(assist&&assistStrength>.01){const move=controllerMoveAxes(),strafe=THREE.MathUtils.clamp(move.length/.72,0,1),rotWeight=assistStrength*strafe;if(rotWeight>.001){yaw-=THREE.MathUtils.clamp(assist.ndcX,-.75,.75)*.72*rotWeight*dt;
     // Rotational aim assist may help track horizontally, but it must never
     // counter-steer sustained vertical recoil. Recoil control belongs to the
     // player, as in controller FPS gunplay; otherwise the assist drags the base
     // pitch down as the recoiling camera rises and looks like a recoil reset.
-    if(!(automaticRecoilActive(currentWeapon)&&recoilBurstActive&&recoilBurstWeapon===currentWeapon))pitch+=THREE.MathUtils.clamp(assist.ndcY,-.75,.75)*.54*rotWeight*aimDt;
+    if(!(automaticRecoilActive(currentWeapon)&&recoilBurstActive&&recoilBurstWeapon===currentWeapon))pitch+=THREE.MathUtils.clamp(assist.ndcY,-.75,.75)*.54*rotWeight*dt;
   }}
   pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
+  controllerDiagnostics.rawX=Number(gamepadFrame?.rawLookX??gamepadFrame?.lookX)||0;controllerDiagnostics.rawY=Number(gamepadFrame?.rawLookY??gamepadFrame?.lookY)||0;controllerDiagnostics.inputX=input.x;controllerDiagnostics.inputY=input.y;controllerDiagnostics.inputLength=input.length;controllerDiagnostics.assistStrength=assistStrength;controllerDiagnostics.assistTarget=String(assist?.remote?.id||controllerAssistTargetId||'');controllerDiagnostics.targetYaw=targetYaw;controllerDiagnostics.targetPitch=targetPitch;controllerDiagnostics.velocityYaw=controllerAimVelocityX;controllerDiagnostics.velocityPitch=controllerAimVelocityY;controllerDiagnostics.deltaYaw=yaw-beforeYaw;controllerDiagnostics.deltaPitch=pitch-beforePitch;controllerDiagnostics.dt=dt;
 }
 function currentShotHeat(weapon=currentWeapon,now=performance.now()){
   const last=localShotHeatAt[weapon]||0,heat=weaponHeatAfterDelay(weapon,localShotHeat[weapon]||0,last?now-last:0);
@@ -1120,7 +1169,8 @@ function normalizePlayerSettingsValue(value={}){
     sfxVolume:clamp(value.sfxVolume,0,1,DEFAULT_PLAYER_SETTINGS.sfxVolume),
     musicVolume:clamp(value.musicVolume,0,1,DEFAULT_PLAYER_SETTINGS.musicVolume),
     graphics:['low','medium','high'].includes(value.graphics)?value.graphics:DEFAULT_PLAYER_SETTINGS.graphics,
-    minimapOrientation:value.minimapOrientation==='north'?'north':'heading'
+    minimapOrientation:value.minimapOrientation==='north'?'north':'heading',
+    diagnostics:value.diagnostics==='on'?'on':'off'
   };
 }
 function setSettingsStatus(text,tone=''){const el=$('settingsStatus');if(!el)return;el.textContent=text;el.className=`admin-status ${tone}`.trim();}
@@ -1128,7 +1178,7 @@ function playerSettingsEqual(a,b){const x=normalizePlayerSettingsValue(a),y=norm
 function syncPlayerSettingsUI(value=playerSettingsDraft||playerSettings){
   const source=normalizePlayerSettingsValue(value),values=[['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerControllerVerticalSensitivity','controllerVerticalSensitivity'],['playerControllerMoveDeadzone','controllerMoveDeadzone'],['playerControllerLookDeadzone','controllerLookDeadzone'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']];
   for(const [id,key] of values){const el=$(id),out=$(`${id}Value`);if(el)el.value=source[key];if(out)out.textContent=key.includes('Volume')?`${Math.round(source[key]*100)}%`:key.includes('Deadzone')?`${Math.round(source[key]*100)}%`:`${Number(source[key]).toFixed(2)}×`;}
-  if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;if($('playerControllerResponseCurve'))$('playerControllerResponseCurve').value=source.controllerResponseCurve;if($('playerControllerAimAssist'))$('playerControllerAimAssist').value=source.controllerAimAssist;syncMusicUI();
+  if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;if($('playerControllerResponseCurve'))$('playerControllerResponseCurve').value=source.controllerResponseCurve;if($('playerControllerAimAssist'))$('playerControllerAimAssist').value=source.controllerAimAssist;if($('playerDiagnostics'))$('playerDiagnostics').value=source.diagnostics;syncMusicUI();syncDiagnosticsSettingsUI();
   const dirty=!playerSettingsEqual(source,playerSettings);if($('settingsResetBtn'))$('settingsResetBtn').disabled=!dirty;if($('settingsSaveBtn'))$('settingsSaveBtn').disabled=!dirty;
 }
 function stagePlayerSettingFromUI(id,key){const el=$(id);if(!el)return;if(!playerSettingsDraft)playerSettingsDraft={...playerSettings};playerSettingsDraft=normalizePlayerSettingsValue({...playerSettingsDraft,[key]:Number(el.value)});syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus(playerSettingsEqual(playerSettingsDraft,playerSettings)?'Saved settings':'Unsaved changes');}
@@ -1139,9 +1189,10 @@ function closePlayerSettings(){cancelPlayerSettings();}
 function resetPlayerSettings(){playerSettingsDraft={...playerSettings};syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus('Saved settings');}
 function savePlayerSettingsDraft(){
   if(!playerSettingsDraft||playerSettingsEqual(playerSettingsDraft,playerSettings)){cancelPlayerSettings();return;}
-  const previous=playerSettings;playerSettings=normalizePlayerSettingsValue(playerSettingsDraft);playerSettingsDraft=null;savePlayerSettings();applyGraphicsQuality();hudLastDraw=0;
+  const previous=playerSettings,diagBefore=diagnosticsRecordingEnabled(previous),nextSettings=normalizePlayerSettingsValue(playerSettingsDraft),diagAfter=diagnosticsRecordingEnabled(nextSettings);if(diagBefore&&!diagAfter)diagnosticsRecordEvent('recording_stop',{samples:diagnosticsRecorder.samples.length,events:diagnosticsRecorder.events.length,incidents:diagnosticsRecorder.incidents.length});playerSettings=nextSettings;playerSettingsDraft=null;savePlayerSettings();applyGraphicsQuality();hudLastDraw=0;
+  if(!diagBefore&&diagAfter)resetDiagnosticsRecording();else if(diagBefore&&!diagAfter)syncDiagnosticsSettingsUI();
   if(!shell.inMatch&&introMusicHandle&&(previous.masterVolume!==playerSettings.masterVolume||previous.musicVolume!==playerSettings.musicVolume)){stopIntroMusic();if(!masterMuted)startIntroMusic();}
-  shell.closePanel(SHELL_PANEL.SETTINGS);showToast('SETTINGS SAVED');
+  shell.closePanel(SHELL_PANEL.SETTINGS);showToast(diagAfter&&!diagBefore?'DIAGNOSTICS RECORDING':diagBefore&&!diagAfter?'DIAGNOSTICS STOPPED':'SETTINGS SAVED');
 }
 
 
@@ -1833,6 +1884,9 @@ function bindUI(){
   $('playerMinimapOrientation')?.addEventListener('change',()=>stagePlayerChoice('minimapOrientation',$('playerMinimapOrientation').value));
   $('playerControllerResponseCurve')?.addEventListener('change',()=>stagePlayerChoice('controllerResponseCurve',$('playerControllerResponseCurve').value));
   $('playerControllerAimAssist')?.addEventListener('change',()=>stagePlayerChoice('controllerAimAssist',$('playerControllerAimAssist').value));
+  $('playerDiagnostics')?.addEventListener('change',()=>stagePlayerChoice('diagnostics',$('playerDiagnostics').value));
+  $('diagnosticsExportBtn')?.addEventListener('click',exportDiagnosticsRecording);
+  $('diagnosticsClearBtn')?.addEventListener('click',()=>{resetDiagnosticsRecording({markStart:diagnosticsRecordingEnabled()});showToast(diagnosticsRecordingEnabled()?'DIAGNOSTICS CLEARED · RECORDING':'DIAGNOSTICS CLEARED');});
   chatSendBtn.addEventListener('click',submitChat);
   chatKeyboard.addEventListener('pointerdown',e=>{const btn=e.target.closest?.('[data-chat-char],[data-chat-action]');if(!btn||!chatOpen)return;e.preventDefault();handleChatKeyboardButton(btn);});
   $('joinBtn').addEventListener('click', () => joinMatch(normalizeCode(codeInput.value)));
@@ -1901,7 +1955,7 @@ function bindUI(){
   document.addEventListener('mousemove', e => {
     if(chatOpen||!shell.canPlay||!matchAllowsMovement(matchState)||hp<=0||(!isTouch&&document.pointerLockElement!==canvas)) return;
     if(Math.abs(e.movementX)+Math.abs(e.movementY)>.01)setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
-    const sens=aimSensitivityScale()*playerSettings.lookSensitivity;yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);
+    const beforePitch=pitch,sens=aimSensitivityScale()*playerSettings.lookSensitivity;yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);if(diagnosticsRecordingEnabled()&&fireInputHeld()&&Math.abs(pitch-beforePitch)>.02)diagnosticsRecordEvent('mouse_look',{dx:diagnosticsRound(e.movementX,2),dy:diagnosticsRound(e.movementY,2),pitchDelta:diagnosticsRound(pitch-beforePitch)});
   });
   document.addEventListener('pointerdown',e=>{
     if(e.pointerType==='touch'||e.pointerType==='pen'){activateTouchInputMode();setActiveInputMode(INPUT_MODE.TOUCH,{quiet:true});}
@@ -2162,7 +2216,7 @@ function onCanvasPointerMove(e){
   if(role==='joy'){const L=hudLayout||computeHudLayout();updateJoy(p.x,p.y,{x:joy.centerX,y:joy.centerY,r:L.joy.r});return;}
   if(role==='look'&&hp>0){
     const dx=p.x-look.x,dy=p.y-look.y;look.x=p.x;look.y=p.y;
-    const sens=aimSensitivityScale()*playerSettings.touchSensitivity;yaw-=dx*.006*sens;pitch-=dy*.0052*sens;pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
+    const beforePitch=pitch,sens=aimSensitivityScale()*playerSettings.touchSensitivity;yaw-=dx*.006*sens;pitch-=dy*.0052*sens;pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);if(diagnosticsRecordingEnabled()&&fireInputHeld()&&Math.abs(pitch-beforePitch)>.02)diagnosticsRecordEvent('touch_look',{dx:diagnosticsRound(dx,2),dy:diagnosticsRound(dy,2),pitchDelta:diagnosticsRound(pitch-beforePitch),pointerId:e.pointerId});
   }
 }
 
@@ -2350,7 +2404,6 @@ function handleMessage(m){
   if(m.t==='flashEffect'){applyFlashEffect(m);return;}
   if(m.t==='explosion'){const projectile=bullets.get(m.id);if(projectile?.type==='launcher')projectile.root.position.set(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0);soundTacticalDetonation(m.kind||'sticky',m);spawnDetonationFx(m.kind||'sticky',m);removeBullet(m.id);removeThrowableVisual(m.id);return;}
   if(m.t==='chat'){receiveChatMessage(m);return;}
-  if(m.t==='fireAck'){applyFireAck(m);return;}
   if(m.t==='loadout'){applyAuthoritativeLoadout(m);return;}
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';r.swapStartedAt=performance.now();syncRemoteWeapon(r);}return;}
   if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;if(r.reloadWeapon!=='shotgun'&&r.reloadUntil)playSpatialCue(reloadSoundId(r.reloadWeapon),r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
@@ -2798,7 +2851,7 @@ function applyServerCorrection(m){
   // later correction packets only contain NEW error instead of re-applying the
   // same network correction over and over after a packet stall.
   if(seq)rebasePredictionsAfter(seq,deltaX,deltaY,deltaZ);
-  const correctionMagnitude=Math.hypot(deltaX,deltaY,deltaZ),recent=!seq||stateSeq-seq<=2;recordNetCorrection(m,correctionMagnitude);
+  const correctionMagnitude=Math.hypot(deltaX,deltaY,deltaZ),recent=!seq||stateSeq-seq<=2;recordNetCorrection(m,correctionMagnitude);if(diagnosticsRecordingEnabled()&&(fireInputHeld()||correctionMagnitude>.08))diagnosticsRecordEvent('server_correction',{seq,dx:diagnosticsRound(deltaX,4),dy:diagnosticsRound(deltaY,4),dz:diagnosticsRound(deltaZ,4),magnitude:diagnosticsRound(correctionMagnitude,4),reason:String(m?.reason||''),fire:fireInputHeld(),positionY:diagnosticsRound(position.y,3),viewFeetY:diagnosticsRound(viewFeetY,3)});
   if(correctionMagnitude>CORRECTION_HARD_SNAP_DISTANCE||Math.abs(deltaY)>.9){clearCorrectionView();resetViewVertical();}
   else{
     const errorX=visualX-position.x,errorY=visualY-position.y,errorZ=visualZ-position.z,horizontal=Math.hypot(errorX,errorZ),scale=horizontal>CORRECTION_MAX_HORIZONTAL?CORRECTION_MAX_HORIZONTAL/horizontal:1;
@@ -2920,18 +2973,8 @@ function sendCurrentState(force=false){
   if(!force&&now-lastStateSent<interval)return false;
   stateSeq+=1;preview.seq=stateSeq;recordNetStateSend(now);lastStateSent=now;lastSentState={x:preview.x,y:preview.y,z:preview.z,yaw:preview.yaw,pitch:preview.pitch,ads:preview.ads,adsAmount:preview.adsAmount||0,crouched:preview.crouched,sprinting:preview.sprinting,sliding:preview.sliding,grounded:preview.grounded,moveX:preview.moveX,moveZ:preview.moveZ,ladderId:preview.ladderId||'',ladderMove:preview.ladderMove||0};rememberPredictionState(preview,now);send(preview);return true;
 }
-function applyFireAck(m){
-  // A shot acknowledgement may reconcile authoritative ammo/reload timing only.
-  // It must never re-apply the loadout, current weapon, attachments, UI, ADS, or
-  // view state. Keeping combat acknowledgement separate prevents network jitter
-  // from injecting work into the camera path during sustained fire.
-  if(m?.accepted===false)recordNetReject('fire',m.reason||'rejected');
-  const ackWeapon=WEAPON_SPECS[m?.weapon]?m.weapon:'';if(ackWeapon&&Number.isFinite(Number(m.ammoCount)))ammo[ackWeapon]=Math.max(0,Math.min(weaponCapacity(ackWeapon),Math.floor(Number(m.ammoCount))));
-  if(Object.prototype.hasOwnProperty.call(m||{},'reloadAt')){reloadUntil=Math.max(0,Number(m.reloadAt)||0);reloadWeapon=m.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;reloadRequestPending=false;}
-  if(m?.accepted===false&&(m.reason==='cooldown'||m.reason==='weapon_switch'||m.reason==='sprint_out'))delayFire(Math.max(8,Math.min(180,Number(m.retryAfterMs)||35)),WEAPON_SPECS[m.weapon]?m.weapon:currentWeapon);
-}
-
 function applyAuthoritativeLoadout(m){
+  if(m?.action==='fire')diagnosticsRecordEvent('fire_loadout_ack',{accepted:m.accepted!==false,reason:String(m.reason||''),weapon:String(m.weapon||''),currentWeapon,stateSeq,serverAmmo:Number(m?.ammo?.[m.weapon]),localAmmo:Number(ammo[m.weapon]??-1),reloadAt:Number(m.reloadAt)||0,pendingWeapon:String(pendingWeapon||'')});
   if(m?.accepted===false&&m.action)recordNetReject(m.action,m.reason);
   const ackRev=Math.max(0,Math.floor(Number(m.rev)||0));
   if(shell.inLobby&&m.action==='loadout'&&ackRev&&ackRev<lobbyLoadoutRevision)return;
@@ -2950,6 +2993,7 @@ function applyAuthoritativeLoadout(m){
   reloadUntil=Math.max(0,Number(m.reloadAt)||0);reloadWeapon=m.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;reloadRequestPending=false;
   if(m.action==='weapon'&&m.accepted!==false)pendingWeapon='';
   if(m.action==='reloadShell')soundReload('shotgun');
+  if(m.action==='fire'&&m.accepted===false&&(m.reason==='cooldown'||m.reason==='weapon_switch'||m.reason==='sprint_out'))delayFire(Math.max(8,Math.min(180,Number(m.retryAfterMs)||35)),m.weapon);
   if(m.pending===true&&pendingLoadout){rememberLoadoutClasses(loadoutClasses,activeClassId);showToast(`${loadoutClassById(loadoutClasses,pendingClassId||activeClassId).name} QUEUED · NEXT SPAWN`);}
   if(shell.inLobby&&lobbyLoadoutDraft){if(Array.isArray(m.loadoutClasses))lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,selectedLoadout());markLobbyLoadoutDirty();}
   syncLocalWeaponModel();syncPauseContext();if(shell.inLobby){renderLobbySetupControls();setLobbyActionState();renderLobbyRoster(lobbyDisplayMode());}
@@ -3180,7 +3224,7 @@ function requestShot(hand='right'){
   // The reticle is authoritative: fire along the exact camera aim including
   // recoil already accumulated from previous rounds. Applying the new impulse
   // after sending means the first shot is precise and subsequent rounds climb.
-  const shotYaw=round4(effectiveAimYaw()),shotPitch=round4(effectiveAimPitch()),preShotHeat=currentShotHeat(weapon,now);
+  const shotYaw=round4(effectiveAimYaw()),shotPitch=round4(effectiveAimPitch()),preShotHeat=currentShotHeat(weapon,now);diagnosticsRecordEvent('shot_request',{weapon,hand,shotYaw,shotPitch,basePitch:diagnosticsRound(pitch),recoilPitch:diagnosticsRound(viewRecoilPitch),recoilTarget:diagnosticsRound(viewRecoilTargetPitch),stateSeq,ammo:Number(ammo[weapon]||0),rawLookY:diagnosticsRound(gamepadFrame?.rawLookY??gamepadFrame?.lookY),processedLookY:diagnosticsRound(controllerDiagnostics.inputY),rt:diagnosticsRound(gamepadFrame?.buttons?.[GAMEPAD_BUTTON.RT]||0,3)});
   if(weapon==='akimbo1887')akimboReadyAt[hand==='left'?'left':'right']=now+weaponRules(weapon).cooldownMs;else fireReadyAt[weapon]=now+weaponRules(weapon).cooldownMs;
   presentLocalShot(weapon,now,hand);
   sendCurrentState(true);send({t:'fire',weapon,hand:weapon==='akimbo1887'?(hand==='left'?'left':'right'):undefined,yaw:shotYaw,pitch:shotPitch,adsAmount:round3(adsBlend),shotAt:Math.round(serverNow()),viewDelayMs:Math.round(currentRemoteViewDelayMs())});
@@ -3606,14 +3650,14 @@ function animate(){
   try{updateTacticalFx(visualDt);}catch(error){console.error('Explosion visual update failed; clearing transient explosion FX.',error);clearTacticalFx();}
   try{updateBulletImpactFx(visualDt);}catch(error){console.error('Bullet impact visual update failed; clearing transient impact FX.',error);clearBulletImpactFx();}
   try{updateSmokeClouds(visualDt);}catch(error){console.error('Smoke visual update failed; clearing transient smoke FX.',error);clearSmokeClouds();}
-  updateEquipmentTrajectory();
+  updateEquipmentTrajectory();captureGameplayDiagnostics(rawFrameDt,performance.now());
   renderer.autoClear=true;renderer.render(scene,camera);
   if(shell.canPlay){renderer.autoClear=false;renderer.clearDepth();renderer.render(hudScene,hudCamera);renderer.autoClear=true;drawHud(performance.now());}
 }
 function maintainNetwork(){
   const now=performance.now(),stateSent=sendCurrentState(false);sendSimulationHeartbeat(stateSent);
-  if(now-lastPing<=(NET_DIAG_ENABLED?2000:15000))return;
-  lastPing=now;lastPingLocalAt=Date.now();send({t:'ping',clientAt:lastPingLocalAt,diag:NET_DIAG_ENABLED?1:0});
+  const diagnosticsOn=diagnosticsRecordingEnabled();if(now-lastPing<=(diagnosticsOn?2000:15000))return;
+  lastPing=now;lastPingLocalAt=Date.now();send({t:'ping',clientAt:lastPingLocalAt,diag:diagnosticsOn?1:0});
 }
 function updatePausedNetwork(){if(traversal)updateTraversal(performance.now());maintainNetwork();}
 function finishControllerUiAdjustment(){
@@ -4231,8 +4275,9 @@ function computeHudLayout(){
   };
 }
 function drawNetworkDiagnostics(c,w,h){
-  if(!NET_DIAG_ENABLED)return;
+  if(!diagnosticsRecordingEnabled())return;
   const lines=[
+    `DIAG REC  ${Math.round((performance.now()-diagnosticsRecorder.startedAt)/1000)}s  INCIDENTS ${diagnosticsRecorder.incidents.length}`,
     `NET ${socket?.readyState===WebSocket.OPEN?'OPEN':'OFF'}  RTT ${Math.round(netDiag.rttMs)}  JIT ${Math.round(netDiag.rttJitterMs)}`,
     `STATE ${Math.round(netDiag.lastStateGapMs)}/${Math.round(netDiag.maxStateGapMs)}ms  SRV ${Math.round(netDiag.serverLastStateGapMs)}/${Math.round(netDiag.serverMaxStateGapMs)}ms`,
     `CORR ${netDiag.corrections}  MAX ${netDiag.maxCorrectionM.toFixed(2)}m  ${netDiag.lastCorrectionReason||'-'}`,
