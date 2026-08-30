@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.21';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.21';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.21';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.21';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.21';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.21';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.21';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.21';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.22';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.22';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.22';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.22';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.22';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.22';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.22';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.22';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, SMOKE_DURATION_MS, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.21';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.21';
-import { createAudioEngine } from './audio-engine.js?v=1.44.21';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.21';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.21';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.21';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.21';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.21';
+} from './game-config.js?v=1.44.22';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.22';
+import { createAudioEngine } from './audio-engine.js?v=1.44.22';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.22';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.22';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.22';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.22';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.22';
 
 let THREE = null;
 
@@ -289,7 +289,7 @@ function loadoutSlotWeapon(draft,slot){return slot==='primary'?draft.primaryWeap
 function loadoutSlotAttachments(draft,slot){return slot==='primary'?draft.primaryAttachments:draft.secondaryAttachments;}
 function loadoutDraftForSurface(surface){return normalizeLoadoutChoice(surface==='lobby'?(lobbyLoadoutDraft||selectedLoadout()):(loadoutDraft||loadoutBaseDraft||pendingLoadout||selectedLoadout()));}
 function loadoutMetricClamp(v){return Math.max(0,Math.min(100,Number(v)||0));}
-function loadoutControlScore(spec,accuracy=null,pelletWeapon=false){if(pelletWeapon&&accuracy){return loadoutMetricClamp(100-(Number(accuracy.hipDeg)||0)*9.5-(Number(accuracy.fireDeg)||0)*7);}const recoil=Math.max(.001,Number(spec.recoilPitch)||0)+Math.max(0,Number(spec.recoilYaw)||0)*1.35;return loadoutMetricClamp(106-recoil*2350);}
+function loadoutControlScore(spec,accuracy=null,pelletWeapon=false){if(pelletWeapon&&accuracy){return loadoutMetricClamp(100-(Number(accuracy.hipDeg)||0)*9.5-(Number(accuracy.fireDeg)||0)*7);}const initial=Math.max(.001,Number(spec.recoilPitch)||0)+Math.max(0,Number(spec.recoilYaw)||0)*1.35,sustained=Math.max(.001,Number(spec.recoilMaxPitch)||Number(spec.recoilPitch)||0)+Math.max(0,Number(spec.recoilMaxYaw)||Number(spec.recoilYaw)||0)*1.35,initialScore=loadoutMetricClamp(106-initial*2350),sustainedScore=loadoutMetricClamp(106-sustained*400),recoveryScore=loadoutMetricClamp(((Number(spec.recoilRecovery)||8)-6)/12*100);return loadoutMetricClamp(initialScore*.40+sustainedScore*.50+recoveryScore*.10);}
 function loadoutMobilityScore(spec){const adsMove=Math.max(.5,Math.min(1.25,Number(spec.adsMoveSpeedScale)||1)),sprint=Math.max(80,Math.min(350,Number(spec.sprintOutMs)||180));return loadoutMetricClamp(adsMove*72+(1-(sprint-80)/270)*28);}
 function loadoutHandlingScore(spec){const ads=Math.max(0,Math.min(420,Number(spec.adsInMs)||0)),reload=Math.max(500,Math.min(4000,Number(spec.reloadMs)||1500));return loadoutMetricClamp((1-ads/420)*68+(1-(reload-500)/3500)*32);}
 function loadoutWeaponStats(weapon,attachments,comparisonAttachments={}){
@@ -409,7 +409,7 @@ let sprintLatched=false,sprinting=false,sliding=false,slideStartedAt=0,slideDirX
 let correctionViewX=0,correctionViewY=0,correctionViewZ=0;
 let myStats={kills:0,deaths:0},scoreboardOpen=false,scoreboardScroll=0,scoreboardDrag=null,scoreboardPanel=null,killConfirmUntil=0,killConfirmName='',killConfirmWeapon='',killConfirmHeadshot=false,killConfirmDistance=0;
 let headshotUntil=0,announcerCurrent=null;const announcerQueue=[];
-let yaw = 0, pitch = 0, viewRecoilPitch = 0, viewRecoilYaw = 0, viewRecoilTargetPitch = 0, viewRecoilTargetYaw = 0, recoilBurstActive=false, recoilBurstWeapon='', recoilBurstReleaseAt=0, recoilBurstEndedAt=0, weaponKickZ=0, weaponKickVelocity=0, verticalVelocity = 0, moveVelocityX = 0, moveVelocityZ = 0, knockX = 0, knockZ = 0, jumpSeq = 0, lastGroundedAt = 0, jumpBufferedUntil = 0;
+let yaw = 0, pitch = 0, recoilDebtPitch = 0, recoilDebtYaw = 0, recoilPatternPitch = 0, recoilPatternYaw = 0, recoilBurstActive=false, recoilBurstWeapon='', recoilBurstReleaseAt=0, recoilBurstEndedAt=0, weaponKickZ=0, weaponKickVelocity=0, verticalVelocity = 0, moveVelocityX = 0, moveVelocityZ = 0, knockX = 0, knockZ = 0, jumpSeq = 0, lastGroundedAt = 0, jumpBufferedUntil = 0;
 let traversal=null,traversalSeq=0,traversalIntentUntil=0,traversalIntentSeq=0,traversalConsumedIntentSeq=0;
 let ladderState=null,ladderSeq=0,ladderAttachLockId='',ladderAttachLockUntil=0,ladderAttachNeedsRelease=false;
 let onGround = true, lastShotVisualAt = 0, lastLocalShotAt = 0, fireReadyAt = freshClientFireReady(), lastStateSent = 0, lastPing = 0, lastPingLocalAt = 0, serverClockOffset = 0, remoteViewDelayMs=REMOTE_INTERPOLATION_MS, remoteDelayMeanMs=REMOTE_INTERPOLATION_MS, remoteDelayJitterMs=0, remoteDelaySamples=0;
@@ -470,7 +470,7 @@ function resetDiagnosticsRecording({markStart=true}={}){
 function diagnosticsControllerSnapshot(){return{rawX:diagnosticsRound(gamepadFrame?.rawLookX??gamepadFrame?.lookX),rawY:diagnosticsRound(gamepadFrame?.rawLookY??gamepadFrame?.lookY),x:diagnosticsRound(controllerDiagnostics.inputX),y:diagnosticsRound(controllerDiagnostics.inputY),len:diagnosticsRound(controllerDiagnostics.inputLength),rt:diagnosticsRound(gamepadFrame?.buttons?.[GAMEPAD_BUTTON.RT]||0,3),lt:diagnosticsRound(gamepadFrame?.buttons?.[GAMEPAD_BUTTON.LT]||0,3),assist:diagnosticsRound(controllerDiagnostics.assistStrength,3),assistTarget:controllerDiagnostics.assistTarget||'',targetPitch:diagnosticsRound(controllerDiagnostics.targetPitch),velocityPitch:diagnosticsRound(controllerDiagnostics.velocityPitch),pitchDelta:diagnosticsRound(controllerDiagnostics.deltaPitch),dt:diagnosticsRound(controllerDiagnostics.dt,5)};}
 function diagnosticsFrameState(now,rawFrameDt){
   const effectivePitch=effectiveAimPitch(),effectiveYaw=effectiveAimYaw(),cameraY=Number(camera?.position?.y),fire=fireInputHeld();
-  return{t:diagnosticsRelativeTime(now),dtMs:diagnosticsRound((Number(rawFrameDt)||0)*1000,2),mode:activeInputMode,fire,mouseFire:!!mouseFireDown,touchFire:touchRoleActive('fire'),gamepadFire:!!gamepadFireDown,weapon:currentWeapon,ads:diagnosticsRound(adsBlend,3),yaw:diagnosticsRound(yaw),pitch:diagnosticsRound(pitch),effectiveYaw:diagnosticsRound(effectiveYaw),effectivePitch:diagnosticsRound(effectivePitch),recoilPitch:diagnosticsRound(viewRecoilPitch),recoilPitchTarget:diagnosticsRound(viewRecoilTargetPitch),recoilYaw:diagnosticsRound(viewRecoilYaw),recoilYawTarget:diagnosticsRound(viewRecoilTargetYaw),recoilBurst:!!recoilBurstActive,recoilStep:Number(localRecoilStep[currentWeapon]??-1),cameraX:diagnosticsRound(camera?.position?.x,3),cameraY:diagnosticsRound(cameraY,3),cameraZ:diagnosticsRound(camera?.position?.z,3),positionY:diagnosticsRound(position?.y,3),viewFeetY:diagnosticsRound(viewFeetY,3),correctionY:diagnosticsRound(correctionViewY,3),verticalVelocity:diagnosticsRound(verticalVelocity,3),grounded:!!onGround,stateSeq,correctionSeq:lastCorrectionSeq,rttMs:diagnosticsRound(netDiag.rttMs,1),lastCorrectionM:diagnosticsRound(netDiag.lastCorrectionM,3),touchLook:touchRoleActive('look'),controller:diagnosticsControllerSnapshot()};
+  return{t:diagnosticsRelativeTime(now),dtMs:diagnosticsRound((Number(rawFrameDt)||0)*1000,2),mode:activeInputMode,fire,mouseFire:!!mouseFireDown,touchFire:touchRoleActive('fire'),gamepadFire:!!gamepadFireDown,weapon:currentWeapon,ads:diagnosticsRound(adsBlend,3),yaw:diagnosticsRound(yaw),pitch:diagnosticsRound(pitch),effectiveYaw:diagnosticsRound(effectiveYaw),effectivePitch:diagnosticsRound(effectivePitch),recoilPitch:diagnosticsRound(recoilDebtPitch),recoilPitchTarget:diagnosticsRound(recoilPatternPitch),recoilYaw:diagnosticsRound(recoilDebtYaw),recoilYawTarget:diagnosticsRound(recoilPatternYaw),recoilDebtPitch:diagnosticsRound(recoilDebtPitch),recoilDebtYaw:diagnosticsRound(recoilDebtYaw),recoilPatternPitch:diagnosticsRound(recoilPatternPitch),recoilPatternYaw:diagnosticsRound(recoilPatternYaw),recoilBurst:!!recoilBurstActive,recoilStep:Number(localRecoilStep[currentWeapon]??-1),cameraX:diagnosticsRound(camera?.position?.x,3),cameraY:diagnosticsRound(cameraY,3),cameraZ:diagnosticsRound(camera?.position?.z,3),positionY:diagnosticsRound(position?.y,3),viewFeetY:diagnosticsRound(viewFeetY,3),correctionY:diagnosticsRound(correctionViewY,3),verticalVelocity:diagnosticsRound(verticalVelocity,3),grounded:!!onGround,stateSeq,correctionSeq:lastCorrectionSeq,rttMs:diagnosticsRound(netDiag.rttMs,1),lastCorrectionM:diagnosticsRound(netDiag.lastCorrectionM,3),touchLook:touchRoleActive('look'),controller:diagnosticsControllerSnapshot()};
 }
 function diagnosticsCaptureIncident(kind,sample,data={}){
   const now=performance.now();if(now-diagnosticsRecorder.lastIncidentAt<250)return;diagnosticsRecorder.lastIncidentAt=now;
@@ -490,7 +490,7 @@ function captureGameplayDiagnostics(rawFrameDt,now=performance.now()){
 }
 function diagnosticsExportPayload(){
   const settings=normalizePlayerSettingsValue(playerSettings);delete settings.masterVolume;delete settings.sfxVolume;delete settings.musicVolume;
-  return{format:'breach-diagnostics-v1',exportedAt:new Date().toISOString(),appVersion:APP_VERSION,protocolVersion:PROTOCOL_VERSION,recording:diagnosticsRecordingEnabled(),startedAt:new Date(diagnosticsRecorder.startedEpoch).toISOString(),durationMs:Math.max(0,performance.now()-diagnosticsRecorder.startedAt),environment:{userAgent:navigator.userAgent||'',platform:navigator.platform||'',touch:!!isTouch,inputMode:activeInputMode,viewport:{w:viewW||0,h:viewH||0},map:currentMapId||'',matchMode:matchState?.mode||''},playerSettings:settings,network:networkDiagnosticsSnapshot(),sampleIntervalMs:DIAGNOSTICS_SAMPLE_INTERVAL_MS,samples:diagnosticsRecorder.samples,events:diagnosticsRecorder.events,incidents:diagnosticsRecorder.incidents};
+  return{format:'breach-diagnostics-v2',recoilModel:'authoritative-aim-debt-v1',exportedAt:new Date().toISOString(),appVersion:APP_VERSION,protocolVersion:PROTOCOL_VERSION,recording:diagnosticsRecordingEnabled(),startedAt:new Date(diagnosticsRecorder.startedEpoch).toISOString(),durationMs:Math.max(0,performance.now()-diagnosticsRecorder.startedAt),environment:{userAgent:navigator.userAgent||'',platform:navigator.platform||'',touch:!!isTouch,inputMode:activeInputMode,viewport:{w:viewW||0,h:viewH||0},map:currentMapId||'',matchMode:matchState?.mode||''},playerSettings:settings,network:networkDiagnosticsSnapshot(),sampleIntervalMs:DIAGNOSTICS_SAMPLE_INTERVAL_MS,samples:diagnosticsRecorder.samples,events:diagnosticsRecorder.events,incidents:diagnosticsRecorder.incidents};
 }
 function exportDiagnosticsRecording(){
   if(!diagnosticsDataCount()){showToast('NO DIAGNOSTICS RECORDED');return;}
@@ -689,7 +689,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.21';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.22';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -844,6 +844,18 @@ function currentControllerAimAssist(now=performance.now()){
   return{remote,strength,ndcX:controllerAssistProjected.x,ndcY:controllerAssistProjected.y,angle:metric.angle};
 }
 function resetControllerAimMotion(){controllerAimVelocityX=controllerAimVelocityY=0;controllerTurnBoost=0;controllerAssistTargetId='';controllerAssistNextScanAt=0;}
+function consumeRecoilDebtAxis(debt,delta){
+  if(debt>0&&delta<0)return Math.max(0,debt+delta);
+  if(debt<0&&delta>0)return Math.min(0,debt+delta);
+  return debt;
+}
+function applyPlayerAimDelta(deltaYaw=0,deltaPitch=0){
+  const beforeYaw=yaw,beforePitch=pitch;
+  yaw+=Number(deltaYaw)||0;pitch=THREE.MathUtils.clamp(pitch+(Number(deltaPitch)||0),-1.28,1.28);
+  const appliedYaw=yaw-beforeYaw,appliedPitch=pitch-beforePitch;
+  recoilDebtYaw=consumeRecoilDebtAxis(recoilDebtYaw,appliedYaw);recoilDebtPitch=consumeRecoilDebtAxis(recoilDebtPitch,appliedPitch);
+  return{yaw:appliedYaw,pitch:appliedPitch};
+}
 function applyControllerAim(dt){
   const beforeYaw=yaw,beforePitch=pitch,input=controllerLookAxes(),now=performance.now(),assist=currentControllerAimAssist(now),breakout=1-smoothstep01(THREE.MathUtils.clamp((input.length-.80)/.20,0,1)),assistStrength=(assist?.strength||0)*breakout;
   if(input.length>.86)controllerTurnBoost=Math.min(1,controllerTurnBoost+dt/.22);else controllerTurnBoost=Math.max(0,controllerTurnBoost-dt/.08);
@@ -852,12 +864,12 @@ function applyControllerAim(dt){
   const targetYaw=input.x*CONTROLLER_LOOK_YAW_RATE*playerSettings.lookSensitivity*adsScale*turnMultiplier*slowdown;
   const targetPitch=input.y*CONTROLLER_LOOK_PITCH_RATE*playerSettings.lookSensitivity*playerSettings.controllerVerticalSensitivity*adsScale*turnMultiplier*slowdown;
   const smoothing=1-Math.exp(-dt/.024);controllerAimVelocityX+= (targetYaw-controllerAimVelocityX)*smoothing;controllerAimVelocityY+=(targetPitch-controllerAimVelocityY)*smoothing;
-  yaw-=controllerAimVelocityX*dt;pitch-=controllerAimVelocityY*dt;
+  applyPlayerAimDelta(-controllerAimVelocityX*dt,-controllerAimVelocityY*dt);
   if(assist&&assistStrength>.01){const move=controllerMoveAxes(),strafe=THREE.MathUtils.clamp(move.length/.72,0,1),rotWeight=assistStrength*strafe;if(rotWeight>.001){yaw-=THREE.MathUtils.clamp(assist.ndcX,-.75,.75)*.72*rotWeight*dt;
     // Rotational aim assist may help track horizontally, but it must never
     // counter-steer sustained vertical recoil. Recoil control belongs to the
-    // player, as in controller FPS gunplay; otherwise the assist drags the base
-    // pitch down as the recoiling camera rises and looks like a recoil reset.
+    // player; rotational assist may track horizontally but must not erase the
+    // authoritative pitch recoil the player is actively controlling.
     if(!(automaticRecoilActive(currentWeapon)&&recoilBurstActive&&recoilBurstWeapon===currentWeapon))pitch+=THREE.MathUtils.clamp(assist.ndcY,-.75,.75)*.54*rotWeight*dt;
   }}
   pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);
@@ -1969,7 +1981,7 @@ function bindUI(){
   document.addEventListener('mousemove', e => {
     if(chatOpen||!shell.canPlay||!matchAllowsMovement(matchState)||hp<=0||(!isTouch&&document.pointerLockElement!==canvas)) return;
     if(Math.abs(e.movementX)+Math.abs(e.movementY)>.01)setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
-    const beforePitch=pitch,sens=aimSensitivityScale()*playerSettings.lookSensitivity;yaw -= e.movementX*.0023*sens; pitch -= e.movementY*.0020*sens; pitch = THREE.MathUtils.clamp(pitch,-1.28,1.28);if(diagnosticsRecordingEnabled()&&fireInputHeld()&&Math.abs(pitch-beforePitch)>.02)diagnosticsRecordEvent('mouse_look',{dx:diagnosticsRound(e.movementX,2),dy:diagnosticsRound(e.movementY,2),pitchDelta:diagnosticsRound(pitch-beforePitch)});
+    const beforePitch=pitch,sens=aimSensitivityScale()*playerSettings.lookSensitivity;applyPlayerAimDelta(-e.movementX*.0023*sens,-e.movementY*.0020*sens);if(diagnosticsRecordingEnabled()&&fireInputHeld()&&Math.abs(pitch-beforePitch)>.02)diagnosticsRecordEvent('mouse_look',{dx:diagnosticsRound(e.movementX,2),dy:diagnosticsRound(e.movementY,2),pitchDelta:diagnosticsRound(pitch-beforePitch)});
   });
   document.addEventListener('pointerdown',e=>{
     if(e.pointerType==='touch'||e.pointerType==='pen'){activateTouchInputMode();setActiveInputMode(INPUT_MODE.TOUCH,{quiet:true});}
@@ -2230,7 +2242,7 @@ function onCanvasPointerMove(e){
   if(role==='joy'){const L=hudLayout||computeHudLayout();updateJoy(p.x,p.y,{x:joy.centerX,y:joy.centerY,r:L.joy.r});return;}
   if(role==='look'&&hp>0){
     const dx=p.x-look.x,dy=p.y-look.y;look.x=p.x;look.y=p.y;
-    const beforePitch=pitch,sens=aimSensitivityScale()*playerSettings.touchSensitivity;yaw-=dx*.006*sens;pitch-=dy*.0052*sens;pitch=THREE.MathUtils.clamp(pitch,-1.28,1.28);if(diagnosticsRecordingEnabled()&&fireInputHeld()&&Math.abs(pitch-beforePitch)>.02)diagnosticsRecordEvent('touch_look',{dx:diagnosticsRound(dx,2),dy:diagnosticsRound(dy,2),pitchDelta:diagnosticsRound(pitch-beforePitch),pointerId:e.pointerId});
+    const beforePitch=pitch,sens=aimSensitivityScale()*playerSettings.touchSensitivity;applyPlayerAimDelta(-dx*.006*sens,-dy*.0052*sens);if(diagnosticsRecordingEnabled()&&fireInputHeld()&&Math.abs(pitch-beforePitch)>.02)diagnosticsRecordEvent('touch_look',{dx:diagnosticsRound(dx,2),dy:diagnosticsRound(dy,2),pitchDelta:diagnosticsRound(pitch-beforePitch),pointerId:e.pointerId});
   }
 }
 
@@ -2347,7 +2359,7 @@ function applyMatchPhaseTransition(previous,next){
   if(!matchPhaseChanged(previous,next))return;
   if(!matchAllowsCombat(next)){clearFireInput();cancelEquipmentAction();setAim(false);reloadRequestPending=false;}
   if(next.status===MATCH_STATUS.ENDED){
-    reloadUntil=0;reloadWeapon='';reloadStartedAt=0;pendingWeapon='';weaponSwapStartedAt=0;localEquipmentCooldownUntil=0;sprintActionReadyAt=0;clearQueuedSprintShot();resetViewRecoil();
+    reloadUntil=0;reloadWeapon='';reloadStartedAt=0;pendingWeapon='';weaponSwapStartedAt=0;localEquipmentCooldownUntil=0;sprintActionReadyAt=0;clearQueuedSprintShot();resetRecoilBookkeeping();
     if(chatOpen)void dismissChat({restorePointer:false});else chatComposer.classList.add('hide');
     scoreboardOpen=false;scoreboardScroll=0;scoreboardDrag=null;scoreboardPanel=null;clearToastNotifications();announcerCurrent=null;announcerQueue.length=0;killConfirmUntil=0;damageIndicators.length=0;bloodSplats.length=0;
   }
@@ -2382,7 +2394,7 @@ function handleMessage(m){
     if(Number(m.protocol)!==PROTOCOL_VERSION){showToast('CLIENT / SERVER VERSION MISMATCH');leaveMatch();return;}
     if(Number.isFinite(Number(m.serverTime)))serverClockOffset=Number(m.serverTime)-Date.now();
     setActiveMap(m.mapId,{rebuild:true});currentRoom=m.code;isMatchAdmin=!!m.isAdmin;matchOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;myTeam=m.self.team||myTeam;rememberTeam(myTeam);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;moveVelocityX=moveVelocityZ=0;onGround=m.self.grounded!==false;lastGroundedAt=onGround?performance.now():0;jumpBufferedUntil=0;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;stopSlide();cancelSprint();jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};wastedUntil=m.self.wastedUntil||0;loadoutClasses=normalizeLoadoutClasses(m.self.loadoutClasses??loadoutClasses,selectedLoadout());activeClassId=normalizeLoadoutClassId(m.self.activeClassId??activeClassId);pendingClassId=m.self.pendingClassId?normalizeLoadoutClassId(m.self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(m.self.secondaryWeapon)?m.self.secondaryWeapon:secondaryWeapon;applyAttachmentState(m.self);tacticalEquipment=normalizeTactical(m.self.tactical);lethalEquipment=normalizeLethal(m.self.lethal);pendingLoadout=m.self.pendingLoadout?normalizeLoadoutChoice(m.self.pendingLoadout):null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);rememberLoadoutClasses(loadoutClasses,pendingClassId||activeClassId);pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon===secondaryWeapon||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
-    yaw=m.self.yaw||0;pitch=m.self.pitch||0;viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();pendingGameSnapshot=gameSnapshot(m.self,m.players||[],m.bots||[],m.serverTime);replaceLobbyParticipants(m.players||[],m.bots||[]);
+    yaw=m.self.yaw||0;pitch=m.self.pitch||0;recoilDebtPitch=recoilDebtYaw=recoilPatternPitch=recoilPatternYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();pendingGameSnapshot=gameSnapshot(m.self,m.players||[],m.bots||[],m.serverTime);replaceLobbyParticipants(m.players||[],m.bots||[]);
     syncModeVisuals();syncLocalStatus();syncPauseContext();if(matchAllowsLobbyEdits(matchState))showLobby();else{void enterGame(pendingGameSnapshot);}return;
   }
   if(m.t==='join'){upsertLobbyParticipant(m.player);if(shell.inMatch&&engineReady)upsertRemote(m.player,true);syncPauseContext();renderAdminPlayers();if(shell.inLobby)renderLobbyRoster(lobbyDisplayMode());showToast(`${m.player.name} joined`);return;}
@@ -2457,7 +2469,7 @@ function returnToLobby(){
 function leaveMatch(){
   if(chatOpen)void dismissChat({restorePointer:false});chatMessages.length=0;
   shell.leaveToMenu();disableMenu(false);serverClockOffset=0;lastPingLocalAt=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left match')}catch{}}socket=null;currentRoom='';isMatchAdmin=false;matchOwnerId='';lobbyParticipants.clear();pendingGameSnapshot=null;lobbyMatchDraft=null;lobbyMatchDirty=false;lobbyMapDraft='';lobbyMapDirty=false;lobbyLoadoutDraft=null;lobbyClassDrafts=null;lobbyLoadoutDirty=false;lobbyLoadoutRevision=0;lobbyLoadoutAckRevision=0;syncLobbyHostControlPlacement();applyWorldSettings(DEFAULT_WORLD_SETTINGS);
-  resetTouchInput();clearRemotes();clearBullets();clearBulletImpactFx();clearRocketTrailPuffs();clearThrowables();clearTacticalFx();clearSmokeClouds();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;loadoutClasses=normalizeLoadoutClasses(preferredLoadoutClasses);activeClassId=normalizeLoadoutClassId(preferredActiveClassId);pendingClassId='';{const c=loadoutClassById(loadoutClasses,activeClassId);primaryWeapon=c.primaryWeapon;secondaryWeapon=c.secondaryWeapon;primaryAttachments={...c.primaryAttachments};secondaryAttachments={...c.secondaryAttachments};tacticalEquipment=c.tactical;lethalEquipment=c.lethal;}pendingLoadout=null;currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();viewFeetY=NaN;verticalVelocity=moveVelocityX=moveVelocityZ=0;lastGroundedAt=0;jumpBufferedUntil=0;viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));localWeaponShotSequence=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;ammo=freshClientAmmo();equipment=freshClientEquipment(tacticalEquipment,lethalEquipment);reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,adsAmount:0,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();akimboReadyAt={left:0,right:0};akimboLeftCycleStartedAt=akimboRightCycleStartedAt=0;akimboCycleSoundPlayed={left:false,right:false};clearFireInput();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAction();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;clearToastNotifications();setAim(false);syncLocalWeaponModel();
+  resetTouchInput();clearRemotes();clearBullets();clearBulletImpactFx();clearRocketTrailPuffs();clearThrowables();clearTacticalFx();clearSmokeClouds();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;loadoutClasses=normalizeLoadoutClasses(preferredLoadoutClasses);activeClassId=normalizeLoadoutClassId(preferredActiveClassId);pendingClassId='';{const c=loadoutClassById(loadoutClasses,activeClassId);primaryWeapon=c.primaryWeapon;secondaryWeapon=c.secondaryWeapon;primaryAttachments={...c.primaryAttachments};secondaryAttachments={...c.secondaryAttachments};tacticalEquipment=c.tactical;lethalEquipment=c.lethal;}pendingLoadout=null;currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();viewFeetY=NaN;verticalVelocity=moveVelocityX=moveVelocityZ=0;lastGroundedAt=0;jumpBufferedUntil=0;recoilDebtPitch=recoilDebtYaw=recoilPatternPitch=recoilPatternYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));localWeaponShotSequence=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;ammo=freshClientAmmo();equipment=freshClientEquipment(tacticalEquipment,lethalEquipment);reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,adsAmount:0,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();akimboReadyAt={left:0,right:0};akimboLeftCycleStartedAt=akimboRightCycleStartedAt=0;akimboCycleSoundPlayed={left:false,right:false};clearFireInput();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAction();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;clearToastNotifications();setAim(false);syncLocalWeaponModel();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshMatches();
 }
 
@@ -2666,7 +2678,7 @@ function deathLookYawFromHit(m){
 function enterLocalDeath(m){
   const now=performance.now();deathViewStartYaw=effectiveAimYaw();deathViewTargetYaw=deathLookYawFromHit(m);deathViewStartPitch=effectiveAimPitch();
   stopSlide();cancelSprint();traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;jumpBufferedUntil=0;
-  wastedUntil=m.respawnAt||serverNow()+worldSettings.combat.respawnMs;deathAnimStartedAt=now;clearFireInput();cancelEquipmentAction();clearQueuedSprintShot();setAim(false);resetViewRecoil();
+  wastedUntil=m.respawnAt||serverNow()+worldSettings.combat.respawnMs;deathAnimStartedAt=now;clearFireInput();cancelEquipmentAction();clearQueuedSprintShot();setAim(false);resetRecoilBookkeeping();
   reloadRequestPending=false;reloadUntil=0;reloadWeapon='';reloadStartedAt=0;pendingWeapon='';weaponSwapStartedAt=0;localEquipmentCooldownUntil=0;sprintActionReadyAt=0;sniperZoomLevel=0;
   moveVelocityX=moveVelocityZ=0;localMoveAmount=0;showToast('ELIMINATED');
 }
@@ -2705,8 +2717,8 @@ function drawDamageIndicators(c,w,h,now){
 function handleRespawn(player){
   if(!player?.id)return;
   const selfRespawn=player.id===clientId;
-  diagnosticsRecordEvent('respawn',{playerId:String(player.id),self:selfRespawn,fireHeld:fireInputHeld(),recoilPitch:diagnosticsRound(viewRecoilPitch),recoilTarget:diagnosticsRound(viewRecoilTargetPitch),recoilBurst:!!recoilBurstActive,recoilStep:Number(localRecoilStep[currentWeapon]??-1)});
-  if(selfRespawn){viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));localWeaponShotSequence=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));}
+  diagnosticsRecordEvent('respawn',{playerId:String(player.id),self:selfRespawn,fireHeld:fireInputHeld(),recoilDebtPitch:diagnosticsRound(recoilDebtPitch),recoilPatternPitch:diagnosticsRound(recoilPatternPitch),recoilBurst:!!recoilBurstActive,recoilStep:Number(localRecoilStep[currentWeapon]??-1)});
+  if(selfRespawn){recoilDebtPitch=recoilDebtYaw=recoilPatternPitch=recoilPatternYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));localWeaponShotSequence=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));}
   // Snapshot application also uses this entry point. A reconnect can legitimately
   // restore a player who is still inside the death/respawn window; do not treat
   // that snapshot as a respawn merely because the world is being rebuilt.
@@ -2977,8 +2989,8 @@ function movementInput(){
   const len=Math.hypot(mx,mz);if(len>1){mx/=len;mz/=len;}
   moveInput.mx=mx;moveInput.mz=mz;moveInput.len=Math.min(1,len);return moveInput;
 }
-function effectiveAimYaw(){return yaw+viewRecoilYaw;}
-function effectiveAimPitch(){return THREE.MathUtils.clamp(pitch+viewRecoilPitch,-1.40,1.40);}
+function effectiveAimYaw(){return yaw;}
+function effectiveAimPitch(){return THREE.MathUtils.clamp(pitch,-1.28,1.28);}
 function statePayload(seq=stateSeq){const input=movementInput(),ladderMove=ladderState?ladderInputAmount():0;return {t:'state',seq:Math.max(0,Math.floor(Number(seq)||0)),at:Math.round(serverNow()),x:round3(position.x),y:round3(position.y),z:round3(position.z),yaw:round3(yaw),pitch:round3(pitch),ads:currentWeapon==='akimbo1887'?false:adsWanted,adsAmount:currentWeapon==='akimbo1887'?0:round3(adsBlend),crouched,sprinting,sliding,grounded:onGround,jumpSeq,moveX:round3(input.mx),moveZ:round3(input.mz),ladderId:ladderState?.id||'',ladderMove:round3(ladderMove)};}
 function stateChanged(p){return !Number.isFinite(lastSentState.x)||Math.abs(p.x-lastSentState.x)>.008||Math.abs(p.y-lastSentState.y)>.008||Math.abs(p.z-lastSentState.z)>.008||Math.abs(normalizeAngle(p.yaw-lastSentState.yaw))>.0025||Math.abs(p.pitch-lastSentState.pitch)>.0025||Math.abs(p.moveX-lastSentState.moveX)>.02||Math.abs(p.moveZ-lastSentState.moveZ)>.02||Math.abs((p.ladderMove||0)-(lastSentState.ladderMove||0))>.02||String(p.ladderId||'')!==String(lastSentState.ladderId||'')||p.ads!==lastSentState.ads||Math.abs((p.adsAmount||0)-(lastSentState.adsAmount||0))>.025||p.crouched!==lastSentState.crouched||p.sprinting!==lastSentState.sprinting||p.sliding!==lastSentState.sliding||p.grounded!==lastSentState.grounded;}
 function rememberPredictionState(p,now=performance.now()){
@@ -3021,22 +3033,19 @@ function touchRoleActive(role){for(const value of touchRoles.values())if(value==
 function fireInputHeld(){return mouseFireDown||touchRoleActive('fire')||gamepadFireDown;}
 function beginRecoilBurst(weapon=currentWeapon){
   if(!automaticRecoilActive(weapon))return;
-  // Any accepted round proves the burst is still alive. Cancel a pending
-  // trigger-release debounce before it can start recovery between shots.
   recoilBurstReleaseAt=0;
   if(recoilBurstActive&&recoilBurstWeapon===weapon)return;
-  recoilBurstActive=true;recoilBurstWeapon=weapon;localRecoilStep[weapon]=-1;
+  recoilBurstActive=true;recoilBurstWeapon=weapon;localRecoilStep[weapon]=-1;recoilPatternPitch=0;recoilPatternYaw=0;
 }
-function endRecoilBurst(){
+function endRecoilBurst(releasedAt=performance.now()){
   if(recoilBurstWeapon&&localRecoilStep[recoilBurstWeapon]!==undefined)localRecoilStep[recoilBurstWeapon]=-1;
-  recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();
+  recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=releasedAt;recoilPatternPitch=0;recoilPatternYaw=0;
 }
 function scheduleRecoilBurstRelease(){
-  if(!recoilBurstActive||!recoilBurstWeapon)return;
-  // Gamepad/touch release events can flicker for a frame on mobile browsers.
-  // Require a continuous release window before ending an automatic burst.
-  const cooldown=Math.max(50,Number(weaponRules(recoilBurstWeapon).cooldownMs)||100);
-  recoilBurstReleaseAt=Math.max(recoilBurstReleaseAt,performance.now()+Math.max(120,Math.min(190,cooldown*1.45)));
+  if(!recoilBurstActive||!recoilBurstWeapon||recoilBurstReleaseAt)return;
+  // One/two bad mobile input frames must not split an automatic burst, but this
+  // qualification window is independent from recoil recovery timing.
+  recoilBurstReleaseAt=performance.now();
 }
 function endRecoilBurstIfReleased(){if(!fireInputHeld())scheduleRecoilBurstRelease();else recoilBurstReleaseAt=0;}
 function clearFireInput(){mouseFireDown=false;gamepadFireDown=false;for(const [id,role] of touchRoles)if(role==='fire'||role==='fire-left'||role==='fire-right')touchRoles.delete(id);endRecoilBurst();clearQueuedSprintShot();}
@@ -3128,7 +3137,10 @@ function singleShotRecoilImpulse(weapon,{step=0,sequence=0,hand='right',basePitc
   return{pitch:basePitch*adsScale*heatScale*firstScale,yaw:baseYaw*adsScale*firstScale*yawShape};
 }
 function automaticRecoilActive(weapon){const r=recoilSpec(weapon);return !!r.automatic&&(weapon!=='assault'||assaultFireMode==='auto');}
-function resetViewRecoil(){viewRecoilPitch=viewRecoilYaw=viewRecoilTargetPitch=viewRecoilTargetYaw=0;endRecoilBurst();weaponKickZ=weaponKickVelocity=0;}
+function resetRecoilBookkeeping({kick=true}={}){
+  // This resets only recoil bookkeeping. It must never alter yaw/pitch.
+  recoilDebtPitch=0;recoilDebtYaw=0;recoilPatternPitch=0;recoilPatternYaw=0;endRecoilBurst();if(kick)weaponKickZ=weaponKickVelocity=0;
+}
 function weaponVisualKickProfile(weapon=currentWeapon){
   return ({
     pistol:{impulse:1.72,stiffness:315,damping:28,maxTravel:.155,rear:1.02,lift:.24,pitch:.58,yaw:.010,roll:.014,adsRear:.90,actionMs:92},
@@ -3150,8 +3162,8 @@ function weaponKickImpulse(weapon){
 }
 function addWeaponKick(weapon){const profile=weaponVisualKickProfile(weapon),attachmentScale=weaponVisualAttachmentRecoilScale(weapon);weaponKickVelocity=Math.min(7.2,weaponKickVelocity+weaponKickImpulse(weapon));weaponKickZ=Math.min(profile.maxTravel*attachmentScale,weaponKickZ);}
 function updateWeaponKick(dt){
-  // Recoil-control attachments affect both the authoritative aim path and the
-  // weapon's visible kick. They never change the ADS sight ray itself.
+  // Visual weapon kick is intentionally separate from aim recoil. Resetting or
+  // finishing this spring can never change the bullet/camera aim direction.
   const profile=weaponVisualKickProfile(currentWeapon),attachmentScale=weaponVisualAttachmentRecoilScale(currentWeapon),maxTravel=profile.maxTravel*attachmentScale;let remaining=Math.min(.05,Math.max(0,Number(dt)||0));
   while(remaining>.000001){const step=Math.min(1/120,remaining);weaponKickVelocity+=(-profile.stiffness*weaponKickZ-profile.damping*weaponKickVelocity)*step;weaponKickZ+=weaponKickVelocity*step;weaponKickZ=THREE.MathUtils.clamp(weaponKickZ,-.025,maxTravel);remaining-=step;}
   if(Math.abs(weaponKickZ)<.00005&&Math.abs(weaponKickVelocity)<.001){weaponKickZ=0;weaponKickVelocity=0;}
@@ -3165,60 +3177,34 @@ function registerLocalShotHeat(weapon,now){
   if(firstShot)localRecoilStep[weapon]=0;else localRecoilStep[weapon]+=1;
   return {heat,firstShot};
 }
-function applyViewRecoil(weapon,preShotHeat=0,firstShot=false,hand='right'){
+function applyAimRecoilDelta(deltaPitch=0,deltaYaw=0){
+  const beforePitch=pitch,beforeYaw=yaw;pitch=THREE.MathUtils.clamp(pitch+(Number(deltaPitch)||0),-1.28,1.28);yaw+=Number(deltaYaw)||0;
+  const appliedPitch=pitch-beforePitch,appliedYaw=yaw-beforeYaw;recoilDebtPitch+=appliedPitch;recoilDebtYaw+=appliedYaw;
+  return{pitch:appliedPitch,yaw:appliedYaw};
+}
+function applyAimRecoil(weapon,preShotHeat=0,firstShot=false,hand='right'){
   const r=recoilSpec(weapon),automatic=automaticRecoilActive(weapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(weapon).recoilScale)||0)/100)),adsScale=1-.20*Math.max(0,Math.min(1,adsBlend)),heatScale=1+Math.min(.24,Math.max(0,preShotHeat)*.04),step=localRecoilStep[weapon]||0;
   const basePitch=Math.max(0,Number(r.recoilPitch)||0)*recoilScale,baseYaw=Math.max(0,Number(r.recoilYaw)||0)*recoilScale,firstScale=firstShot?Math.max(.18,Math.min(1,Number(r.firstShotRecoilScale)||.5)):1;
-  const softPitch=Math.max(0,(Number(r.recoilMaxPitch)||Math.max(0,Number(r.recoilPitch)||0))*recoilScale),softYaw=Math.max(0,(Number(r.recoilMaxYaw)||.020)*recoilScale),hardPitch=softPitch*1.08,hardYaw=softYaw*1.12;
+  const softPitch=Math.max(0,(Number(r.recoilMaxPitch)||Math.max(0,Number(r.recoilPitch)||0))*recoilScale),softYaw=Math.max(0,(Number(r.recoilMaxYaw)||Number(r.recoilYaw)||.020)*recoilScale),hardPitch=softPitch*1.08,hardYaw=softYaw*1.12;
   if(automatic){
-    const target=automaticRecoilTarget(step,weapon,recoilScale,adsScale,heatScale);
-    // Clamp only to the physical camera range. The recoil path itself is
-    // intentionally bounded around its hold area and keeps moving there for
-    // as long as the burst continues.
-    const nextPitch=Math.min(Math.max(0,1.40-pitch),target.pitch);
-    // Continuous automatic fire must never perform its own downward correction.
-    // The burst may climb or settle at its highest reached vertical offset while
-    // horizontal recoil continues to wander. Vertical recovery begins only after
-    // the trigger-release burst lifecycle ends. This also prevents a Bipod or
-    // other dynamic recoil-scale change from pulling the camera downward mid-burst.
-    viewRecoilTargetPitch=Math.max(viewRecoilTargetPitch,nextPitch);
-    viewRecoilTargetYaw=target.yaw;
-    return;
+    const target=automaticRecoilTarget(step,weapon,recoilScale,adsScale,heatScale),nextPatternPitch=Math.max(recoilPatternPitch,Math.max(0,target.pitch)),nextPatternYaw=THREE.MathUtils.clamp(target.yaw,-hardYaw,hardYaw),deltaPitch=Math.max(0,nextPatternPitch-recoilPatternPitch),deltaYaw=nextPatternYaw-recoilPatternYaw;
+    recoilPatternPitch=nextPatternPitch;recoilPatternYaw=nextPatternYaw;applyAimRecoilDelta(deltaPitch,deltaYaw);return;
   }
-  const impulse=singleShotRecoilImpulse(weapon,{step,sequence:localWeaponShotSequence[weapon]||0,hand,basePitch,baseYaw,adsScale,heatScale,firstScale});
-  viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch+impulse.pitch,0,hardPitch);
-  viewRecoilTargetYaw=THREE.MathUtils.clamp(viewRecoilTargetYaw+impulse.yaw,-hardYaw,hardYaw);
+  const impulse=singleShotRecoilImpulse(weapon,{step,sequence:localWeaponShotSequence[weapon]||0,hand,basePitch,baseYaw,adsScale,heatScale,firstScale}),nextDebtPitch=THREE.MathUtils.clamp(recoilDebtPitch+impulse.pitch,0,hardPitch),nextDebtYaw=THREE.MathUtils.clamp(recoilDebtYaw+impulse.yaw,-hardYaw,hardYaw);
+  applyAimRecoilDelta(nextDebtPitch-recoilDebtPitch,nextDebtYaw-recoilDebtYaw);
 }
-
-function updateViewRecoil(dt){
-  const r=recoilSpec(currentWeapon),automatic=automaticRecoilActive(currentWeapon),recoilScale=Math.max(0,Math.min(3,(Number(weaponRules(currentWeapon).recoilScale)||0)/100)),totalDt=Math.min(.05,Math.max(0,Number(dt)||0)),now=performance.now();
-  // Automatic recoil owns its burst lifecycle explicitly. A release must remain
-  // released through the debounce window; any resumed trigger or accepted shot
-  // cancels it before recovery can begin.
+function updateAimRecoil(dt){
+  const r=recoilSpec(currentWeapon),automatic=automaticRecoilActive(currentWeapon),totalDt=Math.min(.05,Math.max(0,Number(dt)||0)),now=performance.now();
   if(automatic&&recoilBurstActive&&recoilBurstWeapon===currentWeapon&&recoilBurstReleaseAt){
     if(fireInputHeld())recoilBurstReleaseAt=0;
-    else if(now>=recoilBurstReleaseAt)endRecoilBurst();
+    else if(now-recoilBurstReleaseAt>=34)endRecoilBurst(recoilBurstReleaseAt);
   }
-  const holdingBurst=automatic&&recoilBurstActive&&recoilBurstWeapon===currentWeapon;
-  const delay=Math.max(0,Number(r.recoilRecoveryDelayMs)||0),recoveryAge=automatic?now-recoilBurstEndedAt:now-lastLocalShotAt;
-  const softPitch=Math.max(0,(Number(r.recoilMaxPitch)||Math.max(0,Number(r.recoilPitch)||0))*recoilScale),softYaw=Math.max(0,(Number(r.recoilMaxYaw)||.020)*recoilScale),maxYaw=softYaw*1.12;
-  if(!holdingBurst&&recoveryAge>=delay){
-    const recovery=Math.max(5,Number(r.recoilRecovery)||12),pitchDecay=Math.exp(-recovery*.46*totalDt),yawDecay=Math.exp(-recovery*.58*totalDt);
-    viewRecoilTargetPitch*=pitchDecay;viewRecoilTargetYaw*=yawDecay;
+  const releaseAt=recoilBurstReleaseAt||recoilBurstEndedAt,recoveryAge=automatic?now-releaseAt:now-lastLocalShotAt,delay=Math.max(0,Number(r.recoilRecoveryDelayMs)||0),canRecover=!fireInputHeld()&&recoveryAge>=delay;
+  if(canRecover&&(Math.abs(recoilDebtPitch)>.000001||Math.abs(recoilDebtYaw)>.000001)){
+    const recovery=Math.max(5,Number(r.recoilRecovery)||12),pitchShare=1-Math.exp(-recovery*.46*totalDt),yawShare=1-Math.exp(-recovery*.58*totalDt),recoverPitch=recoilDebtPitch*pitchShare,recoverYaw=recoilDebtYaw*yawShare;
+    pitch=THREE.MathUtils.clamp(pitch-recoverPitch,-1.28,1.28);yaw-=recoverYaw;recoilDebtPitch-=recoverPitch;recoilDebtYaw-=recoverYaw;
+    if(Math.abs(recoilDebtPitch)<.00002)recoilDebtPitch=0;if(Math.abs(recoilDebtYaw)<.00002)recoilDebtYaw=0;
   }
-  if(!automatic){
-    viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch,0,softPitch*1.08);
-    viewRecoilTargetYaw=THREE.MathUtils.clamp(viewRecoilTargetYaw,-maxYaw,maxYaw);
-  }else{
-    // Automatic recoil is bounded by its path envelope, not accumulated without
-    // limit. While held, vertical recoil never self-recovers; horizontal recoil
-    // can keep wandering. After release this same state recovers smoothly to zero.
-    viewRecoilTargetPitch=THREE.MathUtils.clamp(viewRecoilTargetPitch,0,Math.max(0,1.40-pitch));
-  }
-  const followRate=automatic?18:24,follow=1-Math.exp(-followRate*totalDt);
-  viewRecoilPitch+= (viewRecoilTargetPitch-viewRecoilPitch)*follow;
-  viewRecoilYaw+= (viewRecoilTargetYaw-viewRecoilYaw)*follow;
-  if(Math.abs(viewRecoilTargetPitch)<.00001&&Math.abs(viewRecoilPitch)<.00002){viewRecoilTargetPitch=0;viewRecoilPitch=0;}
-  if(Math.abs(viewRecoilTargetYaw)<.00001&&Math.abs(viewRecoilYaw)<.00002){viewRecoilTargetYaw=0;viewRecoilYaw=0;}
 }
 function presentLocalShot(weapon,now=performance.now(),hand='right'){
   // Shooter-side prediction: weapon feedback must happen on the trigger frame,
@@ -3241,11 +3227,11 @@ function requestShot(hand='right'){
   // The reticle is authoritative: fire along the exact camera aim including
   // recoil already accumulated from previous rounds. Applying the new impulse
   // after sending means the first shot is precise and subsequent rounds climb.
-  const shotYaw=round4(effectiveAimYaw()),shotPitch=round4(effectiveAimPitch()),preShotHeat=currentShotHeat(weapon,now);diagnosticsRecordEvent('shot_request',{weapon,hand,shotYaw,shotPitch,basePitch:diagnosticsRound(pitch),recoilPitch:diagnosticsRound(viewRecoilPitch),recoilTarget:diagnosticsRound(viewRecoilTargetPitch),stateSeq,ammo:Number(ammo[weapon]||0),rawLookY:diagnosticsRound(gamepadFrame?.rawLookY??gamepadFrame?.lookY),processedLookY:diagnosticsRound(controllerDiagnostics.inputY),rt:diagnosticsRound(gamepadFrame?.buttons?.[GAMEPAD_BUTTON.RT]||0,3)});
+  const shotYaw=round4(effectiveAimYaw()),shotPitch=round4(effectiveAimPitch()),preShotHeat=currentShotHeat(weapon,now);diagnosticsRecordEvent('shot_request',{weapon,hand,shotYaw,shotPitch,basePitch:diagnosticsRound(pitch),recoilDebtPitch:diagnosticsRound(recoilDebtPitch),recoilPatternPitch:diagnosticsRound(recoilPatternPitch),stateSeq,ammo:Number(ammo[weapon]||0),rawLookY:diagnosticsRound(gamepadFrame?.rawLookY??gamepadFrame?.lookY),processedLookY:diagnosticsRound(controllerDiagnostics.inputY),rt:diagnosticsRound(gamepadFrame?.buttons?.[GAMEPAD_BUTTON.RT]||0,3)});
   if(weapon==='akimbo1887')akimboReadyAt[hand==='left'?'left':'right']=now+weaponRules(weapon).cooldownMs;else fireReadyAt[weapon]=now+weaponRules(weapon).cooldownMs;
   presentLocalShot(weapon,now,hand);
   sendCurrentState(true);send({t:'fire',weapon,hand:weapon==='akimbo1887'?(hand==='left'?'left':'right'):undefined,yaw:shotYaw,pitch:shotPitch,adsAmount:round3(adsBlend),shotAt:Math.round(serverNow()),viewDelayMs:Math.round(currentRemoteViewDelayMs())});
-  beginRecoilBurst(weapon);recoilBurstReleaseAt=0;const recoilShot=registerLocalShotHeat(weapon,now);localWeaponShotSequence[weapon]=(localWeaponShotSequence[weapon]||0)+1;lastLocalShotAt=now;applyViewRecoil(weapon,preShotHeat,recoilShot.firstShot,hand);if(!godMode&&(ammo[weapon]||0)<=0)endRecoilBurst();clearQueuedSprintShot();return true;
+  beginRecoilBurst(weapon);recoilBurstReleaseAt=0;const recoilShot=registerLocalShotHeat(weapon,now);localWeaponShotSequence[weapon]=(localWeaponShotSequence[weapon]||0)+1;lastLocalShotAt=now;applyAimRecoil(weapon,preShotHeat,recoilShot.firstShot,hand);if(!godMode&&(ammo[weapon]||0)<=0)endRecoilBurst();clearQueuedSprintShot();return true;
 }
 function updateFireControl(now){
   if(!combatWeaponAvailable(now)){clearQueuedSprintShot();return;}
@@ -3269,7 +3255,7 @@ function switchWeapon(weapon){
   clearQueuedSprintShot();cancelSprint();
   weapon=weapon===secondaryWeapon?secondaryWeapon:primaryWeapon;
   if(!shell.canPlay||hp<=0||traversal||ladderState||!combatWeaponAvailable()||weapon===currentWeapon)return;
-  setAim(false);adsTransitionBlockedUntil=0;sniperZoomLevel=0;resetViewRecoil();currentWeapon=weapon;pendingWeapon=weapon;reloadRequestPending=false;reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=performance.now();delayFire(WEAPON_SWITCH_MS,weapon);warmWeaponAudio(weapon);syncLocalWeaponModel();send({t:'weapon',weapon});showToast(WEAPON_SPECS[weapon].name);
+  setAim(false);adsTransitionBlockedUntil=0;sniperZoomLevel=0;resetRecoilBookkeeping();currentWeapon=weapon;pendingWeapon=weapon;reloadRequestPending=false;reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=performance.now();delayFire(WEAPON_SWITCH_MS,weapon);warmWeaponAudio(weapon);syncLocalWeaponModel();send({t:'weapon',weapon});showToast(WEAPON_SPECS[weapon].name);
 }
 function setAim(active){
   if(currentWeapon==='akimbo1887')active=false;
@@ -3986,7 +3972,7 @@ function updateGamepadInput(dt){
 }
 function updateGameSimulation(dt){const now=performance.now();updateCombatAction(now);if(hp>0){updateCrouchState(dt);updateMovement(dt);updateFireControl(now);}}
 function updateGameFrame(dt){
-  const now=performance.now();updateCorrectionView(dt);updateViewRecoil(dt);
+  const now=performance.now();updateCorrectionView(dt);updateAimRecoil(dt);
   const deathP=hp<=0?THREE.MathUtils.clamp((now-(deathAnimStartedAt||now))/700,0,1):0,deathEase=deathP*deathP*(3-2*deathP),viewY=updateViewVertical(dt),stanceEase=smoothstep01(crouchBlend),traversePose=traversal?traversalPose(traversal,now):null,traverseWave=traversePose?Math.sin(Math.PI*traversePose.progress):0;
   const stanceHeight=THREE.MathUtils.lerp(PLAYER_HEIGHT,CROUCH_HEIGHT,stanceEase);
   let cameraY=viewY+stanceHeight-.42*deathEase-slideViewBlend*.13;
