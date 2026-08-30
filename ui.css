@@ -78,7 +78,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.8: one owner for layout, density, overflow and responsive behavior. */
+/* Breach UI contract v1.44.9: one owner for layout, density, overflow and responsive behavior. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -414,7 +414,7 @@ body{font-size:var(--ui-md)}
 }
 [data-input-mode="controller"] .controller-focus:focus-visible{outline:0!important}
 [data-input-mode="controller"] .controller-focus:not(.active):not(.selected):not(.equipped):not(.pending){border-color:rgba(255,255,255,.10)!important}
-/* v1.44.8 Create-a-Class / Gunsmith layout.
+/* v1.44.9 Create-a-Class / Gunsmith layout.
    One responsive system: weapon + live stats share the upper workspace;
    the selected attachment choices own a full-width tray underneath. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
@@ -429,7 +429,7 @@ body{font-size:var(--ui-md)}
 .gunsmith-back:hover,.gunsmith-back:focus-visible{border-color:var(--line2);background:#11181c;color:#fff}
 
 .loadout-class-list{min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:8px;overflow:hidden}
-.loadout-class-card{min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 42px;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:linear-gradient(90deg,rgba(15,21,25,.96),rgba(7,10,12,.92));overflow:hidden}
+.loadout-class-card{min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 58px;border:1px solid rgba(255,255,255,.08);border-radius:9px;background:linear-gradient(90deg,rgba(15,21,25,.96),rgba(7,10,12,.92));overflow:hidden}
 .loadout-class-card.starting{border-color:rgba(255,255,255,.08);background:radial-gradient(circle at 24% 22%,rgba(215,255,88,.13),transparent 52%),linear-gradient(135deg,rgba(24,33,25,.98),rgba(8,12,14,.96));box-shadow:0 0 22px rgba(215,255,88,.10),inset 0 0 26px rgba(215,255,88,.045)}
 .loadout-class-card.starting .loadout-class-card-head strong{color:#f5ffd8}
 .loadout-class-card.equipped{box-shadow:inset 3px 0 0 rgba(215,255,88,.58)}
@@ -444,15 +444,14 @@ body{font-size:var(--ui-md)}
 .loadout-class-weapons span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:normal;color:#c5d0d5;font:850 10px/1.12 system-ui}
 .loadout-class-weapons b{display:block;margin-bottom:3px;color:#7a878e;font:900 8px/1 system-ui;letter-spacing:.08em}
 .loadout-class-main>small{margin-top:auto;color:#87939a;font:850 9px/1.1 system-ui;white-space:nowrap}
-.loadout-class-rename{width:42px;height:100%;padding:0;border:0;border-left:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.018);color:#8d999f;font:900 17px/1 system-ui}
-.loadout-class-rename:hover,.loadout-class-rename:focus-visible{background:#182018;color:var(--accent)}
+.loadout-class-edit{width:58px;height:100%;padding:0;border:0;border-left:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.018);color:#9ba7ad;font:950 9px/1 system-ui;letter-spacing:.07em}
+.loadout-class-edit:hover,.loadout-class-edit:focus-visible{background:#182018;color:var(--accent)}
 
 .loadout-class-view{display:grid;grid-template-rows:44px minmax(0,1fr);gap:8px}
 .loadout-view-nav{justify-content:flex-start}
 .loadout-view-nav>div{min-width:0}
-.class-starting-action{margin-left:auto;height:36px;min-width:126px;padding:0 12px;border:0;border-radius:8px;background:rgba(255,255,255,.055);color:#c7d0d4;font:900 10px/1 system-ui;letter-spacing:.045em}
-.class-starting-action:hover,.class-starting-action:focus-visible{background:rgba(215,255,88,.12);color:#efffc0}
-.class-starting-action.active,.class-starting-action:disabled{background:radial-gradient(circle at 30% 25%,rgba(215,255,88,.16),transparent 60%),linear-gradient(135deg,rgba(26,36,27,.98),rgba(10,15,16,.96));color:#efffc0;opacity:1}
+.class-name-edit{display:block;max-width:min(52vw,420px);margin:3px 0 0;padding:0;border:0;background:transparent;color:var(--text);font:950 20px/1 system-ui;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;cursor:pointer}
+.class-name-edit:hover,.class-name-edit:focus-visible{color:#efffc0;text-shadow:0 0 14px rgba(215,255,88,.18);outline:0}
 .class-detail-grid{min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(2,minmax(0,1fr));gap:9px}
 .class-item-card{position:relative;min-width:0;min-height:0;padding:14px 16px;border:1px solid rgba(255,255,255,.09);border-radius:10px;background:radial-gradient(circle at 78% 35%,rgba(92,108,114,.13),transparent 42%),#0b1013;color:#dce5e9;text-align:left;display:flex!important;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:7px;overflow:hidden}
 .class-item-card:hover,.class-item-card:focus-visible{border-color:rgba(215,255,88,.42);background-color:#101712}
@@ -599,7 +598,7 @@ body{font-size:var(--ui-md)}
   .loadout-class-weapons span{font-size:9px;line-height:1.05}
   .loadout-class-weapons b{margin-bottom:2px;font-size:8px}
   .loadout-class-main>small{font-size:8px}
-  .loadout-class-rename{width:34px;font-size:14px}
+  .loadout-class-edit{width:48px;font-size:8px}
 
   .class-detail-grid{gap:6px}
   .class-item-card{padding:9px 11px;gap:4px;border-radius:8px}
@@ -740,7 +739,7 @@ body{font-size:var(--ui-md)}
   .gunsmith-weapon-picker .loadout-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.8 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.9 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -749,7 +748,7 @@ body{font-size:var(--ui-md)}
 .loadout-stat-bar-hatch.loss{background:repeating-linear-gradient(135deg,rgba(255,105,115,.95) 0 2px,rgba(255,105,115,.22) 2px 4px)}
 .loadout-stat-baseline-mark{position:absolute;top:-1px;bottom:-1px;width:1px;display:block;background:rgba(255,255,255,.72);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
 .loadout-stat.better .loadout-stat-bar-solid,.loadout-stat.worse .loadout-stat-bar-solid{background:#8f9ca4}
-/* v1.44.8 controller focus visuals: focus must never mutate Gunsmith geometry. */
+/* v1.44.9 controller focus visuals: focus must never mutate Gunsmith geometry. */
 [data-input-mode="controller"] .gunsmith-callout.controller-focus,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
   position:absolute!important;
@@ -789,8 +788,8 @@ body{font-size:var(--ui-md)}
   box-shadow:none!important;
   background:transparent!important;
 }
-.loadout-class-card.controller-card-focus .loadout-class-rename.controller-focus,
-.loadout-class-card.controller-card-focus .loadout-class-rename.controller-focus:focus-visible{
+.loadout-class-card.controller-card-focus .loadout-class-edit.controller-focus,
+.loadout-class-card.controller-card-focus .loadout-class-edit.controller-focus:focus-visible{
   outline:0!important;
   background:rgba(215,255,88,.16)!important;
   color:#efffc0!important;
@@ -798,4 +797,3 @@ body{font-size:var(--ui-md)}
 }
 
 
-@media (max-height:460px){.class-starting-action{height:32px;min-width:112px;padding:0 9px;font-size:9px}}

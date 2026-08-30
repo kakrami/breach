@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.8" rel="manifest"/>
-<title>Breach v1.44.8</title>
-<link href="ui.css?v=1.44.8" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.44.9" rel="manifest"/>
+<title>Breach v1.44.9</title>
+<link href="ui.css?v=1.44.9" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -206,11 +206,11 @@
 <div class="lobby-section-head"><div><h2>Create a Class</h2></div></div>
 <div class="loadout-editor loadout-workspace class-flow-workspace" data-loadout-workspace="lobby" data-view="classes">
 <section class="loadout-classes-view active" data-loadout-classes-view="lobby">
-<header class="class-browser-head"><div><span>CREATE A CLASS</span><h3>YOUR CLASSES</h3></div><small>Rename or select a class to edit</small></header>
+<header class="class-browser-head"><div><span>CREATE A CLASS</span><h3>YOUR CLASSES</h3></div><small>Select a class · Edit to customize</small></header>
 <div class="loadout-class-list" data-loadout-class-strip="lobby" role="list" aria-label="Loadout classes"></div>
 </section>
 <section class="loadout-class-view" data-loadout-class-view="lobby" hidden inert>
-<header class="loadout-view-nav"><button class="gunsmith-back" data-loadout-back-classes="lobby" type="button">‹ CLASSES</button><div><span>EDIT CLASS</span><h3 data-loadout-overview-name="lobby">CLASS 1</h3></div><button class="class-starting-action" data-lobby-starting-class type="button" aria-pressed="false">SET AS STARTING</button></header>
+<header class="loadout-view-nav"><button class="gunsmith-back" data-loadout-back-classes="lobby" type="button">‹ CLASSES</button><div><span>EDIT CLASS</span><button class="class-name-edit" data-loadout-class-name-edit="lobby" data-loadout-overview-name="lobby" type="button">CLASS 1</button></div></header>
 <div class="class-detail-grid">
 <button class="class-item-card class-item-weapon" data-loadout-edit-item="lobby-primary" type="button"><span>PRIMARY</span><strong data-loadout-overview-weapon="lobby-primary">ASSAULT RIFLE</strong><small data-loadout-overview-mods="lobby-primary">NO ATTACHMENTS</small><i>EDIT ›</i></button>
 <button class="class-item-card class-item-weapon" data-loadout-edit-item="lobby-secondary" type="button"><span>SECONDARY</span><strong data-loadout-overview-weapon="lobby-secondary">GLOCK</strong><small data-loadout-overview-mods="lobby-secondary">NO ATTACHMENTS</small><i>EDIT ›</i></button>
@@ -312,11 +312,11 @@
 <header class="modal-head"><div><h2>Create a Class</h2><p id="loadoutDescription">Choose a class or edit its loadout. Changes apply on your next spawn.</p></div></header>
 <div class="loadout-editor loadout-workspace class-flow-workspace" data-loadout-workspace="match" data-view="classes">
 <section class="loadout-classes-view active" data-loadout-classes-view="match">
-<header class="class-browser-head"><div><span>CREATE A CLASS</span><h3>YOUR CLASSES</h3></div><small>Rename or select a class to edit</small></header>
+<header class="class-browser-head"><div><span>CREATE A CLASS</span><h3>YOUR CLASSES</h3></div><small>Select a class · Edit to customize</small></header>
 <div class="loadout-class-list" data-loadout-class-strip="match" role="list" aria-label="Loadout classes"></div>
 </section>
 <section class="loadout-class-view" data-loadout-class-view="match" hidden inert>
-<header class="loadout-view-nav"><button class="gunsmith-back" data-loadout-back-classes="match" type="button">‹ CLASSES</button><div><span>EDIT CLASS</span><h3 data-loadout-overview-name="match">CLASS 1</h3></div></header>
+<header class="loadout-view-nav"><button class="gunsmith-back" data-loadout-back-classes="match" type="button">‹ CLASSES</button><div><span>EDIT CLASS</span><button class="class-name-edit" data-loadout-class-name-edit="match" data-loadout-overview-name="match" type="button">CLASS 1</button></div></header>
 <div class="class-detail-grid">
 <button class="class-item-card class-item-weapon" data-loadout-edit-item="match-primary" type="button"><span>PRIMARY</span><strong data-loadout-overview-weapon="match-primary">ASSAULT RIFLE</strong><small data-loadout-overview-mods="match-primary">NO ATTACHMENTS</small><i>EDIT ›</i></button>
 <button class="class-item-card class-item-weapon" data-loadout-edit-item="match-secondary" type="button"><span>SECONDARY</span><strong data-loadout-overview-weapon="match-secondary">GLOCK</strong><small data-loadout-overview-mods="match-secondary">NO ATTACHMENTS</small><i>EDIT ›</i></button>
@@ -429,6 +429,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.44.8" type="module"></script>
+<script src="client.js?v=1.44.9" type="module"></script>
 </body>
 </html>
