@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.39';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.39';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.39';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.39';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.39';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.39';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.39';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.39';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.40';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.40';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.40';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.40';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.40';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.40';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.40';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.40';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.39';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.39';
-import { createAudioEngine } from './audio-engine.js?v=1.44.39';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.39';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.39';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.39';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.39';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.39';
+} from './game-config.js?v=1.44.40';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.40';
+import { createAudioEngine } from './audio-engine.js?v=1.44.40';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.40';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.40';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.40';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.40';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.40';
 
 let THREE = null;
 
@@ -714,7 +714,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.39';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.40';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -918,6 +918,8 @@ const SNIPER_SCOPE_READY_BLEND=.94;
 const SNIPER_SCOPE_LENS_START_BLEND=.50;
 const SNIPER_SCOPE_LENS_FULL_BLEND=.68;
 const SNIPER_SCOPE_SHADOW_START_BLEND=.48;
+const SNIPER_SCOPE_RETICLE_START_BLEND=.86;
+const SNIPER_SCOPE_RETICLE_FULL_BLEND=.92;
 const SNIPER_SCOPE_SCREEN_RADIUS=.435;
 const SNIPER_SCOPE_AXIS_Y=.14;
 const SNIPER_SCOPE_REAR_LOCAL_Z=.047;
@@ -4397,7 +4399,7 @@ function updateWeaponView(dt){
   shotgunGroup.position.set(THREE.MathUtils.lerp(.30,shotgunPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,shotgunPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,shotgunPose.z,a)+kickZ+commonZ);shotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,shotgunPose.rx,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,shotgunPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,shotgunPose.rz,a)-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
   semiShotgunGroup.position.set(THREE.MathUtils.lerp(.30,semiShotgunPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,semiShotgunPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,semiShotgunPose.z,a)+kickZ+commonZ);semiShotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,semiShotgunPose.rx,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,semiShotgunPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,semiShotgunPose.rz,a)-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
   const sniperPose=sniperCalibratedAdsPose();sniperGroup.position.set(THREE.MathUtils.lerp(.28,sniperPose.x,a)+commonX*(1-a),THREE.MathUtils.lerp(-.28,sniperPose.y,a)+commonY*(1-a),THREE.MathUtils.lerp(-.48,sniperPose.z,a)+kickZ+commonZ*(1-a));sniperGroup.rotation.set(THREE.MathUtils.lerp(-.055,sniperPose.rx,a)+reloadCurve*.10+kickPitch,THREE.MathUtils.lerp(-.05,sniperPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,sniperPose.rz,a)-reloadRoll*.65-swapRoll-deathRoll-mobilityRoll+kickRoll);
-  const sniperLensReveal=sniperScopeLensReveal(),sniperLensActive=currentWeapon==='sniper'&&!sniperScopeReady()&&sniperLensReveal>.002,sniperReticleReveal=smoothstep01((sniperLensReveal-.18)/.82);if(sniperScopeDisplayLens)sniperScopeDisplayLens.visible=sniperLensActive;if(sniperScopeDisplayMaterial)sniperScopeDisplayMaterial.opacity=sniperLensReveal;if(sniperScopeLensReticle)sniperScopeLensReticle.visible=sniperLensActive;if(sniperScopeLensReticleMaterial)sniperScopeLensReticleMaterial.opacity=sniperReticleReveal;updateSniperScopeLensProjection();
+  const sniperLensReveal=sniperScopeLensReveal(),sniperLensActive=currentWeapon==='sniper'&&!sniperScopeReady()&&sniperLensReveal>.002,sniperReticleReveal=currentWeapon==='sniper'?smoothstep01((adsBlend-SNIPER_SCOPE_RETICLE_START_BLEND)/(SNIPER_SCOPE_RETICLE_FULL_BLEND-SNIPER_SCOPE_RETICLE_START_BLEND)):0;if(sniperScopeDisplayLens)sniperScopeDisplayLens.visible=sniperLensActive;if(sniperScopeDisplayMaterial)sniperScopeDisplayMaterial.opacity=sniperLensReveal;if(sniperScopeLensReticle)sniperScopeLensReticle.visible=sniperLensActive&&sniperReticleReveal>.002;if(sniperScopeLensReticleMaterial)sniperScopeLensReticleMaterial.opacity=sniperReticleReveal;updateSniperScopeLensProjection();
   grenadeLauncherGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.20,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);grenadeLauncherGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+GRENADE_LAUNCH_PITCH+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
   rpgGroup.position.set(THREE.MathUtils.lerp(.34,rpgPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.16,rpgPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.46,rpgPose.z,a)+kickZ+commonZ);rpgGroup.rotation.set(THREE.MathUtils.lerp(-.025,rpgPose.rx,a)+reloadCurve*.11+kickPitch,THREE.MathUtils.lerp(-.07,rpgPose.ry,a)-reloadCurve*.10+kickYaw,THREE.MathUtils.lerp(.015,rpgPose.rz,a)-reloadRoll*.6-swapRoll-deathRoll-mobilityRoll+kickRoll);
   // Mechanical cycling is separate from recoil: slide/bolt motion gives the shot
