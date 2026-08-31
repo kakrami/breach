@@ -165,6 +165,12 @@ export function createSessionShell({
     if(platform.touchControls&&(!immersive()||!landscapeReady())){paused=true;pauseReason=!immersive()?'fullscreen':'orientation';return render('match-blocked');}
     paused=false;pauseReason='';return render('match-enter');
   }
+  function showMatchPresentation(){
+    if(!inMatch())return snapshot();
+    // Match-end presentation is read-only gameplay. Close any modal/pause layer
+    // without requesting pointer lock so victory/final standings always own the screen.
+    paused=false;pauseReason='';panel=SHELL_PANEL.NONE;return render('match-presentation');
+  }
   function pause(reason='pause'){
     if(!inMatch()||paused)return snapshot();paused=true;pauseReason=reason;panel=SHELL_PANEL.NONE;
     if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();return render(reason);
@@ -214,7 +220,7 @@ export function createSessionShell({
   function start(){syncViewport(true);return render('start');}
   return {
     platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
-    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
+    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,showMatchPresentation,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
     destroy(){resizeObserver?.disconnect();if(viewportFrame)caf(viewportFrame);clearTimeout(viewportSettleTimer);removeEventListener('resize',viewportChanged);removeEventListener('orientationchange',viewportChanged);globalThis.visualViewport?.removeEventListener?.('resize',viewportChanged);document.removeEventListener(fullscreenEvent,fullscreenChanged);document.removeEventListener('pointerlockchange',pointerLockChanged);document.removeEventListener('visibilitychange',visibilityChanged);removeEventListener('pagehide',visibilityChanged);}
   };
 }

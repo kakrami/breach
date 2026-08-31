@@ -1,23 +1,79 @@
 export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 1, music: 1 }) }) {
   let ctx = null;
   let unlocked = false;
+  let sfxBus = null;
+  let sfxCompressor = null;
+  let musicBus = null;
   const encoded = new Map();
   const fetching = new Map();
   const buffers = new Map();
   const decoding = new Map();
   const unlockWaiters = new Set();
+  const activeVoices = new Set();
+
+  const GROUP_VOICE_LIMITS = Object.freeze({
+    Gunfire: 24,
+    Explosions: 8,
+    Feedback: 10,
+    Impacts: 10,
+    'Weapon Handling': 8,
+    Movement: 12,
+    Tactical: 10,
+    Music: 2,
+  });
+  const GROUP_CUE_LIMITS = Object.freeze({
+    Gunfire: 10,
+    Explosions: 4,
+    Feedback: 5,
+    Impacts: 6,
+    'Weapon Handling': 4,
+    Movement: 6,
+    Tactical: 6,
+    Music: 1,
+  });
 
   const clamp01 = value => Math.max(0, Math.min(1, Number(value) || 0));
 
   function existingContext() { return ctx; }
 
+  function resetGraph() {
+    sfxBus = null;
+    sfxCompressor = null;
+    musicBus = null;
+    activeVoices.clear();
+  }
+
+  function ensureGraph() {
+    if (!ctx) return false;
+    if (sfxBus && musicBus) return true;
+    try {
+      sfxBus = ctx.createGain();
+      musicBus = ctx.createGain();
+      if (ctx.createDynamicsCompressor) {
+        sfxCompressor = ctx.createDynamicsCompressor();
+        sfxCompressor.threshold.value = -10;
+        sfxCompressor.knee.value = 12;
+        sfxCompressor.ratio.value = 4;
+        sfxCompressor.attack.value = .003;
+        sfxCompressor.release.value = .16;
+        sfxBus.connect(sfxCompressor).connect(ctx.destination);
+      } else sfxBus.connect(ctx.destination);
+      musicBus.connect(ctx.destination);
+      return true;
+    } catch {
+      resetGraph();
+      return false;
+    }
+  }
+
   function createContextFromGesture() {
-    if (ctx?.state === 'closed') { ctx = null; unlocked = false; buffers.clear(); decoding.clear(); }
-    if (ctx) return ctx;
+    if (ctx?.state === 'closed') { ctx = null; unlocked = false; buffers.clear(); decoding.clear(); resetGraph(); }
+    if (ctx) { ensureGraph(); return ctx; }
     const AudioContext = window.AudioContext || window.webkitAudioContext;
     if (!AudioContext) return null;
     try { ctx = new AudioContext({ latencyHint: 'interactive' }); }
     catch { try { ctx = new AudioContext(); } catch { ctx = null; } }
+    ensureGraph();
     return ctx;
   }
 
@@ -39,6 +95,7 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
     } catch {}
     if (ctx.state === 'running') {
       unlocked = true;
+      ensureGraph();
       resolveUnlockWaiters(true);
       return true;
     }
@@ -48,7 +105,7 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
   async function unlock() {
     const audio = createContextFromGesture();
     if (!audio) return false;
-    if (unlocked && audio.state === 'running') { resolveUnlockWaiters(true); return true; }
+    if (unlocked && audio.state === 'running') { ensureGraph(); resolveUnlockWaiters(true); return true; }
     try {
       if (audio.state !== 'running') await audio.resume();
       // A one-frame silent source makes the unlock explicit on mobile WebKit.
@@ -64,7 +121,7 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
       if (audio.state !== 'running') await audio.resume();
     } catch {}
     unlocked = audio.state === 'running';
-    if (unlocked) resolveUnlockWaiters(true);
+    if (unlocked) { ensureGraph(); resolveUnlockWaiters(true); }
     return unlocked;
   }
 
@@ -98,7 +155,6 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
       if (!bytes) return null;
       const ready = await waitForUnlock();
       if (!ready || !ctx) return null;
-      // decodeAudioData may detach its input buffer on WebKit, so decode a copy.
       const decoded = await ctx.decodeAudioData(bytes.slice(0));
       buffers.set(id, decoded);
       return decoded;
@@ -143,11 +199,53 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
     return { total: ids.length, decoded: ids.length - failed, failed };
   }
 
-  function startDecoded(handle, cue, buffer, volume, options) {
-    if (handle.cancelled || !ctx || ctx.state !== 'running' || !buffer) return false;
+  function finishVoice(voice) {
+    if (!voice) return;
+    activeVoices.delete(voice);
+    if (voice.handle?.voice === voice) voice.handle.voice = null;
+  }
+
+  function stopVoice(voice) {
+    if (!voice) return;
+    try { voice.handle?.source?.stop(); } catch {}
+    finishVoice(voice);
+  }
+
+  function lowestPriorityVoice(list) {
+    return list.reduce((best, voice) => !best || voice.priority < best.priority || (voice.priority === best.priority && voice.startedAt < best.startedAt) ? voice : best, null);
+  }
+
+  function reserveVoice(handle, cueId, cue, options) {
+    const group = cue.group || 'SFX', priority = Math.max(0, Math.min(10, Number(options.priority ?? 2) || 0)), now = performance.now();
+    const cueLimit = Math.max(1, Math.floor(Number(cue.maxVoices) || GROUP_CUE_LIMITS[group] || 6));
+    const groupLimit = Math.max(cueLimit, Math.floor(Number(GROUP_VOICE_LIMITS[group]) || 16));
+    const sameCue = [...activeVoices].filter(voice => voice.cueId === cueId);
+    if (sameCue.length >= cueLimit) {
+      const victim = lowestPriorityVoice(sameCue);
+      if (victim && priority < victim.priority) return null;
+      stopVoice(victim);
+    }
+    const sameGroup = [...activeVoices].filter(voice => voice.group === group);
+    if (sameGroup.length >= groupLimit) {
+      const victim = lowestPriorityVoice(sameGroup);
+      if (victim && priority < victim.priority) return null;
+      stopVoice(victim);
+    }
+    const voice = { handle, cueId, group, priority, startedAt: now };
+    activeVoices.add(voice);
+    handle.voice = voice;
+    return voice;
+  }
+
+  function startDecoded(handle, cueId, cue, buffer, volume, options) {
+    if (handle.cancelled || !ctx || ctx.state !== 'running' || !buffer || !ensureGraph()) return false;
+    const voice = reserveVoice(handle, cueId, cue, options);
+    if (!voice) { handle.cancelled = true; return false; }
     const source = ctx.createBufferSource();
     const gain = ctx.createGain();
     const pan = ctx.createStereoPanner ? ctx.createStereoPanner() : null;
+    const lowpassHz = Math.max(800, Math.min(22000, Number(options.lowpassHz ?? 22000) || 22000));
+    const filter = lowpassHz < 20500 && ctx.createBiquadFilter ? ctx.createBiquadFilter() : null;
     const volumes = getVolumes() || {};
     const category = cue.group === 'Music' ? Number(volumes.music ?? 1) : Number(volumes.sfx ?? 1);
     const base = clamp01(Number(volumes.master ?? 1) * category * Number(cue.gain ?? 1) * Number(volume ?? 1));
@@ -155,10 +253,13 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
     source.loop = !!(options.loop ?? cue.loop);
     source.playbackRate.value = Math.max(0.5, Math.min(2, Number(options.rate ?? options.playbackRate ?? cue.rate ?? 1)));
     gain.gain.value = handle.volumeOverride == null ? base : clamp01(handle.volumeOverride);
-    if (pan) {
-      pan.pan.value = Math.max(-1, Math.min(1, Number(options.pan ?? 0)));
-      source.connect(gain).connect(pan).connect(ctx.destination);
-    } else source.connect(gain).connect(ctx.destination);
+    if (filter) { filter.type = 'lowpass'; filter.frequency.value = lowpassHz; filter.Q.value = .36; }
+    const bus = cue.group === 'Music' ? musicBus : sfxBus;
+    source.connect(gain);
+    let tail = gain;
+    if (filter) { tail.connect(filter); tail = filter; }
+    if (pan) { pan.pan.value = Math.max(-1, Math.min(1, Number(options.pan ?? 0))); tail.connect(pan); pan.connect(bus); }
+    else tail.connect(bus);
     handle.source = source;
     handle.gain = gain;
     try {
@@ -167,9 +268,10 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
         const duration = Math.max(.02, Number(options.maxDuration));
         try { source.stop(ctx.currentTime + duration); } catch {}
       }
-    } catch { return false; }
+    } catch { finishVoice(voice); return false; }
     source.onended = () => {
       handle.source = null;
+      finishVoice(voice);
       if (!handle.cancelled) options.onended?.();
     };
     return true;
@@ -181,11 +283,13 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
     const handle = {
       source: null,
       gain: null,
+      voice: null,
       cancelled: false,
       volumeOverride: null,
       stop() {
         this.cancelled = true;
         try { this.source?.stop(); } catch {}
+        finishVoice(this.voice);
       },
       setVolume(next) {
         this.volumeOverride = clamp01(next);
@@ -195,17 +299,15 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
 
     const readyBuffer = buffers.get(id);
     if (unlocked && ctx?.state === 'running' && readyBuffer) {
-      startDecoded(handle, cue, readyBuffer, volume, options);
+      startDecoded(handle, id, cue, readyBuffer, volume, options);
       return handle;
     }
 
-    // Do not drop a cue just because its buffer is still being fetched/decoded.
-    // It will start after the next successful user-gesture unlock.
     void (async () => {
       if (!unlocked || ctx?.state !== 'running') await waitForUnlock();
       const buffer = await decode(id);
       if (ctx?.state !== 'running') await resumeExisting();
-      startDecoded(handle, cue, buffer, volume, options);
+      startDecoded(handle, id, cue, buffer, volume, options);
     })();
     return handle;
   }
@@ -217,6 +319,7 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
       unlocked,
       fetched: encoded.size,
       decoded: buffers.size,
+      activeVoices: activeVoices.size,
       total: Object.keys(cues).length,
     };
   }

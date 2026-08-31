@@ -1,4 +1,4 @@
-import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.44.23';
+import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.44.28';
 
 export function createProjectileCollisionGrid({
   staticBoxes = [], pyramids = [], naturalObstacles = [], buildingParts = [],
@@ -23,12 +23,12 @@ export function createProjectileCollisionGrid({
   for (const p of buildingParts) if (p.projectileSolid !== false) add({ type:'box', source:p, minX:p.x-p.w/2, maxX:p.x+p.w/2, minY:p.bottomY, maxY:p.topY, minZ:p.z-p.d/2, maxZ:p.z+p.d/2 });
 
   let stamp = 0;
-  function firstHitT(x1, y1, z1, x2, y2, z2) {
+  function firstHitT(x1, y1, z1, x2, y2, z2, radius = 0) {
     stamp = (stamp + 1) >>> 0;
     if (!stamp) { for (const e of entries) e.visit = 0; stamp = 1; }
-    const minCX = Math.floor(Math.min(x1, x2) / cellSize), maxCX = Math.floor(Math.max(x1, x2) / cellSize);
-    const minCY = Math.floor(Math.min(y1, y2) / cellHeight), maxCY = Math.floor(Math.max(y1, y2) / cellHeight);
-    const minCZ = Math.floor(Math.min(z1, z2) / cellSize), maxCZ = Math.floor(Math.max(z1, z2) / cellSize);
+    const r=Math.max(0,Number(radius)||0), minCX = Math.floor((Math.min(x1, x2)-r) / cellSize), maxCX = Math.floor((Math.max(x1, x2)+r) / cellSize);
+    const minCY = Math.floor((Math.min(y1, y2)-r) / cellHeight), maxCY = Math.floor((Math.max(y1, y2)+r) / cellHeight);
+    const minCZ = Math.floor((Math.min(z1, z2)-r) / cellSize), maxCZ = Math.floor((Math.max(z1, z2)+r) / cellSize);
     let best = null;
     for (let cx = minCX; cx <= maxCX; cx += 1) for (let cy = minCY; cy <= maxCY; cy += 1) for (let cz = minCZ; cz <= maxCZ; cz += 1) {
       const list = grid.get(keyFor(cx, cy, cz));
@@ -37,9 +37,9 @@ export function createProjectileCollisionGrid({
         if (entry.visit === stamp) continue;
         entry.visit = stamp;
         let t;
-        if (entry.type === 'box') t = segmentAabbFirstT(x1,y1,z1,x2,y2,z2,entry.minX,entry.maxX,entry.minY,entry.maxY,entry.minZ,entry.maxZ);
-        else if (entry.type === 'round') { const o = entry.source; t = segmentCylinderFirstT(x1,y1,z1,x2,y2,z2,o.x,o.z,o.r,entry.minY,entry.maxY); }
-        else { const o = entry.source; t = segmentPyramidFirstT(x1,y1,z1,x2,y2,z2,o.x,o.z,o.base,o.h,entry.minY,entry.maxY); }
+        if (entry.type === 'box') t = segmentAabbFirstT(x1,y1,z1,x2,y2,z2,entry.minX-r,entry.maxX+r,entry.minY-r,entry.maxY+r,entry.minZ-r,entry.maxZ+r);
+        else if (entry.type === 'round') { const o = entry.source; t = segmentCylinderFirstT(x1,y1,z1,x2,y2,z2,o.x,o.z,o.r+r,entry.minY-r,entry.maxY+r); }
+        else { const o = entry.source; t = segmentPyramidFirstT(x1,y1,z1,x2,y2,z2,o.x,o.z,o.base+2*r,o.h+r,entry.minY-r,entry.maxY+r); }
         if (t != null && (best == null || t < best)) best = t;
       }
     }
