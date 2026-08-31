@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.30';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.30';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.30';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.30';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.30';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.30';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.30';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.30';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.31';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.31';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.31';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.31';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.31';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.31';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.31';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.31';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.30';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.30';
-import { createAudioEngine } from './audio-engine.js?v=1.44.30';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.30';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.30';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.30';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.30';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.30';
+} from './game-config.js?v=1.44.31';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.31';
+import { createAudioEngine } from './audio-engine.js?v=1.44.31';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.31';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.31';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.31';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.31';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.31';
 
 let THREE = null;
 
@@ -714,7 +714,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.30';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.31';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -909,7 +909,12 @@ function currentSpreadRadians(){
   return weaponSpreadRadians(currentWeapon,(localMoveAmount||0)*speed,movement.runSpeed,ads,crouched,!onGround,currentShotHeat(),sliding,attachmentsForWeapon(currentWeapon));
 }
 function accuracyCrosshairRadius(){const fov=(camera?.fov||baseFov)*Math.PI/180,spread=currentSpreadRadians();return THREE.MathUtils.clamp(Math.tan(spread)*(viewH*.5)/Math.max(.08,Math.tan(fov*.5)),3.5,52);}
-function sniperScopeActive(){return combatWeaponAvailable()&&currentWeapon==='sniper'&&adsBlend>.72;}
+// The full-screen sniper mask must begin only after the physical optic has
+// reached the camera axis. Using one cutoff for the HUD, weapon and hands
+// prevents the scope tube/lens from rendering inside the scoped view.
+const SNIPER_SCOPE_READY_BLEND=.94;
+function sniperScopeReady(){return currentWeapon==='sniper'&&adsBlend>=SNIPER_SCOPE_READY_BLEND;}
+function sniperScopeActive(){return combatWeaponAvailable()&&sniperScopeReady();}
 function sniperVariableScopeEquipped(){return weaponHasAttachment('sniper',attachmentsForWeapon('sniper'),'variableScope');}
 function sniperLowZoomLabel(){return sniperVariableScopeEquipped()?'3X':'4X';}
 function sniperHighZoomLabel(){return sniperVariableScopeEquipped()?'6X':'8X';}
@@ -1457,7 +1462,7 @@ function equipmentHandTarget(now,outPos,outQuat){
 }
 function updateFirstPersonHandRig(now,reloading,reloadP,traversalViewActive){
   if(!firstPersonHands||!fpRigScratch)return;
-  const scopedHidden=currentWeapon==='sniper'&&adsBlend>=.94,alive=!!shell.inMatch&&hp>0&&!traversalViewActive&&!scopedHidden;firstPersonHands.visible=alive;if(!alive){if(fpEquipmentProp)fpEquipmentProp.visible=false;return;}
+  const scopedHidden=sniperScopeReady(),alive=!!shell.inMatch&&hp>0&&!traversalViewActive&&!scopedHidden;firstPersonHands.visible=alive;if(!alive){if(fpEquipmentProp)fpEquipmentProp.visible=false;return;}
   let leftAnchor=null,rightAnchor=null,reloadLeft=null,reloadRight=null;
   if(currentWeapon==='akimbo1887'){leftAnchor=akimboLeftGroup?.userData.fpLeftGrip||null;rightAnchor=akimboRightGroup?.userData.fpRightGrip||null;reloadLeft=akimboLeftGroup?.userData.fpReloadLeft||null;reloadRight=akimboRightGroup?.userData.fpReloadRight||null;}
   else{const group=activeFirstPersonWeaponGroup(currentWeapon);leftAnchor=group?.userData.fpLeftGrip||null;rightAnchor=group?.userData.fpRightGrip||null;reloadLeft=group?.userData.fpReloadLeft||null;reloadRight=group?.userData.fpReloadRight||null;}
@@ -3486,7 +3491,7 @@ function sendSimulationHeartbeat(stateSent=false){
 }
 
 
-function syncLocalWeaponModel(){if(pistolGroup)pistolGroup.visible=currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=currentWeapon==='akimbo1887';if(assaultGroup)assaultGroup.visible=currentWeapon==='assault';if(umpGroup)umpGroup.visible=currentWeapon==='ump';if(machineGunGroup)machineGunGroup.visible=currentWeapon==='machineGun';if(shotgunGroup)shotgunGroup.visible=currentWeapon==='shotgun';if(semiShotgunGroup)semiShotgunGroup.visible=currentWeapon==='semiShotgun';if(sniperGroup)sniperGroup.visible=currentWeapon==='sniper';if(grenadeLauncherGroup)grenadeLauncherGroup.visible=currentWeapon==='grenadeLauncher';if(rpgGroup)rpgGroup.visible=currentWeapon==='rpg';syncLocalAttachmentVisuals();syncPauseContext();}
+function syncLocalWeaponModel(){if(pistolGroup)pistolGroup.visible=currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=currentWeapon==='akimbo1887';if(assaultGroup)assaultGroup.visible=currentWeapon==='assault';if(umpGroup)umpGroup.visible=currentWeapon==='ump';if(machineGunGroup)machineGunGroup.visible=currentWeapon==='machineGun';if(shotgunGroup)shotgunGroup.visible=currentWeapon==='shotgun';if(semiShotgunGroup)semiShotgunGroup.visible=currentWeapon==='semiShotgun';if(sniperGroup)sniperGroup.visible=currentWeapon==='sniper'&&!sniperScopeReady();if(grenadeLauncherGroup)grenadeLauncherGroup.visible=currentWeapon==='grenadeLauncher';if(rpgGroup)rpgGroup.visible=currentWeapon==='rpg';syncLocalAttachmentVisuals();syncPauseContext();}
 function remoteAttachmentsForWeapon(r,weapon){return weapon===r.primaryWeapon?normalizeWeaponAttachments(weapon,r.primaryAttachments):weapon===r.secondaryWeapon?normalizeWeaponAttachments(weapon,r.secondaryAttachments):normalizeWeaponAttachments(weapon,{});}
 function syncRemoteWeapon(r){if(!r)return;for(const name of WEAPON_ORDER){if(!r[name])continue;r[name].visible=r.weapon===name;const attachments=remoteAttachmentsForWeapon(r,name);if(name==='akimbo1887'){for(const gun of [r.akimboLeft,r.akimboRight])if(gun)syncWeaponAttachmentVisuals(gun,name,attachments);}else syncWeaponAttachmentVisuals(r[name],name,attachments);}}
 function tracerMaterial(color){return new THREE.LineBasicMaterial({color,transparent:true,opacity:.82,depthWrite:false});}
@@ -4281,7 +4286,7 @@ function updateWeaponView(dt){
   if(machineGunBox){const mgReload=reloading&&currentWeapon==='machineGun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.12)/.74,0,1)):0;machineGunBox.position.y=-.19-mgReload*.30;machineGunBox.position.x=-.045-mgReload*.08;}
   if(semiShotgunMag)semiShotgunMag.position.y=-.14-(reloading&&currentWeapon==='semiShotgun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.22:0);
   if(sniperBolt)sniperBolt.position.z=-.06+(currentWeapon==='sniper'?actionPulse*.085:0)+(reloading&&currentWeapon==='sniper'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.20)/.55,0,1))*.18:0);
-  const traversalViewActive=!!traversePoseNow;sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&adsBlend<.94;shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';machineGunGroup.visible=!traversalViewActive&&currentWeapon==='machineGun';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';
+  const traversalViewActive=!!traversePoseNow;sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&!sniperScopeReady();shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';machineGunGroup.visible=!traversalViewActive&&currentWeapon==='machineGun';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';
   if(shotgunPump){
     let pumpOffset=reloading&&currentWeapon==='shotgun'?Math.sin(Math.PI*reloadP)*.10:0;
     if(shotgunPumpStartedAt){
