@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.34';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.34';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.34';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.34';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.34';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.34';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.34';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.34';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.35';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.35';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.35';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.35';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.35';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.35';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.35';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.35';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.34';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.34';
-import { createAudioEngine } from './audio-engine.js?v=1.44.34';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.34';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.34';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.34';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.34';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.34';
+} from './game-config.js?v=1.44.35';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.35';
+import { createAudioEngine } from './audio-engine.js?v=1.44.35';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.35';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.35';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.35';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.35';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.35';
 
 let THREE = null;
 
@@ -714,7 +714,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.34';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.35';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -909,19 +909,20 @@ function currentSpreadRadians(){
   return weaponSpreadRadians(currentWeapon,(localMoveAmount||0)*speed,movement.runSpeed,ads,crouched,!onGround,currentShotHeat(),sliding,attachmentsForWeapon(currentWeapon));
 }
 function accuracyCrosshairRadius(){const fov=(camera?.fov||baseFov)*Math.PI/180,spread=currentSpreadRadians();return THREE.MathUtils.clamp(Math.tan(spread)*(viewH*.5)/Math.max(.08,Math.tan(fov*.5)),3.5,52);}
-// Classic CoD-style full-screen sniper ADS: the physical ocular glass is opaque,
-// so the player never looks through a literal 3D tube. Once eye relief is reached,
-// the weapon is replaced by the HUD scope and the magnified view resolves from a
-// very short scope-shadow/focus blackout. This hides the model/render handoff and
-// avoids a tiny physical bore suddenly expanding into the final scope picture.
+// CoD-style sniper handoff: the physical optic approaches the eye, then the HUD
+// takes over with the same apparent eyepiece opening. The aperture expands into
+// the final scope while the peripheral view darkens, so there is no black-hole
+// frame and no instant jump from a small 3D bore to the full-screen optic.
 const SNIPER_SCOPE_READY_BLEND=.94;
-const SNIPER_SCOPE_FOCUS_MS=85;
+const SNIPER_SCOPE_FOCUS_MS=150;
 const SNIPER_SCOPE_SCREEN_RADIUS=.435;
+const SNIPER_SCOPE_START_APERTURE_RATIO=.775;
 const SNIPER_SCOPE_AXIS_Y=.14;
 const SNIPER_SCOPE_REAR_LOCAL_Z=.05;
 const SNIPER_SCOPE_OUTER_RADIUS=.0485;
 function sniperScopeReady(){return currentWeapon==='sniper'&&adsBlend>=SNIPER_SCOPE_READY_BLEND;}
-function sniperScopeActive(){return combatWeaponAvailable()&&sniperScopeReady();}
+function sniperScopeActive(){return combatWeaponAvailable()&&currentWeapon==='sniper'&&(sniperScopeReady()||sniperScopeFocusBlend>.001);}
+function sniperWeaponHiddenForScope(){return currentWeapon==='sniper'&&(sniperScopeReady()||sniperScopeFocusBlend>.001);}
 function sniperVariableScopeEquipped(){return weaponHasAttachment('sniper',attachmentsForWeapon('sniper'),'variableScope');}
 function sniperLowZoomLabel(){return sniperVariableScopeEquipped()?'3X':'4X';}
 function sniperHighZoomLabel(){return sniperVariableScopeEquipped()?'6X':'8X';}
@@ -1474,7 +1475,7 @@ function equipmentHandTarget(now,outPos,outQuat){
 }
 function updateFirstPersonHandRig(now,reloading,reloadP,traversalViewActive){
   if(!firstPersonHands||!fpRigScratch)return;
-  const scopedHidden=sniperScopeReady(),alive=!!shell.inMatch&&hp>0&&!traversalViewActive&&!scopedHidden;firstPersonHands.visible=alive;if(!alive){if(fpEquipmentProp)fpEquipmentProp.visible=false;return;}
+  const scopedHidden=sniperWeaponHiddenForScope(),alive=!!shell.inMatch&&hp>0&&!traversalViewActive&&!scopedHidden;firstPersonHands.visible=alive;if(!alive){if(fpEquipmentProp)fpEquipmentProp.visible=false;return;}
   let leftAnchor=null,rightAnchor=null,reloadLeft=null,reloadRight=null;
   if(currentWeapon==='akimbo1887'){leftAnchor=akimboLeftGroup?.userData.fpLeftGrip||null;rightAnchor=akimboRightGroup?.userData.fpRightGrip||null;reloadLeft=akimboLeftGroup?.userData.fpReloadLeft||null;reloadRight=akimboRightGroup?.userData.fpReloadRight||null;}
   else{const group=activeFirstPersonWeaponGroup(currentWeapon);leftAnchor=group?.userData.fpLeftGrip||null;rightAnchor=group?.userData.fpRightGrip||null;reloadLeft=group?.userData.fpReloadLeft||null;reloadRight=group?.userData.fpReloadRight||null;}
@@ -1628,9 +1629,10 @@ function init3D(){
   const rifleMat = new THREE.MeshStandardMaterial({color:0x2f3438,roughness:.42,metalness:.40});
   const stockMat = new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06});
   const lensMat = new THREE.MeshStandardMaterial({color:0xcfe6ef,roughness:.06,metalness:.08,transparent:true,opacity:.18,emissive:0x10252e,emissiveIntensity:.08,depthWrite:false,side:THREE.DoubleSide});
-  // High-magnification scopes do not expose a literal tunnel during ADS. The
-  // eyepiece reads as dark coated glass until the full-screen optic takes over.
-  const ocularLensMat = new THREE.MeshStandardMaterial({color:0x071014,roughness:.20,metalness:.16,emissive:0x06141a,emissiveIntensity:.16,depthWrite:true,side:THREE.DoubleSide});
+  // The ocular lens stays lightly tinted but transparent. Near the eye we stop
+  // rendering the fake tube internals, letting the already-zooming world fill the
+  // physical eyepiece before the HUD aperture expands into the final scope.
+  const ocularLensMat = new THREE.MeshStandardMaterial({color:0x8fc7d8,roughness:.08,metalness:.10,transparent:true,opacity:.10,emissive:0x102830,emissiveIntensity:.10,depthWrite:false,side:THREE.DoubleSide});
   const dragReceiver = new THREE.Mesh(new THREE.BoxGeometry(.16,.12,.46),rifleMat);dragReceiver.position.set(0,.04,-.18);
   const dragHandguard = new THREE.Mesh(new THREE.BoxGeometry(.13,.10,.36),stockMat);dragHandguard.position.set(0,-.005,-.52);
   const rifleBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.84,10),rifleMat);rifleBarrel.rotation.x=Math.PI/2;rifleBarrel.position.set(0,.025,-.82);
@@ -1651,7 +1653,7 @@ function init3D(){
   const scopeShade=new THREE.Mesh(new THREE.CylinderGeometry(.051,.051,.035,18,1,true),rifleMat);scopeShade.rotation.x=Math.PI/2;scopeShade.position.set(0,.14,-.39);
   sniperBolt=new THREE.Mesh(new THREE.BoxGeometry(.050,.050,.16),rifleMat);sniperBolt.position.set(.10,.065,-.06);
   sniperFlash = new THREE.Mesh(new THREE.SphereGeometry(.085,8,6),new THREE.MeshBasicMaterial({color:0xffe6a6,transparent:true,opacity:0}));sniperFlash.position.set(0,.025,-1.24);
-  sniperGroup.add(dragReceiver,dragHandguard,rifleBarrel,stock,stockComb,sniperMag,scopeMountRear,scopeMountFront,scope,scopeInner,scopeShade,scopeFrontRing,scopeRearRing,scopeFrontLens,scopeRearLens,sniperBolt,sniperFlash);sniperGroup.userData.scopeAxis={x:0,y:SNIPER_SCOPE_AXIS_Y,rearZ:SNIPER_SCOPE_REAR_LOCAL_Z,outerRadius:SNIPER_SCOPE_OUTER_RADIUS};sniperGroup.userData.adsOpticPose={x:0,y:-SNIPER_SCOPE_AXIS_Y,z:-.39,rx:0,ry:0,rz:0};sniperGroup.userData.cyclePart=sniperBolt;sniperGroup.userData.cycleBaseZ=-.06;sniperGroup.userData.cycleTravel=.085;registerWeaponHandAnchors(sniperGroup,{right:{position:[.030,-.120,.035],rotation:[-.25,-.03,.05]},left:{position:[-.030,-.045,-.45],rotation:[-.14,.04,.02]},reloadLeft:{position:[-.035,-.125,-.08],rotation:[-.16,.08,.14]},reloadRight:{parent:sniperBolt,position:[.025,.015,.00],rotation:[-.44,-.12,.25]}});sniperGroup.position.set(.28,-.28,-.48);sniperGroup.rotation.set(-.055,-.05,0);sniperGroup.visible=false;
+  sniperGroup.add(dragReceiver,dragHandguard,rifleBarrel,stock,stockComb,sniperMag,scopeMountRear,scopeMountFront,scope,scopeInner,scopeShade,scopeFrontRing,scopeRearRing,scopeFrontLens,scopeRearLens,sniperBolt,sniperFlash);sniperGroup.userData.scopeAxis={x:0,y:SNIPER_SCOPE_AXIS_Y,rearZ:SNIPER_SCOPE_REAR_LOCAL_Z,outerRadius:SNIPER_SCOPE_OUTER_RADIUS};sniperGroup.userData.adsOpticPose={x:0,y:-SNIPER_SCOPE_AXIS_Y,z:-.39,rx:0,ry:0,rz:0};sniperGroup.userData.adsTubeOccluders=[scopeInner,scopeShade,scopeFrontRing,scopeFrontLens];sniperGroup.userData.cyclePart=sniperBolt;sniperGroup.userData.cycleBaseZ=-.06;sniperGroup.userData.cycleTravel=.085;registerWeaponHandAnchors(sniperGroup,{right:{position:[.030,-.120,.035],rotation:[-.25,-.03,.05]},left:{position:[-.030,-.045,-.45],rotation:[-.14,.04,.02]},reloadLeft:{position:[-.035,-.125,-.08],rotation:[-.16,.08,.14]},reloadRight:{parent:sniperBolt,position:[.025,.015,.00],rotation:[-.44,-.12,.25]}});sniperGroup.position.set(.28,-.28,-.48);sniperGroup.rotation.set(-.055,-.05,0);sniperGroup.visible=false;
 
   grenadeLauncherGroup=new THREE.Group();
   const glMat=new THREE.MeshStandardMaterial({color:0x273126,roughness:.58,metalness:.26}),glTube=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.73,12),glMat);glTube.rotation.x=Math.PI/2;glTube.position.set(0,.01,-.40);
@@ -3509,7 +3511,7 @@ function sendSimulationHeartbeat(stateSent=false){
 }
 
 
-function syncLocalWeaponModel(){if(pistolGroup)pistolGroup.visible=currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=currentWeapon==='akimbo1887';if(assaultGroup)assaultGroup.visible=currentWeapon==='assault';if(umpGroup)umpGroup.visible=currentWeapon==='ump';if(machineGunGroup)machineGunGroup.visible=currentWeapon==='machineGun';if(shotgunGroup)shotgunGroup.visible=currentWeapon==='shotgun';if(semiShotgunGroup)semiShotgunGroup.visible=currentWeapon==='semiShotgun';if(sniperGroup)sniperGroup.visible=currentWeapon==='sniper'&&!sniperScopeReady();if(grenadeLauncherGroup)grenadeLauncherGroup.visible=currentWeapon==='grenadeLauncher';if(rpgGroup)rpgGroup.visible=currentWeapon==='rpg';syncLocalAttachmentVisuals();syncPauseContext();}
+function syncLocalWeaponModel(){if(pistolGroup)pistolGroup.visible=currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=currentWeapon==='akimbo1887';if(assaultGroup)assaultGroup.visible=currentWeapon==='assault';if(umpGroup)umpGroup.visible=currentWeapon==='ump';if(machineGunGroup)machineGunGroup.visible=currentWeapon==='machineGun';if(shotgunGroup)shotgunGroup.visible=currentWeapon==='shotgun';if(semiShotgunGroup)semiShotgunGroup.visible=currentWeapon==='semiShotgun';if(sniperGroup)sniperGroup.visible=currentWeapon==='sniper'&&!sniperWeaponHiddenForScope();if(grenadeLauncherGroup)grenadeLauncherGroup.visible=currentWeapon==='grenadeLauncher';if(rpgGroup)rpgGroup.visible=currentWeapon==='rpg';syncLocalAttachmentVisuals();syncPauseContext();}
 function remoteAttachmentsForWeapon(r,weapon){return weapon===r.primaryWeapon?normalizeWeaponAttachments(weapon,r.primaryAttachments):weapon===r.secondaryWeapon?normalizeWeaponAttachments(weapon,r.secondaryAttachments):normalizeWeaponAttachments(weapon,{});}
 function syncRemoteWeapon(r){if(!r)return;for(const name of WEAPON_ORDER){if(!r[name])continue;r[name].visible=r.weapon===name;const attachments=remoteAttachmentsForWeapon(r,name);if(name==='akimbo1887'){for(const gun of [r.akimboLeft,r.akimboRight])if(gun)syncWeaponAttachmentVisuals(gun,name,attachments);}else syncWeaponAttachmentVisuals(r[name],name,attachments);}}
 function tracerMaterial(color){return new THREE.LineBasicMaterial({color,transparent:true,opacity:.82,depthWrite:false});}
@@ -4245,8 +4247,8 @@ function updateAim(dt){
   adsBlend+=(target-adsBlend)*follow;
   if(Math.abs(target-adsBlend)<.002)adsBlend=target;
   const scopeFocusTarget=currentWeapon==='sniper'&&target>0&&adsBlend>=SNIPER_SCOPE_READY_BLEND?1:0,focusStep=Math.max(0,Number(dt)||0)/(SNIPER_SCOPE_FOCUS_MS/1000);
-  sniperScopeFocusBlend=THREE.MathUtils.clamp(sniperScopeFocusBlend+(scopeFocusTarget?focusStep:-focusStep*2),0,1);
-  if(currentWeapon!=='sniper'||adsBlend<SNIPER_SCOPE_READY_BLEND-.01)sniperScopeFocusBlend=0;
+  sniperScopeFocusBlend=THREE.MathUtils.clamp(sniperScopeFocusBlend+(scopeFocusTarget?focusStep:-focusStep*1.35),0,1);
+  if(currentWeapon!=='sniper')sniperScopeFocusBlend=0;
   const eased=adsBlend*adsBlend*(3-2*adsBlend),targetFov=currentWeapon==='sniper'&&sniperZoomLevel>=2?sniperHighZoomFov():spec.adsFov;
   const fov=THREE.MathUtils.lerp(baseFov,targetFov,eased);
   if(Math.abs(camera.fov-fov)>.03){camera.fov=fov;camera.updateProjectionMatrix();}
@@ -4295,6 +4297,7 @@ function updateWeaponView(dt){
   shotgunGroup.position.set(THREE.MathUtils.lerp(.30,shotgunPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,shotgunPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,shotgunPose.z,a)+kickZ+commonZ);shotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,shotgunPose.rx,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,shotgunPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,shotgunPose.rz,a)-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
   semiShotgunGroup.position.set(THREE.MathUtils.lerp(.30,semiShotgunPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,semiShotgunPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,semiShotgunPose.z,a)+kickZ+commonZ);semiShotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,semiShotgunPose.rx,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,semiShotgunPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,semiShotgunPose.rz,a)-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
   const sniperPose=sniperCalibratedAdsPose();sniperGroup.position.set(THREE.MathUtils.lerp(.28,sniperPose.x,a)+commonX*(1-a),THREE.MathUtils.lerp(-.28,sniperPose.y,a)+commonY*(1-a),THREE.MathUtils.lerp(-.48,sniperPose.z,a)+kickZ+commonZ*(1-a));sniperGroup.rotation.set(THREE.MathUtils.lerp(-.055,sniperPose.rx,a)+reloadCurve*.10+kickPitch,THREE.MathUtils.lerp(-.05,sniperPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,sniperPose.rz,a)-reloadRoll*.65-swapRoll-deathRoll-mobilityRoll+kickRoll);
+  const sniperTubeOpen=currentWeapon==='sniper'&&adsBlend>=.66;for(const part of sniperGroup.userData.adsTubeOccluders||[])part.visible=!sniperTubeOpen;
   grenadeLauncherGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.20,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);grenadeLauncherGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+GRENADE_LAUNCH_PITCH+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
   rpgGroup.position.set(THREE.MathUtils.lerp(.34,rpgPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.16,rpgPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.46,rpgPose.z,a)+kickZ+commonZ);rpgGroup.rotation.set(THREE.MathUtils.lerp(-.025,rpgPose.rx,a)+reloadCurve*.11+kickPitch,THREE.MathUtils.lerp(-.07,rpgPose.ry,a)-reloadCurve*.10+kickYaw,THREE.MathUtils.lerp(.015,rpgPose.rz,a)-reloadRoll*.6-swapRoll-deathRoll-mobilityRoll+kickRoll);
   // Mechanical cycling is separate from recoil: slide/bolt motion gives the shot
@@ -4311,7 +4314,7 @@ function updateWeaponView(dt){
   if(machineGunBox){const mgReload=reloading&&currentWeapon==='machineGun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.12)/.74,0,1)):0;machineGunBox.position.y=-.19-mgReload*.30;machineGunBox.position.x=-.045-mgReload*.08;}
   if(semiShotgunMag)semiShotgunMag.position.y=-.14-(reloading&&currentWeapon==='semiShotgun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.22:0);
   if(sniperBolt)sniperBolt.position.z=-.06+(currentWeapon==='sniper'?actionPulse*.085:0)+(reloading&&currentWeapon==='sniper'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.20)/.55,0,1))*.18:0);
-  const traversalViewActive=!!traversePoseNow;sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&!sniperScopeReady();shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';machineGunGroup.visible=!traversalViewActive&&currentWeapon==='machineGun';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';
+  const traversalViewActive=!!traversePoseNow;sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&!sniperWeaponHiddenForScope();shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun';semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault';umpGroup.visible=!traversalViewActive&&currentWeapon==='ump';machineGunGroup.visible=!traversalViewActive&&currentWeapon==='machineGun';grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg';pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';
   if(shotgunPump){
     let pumpOffset=reloading&&currentWeapon==='shotgun'?Math.sin(Math.PI*reloadP)*.10:0;
     if(shotgunPumpStartedAt){
@@ -4433,7 +4436,7 @@ function drawNetworkDiagnostics(c,w,h){
   c.save();c.font='700 9px ui-monospace,monospace';const pad=6,lineH=12,panelW=Math.min(360,Math.max(...lines.map(line=>c.measureText(line).width))+pad*2),panelH=lines.length*lineH+pad*2;c.fillStyle='rgba(0,0,0,.72)';c.fillRect(7,7,panelW,panelH);c.strokeStyle='rgba(215,255,88,.45)';c.strokeRect(7.5,7.5,panelW-1,panelH-1);c.fillStyle='#e8f0f4';c.textAlign='left';c.textBaseline='top';lines.forEach((line,i)=>c.fillText(line,7+pad,7+pad+i*lineH));c.restore();
 }
 function drawHud(now){
-  const hudInterval=touchGameplayControlsVisible()?33:16,scoped=sniperScopeActive(),scopeStateChanged=scoped!==hudLastScopeActive,scopeFocusAnimating=scoped&&sniperScopeFocusBlend<.999;
+  const hudInterval=touchGameplayControlsVisible()?33:16,scoped=sniperScopeActive(),scopeStateChanged=scoped!==hudLastScopeActive,scopeFocusAnimating=scoped&&sniperScopeFocusBlend>.001&&sniperScopeFocusBlend<.999;
   if(!scopeStateChanged&&!scopeFocusAnimating&&now-hudLastDraw<hudInterval)return;hudLastDraw=now;hudLastScopeActive=scoped;if(!hudLayout)hudLayout=computeHudLayout();
   const c=hudCtx,s=hudScale,w=viewW,h=viewH,L=hudLayout,toast=activeToast(now);
   c.setTransform(s,0,0,s,0,0);c.clearRect(0,0,w,h);c.textBaseline='middle';
@@ -4621,8 +4624,22 @@ function drawWeaponCrosshair(c,x,y,weapon,hit,ads=0,headshot=false){if(combatAct
 
 function drawHitConfirm(c,x,y,headshot=false){const size=headshot?8.5:7,gap=4.5;c.save();c.strokeStyle=headshot?'#ffd36d':'rgba(255,255,255,.98)';c.lineWidth=headshot?2.5:2.15;c.lineCap='round';c.shadowColor='rgba(0,0,0,.92)';c.shadowBlur=3;c.beginPath();c.moveTo(x-gap-size,y-gap-size);c.lineTo(x-gap,y-gap);c.moveTo(x+gap,y+gap);c.lineTo(x+gap+size,y+gap+size);c.moveTo(x+gap+size,y-gap-size);c.lineTo(x+gap,y-gap);c.moveTo(x-gap,y+gap);c.lineTo(x-gap-size,y+gap+size);c.stroke();c.restore();}
 
-function drawScopeMask(c,w,h,focus=1){const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2,resolve=smoothstep01(focus);c.save();c.beginPath();c.rect(0,0,w,h);c.arc(cx,cy,r,0,Math.PI*2,true);c.fillStyle='rgba(0,0,0,.975)';c.fill('evenodd');c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.clip();const vignette=c.createRadialGradient(cx,cy,r*.66,cx,cy,r);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(.78,'rgba(0,0,0,.04)');vignette.addColorStop(1,'rgba(0,0,0,.48)');c.fillStyle=vignette;c.fillRect(cx-r,cy-r,r*2,r*2);if(resolve<.999){c.fillStyle=`rgba(3,7,9,${Math.min(.995,Math.pow(1-resolve,.72)*.995)})`;c.fillRect(cx-r,cy-r,r*2,r*2);}c.restore();c.save();c.strokeStyle='rgba(7,9,11,.98)';c.lineWidth=5;c.beginPath();c.arc(cx,cy,r-1.5,0,Math.PI*2);c.stroke();c.strokeStyle='rgba(255,255,255,.10)';c.lineWidth=1;c.beginPath();c.arc(cx,cy,r-4,0,Math.PI*2);c.stroke();c.restore();}
-function drawScopeReticle(c,w,h,hit,headshot=false,focus=1){const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2,color=headshot?'#ffd36d':hit?'#fff':'rgba(12,14,16,.90)',resolve=smoothstep01((focus-.18)/.82);if(resolve<=.01)return;c.save();c.globalAlpha=resolve;c.beginPath();c.arc(cx,cy,r-5,0,Math.PI*2);c.clip();c.strokeStyle=color;c.fillStyle=color;c.lineCap='butt';const innerGap=9,postGap=34;c.lineWidth=2.1;c.beginPath();c.moveTo(cx-r,cy);c.lineTo(cx-postGap,cy);c.moveTo(cx+postGap,cy);c.lineTo(cx+r,cy);c.moveTo(cx,cy-r);c.lineTo(cx,cy-postGap);c.moveTo(cx,cy+postGap);c.lineTo(cx,cy+r);c.stroke();c.lineWidth=.95;c.beginPath();c.moveTo(cx-postGap,cy);c.lineTo(cx-innerGap,cy);c.moveTo(cx+innerGap,cy);c.lineTo(cx+postGap,cy);c.moveTo(cx,cy-postGap);c.lineTo(cx,cy-innerGap);c.moveTo(cx,cy+innerGap);c.lineTo(cx,cy+postGap);c.stroke();c.beginPath();c.arc(cx,cy,1.35,0,Math.PI*2);c.fill();for(const off of [24,46,70,98]){const width=off<50?7:off<80?9:12;c.lineWidth=.9;c.beginPath();c.moveTo(cx-width,cy+off);c.lineTo(cx+width,cy+off);c.stroke();}for(const off of [22,44,66]){c.beginPath();c.arc(cx-off,cy,1.15,0,Math.PI*2);c.arc(cx+off,cy,1.15,0,Math.PI*2);c.fill();}c.fillStyle='rgba(255,255,255,.70)';c.font='900 9px system-ui';c.textAlign='center';c.fillText(sniperZoomLabel(),cx,cy-r+20);c.restore();}
+function drawScopeMask(c,w,h,focus=1){
+  const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2,resolve=smoothstep01(focus),apertureEase=smoothstep01(resolve),apertureR=THREE.MathUtils.lerp(r*SNIPER_SCOPE_START_APERTURE_RATIO,r,apertureEase),outsideAlpha=THREE.MathUtils.lerp(.42,.975,smoothstep01(resolve/.82));
+  c.save();
+  // Peripheral scope shadow builds while the opening grows. The center always
+  // shows the already-zooming world, so there is no black lens waiting to pop.
+  c.beginPath();c.rect(0,0,w,h);c.arc(cx,cy,apertureR,0,Math.PI*2,true);c.fillStyle=`rgba(0,0,0,${outsideAlpha})`;c.fill('evenodd');
+  // Preserve the apparent thickness of the physical eyepiece on the first HUD
+  // frame, then let that annulus collapse as the sight picture fills the optic.
+  if(apertureR<r-.5){c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.arc(cx,cy,apertureR,0,Math.PI*2,true);c.fillStyle=`rgba(5,7,9,${THREE.MathUtils.lerp(.96,.72,resolve)})`;c.fill('evenodd');}
+  c.beginPath();c.arc(cx,cy,apertureR,0,Math.PI*2);c.clip();
+  const vignette=c.createRadialGradient(cx,cy,apertureR*.62,cx,cy,apertureR);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(.78,'rgba(0,0,0,.035)');vignette.addColorStop(1,`rgba(0,0,0,${THREE.MathUtils.lerp(.22,.48,resolve)})`);c.fillStyle=vignette;c.fillRect(cx-apertureR,cy-apertureR,apertureR*2,apertureR*2);
+  if(resolve<.72){c.fillStyle=`rgba(7,15,19,${(1-resolve/.72)*.16})`;c.fillRect(cx-apertureR,cy-apertureR,apertureR*2,apertureR*2);}
+  c.restore();
+  c.save();c.strokeStyle='rgba(7,9,11,.98)';c.lineWidth=THREE.MathUtils.lerp(7,5,resolve);c.beginPath();c.arc(cx,cy,r-1.5,0,Math.PI*2);c.stroke();c.strokeStyle=`rgba(255,255,255,${THREE.MathUtils.lerp(.055,.10,resolve)})`;c.lineWidth=1;c.beginPath();c.arc(cx,cy,r-4,0,Math.PI*2);c.stroke();c.restore();
+}
+function drawScopeReticle(c,w,h,hit,headshot=false,focus=1){const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2,color=headshot?'#ffd36d':hit?'#fff':'rgba(12,14,16,.90)',resolve=smoothstep01((focus-.48)/.52);if(resolve<=.01)return;c.save();c.globalAlpha=resolve;c.beginPath();c.arc(cx,cy,r-5,0,Math.PI*2);c.clip();c.strokeStyle=color;c.fillStyle=color;c.lineCap='butt';const innerGap=9,postGap=34;c.lineWidth=2.1;c.beginPath();c.moveTo(cx-r,cy);c.lineTo(cx-postGap,cy);c.moveTo(cx+postGap,cy);c.lineTo(cx+r,cy);c.moveTo(cx,cy-r);c.lineTo(cx,cy-postGap);c.moveTo(cx,cy+postGap);c.lineTo(cx,cy+r);c.stroke();c.lineWidth=.95;c.beginPath();c.moveTo(cx-postGap,cy);c.lineTo(cx-innerGap,cy);c.moveTo(cx+innerGap,cy);c.lineTo(cx+postGap,cy);c.moveTo(cx,cy-postGap);c.lineTo(cx,cy-innerGap);c.moveTo(cx,cy+innerGap);c.lineTo(cx,cy+postGap);c.stroke();c.beginPath();c.arc(cx,cy,1.35,0,Math.PI*2);c.fill();for(const off of [24,46,70,98]){const width=off<50?7:off<80?9:12;c.lineWidth=.9;c.beginPath();c.moveTo(cx-width,cy+off);c.lineTo(cx+width,cy+off);c.stroke();}for(const off of [22,44,66]){c.beginPath();c.arc(cx-off,cy,1.15,0,Math.PI*2);c.arc(cx+off,cy,1.15,0,Math.PI*2);c.fill();}c.fillStyle='rgba(255,255,255,.70)';c.font='900 9px system-ui';c.textAlign='center';c.fillText(sniperZoomLabel(),cx,cy-r+20);c.restore();}
 function drawTouchControls(c,L,now){
   c.save();if(touchRoleActive('joy')){const j={x:joy.centerX,y:joy.centerY,r:L.joy.r};c.beginPath();c.arc(j.x,j.y,j.r,0,Math.PI*2);c.fillStyle='rgba(9,11,13,.42)';c.fill();c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1.5;c.stroke();c.beginPath();c.arc(j.x,j.y,j.r*.72,0,Math.PI*2);c.strokeStyle='rgba(255,255,255,.08)';c.stroke();const max=j.r*.45,sx=j.x+joy.x*max,sy=j.y+joy.y*max;c.beginPath();c.arc(sx,sy,j.r*.40,0,Math.PI*2);c.fillStyle='rgba(215,255,88,.16)';c.fill();c.strokeStyle='rgba(215,255,88,.42)';c.stroke();c.fillStyle='rgba(255,255,255,.58)';c.font='900 10px system-ui';c.textAlign='center';c.fillText(sprinting?'SPRINT':'MOVE',j.x,j.y+j.r*.70);}c.restore();
   const weaponLocked=!combatWeaponAvailable(now);
