@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.53';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.53';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.53';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.53';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.53';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.53';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.53';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.53';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.54';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.54';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.54';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.54';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.54';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.54';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.54';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.54';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.53';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.53';
-import { createAudioEngine } from './audio-engine.js?v=1.44.53';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.53';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.53';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.53';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.53';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.53';
+} from './game-config.js?v=1.44.54';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.54';
+import { createAudioEngine } from './audio-engine.js?v=1.44.54';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.54';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.54';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.54';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.54';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.54';
 
 let THREE = null;
 
@@ -711,7 +711,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.53';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.54';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -3277,14 +3277,14 @@ function resetRecoilBookkeeping({kick=true}={}){
 }
 function weaponVisualKickProfile(weapon=currentWeapon){
   return ({
-    pistol:{impulse:1.72,stiffness:315,damping:28,maxTravel:.155,rear:1.02,lift:.24,pitch:.58,yaw:.010,roll:.014,adsRear:.90,actionMs:92},
-    assault:{impulse:2.28,stiffness:205,damping:20,maxTravel:.225,rear:1.18,lift:.29,pitch:.72,yaw:.008,roll:.012,adsRear:.94,actionMs:62},
-    ump:{impulse:1.56,stiffness:325,damping:28,maxTravel:.155,rear:.96,lift:.17,pitch:.43,yaw:.006,roll:.009,adsRear:.90,actionMs:48},
-    machineGun:{impulse:2.48,stiffness:182,damping:19,maxTravel:.245,rear:1.26,lift:.32,pitch:.82,yaw:.013,roll:.019,adsRear:.95,actionMs:58},
-    shotgun:{impulse:3.18,stiffness:158,damping:17.5,maxTravel:.285,rear:1.34,lift:.43,pitch:1.08,yaw:.019,roll:.030,adsRear:.95,actionMs:120},
-    semiShotgun:{impulse:2.62,stiffness:198,damping:20.5,maxTravel:.238,rear:1.22,lift:.35,pitch:.88,yaw:.017,roll:.025,adsRear:.94,actionMs:92},
-    akimbo1887:{impulse:1.18,stiffness:245,damping:23,maxTravel:.160,rear:.78,lift:.12,pitch:.20,yaw:0,roll:0,adsRear:1,actionMs:120},
-    sniper:{impulse:3.55,stiffness:132,damping:16.5,maxTravel:.310,rear:1.46,lift:.46,pitch:1.12,yaw:.022,roll:.034,adsRear:.96,actionMs:138},
+    pistol:{impulse:1.62,stiffness:330,damping:29,maxTravel:.145,rear:.98,lift:.22,pitch:.54,yaw:.010,roll:.013,adsRear:.90,actionMs:86},
+    assault:{impulse:2.10,stiffness:220,damping:21,maxTravel:.205,rear:1.12,lift:.27,pitch:.68,yaw:.008,roll:.011,adsRear:.94,actionMs:58},
+    ump:{impulse:1.68,stiffness:315,damping:27,maxTravel:.160,rear:.98,lift:.18,pitch:.46,yaw:.007,roll:.010,adsRear:.90,actionMs:46},
+    machineGun:{impulse:2.62,stiffness:176,damping:18.5,maxTravel:.255,rear:1.30,lift:.34,pitch:.86,yaw:.014,roll:.020,adsRear:.95,actionMs:60},
+    shotgun:{impulse:3.35,stiffness:152,damping:17,maxTravel:.300,rear:1.38,lift:.46,pitch:1.14,yaw:.020,roll:.032,adsRear:.95,actionMs:126},
+    semiShotgun:{impulse:2.48,stiffness:205,damping:21,maxTravel:.228,rear:1.18,lift:.33,pitch:.84,yaw:.017,roll:.024,adsRear:.94,actionMs:86},
+    akimbo1887:{impulse:1.28,stiffness:238,damping:22.5,maxTravel:.170,rear:.82,lift:.14,pitch:.23,yaw:0,roll:0,adsRear:1,actionMs:116},
+    sniper:{impulse:3.72,stiffness:128,damping:16,maxTravel:.325,rear:1.50,lift:.48,pitch:1.18,yaw:.022,roll:.035,adsRear:.96,actionMs:142},
     grenadeLauncher:{impulse:3.28,stiffness:148,damping:17.5,maxTravel:.300,rear:1.42,lift:.29,pitch:.72,yaw:.012,roll:.018,adsRear:.96,actionMs:145},
     rpg:{impulse:3.38,stiffness:135,damping:16,maxTravel:.305,rear:1.40,lift:.35,pitch:.92,yaw:.004,roll:.008,adsRear:.97,actionMs:150},
   })[weapon]||{impulse:1.6,stiffness:250,damping:23,maxTravel:.18,rear:1,lift:.22,pitch:.55,yaw:.008,roll:.012,adsRear:.92,actionMs:80};
