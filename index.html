@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.29" rel="manifest"/>
-<title>Breach v1.44.29</title>
-<link href="ui.css?v=1.44.29" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.44.30" rel="manifest"/>
+<title>Breach v1.44.30</title>
+<link href="ui.css?v=1.44.30" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -52,12 +52,13 @@
 <button class="chat-key" data-chat-char="a" type="button">A</button><button class="chat-key" data-chat-char="s" type="button">S</button><button class="chat-key" data-chat-char="d" type="button">D</button><button class="chat-key" data-chat-char="f" type="button">F</button><button class="chat-key" data-chat-char="g" type="button">G</button><button class="chat-key" data-chat-char="h" type="button">H</button><button class="chat-key" data-chat-char="j" type="button">J</button><button class="chat-key" data-chat-char="k" type="button">K</button><button class="chat-key" data-chat-char="l" type="button">L</button>
 </div>
 <div class="chat-key-row">
-<button class="chat-key chat-key-wide" data-chat-action="shift" id="chatShiftBtn" type="button">SHIFT</button><button class="chat-key" data-chat-char="z" type="button">Z</button><button class="chat-key" data-chat-char="x" type="button">X</button><button class="chat-key" data-chat-char="c" type="button">C</button><button class="chat-key" data-chat-char="v" type="button">V</button><button class="chat-key" data-chat-char="b" type="button">B</button><button class="chat-key" data-chat-char="n" type="button">N</button><button class="chat-key" data-chat-char="m" type="button">M</button><button aria-label="Backspace" class="chat-key chat-key-wide" data-chat-action="backspace" id="chatBackspaceBtn" type="button">⌫</button>
+<button class="chat-key chat-key-wide" data-chat-action="shift" id="chatShiftBtn" type="button">CAPS</button><button class="chat-key" data-chat-char="z" type="button">Z</button><button class="chat-key" data-chat-char="x" type="button">X</button><button class="chat-key" data-chat-char="c" type="button">C</button><button class="chat-key" data-chat-char="v" type="button">V</button><button class="chat-key" data-chat-char="b" type="button">B</button><button class="chat-key" data-chat-char="n" type="button">N</button><button class="chat-key" data-chat-char="m" type="button">M</button><button aria-label="Backspace" class="chat-key chat-key-wide" data-chat-action="backspace" id="chatBackspaceBtn" type="button">⌫</button>
 </div>
 <div class="chat-key-row chat-key-row-bottom">
 <button class="chat-key chat-key-command" data-chat-action="cancel" type="button">CANCEL</button><button class="chat-key" data-chat-char="!" type="button">!</button><button class="chat-key chat-key-space" data-chat-action="space" type="button">SPACE</button><button class="chat-key" data-chat-char="?" type="button">?</button>
 </div>
 </div>
+<div class="controller-menu-hint controller-keyboard-hint">A SELECT · X BACKSPACE · Y SPACE · RS CAPS · MENU SEND · B CANCEL</div>
 </div>
 <section aria-label="Breach text editor" class="game-text-editor hide" id="gameTextEditor">
 <div class="game-text-editor-shell">
@@ -67,9 +68,10 @@
 <div class="chat-key-row chat-key-row-numbers"><button class="chat-key" data-editor-char="1" type="button">1</button><button class="chat-key" data-editor-char="2" type="button">2</button><button class="chat-key" data-editor-char="3" type="button">3</button><button class="chat-key" data-editor-char="4" type="button">4</button><button class="chat-key" data-editor-char="5" type="button">5</button><button class="chat-key" data-editor-char="6" type="button">6</button><button class="chat-key" data-editor-char="7" type="button">7</button><button class="chat-key" data-editor-char="8" type="button">8</button><button class="chat-key" data-editor-char="9" type="button">9</button><button class="chat-key" data-editor-char="0" type="button">0</button></div>
 <div class="chat-key-row"><button class="chat-key" data-editor-char="q" type="button">Q</button><button class="chat-key" data-editor-char="w" type="button">W</button><button class="chat-key" data-editor-char="e" type="button">E</button><button class="chat-key" data-editor-char="r" type="button">R</button><button class="chat-key" data-editor-char="t" type="button">T</button><button class="chat-key" data-editor-char="y" type="button">Y</button><button class="chat-key" data-editor-char="u" type="button">U</button><button class="chat-key" data-editor-char="i" type="button">I</button><button class="chat-key" data-editor-char="o" type="button">O</button><button class="chat-key" data-editor-char="p" type="button">P</button></div>
 <div class="chat-key-row chat-key-row-middle"><button class="chat-key" data-editor-char="a" type="button">A</button><button class="chat-key" data-editor-char="s" type="button">S</button><button class="chat-key" data-editor-char="d" type="button">D</button><button class="chat-key" data-editor-char="f" type="button">F</button><button class="chat-key" data-editor-char="g" type="button">G</button><button class="chat-key" data-editor-char="h" type="button">H</button><button class="chat-key" data-editor-char="j" type="button">J</button><button class="chat-key" data-editor-char="k" type="button">K</button><button class="chat-key" data-editor-char="l" type="button">L</button></div>
-<div class="chat-key-row"><button class="chat-key chat-key-wide" data-editor-action="shift" id="gameTextShiftBtn" type="button">SHIFT</button><button class="chat-key" data-editor-char="z" type="button">Z</button><button class="chat-key" data-editor-char="x" type="button">X</button><button class="chat-key" data-editor-char="c" type="button">C</button><button class="chat-key" data-editor-char="v" type="button">V</button><button class="chat-key" data-editor-char="b" type="button">B</button><button class="chat-key" data-editor-char="n" type="button">N</button><button class="chat-key" data-editor-char="m" type="button">M</button><button class="chat-key chat-key-wide" data-editor-action="backspace" type="button">⌫</button></div>
+<div class="chat-key-row"><button class="chat-key chat-key-wide" data-editor-action="shift" id="gameTextShiftBtn" type="button">CAPS</button><button class="chat-key" data-editor-char="z" type="button">Z</button><button class="chat-key" data-editor-char="x" type="button">X</button><button class="chat-key" data-editor-char="c" type="button">C</button><button class="chat-key" data-editor-char="v" type="button">V</button><button class="chat-key" data-editor-char="b" type="button">B</button><button class="chat-key" data-editor-char="n" type="button">N</button><button class="chat-key" data-editor-char="m" type="button">M</button><button class="chat-key chat-key-wide" data-editor-action="backspace" type="button">⌫</button></div>
 <div class="chat-key-row chat-key-row-bottom"><button class="chat-key chat-key-command" id="gameTextEditorCancel" data-editor-action="cancel" type="button">CANCEL</button><button class="chat-key" data-editor-char="-" type="button">-</button><button class="chat-key chat-key-space" data-editor-action="space" type="button">SPACE</button><button class="chat-key chat-key-command chat-key-send" data-editor-action="done" type="button">DONE</button></div>
 </div>
+<div class="controller-menu-hint controller-keyboard-hint">A SELECT · X BACKSPACE · Y SPACE · RS CAPS · MENU DONE · B CANCEL</div>
 </div>
 </section><section aria-label="Enter Breach" class="entry-screen" id="entryScreen">
 <div class="entry-card">
@@ -282,10 +284,22 @@
 </div>
 <footer class="lobby-footer">
 <div class="lobby-footer-copy"><strong id="lobbyStatus">Waiting in lobby</strong><span id="lobbyHint">Choose your team and loadout.</span></div>
-<div class="controller-menu-hint lobby-controller-hint">LB/RB TABS · A SELECT</div><div class="lobby-footer-actions">
+<div class="controller-menu-hint lobby-controller-hint">D-PAD/STICK MOVE · LB/RB TABS · A SELECT · B LEAVE</div><div class="lobby-footer-actions">
 <button class="primary lobby-start hide" id="lobbyStartBtn"><svg class="ui-icon"><use href="#i-play"></use></svg><span>START MATCH</span></button>
 </div>
 </footer>
+</div>
+</section>
+<section aria-label="Leave lobby confirmation" aria-modal="true" class="lobby-quit-confirm hide" id="lobbyQuitConfirm" role="dialog">
+<div class="lobby-quit-card">
+<div class="eyebrow">MATCH LOBBY</div>
+<h2>Leave lobby?</h2>
+<p>You will disconnect from this room and return to the main menu.</p>
+<div class="lobby-quit-actions">
+<button class="secondary-btn" data-controller-default="true" id="lobbyQuitStayBtn" type="button">STAY</button>
+<button class="secondary-btn danger" id="lobbyQuitLeaveBtn" type="button">LEAVE LOBBY</button>
+</div>
+<div class="controller-menu-hint">A SELECT · B STAY</div>
 </div>
 </section>
 <section aria-label="Connecting" aria-live="polite" class="connection-overlay hide" id="connectionOverlay">
@@ -433,6 +447,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.44.29" type="module"></script>
+<script src="client.js?v=1.44.30" type="module"></script>
 </body>
 </html>

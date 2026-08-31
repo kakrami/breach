@@ -31,7 +31,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .lobby-screen{z-index:45;padding:calc(var(--safe-top) + 6px) calc(var(--safe-right) + 8px) calc(var(--safe-bottom) + 6px) calc(var(--safe-left) + 8px);background:radial-gradient(circle at 15% 12%,rgba(215,255,88,.06),transparent 28%),linear-gradient(135deg,#090d10,#050708 72%);overflow:hidden}.lobby-shell{display:grid;}.lobby-header{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 4px 5px;border-bottom:1px solid var(--line)}.lobby-title{min-width:0}.lobby-room-line{display:flex;align-items:center;gap:9px}.lobby-room-line h1{margin:0;font-size:20px;letter-spacing:.12em}.lobby-mode-badge{padding:4px 7px;border-radius:5px;background:rgba(215,255,88,.11);color:var(--accent);font-size:11px;font-weight:950;letter-spacing:.06em}.lobby-title p{margin:2px 0 0;color:var(--muted);font-size:11px}.lobby-header-actions{display:flex;align-items:center;gap:5px}.lobby-header-actions .secondary-btn{height:34px}.lobby-main{min-width:0;min-height:0;display:block}.lobby-roster-panel,.lobby-setup-panel{min-width:0;min-height:0;padding:8px;border:1px solid var(--line);border-radius:10px;background:rgba(14,19,23,.94)}.lobby-roster-panel{display:grid;grid-template-rows:auto minmax(0,1fr);gap:7px}.lobby-side-stack{min-width:0;min-height:0;}.lobby-setup-panel{overflow-y:auto;overflow-x:hidden}.lobby-section-head{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);}.lobby-section-head h2{margin:1px 0 0;}.lobby-secondary{color:var(--dim);font-size:11px;font-weight:800}.lobby-version{color:var(--dim);font-size:11px;font-weight:850;white-space:nowrap}.lobby-roster-actions{display:flex;align-items:center;gap:5px}.lobby-count{padding:3px 6px;border-radius:99px;background:#20282e;color:var(--muted);font-size:11px;font-weight:900}.lobby-roster{height:100%;min-height:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));overflow:hidden;}.lobby-roster.ffa{grid-template-columns:1fr}.lobby-team-column{min-width:0;min-height:0;display:grid;grid-template-rows:auto minmax(0,1fr);border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#090d10}.lobby-team-players{min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;scrollbar-width:thin;scrollbar-color:#3c4850 transparent}.lobby-team-players::-webkit-scrollbar{width:7px}.lobby-team-players::-webkit-scrollbar-track{background:transparent}.lobby-team-players::-webkit-scrollbar-thumb{border-radius:8px;background:#3c4850}.lobby-team-column.blue{border-color:rgba(84,169,255,.45)}.lobby-team-column.red{border-color:rgba(255,102,114,.45)}.lobby-team-title{display:flex;align-items:center;justify-content:space-between;font-size:11px;font-weight:950;}.lobby-team-column.blue .lobby-team-title{color:#9ed1ff}.lobby-team-column.red .lobby-team-title{color:#ffabb1}.lobby-team-column.ffa .lobby-team-title{color:var(--accent)}.lobby-player{min-width:0;display:grid;border-top:1px solid var(--line);}.lobby-player.self{background:rgba(255,255,255,.035)}.lobby-player-color{border-radius:99px;background:var(--dim)}.lobby-player-color.blue{background:var(--blue)}.lobby-player-color.red,.lobby-player-color.ffa{background:var(--red)}.lobby-player-copy{min-width:0;display:grid;gap:2px}.lobby-player-copy strong{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lobby-player-copy small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.lobby-empty-team{color:var(--dim);text-align:center;}.lobby-control-group{display:grid;gap:5px;margin-top:7px}.lobby-control-group>span,.lobby-setup-row label>span{color:var(--muted);font-size:11px;font-weight:950;letter-spacing:.08em}.compact-group{margin-top:6px}.lobby-team-picker{display:grid;grid-template-columns:repeat(2,1fr);gap:5px}.lobby-team-choice{border:1px solid var(--line);border-radius:7px;background:#090d10;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:6px;font-size:11px;cursor:pointer;}.lobby-team-choice i{width:7px;height:7px;border-radius:50%;background:currentColor}.lobby-team-choice.blue{color:var(--blue)}.lobby-team-choice.red{color:var(--red)}.lobby-team-choice.active{border-color:currentColor;background:#17212b}.lobby-mode-picker{display:grid;grid-template-columns:repeat(3,1fr);}.lobby-mode-picker button{border:1px solid var(--line);border-radius:7px;background:#090d10;color:var(--muted);font-size:11px;font-weight:950;cursor:pointer;}.lobby-mode-picker button.active{border-color:var(--accent);background:#1a2118;color:var(--accent)}.lobby-setup-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:7px}.lobby-setup-row label{min-width:0;display:grid;gap:4px}.lobby-setup-row .input{height:31px;padding:0 7px;font-size:11px}.lobby-rule-summary{padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:#090d10;color:var(--muted);font-size:11px;font-weight:850;}.lobby-guest-setup{display:grid;place-content:center;gap:5px;text-align:center;color:var(--muted);}.lobby-guest-setup strong{color:var(--text);font-size:12px}.lobby-guest-setup span{font-size:11px}.lobby-guest-setup small{max-width:300px;font-size:11px;line-height:1.45}.lobby-footer{min-width:0;display:grid;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;background:#0d1216;}.lobby-footer strong{font-size:11px}.lobby-footer-copy span{color:var(--muted);font-size:11px}.lobby-start{letter-spacing:.05em;}
 
 /* Connection and match menu. */
-.connection-overlay{z-index:70;display:grid;place-items:center;padding:18px;background:rgba(4,6,8,.78);backdrop-filter:blur(8px)}.connection-card{width:min(360px,100%);display:grid;align-items:center;gap:15px;padding:19px;border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.connection-card h2{margin:2px 0 4px;font-size:18px}.connection-card p{margin:0;color:var(--muted);font-size:11px}.spinner{width:29px;height:29px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.connection-overlay{z-index:70;display:grid;place-items:center;padding:18px;background:rgba(4,6,8,.78);backdrop-filter:blur(8px)}
+.lobby-quit-confirm{position:fixed;inset:0;z-index:118;display:grid;place-items:center;padding:calc(var(--safe-top) + 14px) calc(var(--safe-right) + 14px) calc(var(--safe-bottom) + 14px) calc(var(--safe-left) + 14px);background:rgba(3,5,6,.88);backdrop-filter:blur(10px)}
+.lobby-quit-card{width:min(430px,100%);display:grid;gap:10px;padding:18px;border:1px solid var(--line2);border-radius:12px;background:linear-gradient(145deg,#12181d,#090d10);box-shadow:var(--shadow)}
+.lobby-quit-card h2{margin:0;font-size:21px}.lobby-quit-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.lobby-quit-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:3px}.lobby-quit-actions .secondary-btn{width:100%;height:40px}
+.controller-keyboard-hint{padding:4px 6px;border:1px solid rgba(255,255,255,.10);border-radius:6px;background:rgba(9,13,16,.86);font-size:9.5px}
+.connection-card{width:min(360px,100%);display:grid;align-items:center;gap:15px;padding:19px;border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.connection-card h2{margin:2px 0 4px;font-size:18px}.connection-card p{margin:0;color:var(--muted);font-size:11px}.spinner{width:29px;height:29px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 .pause-screen{z-index:75;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.82);backdrop-filter:blur(8px)}.pause-card{border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.pause-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}.pause-card h1{margin:2px 0 0;}.pause-context{display:flex;gap:7px;margin-top:6px;color:var(--muted);}.pause-context span+span::before{content:"·";margin-right:7px}.pause-team{border:1px solid var(--line);border-radius:6px;font-weight:950;}.resume-btn{width:100%;height:50px;font-size:12px;}.pause-actions{margin-top:6px;}
 
 /* Settings and Match Control share one modal architecture. */
@@ -58,7 +63,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .chat-key{height:38px;flex:1 1 0;min-width:0;max-width:58px;padding:0 3px;border:1px solid rgba(255,255,255,.18);border-bottom-color:rgba(0,0,0,.7);border-radius:6px;background:linear-gradient(#252d32,#151b1f);color:#f0f4f6;font:900 11px system-ui,sans-serif;box-shadow:0 2px 0 rgba(0,0,0,.42);touch-action:manipulation;cursor:pointer}
 .chat-key:active,.chat-key.pressed{transform:translateY(1px);background:#303a3f;box-shadow:0 1px 0 rgba(0,0,0,.35)}
 .chat-key-wide{flex:1.55 1 0;max-width:92px;font-size:11px;letter-spacing:.04em}.chat-key-space{flex:5 1 0;max-width:310px}.chat-key-command{flex:1.75 1 0;max-width:105px;font-size:11px}.chat-key-send{border-color:rgba(215,255,88,.42);background:linear-gradient(#273221,#182014);color:var(--accent)}
-#chatShiftBtn.active{border-color:var(--accent);color:var(--accent);background:#263019}
+#chatShiftBtn.active,#gameTextShiftBtn.active{border-color:var(--accent);color:var(--accent);background:#263019}
 .touch .chat-composer{bottom:calc(var(--safe-bottom) + 5px);width:min(760px,calc(100vw - var(--safe-left) - var(--safe-right) - 10px));gap:4px}
 .touch .chat-compose-shell{padding:4px;gap:4px}.touch .chat-channel,.touch .chat-input,.touch .chat-send{height:29px}.touch .chat-input{font-size:11px;line-height:29px}.touch .chat-keyboard{gap:3px;padding:4px}.touch .chat-key-row{gap:3px}.touch .chat-key{height:30px;max-width:none;border-radius:5px;font-size:11px}.touch .chat-key-wide,.touch .chat-key-command{font-size:12px}
 @media(max-height:390px) and (orientation:landscape){.touch .chat-key{height:28px}.touch .chat-composer{gap:3px}.touch .chat-keyboard{gap:3px}}
@@ -68,7 +73,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.29: authoritative menu/layout/responsive ownership. */
+/* Breach UI contract v1.44.30: authoritative menu/layout/responsive ownership. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -403,25 +408,26 @@ body{font-size:var(--ui-md)}
   .lobby-host-setup:not(.hide){display:block;overflow:visible}
   .lobby-host-setup .lobby-match-grid,.lobby-loadout-body{overflow:visible;height:auto}
 }
-/* Controller navigation: one app-wide focus language.
-   Focus brightens and fills the control itself; it never draws an extra ring around it. */
+/* Controller navigation: unmistakable bright focus without changing layout. */
+@keyframes controllerFocusShine{from{filter:brightness(1.18) saturate(1.08);box-shadow:0 0 0 2px rgba(255,255,255,.72),0 0 12px rgba(215,255,88,.48),0 0 28px rgba(215,255,88,.20),inset 0 1px 0 rgba(255,255,255,.44),inset 0 0 24px rgba(215,255,88,.10)}to{filter:brightness(1.34) saturate(1.18);box-shadow:0 0 0 2px rgba(240,255,195,.96),0 0 18px rgba(215,255,88,.74),0 0 38px rgba(215,255,88,.30),inset 0 1px 0 rgba(255,255,255,.72),inset 0 0 30px rgba(215,255,88,.16)}}
 [data-input-mode="controller"] .controller-focus{
   z-index:5;
-  outline:0!important;
-  filter:brightness(1.12) saturate(1.05);
-  box-shadow:0 0 22px rgba(215,255,88,.16),inset 0 0 0 999px rgba(215,255,88,.055),inset 0 0 30px rgba(215,255,88,.07)!important;
+  outline:2px solid rgba(238,255,184,.92)!important;
+  outline-offset:2px!important;
+  border-color:rgba(215,255,88,.88)!important;
+  animation:controllerFocusShine .72s ease-in-out infinite alternate;
 }
-[data-input-mode="controller"] .controller-focus:focus-visible{outline:0!important}
-[data-input-mode="controller"] .controller-focus:not(.active):not(.selected):not(.equipped):not(.pending){border-color:rgba(255,255,255,.10)!important}
+[data-input-mode="controller"] .controller-focus:focus-visible{outline:2px solid rgba(238,255,184,.92)!important;outline-offset:2px!important}
 /* Controller edit mode keeps the same filled focus language. A toggles edit mode;
    held D-pad / left stick repeats adjustments without adding an outline or moving the control. */
 [data-input-mode="controller"] .controller-focus.controller-editing{
-  outline:0!important;
-  filter:brightness(1.18) saturate(1.08);
+  outline:2px solid rgba(255,255,255,.95)!important;
+  outline-offset:2px!important;
+  filter:brightness(1.28) saturate(1.12);
   box-shadow:0 0 24px rgba(215,255,88,.18),inset 0 0 0 999px rgba(215,255,88,.10),inset 0 -3px 0 rgba(215,255,88,.78)!important;
 }
 [data-input-mode="controller"] .controller-focus.controller-editing .game-control-value{color:#fff;background:rgba(215,255,88,.08);box-shadow:none}
-/* v1.44.29 Create-a-Class / Gunsmith layout.
+/* v1.44.30 Create-a-Class / Gunsmith layout.
    One responsive system: weapon + live stats share the upper workspace;
    the selected attachment choices own a full-width tray underneath. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
@@ -728,7 +734,7 @@ body{font-size:var(--ui-md)}
     .gunsmith-weapon-picker .loadout-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.29 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.30 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -737,13 +743,14 @@ body{font-size:var(--ui-md)}
 .loadout-stat-bar-hatch.loss{background:repeating-linear-gradient(135deg,rgba(255,105,115,.95) 0 2px,rgba(255,105,115,.22) 2px 4px)}
 .loadout-stat-baseline-mark{position:absolute;top:-1px;bottom:-1px;width:1px;display:block;background:rgba(255,255,255,.72);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
 .loadout-stat.better .loadout-stat-bar-solid,.loadout-stat.worse .loadout-stat-bar-solid{background:#8f9ca4}
-/* v1.44.29 controller focus visuals: focus must never mutate Gunsmith geometry. */
+/* v1.44.30 controller focus visuals: focus must never mutate Gunsmith geometry. */
 [data-input-mode="controller"] .gunsmith-callout.controller-focus,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
   position:absolute!important;
   transform:none!important;
-  outline:0!important;
-  background:linear-gradient(135deg,rgba(215,255,88,.20),rgba(19,29,22,.96))!important;
+  outline:2px solid rgba(238,255,184,.92)!important;
+  outline-offset:2px!important;
+  background:linear-gradient(135deg,rgba(215,255,88,.25),rgba(19,29,22,.98))!important;
   box-shadow:0 0 22px rgba(215,255,88,.22),inset 0 0 18px rgba(215,255,88,.08)!important;
 }
 [data-input-mode="controller"] .gunsmith-callout.controller-focus span,
@@ -752,8 +759,9 @@ body{font-size:var(--ui-md)}
 [data-input-mode="controller"] .gunsmith-attachment-option.controller-focus:focus-visible,
 [data-input-mode="controller"] .gunsmith-weapon-picker .loadout-choice.controller-focus,
 [data-input-mode="controller"] .gunsmith-weapon-picker .loadout-choice.controller-focus:focus-visible{
-  outline:0!important;
-  background:radial-gradient(circle at 30% 25%,rgba(215,255,88,.13),transparent 58%),linear-gradient(135deg,rgba(24,34,25,.98),rgba(9,14,16,.96))!important;
+  outline:2px solid rgba(238,255,184,.92)!important;
+  outline-offset:2px!important;
+  background:radial-gradient(circle at 30% 25%,rgba(215,255,88,.18),transparent 58%),linear-gradient(135deg,rgba(24,34,25,.98),rgba(9,14,16,.96))!important;
 }
 [data-input-mode="controller"] .gunsmith-attachment-option.controller-focus strong,
 [data-input-mode="controller"] .gunsmith-weapon-picker .loadout-choice.controller-focus strong{color:#efffc0!important}
@@ -764,16 +772,17 @@ body{font-size:var(--ui-md)}
   background:linear-gradient(135deg,rgba(215,255,88,.055),rgba(12,18,16,.98) 48%,rgba(7,10,12,.94));
 }
 .loadout-class-card.controller-card-focus{
-  border-color:rgba(255,255,255,.08);
-  background:radial-gradient(circle at 26% 24%,rgba(215,255,88,.15),transparent 48%),linear-gradient(135deg,rgba(25,35,26,.98),rgba(8,12,14,.96));
-  box-shadow:0 0 26px rgba(215,255,88,.16),inset 0 0 34px rgba(215,255,88,.055);
-  filter:brightness(1.12) saturate(1.05);
+  border-color:rgba(215,255,88,.72);
+  background:radial-gradient(circle at 26% 24%,rgba(215,255,88,.21),transparent 48%),linear-gradient(135deg,rgba(28,39,28,.99),rgba(8,12,14,.96));
+  box-shadow:0 0 0 1px rgba(255,255,255,.30),0 0 30px rgba(215,255,88,.30),inset 0 1px 0 rgba(255,255,255,.34),inset 0 0 34px rgba(215,255,88,.09);
+  filter:brightness(1.22) saturate(1.10);
 }
 .loadout-class-card.controller-card-focus .loadout-class-card-head strong{color:#fff}
 .loadout-class-card.controller-card-focus .loadout-class-weapons span{color:#eef5f1}
 .loadout-class-card.controller-card-focus .loadout-class-main.controller-focus,
 .loadout-class-card.controller-card-focus .loadout-class-main.controller-focus:focus-visible{
-  outline:0!important;
+  outline:2px solid rgba(238,255,184,.84)!important;
+  outline-offset:2px!important;
   box-shadow:none!important;
   background:transparent!important;
 }
@@ -788,7 +797,7 @@ body{font-size:var(--ui-md)}
 /* Diagnostics recorder: compact, controller-friendly controls in Settings. */
 .diagnostics-toggle-card small,.diagnostics-status-card small,.diagnostics-log-card small{color:var(--dim);font-size:10px;line-height:1.3;text-transform:none;letter-spacing:0}.diagnostics-toggle-btn{min-width:148px}.diagnostics-toggle-btn.active{background:#1b2419;color:var(--accent);border-color:rgba(215,255,88,.32);box-shadow:inset 0 0 0 1px rgba(215,255,88,.06)}.diagnostics-status-card output{justify-self:start;color:var(--accent);font-size:11px;font-weight:950}.diagnostics-log-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.diagnostics-log-actions .secondary-btn{width:100%;height:32px;padding:0 8px}
 
-/* v1.44.29 mobile/controller readability baseline.
+/* v1.44.30 mobile/controller readability baseline.
    Compact by removing secondary copy first; actionable/menu text does not collapse
    into 8–9px labels on short landscape screens. */
 @media (max-width:900px) and (orientation:landscape){
@@ -879,5 +888,7 @@ body{font-size:var(--ui-md)}
   .gunsmith-inspector-empty>strong,.gunsmith-weapon-picker .loadout-choice strong{font-size:10.5px}
 }
 
-/* v1.44.29 immediate-action menu semantics. */
+/* v1.44.30 immediate-action menu semantics. */
 .loadout-foot,.settings-actions{grid-template-columns:minmax(0,1fr) auto}.loadout-foot .modal-action,.settings-actions .modal-action{min-width:92px}.settings-actions #settingsResetBtn{min-width:124px}
+
+@media(prefers-reduced-motion:reduce){[data-input-mode="controller"] .controller-focus{animation:none!important}}
