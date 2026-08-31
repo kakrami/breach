@@ -36,7 +36,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 .lobby-quit-card{width:min(430px,100%);display:grid;gap:10px;padding:18px;border:1px solid var(--line2);border-radius:12px;background:linear-gradient(145deg,#12181d,#090d10);box-shadow:var(--shadow)}
 .lobby-quit-card h2{margin:0;font-size:21px}.lobby-quit-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.lobby-quit-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:3px}.lobby-quit-actions .secondary-btn{width:100%;height:40px}
 .controller-keyboard-hint{padding:4px 6px;border:1px solid rgba(255,255,255,.10);border-radius:6px;background:rgba(9,13,16,.86);font-size:9.5px}
-.connection-card{width:min(360px,100%);display:grid;align-items:center;gap:15px;padding:19px;border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.connection-card h2{margin:2px 0 4px;font-size:18px}.connection-card p{margin:0;color:var(--muted);font-size:11px}.spinner{width:29px;height:29px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
+.connection-card{width:min(360px,100%);display:grid;align-items:center;gap:15px;padding:19px;border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.connection-card h2{margin:2px 0 4px;font-size:18px}.connection-card p{margin:0;color:var(--muted);font-size:11px}.connection-card .connection-status{color:var(--text);font-size:13px;font-weight:900;letter-spacing:.02em}.spinner{width:29px;height:29px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
 .pause-screen{z-index:75;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.82);backdrop-filter:blur(8px)}.pause-card{border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.pause-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}.pause-card h1{margin:2px 0 0;}.pause-context{display:flex;gap:7px;margin-top:6px;color:var(--muted);}.pause-context span+span::before{content:"·";margin-right:7px}.pause-team{border:1px solid var(--line);border-radius:6px;font-weight:950;}.resume-btn{width:100%;height:50px;font-size:12px;}.pause-actions{margin-top:6px;}
 
 /* Settings and Match Control share one modal architecture. */
@@ -73,12 +73,12 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.44: authoritative menu/layout/responsive ownership. */
+/* Breach UI contract v1.44.47: authoritative menu/layout/responsive ownership. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
 .deploy-button,.resume-btn{font-size:13px}
-.semantic-title{display:flex;align-items:center;gap:6px}.semantic-badge{display:inline-flex;align-items:center;min-height:16px;padding:0 5px;border:1px solid var(--line2);border-radius:99px;color:var(--muted);font-size:9px!important;font-style:normal;font-weight:1000;letter-spacing:.07em;white-space:nowrap}.semantic-badge.live{border-color:rgba(112,228,154,.35);color:var(--ok)}.semantic-badge.staged{border-color:rgba(215,255,88,.30);color:var(--accent)}
+.semantic-title{display:flex;align-items:center;gap:6px}.semantic-badge{display:inline-flex;align-items:center;min-height:16px;padding:0 5px;border:1px solid var(--line2);border-radius:99px;color:var(--muted);font-size:9px!important;font-style:normal;font-weight:1000;letter-spacing:.07em;white-space:nowrap}.semantic-badge.staged{border-color:rgba(215,255,88,.30);color:var(--accent)}
 .controller-menu-hint{display:none;color:var(--dim);font-size:10px;font-weight:900;letter-spacing:.04em;text-align:center;white-space:nowrap}[data-input-mode="controller"] .controller-menu-hint{display:block}.settings-shell>.controller-menu-hint,.admin-shell>.controller-menu-hint{padding:4px 8px;border-bottom:1px solid var(--line);background:#090d10}.lobby-controller-hint{justify-self:end}
 .connection-card{grid-template-columns:auto minmax(0,1fr)}.connection-copy{min-width:0}.connection-cancel{margin-top:10px;min-width:110px}.rotate-copy{display:grid;justify-items:start}.rotate-exit{margin-top:12px}
 .lobby-reset{height:40px;min-width:118px}.lobby-footer-actions{gap:6px}.admin-weapon-toolbar{grid-template-columns:minmax(120px,180px) minmax(0,1fr)!important;}.admin-weapon-toolbar-copy{display:grid;gap:3px}.admin-weapon-toolbar-copy>span{color:var(--text);font-size:10px;font-weight:950;letter-spacing:.08em}.admin-weapon-toolbar-copy>small{color:var(--muted);font-size:10px;line-height:1.25}.admin-weapon-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}.admin-weapon-choice{min-width:0;height:32px;padding:0 5px;border:1px solid var(--line);border-radius:6px;background:#090d10;color:var(--muted);font-size:10px;font-weight:900;line-height:1.05;cursor:pointer}.admin-weapon-choice.active{border-color:rgba(215,255,88,.42);background:#1a2118;color:var(--accent)}.lobby-map-choice.active:disabled{opacity:1;cursor:default}.lobby-map-choice:disabled:not(.active){opacity:.55;cursor:default}
@@ -180,13 +180,13 @@ body{font-size:var(--ui-md)}
 .loadout-shell .loadout-editor{max-height:calc(100vh - var(--safe-top) - var(--safe-bottom) - 110px)}
 .loadout-foot{grid-template-columns:minmax(0,1fr) auto auto auto}
 /* Settings: exactly three settings per page stay a balanced three-column row. */
-.settings-shell{width:min(850px,100%);height:auto;max-height:100%;}
+.settings-shell{width:min(850px,100%);height:min(500px,100%);max-height:100%;}
 .settings-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px 9px;border-bottom:1px solid var(--line);background:#090d10}
 .settings-tab{min-width:0;height:35px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted);font-size:11px;font-weight:950;letter-spacing:.05em;cursor:pointer}
 .settings-tab:hover{background:#151c21;color:var(--text)}
 .settings-tab.active{border-color:rgba(215,255,88,.28);background:#192016;color:var(--accent)}
-.settings-categories{min-height:0;padding:0;display:block;overflow:hidden}
-.settings-page{min-height:0;max-height:100%;border:0;background:transparent;overflow:auto;overscroll-behavior:contain}
+.settings-categories{height:100%;min-height:0;padding:0;display:block;overflow:hidden}
+.settings-page{height:100%;min-height:0;max-height:100%;border:0;background:transparent;overflow:auto;overscroll-behavior:contain}
 .settings-page .settings-category-head{display:block;padding:7px 10px 3px;border-bottom:0}
 .settings-page .settings-category-head h3{margin:0;font-size:14px}
 .settings-page .settings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px 9px 9px;overflow:visible}
@@ -199,7 +199,7 @@ body{font-size:var(--ui-md)}
 .settings-shell .modal-foot{grid-template-columns:minmax(0,1fr) auto auto auto}
 .desktop .touch-setting{display:none}
 /* Host Control: predictable grids prevent stretched orphan cards and keep Live Bots near the gameplay fields. */
-.admin-shell{width:min(980px,100%);height:auto;max-height:100%;}
+.admin-shell{width:min(980px,100%);height:min(570px,100%);max-height:100%;}
 .admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px 9px;overflow:visible;border-bottom:1px solid var(--line);background:#090d10}
 .admin-tab{width:100%;min-width:0;height:35px;padding:0 8px}
 .admin-page{min-height:0;max-height:calc(100vh - var(--safe-top) - var(--safe-bottom) - 128px);overflow:auto;overscroll-behavior:contain;padding:8px}
@@ -234,7 +234,7 @@ body{font-size:var(--ui-md)}
 .admin-status{max-height:2.7em;overflow:auto;overscroll-behavior:contain}
 /* Lobby cheats group host-only tuning under one conventional top-level section. */
 .lobby-cheats-view.active{display:block;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
-.lobby-cheats-panel{height:auto;min-height:100%;display:grid;grid-template-rows:auto auto auto;gap:7px;padding:8px;border:1px solid var(--line);background:rgba(14,19,23,.94);overflow:visible}
+.lobby-cheats-panel{height:100%;min-height:0;display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:7px;padding:8px;border:1px solid var(--line);background:rgba(14,19,23,.94);overflow:hidden}
 .lobby-cheats-toolbar{min-width:0;display:grid;grid-template-columns:minmax(260px,1fr) minmax(240px,.75fr);gap:7px;align-items:stretch}
 .lobby-god-control{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;background:#090d10}
 .lobby-god-control>div{min-width:0;display:grid;gap:2px}.lobby-god-control strong{font-size:11px;letter-spacing:.04em}.lobby-god-control small{color:var(--muted);font-size:9.5px;line-height:1.2}
@@ -243,8 +243,8 @@ body{font-size:var(--ui-md)}
 .switch-toggle.active{border-color:rgba(215,255,88,.55);background:#1a2415}.switch-toggle.active>span{transform:translateX(18px);background:var(--accent)}
 .lobby-cheat-tabs{min-width:0;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding:4px;border:1px solid var(--line);border-radius:9px;background:#090d10}
 .lobby-cheat-tab{min-width:0;height:36px;border:1px solid transparent;border-radius:7px;background:transparent;color:var(--muted);font-weight:950;letter-spacing:.04em;cursor:pointer}.lobby-cheat-tab:hover{background:#151c21;color:var(--text)}.lobby-cheat-tab.active{border-color:rgba(215,255,88,.28);background:#192016;color:var(--accent)}
-.lobby-cheat-pages,.lobby-cheat-page{min-width:0;min-height:0;height:auto;overflow:visible}.lobby-cheat-page.active{display:block}
-.lobby-tuning-panel,.lobby-weapons-panel{height:auto;min-height:0;display:grid;grid-template-rows:auto auto;padding:8px;border:1px solid var(--line);border-radius:10px;background:#0a0f12;overflow:visible}
+.lobby-cheat-pages{min-width:0;min-height:0;height:100%;overflow:hidden}.lobby-cheat-page{min-width:0;min-height:0;height:100%;overflow:auto;overscroll-behavior:contain}.lobby-cheat-page.active{display:block}
+.lobby-tuning-panel,.lobby-weapons-panel{height:100%;min-height:100%;display:grid;grid-template-rows:auto minmax(0,1fr);padding:8px;border:1px solid var(--line);border-radius:10px;background:#0a0f12;overflow:visible}
 .lobby-gameplay-mount,.lobby-weapons-mount{min-height:0;overflow:visible;padding-top:5px}
 #lobbyGameplayHostMount>.admin-page,#lobbyWeaponsHostMount>.admin-page{display:block!important;min-height:0;padding:0;overflow:visible;background:transparent}
 #lobbyGameplayHostMount>.admin-page.hide,#lobbyWeaponsHostMount>.admin-page.hide{display:block!important}
@@ -427,7 +427,7 @@ body{font-size:var(--ui-md)}
   box-shadow:0 0 24px rgba(215,255,88,.18),inset 0 0 0 999px rgba(215,255,88,.10),inset 0 -3px 0 rgba(215,255,88,.78)!important;
 }
 [data-input-mode="controller"] .controller-focus.controller-editing .game-control-value{color:#fff;background:rgba(215,255,88,.08);box-shadow:none}
-/* v1.44.44 Create-a-Class / Gunsmith layout.
+/* v1.44.47 Create-a-Class / Gunsmith layout.
    One responsive system: weapon + live stats share the upper workspace;
    the selected attachment choices own a full-width tray underneath. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
@@ -734,7 +734,7 @@ body{font-size:var(--ui-md)}
     .gunsmith-weapon-picker .loadout-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.44 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.47 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -743,7 +743,7 @@ body{font-size:var(--ui-md)}
 .loadout-stat-bar-hatch.loss{background:repeating-linear-gradient(135deg,rgba(255,105,115,.95) 0 2px,rgba(255,105,115,.22) 2px 4px)}
 .loadout-stat-baseline-mark{position:absolute;top:-1px;bottom:-1px;width:1px;display:block;background:rgba(255,255,255,.72);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
 .loadout-stat.better .loadout-stat-bar-solid,.loadout-stat.worse .loadout-stat-bar-solid{background:#8f9ca4}
-/* v1.44.44 controller focus visuals: focus must never mutate Gunsmith geometry. */
+/* v1.44.47 controller focus visuals: focus must never mutate Gunsmith geometry. */
 [data-input-mode="controller"] .gunsmith-callout.controller-focus,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
   position:absolute!important;
@@ -797,7 +797,7 @@ body{font-size:var(--ui-md)}
 /* Diagnostics recorder: compact, controller-friendly controls in Settings. */
 .diagnostics-toggle-card small,.diagnostics-status-card small,.diagnostics-log-card small{color:var(--dim);font-size:10px;line-height:1.3;text-transform:none;letter-spacing:0}.diagnostics-toggle-btn{min-width:148px}.diagnostics-toggle-btn.active{background:#1b2419;color:var(--accent);border-color:rgba(215,255,88,.32);box-shadow:inset 0 0 0 1px rgba(215,255,88,.06)}.diagnostics-status-card output{justify-self:start;color:var(--accent);font-size:11px;font-weight:950}.diagnostics-log-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.diagnostics-log-actions .secondary-btn{width:100%;height:32px;padding:0 8px}
 
-/* v1.44.44 mobile/controller readability baseline.
+/* v1.44.47 mobile/controller readability baseline.
    Compact by removing secondary copy first; actionable/menu text does not collapse
    into 8–9px labels on short landscape screens. */
 @media (max-width:900px) and (orientation:landscape){
@@ -888,7 +888,11 @@ body{font-size:var(--ui-md)}
   .gunsmith-inspector-empty>strong,.gunsmith-weapon-picker .loadout-choice strong{font-size:10.5px}
 }
 
-/* v1.44.44 immediate-action menu semantics. */
+/* v1.44.47 immediate-action menu semantics. */
 .loadout-foot,.settings-actions{grid-template-columns:minmax(0,1fr) auto}.loadout-foot .modal-action,.settings-actions .modal-action{min-width:92px}.settings-actions #settingsResetBtn{min-width:124px}
 
 @media(prefers-reduced-motion:reduce){[data-input-mode="controller"] .controller-focus{animation:none!important}}
+
+.lobby-stage-head{justify-content:flex-end;min-height:24px}
+
+.lobby-roster-head .lobby-roster-actions{margin-left:auto}
