@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.42';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.42';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.42';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.42';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.42';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.42';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.42';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.42';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.43';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.43';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.43';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.43';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.43';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.43';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.43';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.43';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.42';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.42';
-import { createAudioEngine } from './audio-engine.js?v=1.44.42';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.42';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.42';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.42';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.42';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.42';
+} from './game-config.js?v=1.44.43';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.43';
+import { createAudioEngine } from './audio-engine.js?v=1.44.43';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.43';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.43';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.43';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.43';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.43';
 
 let THREE = null;
 
@@ -714,7 +714,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.42';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.43';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -909,17 +909,10 @@ function currentSpreadRadians(){
   return weaponSpreadRadians(currentWeapon,(localMoveAmount||0)*speed,movement.runSpeed,ads,crouched,!onGround,currentShotHeat(),sliding,attachmentsForWeapon(currentWeapon));
 }
 function accuracyCrosshairRadius(){const fov=(camera?.fov||baseFov)*Math.PI/180,spread=currentSpreadRadians();return THREE.MathUtils.clamp(Math.tan(spread)*(viewH*.5)/Math.max(.08,Math.tan(fov*.5)),3.5,52);}
-// Sniper ADS is one centered main-camera animation.
-// The rifle centers first; zoom and the fixed HUD scope begin only after that.
-const SNIPER_CENTER_END_BLEND=.52;
-const SNIPER_EYE_END_BLEND=.90;
-const SNIPER_ZOOM_START_BLEND=.52;
-const SNIPER_ZOOM_END_BLEND=.96;
-const SNIPER_MASK_START_BLEND=.66;
-const SNIPER_MASK_END_BLEND=.94;
-const SNIPER_RETICLE_START_BLEND=.90;
-const SNIPER_RETICLE_END_BLEND=.98;
-const SNIPER_WEAPON_HIDE_BLEND=.90;
+// Sniper ADS is one continuous main-camera motion. Centering is front-loaded,
+// while eye movement and zoom build underneath it from the same master curve.
+// Nothing waits for another phase to finish, so there is no visible midpoint.
+const SNIPER_WEAPON_HIDE_BLEND=.94;
 const SNIPER_SCOPE_SCREEN_RADIUS=.435;
 const SNIPER_SCOPE_AXIS_Y=.14;
 function sniperVariableScopeEquipped(){return weaponHasAttachment('sniper',attachmentsForWeapon('sniper'),'variableScope');}
@@ -928,11 +921,31 @@ function sniperHighZoomLabel(){return sniperVariableScopeEquipped()?'6X':'8X';}
 function sniperHighZoomFov(){return sniperVariableScopeEquipped()?Number(ATTACHMENTS.variableScope?.highAdsFov)||12.5:9.5;}
 function sniperZoomLabel(){return sniperZoomLevel>=2?sniperHighZoomLabel():sniperZoomLevel===1?sniperLowZoomLabel():'HIP';}
 function sniperTargetFov(){const spec=effectiveWeaponSpec('sniper');return sniperZoomLevel>=2?sniperHighZoomFov():(Number(spec?.adsFov)||18);}
-function sniperCenterAmount(){return currentWeapon==='sniper'?smoothstep01(adsBlend/SNIPER_CENTER_END_BLEND):0;}
-function sniperEyeAmount(){return currentWeapon==='sniper'?smoothstep01((adsBlend-SNIPER_CENTER_END_BLEND)/(SNIPER_EYE_END_BLEND-SNIPER_CENTER_END_BLEND)):0;}
-function sniperZoomAmount(){return currentWeapon==='sniper'?smoothstep01((adsBlend-SNIPER_ZOOM_START_BLEND)/(SNIPER_ZOOM_END_BLEND-SNIPER_ZOOM_START_BLEND)):0;}
-function sniperMaskAmount(){return currentWeapon==='sniper'?smoothstep01((adsBlend-SNIPER_MASK_START_BLEND)/(SNIPER_MASK_END_BLEND-SNIPER_MASK_START_BLEND)):0;}
-function sniperReticleAmount(){return currentWeapon==='sniper'?smoothstep01((adsBlend-SNIPER_RETICLE_START_BLEND)/(SNIPER_RETICLE_END_BLEND-SNIPER_RETICLE_START_BLEND)):0;}
+function sniperAdsMotion(){
+  if(currentWeapon!=='sniper')return 0;
+  const t=THREE.MathUtils.clamp(adsBlend,0,1);
+  return t*t*t*(t*(t*6-15)+10);
+}
+function sniperCenterAmount(){
+  const t=sniperAdsMotion();
+  return 1-Math.pow(1-t,2.35);
+}
+function sniperEyeAmount(){
+  const t=sniperAdsMotion();
+  return Math.pow(t,1.18);
+}
+function sniperZoomAmount(){
+  const t=sniperAdsMotion();
+  return Math.pow(t,1.42);
+}
+function sniperMaskAmount(){
+  const t=sniperAdsMotion();
+  return Math.pow(t,2.85);
+}
+function sniperReticleAmount(){
+  const t=sniperAdsMotion();
+  return smoothstep01((t-.72)/.24);
+}
 function sniperWeaponHiddenForScope(){return currentWeapon==='sniper'&&adsBlend>=SNIPER_WEAPON_HIDE_BLEND;}
 function sniperAdsPose(){return{x:0,y:-SNIPER_SCOPE_AXIS_Y,z:-.235,rx:0,ry:0,rz:0};}
 function rememberTeam(team){preferredTeam=team==='red'?'red':'blue';localStorage.setItem('breachTeam',preferredTeam);document.documentElement.style.setProperty('--team',TEAM_COLORS[preferredTeam]);}
