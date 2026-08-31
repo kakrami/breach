@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.38';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.38';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.38';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.38';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.38';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.38';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.38';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.38';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.39';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.39';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.39';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.39';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.39';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.39';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.39';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.39';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.38';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.38';
-import { createAudioEngine } from './audio-engine.js?v=1.44.38';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.38';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.38';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.38';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.38';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.38';
+} from './game-config.js?v=1.44.39';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.39';
+import { createAudioEngine } from './audio-engine.js?v=1.44.39';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.39';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.39';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.39';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.39';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.39';
 
 let THREE = null;
 
@@ -397,7 +397,7 @@ let masterMuted=localStorage.getItem('breachMuted')==='1';
 const requestedRoom=new URL(location.href).searchParams.get('room');
 if(requestedRoom)codeInput.value=normalizeCode(requestedRoom);
 
-let scene, camera, renderer, clock, worldRoot, pistolGroup, pistolFlash, pistolMag, akimboLeftGroup, akimboRightGroup, akimboLeftFlash, akimboRightFlash, akimboLeftLever, akimboRightLever, akimboLeftBarrel, akimboRightBarrel, akimboLeftStock, akimboRightStock, assaultGroup, assaultFlash, assaultMag, umpGroup, umpFlash, umpMag, machineGunGroup, machineGunFlash, machineGunBox, machineGunBolt, shotgunGroup, shotgunFlash, shotgunPump, semiShotgunGroup, semiShotgunFlash, semiShotgunMag, sniperGroup, sniperFlash, sniperBolt, grenadeLauncherGroup, grenadeLauncherFlash, rpgGroup, rpgFlash, mantleHands, firstPersonHands, fpLeftHand, fpRightHand, fpLeftForearm, fpRightForearm, fpEquipmentProp, fpRigScratch, sniperScopeDisplayLens, sniperScopeDisplayMaterial, sniperScopeLensReticle, sniperScopeLensReticleMaterial, sniperScopeRearLensMaterial, sniperScopeRenderTarget, sniperScopeRenderCamera, sniperScopeLensProjectionCache, sniperScopeProjectionScratch, sniperScopeRenderLastAt=0, sniperScopeWarmupPending=false, sniperScopeHiddenNodesCache=null, sniperScopeHiddenVisibility=[];
+let scene, camera, renderer, clock, worldRoot, pistolGroup, pistolFlash, pistolMag, akimboLeftGroup, akimboRightGroup, akimboLeftFlash, akimboRightFlash, akimboLeftLever, akimboRightLever, akimboLeftBarrel, akimboRightBarrel, akimboLeftStock, akimboRightStock, assaultGroup, assaultFlash, assaultMag, umpGroup, umpFlash, umpMag, machineGunGroup, machineGunFlash, machineGunBox, machineGunBolt, shotgunGroup, shotgunFlash, shotgunPump, semiShotgunGroup, semiShotgunFlash, semiShotgunMag, sniperGroup, sniperFlash, sniperBolt, grenadeLauncherGroup, grenadeLauncherFlash, rpgGroup, rpgFlash, mantleHands, firstPersonHands, fpLeftHand, fpRightHand, fpLeftForearm, fpRightForearm, fpEquipmentProp, fpRigScratch, sniperScopeDisplayLens, sniperScopeDisplayMaterial, sniperScopeLensReticle, sniperScopeLensReticleMaterial, sniperScopeReticleTexture, sniperScopeRearLensMaterial, sniperScopeRenderTarget, sniperScopeRenderCamera, sniperScopeHudImage, sniperScopeHudReticle, sniperScopeLensProjectionCache, sniperScopeProjectionScratch, sniperScopeRenderLastAt=0, sniperScopeWarmupPending=false, sniperScopeHiddenNodesCache=null, sniperScopeHiddenVisibility=[];
 let hudScene, hudCamera, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0, hudLastScopeActive = false;
 let socket = null, reconnectTimer = null, reconnectAttempt = 0;
 let initialConnectionAttempt=null,initialConnectionSerial=0;
@@ -714,7 +714,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.38';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.39';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -909,12 +909,11 @@ function currentSpreadRadians(){
   return weaponSpreadRadians(currentWeapon,(localMoveAmount||0)*speed,movement.runSpeed,ads,crouched,!onGround,currentShotHeat(),sliding,attachmentsForWeapon(currentWeapon));
 }
 function accuracyCrosshairRadius(){const fov=(camera?.fov||baseFov)*Math.PI/180,spread=currentSpreadRadians();return THREE.MathUtils.clamp(Math.tan(spread)*(viewH*.5)/Math.max(.08,Math.tan(fov*.5)),3.5,52);}
-// Sniper ADS follows one center-locked optical path. The physical lens stays
-// dark early in ADS, then begins showing a render of the *center camera view*
-// while the rifle is still moving into position. A soft scope shadow follows
-// the real eyepiece and closes around it. At the ready point the physical lens
-// is already centered, the visible aperture already matches the final HUD scope,
-// and the HUD can take over without changing the scene inside the optic.
+// Sniper ADS uses one authoritative optic camera for the entire lifecycle.
+// The physical ocular lens reveals that camera around mid-ADS; at eye relief the
+// exact same render target remains on screen behind the HUD scope mask. The world
+// image and reticle therefore do not swap sources at handoff. Scope shadow is an
+// eye-box effect driven by the physical eyepiece alignment, not a transition timer.
 const SNIPER_SCOPE_READY_BLEND=.94;
 const SNIPER_SCOPE_LENS_START_BLEND=.50;
 const SNIPER_SCOPE_LENS_FULL_BLEND=.68;
@@ -957,29 +956,38 @@ function disposeSniperScopeRenderTarget(){
   if(sniperScopeRenderTarget){try{sniperScopeRenderTarget.dispose();}catch{}sniperScopeRenderTarget=null;}
   sniperScopeRenderLastAt=0;sniperScopeLensProjectionCache=null;
   if(sniperScopeDisplayMaterial){sniperScopeDisplayMaterial.map=null;sniperScopeDisplayMaterial.needsUpdate=true;}
+  if(sniperScopeHudImage?.material){sniperScopeHudImage.material.map=null;sniperScopeHudImage.material.needsUpdate=true;}
 }
-function sniperScopeRenderSize(){const quality=playerSettings.graphics;return quality==='low'?288:(isTouch?384:448);}
+function sniperScopeRenderSize(){const quality=playerSettings.graphics;return quality==='low'?384:(isTouch?640:768);}
 function makeSniperLensReticleTexture(){
-  const size=256,q=document.createElement('canvas');q.width=size;q.height=size;const c=q.getContext('2d'),cx=size/2,cy=size/2,r=size*.485,innerGap=size*.033,postGap=size*.13;
+  const size=512,q=document.createElement('canvas');q.width=size;q.height=size;const c=q.getContext('2d'),cx=size/2,cy=size/2,r=size*.485,innerGap=size*.033,postGap=size*.13;
   c.clearRect(0,0,size,size);c.strokeStyle='rgba(8,11,13,.94)';c.fillStyle='rgba(8,11,13,.94)';c.lineCap='butt';
-  c.lineWidth=3.4;c.beginPath();c.moveTo(cx-r,cy);c.lineTo(cx-postGap,cy);c.moveTo(cx+postGap,cy);c.lineTo(cx+r,cy);c.moveTo(cx,cy-r);c.lineTo(cx,cy-postGap);c.moveTo(cx,cy+postGap);c.lineTo(cx,cy+r);c.stroke();
-  c.lineWidth=1.5;c.beginPath();c.moveTo(cx-postGap,cy);c.lineTo(cx-innerGap,cy);c.moveTo(cx+innerGap,cy);c.lineTo(cx+postGap,cy);c.moveTo(cx,cy-postGap);c.lineTo(cx,cy-innerGap);c.moveTo(cx,cy+innerGap);c.lineTo(cx,cy+postGap);c.stroke();
-  c.beginPath();c.arc(cx,cy,2.1,0,Math.PI*2);c.fill();
-  for(const off of [24,46,70,98]){const o=off/128*r,width=o<r*.40?r*.055:o<r*.64?r*.072:r*.095;c.lineWidth=1.4;c.beginPath();c.moveTo(cx-width,cy+o);c.lineTo(cx+width,cy+o);c.stroke();}
-  for(const off of [22,44,66]){const o=off/128*r;c.beginPath();c.arc(cx-o,cy,1.7,0,Math.PI*2);c.arc(cx+o,cy,1.7,0,Math.PI*2);c.fill();}
+  c.lineWidth=6.8;c.beginPath();c.moveTo(cx-r,cy);c.lineTo(cx-postGap,cy);c.moveTo(cx+postGap,cy);c.lineTo(cx+r,cy);c.moveTo(cx,cy-r);c.lineTo(cx,cy-postGap);c.moveTo(cx,cy+postGap);c.lineTo(cx,cy+r);c.stroke();
+  c.lineWidth=3;c.beginPath();c.moveTo(cx-postGap,cy);c.lineTo(cx-innerGap,cy);c.moveTo(cx+innerGap,cy);c.lineTo(cx+postGap,cy);c.moveTo(cx,cy-postGap);c.lineTo(cx,cy-innerGap);c.moveTo(cx,cy+innerGap);c.lineTo(cx,cy+postGap);c.stroke();
+  c.beginPath();c.arc(cx,cy,4.2,0,Math.PI*2);c.fill();
+  for(const off of [24,46,70,98]){const o=off/128*r,width=o<r*.40?r*.055:o<r*.64?r*.072:r*.095;c.lineWidth=2.8;c.beginPath();c.moveTo(cx-width,cy+o);c.lineTo(cx+width,cy+o);c.stroke();}
+  for(const off of [22,44,66]){const o=off/128*r;c.beginPath();c.arc(cx-o,cy,3.4,0,Math.PI*2);c.arc(cx+o,cy,3.4,0,Math.PI*2);c.fill();}
   const texture=new THREE.CanvasTexture(q);texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;texture.generateMipmaps=false;texture.colorSpace=THREE.SRGBColorSpace;texture.needsUpdate=true;return texture;
+}
+function ensureSniperScopeHudPlanes(){
+  if(!hudScene||!sniperScopeRenderTarget||!sniperScopeReticleTexture)return false;
+  if(!sniperScopeHudImage){
+    sniperScopeHudImage=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial({map:sniperScopeRenderTarget.texture,depthTest:false,depthWrite:false,toneMapped:false}));sniperScopeHudImage.position.z=-1.30;sniperScopeHudImage.visible=false;hudScene.add(sniperScopeHudImage);
+    sniperScopeHudReticle=new THREE.Mesh(new THREE.PlaneGeometry(2,2),new THREE.MeshBasicMaterial({map:sniperScopeReticleTexture,transparent:true,depthTest:false,depthWrite:false,toneMapped:false}));sniperScopeHudReticle.position.z=-1.20;sniperScopeHudReticle.visible=false;hudScene.add(sniperScopeHudReticle);
+  }else if(sniperScopeHudImage.material.map!==sniperScopeRenderTarget.texture){sniperScopeHudImage.material.map=sniperScopeRenderTarget.texture;sniperScopeHudImage.material.needsUpdate=true;}
+  const diameter=Math.min(viewW,viewH)*SNIPER_SCOPE_SCREEN_RADIUS*2,sx=diameter/Math.max(1,viewW),sy=diameter/Math.max(1,viewH);sniperScopeHudImage.scale.set(sx,sy,1);sniperScopeHudReticle.scale.set(sx,sy,1);return true;
+}
+function syncSniperScopeHudPlanes(){
+  const active=!!(shell.canPlay&&hp>0&&sniperScopeActive()&&ensureSniperScopeHudPlanes());if(sniperScopeHudImage)sniperScopeHudImage.visible=active;if(sniperScopeHudReticle)sniperScopeHudReticle.visible=active;
 }
 function ensureSniperScopeRenderTarget(){
   if(!THREE||!renderer||!camera||!sniperScopeDisplayMaterial)return false;const size=sniperScopeRenderSize();
   if(!sniperScopeRenderTarget||sniperScopeRenderTarget.width!==size||sniperScopeRenderTarget.height!==size){
-    disposeSniperScopeRenderTarget();sniperScopeRenderTarget=new THREE.WebGLRenderTarget(size,size,{depthBuffer:true,stencilBuffer:false});sniperScopeRenderTarget.texture.minFilter=THREE.LinearFilter;sniperScopeRenderTarget.texture.magFilter=THREE.LinearFilter;sniperScopeRenderTarget.texture.generateMipmaps=false;sniperScopeDisplayMaterial.map=sniperScopeRenderTarget.texture;sniperScopeDisplayMaterial.needsUpdate=true;
-    // Allocate the framebuffer while the weapon is idle/switching rather than on
-    // the first visible lens frame. The old lazy allocation caused a mobile GPU
-    // hitch exactly when the scope image appeared.
+    disposeSniperScopeRenderTarget();sniperScopeRenderTarget=new THREE.WebGLRenderTarget(size,size,{depthBuffer:true,stencilBuffer:false});sniperScopeRenderTarget.texture.minFilter=THREE.LinearFilter;sniperScopeRenderTarget.texture.magFilter=THREE.LinearFilter;sniperScopeRenderTarget.texture.generateMipmaps=false;sniperScopeRenderTarget.texture.colorSpace=THREE.SRGBColorSpace;sniperScopeDisplayMaterial.map=sniperScopeRenderTarget.texture;sniperScopeDisplayMaterial.needsUpdate=true;
     try{renderer.initRenderTarget?.(sniperScopeRenderTarget);}catch{}
   }
-  if(!sniperScopeRenderCamera){sniperScopeRenderCamera=new THREE.PerspectiveCamera(30,1,camera.near,camera.far);sniperScopeRenderCamera.rotation.order='YXZ';}
-  return true;
+  if(!sniperScopeRenderCamera){sniperScopeRenderCamera=new THREE.PerspectiveCamera(baseFov,1,camera.near,camera.far);sniperScopeRenderCamera.rotation.order='YXZ';}
+  ensureSniperScopeHudPlanes();return true;
 }
 function scheduleSniperScopeWarmup(){
   if(sniperScopeWarmupPending||!renderer||currentWeapon!=='sniper')return;sniperScopeWarmupPending=true;
@@ -995,19 +1003,21 @@ function updateSniperScopeLensProjection(){
   return sniperScopeLensProjectionCache;
 }
 function sniperScopeRenderInterval(reveal){
-  if(!isTouch)return 0;if(playerSettings.graphics==='low')return 33;
-  // Early in the reveal the lens is small/soft, so 30 Hz is visually sufficient.
-  // Near eye relief it returns to 60 Hz so the final alignment stays fluid.
-  return reveal<.78?33:16;
+  if(!isTouch)return 0;if(sniperScopeReady())return playerSettings.graphics==='low'?22:16;if(playerSettings.graphics==='low')return 33;return reveal<.78?33:16;
 }
 function updateSniperScopeLensRender(now=performance.now()){
-  const reveal=sniperScopeLensReveal();if(reveal<=.002||sniperScopeReady()||!shell.canPlay||hp<=0)return;
-  const interval=sniperScopeRenderInterval(reveal);if(interval&&now-sniperScopeRenderLastAt<interval)return;
-  if(!ensureSniperScopeRenderTarget())return;const lens=sniperScopeLensProjectionCache||updateSniperScopeLensProjection();if(!lens)return;sniperScopeRenderLastAt=now;
-  camera.updateMatrixWorld(true);const pos=camera.getWorldPosition(fpRigScratch?.scopePos||(fpRigScratch.scopePos=new THREE.Vector3())),quat=camera.getWorldQuaternion(fpRigScratch?.scopeQuat||(fpRigScratch.scopeQuat=new THREE.Quaternion())),fraction=THREE.MathUtils.clamp((2*lens.r)/Math.max(1,viewH),.04,1.05),half=Math.atan(Math.tan(camera.fov*Math.PI/360)*fraction);
-  sniperScopeRenderCamera.position.copy(pos);sniperScopeRenderCamera.quaternion.copy(quat);sniperScopeRenderCamera.fov=THREE.MathUtils.clamp(half*360/Math.PI,2,100);sniperScopeRenderCamera.aspect=1;sniperScopeRenderCamera.near=camera.near;sniperScopeRenderCamera.far=camera.far;sniperScopeRenderCamera.layers.mask=camera.layers.mask;sniperScopeRenderCamera.updateProjectionMatrix();sniperScopeRenderCamera.updateMatrixWorld(true);
+  const reveal=sniperScopeLensReveal();if(reveal<=.002||currentWeapon!=='sniper'||!shell.canPlay||hp<=0){syncSniperScopeHudPlanes();return;}
+  const interval=sniperScopeRenderInterval(reveal),firstReadyFrame=sniperScopeReady()&&!sniperScopeHudImage?.visible;if(!firstReadyFrame&&interval&&now-sniperScopeRenderLastAt<interval){syncSniperScopeHudPlanes();return;}
+  if(!ensureSniperScopeRenderTarget())return;sniperScopeRenderLastAt=now;
+  camera.updateMatrixWorld(true);const pos=camera.getWorldPosition(fpRigScratch?.scopePos||(fpRigScratch.scopePos=new THREE.Vector3())),quat=camera.getWorldQuaternion(fpRigScratch?.scopeQuat||(fpRigScratch.scopeQuat=new THREE.Quaternion()));
+  // The optic camera uses the same center axis and vertical FOV as the current
+  // player view. That means the image appearing in the lens is literally the
+  // center-screen view at that instant; as ADS zoom progresses, this one camera
+  // progresses with it and becomes the final scope image without a source swap.
+  sniperScopeRenderCamera.position.copy(pos);sniperScopeRenderCamera.quaternion.copy(quat);sniperScopeRenderCamera.fov=camera.fov;sniperScopeRenderCamera.aspect=1;sniperScopeRenderCamera.near=camera.near;sniperScopeRenderCamera.far=camera.far;sniperScopeRenderCamera.layers.mask=camera.layers.mask;sniperScopeRenderCamera.updateProjectionMatrix();sniperScopeRenderCamera.updateMatrixWorld(true);
   const nodes=sniperScopeHiddenNodes(),priorTarget=renderer.getRenderTarget(),priorAutoClear=renderer.autoClear;sniperScopeHiddenVisibility.length=nodes.length;for(let i=0;i<nodes.length;i++){sniperScopeHiddenVisibility[i]=nodes[i].visible;nodes[i].visible=false;}
   try{renderer.setRenderTarget(sniperScopeRenderTarget);renderer.autoClear=true;renderer.render(scene,sniperScopeRenderCamera);}finally{renderer.setRenderTarget(priorTarget);renderer.autoClear=priorAutoClear;for(let i=0;i<nodes.length;i++)nodes[i].visible=sniperScopeHiddenVisibility[i];}
+  syncSniperScopeHudPlanes();
 }
 function rememberTeam(team){preferredTeam=team==='red'?'red':'blue';localStorage.setItem('breachTeam',preferredTeam);document.documentElement.style.setProperty('--team',TEAM_COLORS[preferredTeam]);}
 function rememberPrimary(weapon){preferredPrimary=PRIMARY_WEAPONS.includes(weapon)?weapon:'assault';localStorage.setItem('breachPrimary',preferredPrimary);}
@@ -1711,7 +1721,7 @@ function init3D(){
   // That image is never sourced from the off-center physical tube.
   sniperScopeRearLensMaterial = new THREE.MeshBasicMaterial({color:0x10191e,transparent:false,depthWrite:true,side:THREE.DoubleSide,toneMapped:false});
   sniperScopeDisplayMaterial = new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0,depthTest:true,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});
-  sniperScopeLensReticleMaterial = new THREE.MeshBasicMaterial({map:makeSniperLensReticleTexture(),transparent:true,opacity:0,depthTest:true,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});
+  sniperScopeReticleTexture=makeSniperLensReticleTexture();sniperScopeLensReticleMaterial = new THREE.MeshBasicMaterial({map:sniperScopeReticleTexture,transparent:true,opacity:0,depthTest:true,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});
   const dragReceiver = new THREE.Mesh(new THREE.BoxGeometry(.16,.12,.46),rifleMat);dragReceiver.position.set(0,.04,-.18);
   const dragHandguard = new THREE.Mesh(new THREE.BoxGeometry(.13,.10,.36),stockMat);dragHandguard.position.set(0,-.005,-.52);
   const rifleBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.84,10),rifleMat);rifleBarrel.rotation.x=Math.PI/2;rifleBarrel.position.set(0,.025,-.82);
@@ -3867,7 +3877,12 @@ function animate(){
   // and only drawing its canvas afterward made every HUD state one frame late;
   // at the sniper cutoff that produced a world frame with no rifle and no scope.
   const renderNow=performance.now();if(shell.canPlay){updateSniperScopeLensRender(renderNow);drawHud(renderNow);}
-  renderer.autoClear=true;renderer.render(scene,camera);
+  renderer.autoClear=true;
+  // Once eye relief is complete, the normal world render is fully hidden by the
+  // black scope mask and the shared optic texture. Skip that redundant second
+  // world pass: the authoritative scope camera already rendered the scene into
+  // sniperScopeRenderTarget this frame.
+  if(shell.canPlay&&sniperScopeActive())renderer.clear(true,true,true);else renderer.render(scene,camera);
   if(shell.canPlay){renderer.autoClear=false;renderer.clearDepth();renderer.render(hudScene,hudCamera);renderer.autoClear=true;}
 }
 function maintainNetwork(){
@@ -4382,7 +4397,7 @@ function updateWeaponView(dt){
   shotgunGroup.position.set(THREE.MathUtils.lerp(.30,shotgunPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,shotgunPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,shotgunPose.z,a)+kickZ+commonZ);shotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,shotgunPose.rx,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,shotgunPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,shotgunPose.rz,a)-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
   semiShotgunGroup.position.set(THREE.MathUtils.lerp(.30,semiShotgunPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,semiShotgunPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,semiShotgunPose.z,a)+kickZ+commonZ);semiShotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,semiShotgunPose.rx,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,semiShotgunPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,semiShotgunPose.rz,a)-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
   const sniperPose=sniperCalibratedAdsPose();sniperGroup.position.set(THREE.MathUtils.lerp(.28,sniperPose.x,a)+commonX*(1-a),THREE.MathUtils.lerp(-.28,sniperPose.y,a)+commonY*(1-a),THREE.MathUtils.lerp(-.48,sniperPose.z,a)+kickZ+commonZ*(1-a));sniperGroup.rotation.set(THREE.MathUtils.lerp(-.055,sniperPose.rx,a)+reloadCurve*.10+kickPitch,THREE.MathUtils.lerp(-.05,sniperPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,sniperPose.rz,a)-reloadRoll*.65-swapRoll-deathRoll-mobilityRoll+kickRoll);
-  const sniperLensReveal=sniperScopeLensReveal(),sniperLensActive=currentWeapon==='sniper'&&!sniperScopeReady()&&sniperLensReveal>.002;if(sniperScopeDisplayLens)sniperScopeDisplayLens.visible=sniperLensActive;if(sniperScopeDisplayMaterial)sniperScopeDisplayMaterial.opacity=sniperLensReveal;if(sniperScopeLensReticle)sniperScopeLensReticle.visible=sniperLensActive;if(sniperScopeLensReticleMaterial)sniperScopeLensReticleMaterial.opacity=sniperLensReveal;updateSniperScopeLensProjection();
+  const sniperLensReveal=sniperScopeLensReveal(),sniperLensActive=currentWeapon==='sniper'&&!sniperScopeReady()&&sniperLensReveal>.002,sniperReticleReveal=smoothstep01((sniperLensReveal-.18)/.82);if(sniperScopeDisplayLens)sniperScopeDisplayLens.visible=sniperLensActive;if(sniperScopeDisplayMaterial)sniperScopeDisplayMaterial.opacity=sniperLensReveal;if(sniperScopeLensReticle)sniperScopeLensReticle.visible=sniperLensActive;if(sniperScopeLensReticleMaterial)sniperScopeLensReticleMaterial.opacity=sniperReticleReveal;updateSniperScopeLensProjection();
   grenadeLauncherGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.20,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);grenadeLauncherGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+GRENADE_LAUNCH_PITCH+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
   rpgGroup.position.set(THREE.MathUtils.lerp(.34,rpgPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.16,rpgPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.46,rpgPose.z,a)+kickZ+commonZ);rpgGroup.rotation.set(THREE.MathUtils.lerp(-.025,rpgPose.rx,a)+reloadCurve*.11+kickPitch,THREE.MathUtils.lerp(-.07,rpgPose.ry,a)-reloadCurve*.10+kickYaw,THREE.MathUtils.lerp(.015,rpgPose.rz,a)-reloadRoll*.6-swapRoll-deathRoll-mobilityRoll+kickRoll);
   // Mechanical cycling is separate from recoil: slide/bolt motion gives the shot
@@ -4460,7 +4475,7 @@ function resizeHudOverlay(){
   if(!hudCanvas)return;
   const quality=playerSettings.graphics,hudMax=quality==='low'?1:(quality==='medium'?1.25:(isTouch?1.4:1.75));hudScale=Math.min(devicePixelRatio || 1,hudMax);
   hudCanvas.width=Math.max(2,Math.round(viewW*hudScale));hudCanvas.height=Math.max(2,Math.round(viewH*hudScale));
-  hudCtx=hudCanvas.getContext('2d');hudTexture.needsUpdate=true;hudLastDraw=0;
+  hudCtx=hudCanvas.getContext('2d');hudTexture.needsUpdate=true;hudLastDraw=0;if(sniperScopeRenderTarget)ensureSniperScopeHudPlanes();
 }
 
 function safeInsets(){
@@ -4521,7 +4536,7 @@ function drawNetworkDiagnostics(c,w,h){
   c.save();c.font='700 9px ui-monospace,monospace';const pad=6,lineH=12,panelW=Math.min(360,Math.max(...lines.map(line=>c.measureText(line).width))+pad*2),panelH=lines.length*lineH+pad*2;c.fillStyle='rgba(0,0,0,.72)';c.fillRect(7,7,panelW,panelH);c.strokeStyle='rgba(215,255,88,.45)';c.strokeRect(7.5,7.5,panelW-1,panelH-1);c.fillStyle='#e8f0f4';c.textAlign='left';c.textBaseline='top';lines.forEach((line,i)=>c.fillText(line,7+pad,7+pad+i*lineH));c.restore();
 }
 function drawHud(now){
-  const scopeTransition=sniperScopeTransitionActive(),hudInterval=scopeTransition?16:(touchGameplayControlsVisible()?33:16),scoped=sniperScopeActive(),scopeStateChanged=scoped!==hudLastScopeActive;
+  const scopeTransition=sniperScopeTransitionActive(),hudInterval=scopeTransition?16:(touchGameplayControlsVisible()?33:16),scoped=sniperScopeActive(),scopeStateChanged=scoped!==hudLastScopeActive;syncSniperScopeHudPlanes();
   if(!scopeStateChanged&&!scopeTransition&&now-hudLastDraw<hudInterval)return;hudLastDraw=now;hudLastScopeActive=scoped;if(!hudLayout)hudLayout=computeHudLayout();
   const c=hudCtx,s=hudScale,w=viewW,h=viewH,L=hudLayout,toast=activeToast(now);
   c.setTransform(s,0,0,s,0,0);c.clearRect(0,0,w,h);c.textBaseline='middle';
@@ -4711,19 +4726,25 @@ function drawHitConfirm(c,x,y,headshot=false){const size=headshot?8.5:7,gap=4.5;
 
 function drawSniperScopeTransitionShadow(c,w,h){
   const t=sniperScopeTransitionBlend(),lens=sniperScopeLensProjectionCache;if(t<=.001||!lens)return;
-  const finalR=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,late=smoothstep01((t-.62)/.38),cx=THREE.MathUtils.lerp(lens.x,w/2,late*.04),cy=THREE.MathUtils.lerp(lens.y,h/2,late*.04),r=THREE.MathUtils.lerp(lens.r,finalR,late*.025),baseFeather=Math.max(12,Math.min(46,r*.16)),feather=THREE.MathUtils.lerp(baseFeather,2.5,late),hardR=r+feather,outsideAlpha=THREE.MathUtils.lerp(.045,.975,Math.pow(t,1.18));
+  const finalR=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=lens.x,cy=lens.y,r=lens.r,alignment=smoothstep01((adsBlend-SNIPER_SCOPE_LENS_START_BLEND)/(SNIPER_SCOPE_READY_BLEND-SNIPER_SCOPE_LENS_START_BLEND)),baseFeather=Math.max(12,Math.min(48,r*.18)),feather=THREE.MathUtils.lerp(baseFeather,3,alignment),hardR=r+feather,outsideAlpha=THREE.MathUtils.lerp(.035,.975,Math.pow(t,1.20));
   c.save();
-  // Soft eye-relief shadow: faint at first, then progressively owns the
-  // peripheral view. Its center/radius follow the *physical* eyepiece, so the
-  // blur naturally becomes the final centered scope circle instead of jumping.
+  // Eye-box shadow inside the ocular. While the eye is still off-axis, one edge
+  // stays darker/softer; the crescent clears as the eyepiece reaches screen center.
+  const dx=(cx-w/2)*.20,dy=(cy-h/2)*.20,innerStrength=(1-alignment)*.62+.05,eyeCx=cx-dx,eyeCy=cy-dy,eyeInner=Math.max(2,r*(.30+.34*alignment)),eyeOuter=Math.max(eyeInner+2,r*.98),eg=c.createRadialGradient(eyeCx,eyeCy,eyeInner,eyeCx,eyeCy,eyeOuter);eg.addColorStop(0,'rgba(0,0,0,0)');eg.addColorStop(.55,`rgba(0,0,0,${innerStrength*.12})`);eg.addColorStop(1,`rgba(0,0,0,${innerStrength})`);c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.clip();c.fillStyle=eg;c.fillRect(cx-r,cy-r,r*2,r*2);c.restore();
+  c.save();
+  // Peripheral scope shadow follows the physical ocular. It becomes the final
+  // scope mask as eye alignment completes, but never changes the image source.
   c.beginPath();c.rect(0,0,w,h);c.arc(cx,cy,hardR,0,Math.PI*2,true);c.fillStyle=`rgba(0,0,0,${outsideAlpha})`;c.fill('evenodd');
-  const inner=Math.max(1,r-feather*.55),g=c.createRadialGradient(cx,cy,inner,cx,cy,hardR);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.42,`rgba(0,0,0,${outsideAlpha*.08})`);g.addColorStop(.76,`rgba(0,0,0,${outsideAlpha*.42})`);g.addColorStop(1,`rgba(0,0,0,${outsideAlpha})`);c.beginPath();c.arc(cx,cy,hardR,0,Math.PI*2);c.arc(cx,cy,inner,0,Math.PI*2,true);c.fillStyle=g;c.fill('evenodd');
-  c.restore();
+  const inner=Math.max(1,r-feather*.55),g=c.createRadialGradient(cx,cy,inner,cx,cy,hardR);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(.42,`rgba(0,0,0,${outsideAlpha*.08})`);g.addColorStop(.76,`rgba(0,0,0,${outsideAlpha*.42})`);g.addColorStop(1,`rgba(0,0,0,${outsideAlpha})`);c.beginPath();c.arc(cx,cy,hardR,0,Math.PI*2);c.arc(cx,cy,inner,0,Math.PI*2,true);c.fillStyle=g;c.fill('evenodd');c.restore();
 }
 function drawScopeMask(c,w,h){
   const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2;c.save();c.beginPath();c.rect(0,0,w,h);c.arc(cx,cy,r,0,Math.PI*2,true);c.fillStyle='rgba(0,0,0,.975)';c.fill('evenodd');c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);c.clip();const vignette=c.createRadialGradient(cx,cy,r*.60,cx,cy,r);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(.80,'rgba(0,0,0,.04)');vignette.addColorStop(1,'rgba(0,0,0,.48)');c.fillStyle=vignette;c.fillRect(cx-r,cy-r,r*2,r*2);c.restore();c.save();c.strokeStyle='rgba(7,9,11,.98)';c.lineWidth=5;c.beginPath();c.arc(cx,cy,r-1.5,0,Math.PI*2);c.stroke();c.strokeStyle='rgba(255,255,255,.10)';c.lineWidth=1;c.beginPath();c.arc(cx,cy,r-4,0,Math.PI*2);c.stroke();c.restore();
 }
-function drawScopeReticle(c,w,h,hit,headshot=false){const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2,color=headshot?'#ffd36d':hit?'#fff':'rgba(12,14,16,.90)';c.save();c.beginPath();c.arc(cx,cy,r-5,0,Math.PI*2);c.clip();c.strokeStyle=color;c.fillStyle=color;c.lineCap='butt';const innerGap=9,postGap=34;c.lineWidth=2.1;c.beginPath();c.moveTo(cx-r,cy);c.lineTo(cx-postGap,cy);c.moveTo(cx+postGap,cy);c.lineTo(cx+r,cy);c.moveTo(cx,cy-r);c.lineTo(cx,cy-postGap);c.moveTo(cx,cy+postGap);c.lineTo(cx,cy+r);c.stroke();c.lineWidth=.95;c.beginPath();c.moveTo(cx-postGap,cy);c.lineTo(cx-innerGap,cy);c.moveTo(cx+innerGap,cy);c.lineTo(cx+postGap,cy);c.moveTo(cx,cy-postGap);c.lineTo(cx,cy-innerGap);c.moveTo(cx,cy+innerGap);c.lineTo(cx,cy+postGap);c.stroke();c.beginPath();c.arc(cx,cy,1.35,0,Math.PI*2);c.fill();for(const off of [24,46,70,98]){const width=off<50?7:off<80?9:12;c.lineWidth=.9;c.beginPath();c.moveTo(cx-width,cy+off);c.lineTo(cx+width,cy+off);c.stroke();}for(const off of [22,44,66]){c.beginPath();c.arc(cx-off,cy,1.15,0,Math.PI*2);c.arc(cx+off,cy,1.15,0,Math.PI*2);c.fill();}c.fillStyle='rgba(255,255,255,.70)';c.font='900 9px system-ui';c.textAlign='center';c.fillText(sniperZoomLabel(),cx,cy-r+20);c.restore();}
+function drawScopeReticle(c,w,h,hit,headshot=false){
+  // The reticle graphic is the same texture used on the physical lens and is
+  // rendered by sniperScopeHudReticle. HUD only owns the zoom readout here.
+  const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2;c.save();c.fillStyle='rgba(255,255,255,.70)';c.font='900 9px system-ui';c.textAlign='center';c.fillText(sniperZoomLabel(),cx,cy-r+20);c.restore();
+}
 function drawTouchControls(c,L,now){
   c.save();if(touchRoleActive('joy')){const j={x:joy.centerX,y:joy.centerY,r:L.joy.r};c.beginPath();c.arc(j.x,j.y,j.r,0,Math.PI*2);c.fillStyle='rgba(9,11,13,.42)';c.fill();c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1.5;c.stroke();c.beginPath();c.arc(j.x,j.y,j.r*.72,0,Math.PI*2);c.strokeStyle='rgba(255,255,255,.08)';c.stroke();const max=j.r*.45,sx=j.x+joy.x*max,sy=j.y+joy.y*max;c.beginPath();c.arc(sx,sy,j.r*.40,0,Math.PI*2);c.fillStyle='rgba(215,255,88,.16)';c.fill();c.strokeStyle='rgba(215,255,88,.42)';c.stroke();c.fillStyle='rgba(255,255,255,.58)';c.font='900 10px system-ui';c.textAlign='center';c.fillText(sprinting?'SPRINT':'MOVE',j.x,j.y+j.r*.70);}c.restore();
   const weaponLocked=!combatWeaponAvailable(now);
