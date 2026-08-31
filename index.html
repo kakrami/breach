@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.28" rel="manifest"/>
-<title>Breach v1.44.28</title>
-<link href="ui.css?v=1.44.28" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.44.29" rel="manifest"/>
+<title>Breach v1.44.29</title>
+<link href="ui.css?v=1.44.29" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -68,7 +68,7 @@
 <div class="chat-key-row"><button class="chat-key" data-editor-char="q" type="button">Q</button><button class="chat-key" data-editor-char="w" type="button">W</button><button class="chat-key" data-editor-char="e" type="button">E</button><button class="chat-key" data-editor-char="r" type="button">R</button><button class="chat-key" data-editor-char="t" type="button">T</button><button class="chat-key" data-editor-char="y" type="button">Y</button><button class="chat-key" data-editor-char="u" type="button">U</button><button class="chat-key" data-editor-char="i" type="button">I</button><button class="chat-key" data-editor-char="o" type="button">O</button><button class="chat-key" data-editor-char="p" type="button">P</button></div>
 <div class="chat-key-row chat-key-row-middle"><button class="chat-key" data-editor-char="a" type="button">A</button><button class="chat-key" data-editor-char="s" type="button">S</button><button class="chat-key" data-editor-char="d" type="button">D</button><button class="chat-key" data-editor-char="f" type="button">F</button><button class="chat-key" data-editor-char="g" type="button">G</button><button class="chat-key" data-editor-char="h" type="button">H</button><button class="chat-key" data-editor-char="j" type="button">J</button><button class="chat-key" data-editor-char="k" type="button">K</button><button class="chat-key" data-editor-char="l" type="button">L</button></div>
 <div class="chat-key-row"><button class="chat-key chat-key-wide" data-editor-action="shift" id="gameTextShiftBtn" type="button">SHIFT</button><button class="chat-key" data-editor-char="z" type="button">Z</button><button class="chat-key" data-editor-char="x" type="button">X</button><button class="chat-key" data-editor-char="c" type="button">C</button><button class="chat-key" data-editor-char="v" type="button">V</button><button class="chat-key" data-editor-char="b" type="button">B</button><button class="chat-key" data-editor-char="n" type="button">N</button><button class="chat-key" data-editor-char="m" type="button">M</button><button class="chat-key chat-key-wide" data-editor-action="backspace" type="button">⌫</button></div>
-<div class="chat-key-row chat-key-row-bottom"><button class="chat-key chat-key-command" id="gameTextEditorCancel" data-editor-action="cancel" type="button">CANCEL</button><button class="chat-key" data-editor-char="-" type="button">-</button><button class="chat-key chat-key-space" data-editor-action="space" type="button">SPACE</button><button class="chat-key chat-key-command chat-key-send" data-editor-action="done" type="button">SAVE</button></div>
+<div class="chat-key-row chat-key-row-bottom"><button class="chat-key chat-key-command" id="gameTextEditorCancel" data-editor-action="cancel" type="button">CANCEL</button><button class="chat-key" data-editor-char="-" type="button">-</button><button class="chat-key chat-key-space" data-editor-action="space" type="button">SPACE</button><button class="chat-key chat-key-command chat-key-send" data-editor-action="done" type="button">DONE</button></div>
 </div>
 </div>
 </section><section aria-label="Enter Breach" class="entry-screen" id="entryScreen">
@@ -159,7 +159,7 @@
 </section>
 <div class="lobby-side-view" data-lobby-side-view="match" hidden="">
 <section class="lobby-setup-panel">
-<div class="lobby-section-head"><div><h2>Match setup</h2></div><span class="lobby-secondary" id="lobbySetupOwnerLabel">Host controls</span></div>
+<div class="lobby-section-head"><div><h2>Match setup</h2></div><div class="lobby-section-actions"><span class="lobby-secondary" id="lobbySetupOwnerLabel">Host controls</span><button class="secondary-btn lobby-reset hide" id="lobbyResetSetupBtn" type="button">RESET SETUP</button></div></div>
 <div class="lobby-host-setup hide" id="lobbyHostSetup">
 <div class="lobby-match-grid">
 <section class="lobby-match-card lobby-match-rules-card">
@@ -283,7 +283,6 @@
 <footer class="lobby-footer">
 <div class="lobby-footer-copy"><strong id="lobbyStatus">Waiting in lobby</strong><span id="lobbyHint">Choose your team and loadout.</span></div>
 <div class="controller-menu-hint lobby-controller-hint">LB/RB TABS · A SELECT</div><div class="lobby-footer-actions">
-<button class="secondary-btn lobby-reset hide" id="lobbyResetSetupBtn" type="button">RESET SETUP</button>
 <button class="primary lobby-start hide" id="lobbyStartBtn"><svg class="ui-icon"><use href="#i-play"></use></svg><span>START MATCH</span></button>
 </div>
 </footer>
@@ -359,13 +358,13 @@
 </div>
 </section>
 </div>
-<footer class="modal-foot loadout-foot"><span class="admin-status" id="loadoutStatus">Saved changes equip on your next spawn.</span><button class="secondary-btn" id="loadoutResetBtn">RESET</button><button class="secondary-btn" id="loadoutCancelBtn">CANCEL</button><button class="primary modal-action" id="loadoutSaveBtn">SAVE</button></footer>
+<footer class="modal-foot loadout-foot"><span class="admin-status" id="loadoutStatus">Changes save automatically and equip on your next spawn.</span><button class="primary modal-action" id="loadoutCloseBtn">CLOSE</button></footer>
 </div>
 </section>
 
 <section aria-label="Player settings" class="modal-screen hide" id="settingsPanel">
 <div class="modal-shell settings-shell">
-<header class="modal-head"><div><h2>Settings</h2><p>Preferences save with Save. Mute, fullscreen, and diagnostics act immediately.</p></div></header>
+<header class="modal-head"><div><h2>Settings</h2><p>Changes apply and save automatically.</p></div></header>
 <div aria-label="Settings categories" class="settings-tabs" data-controller-primary-tabs="true" role="tablist"><button aria-selected="true" class="settings-tab active" data-settings-tab="controls" role="tab" type="button">CONTROLS</button><button aria-selected="false" class="settings-tab" data-settings-tab="audio" role="tab" type="button">AUDIO</button><button aria-selected="false" class="settings-tab" data-settings-tab="display" role="tab" type="button">DISPLAY</button></div><div class="controller-menu-hint">LB/RB TABS · A EDIT · D-PAD ADJUST · B BACK</div><div class="settings-categories player-settings-grid">
 <section class="settings-page active" data-settings-page="controls"><div class="settings-category-head"><h3>Aim &amp; input</h3></div><div class="settings-grid">
 <label class="setting"><span>Look sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="2" data-min="0.5" data-step="0.05" data-value="0.5" id="playerLookSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerLookSensitivityValue"></output></label>
@@ -379,7 +378,7 @@
 <label class="setting"><span>Right stick min deadzone</span><div class="game-slider-control" data-game-control="slider" data-max="0.25" data-min="0.02" data-step="0.01" data-value="0.07" id="playerControllerLookDeadzone" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerControllerLookDeadzoneValue"></output></label>
 </div></section>
 <section class="settings-page" data-settings-page="audio" hidden="" inert=""><div class="settings-category-head"><h3>Sound</h3></div><div class="settings-grid">
-<label class="setting select-setting"><span>Mute all audio <i class="semantic-badge live">LIVE</i></span><div aria-label="Mute all audio" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"off","label":"Off"},{"value":"on","label":"On"}]' data-value="off" id="playerMasterMute" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Off</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label class="setting select-setting"><span>Mute all audio</span><div aria-label="Mute all audio" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"off","label":"Off"},{"value":"on","label":"On"}]' data-value="off" id="playerMasterMute" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Off</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <label class="setting"><span>Master volume</span><div class="game-slider-control" data-game-control="slider" data-max="1" data-min="0" data-step="0.05" data-value="0" id="playerMasterVolume" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerMasterVolumeValue"></output></label>
 <label class="setting"><span>SFX volume</span><div class="game-slider-control" data-game-control="slider" data-max="1" data-min="0" data-step="0.05" data-value="0" id="playerSfxVolume" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerSfxVolumeValue"></output></label>
 <label class="setting"><span>Music volume</span><div class="game-slider-control" data-game-control="slider" data-max="1" data-min="0" data-step="0.05" data-value="0" id="playerMusicVolume" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerMusicVolumeValue"></output></label>
@@ -387,13 +386,13 @@
 <section class="settings-page" data-settings-page="display" hidden="" inert=""><div class="settings-category-head"><h3>Graphics</h3></div><div class="settings-grid">
 <label class="setting select-setting"><span>Graphics quality</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"low","label":"Low"},{"value":"medium","label":"Medium"},{"value":"high","label":"High"}]' data-value="low" id="playerGraphics" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Low</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <label class="setting select-setting"><span>Minimap orientation</span><div aria-label="Minimap orientation" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"heading","label":"Heading Up"},{"value":"north","label":"North Up"}]' data-value="heading" id="playerMinimapOrientation" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Heading Up</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
-<div class="setting setting-action"><span>FULLSCREEN <i class="semantic-badge live">LIVE</i></span><button class="secondary-btn" id="settingsFullscreenBtn" type="button">ENTER FULLSCREEN</button></div></div><div class="settings-category-head"><h3>Diagnostics</h3></div><div class="settings-grid diagnostics-settings-grid">
-<div class="setting setting-action diagnostics-toggle-card"><span>Gameplay diagnostics</span><button aria-pressed="false" class="secondary-btn diagnostics-toggle-btn" id="playerDiagnosticsBtn" type="button">START RECORDING</button><small>Starts and stops immediately. Settings Save is not required.</small></div>
+<div class="setting setting-action"><span>FULLSCREEN</span><button class="secondary-btn" id="settingsFullscreenBtn" type="button">ENTER FULLSCREEN</button></div></div><div class="settings-category-head"><h3>Diagnostics</h3></div><div class="settings-grid diagnostics-settings-grid">
+<div class="setting setting-action diagnostics-toggle-card"><span>Gameplay diagnostics</span><button aria-pressed="false" class="secondary-btn diagnostics-toggle-btn" id="playerDiagnosticsBtn" type="button">START RECORDING</button><small>Starts and stops immediately.</small></div>
 <div class="setting diagnostics-status-card"><span>Recorder</span><output id="diagnosticsStatus">OFF</output><small>Records aim, input, recoil, camera, frame timing, corrections and fire/network events.</small></div>
 <div class="setting diagnostics-log-card"><span>Recording log</span><div class="diagnostics-log-actions"><button class="secondary-btn" id="diagnosticsExportBtn" type="button">EXPORT</button><button class="secondary-btn" id="diagnosticsClearBtn" type="button">CLEAR</button></div><small>After the jump happens, export the JSON and send it back here.</small></div>
 </div></section>
 </div>
-<footer class="modal-foot settings-actions"><span class="admin-status" id="settingsStatus">Saved settings</span><button class="secondary-btn" id="settingsResetBtn">RESET</button><button class="secondary-btn" id="settingsCancelBtn">CANCEL</button><button class="primary modal-action" id="settingsSaveBtn">SAVE</button></footer>
+<footer class="modal-foot settings-actions"><span class="admin-status" id="settingsStatus">Changes save automatically</span><button class="secondary-btn" id="settingsResetBtn">RESET DEFAULTS</button><button class="primary modal-action" id="settingsCloseBtn">CLOSE</button></footer>
 </div>
 </section>
 <section aria-label="Match control" class="modal-screen hide" id="adminPanel">
@@ -434,6 +433,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.44.28" type="module"></script>
+<script src="client.js?v=1.44.29" type="module"></script>
 </body>
 </html>

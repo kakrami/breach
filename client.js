@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.28';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.28';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.28';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.28';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.28';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.28';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.28';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.28';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.29';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.29';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.29';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.29';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.29';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.29';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.29';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.29';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.28';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.28';
-import { createAudioEngine } from './audio-engine.js?v=1.44.28';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.28';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.28';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.28';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.28';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.28';
+} from './game-config.js?v=1.44.29';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.29';
+import { createAudioEngine } from './audio-engine.js?v=1.44.29';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.29';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.29';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.29';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.29';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.29';
 
 let THREE = null;
 
@@ -347,7 +347,7 @@ function bindLoadoutWorkspaceTabs(){
   for(const button of document.querySelectorAll('[data-loadout-weapon-picker-toggle]')){const stableKey=button.dataset.loadoutWeaponPickerToggle;button.dataset.controllerKey=`weapon-toggle:${stableKey}`;button.addEventListener('click',()=>{const key=button.dataset.loadoutWeaponPickerToggle,[surface,slot]=key.split('-');if(loadoutWeaponPickerOpen.has(key)){loadoutWeaponPickerOpen.delete(key);renderAttachmentEditor(surface,slot,loadoutDraftForSurface(surface));queueControllerUiFocus(`weapon-toggle:${key}`);}else{loadoutWeaponPickerOpen.add(key);loadoutAttachmentTrayOpen.delete(key);clearLoadoutAttachmentComparisonBase(key);renderAttachmentEditor(surface,slot,loadoutDraftForSurface(surface));queueControllerUiFocus(`loadout:${surface}:${slot}:${loadoutSlotWeapon(loadoutDraftForSurface(surface),slot)}`);}renderLoadoutStats(surface,slot,loadoutSlotWeapon(loadoutDraftForSurface(surface),slot),loadoutSlotAttachments(loadoutDraftForSurface(surface),slot));});}
   for(const button of document.querySelectorAll('[data-loadout-ads-preview]')){const key=button.dataset.loadoutAdsPreview;const down=e=>{e.preventDefault();button.setPointerCapture?.(e.pointerId);setLoadoutAdsPreview(key,true);};const up=e=>{e.preventDefault();try{button.releasePointerCapture?.(e.pointerId);}catch{}setLoadoutAdsPreview(key,false);};button.addEventListener('pointerdown',down);button.addEventListener('pointerup',up);button.addEventListener('pointercancel',()=>setLoadoutAdsPreview(key,false));button.addEventListener('lostpointercapture',()=>setLoadoutAdsPreview(key,false));button.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();setLoadoutAdsPreview(key,true);}});button.addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();setLoadoutAdsPreview(key,false);}});button.addEventListener('click',e=>{if(e.detail===0)setLoadoutAdsPreview(key,!loadoutPreviewAdsKeys.has(key));});}
 }
-function applyLoadoutAttachmentChoice(surface,weaponSlot,slot,id){const live=loadoutDraftForSurface(surface),key=weaponSlot==='primary'?'primaryAttachments':'secondaryAttachments',next={...loadoutSlotAttachments(live,weaponSlot),[slot]:id};if(surface==='lobby'){setLobbyLoadoutDraft({[key]:next});renderAttachmentEditors('lobby',lobbyLoadoutDraft||loadoutDraftForSurface('lobby'));}else{loadoutDraft=normalizeLoadoutChoice({...live,[key]:next});syncMatchLoadoutEditor();}}
+function applyLoadoutAttachmentChoice(surface,weaponSlot,slot,id){const live=loadoutDraftForSurface(surface),key=weaponSlot==='primary'?'primaryAttachments':'secondaryAttachments',next={...loadoutSlotAttachments(live,weaponSlot),[slot]:id};if(surface==='lobby'){setLobbyLoadoutDraft({[key]:next});renderAttachmentEditors('lobby',lobbyLoadoutDraft||loadoutDraftForSurface('lobby'));}else{loadoutDraft=normalizeLoadoutChoice({...live,[key]:next});syncMatchLoadoutEditor();commitMatchLoadoutChange();}}
 function renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups){const key=`${surface}-${weaponSlot}`,host=document.querySelector(`[data-gunsmith-callouts="${key}"]`);if(!host)return;host.replaceChildren();const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('gunsmith-callout-lines');svg.setAttribute('aria-hidden','true');host.append(svg);for(const [slot] of groups){const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.dataset.calloutLine=slot;const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.dataset.calloutDot=slot;dot.setAttribute('r','2.8');svg.append(line,dot);const b=document.createElement('button');b.type='button';b.className=`gunsmith-callout gunsmith-callout-${slot}`;b.dataset.calloutSlot=slot;b.dataset.controllerKey=`gunsmith:${key}:slot:${slot}`;const label=document.createElement('span');label.textContent=slot.toUpperCase();const id=current?.[slot]||'',item=id?ATTACHMENTS[id]:null,value=document.createElement('strong');value.textContent=item?.short||item?.name||'NONE';b.append(label,value);b.classList.toggle('active',loadoutAttachmentTrayOpen.has(key)&&loadoutAttachmentSlot[key]===slot);b.classList.toggle('equipped',!!item);b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();loadoutWeaponPickerOpen.delete(key);if(!loadoutAttachmentTrayOpen.has(key)||loadoutAttachmentSlot[key]!==slot)setLoadoutAttachmentComparisonBase(surface,weaponSlot,weapon,slot,current);loadoutAttachmentSlot[key]=slot;loadoutAttachmentTrayOpen.add(key);renderAttachmentEditor(surface,weaponSlot,loadoutDraftForSurface(surface));renderLoadoutStats(surface,weaponSlot,weapon,loadoutSlotAttachments(loadoutDraftForSurface(surface),weaponSlot));const selected=current?.[slot]||'';queueControllerUiFocus(`attachment:${key}:${slot}:${selected||'none'}`);});host.append(b);} }
 function renderAttachmentEditor(surface,weaponSlot,draft){
   const host=document.querySelector(`[data-attachment-editor="${surface}-${weaponSlot}"]`);if(!host)return;const key=`${surface}-${weaponSlot}`,weapon=loadoutSlotWeapon(draft,weaponSlot),current=loadoutSlotAttachments(draft,weaponSlot),groups=ATTACHMENT_SLOTS.map(slot=>[slot,attachmentOptionsForWeapon(weapon,slot)]).filter(([,items])=>items.length),picker=document.querySelector(`[data-gunsmith-weapon-picker="${key}"]`),weaponPicker=loadoutWeaponPickerOpen.has(key);if(picker)picker.hidden=!weaponPicker;host.hidden=weaponPicker;renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups);if(weaponPicker)return;host.replaceChildren();host.classList.toggle('empty',groups.length===0);if(!groups.length){const empty=document.createElement('div');empty.className='gunsmith-inspector-empty';empty.innerHTML='<strong>NO ATTACHMENTS</strong><span>This weapon has no configurable attachment slots.</span>';host.append(empty);return;}
@@ -556,7 +556,7 @@ const lobbyParticipants = new Map();
 let pendingGameSnapshot = null;
 let lobbyMatchDraft=null,lobbyMatchDirty=false;
 let lobbyMapDraft='',lobbyMapDirty=false;
-let lobbyLoadoutDraft=null,lobbyClassDrafts=null,lobbyLoadoutDirty=false,lobbyLoadoutRevision=0,lobbyLoadoutAckRevision=0,lobbyStartingClassId=activeClassId;const loadoutEditClass={lobby:activeClassId,match:activeClassId};
+let lobbyLoadoutDraft=null,lobbyClassDrafts=null,lobbyLoadoutDirty=false,lobbyLoadoutRevision=0,lobbyLoadoutAckRevision=0,lobbyStartingClassId=activeClassId,matchLoadoutRevision=0,matchLoadoutAckRevision=0;const loadoutEditClass={lobby:activeClassId,match:activeClassId};
 const bullets = new Map();
 const throwables = new Map();
 const tacticalFx = [];
@@ -714,7 +714,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.28';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.29';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -950,14 +950,14 @@ function renameLoadoutClass(surface,id,value){
     const classes=normalizeLoadoutClasses(lobbyClassDrafts||loadoutClasses,selectedLoadout()),idx=classes.findIndex(c=>c.id===classId);if(idx<0)return;
     classes[idx]={...classes[idx],name:normalizeLoadoutClassName(value,idx)};lobbyClassDrafts=classes;markLobbyLoadoutDirty();renderLoadoutClassStrip('lobby');renderLoadoutOverview('lobby',lobbyLoadoutDraft||classLoadout(classes,loadoutEditClass.lobby));setLobbyActionState();syncLobbyClassesToServer();
   }else{
-    if(loadoutDraft)matchClassDrafts=writeClassLoadout(matchClassDrafts||loadoutClasses,loadoutEditClass.match,loadoutDraft);const classes=normalizeLoadoutClasses(matchClassDrafts||loadoutClasses,selectedLoadout()),idx=classes.findIndex(c=>c.id===classId);if(idx<0)return;classes[idx]={...classes[idx],name:normalizeLoadoutClassName(value,idx)};matchClassDrafts=classes;syncMatchLoadoutEditor();
+    if(loadoutDraft)matchClassDrafts=writeClassLoadout(matchClassDrafts||loadoutClasses,loadoutEditClass.match,loadoutDraft);const classes=normalizeLoadoutClasses(matchClassDrafts||loadoutClasses,selectedLoadout()),idx=classes.findIndex(c=>c.id===classId);if(idx<0)return;classes[idx]={...classes[idx],name:normalizeLoadoutClassName(value,idx)};matchClassDrafts=classes;syncMatchLoadoutEditor();commitMatchLoadoutChange();
   }
 }
 function selectLoadoutClass(surface,id){
   const classId=normalizeLoadoutClassId(id);
   if(surface==='lobby'){setLobbyStartingClass(classId);queueControllerUiFocus(`class:${surface}:${classId}:main`);return;}
   if(loadoutDraft)matchClassDrafts=writeClassLoadout(matchClassDrafts||loadoutClasses,loadoutEditClass.match,loadoutDraft);
-  loadoutEditClass.match=classId;loadoutBaseDraft=classLoadout(matchClassBase||loadoutClasses,classId);loadoutDraft=classLoadout(matchClassDrafts||loadoutClasses,classId);syncMatchLoadoutEditor();setLoadoutWorkspaceMode('match','classes',{ensurePreview:false});queueControllerUiFocus(`class:${surface}:${classId}:main`);
+  loadoutEditClass.match=classId;loadoutBaseDraft=classLoadout(matchClassBase||loadoutClasses,classId);loadoutDraft=classLoadout(matchClassDrafts||loadoutClasses,classId);syncMatchLoadoutEditor();commitMatchLoadoutChange({selectClass:true,announce:true});setLoadoutWorkspaceMode('match','classes',{ensurePreview:false});queueControllerUiFocus(`class:${surface}:${classId}:main`);
 }
 function renderLoadoutClassStrip(surface){
   const host=document.querySelector(`[data-loadout-class-strip="${surface}"]`);if(!host)return;
@@ -1169,15 +1169,21 @@ function syncMatchLoadoutEditor(){
   for(const btn of matchSecondaryButtons)btn.classList.toggle('active',btn.dataset.matchSecondaryChoice===draft.secondaryWeapon);
   for(const btn of matchTacticalButtons)btn.classList.toggle('active',btn.dataset.matchTacticalChoice===draft.tactical);
   for(const btn of matchLethalButtons)btn.classList.toggle('active',btn.dataset.matchLethalChoice===draft.lethal);
-  if(matchClassDrafts)matchClassDrafts=writeClassLoadout(matchClassDrafts,loadoutEditClass.match,draft);renderLoadoutClassStrip('match');const targetClass=normalizeLoadoutClassId(loadoutEditClass.match),savedClass=normalizeLoadoutClassId(pendingClassId||activeClassId),dirty=!classSetEqual(matchClassDrafts||loadoutClasses,matchClassBase||loadoutClasses)||targetClass!==savedClass,status=$('loadoutStatus'),description=$('loadoutDescription');if(description)description.textContent=godMode?'God Mode is active. Save equips the new loadout immediately.':'Changes are staged until Save. Your current life stays unchanged.';if(status)status.textContent=dirty?'Unsaved changes':godMode?'Saved loadout · changes equip immediately.':(pendingLoadout?'Queued loadout is saved for your next spawn.':'Saved loadout · equips on your next spawn.');if($('loadoutResetBtn'))$('loadoutResetBtn').disabled=!dirty;if($('loadoutSaveBtn'))$('loadoutSaveBtn').disabled=!dirty;
+  if(matchClassDrafts)matchClassDrafts=writeClassLoadout(matchClassDrafts,loadoutEditClass.match,draft);renderLoadoutClassStrip('match');const status=$('loadoutStatus'),description=$('loadoutDescription');if(description)description.textContent=godMode?'Changes save automatically and equip immediately while God Mode is active.':'Changes save automatically and equip on your next spawn. Your current life stays unchanged.';if(status)status.textContent=godMode?'AUTO-SAVE · EQUIPS IMMEDIATELY':'AUTO-SAVE · NEXT SPAWN';
 }
 function openMatchLoadout(){if(!shell.inMatch||matchState.status===MATCH_STATUS.ENDED)return;matchClassBase=normalizeLoadoutClasses(loadoutClasses,selectedLoadout());matchClassDrafts=normalizeLoadoutClasses(matchClassBase,selectedLoadout());loadoutEditClass.match=normalizeLoadoutClassId(pendingClassId||activeClassId);loadoutBaseDraft=classLoadout(matchClassBase,loadoutEditClass.match);loadoutDraft=classLoadout(matchClassDrafts,loadoutEditClass.match);syncMatchLoadoutEditor();shell.openPanel(SHELL_PANEL.LOADOUT);setLoadoutWorkspaceMode('match','classes',{ensurePreview:false});}
 function closeMatchLoadout(){setLoadoutWorkspaceMode('match','classes',{ensurePreview:false});loadoutDraft=null;loadoutBaseDraft=null;matchClassDrafts=null;matchClassBase=null;shell.closePanel(SHELL_PANEL.LOADOUT);}
-function resetMatchLoadout(){if(!matchClassBase)return;matchClassDrafts=normalizeLoadoutClasses(matchClassBase,selectedLoadout());loadoutEditClass.match=normalizeLoadoutClassId(pendingClassId||activeClassId);loadoutBaseDraft=classLoadout(matchClassBase,loadoutEditClass.match);loadoutDraft=classLoadout(matchClassDrafts,loadoutEditClass.match);syncMatchLoadoutEditor();}
-function saveMatchLoadout(){
-  if(socket?.readyState!==WebSocket.OPEN||!loadoutDraft)return;matchClassDrafts=writeClassLoadout(matchClassDrafts||loadoutClasses,loadoutEditClass.match,loadoutDraft);const classId=normalizeLoadoutClassId(loadoutEditClass.match),savedClass=normalizeLoadoutClassId(pendingClassId||activeClassId);if(classSetEqual(matchClassDrafts,matchClassBase||loadoutClasses)&&classId===savedClass){closeMatchLoadout();return;}
-  const next=classLoadout(matchClassDrafts,classId);send({t:'loadout',classId,loadoutClasses:matchClassDrafts,...next});loadoutClasses=normalizeLoadoutClasses(matchClassDrafts,selectedLoadout());rememberLoadoutClasses(loadoutClasses,classId);if(godMode){pendingClassId='';pendingLoadout=null;showToast(`${loadoutClassById(loadoutClasses,classId).name} APPLYING`);}else{pendingClassId=classId;pendingLoadout=next;showToast(hp<=0?`${loadoutClassById(loadoutClasses,classId).name} SAVED FOR RESPAWN`:`${loadoutClassById(loadoutClasses,classId).name} · NEXT SPAWN`);}syncPauseContext();closeMatchLoadout();
+function commitMatchLoadoutChange({selectClass=false,announce=false}={}){
+  if(socket?.readyState!==WebSocket.OPEN||!matchClassDrafts||!loadoutDraft)return false;
+  matchClassDrafts=writeClassLoadout(matchClassDrafts,loadoutEditClass.match,loadoutDraft);
+  const editedClassId=normalizeLoadoutClassId(loadoutEditClass.match),classId=selectClass?editedClassId:normalizeLoadoutClassId(pendingClassId||activeClassId),classes=normalizeLoadoutClasses(matchClassDrafts,selectedLoadout()),next=classLoadout(classes,classId),classesOnly=!selectClass&&editedClassId!==classId,rev=++matchLoadoutRevision;
+  loadoutClasses=classes;matchClassBase=normalizeLoadoutClasses(classes,selectedLoadout());loadoutBaseDraft=classLoadout(matchClassBase,editedClassId);rememberLoadoutClasses(loadoutClasses,classId);
+  if(!classesOnly&&!godMode){pendingClassId=classId;pendingLoadout=next;}
+  send(classesOnly?{t:'loadout',rev,classId,loadoutClasses:classes,classesOnly:true}:{t:'loadout',rev,classId,loadoutClasses:classes,...next});syncPauseContext();renderLoadoutClassStrip('match');
+  if(announce)showToast(godMode?`${loadoutClassById(classes,classId).name} APPLYING`:`${loadoutClassById(classes,classId).name} · NEXT SPAWN`,{duration:1100,key:'loadout-class'});
+  return true;
 }
+function setMatchLoadoutDraft(next={}){loadoutDraft=normalizeLoadoutChoice({...loadoutDraftForSurface('match'),...next});syncMatchLoadoutEditor();commitMatchLoadoutChange();}
 
 function weaponSoundCueIds(weapon=currentWeapon){return weapon==='akimbo1887'?['shot1887','shot1887Suppressed','reload1887','action1887']:weapon==='assault'?['shotAssault','shotAssaultSuppressed','reloadAssault']:weapon==='ump'?['shotUmp','shotUmpSuppressed','reloadUmp']:weapon==='machineGun'?['shotMachineGun','shotMachineGunSuppressed','reloadMachineGun']:weapon==='shotgun'?['shotShotgun','shotShotgunSuppressed','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotSemiShotgun','reloadSemiShotgun']:weapon==='sniper'?['shotSniper','shotSniperSuppressed','reloadSniper']:weapon==='grenadeLauncher'?['shotGl','reloadGl','glExplosion']:weapon==='rpg'?['shotRpg','reloadRpg','rpgExplosion']:['shotPistol','shotPistolSuppressed','reloadPistol'];}
 function warmWeaponAudio(weapon=currentWeapon){for(const id of weaponSoundCueIds(weapon))gameAudio.load(id);}
@@ -1238,24 +1244,19 @@ function normalizePlayerSettingsValue(value={}){
 }
 function setSettingsStatus(text,tone=''){const el=$('settingsStatus');if(!el)return;el.textContent=text;el.className=`admin-status ${tone}`.trim();}
 function playerSettingsEqual(a,b){const x=normalizePlayerSettingsValue(a),y=normalizePlayerSettingsValue(b);return Object.keys(x).every(k=>x[k]===y[k]);}
-function syncPlayerSettingsUI(value=playerSettingsDraft||playerSettings){
+function syncPlayerSettingsUI(value=playerSettings){
   const source=normalizePlayerSettingsValue(value),values=[['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerControllerVerticalSensitivity','controllerVerticalSensitivity'],['playerControllerMoveDeadzone','controllerMoveDeadzone'],['playerControllerLookDeadzone','controllerLookDeadzone'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']];
   for(const [id,key] of values){const el=$(id),out=$(`${id}Value`);if(el)el.value=source[key];if(out)out.textContent=key.includes('Volume')?`${Math.round(source[key]*100)}%`:key.includes('Deadzone')?`${Math.round(source[key]*100)}%`:`${Number(source[key]).toFixed(2)}×`;}
   if($('playerGraphics'))$('playerGraphics').value=source.graphics;if($('playerMinimapOrientation'))$('playerMinimapOrientation').value=source.minimapOrientation;if($('playerControllerResponseCurve'))$('playerControllerResponseCurve').value=source.controllerResponseCurve;if($('playerControllerAimAssist'))$('playerControllerAimAssist').value=source.controllerAimAssist;syncMusicUI();syncDiagnosticsSettingsUI();
-  const dirty=!playerSettingsEqual(source,playerSettings);if($('settingsResetBtn'))$('settingsResetBtn').disabled=!dirty;if($('settingsSaveBtn'))$('settingsSaveBtn').disabled=!dirty;
 }
-function stagePlayerSettingFromUI(id,key){const el=$(id);if(!el)return;if(!playerSettingsDraft)playerSettingsDraft={...playerSettings};playerSettingsDraft=normalizePlayerSettingsValue({...playerSettingsDraft,[key]:Number(el.value)});syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus(playerSettingsEqual(playerSettingsDraft,playerSettings)?'Saved settings':'Unsaved changes');}
-function stagePlayerChoice(key,value){if(!playerSettingsDraft)playerSettingsDraft={...playerSettings};playerSettingsDraft=normalizePlayerSettingsValue({...playerSettingsDraft,[key]:value});syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus(playerSettingsEqual(playerSettingsDraft,playerSettings)?'Saved settings':'Unsaved changes');}
-function openPlayerSettings(){if(shell.inMatch&&matchState.status===MATCH_STATUS.ENDED)return;playerSettingsDraft={...playerSettings};syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus('Preferences saved · live actions apply immediately');switchSubTabs('[data-settings-tab]','[data-settings-page]','data-settings-tab','data-settings-page','controls');shell.openPanel(SHELL_PANEL.SETTINGS);}
-function cancelPlayerSettings(){playerSettingsDraft=null;shell.closePanel(SHELL_PANEL.SETTINGS);}
-function closePlayerSettings(){cancelPlayerSettings();}
-function resetPlayerSettings(){playerSettingsDraft={...playerSettings};syncPlayerSettingsUI(playerSettingsDraft);setSettingsStatus('Staged preferences reset to saved');}
-function savePlayerSettingsDraft(){
-  if(!playerSettingsDraft||playerSettingsEqual(playerSettingsDraft,playerSettings)){cancelPlayerSettings();return;}
-  const previous=playerSettings,nextSettings=normalizePlayerSettingsValue(playerSettingsDraft);playerSettings=nextSettings;playerSettingsDraft=null;savePlayerSettings();applyGraphicsQuality();hudLastDraw=0;
-  if(!shell.inMatch&&introMusicHandle&&(previous.masterVolume!==playerSettings.masterVolume||previous.musicVolume!==playerSettings.musicVolume)){stopIntroMusic();if(!masterMuted)startIntroMusic();}
-  shell.closePanel(SHELL_PANEL.SETTINGS);showToast('SETTINGS SAVED');
-}
+function applyPlayerSettings(next,{status='Saved automatically'}={}){const previous=playerSettings;playerSettings=normalizePlayerSettingsValue(next);playerSettingsDraft=null;savePlayerSettings();applyGraphicsQuality();hudLastDraw=0;syncPlayerSettingsUI(playerSettings);setSettingsStatus(status,'ok');return previous;}
+function stagePlayerSettingFromUI(id,key){const el=$(id);if(!el)return;applyPlayerSettings({...playerSettings,[key]:Number(el.value)});}
+function stagePlayerChoice(key,value){applyPlayerSettings({...playerSettings,[key]:value});}
+function refreshIntroMusicVolume(){if(!shell.inMatch&&introMusicHandle){stopIntroMusic();if(!masterMuted)startIntroMusic();}}
+function openPlayerSettings(){if(shell.inMatch&&matchState.status===MATCH_STATUS.ENDED)return;playerSettingsDraft=null;syncPlayerSettingsUI(playerSettings);setSettingsStatus('Changes save automatically','ok');switchSubTabs('[data-settings-tab]','[data-settings-page]','data-settings-tab','data-settings-page','controls');shell.openPanel(SHELL_PANEL.SETTINGS);}
+function closePlayerSettings(){playerSettingsDraft=null;shell.closePanel(SHELL_PANEL.SETTINGS);}
+function cancelPlayerSettings(){closePlayerSettings();}
+function resetPlayerSettings(){if(diagnosticsRecordingEnabled())setDiagnosticsRecording(false);setMasterMuted(false);applyPlayerSettings({...DEFAULT_PLAYER_SETTINGS,diagnostics:'off'},{status:'Defaults restored'});refreshIntroMusicVolume();showToast('SETTINGS RESET TO DEFAULTS');}
 
 
 
@@ -1929,21 +1930,19 @@ function bindUI(){
   $('lobbySettingsBtn').addEventListener('click',openPlayerSettings);
   $('pauseSettingsBtn').addEventListener('click',openPlayerSettings);
   $('pauseLoadoutBtn').addEventListener('click',openMatchLoadout);
-  $('loadoutResetBtn').addEventListener('click',resetMatchLoadout);
-  $('loadoutCancelBtn').addEventListener('click',closeMatchLoadout);
-  $('loadoutSaveBtn').addEventListener('click',saveMatchLoadout);
-  for(const btn of matchPrimaryButtons)btn.addEventListener('click',()=>{loadoutDraft=normalizeLoadoutChoice({...loadoutDraft,primaryWeapon:btn.dataset.matchPrimaryChoice});syncMatchLoadoutEditor();});
-  for(const btn of matchSecondaryButtons)btn.addEventListener('click',()=>{loadoutDraft=normalizeLoadoutChoice({...loadoutDraft,secondaryWeapon:btn.dataset.matchSecondaryChoice});syncMatchLoadoutEditor();});
-  for(const btn of matchTacticalButtons)btn.addEventListener('click',()=>{loadoutDraft=normalizeLoadoutChoice({...loadoutDraft,tactical:btn.dataset.matchTacticalChoice});syncMatchLoadoutEditor();});
-  for(const btn of matchLethalButtons)btn.addEventListener('click',()=>{loadoutDraft=normalizeLoadoutChoice({...loadoutDraft,lethal:btn.dataset.matchLethalChoice});syncMatchLoadoutEditor();});
-  $('settingsCancelBtn').addEventListener('click',cancelPlayerSettings);
-  $('settingsSaveBtn').addEventListener('click',savePlayerSettingsDraft);
+  $('loadoutCloseBtn').addEventListener('click',closeMatchLoadout);
+  for(const btn of matchPrimaryButtons)btn.addEventListener('click',()=>setMatchLoadoutDraft({primaryWeapon:btn.dataset.matchPrimaryChoice}));
+  for(const btn of matchSecondaryButtons)btn.addEventListener('click',()=>setMatchLoadoutDraft({secondaryWeapon:btn.dataset.matchSecondaryChoice}));
+  for(const btn of matchTacticalButtons)btn.addEventListener('click',()=>setMatchLoadoutDraft({tactical:btn.dataset.matchTacticalChoice}));
+  for(const btn of matchLethalButtons)btn.addEventListener('click',()=>setMatchLoadoutDraft({lethal:btn.dataset.matchLethalChoice}));
+  $('settingsCloseBtn').addEventListener('click',closePlayerSettings);
   $('settingsFullscreenBtn').addEventListener('click',async()=>{ensureAudio();if(shell.fullscreen)await shell.exitFullscreenFromGesture();else await shell.enterFullscreenFromGesture();});
   $('rotateExitFullscreenBtn')?.addEventListener('click',()=>shell.exitFullscreenFromGesture());
   $('connectionCancelBtn')?.addEventListener('click',()=>cancelInitialConnection('Connection canceled.'));
   $('settingsResetBtn').addEventListener('click',resetPlayerSettings);
-  $('playerMasterMute')?.addEventListener('change',()=>{setMasterMuted($('playerMasterMute').value==='on');setSettingsStatus(playerSettingsDraft&&!playerSettingsEqual(playerSettingsDraft,playerSettings)?'Unsaved preferences · mute applied live':'Preferences saved · mute applied live');});
+  $('playerMasterMute')?.addEventListener('change',()=>{setMasterMuted($('playerMasterMute').value==='on');setSettingsStatus('Saved automatically','ok');});
   for(const [id,key] of [['playerLookSensitivity','lookSensitivity'],['playerAdsSensitivity','adsSensitivity'],['playerTouchSensitivity','touchSensitivity'],['playerControllerVerticalSensitivity','controllerVerticalSensitivity'],['playerControllerMoveDeadzone','controllerMoveDeadzone'],['playerControllerLookDeadzone','controllerLookDeadzone'],['playerMasterVolume','masterVolume'],['playerSfxVolume','sfxVolume'],['playerMusicVolume','musicVolume']])$(id)?.addEventListener('input',()=>stagePlayerSettingFromUI(id,key));
+  for(const id of ['playerMasterVolume','playerMusicVolume'])$(id)?.addEventListener('change',refreshIntroMusicVolume);
   $('playerGraphics').addEventListener('change',()=>stagePlayerChoice('graphics',$('playerGraphics').value));
   $('playerMinimapOrientation')?.addEventListener('change',()=>stagePlayerChoice('minimapOrientation',$('playerMinimapOrientation').value));
   $('playerControllerResponseCurve')?.addEventListener('change',()=>stagePlayerChoice('controllerResponseCurve',$('playerControllerResponseCurve').value));
@@ -3057,7 +3056,9 @@ function applyAuthoritativeLoadout(m){
   if(m?.accepted===false&&m.action)recordNetReject(m.action,m.reason);
   const ackRev=Math.max(0,Math.floor(Number(m.rev)||0));
   if(shell.inLobby&&m.action==='loadout'&&ackRev&&ackRev<lobbyLoadoutRevision)return;
+  if(shell.inMatch&&m.action==='loadout'&&ackRev&&ackRev<matchLoadoutRevision)return;
   if(shell.inLobby&&m.action==='loadout'&&ackRev)lobbyLoadoutAckRevision=Math.max(lobbyLoadoutAckRevision,ackRev);
+  if(shell.inMatch&&m.action==='loadout'&&ackRev)matchLoadoutAckRevision=Math.max(matchLoadoutAckRevision,ackRev);
   if(Array.isArray(m.loadoutClasses))loadoutClasses=normalizeLoadoutClasses(m.loadoutClasses,selectedLoadout());if(Object.prototype.hasOwnProperty.call(m,'activeClassId')){activeClassId=normalizeLoadoutClassId(m.activeClassId);if(shell.inLobby)lobbyStartingClassId=activeClassId;}if(Object.prototype.hasOwnProperty.call(m,'pendingClassId'))pendingClassId=m.pendingClassId?normalizeLoadoutClassId(m.pendingClassId):'';if(Array.isArray(m.loadoutClasses))rememberLoadoutClasses(loadoutClasses,pendingClassId||activeClassId);
   if(PRIMARY_WEAPONS.includes(m.primaryWeapon)){primaryWeapon=m.primaryWeapon;if(shell.inLobby)rememberPrimary(primaryWeapon);}
   if(SECONDARY_WEAPONS.includes(m.secondaryWeapon)){secondaryWeapon=m.secondaryWeapon;if(shell.inLobby)rememberSecondary(secondaryWeapon);}
@@ -3075,7 +3076,7 @@ function applyAuthoritativeLoadout(m){
   if(m.action==='fire'&&m.accepted===false&&(m.reason==='cooldown'||m.reason==='weapon_switch'||m.reason==='sprint_out'))delayFire(Math.max(8,Math.min(180,Number(m.retryAfterMs)||35)),m.weapon);
   if(m.pending===true&&pendingLoadout){rememberLoadoutClasses(loadoutClasses,activeClassId);showToast(`${loadoutClassById(loadoutClasses,pendingClassId||activeClassId).name} QUEUED · NEXT SPAWN`);}
   if(shell.inLobby&&lobbyLoadoutDraft){if(Array.isArray(m.loadoutClasses))lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,selectedLoadout());markLobbyLoadoutDirty();}
-  syncLocalWeaponModel();syncPauseContext();if(shell.inLobby){renderLobbySetupControls();setLobbyActionState();renderLobbyRoster(lobbyDisplayMode());}
+  if(shell.panel===SHELL_PANEL.LOADOUT&&Array.isArray(m.loadoutClasses)){matchClassDrafts=normalizeLoadoutClasses(loadoutClasses,selectedLoadout());matchClassBase=normalizeLoadoutClasses(loadoutClasses,selectedLoadout());loadoutDraft=classLoadout(matchClassDrafts,loadoutEditClass.match);loadoutBaseDraft=classLoadout(matchClassBase,loadoutEditClass.match);syncMatchLoadoutEditor();}syncLocalWeaponModel();syncPauseContext();if(shell.inLobby){renderLobbySetupControls();setLobbyActionState();renderLobbyRoster(lobbyDisplayMode());}
 }
 
 function freshClientFireReady(){return Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));}
