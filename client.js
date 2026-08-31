@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.51';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.51';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.51';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.51';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.51';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.51';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.51';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.51';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.52';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.52';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.52';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.52';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.52';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.52';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.52';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.52';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.51';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.51';
-import { createAudioEngine } from './audio-engine.js?v=1.44.51';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.51';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.51';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.51';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.51';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.51';
+} from './game-config.js?v=1.44.52';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.52';
+import { createAudioEngine } from './audio-engine.js?v=1.44.52';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.52';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.52';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.52';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.52';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.52';
 
 let THREE = null;
 
@@ -347,8 +347,8 @@ function bindLoadoutWorkspaceTabs(){
 function applyLoadoutAttachmentChoice(surface,weaponSlot,slot,id){const live=loadoutDraftForSurface(surface),key=weaponSlot==='primary'?'primaryAttachments':'secondaryAttachments',next={...loadoutSlotAttachments(live,weaponSlot),[slot]:id};if(surface==='lobby'){setLobbyLoadoutDraft({[key]:next});renderAttachmentEditors('lobby',lobbyLoadoutDraft||loadoutDraftForSurface('lobby'));}else{loadoutDraft=normalizeLoadoutChoice({...live,[key]:next});syncMatchLoadoutEditor();commitMatchLoadoutChange();}}
 function renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups){const key=`${surface}-${weaponSlot}`,host=document.querySelector(`[data-gunsmith-callouts="${key}"]`);if(!host)return;host.replaceChildren();const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('gunsmith-callout-lines');svg.setAttribute('aria-hidden','true');host.append(svg);for(const [slot] of groups){const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.dataset.calloutLine=slot;const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.dataset.calloutDot=slot;dot.setAttribute('r','2.8');svg.append(line,dot);const b=document.createElement('button');b.type='button';b.className=`gunsmith-callout gunsmith-callout-${slot}`;b.dataset.calloutSlot=slot;b.dataset.controllerKey=`gunsmith:${key}:slot:${slot}`;const label=document.createElement('span');label.textContent=slot.toUpperCase();const id=current?.[slot]||'',item=id?ATTACHMENTS[id]:null,value=document.createElement('strong');value.textContent=item?.short||item?.name||'NONE';b.append(label,value);b.classList.toggle('active',loadoutAttachmentTrayOpen.has(key)&&loadoutAttachmentSlot[key]===slot);b.classList.toggle('equipped',!!item);b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();loadoutWeaponPickerOpen.delete(key);if(!loadoutAttachmentTrayOpen.has(key)||loadoutAttachmentSlot[key]!==slot)setLoadoutAttachmentComparisonBase(surface,weaponSlot,weapon,slot,current);loadoutAttachmentSlot[key]=slot;loadoutAttachmentTrayOpen.add(key);renderAttachmentEditor(surface,weaponSlot,loadoutDraftForSurface(surface));renderLoadoutStats(surface,weaponSlot,weapon,loadoutSlotAttachments(loadoutDraftForSurface(surface),weaponSlot));const selected=current?.[slot]||'';queueControllerUiFocus(`attachment:${key}:${slot}:${selected||'none'}`);});host.append(b);} }
 function renderAttachmentEditor(surface,weaponSlot,draft){
-  const host=document.querySelector(`[data-attachment-editor="${surface}-${weaponSlot}"]`);if(!host)return;const key=`${surface}-${weaponSlot}`,weapon=loadoutSlotWeapon(draft,weaponSlot),current=loadoutSlotAttachments(draft,weaponSlot),groups=ATTACHMENT_SLOTS.map(slot=>[slot,attachmentOptionsForWeapon(weapon,slot)]).filter(([,items])=>items.length),picker=document.querySelector(`[data-gunsmith-weapon-picker="${key}"]`),weaponPicker=loadoutWeaponPickerOpen.has(key);if(picker)picker.hidden=!weaponPicker;host.hidden=weaponPicker;renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups);if(weaponPicker)return;host.replaceChildren();host.classList.toggle('empty',groups.length===0);if(!groups.length){const empty=document.createElement('div');empty.className='gunsmith-inspector-empty';empty.innerHTML='<strong>NO ATTACHMENTS</strong>';host.append(empty);return;}
-  const activeSlot=activeLoadoutAttachmentSlot(surface,weaponSlot,weapon),activeItems=activeSlot?(groups.find(([slot])=>slot===activeSlot)?.[1]||[]):[];if(!activeSlot||!loadoutAttachmentTrayOpen.has(key))return;
+  const host=document.querySelector(`[data-attachment-editor="${surface}-${weaponSlot}"]`);if(!host)return;const key=`${surface}-${weaponSlot}`,weapon=loadoutSlotWeapon(draft,weaponSlot),current=loadoutSlotAttachments(draft,weaponSlot),groups=ATTACHMENT_SLOTS.map(slot=>[slot,attachmentOptionsForWeapon(weapon,slot)]).filter(([,items])=>items.length),picker=document.querySelector(`[data-gunsmith-weapon-picker="${key}"]`),weaponPicker=loadoutWeaponPickerOpen.has(key),layout=host.closest('.gunsmith-layout');if(layout){layout.classList.toggle('picker-open',weaponPicker);layout.classList.remove('tray-open');}if(picker)picker.hidden=!weaponPicker;host.hidden=weaponPicker;renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups);if(weaponPicker)return;host.replaceChildren();host.classList.toggle('empty',groups.length===0);if(!groups.length){const empty=document.createElement('div');empty.className='gunsmith-inspector-empty';empty.innerHTML='<strong>NO ATTACHMENTS</strong>';host.append(empty);return;}
+  const activeSlot=activeLoadoutAttachmentSlot(surface,weaponSlot,weapon),activeItems=activeSlot?(groups.find(([slot])=>slot===activeSlot)?.[1]||[]):[],trayOpen=!!activeSlot&&loadoutAttachmentTrayOpen.has(key);layout?.classList.toggle('tray-open',trayOpen);if(!trayOpen)return;
   const selectedId=current?.[activeSlot]||'',selectedItem=selectedId?ATTACHMENTS[selectedId]:null,head=document.createElement('header');head.className='gunsmith-attachment-head';const title=document.createElement('div'),strong=document.createElement('strong');strong.textContent=activeSlot.toUpperCase();title.append(strong);const close=document.createElement('button');close.type='button';close.className='gunsmith-tray-close';close.textContent='×';close.setAttribute('aria-label','Close attachment options');close.dataset.controllerKey=`attachment:${key}:close`;close.addEventListener('click',()=>{const slot=loadoutAttachmentSlot[key];loadoutAttachmentTrayOpen.delete(key);clearLoadoutAttachmentComparisonBase(key);loadoutAttachmentSlot[key]='';renderAttachmentEditor(surface,weaponSlot,loadoutDraftForSurface(surface));renderLoadoutStats(surface,weaponSlot,weapon,loadoutSlotAttachments(loadoutDraftForSurface(surface),weaponSlot));queueControllerUiFocus(`gunsmith:${key}:slot:${slot}`);});head.append(title,close);
   const options=document.createElement('div');options.className='gunsmith-attachment-options';for(const item of [null,...activeItems]){const id=item?.id||'',b=document.createElement('button');b.type='button';b.className='gunsmith-attachment-option';b.dataset.controllerKey=`attachment:${key}:${activeSlot}:${id||'none'}`;b.classList.toggle('active',(current?.[activeSlot]||'')===id);const name=document.createElement('strong');name.textContent=item?.name||'NONE';const detailText=item?attachmentDescriptionForWeapon(item,weapon):'';b.append(name);if(detailText){const detail=document.createElement('small');detail.textContent=detailText;b.append(detail);}b.addEventListener('click',()=>{applyLoadoutAttachmentChoice(surface,weaponSlot,activeSlot,id);queueControllerUiFocus(`attachment:${key}:${activeSlot}:${id||'none'}`);});options.append(b);}host.append(head,options);
 }
@@ -710,7 +710,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.51';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.52';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
