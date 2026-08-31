@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.55';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.55';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.55';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.55';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.55';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.55';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.55';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.55';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.56';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.56';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.56';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.56';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.56';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.56';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.56';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.56';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.55';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.55';
-import { createAudioEngine } from './audio-engine.js?v=1.44.55';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.55';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.55';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.55';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.55';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.55';
+} from './game-config.js?v=1.44.56';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.56';
+import { createAudioEngine } from './audio-engine.js?v=1.44.56';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.56';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.56';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.56';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.56';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.56';
 
 let THREE = null;
 
@@ -99,7 +99,7 @@ const NET_DIAG_URL_ENABLED = new URL(location.href).searchParams.get('netdiag')=
 const NET_DIAG_FRAME_STALL_MS = 100;
 // Entire sound set is generated locally as 16-bit PCM WAV assets.
 // No third-party or runtime-hosted audio is required.
-const AUDIO_ASSET_REV='audio-20260831-hitmark-kick';
+const AUDIO_ASSET_REV='audio-20260831-hit-feedback-no-metal';
 const ATTACHMENT_AUDIO_REV='audio-20260829-1';
 const SOUND_CUES = {
   introMusic:{url:`audio/intro.wav?rev=${AUDIO_ASSET_REV}`,group:'Music',gain:.40,loop:true},
@@ -133,7 +133,6 @@ const SOUND_CUES = {
   reloadGl:{url:`audio/reload-gl.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.72},
   reloadRpg:{url:`audio/reload-rpg.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.76},
   hitmarker:{url:`audio/hitmarker.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.58},
-  headshot:{url:`audio/headshot.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.58},
   kill:{url:`audio/kill.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.58},
   announcer:{url:`audio/announcer.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.54},
   shield:{url:`audio/shield.wav?rev=${AUDIO_ASSET_REV}`,group:'Feedback',gain:.58},
@@ -144,7 +143,6 @@ const SOUND_CUES = {
   land:{url:`audio/land.wav?rev=${AUDIO_ASSET_REV}`,group:'Movement',gain:.66},
   slide:{url:`audio/slide.wav?rev=${AUDIO_ASSET_REV}`,group:'Movement',gain:.58},
   impactWall:{url:`audio/impact-wall.wav?rev=${AUDIO_ASSET_REV}`,group:'Impacts',gain:.62},
-  impactPlayer:{url:`audio/impact-player.wav?rev=${AUDIO_ASSET_REV}`,group:'Impacts',gain:.60},
   impactBlocked:{url:`audio/impact-blocked.wav?rev=${AUDIO_ASSET_REV}`,group:'Impacts',gain:.58},
   flashThrow:{url:`audio/flash-throw.wav?rev=${AUDIO_ASSET_REV}`,group:'Tactical',gain:.52},
   stickyThrow:{url:`audio/sticky-throw.wav?rev=${AUDIO_ASSET_REV}`,group:'Tactical',gain:.52},
@@ -711,7 +709,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.55';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.56';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1245,7 +1243,7 @@ function setMatchLoadoutDraft(next={}){loadoutDraft=normalizeLoadoutChoice({...l
 
 function weaponSoundCueIds(weapon=currentWeapon){return weapon==='akimbo1887'?['shot1887','shot1887Suppressed','reload1887','action1887']:weapon==='assault'?['shotAssault','shotAssaultSuppressed','reloadAssault']:weapon==='ump'?['shotUmp','shotUmpSuppressed','reloadUmp']:weapon==='machineGun'?['shotMachineGun','shotMachineGunSuppressed','reloadMachineGun']:weapon==='shotgun'?['shotShotgun','shotShotgunSuppressed','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotSemiShotgun','reloadSemiShotgun']:weapon==='sniper'?['shotSniper','shotSniperSuppressed','reloadSniper']:weapon==='grenadeLauncher'?['shotGl','reloadGl','glExplosion']:weapon==='rpg'?['shotRpg','reloadRpg','rpgExplosion']:['shotPistol','shotPistolSuppressed','reloadPistol'];}
 function warmWeaponAudio(weapon=currentWeapon){for(const id of weaponSoundCueIds(weapon))gameAudio.load(id);}
-const CORE_GAMEPLAY_AUDIO_IDS=Object.freeze(['footstepLeft','footstepRight','jump','land','slide','impactWall','impactPlayer','impactBlocked','hurt','hitmarker','headshot','kill','shield','announcer','flashDetonate','grenadeExplosion','glExplosion','rpgExplosion','flashThrow','stickyThrow','flashImpact','stickyImpact','semtexBeep']);
+const CORE_GAMEPLAY_AUDIO_IDS=Object.freeze(['footstepLeft','footstepRight','jump','land','slide','impactWall','impactBlocked','hurt','hitmarker','kill','shield','announcer','flashDetonate','grenadeExplosion','glExplosion','rpgExplosion','flashThrow','stickyThrow','flashImpact','stickyImpact','semtexBeep']);
 const ALL_WEAPON_AUDIO_IDS=Object.freeze([...new Set(WEAPON_ORDER.flatMap(weapon=>weaponSoundCueIds(weapon)))]);
 function ensureAudio(){audioUnlockPromise=gameAudio.unlock();return audioUnlockPromise;}
 async function warmGameplayAudio(weapon=currentWeapon){
@@ -3703,8 +3701,11 @@ function updateThrowables(dt){
 }
 
 function playBulletImpactSound(kind,x,y,z){
-  const cue=kind==='player'?'impactPlayer':kind==='blocked'?'impactBlocked':'impactWall';
-  const rate=kind==='player'?.97+Math.random()*.05:.94+Math.random()*.10;
+  // Player hits use the dedicated hit-confirm kick only. A second spatial
+  // impact cue made successful hits sound metallic and duplicated feedback.
+  if(kind==='player')return;
+  const cue=kind==='blocked'?'impactBlocked':'impactWall';
+  const rate=.94+Math.random()*.10;
   playSpatialCue(cue,Number(x)||0,Number(y)||0,Number(z)||0,42,.92,{playbackRate:rate});
 }
 function spawnBulletImpactFx(m){
@@ -4779,7 +4780,7 @@ function reloadSoundId(weapon=currentWeapon){
 }
 function soundReload(weapon=currentWeapon){playSoundCue(reloadSoundId(weapon),1,{playbackRate:.99+Math.random()*.02,priority:3});}
 function soundHitmarker(){playSoundCue('hitmarker',1,{priority:5});}
-function soundHeadshot(){playSoundCue('headshot',1,{priority:6});}
+function soundHeadshot(){playSoundCue('hitmarker',1.10,{playbackRate:.88,priority:6});}
 function soundKill(){playSoundCue('kill',1,{priority:6});}
 function soundAnnouncer(priority=1){playSoundCue('announcer',1,{playbackRate:priority>=5?1.08:1,priority:Math.max(3,Math.min(6,priority))});}
 function soundShield(){playSoundCue('shield',1,{priority:5});}
