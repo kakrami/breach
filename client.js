@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.58';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.58';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.58';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.58';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.58';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.58';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.58';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.58';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.59';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.59';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.59';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.59';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.59';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.59';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.59';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.59';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec
-} from './game-config.js?v=1.44.58';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.58';
-import { createAudioEngine } from './audio-engine.js?v=1.44.58';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.58';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.58';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.58';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.58';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.58';
+} from './game-config.js?v=1.44.59';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.59';
+import { createAudioEngine } from './audio-engine.js?v=1.44.59';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.59';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.59';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.59';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.59';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.59';
 
 let THREE = null;
 
@@ -707,7 +707,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.58';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.59';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -912,12 +912,31 @@ const SNIPER_BREATH_READY_BLEND=.965;
 const SNIPER_BREATH_HOLD_MS=4200;
 const SNIPER_BREATH_RECOVER_MS=3200;
 const SNIPER_BREATH_RESTART_RESERVE=.28;
+const sniperThermalMaterialStates=new Map();
+const sniperThermalLightStates=new Map();
+let sniperThermalBackgroundState=null,sniperThermalFogState=null,sniperThermalWorldBlend=0,sniperThermalLastCollectAt=0;
 function sniperOpticSpec(){const id=String(attachmentsForWeapon('sniper')?.optic||'');return id?ATTACHMENTS[id]||null:null;}
 function sniperZoomLabel(){return String(sniperOpticSpec()?.zoomLabel||'4X');}
 function sniperTargetFov(){return Number(effectiveWeaponSpec('sniper')?.adsFov)||18;}
 function sniperScopeSensitivityBase(){const fov=sniperTargetFov();return fov<=10.5?.15:fov<=13.5?.20:.28;}
 function sniperThermalMode(){return String(sniperOpticSpec()?.thermalMode||'');}
 function sniperThermalAmount(){if(!sniperThermalMode())return 0;return smoothstep01((sniperAdsMotion()-.66)/.28);}
+function sniperThermalWorldAmount(){if(!sniperThermalMode())return 0;return smoothstep01((sniperMaskAmount()-.88)/.10);}
+let sniperThermalColorScratch=null;
+function thermalGrayTarget(color,mode,out){out=out||(sniperThermalColorScratch||(sniperThermalColorScratch=new THREE.Color()));const lum=color.r*.2126+color.g*.7152+color.b*.0722,gray=THREE.MathUtils.clamp(lum*(mode==='white'?.38:.44)+(mode==='white'?.022:.028),.018,mode==='white'?.44:.50);return out.setRGB(gray,gray,gray);}
+function captureSniperThermalMaterial(mat){if(!mat||mat.userData?.sniperThermalSignature||sniperThermalMaterialStates.has(mat)||!mat.color?.isColor)return;const map=mat.map||null,thermalMap=map?.userData?.worldTextureName?getWorldThermalTexture(map.userData.worldTextureName):(map?.userData?.thermalTexture||null);sniperThermalMaterialStates.set(mat,{color:mat.color.clone(),emissive:mat.emissive?.isColor?mat.emissive.clone():null,map,thermalMap});}
+function collectSniperThermalSceneState(){if(!scene)return;scene.traverse(obj=>{if(obj.isLight){if(!sniperThermalLightStates.has(obj))sniperThermalLightStates.set(obj,{color:obj.color?.clone?.()||null,groundColor:obj.groundColor?.clone?.()||null});return;}const mats=Array.isArray(obj.material)?obj.material:[obj.material];for(const mat of mats)captureSniperThermalMaterial(mat);});if(!sniperThermalBackgroundState&&scene.background?.isColor)sniperThermalBackgroundState=scene.background.clone();if(!sniperThermalFogState&&scene.fog?.color?.isColor)sniperThermalFogState=scene.fog.color.clone();}
+function updateSniperThermalWorld(){
+  const mode=sniperThermalMode(),amount=sniperThermalWorldAmount(),now=performance.now();
+  if(amount>.001&&(sniperThermalWorldBlend<=.001||now-sniperThermalLastCollectAt>500)){collectSniperThermalSceneState();sniperThermalLastCollectAt=now;}
+  if(!sniperThermalMaterialStates.size&&!sniperThermalLightStates.size&&!sniperThermalBackgroundState&&!sniperThermalFogState){sniperThermalWorldBlend=amount;return;}
+  for(const [mat,state] of sniperThermalMaterialStates){if(!mat?.color?.isColor)continue;thermalGrayTarget(state.color,mode||'white',sniperThermalColorScratch);mat.color.copy(state.color).lerp(sniperThermalColorScratch,amount);if(state.emissive&&mat.emissive?.isColor){thermalGrayTarget(state.emissive,mode||'white',sniperThermalColorScratch).multiplyScalar(.28);mat.emissive.copy(state.emissive).lerp(sniperThermalColorScratch,amount);}const nextMap=amount>.32&&state.thermalMap?state.thermalMap:state.map;if(mat.map!==nextMap)mat.map=nextMap;}
+  for(const [light,state] of sniperThermalLightStates){if(state.color&&light.color?.isColor){thermalGrayTarget(state.color,mode||'white',sniperThermalColorScratch);light.color.copy(state.color).lerp(sniperThermalColorScratch,amount);}if(state.groundColor&&light.groundColor?.isColor){thermalGrayTarget(state.groundColor,mode||'white',sniperThermalColorScratch);light.groundColor.copy(state.groundColor).lerp(sniperThermalColorScratch,amount);}}
+  if(sniperThermalBackgroundState&&scene?.background?.isColor){thermalGrayTarget(sniperThermalBackgroundState,mode||'white',sniperThermalColorScratch);scene.background.copy(sniperThermalBackgroundState).lerp(sniperThermalColorScratch,amount);}
+  if(sniperThermalFogState&&scene?.fog?.color?.isColor){thermalGrayTarget(sniperThermalFogState,mode||'white',sniperThermalColorScratch);scene.fog.color.copy(sniperThermalFogState).lerp(sniperThermalColorScratch,amount);}
+  sniperThermalWorldBlend=amount;
+  if(amount<=.001){sniperThermalMaterialStates.clear();sniperThermalLightStates.clear();sniperThermalBackgroundState=null;sniperThermalFogState=null;sniperThermalLastCollectAt=0;}
+}
 function sniperAdsMotion(){
   if(currentWeapon!=='sniper')return 0;
   const t=THREE.MathUtils.clamp(adsBlend,0,1);
@@ -1808,17 +1827,19 @@ const WORLD_TEXTURE_DEFS=Object.freeze({
   glass:Object.freeze({file:'glass_grime.png',repeat:[2.0,2.0]}),
 });
 const WORLD_TEXTURE_ASSET_REV='textures-20260826-1';
-const worldTextureCache=new Map();
+const worldTextureCache=new Map(),worldThermalTextureCache=new Map();
 let worldTextureLoader=null;
+function configureWorldTexture(tex,def){tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(def.repeat[0],def.repeat[1]);tex.minFilter=THREE.LinearMipmapLinearFilter;tex.magFilter=THREE.LinearFilter;tex.anisotropy=Math.min(isTouch?1:8,renderer?.capabilities?.getMaxAnisotropy?.()||1);tex.userData.preserveWorldTexture=true;return tex;}
 function getWorldTexture(name){
   if(!THREE||!name)return null;
   if(worldTextureCache.has(name))return worldTextureCache.get(name);
   const def=WORLD_TEXTURE_DEFS[name];if(!def)return null;
   worldTextureLoader ||= new THREE.TextureLoader();
-  const tex=worldTextureLoader.load(`textures/${def.file}?rev=${WORLD_TEXTURE_ASSET_REV}`);
-  tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(def.repeat[0],def.repeat[1]);
-  tex.minFilter=THREE.LinearMipmapLinearFilter;tex.magFilter=THREE.LinearFilter;tex.anisotropy=Math.min(isTouch?1:8,renderer?.capabilities?.getMaxAnisotropy?.()||1);
-  tex.userData.preserveWorldTexture=true;worldTextureCache.set(name,tex);return tex;
+  const tex=configureWorldTexture(worldTextureLoader.load(`textures/${def.file}?rev=${WORLD_TEXTURE_ASSET_REV}`),def);
+  tex.userData.worldTextureName=name;worldTextureCache.set(name,tex);return tex;
+}
+function getWorldThermalTexture(name){
+  if(!THREE||!name)return null;if(worldThermalTextureCache.has(name))return worldThermalTextureCache.get(name);const def=WORLD_TEXTURE_DEFS[name];if(!def)return null;worldTextureLoader ||= new THREE.TextureLoader();const tex=configureWorldTexture(worldTextureLoader.load(`textures/thermal/${def.file}?rev=${WORLD_TEXTURE_ASSET_REV}`),def);tex.userData.worldThermalTexture=true;worldThermalTextureCache.set(name,tex);return tex;
 }
 function worldMat(color,texture,roughness=.9,metalness=0,extra={}){
   return new THREE.MeshStandardMaterial({color,map:getWorldTexture(texture),roughness,metalness,...extra});
@@ -1882,7 +1903,8 @@ function makeTerrainTexture(){
   if(rig){x.globalAlpha=.18;x.strokeStyle='#8a7251';x.lineWidth=1;for(let i=0;i<28;i++){const y=(i*29+13)%size;x.beginPath();x.moveTo(0,y);x.bezierCurveTo(80,y+3,170,y-4,size,y+2);x.stroke();}x.globalAlpha=.20;x.fillStyle='#715d43';for(let i=0;i<520;i++){const px=rand()*size,py=rand()*size,r=.3+rand()*1.0;x.fillRect(px,py,r,r);}}
   else if(yard){x.globalAlpha=.22;x.strokeStyle='#575d60';x.lineWidth=1;for(let i=0;i<18;i++){const y=(i*31+9)%size;x.beginPath();x.moveTo(0,y);x.lineTo(size,y+((i%3)-1)*2);x.stroke();}x.globalAlpha=.18;x.fillStyle='#4e5355';for(let i=0;i<420;i++){const px=rand()*size,py=rand()*size,r=.35+rand()*1.2;x.fillRect(px,py,r,r);}}
   else{x.globalAlpha=depot?.28:.22;x.strokeStyle=depot?'#575d5b':'#758064';x.lineWidth=1;for(let i=0;i<34;i++){const y=(i*37)%size;x.beginPath();x.moveTo(0,y);x.bezierCurveTo(70,y+10,150,y-12,size,y+4);x.stroke();}x.globalAlpha=.16;x.fillStyle=depot?'#777064':'#5d674d';for(let i=0;i<520;i++){const px=rand()*size,py=rand()*size,r=.4+rand()*1.5;x.beginPath();x.arc(px,py,r,0,Math.PI*2);x.fill();}}
-  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(yard?34:(rig?30:28),yard?34:(rig?30:28));tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy?.()||1);return tex;
+  const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;tex.wrapS=tex.wrapT=THREE.RepeatWrapping;tex.repeat.set(yard?34:(rig?30:28),yard?34:(rig?30:28));tex.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy?.()||1);tex.userData.preserveWorldTexture=true;
+  const tc=document.createElement('canvas');tc.width=tc.height=size;const tx=tc.getContext('2d');tx.drawImage(c,0,0);const td=tx.getImageData(0,0,size,size);for(let i=0;i<td.data.length;i+=4){const g=Math.round(td.data[i]*.2126+td.data[i+1]*.7152+td.data[i+2]*.0722);td.data[i]=td.data[i+1]=td.data[i+2]=g;}tx.putImageData(td,0,0);const thermalTex=new THREE.CanvasTexture(tc);thermalTex.colorSpace=THREE.SRGBColorSpace;thermalTex.wrapS=thermalTex.wrapT=THREE.RepeatWrapping;thermalTex.repeat.copy(tex.repeat);thermalTex.anisotropy=tex.anisotropy;thermalTex.userData.preserveWorldTexture=true;thermalTex.userData.worldThermalTexture=true;tex.userData.thermalTexture=thermalTex;return tex;
 }
 function addStaticInstancedMesh(geometry,material,transforms,{castShadow=true,receiveShadow=true}={}){
   if(!transforms.length)return null;
@@ -2345,7 +2367,7 @@ function onCanvasPointerDown(e){
     }
     if(!liveHud)return;
     if(currentWeapon!=='akimbo1887'&&pointInCircle(p.x,p.y,layout.aim)){touchRoles.set(e.pointerId,'aimtoggle');toggleAim();return;}
-    if(currentWeapon==='sniper'&&adsWanted&&adsBlend>=SNIPER_BREATH_READY_BLEND&&pointInCircle(p.x,p.y,layout.mode)){if(!sniperBreathExhausted)touchRoles.set(e.pointerId,'steady');return;}
+    if(currentWeapon==='sniper'&&adsWanted&&adsBlend>=SNIPER_BREATH_READY_BLEND&&pointInCircle(p.x,p.y,layout.steady)){if(!sniperBreathExhausted)touchRoles.set(e.pointerId,'steady');return;}
     if(pointInCircle(p.x,p.y,layout.leftFire)){
       touchVisual.fireUntil=performance.now()+150;pressTouchFire(e.pointerId,currentWeapon==='akimbo1887'?'left':'right');return;
     }
@@ -3833,7 +3855,7 @@ function updateSmokeCloudVisibility(now=performance.now()){
 }
 function radiusVisualDrift(radius){return Math.min(.08,Math.max(.025,(Number(radius)||9.6)*.006));}
 function updateSmokeClouds(dt){
-  const now=performance.now(),srv=serverNow(),thermalSmokeScale=THREE.MathUtils.lerp(1,.18,sniperThermalAmount());updateSmokeCloudVisibility(now);for(const [id,c] of smokeClouds){const ageMs=Math.max(0,srv-(Number(c.bornAt)||srv)),grow=Math.min(1,ageMs/SMOKE_GROW_MS),remaining=c.expiresAt-srv;if(remaining<=0){smokeClouds.delete(id);try{scene?.remove(c.root);}catch{}disposeObject3D(c.root);continue;}if(c.root.visible===false)continue;const fade=Math.min(1,remaining/1800),visualScale=SMOKE_START_SCALE+(1-SMOKE_START_SCALE)*grow;c.root.scale.setScalar(visualScale);c.root.rotation.y+=dt*.018;for(const layer of c.layers){const u=layer.userData||{},pulse=.97+.03*Math.sin(now*.0007+(u.phase||0));layer.material.opacity=(u.baseOpacity||.62)*pulse*grow*fade*thermalSmokeScale;layer.position.x=Math.sin(now*.00019+(u.phase||0))*radiusVisualDrift(c.radius);layer.position.y=Math.sin(now*.00024+(u.phase||0))*.018;layer.position.z=Math.cos(now*.00017+(u.phase||0))*radiusVisualDrift(c.radius);}}
+  const now=performance.now(),srv=serverNow(),thermalSmokeScale=THREE.MathUtils.lerp(1,.18,sniperThermalWorldAmount());updateSmokeCloudVisibility(now);for(const [id,c] of smokeClouds){const ageMs=Math.max(0,srv-(Number(c.bornAt)||srv)),grow=Math.min(1,ageMs/SMOKE_GROW_MS),remaining=c.expiresAt-srv;if(remaining<=0){smokeClouds.delete(id);try{scene?.remove(c.root);}catch{}disposeObject3D(c.root);continue;}if(c.root.visible===false)continue;const fade=Math.min(1,remaining/1800),visualScale=SMOKE_START_SCALE+(1-SMOKE_START_SCALE)*grow;c.root.scale.setScalar(visualScale);c.root.rotation.y+=dt*.018;for(const layer of c.layers){const u=layer.userData||{},pulse=.97+.03*Math.sin(now*.0007+(u.phase||0));layer.material.opacity=(u.baseOpacity||.62)*pulse*grow*fade*thermalSmokeScale;layer.position.x=Math.sin(now*.00019+(u.phase||0))*radiusVisualDrift(c.radius);layer.position.y=Math.sin(now*.00024+(u.phase||0))*.018;layer.position.z=Math.cos(now*.00017+(u.phase||0))*radiusVisualDrift(c.radius);}}
 }
 function clearSmokeClouds(){const pending=[...smokeClouds.values()];smokeClouds.clear();lastSmokeVisibilityAt=0;for(const c of pending){try{scene?.remove(c.root);}catch{}disposeObject3D(c.root);}}
 
@@ -3854,7 +3876,7 @@ function animate(){
     for(let i=0;i<steps;i++)updateGameSimulation(stepDt);
     updateGameFrame(Math.min(frameDt,MAX_PLAYER_PHYSICS_STEP_SEC));
   }else updatePausedNetwork();
-  const visualDt=Math.min(frameDt,.10);updateAim(visualDt);updateRemoteVisuals(visualDt);syncSniperThermalSignatures();updateWeaponView(visualDt);updateGameplayLaserBeams(performance.now());
+  const visualDt=Math.min(frameDt,.10);updateAim(visualDt);updateRemoteVisuals(visualDt);updateSniperThermalWorld();syncSniperThermalSignatures();updateWeaponView(visualDt);updateGameplayLaserBeams(performance.now());
   // Cosmetic systems are fault-contained from the gameplay/simulation path.
   // A malformed transient effect must be discarded rather than poisoning every
   // following render frame and making the match appear frozen.
@@ -4495,7 +4517,7 @@ function computeHudLayout(){
   const leftFireX=(flashX+stickyX)/2,leftFireY=Math.max(safe.top+leftFireR+52,equipRowY-equipR-leftFireR-(compact?8:10));
   const fireX=viewW-safe.right-margin-fireR,fireY=viewH-bottom-fireR,reloadX=fireX-fireR-reloadR-9,reloadY=fireY,crouchX=reloadX-reloadR-crouchR-9,crouchY=fireY;
   const topRowY=fireY-fireR-Math.max(jumpR,swapR,aimR)-11,jumpX=crouchX,jumpY=topRowY,swapX=reloadX,swapY=topRowY,aimX=fireX,aimY=topRowY;
-  const modeX=crouchX-crouchR-modeR-9,modeY=(topRowY+fireY)/2,weaponLift=touchGameplayControlsVisible()?(fireR*3.75+8):0;
+  const modeX=crouchX-crouchR-modeR-9,modeY=(topRowY+fireY)/2,steadyX=leftFireX+leftFireR+modeR+(compact?8:10),steadyY=leftFireY,weaponLift=touchGameplayControlsVisible()?(fireR*3.75+8):0;
   const weaponX=viewW-safe.right-margin-weaponW,weaponY=viewH-bottom-weaponH-weaponLift;
   const teamIndicatorY=teamY+teamH+8,announcerY=teamIndicatorY+(compact?24:28),noticeW=Math.max(118,Math.min(compact?190:240,contentW*.34)),noticeH=28;
   const noticeX=Math.max(contentLeft,Math.min((viewW-noticeW)/2,contentRight-noticeW)),noticeY=announcerY+(compact?30:36);
@@ -4508,7 +4530,7 @@ function computeHudLayout(){
     chat:{x:chatX,y:controlsY,w:chatW,h:menuH},menu:{x:menuX,y:controlsY,w:menuW,h:menuH},
     weapon:{x:weaponX,y:weaponY,w:weaponW,h:weaponH},joy:{x:defaultJoyX,y:defaultJoyY,r:joyR},
     leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},crouch:{x:crouchX,y:crouchY,r:crouchR},flash:{x:flashX,y:flashY,r:equipR},sticky:{x:stickyX,y:stickyY,r:equipR},
-    fire:{x:fireX,y:fireY,r:fireR},aim:{x:aimX,y:aimY,r:aimR},jump:{x:jumpX,y:jumpY,r:jumpR},reload:{x:reloadX,y:reloadY,r:reloadR},swap:{x:swapX,y:swapY,r:swapR},mode:{x:modeX,y:modeY,r:modeR},
+    fire:{x:fireX,y:fireY,r:fireR},aim:{x:aimX,y:aimY,r:aimR},jump:{x:jumpX,y:jumpY,r:jumpR},reload:{x:reloadX,y:reloadY,r:reloadR},swap:{x:swapX,y:swapY,r:swapR},mode:{x:modeX,y:modeY,r:modeR},steady:{x:steadyX,y:steadyY,r:modeR},
     deathLoadout:{x:viewW/2-92,y:Math.min(viewH-safe.bottom-margin-34,viewH/2+(compact?60:70)),w:184,h:34}
   };
 }
@@ -4726,6 +4748,7 @@ function ensureRemoteThermalMaterials(r){
     warm:new THREE.MeshBasicMaterial({color:0xff7a1a,toneMapped:false}),
     hot:new THREE.MeshBasicMaterial({color:0xffb044,toneMapped:false})
   };
+  r.thermalMaterials.warm.userData.sniperThermalSignature=true;r.thermalMaterials.hot.userData.sniperThermalSignature=true;
 }
 function setRemoteThermalSignature(r,mode){
   if(!r)return;ensureRemoteThermalMaterials(r);
@@ -4741,7 +4764,7 @@ function syncSniperThermalSignatures(){
   for(const r of remotes.values()){const visibleHeat=active&&r.hp>0&&!modeFriendly(r.team);if(visibleHeat)setRemoteThermalSignature(r,mode);else if(r.thermalActive)restoreRemoteThermalSignature(r);}
 }
 function drawSniperThermal(c,w,h,amount=1){
-  const mode=sniperThermalMode(),a=THREE.MathUtils.clamp(amount,0,1);if(!mode||a<=.001)return;const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2;c.save();c.beginPath();c.arc(cx,cy,r-5,0,Math.PI*2);c.clip();c.globalAlpha=a;c.fillStyle=mode==='orange'?'rgba(38,41,42,.30)':'rgba(25,28,30,.45)';c.fillRect(cx-r,cy-r,r*2,r*2);const vignette=c.createRadialGradient(cx,cy,r*.50,cx,cy,r);vignette.addColorStop(0,'rgba(0,0,0,0)');vignette.addColorStop(1,mode==='orange'?'rgba(8,10,11,.24)':'rgba(4,5,6,.34)');c.fillStyle=vignette;c.fillRect(cx-r,cy-r,r*2,r*2);c.restore();
+  const mode=sniperThermalMode(),a=THREE.MathUtils.clamp(amount,0,1);if(!mode||a<=.001)return;const r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2;c.save();c.beginPath();c.arc(cx,cy,r-5,0,Math.PI*2);c.clip();c.globalAlpha=a;c.fillStyle=mode==='orange'?'rgba(16,19,20,.10)':'rgba(10,12,13,.14)';c.fillRect(cx-r,cy-r,r*2,r*2);const vignette=c.createRadialGradient(cx,cy,r*.46,cx,cy,r);vignette.addColorStop(0,'rgba(255,255,255,.015)');vignette.addColorStop(.72,'rgba(0,0,0,0)');vignette.addColorStop(1,mode==='orange'?'rgba(5,7,8,.30)':'rgba(3,4,5,.36)');c.fillStyle=vignette;c.fillRect(cx-r,cy-r,r*2,r*2);c.globalAlpha=a*.10;c.fillStyle='rgba(255,255,255,.28)';for(let y=cy-r;y<cy+r;y+=4)c.fillRect(cx-r,y,r*2,1);c.restore();
 }
 function drawScopeReticle(c,w,h,hit,headshot=false,amount=1){
   const a=THREE.MathUtils.clamp(amount,0,1),r=Math.min(w,h)*SNIPER_SCOPE_SCREEN_RADIUS,cx=w/2,cy=h/2,gap=Math.max(7,r*.032),post=Math.max(30,r*.17);if(a<=.001)return;
@@ -4763,7 +4786,7 @@ function drawTouchControls(c,L,now){
   drawRoundControl(c,L.leftFire,now<touchVisual.fireUntil,'fire',weaponLocked);drawRoundControl(c,L.crouch,crouched,'crouch');drawRoundControl(c,L.flash,equipmentAimKind()===tacticalEquipment||now<touchVisual.flashUntil,'flash');drawRoundControl(c,L.sticky,equipmentAimKind()===lethalEquipment||now<touchVisual.stickyUntil,'sticky');
   drawRoundControl(c,L.fire,now<touchVisual.fireUntil,'fire',weaponLocked);if(currentWeapon!=='akimbo1887')drawRoundControl(c,L.aim,adsWanted,'aim',weaponLocked);drawRoundControl(c,L.jump,now<touchVisual.jumpUntil,'jump');
   drawRoundControl(c,L.reload,now<touchVisual.reloadUntil||!!reloadUntil,'reload',weaponLocked);drawRoundControl(c,L.swap,now<touchVisual.swapUntil,'swap',weaponLocked);
-  if(currentWeapon==='assault')drawRoundControl(c,L.mode,now<touchVisual.modeUntil||assaultFireMode==='auto','mode',weaponLocked);else if(currentWeapon==='sniper'&&adsWanted&&adsBlend>=SNIPER_BREATH_READY_BLEND)drawRoundControl(c,L.mode,sniperBreathActive,'steady',weaponLocked||sniperBreathExhausted);
+  if(currentWeapon==='assault')drawRoundControl(c,L.mode,now<touchVisual.modeUntil||assaultFireMode==='auto','mode',weaponLocked);else if(currentWeapon==='sniper'&&adsWanted&&adsBlend>=SNIPER_BREATH_READY_BLEND)drawRoundControl(c,L.steady,sniperBreathActive,'steady',weaponLocked||sniperBreathExhausted);
 }
 function drawRoundControl(c,b,active,type,disabled=false){
   c.save();if(disabled)c.globalAlpha=.34;c.beginPath();c.arc(b.x,b.y,b.r,0,Math.PI*2);const hot=type==='fire',aim=type==='aim';c.fillStyle=active?(aim?'rgba(215,255,88,.30)':hot?'rgba(255,95,103,.48)':'rgba(215,255,88,.22)'):(hot?'rgba(60,22,25,.56)':'rgba(9,11,13,.62)');c.fill();c.strokeStyle=active?(aim?HUD_ACCENT:hot?'rgba(255,132,139,.86)':HUD_ACCENT):(hot?'rgba(255,115,123,.52)':'rgba(255,255,255,.22)');c.lineWidth=active?2:1.4;c.stroke();drawControlIcon(c,b.x,b.y-b.r*.08,b.r,type,active);
