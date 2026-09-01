@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.59" rel="manifest"/>
-<title>Breach v1.44.59</title>
-<link href="ui.css?v=1.44.59" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.44.61" rel="manifest"/>
+<title>Breach v1.44.61</title>
+<link href="ui.css?v=1.44.61" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -307,15 +307,13 @@
 <div class="pause-card">
 <header><div><h1>PAUSED</h1><div class="pause-context"><span id="pauseRoom">Match ----</span><span id="pauseLoadout">Assault Rifle + Pistol</span></div></div><span class="pause-team" id="pauseTeamBadge">BLUE TEAM</span></header>
 <button class="resume-btn primary" id="resumeBtn"><svg class="ui-icon"><use href="#i-play"></use></svg><span>RESUME MATCH</span></button>
-<div class="pause-section"><span>PLAYER</span><div class="pause-actions pause-actions-player">
+<div class="pause-actions pause-actions-all" aria-label="Match actions">
 <button class="secondary-btn" id="pauseLoadoutBtn"><svg class="mini-icon"><use href="#i-loadout"></use></svg><span>Change Loadout</span></button>
 <button class="secondary-btn" id="teamSwitchBtn"><svg class="mini-icon"><use href="#i-team"></use></svg><span id="teamSwitchText">Switch on Respawn</span></button>
 <button class="secondary-btn" id="copyBtn"><svg class="mini-icon"><use href="#i-copy"></use></svg><span>Invite Players</span></button>
-</div></div>
-<div class="pause-section"><span>SYSTEM</span><div class="pause-actions pause-actions-system">
 <button class="secondary-btn" id="pauseSettingsBtn"><svg class="mini-icon"><use href="#i-settings"></use></svg><span>Settings</span></button>
 <button class="secondary-btn hide" id="adminBtn"><svg class="mini-icon"><use href="#i-shield"></use></svg><span>Host Control</span></button>
-</div></div>
+</div>
 <div class="pause-leave"><button class="secondary-btn danger" id="leaveBtn"><svg class="mini-icon"><use href="#i-exit"></use></svg><span>Return to Lobby</span></button></div>
 </div>
 </section>
@@ -442,6 +440,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.44.59" type="module"></script>
+<script src="client.js?v=1.44.61" type="module"></script>
 </body>
 </html>

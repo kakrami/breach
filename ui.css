@@ -73,7 +73,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.59: authoritative menu/layout/responsive ownership. */
+/* Breach UI contract v1.44.61: authoritative menu/layout/responsive ownership. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -180,7 +180,7 @@ body{font-size:var(--ui-md)}
 .loadout-shell .loadout-editor{height:100%;min-height:0;max-height:none}
 .loadout-foot{grid-template-columns:minmax(0,1fr) auto auto auto}
 /* Settings: exactly three settings per page stay a balanced three-column row. */
-.settings-shell{width:min(850px,100%);height:min(500px,100%);max-height:100%;}
+.settings-shell{width:min(850px,100%);height:min(350px,100%);max-height:100%;}
 .settings-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px 9px;border-bottom:1px solid var(--line);background:#090d10}
 .settings-tab{min-width:0;height:35px;border:1px solid transparent;border-radius:8px;background:transparent;color:var(--muted);font-size:11px;font-weight:950;letter-spacing:.05em;cursor:pointer}
 .settings-tab:hover{background:#151c21;color:var(--text)}
@@ -300,15 +300,15 @@ body{font-size:var(--ui-md)}
 .game-cycle .game-control-value{font-size:10px;text-transform:uppercase}
 .game-stepper .game-control-value{font-variant-numeric:tabular-nums;color:var(--accent);white-space:nowrap;overflow-wrap:normal;word-break:normal}
 .disabled-setting .game-control{cursor:not-allowed;opacity:.45}
-.controller-focus{outline:3px solid var(--accent)!important;outline-offset:3px!important;box-shadow:0 0 0 4px rgba(215,255,88,.12)!important}
-.controller-editing{outline-color:#fff!important;box-shadow:0 0 0 3px rgba(215,255,88,.2),0 0 0 6px rgba(255,255,255,.2)!important}
+.controller-focus{outline:0!important;outline-offset:0!important}
+.controller-editing{outline:0!important;outline-offset:0!important;box-shadow:inset 0 -2px 0 rgba(215,255,88,.78)!important}
 .controller-editing .game-control-value{color:#fff;background:rgba(215,255,88,.08);box-shadow:inset 0 -2px 0 var(--accent)}
 .controller-editing .game-control-arrow,.controller-adjusting .game-control-arrow{color:var(--accent)}
 .controller-adjusting .game-control-value{background:rgba(215,255,88,.12)}
 /* The stepper owns one pressed side at the parent level. This overrides stale hover/native active/controller styling so both arrows can never look pressed together. */
 .game-control[data-pressed-step] .game-control-arrow{background:#12191e;color:var(--muted);transform:none!important}
 .game-control[data-pressed-step="-1"] .game-control-arrow[data-control-step="-1"],.game-control[data-pressed-step="1"] .game-control-arrow[data-control-step="1"]{background:#253027;color:var(--accent)}
-.controller-focus.game-control,.controller-focus.game-text-field,.controller-focus.game-slider-control{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.12)}
+.controller-focus.game-control,.controller-focus.game-text-field,.controller-focus.game-slider-control{outline:0!important}
 .game-slider-control{width:100%;min-width:0;height:30px;padding:6px 0;display:flex;align-items:center;outline:0;user-select:none;-webkit-user-select:none;touch-action:none}
 .game-slider-track{position:relative;width:100%;height:8px;border:1px solid #344149;border-radius:99px;background:#050708;cursor:pointer;touch-action:none}
 .game-slider-fill{position:absolute;inset:1px auto 1px 1px;width:0;border-radius:99px;background:var(--accent)}
@@ -408,26 +408,25 @@ body{font-size:var(--ui-md)}
   .lobby-host-setup:not(.hide){display:block;overflow:visible}
   .lobby-host-setup .lobby-match-grid,.lobby-loadout-body{overflow:visible;height:auto}
 }
-/* Controller navigation: unmistakable bright focus without changing layout. */
-@keyframes controllerFocusShine{from{filter:brightness(1.18) saturate(1.08);box-shadow:0 0 0 2px rgba(255,255,255,.72),0 0 12px rgba(215,255,88,.48),0 0 28px rgba(215,255,88,.20),inset 0 1px 0 rgba(255,255,255,.44),inset 0 0 24px rgba(215,255,88,.10)}to{filter:brightness(1.34) saturate(1.18);box-shadow:0 0 0 2px rgba(240,255,195,.96),0 0 18px rgba(215,255,88,.74),0 0 38px rgba(215,255,88,.30),inset 0 1px 0 rgba(255,255,255,.72),inset 0 0 30px rgba(215,255,88,.16)}}
-[data-input-mode="controller"] .controller-focus{
-  z-index:5;
-  outline:2px solid rgba(238,255,184,.92)!important;
-  outline-offset:2px!important;
-  border-color:rgba(215,255,88,.88)!important;
-  animation:controllerFocusShine .72s ease-in-out infinite alternate;
-}
-[data-input-mode="controller"] .controller-focus:focus-visible{outline:2px solid rgba(238,255,184,.92)!important;outline-offset:2px!important}
-/* Controller edit mode keeps the same filled focus language. A toggles edit mode;
-   held D-pad / left stick repeats adjustments without adding an outline or moving the control. */
-[data-input-mode="controller"] .controller-focus.controller-editing{
-  outline:2px solid rgba(255,255,255,.95)!important;
-  outline-offset:2px!important;
-  filter:brightness(1.28) saturate(1.12);
-  box-shadow:0 0 24px rgba(215,255,88,.18),inset 0 0 0 999px rgba(215,255,88,.10),inset 0 -3px 0 rgba(215,255,88,.78)!important;
-}
+/* Controller focus is rendered by one geometry-neutral moving sheen overlay.
+   Focus never changes borders, outlines, dimensions, or mount/preview geometry. */
+[data-input-mode="controller"] .controller-focus,
+[data-input-mode="controller"] .controller-focus:focus-visible,
+[data-input-mode="controller"] button:focus-visible,
+[data-input-mode="controller"] [role="tab"]:focus-visible,
+[data-input-mode="controller"] [data-game-control]:focus-visible{outline:0!important;outline-offset:0!important}
+[data-input-mode="controller"] .controller-focus.game-control,
+[data-input-mode="controller"] .controller-focus.game-text-field,
+[data-input-mode="controller"] .controller-focus.game-slider-control{border-color:var(--line)!important;box-shadow:none!important}
+[data-input-mode="controller"] .controller-focus.controller-editing{outline:0!important;filter:brightness(1.12) saturate(1.05);box-shadow:inset 0 -2px 0 rgba(215,255,88,.78)!important}
 [data-input-mode="controller"] .controller-focus.controller-editing .game-control-value{color:#fff;background:rgba(215,255,88,.08);box-shadow:none}
-/* v1.44.59 Create-a-Class / Gunsmith layout.
+.controller-focus-shine-layer{position:fixed;left:0;top:0;width:0;height:0;z-index:190;pointer-events:none;opacity:0;overflow:hidden;transform:translate3d(-9999px,-9999px,0);will-change:transform,width,height,opacity;border-radius:8px;background:rgba(215,255,88,.025);box-shadow:0 0 18px rgba(215,255,88,.16),inset 0 0 22px rgba(215,255,88,.055);transition:opacity .08s ease,width .07s ease,height .07s ease,transform .07s ease}
+.controller-focus-shine-layer.visible{opacity:1}
+.controller-focus-shine-layer::before{content:"";position:absolute;inset:-55% -95%;background:linear-gradient(108deg,transparent 34%,rgba(215,255,88,.06) 40%,rgba(255,255,255,.46) 48%,rgba(215,255,88,.19) 55%,transparent 64%);transform:translateX(-48%);animation:controllerFocusSweep 1.05s linear infinite;mix-blend-mode:screen}
+.controller-focus-shine-layer::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(215,255,88,.08),transparent 72%);opacity:.72}
+.controller-focus-shine-layer.editing{background:rgba(215,255,88,.06);box-shadow:0 0 22px rgba(215,255,88,.22),inset 0 -2px 0 rgba(215,255,88,.58)}
+@keyframes controllerFocusSweep{0%{transform:translateX(-50%)}100%{transform:translateX(50%)}}
+/* v1.44.61 Create-a-Class / Gunsmith layout.
    One responsive system: weapon + live stats share the upper workspace;
    the selected attachment choices own a full-width tray underneath. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
@@ -727,7 +726,7 @@ body{font-size:var(--ui-md)}
     .gunsmith-weapon-picker .loadout-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.59 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.61 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -736,15 +735,15 @@ body{font-size:var(--ui-md)}
 .loadout-stat-bar-hatch.loss{background:repeating-linear-gradient(135deg,rgba(255,105,115,.95) 0 2px,rgba(255,105,115,.22) 2px 4px)}
 .loadout-stat-baseline-mark{position:absolute;top:-1px;bottom:-1px;width:1px;display:block;background:rgba(255,255,255,.72);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
 .loadout-stat.better .loadout-stat-bar-solid,.loadout-stat.worse .loadout-stat-bar-solid{background:#8f9ca4}
-/* v1.44.59 controller focus visuals: focus must never mutate Gunsmith geometry. */
+/* v1.44.61 controller focus visuals: focus must never mutate Gunsmith geometry. */
 [data-input-mode="controller"] .gunsmith-callout.controller-focus,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
   position:absolute!important;
   transform:none!important;
-  outline:2px solid rgba(238,255,184,.92)!important;
-  outline-offset:2px!important;
-  background:linear-gradient(135deg,rgba(215,255,88,.25),rgba(19,29,22,.98))!important;
-  box-shadow:0 0 22px rgba(215,255,88,.22),inset 0 0 18px rgba(215,255,88,.08)!important;
+  outline:0!important;
+  outline-offset:0!important;
+  background:linear-gradient(135deg,rgba(215,255,88,.16),rgba(19,29,22,.98))!important;
+  box-shadow:inset 0 0 18px rgba(215,255,88,.06)!important;
 }
 [data-input-mode="controller"] .gunsmith-callout.controller-focus span,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus strong{color:#efffc0!important}
@@ -752,9 +751,9 @@ body{font-size:var(--ui-md)}
 [data-input-mode="controller"] .gunsmith-attachment-option.controller-focus:focus-visible,
 [data-input-mode="controller"] .gunsmith-weapon-picker .loadout-choice.controller-focus,
 [data-input-mode="controller"] .gunsmith-weapon-picker .loadout-choice.controller-focus:focus-visible{
-  outline:2px solid rgba(238,255,184,.92)!important;
-  outline-offset:2px!important;
-  background:radial-gradient(circle at 30% 25%,rgba(215,255,88,.18),transparent 58%),linear-gradient(135deg,rgba(24,34,25,.98),rgba(9,14,16,.96))!important;
+  outline:0!important;
+  outline-offset:0!important;
+  background:radial-gradient(circle at 30% 25%,rgba(215,255,88,.12),transparent 58%),linear-gradient(135deg,rgba(24,34,25,.98),rgba(9,14,16,.96))!important;
 }
 [data-input-mode="controller"] .gunsmith-attachment-option.controller-focus strong,
 [data-input-mode="controller"] .gunsmith-weapon-picker .loadout-choice.controller-focus strong{color:#efffc0!important}
@@ -765,17 +764,17 @@ body{font-size:var(--ui-md)}
   background:linear-gradient(135deg,rgba(215,255,88,.055),rgba(12,18,16,.98) 48%,rgba(7,10,12,.94));
 }
 .loadout-class-card.controller-card-focus{
-  border-color:rgba(215,255,88,.72);
-  background:radial-gradient(circle at 26% 24%,rgba(215,255,88,.21),transparent 48%),linear-gradient(135deg,rgba(28,39,28,.99),rgba(8,12,14,.96));
-  box-shadow:0 0 0 1px rgba(255,255,255,.30),0 0 30px rgba(215,255,88,.30),inset 0 1px 0 rgba(255,255,255,.34),inset 0 0 34px rgba(215,255,88,.09);
-  filter:brightness(1.22) saturate(1.10);
+  border-color:rgba(255,255,255,.08);
+  background:radial-gradient(circle at 26% 24%,rgba(215,255,88,.11),transparent 48%),linear-gradient(135deg,rgba(24,32,25,.99),rgba(8,12,14,.96));
+  box-shadow:inset 0 0 24px rgba(215,255,88,.045);
+  filter:brightness(1.08) saturate(1.04);
 }
 .loadout-class-card.controller-card-focus .loadout-class-card-head strong{color:#fff}
 .loadout-class-card.controller-card-focus .loadout-class-weapons span{color:#eef5f1}
 .loadout-class-card.controller-card-focus .loadout-class-main.controller-focus,
 .loadout-class-card.controller-card-focus .loadout-class-main.controller-focus:focus-visible{
-  outline:2px solid rgba(238,255,184,.84)!important;
-  outline-offset:2px!important;
+  outline:0!important;
+  outline-offset:0!important;
   box-shadow:none!important;
   background:transparent!important;
 }
@@ -790,7 +789,7 @@ body{font-size:var(--ui-md)}
 /* Diagnostics recorder: compact, controller-friendly controls in Settings. */
 .diagnostics-toggle-card small,.diagnostics-status-card small,.diagnostics-log-card small{color:var(--dim);font-size:10px;line-height:1.3;text-transform:none;letter-spacing:0}.diagnostics-toggle-btn{min-width:148px}.diagnostics-toggle-btn.active{background:#1b2419;color:var(--accent);border-color:rgba(215,255,88,.32);box-shadow:inset 0 0 0 1px rgba(215,255,88,.06)}.diagnostics-status-card output{justify-self:start;color:var(--accent);font-size:11px;font-weight:950}.diagnostics-log-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.diagnostics-log-actions .secondary-btn{width:100%;height:32px;padding:0 8px}
 
-/* v1.44.59 mobile/controller readability baseline.
+/* v1.44.61 mobile/controller readability baseline.
    Compact by removing secondary copy first; actionable/menu text does not collapse
    into 8–9px labels on short landscape screens. */
 @media (max-width:900px) and (orientation:landscape){
@@ -880,11 +879,104 @@ body{font-size:var(--ui-md)}
   .gunsmith-inspector-empty>strong,.gunsmith-weapon-picker .loadout-choice strong{font-size:10.5px}
 }
 
-/* v1.44.59 immediate-action menu semantics. */
+/* v1.44.61 immediate-action menu semantics. */
 .loadout-foot,.settings-actions{grid-template-columns:minmax(0,1fr) auto}.loadout-foot .modal-action,.settings-actions .modal-action{min-width:92px}.settings-actions #settingsResetBtn{min-width:124px}
+
+
+
+/* v1.44.61 whole-app density audit.
+   Vertical space is treated as scarce: small labels/actions share rows, redundant headings
+   are removed, and content gets the reclaimed height instead of shrinking typography. */
+.front-shell{grid-template-rows:48px minmax(0,1fr) auto;gap:6px}
+.front-header{padding-bottom:4px;gap:10px}
+.menu-logo{width:32px;height:32px;padding:7px;border-radius:8px}
+.menu-brand strong{font-size:15px}
+.front-profile{padding:2px 8px}
+.front-profile .input{height:32px}
+.menu-actions .square-btn{width:34px;min-width:34px;height:34px}
+.front-nav{padding:6px;gap:4px}
+.front-nav-button{height:50px;padding:0 9px}
+.front-content>.deploy-view{padding:12px}
+.front-hero,.join-panel{padding:clamp(10px,2vw,20px);gap:14px}
+.front-hero h1{font-size:26px}.join-panel h1{font-size:23px}
+.menu-status:empty{display:none}
+
+.lobby-shell{gap:5px}
+.lobby-header{gap:8px;padding:0 2px 4px}
+.lobby-room-line{gap:7px}.lobby-room-line h1{font-size:18px}.lobby-mode-badge{padding:3px 6px}
+.lobby-header-actions{gap:4px}.lobby-header-actions .secondary-btn{height:32px;padding:0 8px}.lobby-header-actions .square-btn{width:32px;min-width:32px;height:32px}
+.lobby-side-stack{gap:5px}.lobby-side-tabs{padding:3px;gap:3px}.lobby-side-tab{height:34px}
+.lobby-roster-panel.active{gap:6px;padding:7px}.lobby-roster-team-control{gap:7px;padding:5px 7px}.lobby-team-choice{height:33px}
+.lobby-roster{gap:6px}.lobby-team-title{height:31px;padding:0 7px}.lobby-player{padding:6px 7px}.lobby-empty-team{padding:10px 7px}
+.lobby-footer{padding:4px 6px;gap:6px}.lobby-start{height:36px;min-width:180px}
+.lobby-match-grid{gap:6px}.lobby-match-card{padding:7px;gap:5px}.lobby-card-title{padding-bottom:4px}.lobby-mode-picker button{height:32px}.lobby-match-card .lobby-setup-row{gap:5px}
+.lobby-map-panel{gap:5px;padding:5px}.lobby-map-toolbar{gap:6px}.lobby-map-choice-grid{gap:4px}.lobby-map-choice{min-height:42px;padding:4px 5px}
+
+/* The class browser title duplicated the active LOADOUT context. Cards own the page. */
+.loadout-classes-view{grid-template-rows:minmax(0,1fr);gap:0}
+.loadout-classes-view>.class-browser-head{display:none}
+.loadout-class-list{gap:6px}
+.loadout-class-card{grid-template-columns:minmax(0,1fr) 52px}
+.loadout-class-main{padding:9px 10px;gap:6px}.loadout-class-edit{width:52px}
+.loadout-class-view,.loadout-item-view{grid-template-rows:38px minmax(0,1fr);gap:5px}
+.loadout-view-nav{padding:2px 3px 5px;gap:8px}
+.gunsmith-back{height:31px;padding:0 9px}.gunsmith-change-weapon{height:30px;padding:0 9px}
+.class-name-edit{font-size:18px}.class-detail-grid{gap:6px}.class-item-card{padding:11px 13px;gap:5px}
+.gunsmith-layout{gap:5px}.gunsmith-weapon-column{padding:6px;gap:5px 7px}.gunsmith-inspector{padding:6px}
+/* Picker/card labels already exist in the compact top bar; don't spend another row on them. */
+.gunsmith-weapon-picker{grid-template-rows:minmax(0,1fr);gap:0}.gunsmith-weapon-picker>header{display:none}
+.equipment-editor-card{grid-template-rows:minmax(0,1fr);gap:0;padding:10px}.equipment-editor-card>header{display:none}
+.gunsmith-attachment-options{gap:5px}.gunsmith-attachment-option{padding:7px 8px;gap:3px}
+.loadout-stat-row{gap:3px}.loadout-stat{padding:4px 6px}.loadout-stat-delta{margin-top:2px}
+
+/* Settings/Host Control controller instructions no longer consume a dedicated grid row. */
+.settings-shell,.admin-shell{position:relative}
+.settings-shell{grid-template-rows:auto auto minmax(0,1fr) auto}
+.admin-shell{grid-template-rows:auto auto minmax(0,1fr) auto}
+.settings-shell>.controller-menu-hint,.admin-shell>.controller-menu-hint{position:absolute;top:11px;right:12px;z-index:3;max-width:58%;padding:0;border:0;background:transparent;text-align:right;pointer-events:none}
+.modal-head{padding:7px 9px 5px}.modal-head h2{font-size:17px}.settings-tabs,.admin-tabs{padding:4px 7px;gap:4px}.settings-tab,.admin-tab{height:32px}
+.settings-page .settings-category-head{padding:5px 8px 2px}.settings-page .settings-grid{gap:5px;padding:5px 7px 7px}.settings-page .setting{padding:6px;gap:4px}
+/* Exact-fit groups prevent one small orphan card from creating an extra settings row. */
+.settings-page .settings-grid:has(#playerControllerVerticalSensitivity){grid-template-columns:repeat(5,minmax(0,1fr))}
+.settings-page .settings-grid:has(#playerMasterMute){grid-template-columns:repeat(4,minmax(0,1fr))}
+.admin-page{padding:6px}.admin-page>.settings-grid{gap:5px}.admin-page>.settings-grid>.setting{padding:6px;gap:4px}.admin-bot-card{margin-top:5px;padding:6px;gap:5px}
+.modal-foot{padding:4px 7px;gap:5px}.modal-foot>button{height:34px;padding:0 11px}
+
+/* RESUME is a header action, not a full-width row. */
+.pause-card{padding:11px;grid-template-columns:minmax(0,1fr) auto;gap:6px 8px}
+.pause-card>header{grid-column:1;grid-row:1;padding-bottom:0;border-bottom:0}
+.pause-card>.resume-btn{grid-column:2;grid-row:1;width:auto;min-width:150px;height:38px;margin:0;padding:0 12px;align-self:center}
+.pause-card>.pause-actions-all{grid-column:1/-1;grid-row:2;display:grid;grid-template-columns:repeat(auto-fit,minmax(112px,1fr));gap:4px;margin:0}
+.pause-card>.pause-actions-all .secondary-btn,.pause-leave .secondary-btn{height:34px}
+.pause-card>.pause-leave{grid-column:1/-1;grid-row:3;margin-top:0;padding-top:6px}
+
+@media (max-width:760px),(max-height:360px) and (orientation:landscape){
+  .settings-shell>.controller-menu-hint,.admin-shell>.controller-menu-hint{display:none!important}
+  .front-shell{grid-template-rows:42px minmax(0,1fr) auto;gap:4px}
+  .front-nav-button{height:40px}
+  .lobby-side-tab{height:31px}
+  .lobby-header-actions .secondary-btn{height:30px}.lobby-header-actions .square-btn{width:30px;min-width:30px;height:30px}
+  .lobby-start{height:33px}
+  .loadout-class-view,.loadout-item-view{grid-template-rows:34px minmax(0,1fr)}
+}
+@media (max-width:480px) and (orientation:landscape){
+  .pause-card{grid-template-columns:minmax(0,1fr) auto!important}
+  .pause-card>header{grid-column:1!important}.pause-card>.resume-btn{grid-column:2!important;width:auto!important;min-width:116px;height:34px;padding:0 8px}
+  .pause-card>.pause-actions-all{grid-column:1/-1!important;grid-row:2!important;grid-template-columns:repeat(auto-fit,minmax(100px,1fr))}
+  .pause-card>.pause-leave{grid-column:1/-1!important;grid-row:3!important}
+}
+@media (orientation:portrait){
+  .settings-shell>.controller-menu-hint,.admin-shell>.controller-menu-hint{display:none!important}
+  .pause-card{grid-template-columns:1fr}.pause-card>header,.pause-card>.resume-btn,.pause-card>.pause-actions-all,.pause-card>.pause-leave{grid-column:1!important;grid-row:auto!important}.pause-card>.resume-btn{width:100%;margin-top:5px}.pause-card>.pause-actions-all{grid-template-columns:1fr}
+  .loadout-classes-view{grid-template-rows:minmax(0,1fr)}
+}
+@media(prefers-reduced-motion:reduce){.controller-focus-shine-layer::before{animation:none!important;background:rgba(215,255,88,.11)}}
 
 @media(prefers-reduced-motion:reduce){[data-input-mode="controller"] .controller-focus{animation:none!important}}
 
 .lobby-stage-head{justify-content:flex-end;min-height:24px}
 
 .lobby-roster-head .lobby-roster-actions{margin-left:auto}
+
+[data-input-mode="touch"] .lobby-footer:has(#lobbyStatus:empty):has(.lobby-start.hide),
+[data-input-mode="keyboardMouse"] .lobby-footer:has(#lobbyStatus:empty):has(.lobby-start.hide){display:none}
