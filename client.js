@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.62';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.62';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.62';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.62';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.62';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.62';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.62';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.62';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.63';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.63';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.63';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.63';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.63';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.63';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.63';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.63';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, normalizeKillstreak
-} from './game-config.js?v=1.44.62';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.62';
-import { createAudioEngine } from './audio-engine.js?v=1.44.62';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.62';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.62';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.62';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.62';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.62';
+} from './game-config.js?v=1.44.63';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.63';
+import { createAudioEngine } from './audio-engine.js?v=1.44.63';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.63';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.63';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.63';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.63';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.63';
 
 let THREE = null;
 
@@ -728,7 +728,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.62';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.63';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -3855,37 +3855,71 @@ function applyExplosionFeedback(kind,m){
 }
 function explosionVisualRoll(now=performance.now()){if(now>=blastFeedbackUntil||blastFeedbackPower<=.001){blastFeedbackPower=0;return 0;}const remaining=THREE.MathUtils.clamp((blastFeedbackUntil-now)/420,0,1),p=blastFeedbackPower*remaining;return Math.sin(now*.071+blastFeedbackSeed)*p*.026;}
 function makeUfoVisual(){
-  const root=new THREE.Group(),disc=new THREE.Mesh(new THREE.CylinderGeometry(2.15,2.55,.42,20),new THREE.MeshBasicMaterial({color:0x9cabb4})),dome=new THREE.Mesh(new THREE.SphereGeometry(1.05,16,10,0,Math.PI*2,0,Math.PI*.55),new THREE.MeshBasicMaterial({color:0x7de8ff,transparent:true,opacity:.72})),ring=new THREE.Mesh(new THREE.TorusGeometry(2.35,.11,8,28),new THREE.MeshBasicMaterial({color:0xd7ff58}));dome.position.y=.22;ring.rotation.x=Math.PI/2;root.add(disc,dome,ring);return root;
+  const root=new THREE.Group(),disc=new THREE.Mesh(new THREE.CylinderGeometry(2.15,2.55,.42,24),new THREE.MeshStandardMaterial({color:0x8f9ca5,metalness:.72,roughness:.28,emissive:0x16262c,emissiveIntensity:.32})),dome=new THREE.Mesh(new THREE.SphereGeometry(1.05,20,12,0,Math.PI*2,0,Math.PI*.55),new THREE.MeshStandardMaterial({color:0x6edff5,emissive:0x1f91ac,emissiveIntensity:.88,transparent:true,opacity:.78,roughness:.18,metalness:.15})),ring=new THREE.Mesh(new THREE.TorusGeometry(2.35,.11,8,32),new THREE.MeshBasicMaterial({color:0xd7ff58,transparent:true,opacity:.92})),underGlow=new THREE.Mesh(new THREE.RingGeometry(.85,2.05,28),new THREE.MeshBasicMaterial({color:0x78efff,transparent:true,opacity:.34,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));
+  dome.position.y=.22;ring.rotation.x=Math.PI/2;underGlow.rotation.x=-Math.PI/2;underGlow.position.y=-.24;root.add(disc,dome,ring,underGlow);root.userData.underGlow=underGlow;return root;
+}
+function jaggedLightningPoints(start,end,segments=18,jitter=1){
+  const out=[],direction=end.clone().sub(start),side=new THREE.Vector3(1,0,0),cross=new THREE.Vector3().crossVectors(direction,side);if(cross.lengthSq()<.01)cross.set(0,0,1);cross.normalize();const side2=new THREE.Vector3().crossVectors(direction,cross).normalize();
+  for(let i=0;i<=segments;i++){const t=i/segments,p=start.clone().lerp(end,t);if(i>0&&i<segments){const taper=Math.sin(Math.PI*t),j=jitter*taper;p.addScaledVector(cross,(Math.random()-.5)*j).addScaledVector(side2,(Math.random()-.5)*j);}out.push(p);}return out;
+}
+function lightningLine(points,color=0xeaf8ff,opacity=1){
+  const material=new THREE.LineBasicMaterial({color,transparent:true,opacity,depthWrite:false,blending:THREE.AdditiveBlending});material.userData.baseOpacity=opacity;return new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),material);
+}
+function lightningScorchTexture(){
+  const q=document.createElement('canvas');q.width=128;q.height=128;const c=q.getContext('2d'),g=c.createRadialGradient(64,64,5,64,64,62);g.addColorStop(0,'rgba(8,5,4,.92)');g.addColorStop(.34,'rgba(24,15,10,.84)');g.addColorStop(.68,'rgba(46,30,19,.52)');g.addColorStop(1,'rgba(34,22,15,0)');c.fillStyle=g;c.fillRect(0,0,128,128);for(let i=0;i<70;i++){const a=Math.random()*Math.PI*2,r=10+Math.random()*49,rr=.5+Math.random()*2.8;c.fillStyle=`rgba(${18+Math.floor(Math.random()*24)},${10+Math.floor(Math.random()*15)},${7+Math.floor(Math.random()*10)},${.18+Math.random()*.35})`;c.beginPath();c.arc(64+Math.cos(a)*r,64+Math.sin(a)*r,rr,0,Math.PI*2);c.fill();}const tex=new THREE.CanvasTexture(q);tex.colorSpace=THREE.SRGBColorSpace;tex.minFilter=THREE.LinearFilter;tex.magFilter=THREE.LinearFilter;return tex;
+}
+function buildLightningVisual(m){
+  const x=Number(m.x)||0,y=Number(m.y)||0,z=Number(m.z)||0,root=new THREE.Group(),boltMaterials=[],structureMaterials=[];
+  const strike=new THREE.Vector3(x,y,z),sky=new THREE.Vector3(x+(Math.random()-.5)*5,y+52,z+(Math.random()-.5)*5),mainPoints=jaggedLightningPoints(sky,strike,24,2.4),main=lightningLine(mainPoints,0xf4fbff,1);root.add(main);boltMaterials.push(main.material);
+  const glow=lightningLine(mainPoints,0x62bfff,.48);root.add(glow);boltMaterials.push(glow.material);
+  for(const idx of [5,8,11,14,17,20]){const origin=mainPoints[Math.min(idx,mainPoints.length-2)],drop=8+Math.random()*14,end=origin.clone().add(new THREE.Vector3((Math.random()-.5)*10,-drop,(Math.random()-.5)*10)),branch=lightningLine(jaggedLightningPoints(origin,end,7,.95),0xaedfff,.62);root.add(branch);boltMaterials.push(branch.material);}
+  const flash=new THREE.PointLight(0xbfe8ff,8,34,1.6);flash.position.copy(strike).add(new THREE.Vector3(0,2,0));root.add(flash);
+  const hit=new THREE.Mesh(new THREE.SphereGeometry(.72,12,8),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.96,depthWrite:false,blending:THREE.AdditiveBlending}));hit.position.copy(strike);root.add(hit);boltMaterials.push(hit.material);
+  const sx=Number(m.structureX),sz=Number(m.structureZ),sw=Math.max(.5,Number(m.structureW)||1),sd=Math.max(.5,Number(m.structureD)||1),roof=Math.max(y,Number(m.structureRoofY)||y),base=terrainHeight(Number.isFinite(sx)?sx:x,Number.isFinite(sz)?sz:z),sh=Math.max(.45,roof-base),structureX=Number.isFinite(sx)?sx:x,structureZ=Number.isFinite(sz)?sz:z;
+  if(Number.isFinite(sw)&&Number.isFinite(sd)){
+    const edges=new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(sw+.12,sh+.12,sd+.12)),new THREE.LineBasicMaterial({color:0x6edfff,transparent:true,opacity:.78,depthWrite:false,blending:THREE.AdditiveBlending}));edges.position.set(structureX,base+sh/2,structureZ);root.add(edges);structureMaterials.push(edges.material);
+    const halfW=sw/2,halfD=sd/2;for(let i=0;i<7;i++){const side=i%4,ex=side===0?structureX-halfW:side===1?structureX+halfW:structureX+(Math.random()-.5)*sw,ez=side===2?structureZ-halfD:side===3?structureZ+halfD:structureZ+(Math.random()-.5)*sd,ey=base+Math.random()*sh,end=new THREE.Vector3(ex,ey,ez),arc=lightningLine(jaggedLightningPoints(strike,end,8,.48),0x8de8ff,.7);root.add(arc);structureMaterials.push(arc.material);}
+  }
+  const scorch=new THREE.Mesh(new THREE.PlaneGeometry(Math.min(4.2,Math.max(2.1,Math.min(sw,sd)*.42)),Math.min(4.2,Math.max(2.1,Math.min(sw,sd)*.42))),new THREE.MeshBasicMaterial({map:lightningScorchTexture(),transparent:true,opacity:.9,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2}));scorch.rotation.x=-Math.PI/2;scorch.position.set(x,y+.035,z);root.add(scorch);
+  const smokeSprites=[],smokeTex=getSharedSmokeTexture();for(let i=0;i<5;i++){const mat=new THREE.SpriteMaterial({map:smokeTex,color:0x5b6265,transparent:true,opacity:.36,depthWrite:false}),sprite=new THREE.Sprite(mat);sprite.scale.set(1.7+Math.random()*1.5,1.7+Math.random()*1.5,1);sprite.position.set(x+(Math.random()-.5)*.8,y+.4+Math.random()*.8,z+(Math.random()-.5)*.8);sprite.userData={phase:Math.random()*Math.PI*2,baseX:sprite.position.x,baseZ:sprite.position.z,rise:.28+Math.random()*.22};root.add(sprite);smokeSprites.push(sprite);}
+  return{root,boltMaterials,structureMaterials,flash,scorch,smokeSprites};
 }
 function addKillstreakVisual(entry){killstreakFx.push(entry);if(entry.root)scene.add(entry.root);return entry;}
 function handleKillstreakFx(m){
   const kind=normalizeKillstreak(m.kind);if(!kind)return;const mine=samePlayerId(m.ownerId,clientId),enemy=!mine&&(!currentModeSpec().teamBased||!modeFriendly(m.ownerTeam));
   if(m.phase==='start'){
     if(mine)queueAnnouncer(`${KILLSTREAK_SPECS[kind]?.name||kind.toUpperCase()} DEPLOYED`,'',1500,5);else if(enemy)queueAnnouncer(`ENEMY ${KILLSTREAK_SPECS[kind]?.short||kind.toUpperCase()} INBOUND`,'',1500,5);
-    if(kind==='ufo')for(let i=0;i<3;i++){const root=makeUfoVisual();root.scale.setScalar(.82+i*.08);addKillstreakVisual({type:'ufoFlyby',root,start:Number(m.startedAt)||serverNow(),end:(Number(m.startedAt)||serverNow())+1500+i*120,index:i});}
+    if(kind==='ufo')for(let i=0;i<3;i++){const root=makeUfoVisual();root.scale.setScalar(.74+i*.07);addKillstreakVisual({type:'ufoFlyby',root,start:Number(m.startedAt)||serverNow(),end:(Number(m.startedAt)||serverNow())+1700+i*130,index:i});}
     return;
   }
   if(m.phase==='ufoAbduct'){
-    const root=makeUfoVisual(),beam=new THREE.Mesh(new THREE.CylinderGeometry(.35,2.2,9,18,1,true),new THREE.MeshBasicMaterial({color:0x8ef5ff,transparent:true,opacity:.22,side:THREE.DoubleSide,depthWrite:false}));beam.position.y=-4.5;root.add(beam);root.position.set(Number(m.x)||0,(Number(m.y)||0)+11,Number(m.z)||0);addKillstreakVisual({type:'ufoAbduct',root,beam,targetId:String(m.targetId||''),start:Number(m.startAt)||serverNow(),killAt:Number(m.killAt)||serverNow()+1850,end:(Number(m.killAt)||serverNow()+1850)+500});return;
+    const targetX=Number(m.x)||0,targetY=Number(m.y)||0,targetZ=Number(m.z)||0,root=makeUfoVisual(),beam=new THREE.Mesh(new THREE.CylinderGeometry(.28,2.55,10.2,22,1,true),new THREE.MeshBasicMaterial({color:0x8ef5ff,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending})),beamGlow=new THREE.Mesh(new THREE.CircleGeometry(2.25,28),new THREE.MeshBasicMaterial({color:0xb8fbff,transparent:true,opacity:0,side:THREE.DoubleSide,depthWrite:false,blending:THREE.AdditiveBlending}));beam.position.y=-5.1;beamGlow.rotation.x=-Math.PI/2;beamGlow.position.y=-10.05;root.add(beam,beamGlow);const seed=tracerHash(`${m.id||''}:${m.targetId||''}`),angle=(seed%6283)/1000,distance=58+(seed%17),startPos=new THREE.Vector3(targetX+Math.cos(angle)*distance,targetY+30+(seed%9),targetZ+Math.sin(angle)*distance);root.position.copy(startPos);addKillstreakVisual({type:'ufoAbduct',root,beam,beamGlow,targetId:String(m.targetId||''),targetX,targetY,targetZ,startPos,start:Number(m.startAt)||serverNow(),killAt:Number(m.killAt)||serverNow()+3200,end:(Number(m.killAt)||serverNow()+3200)+650});return;
   }
   if(m.phase==='asteroidIncoming'){
-    const root=new THREE.Group(),rock=new THREE.Mesh(new THREE.IcosahedronGeometry(.8,1),new THREE.MeshBasicMaterial({color:0xff6d2f})),glow=new THREE.Mesh(new THREE.SphereGeometry(1.35,10,8),new THREE.MeshBasicMaterial({color:0xffb14c,transparent:true,opacity:.24,depthWrite:false}));root.add(rock,glow);addKillstreakVisual({type:'asteroid',root,x:Number(m.x)||0,y:Number(m.y)||0,z:Number(m.z)||0,start:serverNow(),impactAt:Number(m.impactAt)||serverNow()+720,end:(Number(m.impactAt)||serverNow()+720)+180});return;
+    const root=new THREE.Group(),rock=new THREE.Mesh(new THREE.IcosahedronGeometry(.8,1),new THREE.MeshStandardMaterial({color:0x6c2614,emissive:0xff4e16,emissiveIntensity:1.8,roughness:.72})),glow=new THREE.Mesh(new THREE.SphereGeometry(1.4,10,8),new THREE.MeshBasicMaterial({color:0xff8b35,transparent:true,opacity:.3,depthWrite:false,blending:THREE.AdditiveBlending}));root.add(rock,glow);addKillstreakVisual({type:'asteroid',root,x:Number(m.x)||0,y:Number(m.y)||0,z:Number(m.z)||0,start:serverNow(),impactAt:Number(m.impactAt)||serverNow()+720,end:(Number(m.impactAt)||serverNow()+720)+180});return;
   }
   if(m.phase==='asteroidImpact'){
     for(let i=killstreakFx.length-1;i>=0;i--){const f=killstreakFx[i];if(f.type==='asteroid'&&Math.hypot(f.x-(Number(m.x)||0),f.z-(Number(m.z)||0))<2.2){try{scene.remove(f.root);}catch{}disposeObject3D(f.root);killstreakFx.splice(i,1);break;}}
     applyExplosionFeedback('rpg',m);soundTacticalDetonation('rpg',m);spawnDetonationFx('rpg',m);return;
   }
   if(m.phase==='lightningStrike'){
-    const x=Number(m.x)||0,y=Number(m.y)||0,z=Number(m.z)||0,points=[],segments=8;for(let i=0;i<=segments;i++){const t=i/segments,spread=(1-Math.abs(t-.5)*1.25)*.72;points.push(new THREE.Vector3(x+(Math.random()-.5)*spread,y+34*(1-t),z+(Math.random()-.5)*spread));}points[points.length-1].set(x,y,z);const geometry=new THREE.BufferGeometry().setFromPoints(points),line=new THREE.Line(geometry,new THREE.LineBasicMaterial({color:0xe9f7ff,transparent:true,opacity:1})),root=new THREE.Group();root.add(line);const hit=new THREE.Mesh(new THREE.SphereGeometry(.48,10,8),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.92}));hit.position.set(x,y,z);root.add(hit);addKillstreakVisual({type:'lightning',root,start:performance.now(),end:performance.now()+280});applyExplosionFeedback('flash',{...m,radius:Number(m.radius)||6.6});return;
+    const fx=buildLightningVisual(m),now=performance.now();addKillstreakVisual({type:'lightning',...fx,start:now,boltEnd:now+430,electricEnd:now+1050,smokeEnd:now+8200,end:now+12000});applyExplosionFeedback('flash',{...m,radius:Number(m.radius)||6.6});return;
   }
 }
 function updateKillstreakFx(dt){
   const srv=serverNow(),now=performance.now();ufoLocalLift=0;
   for(let i=killstreakFx.length-1;i>=0;i--){const f=killstreakFx[i];let expired=false;
-    if(f.type==='ufoFlyby'){const duration=Math.max(1,f.end-f.start),p=Math.max(0,Math.min(1,(srv-f.start)/duration)),limit=minimapWorldLimit()+28,dir=f.index%2? -1:1;f.root.position.set(dir*(-limit+2*limit*p),27+f.index*3,(-.62+f.index*.62)*minimapWorldLimit());f.root.rotation.y=dir>0?-Math.PI/2:Math.PI/2;f.root.rotation.z=Math.sin(p*Math.PI*7)*.035;expired=srv>f.end;}
-    else if(f.type==='ufoAbduct'){const actor=samePlayerId(f.targetId,clientId)?null:remotes.get(f.targetId),baseX=actor?.group?.position?.x??f.root.position.x,baseZ=actor?.group?.position?.z??f.root.position.z,baseY=actor?.group?.position?.y??position?.y??0,p=Math.max(0,Math.min(1,(srv-f.start)/Math.max(1,f.killAt-f.start))),lift=7.5*smoothstep01((p-.16)/.78);f.root.position.set(baseX,baseY+11,baseZ);f.root.rotation.y+=dt*1.8;if(samePlayerId(f.targetId,clientId))ufoLocalLift=Math.max(ufoLocalLift,lift);else if(actor?.group)actor.group.position.y+=lift;f.beam.material.opacity=.14+.18*Math.sin(Math.min(1,p)*Math.PI);expired=srv>f.end;}
-    else if(f.type==='asteroid'){const p=Math.max(0,Math.min(1,(srv-f.start)/Math.max(1,f.impactAt-f.start))),height=38*(1-p);f.root.position.set(f.x+5*(1-p),f.y+height,f.z-4*(1-p));f.root.rotation.x+=dt*8;f.root.rotation.z+=dt*5;f.root.scale.setScalar(.72+.55*p);expired=srv>f.end;}
-    else if(f.type==='lightning'){const remain=Math.max(0,(f.end-now)/Math.max(1,f.end-f.start));for(const child of f.root.children)if(child.material?.opacity!=null)child.material.opacity=remain;expired=now>f.end;}
+    if(f.type==='ufoFlyby'){const duration=Math.max(1,f.end-f.start),p=Math.max(0,Math.min(1,(srv-f.start)/duration)),limit=minimapWorldLimit()+42,dir=f.index%2?-1:1,curve=Math.sin(Math.PI*p);f.root.position.set(dir*(-limit+2*limit*p),31+f.index*3-curve*5,(-.72+f.index*.72)*minimapWorldLimit());f.root.rotation.y=dir>0?-Math.PI/2:Math.PI/2;f.root.rotation.z=Math.sin(p*Math.PI*5)*.04;expired=srv>f.end;}
+    else if(f.type==='ufoAbduct'){
+      const actor=samePlayerId(f.targetId,clientId)?null:remotes.get(f.targetId),baseX=actor?.group?.position?.x??f.targetX,baseZ=actor?.group?.position?.z??f.targetZ,baseY=actor?.group?.position?.y??position?.y??f.targetY,total=Math.max(1,f.killAt-f.start),p=Math.max(0,Math.min(1,(srv-f.start)/total)),approach=smoothstep01(p/.28),hoverY=baseY+11.2,targetPos=new THREE.Vector3(baseX,hoverY,baseZ);f.root.position.lerpVectors(f.startPos,targetPos,approach);f.root.rotation.y+=dt*(approach<.98?3.5:1.6);f.root.rotation.z=(1-approach)*Math.sin(p*Math.PI*3)*.12;
+      const beamP=smoothstep01((p-.25)/.16),liftP=smoothstep01((p-.34)/.56),lift=9.6*liftP;f.beam.visible=beamP>.01;f.beamGlow.visible=beamP>.01;f.beam.material.opacity=beamP*(.18+.16*Math.sin(now*.026));f.beamGlow.material.opacity=beamP*(.18+.12*Math.sin(now*.019));if(f.root.userData.underGlow)f.root.userData.underGlow.material.opacity=.3+.18*beamP;
+      if(samePlayerId(f.targetId,clientId))ufoLocalLift=Math.max(ufoLocalLift,lift);else if(actor?.group)actor.group.position.y+=lift;expired=srv>f.end;
+    }
+    else if(f.type==='asteroid'){const p=Math.max(0,Math.min(1,(srv-f.start)/Math.max(1,f.impactAt-f.start))),height=42*(1-p);f.root.position.set(f.x+7*(1-p),f.y+height,f.z-6*(1-p));f.root.rotation.x+=dt*9;f.root.rotation.z+=dt*6;f.root.scale.setScalar(.72+.6*p);expired=srv>f.end;}
+    else if(f.type==='lightning'){
+      const boltRemain=Math.max(0,(f.boltEnd-now)/Math.max(1,f.boltEnd-f.start)),flicker=boltRemain>0?(.6+.4*Math.abs(Math.sin(now*.11))):0;for(const mat of f.boltMaterials)mat.opacity=Math.min(1,(mat.userData?.baseOpacity||1)*flicker);const electricRemain=Math.max(0,(f.electricEnd-now)/Math.max(1,f.electricEnd-f.start));for(const mat of f.structureMaterials)mat.opacity=.78*electricRemain*(.55+.45*Math.abs(Math.sin(now*.072)));if(f.flash)f.flash.intensity=8*boltRemain*(.45+.55*Math.abs(Math.sin(now*.13)));
+      const smokeRemain=Math.max(0,(f.smokeEnd-now)/Math.max(1,f.smokeEnd-f.start));for(const sprite of f.smokeSprites){const u=sprite.userData||{};sprite.position.y+=dt*(u.rise||.35);sprite.position.x=(u.baseX||sprite.position.x)+Math.sin(now*.0012+(u.phase||0))*.22;sprite.position.z=(u.baseZ||sprite.position.z)+Math.cos(now*.0010+(u.phase||0))*.22;sprite.material.opacity=.34*smokeRemain;}if(f.scorch){const fade=now<f.smokeEnd?1:Math.max(0,(f.end-now)/Math.max(1,f.end-f.smokeEnd));f.scorch.material.opacity=.88*fade;}expired=now>f.end;
+    }
     if(expired){try{scene.remove(f.root);}catch{}disposeObject3D(f.root);killstreakFx.splice(i,1);}
   }
   if(srv>=killstreakControlUntil)killstreakControlUntil=0;
@@ -4631,6 +4665,9 @@ function computeHudLayout(){
   const topRowY=fireY-fireR-Math.max(jumpR,swapR,aimR)-11,jumpX=crouchX,jumpY=topRowY,swapX=reloadX,swapY=topRowY,aimX=fireX,aimY=topRowY;
   const modeX=crouchX-crouchR-modeR-9,modeY=(topRowY+fireY)/2,steadyX=leftFireX+leftFireR+modeR+(compact?8:10),steadyY=leftFireY,weaponLift=touchGameplayControlsVisible()?(fireR*3.75+8):0;
   const weaponX=viewW-safe.right-margin-weaponW,weaponY=viewH-bottom-weaponH-weaponLift;
+  const streakW=mapSize,streakH=compact?38:42;let streakX=mapX,streakY=controlsY+menuH+5;
+  const streakHitsWeapon=streakX<weaponX+weaponW+6&&streakX+streakW>weaponX-6&&streakY<weaponY+weaponH+6&&streakY+streakH>weaponY-6;
+  if(streakHitsWeapon){streakX=Math.max(contentLeft,Math.min(weaponX-streakW-10,mapX-streakW-10));if(streakX+streakW>weaponX-6)streakX=contentLeft;}
   const teamIndicatorY=teamY+teamH+8,announcerY=teamIndicatorY+(compact?24:28),noticeW=Math.max(118,Math.min(compact?190:240,contentW*.34)),noticeH=28;
   const noticeX=Math.max(contentLeft,Math.min((viewW-noticeW)/2,contentRight-noticeW)),noticeY=announcerY+(compact?30:36);
   const gapLeft=teamX+teamW+8,gapRight=mapX-8,gapW=gapRight-gapLeft,chatFallbackX=Math.max(contentLeft,Math.min(mapX-150,contentRight-150));
@@ -4639,7 +4676,7 @@ function computeHudLayout(){
   return{compact,safe,moveBoundary,
     map:{x:mapX,y:mapY,w:mapSize,h:mapSize},kill:{x:killX,y:killY,w:killW,h:killH},
     team:{x:teamX,y:teamY,w:teamW,h:teamH},teamIndicator:{x:teamX+teamW/2,y:teamIndicatorY},notice:{x:noticeX,y:noticeY,w:noticeW,h:noticeH},chatFeed:{x:chatFeedX,y:chatFeedY,w:chatFeedW,h:chatFeedH},announcer:{x:viewW/2,y:announcerY},
-    chat:{x:chatX,y:controlsY,w:chatW,h:menuH},menu:{x:menuX,y:controlsY,w:menuW,h:menuH},streak:{x:mapX,y:controlsY+menuH+5,w:mapSize,h:compact?38:42},
+    chat:{x:chatX,y:controlsY,w:chatW,h:menuH},menu:{x:menuX,y:controlsY,w:menuW,h:menuH},streak:{x:streakX,y:streakY,w:streakW,h:streakH},
     weapon:{x:weaponX,y:weaponY,w:weaponW,h:weaponH},joy:{x:defaultJoyX,y:defaultJoyY,r:joyR},
     leftFire:{x:leftFireX,y:leftFireY,r:leftFireR},crouch:{x:crouchX,y:crouchY,r:crouchR},flash:{x:flashX,y:flashY,r:equipR},sticky:{x:stickyX,y:stickyY,r:equipR},
     fire:{x:fireX,y:fireY,r:fireR},aim:{x:aimX,y:aimY,r:aimR},jump:{x:jumpX,y:jumpY,r:jumpR},reload:{x:reloadX,y:reloadY,r:reloadR},swap:{x:swapX,y:swapY,r:swapR},mode:{x:modeX,y:modeY,r:modeR},steady:{x:steadyX,y:steadyY,r:modeR},
@@ -4663,10 +4700,25 @@ function drawKillstreakPanel(c,r){
   for(let i=0;i<KILLSTREAK_ORDER.length;i++){const kind=KILLSTREAK_ORDER[i],spec=KILLSTREAK_SPECS[kind],count=killstreakStatus.available.filter(v=>v===kind).length,ready=count>0,selected=ready&&killstreakSelected===kind,x=r.x+i*slotW;if(i)c.fillStyle='rgba(255,255,255,.09)',c.fillRect(x,r.y+5,1,r.h-10);if(selected){c.fillStyle='rgba(215,255,88,.14)';c.fillRect(x+1,r.y+1,slotW-2,r.h-2);}c.fillStyle=ready?HUD_ACCENT:'rgba(225,233,238,.50)';c.font=`1000 ${r.w<105?7.5:8.5}px system-ui`;c.fillText(kind==='lightning'?'LGT':kind==='asteroids'?'AST':spec.short,x+slotW/2,r.y+12);c.font='900 8px system-ui';c.fillStyle=ready?'#fff':'rgba(180,191,199,.60)';c.fillText(ready?(count>1?`READY ×${count}`:'READY'):`${spec.kills} K`,x+slotW/2,r.y+r.h-10);}
   c.textAlign='left';c.font='1000 7px system-ui';c.fillStyle='rgba(255,255,255,.60)';c.fillText(`STREAK ${killstreakStatus.streak}`,r.x+4,r.y+r.h-2);c.restore();
 }
-function drawKillstreakTargeting(c,w,h){
-  if(!killstreakTargeting)return;const pad=Math.max(18,Math.min(54,w*.05)),header=66,footer=48,size=Math.max(180,Math.min(w-pad*2,h-header-footer-22,620)),x=(w-size)/2,y=Math.max(header,(h-size)/2-4),staticMap=getMinimapStatic(768,768,currentMapId);killstreakTargetRect={x,y,w:size,h:size};
-  c.save();c.fillStyle='rgba(0,0,0,.82)';c.fillRect(0,0,w,h);c.drawImage(staticMap,x,y,size,size);c.fillStyle='rgba(255,67,32,.08)';c.fillRect(x,y,size,size);c.strokeStyle='rgba(255,136,76,.88)';c.lineWidth=2;c.strokeRect(x,y,size,size);const limit=minimapWorldLimit(),tx=x+(killstreakTargeting.x/limit+1)*.5*size,ty=y+(killstreakTargeting.z/limit+1)*.5*size,scatter=11/(limit*2)*size;c.strokeStyle='#ff7848';c.lineWidth=2;c.beginPath();c.arc(tx,ty,Math.max(10,scatter),0,Math.PI*2);c.stroke();c.beginPath();c.moveTo(tx-10,ty);c.lineTo(tx+10,ty);c.moveTo(tx,ty-10);c.lineTo(tx,ty+10);c.stroke();c.textAlign='center';c.fillStyle='#fff';c.font='1000 20px system-ui';c.fillText('ASTEROID STRIKE',w/2,30);c.fillStyle='#ffb08c';c.font='850 11px system-ui';const hint=controllerInputActive()?'LS MOVE · A CONFIRM · B CANCEL':isTouch?'TAP MAP TO FIRE · TAP OUTSIDE TO CANCEL':'MOVE MOUSE · CLICK TO FIRE · ESC CANCEL';c.fillText(hint,w/2,h-24);c.restore();
+function drawKillstreakTargetingPlayers(c,r){
+  const limit=minimapWorldLimit(),toX=x=>r.x+(x/limit+1)*.5*r.w,toY=z=>r.y+(z/limit+1)*.5*r.h,teamBased=currentModeSpec().teamBased,now=performance.now(),pulse=.5+.5*Math.sin(now*.008),targetRadius=11,inside=[];
+  for(const rmt of remotes.values()){
+    if((Number(rmt.hp)||0)<=0)continue;const friendly=teamBased&&modeFriendly(rmt.team),enemy=!friendly,x=toX(rmt.group.position.x),y=toY(rmt.group.position.z),distance=Math.hypot(rmt.group.position.x-killstreakTargeting.x,rmt.group.position.z-killstreakTargeting.z);if(enemy&&distance<=targetRadius)inside.push(rmt);
+    c.save();c.translate(x,y);if(enemy){c.rotate(Math.PI/4);c.fillStyle='#ff493f';c.fillRect(-4.8,-4.8,9.6,9.6);c.strokeStyle=`rgba(255,230,220,${.72+.28*pulse})`;c.lineWidth=1.4;c.strokeRect(-6.2,-6.2,12.4,12.4);}else{c.beginPath();c.moveTo(0,-5.8);c.lineTo(4.6,4.6);c.lineTo(0,2.7);c.lineTo(-4.6,4.6);c.closePath();c.fillStyle='#58b8ff';c.fill();c.strokeStyle='#dff4ff';c.lineWidth=1;c.stroke();}c.restore();
+  }
+  if(position){const x=toX(position.x),y=toY(position.z);c.save();c.translate(x,y);c.rotate(-yaw);c.beginPath();c.moveTo(0,-6.6);c.lineTo(5,5.2);c.lineTo(0,3);c.lineTo(-5,5.2);c.closePath();c.fillStyle='#ffffff';c.fill();c.strokeStyle='#77d7ff';c.lineWidth=1.3;c.stroke();c.restore();}
+  return inside.length;
 }
+function drawKillstreakTargeting(c,w,h){
+  if(!killstreakTargeting)return;const pad=Math.max(14,Math.min(46,w*.045)),header=72,footer=56,size=Math.max(180,Math.min(w-pad*2,h-header-footer-18,660)),x=(w-size)/2,y=Math.max(header,(h-size)/2-2),staticMap=getMinimapStatic(768,768,currentMapId);killstreakTargetRect={x,y,w:size,h:size};
+  c.save();c.fillStyle='rgba(0,0,0,.88)';c.fillRect(0,0,w,h);roundRect(c,x-9,y-9,size+18,size+18,10,'rgba(8,12,15,.97)','rgba(255,128,70,.72)');c.drawImage(staticMap,x,y,size,size);c.fillStyle='rgba(255,64,30,.055)';c.fillRect(x,y,size,size);c.strokeStyle='rgba(255,160,96,.9)';c.lineWidth=2;c.strokeRect(x,y,size,size);
+  const scanY=y+(performance.now()*.065%(size+36))-18,scan=c.createLinearGradient(0,scanY-10,0,scanY+10);scan.addColorStop(0,'rgba(255,120,70,0)');scan.addColorStop(.5,'rgba(255,140,80,.14)');scan.addColorStop(1,'rgba(255,120,70,0)');c.fillStyle=scan;c.fillRect(x,scanY-10,size,20);
+  const enemiesInZone=drawKillstreakTargetingPlayers(c,killstreakTargetRect),limit=minimapWorldLimit(),tx=x+(killstreakTargeting.x/limit+1)*.5*size,ty=y+(killstreakTargeting.z/limit+1)*.5*size,scatter=11/(limit*2)*size;c.strokeStyle='#ff6f45';c.lineWidth=2.2;c.beginPath();c.arc(tx,ty,Math.max(12,scatter),0,Math.PI*2);c.stroke();c.strokeStyle='rgba(255,210,180,.88)';c.lineWidth=1.2;c.beginPath();c.arc(tx,ty,Math.max(17,scatter+6),0,Math.PI*2);c.stroke();c.beginPath();c.moveTo(tx-12,ty);c.lineTo(tx+12,ty);c.moveTo(tx,ty-12);c.lineTo(tx,ty+12);c.stroke();
+  c.textAlign='center';c.fillStyle='#fff';c.font='1000 20px system-ui';c.fillText('ASTEROID STRIKE',w/2,29);c.fillStyle=enemiesInZone?'#ff7d59':'#aeb8bf';c.font='1000 11px system-ui';c.fillText(`${enemiesInZone} ${enemiesInZone===1?'ENEMY':'ENEMIES'} IN STRIKE ZONE`,w/2,49);
+  c.textAlign='left';c.font='900 9px system-ui';c.fillStyle='#ff6b58';c.fillText('◆ ENEMY',x,y+size+18);c.fillStyle='#68c3ff';c.fillText('▲ FRIENDLY',x+72,y+size+18);c.fillStyle='#fff';c.fillText('▲ YOU',x+162,y+size+18);
+  c.textAlign='center';c.fillStyle='#ffb08c';c.font='850 11px system-ui';const hint=controllerInputActive()?'LS MOVE · A CONFIRM · B CANCEL':isTouch?'TAP MAP TO FIRE · TAP OUTSIDE TO CANCEL':'MOVE MOUSE · CLICK TO FIRE · ESC CANCEL';c.fillText(hint,w/2,h-22);c.restore();
+}
+
 function drawHud(now){
   const scopeAmount=activeScopeMaskAmount(),scoped=scopeAmount>.002,scopeAnimating=scoped&&scopeAmount<.998,hudInterval=scopeAnimating?16:(touchGameplayControlsVisible()?33:16),scopeStateChanged=scoped!==hudLastScopeActive;
   if(!scopeStateChanged&&!scopeAnimating&&now-hudLastDraw<hudInterval)return;hudLastDraw=now;hudLastScopeActive=scoped;if(!hudLayout)hudLayout=computeHudLayout();
