@@ -73,7 +73,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.63: authoritative menu/layout/responsive ownership. */
+/* Breach UI contract v1.44.65: authoritative menu/layout/responsive ownership. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -134,7 +134,7 @@ body{font-size:var(--ui-md)}
 .lobby-footer{padding:6px 9px;grid-template-columns:minmax(0,1fr) auto auto}
 .lobby-footer-copy{min-width:0;display:grid;gap:1px}
 .lobby-footer-actions{min-width:0;display:flex;align-items:center;justify-content:flex-end}.lobby-start{height:40px;min-width:210px;padding:0 16px;font-size:12px;border-radius:8px}
-/* Match setup: horizontal room goes to the fields that need it, never to an empty fourth slot. */
+/* Match rules use available width without creating empty columns. */
 .lobby-match-grid{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(200px,.72fr);gap:8px;align-items:start}
 .lobby-match-card{min-width:0;padding:9px;border:1px solid var(--line);border-radius:10px;background:#0a0f12;display:grid;align-content:start;gap:7px}
 .lobby-card-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
@@ -148,7 +148,7 @@ body{font-size:var(--ui-md)}
 .lobby-bots-row{grid-template-columns:1fr}
 .lobby-match-card .input{width:100%;max-width:none}
 .lobby-rule-summary{margin-top:0;width:100%;min-width:0;text-align:left;line-height:1.2}
-/* Map selection: choices are a complete strip above a full-width level preview. */
+/* Map choices sit above a full-width level preview. */
 .lobby-map-view.active{display:block;height:100%;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
 .lobby-map-panel{height:100%;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto minmax(120px,1fr) auto;gap:7px;padding:7px}
 .lobby-map-toolbar{min-width:0;display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr);align-items:end;gap:8px;overflow:visible}
@@ -165,10 +165,6 @@ body{font-size:var(--ui-md)}
 .lobby-map-choice:disabled.active{opacity:1}
 .lobby-map-canvas-wrap{position:relative;min-width:0;min-height:0;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#080d10}
 #lobbyMapPreview{display:block;width:100%;height:100%;min-height:120px;object-fit:contain}
-.lobby-map-legend{position:absolute;left:7px;right:7px;bottom:7px;display:flex;flex-wrap:wrap;gap:5px 10px;align-items:center;padding:5px 7px;border:1px solid rgba(255,255,255,.10);border-radius:7px;background:rgba(5,8,10,.72);color:#c8d2d8;font-size:9px;font-weight:900;letter-spacing:.03em;pointer-events:none}
-.lobby-map-legend span{display:inline-flex;align-items:center;gap:5px}
-.lobby-map-legend i{width:8px;height:8px;border-radius:2px;background:rgba(205,213,218,.55)}
-.lobby-map-legend .map-legend-natural{border-radius:50%;background:rgba(80,135,75,.82)}
 /* Utility surfaces shrink to content when possible; the content row owns real overflow. */
 .modal-screen{place-items:center;padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 9px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 9px);background:rgba(3,5,6,.86);backdrop-filter:blur(8px)}
 .modal-shell{width:min(var(--content-max),100%);height:auto;min-height:0;display:grid;overflow:hidden;border:1px solid var(--line2);border-radius:12px;background:#0d1216;box-shadow:var(--shadow);}
@@ -198,7 +194,7 @@ body{font-size:var(--ui-md)}
 .setting-action .secondary-btn{width:100%;height:38px;white-space:normal}
 .settings-shell .modal-foot{grid-template-columns:minmax(0,1fr) auto auto auto}
 .desktop .touch-setting{display:none}
-/* Host Control: predictable grids prevent stretched orphan cards and keep Live Bots near the gameplay fields. */
+/* Host options use predictable grids without stretched orphan cards. */
 .admin-shell{width:min(980px,100%);height:min(570px,100%);max-height:100%;}
 .admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px 9px;overflow:visible;border-bottom:1px solid var(--line);background:#090d10}
 .admin-tab{width:100%;min-width:0;height:35px;padding:0 8px}
@@ -344,7 +340,7 @@ body{font-size:var(--ui-md)}
 .menu-screen{padding:calc(var(--safe-top) + 5px) calc(var(--safe-right) + 7px) calc(var(--safe-bottom) + 5px) calc(var(--safe-left) + 7px)}.front-shell{grid-template-rows:auto minmax(0,1fr) auto;gap:6px}.front-header{gap:8px;padding-bottom:4px}.front-body{grid-template-columns:180px minmax(0,1fr);gap:6px}.front-nav{padding:6px;gap:4px}.front-nav-button{height:48px;padding:0 7px}.front-content>.deploy-view{padding:9px}.front-hero,.join-panel{padding:12px}.front-hero h1{font-size:23px}.join-panel h1{font-size:21px}.front-hero p,.join-panel p{font-size:10px;line-height:1.3}.front-hero .deploy-button{height:44px}
   .lobby-screen{padding:calc(var(--safe-top) + 4px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 4px) calc(var(--safe-left) + 6px)}.lobby-shell{gap:5px}.lobby-header{gap:7px;padding-bottom:3px}.lobby-room-line{gap:6px;flex-wrap:wrap}.lobby-room-line h1{font-size:16px}.lobby-mode-badge{font-size:9px;padding:3px 5px}.lobby-title p,.lobby-version{font-size:10px}.lobby-header-actions{gap:3px;flex-wrap:wrap;justify-content:flex-end}.lobby-header-actions .secondary-btn{height:32px;padding:0 8px;font-size:10.5px}.lobby-header-actions .square-btn{width:30px;min-width:30px;height:30px}.lobby-side-stack{gap:4px}.lobby-side-tabs{padding:3px;gap:3px}.lobby-side-tab{height:32px;font-size:10.5px}.lobby-roster-panel.active,.lobby-setup-panel,.lobby-loadout-panel{padding:6px}.lobby-section-head{padding-bottom:4px}.lobby-section-head h2{font-size:14px}.lobby-secondary{font-size:9.5px}.lobby-roster-team-control{gap:6px;padding:4px 6px}.lobby-team-choice{height:29px}.lobby-player{padding:5px 7px}.lobby-team-title{height:27px}.lobby-footer{padding:4px 7px}.lobby-footer strong{font-size:10px}.lobby-footer-copy span{font-size:10px}.lobby-start{height:34px;min-width:150px;font-size:10.5px}
   .lobby-match-grid{grid-template-columns:minmax(0,1.32fr) minmax(160px,.68fr);gap:5px}.lobby-match-card{padding:5px;gap:4px}.lobby-card-title{padding-bottom:3px}.lobby-card-title strong{font-size:11px}.lobby-mode-picker button{height:31px;font-size:10.5px}.lobby-match-card .lobby-setup-row{gap:4px}.lobby-setup-row label>span{font-size:9.5px}.lobby-match-card .input{height:31px;font-size:10px}.lobby-rule-summary{padding:4px 6px;font-size:9.5px}
-  .lobby-map-panel{gap:4px;padding:4px;grid-template-rows:auto minmax(110px,1fr) auto}.lobby-map-toolbar{grid-template-columns:minmax(95px,125px) minmax(0,1fr);gap:5px}.lobby-map-toolbar h2{font-size:13px}.lobby-map-toolbar p{font-size:9.5px}.lobby-map-choice-grid{gap:4px}.lobby-map-choice{min-height:38px;padding:3px 4px}.lobby-map-choice strong{font-size:10.5px}.lobby-map-choice small{font-size:9.5px}.lobby-map-legend{left:5px;right:5px;bottom:5px;padding:4px 5px;gap:4px 8px;font-size:9.5px}
+  .lobby-map-panel{gap:4px;padding:4px;grid-template-rows:auto minmax(110px,1fr) auto}.lobby-map-toolbar{grid-template-columns:minmax(95px,125px) minmax(0,1fr);gap:5px}.lobby-map-toolbar h2{font-size:13px}.lobby-map-toolbar p{font-size:9.5px}.lobby-map-choice-grid{gap:4px}.lobby-map-choice{min-height:38px;padding:3px 4px}.lobby-map-choice strong{font-size:10.5px}.lobby-map-choice small{font-size:9.5px}
   .modal-screen{padding:calc(var(--safe-top) + 4px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 4px) calc(var(--safe-left) + 6px)}.modal-shell{border-radius:9px}.modal-head{padding:5px 7px 4px}.modal-head h2{font-size:15px}.modal-head p{font-size:9px;margin-top:2px}.settings-tabs,.admin-tabs{padding:3px 6px;gap:3px}.settings-tab,.admin-tab{height:32px;font-size:10.5px}.settings-page .settings-category-head{padding:4px 7px 1px}.settings-page .settings-category-head h3{font-size:12px}.settings-page .settings-grid{gap:5px;padding:4px 7px 6px}.settings-page .setting{padding:5px;gap:4px}.setting>span{font-size:10.5px}.setting .game-control,.weapon-settings-card .game-control{height:32px;font-size:10.5px}.game-slider-control{height:27px;padding:5px 0}.modal-foot{padding:4px 7px}
   .admin-page{max-height:calc(100vh - var(--safe-top) - var(--safe-bottom) - 106px);}.admin-page>.settings-grid{gap:4px}.admin-page>.settings-grid>.setting{padding:5px}.admin-bot-card{padding:5px;gap:5px;}.admin-bot-head{padding-bottom:3px}.admin-bot-head strong{font-size:11px}.admin-bot-head small,.admin-bot-summary{font-size:9.5px}.admin-bot-controls{gap:4px}.admin-bot-controls .game-control{height:31px}.admin-weapon-toolbar{margin-bottom:4px;padding:5px 6px;gap:6px}.weapon-settings-card{padding:6px;gap:5px}.weapon-settings-card strong{font-size:11px;padding-bottom:3px}.weapon-fields{gap:4px}
   .pause-card{width:min(700px,100%);padding:8px}.pause-card h1{font-size:17px}.pause-context{font-size:9.5px;margin-top:3px}.pause-team{font-size:9.5px;padding:3px 6px}.resume-btn{height:34px;margin-top:5px}.pause-section{margin-top:5px;gap:4px}.pause-section>span{font-size:9.5px}.pause-actions{gap:4px}.pause-actions .secondary-btn,.pause-leave .secondary-btn{height:32px;font-size:10.5px}.pause-leave{margin-top:5px;padding-top:4px}
@@ -384,7 +380,7 @@ body{font-size:var(--ui-md)}
   .admin-page>.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-bot-controls{grid-template-columns:repeat(3,minmax(0,1fr))}.weapon-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-weapon-toolbar{align-items:start}
   .pause-card{grid-template-columns:1fr}.pause-actions-player{grid-template-columns:repeat(3,minmax(0,1fr))}.pause-actions-system{grid-template-columns:repeat(2,minmax(0,1fr))}
 .lobby-roster-team-control{width:100%;min-width:0;justify-content:stretch}.lobby-team-picker{width:100%;min-width:0;justify-self:stretch}.lobby-team-choice{width:100%;min-width:0}
-  .admin-shell .modal-foot{grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center}.admin-shell .admin-status{grid-column:1/-1;width:100%;max-height:none;overflow:visible;font-size:9.5px;line-height:1.15}.admin-shell #adminResetBtn{grid-column:2}.admin-shell #adminCancelBtn{grid-column:3}.admin-shell #adminSaveBtn{grid-column:4}
+  .admin-shell .modal-foot{grid-template-columns:minmax(0,1fr) auto;align-items:center}.admin-shell .admin-status{width:100%;max-height:none;overflow:visible;font-size:9.5px;line-height:1.15}.admin-shell #adminCancelBtn{grid-column:2}
 .join-controls{grid-template-columns:minmax(0,1fr)}.join-controls .deploy-button{width:100%}
 .front-nav-button{height:40px}.front-nav-button strong{font-size:11px}.front-nav-button small{display:none}
   .lobby-match-card .lobby-control-group{grid-template-columns:1fr}
@@ -426,7 +422,7 @@ body{font-size:var(--ui-md)}
 .controller-focus-shine-layer::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(215,255,88,.08),transparent 72%);opacity:.72}
 .controller-focus-shine-layer.editing{background:rgba(215,255,88,.06);box-shadow:0 0 22px rgba(215,255,88,.22),inset 0 -2px 0 rgba(215,255,88,.58)}
 @keyframes controllerFocusSweep{0%{transform:translateX(-50%)}100%{transform:translateX(50%)}}
-/* v1.44.63 Create-a-Class / Gunsmith layout.
+/* v1.44.65 Create-a-Class / Gunsmith layout.
    One responsive system: weapon + live stats share the upper workspace;
    the selected attachment choices own a full-width tray underneath. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
@@ -726,7 +722,7 @@ body{font-size:var(--ui-md)}
     .gunsmith-weapon-picker .loadout-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.63 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.65 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -735,7 +731,7 @@ body{font-size:var(--ui-md)}
 .loadout-stat-bar-hatch.loss{background:repeating-linear-gradient(135deg,rgba(255,105,115,.95) 0 2px,rgba(255,105,115,.22) 2px 4px)}
 .loadout-stat-baseline-mark{position:absolute;top:-1px;bottom:-1px;width:1px;display:block;background:rgba(255,255,255,.72);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
 .loadout-stat.better .loadout-stat-bar-solid,.loadout-stat.worse .loadout-stat-bar-solid{background:#8f9ca4}
-/* v1.44.63 controller focus visuals: focus must never mutate Gunsmith geometry. */
+/* v1.44.65 controller focus visuals: focus must never mutate Gunsmith geometry. */
 [data-input-mode="controller"] .gunsmith-callout.controller-focus,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
   position:absolute!important;
@@ -789,7 +785,7 @@ body{font-size:var(--ui-md)}
 /* Diagnostics recorder: compact, controller-friendly controls in Settings. */
 .diagnostics-toggle-card small,.diagnostics-status-card small,.diagnostics-log-card small{color:var(--dim);font-size:10px;line-height:1.3;text-transform:none;letter-spacing:0}.diagnostics-toggle-btn{min-width:148px}.diagnostics-toggle-btn.active{background:#1b2419;color:var(--accent);border-color:rgba(215,255,88,.32);box-shadow:inset 0 0 0 1px rgba(215,255,88,.06)}.diagnostics-status-card output{justify-self:start;color:var(--accent);font-size:11px;font-weight:950}.diagnostics-log-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.diagnostics-log-actions .secondary-btn{width:100%;height:32px;padding:0 8px}
 
-/* v1.44.63 mobile/controller readability baseline.
+/* v1.44.65 mobile/controller readability baseline.
    Compact by removing secondary copy first; actionable/menu text does not collapse
    into 8–9px labels on short landscape screens. */
 @media (max-width:900px) and (orientation:landscape){
@@ -804,7 +800,6 @@ body{font-size:var(--ui-md)}
   .lobby-map-toolbar p,
   .lobby-map-choice strong,
   .lobby-map-choice small,
-  .lobby-map-legend,
   .modal-head p,
   .setting>span,
   .admin-page>.settings-grid>.setting>span,
@@ -879,12 +874,12 @@ body{font-size:var(--ui-md)}
   .gunsmith-inspector-empty>strong,.gunsmith-weapon-picker .loadout-choice strong{font-size:10.5px}
 }
 
-/* v1.44.63 immediate-action menu semantics. */
+/* v1.44.65 immediate-action menu semantics. */
 .loadout-foot,.settings-actions{grid-template-columns:minmax(0,1fr) auto}.loadout-foot .modal-action,.settings-actions .modal-action{min-width:92px}.settings-actions #settingsResetBtn{min-width:124px}
 
 
 
-/* v1.44.63 whole-app density audit.
+/* v1.44.65 whole-app density audit.
    Vertical space is treated as scarce: small labels/actions share rows, redundant headings
    are removed, and content gets the reclaimed height instead of shrinking typography. */
 .front-shell{grid-template-rows:48px minmax(0,1fr) auto;gap:6px}
@@ -929,7 +924,7 @@ body{font-size:var(--ui-md)}
 .gunsmith-attachment-options{gap:5px}.gunsmith-attachment-option{padding:7px 8px;gap:3px}
 .loadout-stat-row{gap:3px}.loadout-stat{padding:4px 6px}.loadout-stat-delta{margin-top:2px}
 
-/* Settings/Host Control controller instructions no longer consume a dedicated grid row. */
+/* Settings/Host Options controller instructions no longer consume a dedicated grid row. */
 .settings-shell,.admin-shell{position:relative}
 .settings-shell{grid-template-rows:auto auto minmax(0,1fr) auto}
 .admin-shell{grid-template-rows:auto auto minmax(0,1fr) auto}
@@ -980,3 +975,69 @@ body{font-size:var(--ui-md)}
 
 [data-input-mode="touch"] .lobby-footer:has(#lobbyStatus:empty):has(.lobby-start.hide),
 [data-input-mode="keyboardMouse"] .lobby-footer:has(#lobbyStatus:empty):has(.lobby-start.hide){display:none}
+
+
+/* v1.44.65 menu convention cleanup. */
+.front-action-only,.join-action-only{border:0!important;background:transparent!important;box-shadow:none!important}
+.front-action-only{display:flex;justify-content:center;align-items:center;padding:0!important}
+.front-action-only .deploy-button{width:min(260px,100%)}
+.join-action-only{display:block;padding:0!important;width:min(620px,100%)}
+.live-toolbar-actions{justify-content:flex-end;min-height:34px}
+
+/* The map page has no editor-style legend or redundant title row. */
+.lobby-map-panel{grid-template-rows:auto minmax(120px,1fr)}
+.lobby-map-toolbar{grid-template-columns:minmax(0,1fr);align-items:stretch}
+
+/* Host options read as one conventional category surface. */
+.lobby-cheats-panel{grid-template-rows:auto minmax(0,1fr)}
+.lobby-cheats-toolbar{grid-template-columns:minmax(0,1fr)}
+.lobby-cheat-tabs{width:100%}
+.lobby-god-control{min-height:54px}
+
+/* Footer only occupies the space its current actions/status need. */
+.lobby-footer{border:0;background:transparent;border-radius:0;padding:0 2px!important;grid-template-columns:minmax(0,1fr) auto auto;min-height:36px}
+.lobby-footer-copy:has(#lobbyStatus:empty){display:none}
+
+/* Binary settings behave like binary settings, not value pickers. */
+.setting-switch{grid-template-columns:minmax(0,1fr) auto;align-items:center;align-content:center}
+.setting-switch>span{align-self:center}
+.settings-tabs:has([data-settings-tab="developer"]:not(.hide)){grid-template-columns:repeat(4,minmax(0,1fr))}
+
+/* Gunsmith input help is contextual, not persistent decoration. */
+.loadout-preview-hint{opacity:0;visibility:hidden;transform:translateY(3px);transition:opacity .15s ease,transform .15s ease,visibility 0s linear .15s}
+.loadout-workspace.show-input-hint .loadout-preview-hint{display:block!important;opacity:1;visibility:visible;transform:none;transition-delay:0s}
+
+/* Roles are informational once; role changes are explicit actions. */
+.lobby-role-chip,.admin-role-chip{display:inline-flex;align-items:center;height:18px;margin-left:5px;padding:0 5px;border:1px solid rgba(215,255,88,.28);border-radius:4px;background:rgba(215,255,88,.07);color:var(--accent);font-size:8px;font-weight:950;letter-spacing:.05em;vertical-align:middle;white-space:nowrap}
+.lobby-admin-action{height:28px;padding:0 8px;border:1px solid var(--line);border-radius:6px;background:#11171b;color:var(--text);font-size:8.5px;font-weight:950;letter-spacing:.03em;cursor:pointer;white-space:nowrap}
+.lobby-admin-action:hover{border-color:var(--line2);background:#1a2228}
+.lobby-admin-action.danger{color:#ff9aa2}
+.admin-player-actions{align-items:center;flex-wrap:wrap;justify-content:flex-end}
+.admin-player-toggle{height:32px;padding:0 7px;border:1px solid var(--line);border-radius:7px;background:#090d10;display:flex;align-items:center;gap:7px;color:var(--muted);font-size:9px;font-weight:950;letter-spacing:.04em;white-space:nowrap}
+.admin-player-toggle .switch-toggle{width:36px;height:20px}
+.admin-player-toggle .switch-toggle>span{width:12px;height:12px}
+.admin-player-toggle .switch-toggle.active>span{transform:translateX(16px)}
+.admin-mini.danger{color:#ff9aa2}
+.admin-footer{grid-template-columns:minmax(0,1fr) auto!important}
+
+@media (max-width:760px),(max-height:360px) and (orientation:landscape){
+  .lobby-map-toolbar{grid-template-columns:minmax(0,1fr)!important}
+  .lobby-cheats-toolbar{grid-template-columns:minmax(0,1fr)!important}
+  .lobby-footer{grid-template-columns:minmax(0,1fr) auto!important}
+  .lobby-footer-copy:has(#lobbyStatus:empty){display:none}
+  .lobby-controller-hint{justify-self:start}
+}
+@media (orientation:portrait){
+  .lobby-map-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .lobby-footer{grid-template-columns:1fr!important;padding:0!important}
+  .lobby-footer-copy:has(#lobbyStatus:empty){display:none}
+  .lobby-footer-actions{justify-content:stretch}.lobby-start{width:100%;min-width:0}
+  .settings-tabs:has([data-settings-tab="developer"]:not(.hide)){grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+/* v1.44.65 footer child placement remains stable when empty siblings are hidden. */
+.lobby-footer-copy{grid-column:1}
+.lobby-controller-hint{grid-column:2}
+.lobby-footer-actions{grid-column:3}
+@media (max-width:760px),(max-height:360px) and (orientation:landscape){.lobby-footer-copy{grid-column:1}.lobby-controller-hint{grid-column:1}.lobby-footer-actions{grid-column:2}}
+@media (orientation:portrait){.lobby-footer-copy,.lobby-controller-hint,.lobby-footer-actions{grid-column:1}}
