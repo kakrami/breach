@@ -19,6 +19,7 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
     'Weapon Handling': 8,
     Movement: 12,
     Tactical: 10,
+    Killstreaks: 10,
     Music: 2,
   });
   const GROUP_CUE_LIMITS = Object.freeze({
@@ -29,6 +30,7 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
     'Weapon Handling': 4,
     Movement: 6,
     Tactical: 6,
+    Killstreaks: 4,
     Music: 1,
   });
 

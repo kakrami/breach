@@ -64,10 +64,10 @@ export function createGamepadInput({stickDeadzone=.16,lookDeadzone=.14,lookCurve
     if(destroyed)return EMPTY_FRAME;
     const pad=selectGamepad();
     if(!pad){lastHeld.fill(false);lastKey='';lastConnected=false;return EMPTY_FRAME;}
-    const key=`${pad.index}:${pad.id||'gamepad'}`;
-    if(key!==lastKey||!lastConnected){lastHeld.fill(false);lastKey=key;lastConnected=true;}
+    const key=`${pad.index}:${pad.id||'gamepad'}`,firstFrame=key!==lastKey||!lastConnected;
+    if(firstFrame){lastKey=key;lastConnected=true;}
     const buttons=Array.from({length:18},(_,i)=>buttonValue(pad.buttons?.[i]));
-    const held=buttons.map(value=>value>=buttonThreshold),pressed=held.map((value,i)=>value&&!lastHeld[i]),released=held.map((value,i)=>!value&&lastHeld[i]);
+    const held=buttons.map(value=>value>=buttonThreshold),pressed=firstFrame?held.map(()=>false):held.map((value,i)=>value&&!lastHeld[i]),released=firstFrame?held.map(()=>false):held.map((value,i)=>!value&&lastHeld[i]);
     lastHeld=held.slice();
     const rawMoveX=clamp(Number(pad.axes?.[0])||0,-1,1),rawMoveY=clamp(Number(pad.axes?.[1])||0,-1,1);
     const rawLookX=clamp(Number(pad.axes?.[2])||0,-1,1),rawLookY=clamp(Number(pad.axes?.[3])||0,-1,1);

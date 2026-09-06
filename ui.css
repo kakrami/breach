@@ -73,7 +73,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.72: authoritative menu/layout/responsive ownership. */
+/* Breach UI contract v1.44.76: authoritative menu/layout/responsive ownership. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -131,7 +131,7 @@ body{font-size:var(--ui-md)}
 .killstreak-equipped-slot.empty{border-style:dashed;border-color:rgba(255,255,255,.13);background:#090d10}.killstreak-equipped-slot .kill-count{min-width:34px;color:var(--accent);font:1000 18px/1 system-ui}.killstreak-equipped-slot.empty .kill-count{color:#626e75}.killstreak-equipped-slot div{min-width:0}.killstreak-equipped-slot strong{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#f2f6f8;font-size:11px}.killstreak-equipped-slot small{display:block;margin-top:3px;color:#77838b;font-size:8.5px;font-weight:850;letter-spacing:.04em}
 .killstreak-choice-grid{min-height:0;overflow:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:minmax(112px,1fr);gap:7px;align-content:start;padding-right:1px}
 .killstreak-choice{position:relative;min-width:0;min-height:112px;padding:11px;border:1px solid var(--line);border-radius:9px;background:#0a0f12;color:var(--text);display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:7px;text-align:left;cursor:pointer;transition:border-color .12s,background .12s,transform .12s,box-shadow .12s}
-.killstreak-choice:hover:not(:disabled){border-color:rgba(255,255,255,.24);background:#10171b}.killstreak-choice:disabled{cursor:wait;opacity:.72}.killstreak-choice.selected{border-color:rgba(215,255,88,.48);background:linear-gradient(145deg,rgba(215,255,88,.10),#0b110d 68%);box-shadow:inset 3px 0 0 var(--accent)}
+.killstreak-choice:hover:not(:disabled){border-color:rgba(255,255,255,.24);background:#10171b}.killstreak-choice:disabled,.killstreak-choice.syncing{cursor:wait;opacity:.72}.killstreak-choice.selected{border-color:rgba(215,255,88,.48);background:linear-gradient(145deg,rgba(215,255,88,.10),#0b110d 68%);box-shadow:inset 3px 0 0 var(--accent)}
 .killstreak-choice-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.killstreak-choice-kills{color:var(--accent);font:1000 18px/1 system-ui}.killstreak-choice.selected .killstreak-choice-state{color:var(--accent)}.killstreak-choice-state{color:#66727a;font:950 8.5px/1 system-ui;letter-spacing:.08em}
 .killstreak-choice strong{font-size:12px;letter-spacing:.035em}.killstreak-choice p{margin:0;color:#859198;font-size:9.5px;font-weight:700;line-height:1.3}
 @media (max-width:560px){.lobby-side-tab{font-size:8.5px;padding:0 3px;letter-spacing:.02em;white-space:nowrap}}
@@ -438,7 +438,7 @@ body{font-size:var(--ui-md)}
 .controller-focus-shine-layer::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(215,255,88,.08),transparent 72%);opacity:.72}
 .controller-focus-shine-layer.editing{background:rgba(215,255,88,.06);box-shadow:0 0 22px rgba(215,255,88,.22),inset 0 -2px 0 rgba(215,255,88,.58)}
 @keyframes controllerFocusSweep{0%{transform:translateX(-50%)}100%{transform:translateX(50%)}}
-/* v1.44.72 Create-a-Class / Gunsmith layout.
+/* v1.44.76 Create-a-Class / Gunsmith layout.
    One responsive system: weapon + live stats share the upper workspace;
    the selected attachment choices own a full-width tray underneath. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
@@ -738,7 +738,7 @@ body{font-size:var(--ui-md)}
     .gunsmith-weapon-picker .loadout-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.72 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.76 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -747,7 +747,7 @@ body{font-size:var(--ui-md)}
 .loadout-stat-bar-hatch.loss{background:repeating-linear-gradient(135deg,rgba(255,105,115,.95) 0 2px,rgba(255,105,115,.22) 2px 4px)}
 .loadout-stat-baseline-mark{position:absolute;top:-1px;bottom:-1px;width:1px;display:block;background:rgba(255,255,255,.72);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
 .loadout-stat.better .loadout-stat-bar-solid,.loadout-stat.worse .loadout-stat-bar-solid{background:#8f9ca4}
-/* v1.44.72 controller focus visuals: focus must never mutate Gunsmith geometry. */
+/* v1.44.76 controller focus visuals: focus must never mutate Gunsmith geometry. */
 [data-input-mode="controller"] .gunsmith-callout.controller-focus,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
   position:absolute!important;
@@ -801,7 +801,7 @@ body{font-size:var(--ui-md)}
 /* Diagnostics recorder: compact, controller-friendly controls in Settings. */
 .diagnostics-toggle-card small,.diagnostics-status-card small,.diagnostics-log-card small{color:var(--dim);font-size:10px;line-height:1.3;text-transform:none;letter-spacing:0}.diagnostics-toggle-btn{min-width:148px}.diagnostics-toggle-btn.active{background:#1b2419;color:var(--accent);border-color:rgba(215,255,88,.32);box-shadow:inset 0 0 0 1px rgba(215,255,88,.06)}.diagnostics-status-card output{justify-self:start;color:var(--accent);font-size:11px;font-weight:950}.diagnostics-log-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.diagnostics-log-actions .secondary-btn{width:100%;height:32px;padding:0 8px}
 
-/* v1.44.72 mobile/controller readability baseline.
+/* v1.44.76 mobile/controller readability baseline.
    Compact by removing secondary copy first; actionable/menu text does not collapse
    into 8–9px labels on short landscape screens. */
 @media (max-width:900px) and (orientation:landscape){
@@ -890,12 +890,12 @@ body{font-size:var(--ui-md)}
   .gunsmith-inspector-empty>strong,.gunsmith-weapon-picker .loadout-choice strong{font-size:10.5px}
 }
 
-/* v1.44.72 immediate-action menu semantics. */
+/* v1.44.76 immediate-action menu semantics. */
 .loadout-foot,.settings-actions{grid-template-columns:minmax(0,1fr) auto}.loadout-foot .modal-action,.settings-actions .modal-action{min-width:92px}.settings-actions #settingsResetBtn{min-width:124px}
 
 
 
-/* v1.44.72 whole-app density audit.
+/* v1.44.76 whole-app density audit.
    Vertical space is treated as scarce: small labels/actions share rows, redundant headings
    are removed, and content gets the reclaimed height instead of shrinking typography. */
 .front-shell{grid-template-rows:48px minmax(0,1fr) auto;gap:6px}
@@ -993,7 +993,7 @@ body{font-size:var(--ui-md)}
 [data-input-mode="keyboardMouse"] .lobby-footer:has(#lobbyStatus:empty):has(.lobby-start.hide){display:none}
 
 
-/* v1.44.72 menu convention cleanup. */
+/* v1.44.76 menu convention cleanup. */
 .front-action-only,.join-action-only{border:0!important;background:transparent!important;box-shadow:none!important}
 .front-action-only{display:flex;justify-content:center;align-items:center;padding:0!important}
 .front-action-only .deploy-button{width:min(260px,100%)}
@@ -1051,7 +1051,7 @@ body{font-size:var(--ui-md)}
   .settings-tabs:has([data-settings-tab="developer"]:not(.hide)){grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.72 footer child placement remains stable when empty siblings are hidden. */
+/* v1.44.76 footer child placement remains stable when empty siblings are hidden. */
 .lobby-footer-copy{grid-column:1}
 .lobby-controller-hint{grid-column:2}
 .lobby-footer-actions{grid-column:3}
@@ -1059,7 +1059,7 @@ body{font-size:var(--ui-md)}
 @media (orientation:portrait){.lobby-footer-copy,.lobby-controller-hint,.lobby-footer-actions{grid-column:1}}
 
 
-/* v1.44.72 killstreak setup geometry is state-invariant. Selecting or removing a streak
+/* v1.44.76 killstreak setup geometry is state-invariant. Selecting or removing a streak
    changes only state styling/content; slot, catalog, and footer positions never reflow. */
 .killstreak-setup-panel{grid-template-rows:max-content 54px minmax(0,1fr)}
 .killstreak-equipped-strip{height:54px;min-height:54px;max-height:54px}
@@ -1069,3 +1069,13 @@ body{font-size:var(--ui-md)}
   .killstreak-equipped-strip{height:42px;min-height:42px;max-height:42px}
   .killstreak-equipped-slot{height:42px;min-height:42px;max-height:42px}
 }
+
+/* v1.44.76 controller menus follow console list conventions: adjustable values
+   are one item per row so Left/Right can change the value while Up/Down always
+   reaches every setting instead of trapping focus inside a desktop grid. */
+[data-input-mode="controller"] .settings-page .settings-grid,
+[data-input-mode="controller"] .admin-page > .settings-grid,
+[data-input-mode="controller"] #lobbyGameplayHostMount .settings-grid,
+[data-input-mode="controller"] .lobby-match-card .lobby-setup-row,
+[data-input-mode="controller"] .admin-bot-controls,
+[data-input-mode="controller"] .weapon-fields{grid-template-columns:1fr!important}
