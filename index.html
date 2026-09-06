@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.65" rel="manifest"/>
-<title>Breach v1.44.65</title>
-<link href="ui.css?v=1.44.65" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.44.67" rel="manifest"/>
+<title>Breach v1.44.67</title>
+<link href="ui.css?v=1.44.67" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -148,6 +148,7 @@
 <button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="match" role="tab" type="button">MATCH</button>
 <button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="map" role="tab" type="button">MAP</button>
 <button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="loadout" role="tab" type="button">LOADOUT</button>
+<button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="killstreaks" role="tab" type="button">KILLSTREAKS</button>
 <button aria-selected="false" class="lobby-side-tab hide" data-lobby-side-tab="cheats" role="tab" id="lobbyCheatsTab" type="button">HOST OPTIONS</button>
 </div>
 <section class="lobby-side-view lobby-roster-panel active" data-lobby-side-view="players">
@@ -250,6 +251,13 @@
 </section>
 </div>
 
+</section>
+</div>
+<div class="lobby-side-view lobby-killstreak-view" data-lobby-side-view="killstreaks" hidden="">
+<section class="killstreak-setup-panel">
+<header class="killstreak-setup-head"><strong>SELECT 3 KILLSTREAKS</strong><span id="lobbyKillstreakCount">3 / 3 EQUIPPED</span></header>
+<div class="killstreak-equipped-strip" id="lobbyKillstreakEquipped" aria-label="Equipped killstreaks"></div>
+<div class="killstreak-choice-grid" id="lobbyKillstreakChoices" aria-label="Available killstreaks"></div>
 </section>
 </div>
 <div class="lobby-side-view lobby-cheats-view" data-lobby-side-view="cheats" hidden="">
@@ -435,6 +443,6 @@
   });
 })();
 </script>
-<script src="client.js?v=1.44.65" type="module"></script>
+<script src="client.js?v=1.44.67" type="module"></script>
 </body>
 </html>
