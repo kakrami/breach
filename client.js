@@ -1,24 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.67';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.67';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.67';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.67';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.67';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.67';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.67';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.67';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.70';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.70';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.70';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.70';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.70';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.70';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.70';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.70';
 import {
   APP_VERSION, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.44.67';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.67';
-import { createAudioEngine } from './audio-engine.js?v=1.44.67';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.67';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.67';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.67';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.67';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.67';
+} from './game-config.js?v=1.44.70';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.70';
+import { createAudioEngine } from './audio-engine.js?v=1.44.70';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.70';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.70';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.70';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.70';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.70';
 
 let THREE = null;
 
@@ -378,10 +378,11 @@ const clientId=getClientId(),clientAuth=getClientAuth();
 const samePlayerId=(a,b)=>String(a??'')===String(b??'');
 nameInput.value=localStorage.getItem('breachName')||`Player${Math.floor(Math.random()*90+10)}`;
 let preferredTeam=localStorage.getItem('breachTeam')==='red'?'red':'blue';
-let preferredPrimary=PRIMARY_WEAPONS.includes(localStorage.getItem('breachPrimary'))?localStorage.getItem('breachPrimary'):'assault';
-let preferredSecondary=SECONDARY_WEAPONS.includes(localStorage.getItem('breachSecondary'))?localStorage.getItem('breachSecondary'):'pistol';
+const storedPreferredPrimary=localStorage.getItem('breachPrimary'),storedPreferredSecondary=localStorage.getItem('breachSecondary');
 let storedAttachmentPreferences={};try{storedAttachmentPreferences=JSON.parse(localStorage.getItem('breachAttachments')||'{}')||{};}catch{}
-let preferredPrimaryAttachments=normalizeWeaponAttachments(preferredPrimary,storedAttachmentPreferences.primary),preferredSecondaryAttachments=normalizeWeaponAttachments(preferredSecondary,storedAttachmentPreferences.secondary);
+const normalizedPreferredWeapons=normalizeLoadoutDefinition({primaryWeapon:storedPreferredPrimary,secondaryWeapon:storedPreferredSecondary,primaryAttachments:storedAttachmentPreferences.primary,secondaryAttachments:storedAttachmentPreferences.secondary});
+let preferredPrimary=normalizedPreferredWeapons.primaryWeapon,preferredSecondary=normalizedPreferredWeapons.secondaryWeapon;
+let preferredPrimaryAttachments=normalizedPreferredWeapons.primaryAttachments,preferredSecondaryAttachments=normalizedPreferredWeapons.secondaryAttachments;
 let preferredTactical=normalizeTactical(localStorage.getItem('breachTactical'));
 let preferredLethal=normalizeLethal(localStorage.getItem('breachLethal'));
 let storedLoadoutClasses=[];try{storedLoadoutClasses=JSON.parse(localStorage.getItem('breachLoadoutClasses')||'[]')||[];}catch{}
@@ -735,7 +736,7 @@ shell.start();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.67';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.70';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1153,17 +1154,21 @@ function refreshLobbyDraftOwnership(){
   else if(!lobbyLoadoutDirty){lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,committedLoadout);lobbyStartingClassId=normalizeLoadoutClassId(activeClassId);loadoutEditClass.lobby=normalizeLoadoutClassId(loadoutEditClass.lobby||activeClassId);lobbyLoadoutDraft=classLoadout(lobbyClassDrafts,loadoutEditClass.lobby);}
   if(!lobbyKillstreakDraft)lobbyKillstreakDraft=[...killstreakSelection];
 }
+function stableKillstreakDraft(value=lobbyKillstreakDraft??killstreakSelection){
+  const out=Array(KILLSTREAK_SELECTION_COUNT).fill(''),seen=new Set(),source=Array.isArray(value)?value:[];
+  for(let i=0;i<KILLSTREAK_SELECTION_COUNT;i++){const id=normalizeKillstreak(source[i]);if(!id||seen.has(id))continue;out[i]=id;seen.add(id);}return out;
+}
 function renderLobbyKillstreakSetup(){
   const choices=$('lobbyKillstreakChoices'),equipped=$('lobbyKillstreakEquipped'),count=$('lobbyKillstreakCount');if(!choices||!equipped||!count)return;
-  const draft=normalizeKillstreakSelection(lobbyKillstreakDraft??killstreakSelection,{fill:false}),selected=new Set(draft);count.textContent=`${draft.length} / ${KILLSTREAK_SELECTION_COUNT} EQUIPPED`;count.classList.toggle('incomplete',draft.length!==KILLSTREAK_SELECTION_COUNT);
+  const draft=stableKillstreakDraft(),selected=new Set(draft.filter(Boolean)),equippedCount=selected.size;count.textContent=`${equippedCount} / ${KILLSTREAK_SELECTION_COUNT} EQUIPPED`;count.classList.toggle('incomplete',equippedCount!==KILLSTREAK_SELECTION_COUNT);
   equipped.replaceChildren();for(let i=0;i<KILLSTREAK_SELECTION_COUNT;i++){const kind=draft[i],slot=document.createElement('div');slot.className=`killstreak-equipped-slot${kind?'':' empty'}`;slot.dataset.slot=String(i+1);if(kind){const spec=KILLSTREAK_SPECS[kind];slot.innerHTML=`<span class="kill-count">${spec.kills}</span><div><strong>${escapeHtml(spec.name)}</strong><small>SLOT ${i+1} · KILL STREAK</small></div>`;}else slot.innerHTML=`<span class="kill-count">—</span><div><strong>OPEN SLOT</strong><small>SLOT ${i+1}</small></div>`;equipped.append(slot);}
   choices.replaceChildren();for(const kind of KILLSTREAK_ORDER){const spec=KILLSTREAK_SPECS[kind],active=selected.has(kind),button=document.createElement('button');button.type='button';button.className=`killstreak-choice${active?' selected':''}`;button.dataset.killstreakChoice=kind;button.dataset.controllerKey=`killstreak-choice:${kind}`;button.setAttribute('aria-pressed',String(active));button.disabled=lobbyKillstreakSyncPending;button.innerHTML=`<span class="killstreak-choice-top"><span class="killstreak-choice-kills">${spec.kills}</span><span class="killstreak-choice-state">${active?'EQUIPPED':'SELECT'}</span></span><strong>${escapeHtml(spec.name)}</strong><p>${escapeHtml(spec.description||'')}</p>`;button.addEventListener('click',()=>toggleLobbyKillstreakChoice(kind));choices.append(button);}
 }
 function toggleLobbyKillstreakChoice(kind){
-  if(!shell.inLobby||!matchAllowsLobbyEdits(matchState)){showToast('KILLSTREAKS LOCKED DURING MATCH');return false;}if(lobbyKillstreakSyncPending){showToast('SAVING KILLSTREAKS',{key:'killstreak-saving'});return false;}const id=normalizeKillstreak(kind);if(!id)return false;let draft=normalizeKillstreakSelection(lobbyKillstreakDraft??killstreakSelection,{fill:false});
-  if(draft.includes(id)){draft=draft.filter(item=>item!==id);lobbyKillstreakDraft=draft;renderLobbyKillstreakSetup();return true;}
-  if(draft.length>=KILLSTREAK_SELECTION_COUNT){showToast(`${KILLSTREAK_SELECTION_COUNT} KILLSTREAKS EQUIPPED · REMOVE ONE FIRST`,{key:'killstreak-limit'});return false;}
-  lobbyKillstreakDraft=normalizeKillstreakSelection([...draft,id],{fill:false});renderLobbyKillstreakSetup();if(lobbyKillstreakDraft.length===KILLSTREAK_SELECTION_COUNT)commitLobbyKillstreakSelection();return true;
+  if(!shell.inLobby||!matchAllowsLobbyEdits(matchState)){showToast('KILLSTREAKS LOCKED DURING MATCH');return false;}if(lobbyKillstreakSyncPending){showToast('SAVING KILLSTREAKS',{key:'killstreak-saving'});return false;}const id=normalizeKillstreak(kind);if(!id)return false;const draft=stableKillstreakDraft(),selectedIndex=draft.indexOf(id);
+  if(selectedIndex>=0){draft[selectedIndex]='';lobbyKillstreakDraft=draft;renderLobbyKillstreakSetup();return true;}
+  const openIndex=draft.findIndex(item=>!item);if(openIndex<0){showToast(`${KILLSTREAK_SELECTION_COUNT} KILLSTREAKS EQUIPPED · REMOVE ONE FIRST`,{key:'killstreak-limit'});return false;}
+  draft[openIndex]=id;lobbyKillstreakDraft=draft;renderLobbyKillstreakSetup();if(draft.every(Boolean))commitLobbyKillstreakSelection();return true;
 }
 function commitLobbyKillstreakSelection(){
   const next=normalizeKillstreakSelection(lobbyKillstreakDraft,{fill:false});if(next.length!==KILLSTREAK_SELECTION_COUNT||!matchAllowsLobbyEdits(matchState))return false;killstreakSelection=normalizeKillstreakSelection(next);rememberKillstreakSelection(killstreakSelection);lobbyKillstreakDraft=[...killstreakSelection];lobbyKillstreakSyncPending=true;const rev=++lobbyKillstreakRevision;send({t:'killstreakLoadout',rev,selection:killstreakSelection});renderLobbyKillstreakSetup();setLobbyActionState();hudLastDraw=0;return true;
@@ -1273,10 +1278,7 @@ function bindSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,initial){
   const tabs=[...document.querySelectorAll(tabSelector)];for(const tab of tabs){tab.addEventListener('click',()=>switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,tab.getAttribute(tabAttr)));tab.addEventListener('keydown',e=>{if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;const available=tabs.filter(item=>!item.hidden&&!item.classList.contains('hide'));if(!available.length)return;e.preventDefault();const cur=Math.max(0,available.indexOf(tab)),next=e.key==='Home'?0:e.key==='End'?available.length-1:(cur+(e.key==='ArrowRight'?1:-1)+available.length)%available.length;available[next].focus();switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,available[next].getAttribute(tabAttr));});}
   switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,initial);
 }
-function normalizeLoadoutChoice(value,fallback=selectedLoadout()){
-  const v=value&&typeof value==='object'?value:{},primaryWeapon=PRIMARY_WEAPONS.includes(v.primaryWeapon)?v.primaryWeapon:fallback.primaryWeapon,secondaryWeapon=SECONDARY_WEAPONS.includes(v.secondaryWeapon)?v.secondaryWeapon:(SECONDARY_WEAPONS.includes(fallback.secondaryWeapon)?fallback.secondaryWeapon:'pistol');
-  return{primaryWeapon,secondaryWeapon,primaryAttachments:normalizeWeaponAttachments(primaryWeapon,v.primaryAttachments??fallback.primaryAttachments),secondaryAttachments:normalizeWeaponAttachments(secondaryWeapon,v.secondaryAttachments??fallback.secondaryAttachments),tactical:normalizeTactical(v.tactical??fallback.tactical),lethal:normalizeLethal(v.lethal??fallback.lethal)};
-}
+function normalizeLoadoutChoice(value,fallback=selectedLoadout()){return normalizeLoadoutDefinition(value,fallback);}
 function loadoutChoiceEqual(a,b){const x=normalizeLoadoutChoice(a),y=normalizeLoadoutChoice(b);return x.primaryWeapon===y.primaryWeapon&&x.secondaryWeapon===y.secondaryWeapon&&JSON.stringify(x.primaryAttachments)===JSON.stringify(y.primaryAttachments)&&JSON.stringify(x.secondaryAttachments)===JSON.stringify(y.secondaryAttachments)&&x.tactical===y.tactical&&x.lethal===y.lethal;}
 function syncMatchLoadoutEditor(){
   const draft=normalizeLoadoutChoice(loadoutDraft||loadoutBaseDraft||pendingLoadout||selectedLoadout());loadoutDraft=draft;renderAttachmentEditors('match',draft);
@@ -4432,7 +4434,7 @@ function updateGameFrame(dt){
     cameraY-=duck*traverseWave;
     if(traversal?.viewMaxY!=null&&Number.isFinite(Number(traversal.viewMaxY)))cameraY=Math.min(cameraY,Number(traversal.viewMaxY));
   }
-  const cameraCorrectionX=(traversal||ladderState)?0:correctionViewX,cameraCorrectionZ=(traversal||ladderState)?0:correctionViewZ,quake=hp>0?activeEarthquakeVisual():null,quakeP=quake?THREE.MathUtils.clamp((serverNow()-quake.start)/Math.max(1,quake.end-quake.start),0,1):0,quakeFade=quake?Math.min(1,quakeP/.08,Math.max(0,(1-quakeP)/.12)):0,quakeX=quakeFade*(Math.sin(now*.041+quake.seed*.01)*.055+Math.sin(now*.083)*.025),quakeY=quakeFade*(Math.sin(now*.057+1.4)*.045),quakeZ=quakeFade*(Math.cos(now*.037+quake.seed*.013)*.055);
+  const cameraCorrectionX=(traversal||ladderState)?0:correctionViewX,cameraCorrectionZ=(traversal||ladderState)?0:correctionViewZ,quake=hp>0?activeEarthquakeVisual():null,quakeP=quake?THREE.MathUtils.clamp((serverNow()-quake.start)/Math.max(1,quake.end-quake.start),0,1):0,quakeFade=quake?Math.min(1,quakeP/.08,Math.max(0,(1-quakeP)/.12)):0,quakeSeed=Number(quake?.seed)||0,quakeX=quakeFade*(Math.sin(now*.041+quakeSeed*.01)*.055+Math.sin(now*.083)*.025),quakeY=quakeFade*(Math.sin(now*.057+1.4)*.045),quakeZ=quakeFade*(Math.cos(now*.037+quakeSeed*.013)*.055);
   camera.position.set(position.x+cameraCorrectionX+quakeX,cameraY+quakeY,position.z+cameraCorrectionZ+quakeZ);const liveYaw=effectiveAimYaw(),deathYaw=Number.isFinite(deathViewTargetYaw)?deathViewStartYaw+normalizeAngle(deathViewTargetYaw-deathViewStartYaw)*deathEase:deathViewStartYaw;camera.rotation.y=hp<=0?deathYaw:liveYaw;const livePitch=effectiveAimPitch(),deathPitch=THREE.MathUtils.clamp(deathViewStartPitch+.10*deathEase,-1.40,1.40);camera.rotation.x=THREE.MathUtils.clamp((hp<=0?deathPitch:livePitch)-.045*traverseWave+quakeFade*Math.sin(now*.049)*.012,-1.40,1.40);camera.rotation.z=.72*deathEase+(hp>0?explosionVisualRoll(now):0)+quakeFade*Math.sin(now*.033+quake?.seed*.005)*.024;
   maintainNetwork();
 }
