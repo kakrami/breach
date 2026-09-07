@@ -8,11 +8,11 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.76" rel="manifest"/>
-<title>Breach v1.44.76</title>
-<link href="ui.css?v=1.44.76" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.44.79" rel="manifest"/>
+<title>Breach v1.44.79</title>
+<link href="ui.css?v=1.44.79" rel="stylesheet"/>
 </head>
-<body>
+<body class="canvas-ui-mode">
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
 <defs>
 <symbol id="i-mark" viewbox="0 0 24 24"><path d="M5 4h8.5c3.2 0 5.5 1.7 5.5 4.4 0 1.9-1 3.2-2.8 4 2.2.7 3.3 2.1 3.3 4.1 0 2.8-2.4 4.5-6.1 4.5H5V4Z"></path><path class="cut" d="M9 8h4.1c1.2 0 1.9.5 1.9 1.4 0 .9-.7 1.5-1.9 1.5H9V8Zm0 6.5h4.6c1.3 0 2 .5 2 1.5s-.7 1.5-2 1.5H9v-3Z"></path></symbol>
@@ -35,6 +35,7 @@
 </svg>
 <main class="app-root" id="appRoot">
 <div class="game-stage" id="gameStage"><canvas aria-label="Breach gameplay" draggable="false" id="game"></canvas></div>
+<canvas aria-label="Breach interface" id="uiCanvas"></canvas>
 <div aria-label="Game chat" aria-modal="false" class="chat-composer hide" id="chatComposer" role="dialog">
 <div class="chat-compose-shell">
 <span class="chat-channel">ALL</span>
@@ -428,8 +429,31 @@
 <script>
 (() => {
   window.__breachModuleBooted = false;
-  const CURRENT_VERSION = '1.44.76', CURRENT_BUILD = '20260906T050750Z', CURRENT_PROTOCOL = 89;
+  const CURRENT_VERSION = '1.44.79', CURRENT_BUILD = '20260906T144429Z', CURRENT_PROTOCOL = 90;
   const ONLINE_API = 'https://breach-online.kiadesignenterprise.workers.dev';
+  const bootCanvasUi = async () => {
+    if (window.__breachCanvasUi) return window.__breachCanvasUi;
+    try {
+      const mod = await import('./canvas-ui.js?v=1.44.79');
+      const canvas = document.getElementById('uiCanvas');
+      if (!canvas) return null;
+      const bridge = mod.createCanvasUiBridge({ canvas });
+      bridge.start();
+      window.__breachCanvasUi = bridge;
+      return bridge;
+    } catch (error) {
+      const canvas = document.getElementById('uiCanvas');
+      const ctx = canvas?.getContext?.('2d');
+      if (ctx) {
+        const dpr = Math.max(1, Math.min(3, window.devicePixelRatio || 1));
+        canvas.width = Math.max(1, Math.round(innerWidth * dpr)); canvas.height = Math.max(1, Math.round(innerHeight * dpr));
+        canvas.style.width = `${innerWidth}px`; canvas.style.height = `${innerHeight}px`;
+        ctx.setTransform(dpr,0,0,dpr,0,0); ctx.fillStyle = '#070a0c'; ctx.fillRect(0,0,innerWidth,innerHeight);
+        ctx.fillStyle = '#ff6973'; ctx.font = '800 14px system-ui,sans-serif'; ctx.textAlign = 'center'; ctx.fillText('CLIENT UI FAILED TO START', innerWidth/2, innerHeight/2);
+      }
+      return null;
+    }
+  };
   const GUARD_KEY = 'breach:update-reload', GUARD_MS = 30000;
   const fail = message => {
     const entry = document.getElementById('entryStatus');
@@ -442,7 +466,7 @@
     if (target && target !== window && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) fail('Client asset failed to load.');
   }, true);
   window.addEventListener('unhandledrejection', () => { if (!window.__breachModuleBooted) fail('Client failed to start.'); });
-  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.44.76';document.body.appendChild(script); };
+  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.44.79';document.body.appendChild(script); };
   const cleanReloadParams = () => { const url=new URL(location.href);if(url.searchParams.has('__breach_update')||url.searchParams.has('__breach_reload')){url.searchParams.delete('__breach_update');url.searchParams.delete('__breach_reload');history.replaceState(null,'',url);} };
   const reloadFor = manifest => {
     const target=`${manifest.version||'unknown'}|${manifest.build||'unknown'}|${Number(manifest.protocol)||0}`,now=Date.now();
@@ -450,6 +474,7 @@
     const url=new URL(location.href);url.searchParams.set('__breach_update',manifest.version||'latest');url.searchParams.set('__breach_reload',String(now));location.replace(url.href);return true;
   };
   (async()=>{
+    await bootCanvasUi();
     try{
       const clientUrl=new URL('./version.json',location.href),serverUrl=new URL(`${ONLINE_API}/health`);clientUrl.searchParams.set('__check',String(Date.now()));serverUrl.searchParams.set('__check',String(Date.now()));
       const [clientResult,serverResult]=await Promise.allSettled([fetch(clientUrl,{cache:'no-store'}),fetch(serverUrl,{cache:'no-store'})]);

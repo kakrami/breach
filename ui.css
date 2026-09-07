@@ -6,13 +6,16 @@
   --safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);
   --shadow:0 22px 70px rgba(0,0,0,.48)
 }
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none;-webkit-font-smoothing:antialiased}
-button,input,select{font:inherit;color:inherit}button{border:0}input,select,textarea,[contenteditable=true]{user-select:text;-webkit-user-select:text;touch-action:manipulation}button{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none;touch-action:none;-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}button{border:0}button,input,select,textarea,[contenteditable=true]{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.hide,[hidden]{display:none!important}
 .svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}.ui-icon,.mini-icon,.brand-icon{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ui-icon{width:18px;height:18px}.mini-icon{width:14px;height:14px}.brand-icon{width:100%;height:100%;stroke-width:1.6}.brand-icon .cut,.ui-icon .cut{fill:currentColor;stroke:none}
 .eyebrow{color:var(--accent);font-size:10px;font-weight:950;letter-spacing:.17em;text-transform:uppercase}
-.app-root,.game-stage,.entry-screen,.rotate-gate,.menu-screen,.lobby-screen,.connection-overlay,.pause-screen,.modal-screen{position:fixed;inset:0;width:100%;height:100%}.app-root{isolation:isolate;overflow:hidden;background:var(--bg)}.game-stage{z-index:0;overflow:hidden;contain:strict}#game{position:absolute;inset:0;display:block;width:100%;height:100%;background:#90cbe7;outline:0;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}
+.app-root,.game-stage,.entry-screen,.rotate-gate,.menu-screen,.lobby-screen,.connection-overlay,.pause-screen,.modal-screen{position:fixed;inset:0;width:100%;height:100%}.app-root{isolation:isolate;overflow:hidden;background:var(--bg)}.game-stage{z-index:0;overflow:hidden;contain:strict}#game{position:absolute;inset:0;display:block;width:100%;height:100%;background:#90cbe7;outline:0;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}#uiCanvas{position:fixed;inset:0;z-index:1000;display:block;width:100%;height:100%;background:transparent;outline:0;pointer-events:none;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}.canvas-ui-source{opacity:0!important;pointer-events:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-touch-callout:none!important}
+/* Canvas-only presentation contract. These DOM trees are state/layout scaffolding only. */
+.canvas-ui-mode #entryScreen,.canvas-ui-mode #rotateGate,.canvas-ui-mode #menu,.canvas-ui-mode #lobbyScreen,.canvas-ui-mode #connectionOverlay,.canvas-ui-mode #pause,.canvas-ui-mode #loadoutPanel,.canvas-ui-mode #settingsPanel,.canvas-ui-mode #adminPanel,.canvas-ui-mode #lobbyQuitConfirm,.canvas-ui-mode #chatComposer,.canvas-ui-mode #gameTextEditor{opacity:0!important;pointer-events:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-touch-callout:none!important}
+.controller-focus-shine-layer{opacity:0!important;pointer-events:none!important}
 .input,.setting input,.weapon-settings-card input{width:100%;min-width:0;height:38px;padding:0 10px;border:1px solid var(--line);border-radius:8px;outline:0;background:#090d10;color:var(--text);font-size:11px;font-weight:750}.input:focus,.setting input:focus,.weapon-settings-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.08)}
 .btn,.primary,.secondary-btn,.square-btn,.small-btn,.deploy-button,.resume-btn,.modal-action{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;font-weight:900;letter-spacing:.03em;transition:background .12s,border-color .12s,transform .08s,opacity .12s}.btn,.secondary-btn,.square-btn,.small-btn{background:var(--surface2);color:var(--text);border:1px solid var(--line)}.btn:hover,.secondary-btn:hover,.square-btn:hover,.small-btn:hover{background:#20282f;border-color:var(--line2)}.primary,.deploy-button.primary,.resume-btn.primary,.modal-action.primary{background:var(--accent);color:var(--accentInk);border:1px solid var(--accent)}button:active{transform:translateY(1px)}button:disabled{opacity:.4;cursor:not-allowed;transform:none}.danger{background:#29171b!important;border-color:#5d2d34!important;color:#ff9aa2!important}.square-btn,.icon-btn{width:38px;min-width:38px;height:38px;padding:0}.secondary-btn{height:36px;padding:0 10px;font-size:11px}.small-btn{height:32px;padding:0 9px;font-size:11px}.deploy-button{height:48px;padding:0 18px;font-size:12px}.modal-action{height:36px;padding:0 14px;font-size:11px}
 
@@ -73,7 +76,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.76: authoritative menu/layout/responsive ownership. */
+/* Breach UI contract v1.44.79: authoritative menu/layout/responsive ownership. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -438,7 +441,7 @@ body{font-size:var(--ui-md)}
 .controller-focus-shine-layer::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(215,255,88,.08),transparent 72%);opacity:.72}
 .controller-focus-shine-layer.editing{background:rgba(215,255,88,.06);box-shadow:0 0 22px rgba(215,255,88,.22),inset 0 -2px 0 rgba(215,255,88,.58)}
 @keyframes controllerFocusSweep{0%{transform:translateX(-50%)}100%{transform:translateX(50%)}}
-/* v1.44.76 Create-a-Class / Gunsmith layout.
+/* v1.44.79 Create-a-Class / Gunsmith layout.
    One responsive system: weapon + live stats share the upper workspace;
    the selected attachment choices own a full-width tray underneath. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
@@ -738,7 +741,7 @@ body{font-size:var(--ui-md)}
     .gunsmith-weapon-picker .loadout-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.76 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.79 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -747,7 +750,7 @@ body{font-size:var(--ui-md)}
 .loadout-stat-bar-hatch.loss{background:repeating-linear-gradient(135deg,rgba(255,105,115,.95) 0 2px,rgba(255,105,115,.22) 2px 4px)}
 .loadout-stat-baseline-mark{position:absolute;top:-1px;bottom:-1px;width:1px;display:block;background:rgba(255,255,255,.72);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
 .loadout-stat.better .loadout-stat-bar-solid,.loadout-stat.worse .loadout-stat-bar-solid{background:#8f9ca4}
-/* v1.44.76 controller focus visuals: focus must never mutate Gunsmith geometry. */
+/* v1.44.79 controller focus visuals: focus must never mutate Gunsmith geometry. */
 [data-input-mode="controller"] .gunsmith-callout.controller-focus,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
   position:absolute!important;
@@ -801,7 +804,7 @@ body{font-size:var(--ui-md)}
 /* Diagnostics recorder: compact, controller-friendly controls in Settings. */
 .diagnostics-toggle-card small,.diagnostics-status-card small,.diagnostics-log-card small{color:var(--dim);font-size:10px;line-height:1.3;text-transform:none;letter-spacing:0}.diagnostics-toggle-btn{min-width:148px}.diagnostics-toggle-btn.active{background:#1b2419;color:var(--accent);border-color:rgba(215,255,88,.32);box-shadow:inset 0 0 0 1px rgba(215,255,88,.06)}.diagnostics-status-card output{justify-self:start;color:var(--accent);font-size:11px;font-weight:950}.diagnostics-log-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.diagnostics-log-actions .secondary-btn{width:100%;height:32px;padding:0 8px}
 
-/* v1.44.76 mobile/controller readability baseline.
+/* v1.44.79 mobile/controller readability baseline.
    Compact by removing secondary copy first; actionable/menu text does not collapse
    into 8–9px labels on short landscape screens. */
 @media (max-width:900px) and (orientation:landscape){
@@ -890,12 +893,12 @@ body{font-size:var(--ui-md)}
   .gunsmith-inspector-empty>strong,.gunsmith-weapon-picker .loadout-choice strong{font-size:10.5px}
 }
 
-/* v1.44.76 immediate-action menu semantics. */
+/* v1.44.79 immediate-action menu semantics. */
 .loadout-foot,.settings-actions{grid-template-columns:minmax(0,1fr) auto}.loadout-foot .modal-action,.settings-actions .modal-action{min-width:92px}.settings-actions #settingsResetBtn{min-width:124px}
 
 
 
-/* v1.44.76 whole-app density audit.
+/* v1.44.79 whole-app density audit.
    Vertical space is treated as scarce: small labels/actions share rows, redundant headings
    are removed, and content gets the reclaimed height instead of shrinking typography. */
 .front-shell{grid-template-rows:48px minmax(0,1fr) auto;gap:6px}
@@ -993,7 +996,7 @@ body{font-size:var(--ui-md)}
 [data-input-mode="keyboardMouse"] .lobby-footer:has(#lobbyStatus:empty):has(.lobby-start.hide){display:none}
 
 
-/* v1.44.76 menu convention cleanup. */
+/* v1.44.79 menu convention cleanup. */
 .front-action-only,.join-action-only{border:0!important;background:transparent!important;box-shadow:none!important}
 .front-action-only{display:flex;justify-content:center;align-items:center;padding:0!important}
 .front-action-only .deploy-button{width:min(260px,100%)}
@@ -1051,7 +1054,7 @@ body{font-size:var(--ui-md)}
   .settings-tabs:has([data-settings-tab="developer"]:not(.hide)){grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.76 footer child placement remains stable when empty siblings are hidden. */
+/* v1.44.79 footer child placement remains stable when empty siblings are hidden. */
 .lobby-footer-copy{grid-column:1}
 .lobby-controller-hint{grid-column:2}
 .lobby-footer-actions{grid-column:3}
@@ -1059,7 +1062,7 @@ body{font-size:var(--ui-md)}
 @media (orientation:portrait){.lobby-footer-copy,.lobby-controller-hint,.lobby-footer-actions{grid-column:1}}
 
 
-/* v1.44.76 killstreak setup geometry is state-invariant. Selecting or removing a streak
+/* v1.44.79 killstreak setup geometry is state-invariant. Selecting or removing a streak
    changes only state styling/content; slot, catalog, and footer positions never reflow. */
 .killstreak-setup-panel{grid-template-rows:max-content 54px minmax(0,1fr)}
 .killstreak-equipped-strip{height:54px;min-height:54px;max-height:54px}
@@ -1070,7 +1073,7 @@ body{font-size:var(--ui-md)}
   .killstreak-equipped-slot{height:42px;min-height:42px;max-height:42px}
 }
 
-/* v1.44.76 controller menus follow console list conventions: adjustable values
+/* v1.44.79 controller menus follow console list conventions: adjustable values
    are one item per row so Left/Right can change the value while Up/Down always
    reaches every setting instead of trapping focus inside a desktop grid. */
 [data-input-mode="controller"] .settings-page .settings-grid,
