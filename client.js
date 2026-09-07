@@ -1,25 +1,24 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.79';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.79';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.79';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.79';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.79';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.79';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.79';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.79';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.80';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.80';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.80';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.80';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.80';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.80';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.80';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.80';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.44.79';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.79';
-import { createAudioEngine } from './audio-engine.js?v=1.44.79';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.79';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.79';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.79';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.79';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.79';
-import { createCanvasUiBridge } from './canvas-ui.js?v=1.44.79';
+} from './game-config.js?v=1.44.80';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.80';
+import { createAudioEngine } from './audio-engine.js?v=1.44.80';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.80';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.80';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.80';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.80';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.80';
 
 let THREE = null;
 
@@ -377,7 +376,7 @@ const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews
 const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbySecondaryButtons=[...document.querySelectorAll('[data-lobby-secondary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbyMapButtons=[...document.querySelectorAll('[data-lobby-map-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
 const matchPrimaryButtons=[...document.querySelectorAll('[data-match-primary-choice]')],matchSecondaryButtons=[...document.querySelectorAll('[data-match-secondary-choice]')],matchTacticalButtons=[...document.querySelectorAll('[data-match-tactical-choice]')],matchLethalButtons=[...document.querySelectorAll('[data-match-lethal-choice]')];
 const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMapPreview=$('lobbyMapPreview'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
-const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),uiCanvas=$('uiCanvas'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
+const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
 const gameTextEditor=$('gameTextEditor'),gameTextEditorTitle=$('gameTextEditorTitle'),gameTextEditorValue=$('gameTextEditorValue'),gameTextEditorPlaceholder=$('gameTextEditorPlaceholder'),gameTextKeyboard=$('gameTextKeyboard'),gameTextShiftBtn=$('gameTextShiftBtn');
 initGameControls();
 document.querySelectorAll('[data-app-version]').forEach(el=>{el.textContent=`Version ${APP_VERSION}`;});
@@ -809,7 +808,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.79';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.80';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -845,9 +844,6 @@ async function prepareGameRuntime(){
 }
 
 bindUI();
-let canvasUi=window.__breachCanvasUi||null;
-if(!canvasUi&&uiCanvas){canvasUi=createCanvasUiBridge({canvas:uiCanvas});canvasUi.start();window.__breachCanvasUi=canvasUi;}
-else canvasUi?.invalidate?.();
 let controllerUiFrameLast=performance.now();
 function runPreEngineControllerFrame(now){
   if(engineInitialized)return;
@@ -2265,6 +2261,7 @@ function bindUI(){
   });
 
   canvas.addEventListener('contextmenu', e => e.preventDefault());
+  canvas.addEventListener('dblclick',e=>{e.preventDefault();const sel=window.getSelection?.();if(sel)sel.removeAllRanges();},{passive:false});
   canvas.addEventListener('pointerdown', onCanvasPointerDown, {passive:false});
   canvas.addEventListener('pointermove', onCanvasPointerMove, {passive:false});
   canvas.addEventListener('pointerup', onCanvasPointerEnd, {passive:false});
