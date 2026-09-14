@@ -1,5 +1,6 @@
 {
-  "version": "1.44.82",
-  "build": "20260913T224400Z",
-  "protocol": 90
+  "version": "1.45.0-alpha.4.1",
+  "build": "phase4.1-hardware-validation",
+  "phase": "4.1",
+  "protocol": 101
 }

@@ -1,15 +1,9 @@
 {
-  "name": "Breach v1.44.82",
-  "short_name": "Breach",
-  "id": "./",
+  "name": "Breach Rebuild Phase 4.1 Hardware Validation",
+  "short_name": "Breach P4.1",
   "start_url": "./",
-  "scope": "./",
   "display": "standalone",
-  "display_override": [
-    "standalone",
-    "browser"
-  ],
-  "orientation": "landscape",
-  "background_color": "#090b0d",
-  "theme_color": "#090b0d"
+  "background_color": "#090d14",
+  "theme_color": "#090d14",
+  "orientation": "any"
 }
