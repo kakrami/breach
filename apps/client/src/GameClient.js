@@ -5,6 +5,7 @@ import { CLIENT_FIXED_STEP } from "../../../packages/simulation/src/movement.js"
 import { ClientStore } from "./state/ClientStore.js";
 import { minimapMarkers } from "./state/selectors.js";
 import { NetworkClient } from "./network/NetworkClient.js";
+import { CANONICAL_SERVER_BASE, OBSOLETE_ALPHA_SERVER_BASE, normalizeServerBase } from "./config/ServerEndpoint.js";
 import { PlatformCapabilities } from "./platform/PlatformCapabilities.js";
 import { InputHub } from "./input/InputHub.js";
 import { KeyboardMouseDevice } from "./input/devices/KeyboardMouseDevice.js";
@@ -134,9 +135,9 @@ export class GameClient {
         try {
             const form = this.ui.readJoinForm();
             if (!/^https?:\/\//i.test(form.serverBase))
-                throw new Error("Enter the alpha Worker URL including https://");
+                throw new Error("Enter the Worker URL including https://");
             this.roomId = roomId(form.room);
-            this.serverBase = form.serverBase.replace(/\/$/, "");
+            this.serverBase = normalizeServerBase(form.serverBase);
             this.displayName = form.displayName.slice(0, 24) || "Player";
             localStorage.setItem(STORAGE.server, this.serverBase);
             localStorage.setItem(STORAGE.room, this.roomId);
@@ -153,7 +154,7 @@ export class GameClient {
     connect() {
         if (!this.roomId || !this.serverBase)
             return;
-        this.network.connect({ serverBase: this.serverBase, roomId: this.roomId, sessionId: this.sessionId, displayName: this.displayName });
+        void this.network.connect({ serverBase: this.serverBase, roomId: this.roomId, sessionId: this.sessionId, displayName: this.displayName });
     }
     switchTeam = () => {
         try {
@@ -221,7 +222,7 @@ export class GameClient {
         const connected = status === "open";
         this.store.setTransportConnected(connected);
         if (status === "connecting")
-            this.ui.setStatus("Connecting to movement alpha…");
+            this.ui.setStatus(detail ?? "Connecting to movement alpha…");
         else if (status === "open") {
             this.prediction.markAllUnsent();
             this.ui.setStatus("Connected. WASD / sticks / touch move; K or Test Respawn verifies lifecycle.");
@@ -361,7 +362,11 @@ export class GameClient {
         return created;
     }
     restoreForm() {
-        this.ui.serverBase.value = localStorage.getItem(STORAGE.server) ?? "https://breach-online-alpha.kiadesignenterprise.workers.dev";
+        const storedServer = localStorage.getItem(STORAGE.server);
+        const normalizedServer = normalizeServerBase(storedServer);
+        if (storedServer === OBSOLETE_ALPHA_SERVER_BASE)
+            localStorage.setItem(STORAGE.server, CANONICAL_SERVER_BASE);
+        this.ui.serverBase.value = normalizedServer;
         this.ui.room.value = localStorage.getItem(STORAGE.room) ?? "ALPHA";
         this.ui.displayName.value = localStorage.getItem(STORAGE.name) ?? `Player-${Math.floor(100 + Math.random() * 900)}`;
     }

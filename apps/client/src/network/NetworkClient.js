@@ -1,5 +1,5 @@
 import { decodeServerEvent } from "../../../../packages/shared/src/validation.js";
-import { PROTOCOL_VERSION } from "../../../../packages/shared/src/version.js";
+import { BREACH_VERSION, PROTOCOL_VERSION } from "../../../../packages/shared/src/version.js";
 export class NetworkClient {
     callbacks;
     socket = null;
@@ -8,51 +8,77 @@ export class NetworkClient {
     constructor(callbacks) {
         this.callbacks = callbacks;
     }
-    connect(options) {
+    async connect(options) {
         this.disconnect(false);
         this.options = { ...options };
         const generation = ++this.generation;
-        const url = socketUrl(options);
-        this.callbacks.onStatus("connecting");
-        this.callbacks.onDiagnostic("network.connect", { room: options.roomId, url: redactUrl(url) });
-        const socket = new WebSocket(url);
-        this.socket = socket;
-        socket.addEventListener("open", () => {
+        this.callbacks.onStatus("connecting", "Checking Worker health");
+        this.callbacks.onDiagnostic("network.connect", { room: options.roomId, serverBase: options.serverBase });
+        try {
+            const health = await probeHealth(options.serverBase);
             if (generation !== this.generation)
                 return;
-            this.callbacks.onStatus("open");
-            this.callbacks.onDiagnostic("network.open", { generation });
-        });
-        socket.addEventListener("message", (event) => {
-            if (generation !== this.generation)
-                return;
-            try {
-                const decoded = decodeServerEvent(String(event.data));
-                this.callbacks.onDiagnostic("network.event", { type: decoded.type, seq: decoded.seq });
-                this.callbacks.onEvent(decoded);
+            this.callbacks.onDiagnostic("network.health", health);
+            if (!health.ok)
+                throw new Error("Worker health check returned ok=false");
+            if (health.protocol !== PROTOCOL_VERSION) {
+                throw new Error(`Worker protocol ${String(health.protocol ?? "unknown")} does not match client protocol ${PROTOCOL_VERSION}`);
             }
-            catch (error) {
-                this.callbacks.onDiagnostic("network.decode_error", { error: error instanceof Error ? error.message : String(error) });
+            if (health.version !== BREACH_VERSION) {
+                throw new Error(`Worker version ${String(health.version ?? "unknown")} does not match client ${BREACH_VERSION}`);
             }
-        });
-        socket.addEventListener("close", (event) => {
+            const url = socketUrl(options);
+            this.callbacks.onDiagnostic("network.socket_opening", { room: options.roomId, url: redactUrl(url) });
+            const socket = new WebSocket(url);
+            this.socket = socket;
+            socket.addEventListener("open", () => {
+                if (generation !== this.generation)
+                    return;
+                this.callbacks.onStatus("open");
+                this.callbacks.onDiagnostic("network.open", { generation });
+            });
+            socket.addEventListener("message", (event) => {
+                if (generation !== this.generation)
+                    return;
+                try {
+                    const decoded = decodeServerEvent(String(event.data));
+                    this.callbacks.onDiagnostic("network.event", { type: decoded.type, seq: decoded.seq });
+                    this.callbacks.onEvent(decoded);
+                }
+                catch (error) {
+                    this.callbacks.onDiagnostic("network.decode_error", { error: error instanceof Error ? error.message : String(error) });
+                }
+            });
+            socket.addEventListener("close", (event) => {
+                if (generation !== this.generation)
+                    return;
+                this.socket = null;
+                const detail = event.code === 1006
+                    ? "1006 abnormal close after health check — inspect Worker logs"
+                    : `${event.code}${event.reason ? ` ${event.reason}` : ""}`;
+                this.callbacks.onStatus("closed", detail);
+                this.callbacks.onDiagnostic("network.close", { code: event.code, reason: event.reason, clean: event.wasClean });
+            });
+            socket.addEventListener("error", () => {
+                if (generation !== this.generation)
+                    return;
+                this.callbacks.onStatus("error", "WebSocket transport error after successful Worker health check");
+                this.callbacks.onDiagnostic("network.error", { generation });
+            });
+        }
+        catch (error) {
             if (generation !== this.generation)
                 return;
             this.socket = null;
-            this.callbacks.onStatus("closed", `${event.code}${event.reason ? ` ${event.reason}` : ""}`);
-            this.callbacks.onDiagnostic("network.close", { code: event.code, reason: event.reason, clean: event.wasClean });
-        });
-        socket.addEventListener("error", () => {
-            if (generation !== this.generation)
-                return;
-            this.callbacks.onStatus("error", "WebSocket error");
-            this.callbacks.onDiagnostic("network.error", { generation });
-        });
+            const message = error instanceof Error ? error.message : String(error);
+            this.callbacks.onStatus("error", `Worker preflight failed: ${message}`);
+            this.callbacks.onDiagnostic("network.preflight_error", { serverBase: options.serverBase, error: message });
+        }
     }
     reconnect() {
         if (!this.options)
             return;
-        this.connect(this.options);
+        void this.connect(this.options);
     }
     disconnect(clearOptions = true) {
         this.generation += 1;
@@ -79,6 +105,26 @@ export class NetworkClient {
     }
     isOpen() {
         return this.socket?.readyState === WebSocket.OPEN;
+    }
+}
+async function probeHealth(serverBase) {
+    const url = new URL("/health", serverBase.endsWith("/") ? serverBase : `${serverBase}/`);
+    const controller = new AbortController();
+    const timeout = window.setTimeout(() => controller.abort(), 6000);
+    try {
+        const response = await fetch(url, { method: "GET", cache: "no-store", signal: controller.signal });
+        if (!response.ok)
+            throw new Error(`HTTP ${response.status} from ${url.host}/health`);
+        const value = await response.json();
+        return value;
+    }
+    catch (error) {
+        if (error instanceof DOMException && error.name === "AbortError")
+            throw new Error(`Timed out reaching ${url.host}/health`);
+        throw error;
+    }
+    finally {
+        window.clearTimeout(timeout);
     }
 }
 function socketUrl(options) {

@@ -1,6 +1,6 @@
 {
-  "version": "1.45.0-alpha.4.1",
-  "build": "phase4.1-hardware-validation",
+  "version": "1.45.0-alpha.4.2",
+  "build": "phase4.1-hardware-validation-worker-preflight",
   "phase": "4.1",
   "protocol": 101
 }
