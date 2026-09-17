@@ -1,3 +1,4 @@
+import { createPointerSessions } from './pointer-sessions.js?v=1.44.81';
 const DEFAULT_SOURCE_IDS = Object.freeze([
   'entryScreen','rotateGate','menu','lobbyScreen','connectionOverlay','pause',
   'loadoutPanel','settingsPanel','adminPanel','lobbyQuitConfirm','chatComposer','gameTextEditor'
@@ -203,7 +204,7 @@ function buildCommands(sources,viewport){
       const name=svgIconName(el);if(name)commands.push({type:'icon',name,rect,clip,color:style.color||'#fff',alpha});
       return;
     }
-    if(el.matches?.(INTERACTIVE_SELECTOR)&&!el.disabled&&!el.classList.contains('disabled'))interactives.push({el,rect,clip,depth:elementDepth(el),z:zIndexOf(el),root});
+    if(el.matches?.(INTERACTIVE_SELECTOR)&&!el.disabled&&!el.closest('[inert],[aria-disabled="true"]')&&!el.classList.contains('disabled'))interactives.push({el,rect,clip,depth:elementDepth(el),z:zIndexOf(el),root});
     for(const child of el.childNodes)paintNode(child,root,alpha);
   };
   for(const source of sources){
@@ -211,7 +212,7 @@ function buildCommands(sources,viewport){
     commands.push({type:'sourceBackdrop',rect:viewport,clip:viewport,fill:sourceFallbackColor(source),alpha:1});
     paintNode(source,source,1);
   }
-  interactives.sort((a,b)=>a.z-b.z||a.depth-b.depth||domOrder(a.el,b.el));
+  interactives.sort((a,b)=>sources.indexOf(a.root)-sources.indexOf(b.root)||a.z-b.z||domOrder(a.el,b.el));
   return {commands,interactives};
 }
 function drawCommands(ctx,commands,dpr){
@@ -230,56 +231,77 @@ function drawCommands(ctx,commands,dpr){
 }
 function dispatchPointer(target,type,sourceEvent){
   if(!target||typeof PointerEvent!=='function')return;
-  try{target.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,clientX:sourceEvent.clientX,clientY:sourceEvent.clientY,pointerId:sourceEvent.pointerId,pointerType:sourceEvent.pointerType||'mouse',button:sourceEvent.button??0,buttons:type==='pointerup'?0:(sourceEvent.buttons||1),pressure:type==='pointerup'?0:(sourceEvent.pressure||.5)}));}catch{}
+  try{target.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,clientX:sourceEvent.clientX,clientY:sourceEvent.clientY,pointerId:sourceEvent.pointerId,pointerType:sourceEvent.pointerType||'mouse',button:sourceEvent.button??0,buttons:(type==='pointerup'||type==='pointercancel')?0:(sourceEvent.buttons||1),pressure:(type==='pointerup'||type==='pointercancel')?0:(sourceEvent.pressure||.5)}));}catch{}
 }
 
 export function createCanvasUiBridge({canvas,sourceIds=DEFAULT_SOURCE_IDS,onAfterAction=()=>{}}={}){
   if(!canvas)throw new Error('Canvas UI bridge requires a canvas.');
-  const ctx=canvas.getContext('2d',{alpha:true,desynchronized:true});
+  const ctx=canvas.getContext('2d',{alpha:true});
   if(!ctx)throw new Error('Canvas UI bridge could not create a 2D context.');
-  let sources=[],commands=[],interactives=[],dirty=true,running=false,raf=0,lastPaint=0,hover=null,press=null;
-  const viewport=()=>({left:0,top:0,right:innerWidth,bottom:innerHeight,width:innerWidth,height:innerHeight});
-  function resize(){const dpr=Math.max(1,Math.min(3,finite(devicePixelRatio,1))),w=Math.max(1,Math.round(innerWidth*dpr)),h=Math.max(1,Math.round(innerHeight*dpr));if(canvas.width!==w||canvas.height!==h){canvas.width=w;canvas.height=h;canvas.style.width=`${innerWidth}px`;canvas.style.height=`${innerHeight}px`;dirty=true;}return dpr;}
-  function active(){sources=visibleSources(sourceIds);return sources.length>0;}
-  function rebuild(){sources=visibleSources(sourceIds);const built=buildCommands(sources,viewport());commands=built.commands;interactives=built.interactives;dirty=false;}
+  let sources=[],commands=[],interactives=[],scrollers=[],dirty=true,running=false,raf=0,lastPaint=0,listeners=[];
+  const size=()=>({width:canvas.parentElement?.clientWidth||innerWidth,height:canvas.parentElement?.clientHeight||innerHeight});
+  const viewport=()=>{const {width,height}=size();return{left:0,top:0,right:width,bottom:height,width,height};};
+  const gestures=createPointerSessions(canvas,{limit:1,onCancel:state=>complete(state,true)});
+  function topSource(){return sources[sources.length-1]||null;}
+  function resize(){const {width,height}=size(),dpr=Math.max(1,Math.min(3,finite(devicePixelRatio,1))),w=Math.max(1,Math.round(width*dpr)),h=Math.max(1,Math.round(height*dpr));if(canvas.width!==w||canvas.height!==h){gestures.cancelAll();canvas.width=w;canvas.height=h;canvas.style.width=`${width}px`;canvas.style.height=`${height}px`;dirty=true;}return dpr;}
+  function rebuild(){
+    sources=visibleSources(sourceIds);const built=buildCommands(sources,viewport());commands=built.commands;interactives=built.interactives;
+    const top=topSource();scrollers=top?[top,...top.querySelectorAll('*')].filter(el=>nearestScrollable(el,top)===el):[];dirty=false;
+  }
+  function refresh(){if(dirty)rebuild();}
+  function valid(state){return state.root===topSource()&&(!state.item||state.item.el.isConnected&&elementDisplayed(state.item.el)&&!state.item.el.disabled&&!state.item.el.closest('[inert],[aria-disabled="true"]'));}
   function render(now=performance.now()){
-    raf=requestAnimationFrame(render);const hasUi=active();canvas.classList.toggle('active',hasUi);canvas.style.pointerEvents=hasUi?'auto':'none';if(!hasUi){if(commands.length||lastPaint){commands=[];interactives=[];const dpr=resize();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,innerWidth,innerHeight);lastPaint=0;}return;}
-    const dpr=resize();if(!dirty&&now-lastPaint<33)return;if(dirty)rebuild();drawCommands(ctx,commands,dpr);lastPaint=now;
+    if(!running)return;raf=requestAnimationFrame(render);const dpr=resize();refresh();
+    const hasUi=sources.length>0;canvas.classList.toggle('active',hasUi);canvas.style.pointerEvents=hasUi?'auto':'none';
+    if(gestures.current&&!valid(gestures.current))gestures.cancelAll();
+    if(!hasUi){gestures.cancelAll();ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,canvas.width/dpr,canvas.height/dpr);lastPaint=0;return;}
+    if(now-lastPaint<33)return;drawCommands(ctx,commands,dpr);lastPaint=now;
   }
-  function hit(x,y){for(let i=interactives.length-1;i>=0;i--){const item=interactives[i];if(contains(item.rect,x,y)&&contains(item.clip,x,y))return item;}return null;}
+  function hit(x,y){refresh();const top=topSource();for(let i=interactives.length-1;i>=0;i--){const item=interactives[i];if(item.root===top&&contains(item.rect,x,y)&&contains(item.clip,x,y))return item;}return null;}
+  function scrollerAt(x,y){refresh();return [...scrollers].reverse().find(el=>contains(rectOf(el.getBoundingClientRect()),x,y)&&contains(clipForElement(el,viewport(),topSource()),x,y));}
   function mark(){dirty=true;}
-  function setSliderFromPoint(item,x,{commit=false}={}){
-    const el=item?.el;if(!el||el.dataset?.gameControl!=='slider')return false;const track=el.querySelector('.game-slider-track')||el,rect=track.getBoundingClientRect(),min=finite(el.dataset.min,0),max=finite(el.dataset.max,1),step=Math.max(.000001,finite(el.dataset.step,.01)),pct=Math.max(0,Math.min(1,(x-rect.left)/Math.max(1,rect.width))),raw=min+(max-min)*pct,value=min+Math.round((raw-min)/step)*step;el.value=String(Number(value.toFixed(4)));el.dispatchEvent(new Event('input',{bubbles:true}));if(commit)el.dispatchEvent(new Event('change',{bubbles:true}));mark();return true;
+  function slider(item,x){
+    const el=item.el,track=el.querySelector('.game-slider-track')||el,rect=track.getBoundingClientRect(),min=finite(el.dataset.min,0),max=finite(el.dataset.max,1),step=Math.max(.000001,finite(el.dataset.step,.01)),pct=Math.max(0,Math.min(1,(x-rect.left)/Math.max(1,rect.width))),raw=min+(max-min)*pct,value=Math.max(min,Math.min(max,min+Math.round((raw-min)/step)*step));
+    el.value=String(Number(value.toFixed(4)));el.dispatchEvent(new Event('input',{bubbles:true}));mark();
   }
+  const consume=e=>{if(e.cancelable)e.preventDefault();e.stopPropagation();};
   function pointerDown(e){
-    e.preventDefault();e.stopPropagation();canvas.setPointerCapture?.(e.pointerId);const item=hit(e.clientX,e.clientY),scrollable=item?nearestScrollable(item.el,item.root):null;press={item,startX:e.clientX,startY:e.clientY,lastX:e.clientX,lastY:e.clientY,pointerId:e.pointerId,dragged:false,scrollable};hover=item?.el||null;
-    if(item?.el?.dataset?.gameControl==='slider'){setSliderFromPoint(item,e.clientX);press.slider=true;return;}
-    if(item?.el?.matches?.('[data-loadout-ads-preview]')||item?.el?.tagName==='CANVAS'){dispatchPointer(item.el,'pointerdown',e);press.forwarded=true;}
+    if(e.pointerType==='mouse'&&e.button!==0)return;consume(e);refresh();
+    const item=hit(e.clientX,e.clientY),root=topSource();
+    const state=gestures.begin(e,{item,root,scrollable:scrollerAt(e.clientX,e.clientY)});if(!state)return;
+    if(item?.el?.dataset?.gameControl==='slider'){state.slider=true;state.initial=String(item.el.value);slider(item,e.clientX);return;}
+    if(item?.el?.matches('[data-control-step],[data-loadout-ads-preview],canvas'))state.forwarded=item.el;
+    // Chat occupies only its composer; the rest is the game's read-only feed.
+    if(!item&&!state.scrollable&&root?.id==='chatComposer')state.forwarded=document.getElementById('game');
+    if(state.forwarded)dispatchPointer(state.forwarded,'pointerdown',e);
   }
   function pointerMove(e){
-    if(!press||press.pointerId!==e.pointerId){hover=hit(e.clientX,e.clientY)?.el||null;return;}e.preventDefault();e.stopPropagation();const dx=e.clientX-press.lastX,dy=e.clientY-press.lastY,total=Math.hypot(e.clientX-press.startX,e.clientY-press.startY);if(total>7)press.dragged=true;
-    if(press.slider){setSliderFromPoint(press.item,e.clientX);}
-    else if(press.forwarded)dispatchPointer(press.item.el,'pointermove',e);
-    else if(press.dragged&&press.scrollable){press.scrollable.scrollLeft-=dx;press.scrollable.scrollTop-=dy;mark();}
-    press.lastX=e.clientX;press.lastY=e.clientY;
+    const state=gestures.move(e);if(!state)return;consume(e);refresh();
+    if(!valid(state)){gestures.cancel(e.pointerId);return;}
+    if(state.slider)slider(state.item,e.clientX);
+    else if(state.forwarded)dispatchPointer(state.forwarded,'pointermove',e);
+    else if(state.distance>7&&state.scrollable){state.scrollable.scrollLeft-=state.dx;state.scrollable.scrollTop-=state.dy;mark();}
   }
-  function finishPointer(e,canceled=false){
-    if(!press||press.pointerId!==e.pointerId)return;e.preventDefault();e.stopPropagation();const state=press;press=null;try{canvas.releasePointerCapture?.(e.pointerId);}catch{}
-    if(state.slider){setSliderFromPoint(state.item,e.clientX,{commit:true});onAfterAction();return;}
-    if(state.forwarded){dispatchPointer(state.item.el,canceled?'pointercancel':'pointerup',e);mark();onAfterAction();return;}
-    if(!canceled&&!state.dragged&&state.item?.el&&!state.item.el.disabled){try{state.item.el.click();}catch{}mark();onAfterAction();}
+  function complete(state,canceled){
+    if(state.slider){if(canceled){state.item.el.value=state.initial;state.item.el.dispatchEvent(new Event('input',{bubbles:true}));}else slider(state.item,state.x);state.item.el.dispatchEvent(new Event('change',{bubbles:true}));}
+    else if(state.forwarded)dispatchPointer(state.forwarded,canceled?'pointercancel':'pointerup',state.event);
+    else if(!canceled&&state.distance<=7&&state.item?.el&&hit(state.x,state.y)?.el===state.item.el)state.item.el.click();
+    mark();onAfterAction();
   }
-  function wheel(e){const item=hit(e.clientX,e.clientY),scroller=item?nearestScrollable(item.el,item.root):sources.map(s=>nearestScrollable(s,s)).find(Boolean);if(!scroller)return;e.preventDefault();e.stopPropagation();scroller.scrollTop+=e.deltaY;scroller.scrollLeft+=e.deltaX;mark();}
-  function suppressGesture(e){e.preventDefault();}
-  const observer=new MutationObserver(mark);
+  function pointerUp(e){consume(e);const state=gestures.end(e);if(!state)return;refresh();complete(state,!valid(state));}
+  function pointerCancel(e){gestures.cancel(e.pointerId);}
+  function cancel(){gestures.cancelAll();}
+  function visibility(){if(document.hidden)cancel();}
+  function wheel(e){const scroller=scrollerAt(e.clientX,e.clientY);if(!scroller)return;consume(e);const unit=e.deltaMode===1?16:e.deltaMode===2?scroller.clientHeight:1;scroller.scrollTop+=e.deltaY*unit;scroller.scrollLeft+=e.deltaX*unit;mark();}
+  function listen(target,type,fn,options){target.addEventListener(type,fn,options);listeners.push(()=>target.removeEventListener(type,fn,options));}
+  const observer=new MutationObserver(()=>{mark();refresh();const state=gestures.current;if(state&&!valid(state))cancel();});
   function start(){
-    if(running)return;running=true;for(const id of sourceIds){const el=document.getElementById(id);if(el)el.classList.add('canvas-ui-source');}
-    for(const id of sourceIds){const source=document.getElementById(id);if(source)observer.observe(source,{subtree:true,childList:true,attributes:true,characterData:true});}
-    canvas.addEventListener('pointerdown',pointerDown,{passive:false});canvas.addEventListener('pointermove',pointerMove,{passive:false});canvas.addEventListener('pointerup',e=>finishPointer(e,false),{passive:false});canvas.addEventListener('pointercancel',e=>finishPointer(e,true),{passive:false});canvas.addEventListener('touchstart',suppressGesture,{passive:false});canvas.addEventListener('touchmove',suppressGesture,{passive:false});canvas.addEventListener('touchend',suppressGesture,{passive:false});canvas.addEventListener('wheel',wheel,{passive:false});canvas.addEventListener('dblclick',suppressGesture,{passive:false});canvas.addEventListener('contextmenu',suppressGesture,{passive:false});
-    for(const type of ['gesturestart','gesturechange','gestureend'])document.addEventListener(type,suppressGesture,{passive:false,capture:true});
-    document.addEventListener('selectstart',suppressGesture,{capture:true});document.addEventListener('dragstart',suppressGesture,{capture:true});document.addEventListener('scroll',mark,{capture:true,passive:true});
-    addEventListener('resize',mark,{passive:true});visualViewport?.addEventListener?.('resize',mark,{passive:true});raf=requestAnimationFrame(render);
+    if(running)return;running=true;
+    for(const id of sourceIds){const el=document.getElementById(id);if(el){el.classList.add('canvas-ui-source');observer.observe(el,{subtree:true,childList:true,attributes:true,characterData:true});}}
+    for(const [type,fn] of [['pointerdown',pointerDown],['pointermove',pointerMove],['pointerup',pointerUp],['pointercancel',pointerCancel],['lostpointercapture',pointerCancel],['wheel',wheel],['contextmenu',consume]])listen(canvas,type,fn,{passive:false});
+    listen(globalThis,'blur',cancel);listen(globalThis,'pagehide',cancel);listen(document,'visibilitychange',visibility);listen(document,'scroll',mark,{capture:true,passive:true});listen(globalThis,'resize',mark,{passive:true});
+    if(globalThis.visualViewport)listen(globalThis.visualViewport,'resize',mark,{passive:true});raf=requestAnimationFrame(render);
   }
-  function destroy(){if(!running)return;running=false;observer.disconnect();cancelAnimationFrame(raf);canvas.removeEventListener('pointerdown',pointerDown);canvas.removeEventListener('pointermove',pointerMove);canvas.removeEventListener('wheel',wheel);}
-  return {start,destroy,invalidate:mark,get active(){return sources.length>0;}};
+  function destroy(){if(!running)return;cancel();running=false;observer.disconnect();cancelAnimationFrame(raf);for(const remove of listeners)remove();listeners=[];}
+  return {start,destroy,invalidate:mark,cancel,get active(){return sources.length>0;}};
 }
