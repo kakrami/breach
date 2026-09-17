@@ -7,19 +7,16 @@
   --shadow:0 22px 70px rgba(0,0,0,.48)
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
-html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none;touch-action:none;-webkit-font-smoothing:antialiased}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;overscroll-behavior:none;touch-action:manipulation;-webkit-font-smoothing:antialiased}
 button,input,select{font:inherit;color:inherit}button{border:0}button,input,select,textarea,[contenteditable=true]{user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}.hide,[hidden]{display:none!important}
 .svg-sprite{position:absolute;width:0;height:0;overflow:hidden;pointer-events:none}.ui-icon,.mini-icon,.brand-icon{display:block;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}.ui-icon{width:18px;height:18px}.mini-icon{width:14px;height:14px}.brand-icon{width:100%;height:100%;stroke-width:1.6}.brand-icon .cut,.ui-icon .cut{fill:currentColor;stroke:none}
 .eyebrow{color:var(--accent);font-size:10px;font-weight:950;letter-spacing:.17em;text-transform:uppercase}
-.app-root,.game-stage,.entry-screen,.rotate-gate,.menu-screen,.lobby-screen,.connection-overlay,.pause-screen,.modal-screen{position:fixed;inset:0 auto auto 0;width:var(--app-width,100%);height:var(--app-height,100dvh)}.app-root{isolation:isolate;overflow:hidden;background:var(--bg)}.game-stage{z-index:0;overflow:hidden;contain:strict}#game{position:absolute;inset:0;display:block;width:100%;height:100%;background:#90cbe7;outline:0;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}#uiCanvas{position:fixed;inset:0;z-index:1000;display:block;width:100%;height:100%;background:transparent;outline:0;pointer-events:none;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}.canvas-ui-source{opacity:0!important;pointer-events:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-touch-callout:none!important}
-/* Canvas-only presentation contract. These DOM trees are state/layout scaffolding only. */
-.canvas-ui-mode #entryScreen,.canvas-ui-mode #rotateGate,.canvas-ui-mode #menu,.canvas-ui-mode #lobbyScreen,.canvas-ui-mode #connectionOverlay,.canvas-ui-mode #pause,.canvas-ui-mode #loadoutPanel,.canvas-ui-mode #settingsPanel,.canvas-ui-mode #adminPanel,.canvas-ui-mode #lobbyQuitConfirm,.canvas-ui-mode #chatComposer,.canvas-ui-mode #gameTextEditor{opacity:0!important;pointer-events:none!important;user-select:none!important;-webkit-user-select:none!important;-webkit-touch-callout:none!important}
-.controller-focus-shine-layer{opacity:0!important;pointer-events:none!important}
+.app-root,.game-stage,.entry-screen,.rotate-gate,.menu-screen,.lobby-screen,.connection-overlay,.pause-screen,.modal-screen{position:fixed;inset:0 auto auto 0;width:var(--app-width,100%);height:var(--app-height,100dvh)}.app-root{isolation:isolate;overflow:hidden;background:var(--bg)}.game-stage{z-index:0;overflow:hidden;contain:strict}#game{position:absolute;inset:0;display:block;width:100%;height:100%;background:#90cbe7;outline:0;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none}
 .input,.setting input,.weapon-settings-card input{width:100%;min-width:0;height:38px;padding:0 10px;border:1px solid var(--line);border-radius:8px;outline:0;background:#090d10;color:var(--text);font-size:11px;font-weight:750}.input:focus,.setting input:focus,.weapon-settings-card input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.08)}
 .btn,.primary,.secondary-btn,.square-btn,.small-btn,.deploy-button,.resume-btn,.modal-action{cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:7px;border-radius:8px;font-weight:900;letter-spacing:.03em;transition:background .12s,border-color .12s,transform .08s,opacity .12s}.btn,.secondary-btn,.square-btn,.small-btn{background:var(--surface2);color:var(--text);border:1px solid var(--line)}.btn:hover,.secondary-btn:hover,.square-btn:hover,.small-btn:hover{background:#20282f;border-color:var(--line2)}.primary,.deploy-button.primary,.resume-btn.primary,.modal-action.primary{background:var(--accent);color:var(--accentInk);border:1px solid var(--accent)}button:active{transform:translateY(1px)}button:disabled{opacity:.4;cursor:not-allowed;transform:none}.danger{background:#29171b!important;border-color:#5d2d34!important;color:#ff9aa2!important}.square-btn,.icon-btn{width:38px;min-width:38px;height:38px;padding:0}.secondary-btn{height:36px;padding:0 10px;font-size:11px}.small-btn{height:32px;padding:0 9px;font-size:11px}.deploy-button{height:48px;padding:0 18px;font-size:12px}.modal-action{height:36px;padding:0 14px;font-size:11px}
 
-/* Entry is the only pre-fullscreen surface. */
+/* Entry also supports browsers without element fullscreen. */
 .entry-screen{z-index:100;display:grid;place-items:center;padding:calc(var(--safe-top) + 18px) calc(var(--safe-right) + 18px) calc(var(--safe-bottom) + 18px) calc(var(--safe-left) + 18px);background:radial-gradient(circle at 50% 38%,rgba(215,255,88,.1),transparent 30%),linear-gradient(145deg,#0b1013,#050708 72%)}
 .entry-card{width:min(420px,100%);display:grid;justify-items:center;text-align:center;gap:9px}.entry-mark{width:70px;height:70px;padding:16px;border-radius:18px;background:var(--accent);color:var(--accentInk)}.entry-brand{font-size:30px;font-weight:1000;letter-spacing:.18em;margin-left:.18em}.entry-version{font-size:10px;color:var(--dim);font-weight:900;letter-spacing:.1em;text-transform:uppercase}.entry-button{width:min(310px,100%);height:56px;margin-top:10px;padding:0 20px;border:1px solid var(--accent);border-radius:10px;background:var(--accent);color:var(--accentInk);font-size:12px;font-weight:1000;letter-spacing:.07em;display:flex;align-items:center;justify-content:center;gap:9px}.entry-status{min-height:18px;color:var(--muted);font-size:11px;font-weight:750}.entry-status.error{color:var(--danger)}
 .rotate-gate{z-index:95;display:grid;place-items:center;padding:18px;background:#070a0c}.rotate-card{width:min(520px,100%);display:flex;align-items:center;justify-content:center;gap:22px}.rotate-card h1{margin:3px 0 5px;font-size:25px}.rotate-card p{margin:0;color:var(--muted);font-size:12px}.rotate-phone{width:58px;height:92px;display:grid;place-items:center;border:3px solid var(--accent);border-radius:13px;transform:rotate(90deg)}.rotate-phone span{width:28px;height:4px;border-radius:4px;background:var(--accent)}
@@ -76,7 +73,7 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(orientation:portrait){.rotate-card{display:grid;justify-items:center;text-align:center}.entry-screen{display:grid}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}.spinner{animation:none}}
 
-/* Breach UI contract v1.44.81: authoritative menu/layout/responsive ownership. */
+/* Breach UI contract v1.44.82: authoritative menu/layout/responsive ownership. */
 :root{--ui-xs:10px;--ui-sm:11px;--ui-md:12px;--ui-lg:14px;--ui-xl:18px;--panel-radius:12px;--content-max:1100px}
 body{font-size:var(--ui-md)}
 .secondary-btn,.small-btn,.modal-action,.admin-tab,.lobby-side-tab,.lobby-cheat-tab,.lobby-start,.loadout-foot .primary{font-size:12px}
@@ -154,7 +151,7 @@ body{font-size:var(--ui-md)}
 .lobby-footer-copy{min-width:0;display:grid;gap:1px}
 .lobby-footer-actions{min-width:0;display:flex;align-items:center;justify-content:flex-end}.lobby-start{height:40px;min-width:210px;padding:0 16px;font-size:12px;border-radius:8px}
 /* Match rules use available width without creating empty columns. */
-.lobby-match-grid{display:grid;grid-template-columns:minmax(0,1.28fr) minmax(200px,.72fr);gap:8px;align-items:start}
+.lobby-match-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));display:grid;gap:8px;align-items:start}
 .lobby-match-card{min-width:0;padding:9px;border:1px solid var(--line);border-radius:10px;background:#0a0f12;display:grid;align-content:start;gap:7px}
 .lobby-card-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
 .lobby-card-title strong{font-size:13px}
@@ -163,8 +160,8 @@ body{font-size:var(--ui-md)}
 .lobby-mode-picker{gap:5px}
 .lobby-mode-picker button{min-width:0;height:35px;white-space:normal;overflow-wrap:anywhere;line-height:1.05;padding:2px 5px}
 .lobby-match-card .lobby-setup-row{margin-top:0;gap:6px}
-.lobby-rules-row{grid-template-columns:repeat(3,minmax(105px,1fr))}
-.lobby-bots-row{grid-template-columns:1fr}
+.lobby-rules-row{grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));}
+.lobby-bots-row{grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));}
 .lobby-match-card .input{width:100%;max-width:none}
 .lobby-rule-summary{margin-top:0;width:100%;min-width:0;text-align:left;line-height:1.2}
 /* Map choices sit above a full-width level preview. */
@@ -204,7 +201,7 @@ body{font-size:var(--ui-md)}
 .settings-page{height:100%;min-height:0;max-height:100%;border:0;background:transparent;overflow:auto;overscroll-behavior:contain}
 .settings-page .settings-category-head{display:block;padding:7px 10px 3px;border-bottom:0}
 .settings-page .settings-category-head h3{margin:0;font-size:14px}
-.settings-page .settings-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:6px 9px 9px;overflow:visible}
+.settings-page .settings-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));display:grid;gap:6px;padding:6px 9px 9px;overflow:visible}
 .settings-page .setting{width:100%;min-width:0;padding:8px;gap:6px;text-transform:none;letter-spacing:0}
 .setting>span{font-weight:900;text-transform:uppercase;letter-spacing:.04em;overflow-wrap:anywhere}
 .setting output{font-size:10px}
@@ -218,7 +215,7 @@ body{font-size:var(--ui-md)}
 .admin-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;padding:5px 9px;overflow:visible;border-bottom:1px solid var(--line);background:#090d10}
 .admin-tab{width:100%;min-width:0;height:35px;padding:0 8px}
 .admin-page{min-height:0;max-height:calc(var(--app-height,100dvh) - var(--safe-top) - var(--safe-bottom) - 128px);overflow:auto;overscroll-behavior:contain;padding:8px}
-.admin-page>.settings-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));align-content:start;gap:6px;padding:0;overflow:visible}
+.admin-page>.settings-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));display:grid;align-content:start;gap:6px;padding:0;overflow:visible}
 .admin-page>.settings-grid>.setting{min-width:0;max-width:none;padding:7px;gap:5px}
 .admin-bot-card{margin-top:7px;padding:8px;border:1px solid var(--line);border-radius:10px;background:#0a0f12;display:grid;gap:7px}
 .admin-bot-head{display:flex;align-items:end;justify-content:space-between;gap:10px;padding-bottom:5px;border-bottom:1px solid var(--line)}
@@ -238,7 +235,7 @@ body{font-size:var(--ui-md)}
 .weapon-settings-card{width:100%;display:grid;align-content:start;gap:7px;padding:9px}
 .weapon-settings-card strong{font-size:13px;padding-bottom:5px;margin-bottom:0}
 .weapon-settings-card label{font-size:9.5px;gap:4px}
-.weapon-fields{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px}
+.weapon-fields{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));display:grid;gap:6px}
 .weapon-settings-card input{width:100%;max-width:none}
 .admin-page[data-admin-page="players"]{overflow:hidden}
 .admin-player-list{height:100%;min-height:0;padding-right:3px}
@@ -264,7 +261,7 @@ body{font-size:var(--ui-md)}
 #lobbyGameplayHostMount>.admin-page,#lobbyWeaponsHostMount>.admin-page{display:block!important;min-height:0;padding:0;overflow:visible;background:transparent}
 #lobbyGameplayHostMount>.admin-page.hide,#lobbyWeaponsHostMount>.admin-page.hide{display:block!important}
 #lobbyGameplayHostMount .admin-bot-card{display:none!important}
-#lobbyGameplayHostMount .settings-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;padding:0;overflow:visible}
+#lobbyGameplayHostMount .settings-grid{grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr));gap:7px;padding:0;overflow:visible}
 #lobbyGameplayHostMount .setting{min-height:54px;padding:6px;gap:4px}
 #lobbyGameplayHostMount .setting>span{overflow-wrap:normal;word-break:normal;hyphens:none}
 #lobbyWeaponsHostMount .admin-weapon-toolbar{display:block;margin:0 0 3px;padding:4px 6px}
@@ -304,7 +301,7 @@ body{font-size:var(--ui-md)}
 .game-text-field{cursor:pointer;display:flex;align-items:center;text-align:left;user-select:none;-webkit-user-select:none}
 .game-text-field .game-control-value{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .game-text-field .game-control-value.placeholder{color:var(--dim)}
-.game-control{padding:0!important;display:grid;grid-template-columns:30px minmax(0,1fr) 30px;align-items:stretch;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
+.game-control{min-width:108px;padding:0!important;display:grid;grid-template-columns:30px minmax(0,1fr) 30px;align-items:stretch;overflow:hidden;user-select:none;-webkit-user-select:none;touch-action:manipulation}
 .setting .game-control,.weapon-settings-card .game-control{width:100%;min-width:0;height:38px;border:1px solid var(--line);border-radius:8px;outline:0;background:#090d10;color:var(--text);font-size:11px;font-weight:750}
 .game-control:focus-visible,.game-text-field:focus-visible,.game-slider-control:focus-visible{border-color:var(--accent);box-shadow:0 0 0 3px rgba(215,255,88,.08);outline:0}
 .game-control.disabled{opacity:.42;pointer-events:none}
@@ -315,7 +312,6 @@ body{font-size:var(--ui-md)}
 .game-cycle .game-control-value{font-size:10px;text-transform:uppercase}
 .game-stepper .game-control-value{font-variant-numeric:tabular-nums;color:var(--accent);white-space:nowrap;overflow-wrap:normal;word-break:normal}
 .disabled-setting .game-control{cursor:not-allowed;opacity:.45}
-.controller-focus{outline:0!important;outline-offset:0!important}
 .controller-editing{outline:0!important;outline-offset:0!important;box-shadow:inset 0 -2px 0 rgba(215,255,88,.78)!important}
 .controller-editing .game-control-value{color:#fff;background:rgba(215,255,88,.08);box-shadow:inset 0 -2px 0 var(--accent)}
 .controller-editing .game-control-arrow,.controller-adjusting .game-control-arrow{color:var(--accent)}
@@ -323,7 +319,6 @@ body{font-size:var(--ui-md)}
 /* The stepper owns one pressed side at the parent level. This overrides stale hover/native active/controller styling so both arrows can never look pressed together. */
 .game-control[data-pressed-step] .game-control-arrow{background:#12191e;color:var(--muted);transform:none!important}
 .game-control[data-pressed-step="-1"] .game-control-arrow[data-control-step="-1"],.game-control[data-pressed-step="1"] .game-control-arrow[data-control-step="1"]{background:#253027;color:var(--accent)}
-.controller-focus.game-control,.controller-focus.game-text-field,.controller-focus.game-slider-control{outline:0!important}
 .game-slider-control{width:100%;min-width:0;height:30px;padding:6px 0;display:flex;align-items:center;outline:0;user-select:none;-webkit-user-select:none;touch-action:none}
 .game-slider-track{position:relative;width:100%;height:8px;border:1px solid #344149;border-radius:99px;background:#050708;cursor:pointer;touch-action:none}
 .game-slider-fill{position:absolute;inset:1px auto 1px 1px;width:0;border-radius:99px;background:var(--accent)}
@@ -353,50 +348,50 @@ body{font-size:var(--ui-md)}
 .game-control:not([data-pressed-step]) .game-control-arrow:hover{background:#1b242a;color:var(--text)}
 }
 @media (max-width:900px) and (orientation:landscape){
-  #lobbyGameplayHostMount .settings-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #lobbyGameplayHostMount .settings-grid{}
   .lobby-side-tab,.lobby-start,.settings-tab,.admin-tab,.pause-actions .secondary-btn,.pause-leave .secondary-btn,.lobby-cheat-tab{font-size:10.5px;min-height:32px}
   .setting>span,.lobby-header-actions .secondary-btn,.lobby-bots-row .game-control-value,.game-cycle .game-control-value,.lobby-map-choice strong{font-size:10.5px}
 .menu-screen{padding:calc(var(--safe-top) + 5px) calc(var(--safe-right) + 7px) calc(var(--safe-bottom) + 5px) calc(var(--safe-left) + 7px)}.front-shell{grid-template-rows:auto minmax(0,1fr) auto;gap:6px}.front-header{gap:8px;padding-bottom:4px}.front-body{grid-template-columns:180px minmax(0,1fr);gap:6px}.front-nav{padding:6px;gap:4px}.front-nav-button{height:48px;padding:0 7px}.front-content>.deploy-view{padding:9px}.front-hero,.join-panel{padding:12px}.front-hero h1{font-size:23px}.join-panel h1{font-size:21px}.front-hero p,.join-panel p{font-size:10px;line-height:1.3}.front-hero .deploy-button{height:44px}
   .lobby-screen{padding:calc(var(--safe-top) + 4px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 4px) calc(var(--safe-left) + 6px)}.lobby-shell{gap:5px}.lobby-header{gap:7px;padding-bottom:3px}.lobby-room-line{gap:6px;flex-wrap:wrap}.lobby-room-line h1{font-size:16px}.lobby-mode-badge{font-size:9px;padding:3px 5px}.lobby-title p,.lobby-version{font-size:10px}.lobby-header-actions{gap:3px;flex-wrap:wrap;justify-content:flex-end}.lobby-header-actions .secondary-btn{height:32px;padding:0 8px;font-size:10.5px}.lobby-header-actions .square-btn{width:30px;min-width:30px;height:30px}.lobby-side-stack{gap:4px}.lobby-side-tabs{padding:3px;gap:3px}.lobby-side-tab{height:32px;font-size:10.5px}.lobby-roster-panel.active,.lobby-setup-panel,.lobby-loadout-panel{padding:6px}.lobby-section-head{padding-bottom:4px}.lobby-section-head h2{font-size:14px}.lobby-secondary{font-size:9.5px}.lobby-roster-team-control{gap:6px;padding:4px 6px}.lobby-team-choice{height:29px}.lobby-player{padding:5px 7px}.lobby-team-title{height:27px}.lobby-footer{padding:4px 7px}.lobby-footer strong{font-size:10px}.lobby-footer-copy span{font-size:10px}.lobby-start{height:34px;min-width:150px;font-size:10.5px}
-  .lobby-match-grid{grid-template-columns:minmax(0,1.32fr) minmax(160px,.68fr);gap:5px}.lobby-match-card{padding:5px;gap:4px}.lobby-card-title{padding-bottom:3px}.lobby-card-title strong{font-size:11px}.lobby-mode-picker button{height:31px;font-size:10.5px}.lobby-match-card .lobby-setup-row{gap:4px}.lobby-setup-row label>span{font-size:9.5px}.lobby-match-card .input{height:31px;font-size:10px}.lobby-rule-summary{padding:4px 6px;font-size:9.5px}
+  .lobby-match-grid{gap:5px}.lobby-match-card{padding:5px;gap:4px}.lobby-card-title{padding-bottom:3px}.lobby-card-title strong{font-size:11px}.lobby-mode-picker button{height:31px;font-size:10.5px}.lobby-match-card .lobby-setup-row{gap:4px}.lobby-setup-row label>span{font-size:9.5px}.lobby-match-card .input{height:31px;font-size:10px}.lobby-rule-summary{padding:4px 6px;font-size:9.5px}
   .lobby-map-panel{gap:4px;padding:4px;grid-template-rows:auto minmax(110px,1fr) auto}.lobby-map-toolbar{grid-template-columns:minmax(95px,125px) minmax(0,1fr);gap:5px}.lobby-map-toolbar h2{font-size:13px}.lobby-map-toolbar p{font-size:9.5px}.lobby-map-choice-grid{gap:4px}.lobby-map-choice{min-height:38px;padding:3px 4px}.lobby-map-choice strong{font-size:10.5px}.lobby-map-choice small{font-size:9.5px}
   .modal-screen{padding:calc(var(--safe-top) + 4px) calc(var(--safe-right) + 6px) calc(var(--safe-bottom) + 4px) calc(var(--safe-left) + 6px)}.modal-shell{border-radius:9px}.modal-head{padding:5px 7px 4px}.modal-head h2{font-size:15px}.modal-head p{font-size:9px;margin-top:2px}.settings-tabs,.admin-tabs{padding:3px 6px;gap:3px}.settings-tab,.admin-tab{height:32px;font-size:10.5px}.settings-page .settings-category-head{padding:4px 7px 1px}.settings-page .settings-category-head h3{font-size:12px}.settings-page .settings-grid{gap:5px;padding:4px 7px 6px}.settings-page .setting{padding:5px;gap:4px}.setting>span{font-size:10.5px}.setting .game-control,.weapon-settings-card .game-control{height:32px;font-size:10.5px}.game-slider-control{height:27px;padding:5px 0}.modal-foot{padding:4px 7px}
   .admin-page{max-height:calc(var(--app-height,100dvh) - var(--safe-top) - var(--safe-bottom) - 106px);}.admin-page>.settings-grid{gap:4px}.admin-page>.settings-grid>.setting{padding:5px}.admin-bot-card{padding:5px;gap:5px;}.admin-bot-head{padding-bottom:3px}.admin-bot-head strong{font-size:11px}.admin-bot-head small,.admin-bot-summary{font-size:9.5px}.admin-bot-controls{gap:4px}.admin-bot-controls .game-control{height:31px}.admin-weapon-toolbar{margin-bottom:4px;padding:5px 6px;gap:6px}.weapon-settings-card{padding:6px;gap:5px}.weapon-settings-card strong{font-size:11px;padding-bottom:3px}.weapon-fields{gap:4px}
   .pause-card{width:min(700px,100%);padding:8px}.pause-card h1{font-size:17px}.pause-context{font-size:9.5px;margin-top:3px}.pause-team{font-size:9.5px;padding:3px 6px}.resume-btn{height:34px;margin-top:5px}.pause-section{margin-top:5px;gap:4px}.pause-section>span{font-size:9.5px}.pause-actions{gap:4px}.pause-actions .secondary-btn,.pause-leave .secondary-btn{height:32px;font-size:10.5px}.pause-leave{margin-top:5px;padding-top:4px}
   .chat-composer{bottom:calc(var(--safe-bottom) + 4px);width:min(820px,calc(100vw - var(--safe-left) - var(--safe-right) - 8px));gap:3px}.chat-compose-shell{padding:4px;gap:3px}.chat-channel,.chat-input,.chat-send{height:29px}.chat-input{font-size:11px;line-height:29px}.chat-keyboard{gap:3px;padding:4px}.chat-key-row{gap:3px}.chat-key-row-numbers{display:flex}.chat-key{height:29px;max-width:none;border-radius:5px;font-size:10px}.chat-key-wide,.chat-key-command{font-size:9px}.game-text-editor{padding:4px}.game-text-editor-shell{padding:6px;gap:4px}.game-text-editor-display{height:31px;font-size:12px}.game-text-editor-shell>header h2{font-size:14px}
-.lobby-match-card .lobby-control-group{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:5px}.lobby-match-card .lobby-control-group>span{white-space:nowrap}.lobby-bots-row{grid-template-columns:repeat(2,minmax(0,1fr))}
+.lobby-match-card .lobby-control-group{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:5px}.lobby-match-card .lobby-control-group>span{white-space:nowrap}.lobby-bots-row{}
   .admin-bot-card{grid-template-columns:minmax(145px,.8fr) minmax(0,1.2fr);align-items:center}.admin-bot-head{align-items:center;padding:0 7px 0 0;border:0;border-right:1px solid var(--line)}
-.admin-page>.settings-grid>.setting{display:grid;grid-template-columns:minmax(0,1fr) minmax(64px,.92fr);align-items:center;column-gap:5px;min-height:43px}.admin-page>.settings-grid>.setting>span{font-size:9.5px;line-height:1.1}.admin-page>.settings-grid>.setting .game-control{height:31px}
+.admin-page>.settings-grid>.setting{display:grid;grid-template-columns:minmax(0,1fr) minmax(108px,.92fr);align-items:center;column-gap:5px;min-height:43px}.admin-page>.settings-grid>.setting>span{font-size:9.5px;line-height:1.1}.admin-page>.settings-grid>.setting .game-control{height:31px}
 .admin-page>.settings-grid>.setting .game-control{grid-template-columns:30px minmax(0,1fr) 30px}
 #lobbyGameplayHostMount .settings-grid>.setting{grid-template-columns:minmax(0,1fr) minmax(108px,.9fr)}#lobbyGameplayHostMount .setting .game-control{grid-template-columns:30px minmax(42px,1fr) 30px}
 .admin-page{padding:2px 5px}.admin-bot-card{margin-top:3px}
 }
 
 @media (max-width:780px) and (orientation:landscape){
-  #lobbyGameplayHostMount .settings-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+  #lobbyGameplayHostMount .settings-grid{}
 }
 @media (max-width:700px) and (orientation:landscape){
   .lobby-footer{gap:6px}.lobby-footer-copy{max-width:330px}.lobby-start{height:34px;min-width:150px;padding:0 10px;font-size:10.5px}
   .lobby-cheats-panel{padding:5px;gap:4px}.lobby-cheats-toolbar{grid-template-columns:minmax(210px,1fr) minmax(180px,.75fr);gap:4px}.lobby-god-control{padding:4px 6px}.lobby-god-control small{font-size:9px}.lobby-cheat-tabs{padding:3px;gap:3px}.lobby-cheat-tab{height:30px;font-size:10.5px}.lobby-tuning-panel,.lobby-weapons-panel{padding:5px}.lobby-gameplay-mount,.lobby-weapons-mount{padding-top:3px}
-  #lobbyGameplayHostMount .settings-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}#lobbyGameplayHostMount .setting{min-height:46px;padding:5px}
+  #lobbyGameplayHostMount .settings-grid{gap:5px}#lobbyGameplayHostMount .setting{min-height:46px;padding:5px}
   #lobbyWeaponsHostMount .admin-weapon-toolbar{margin-bottom:2px;padding:3px 5px}#lobbyWeaponsHostMount .weapon-settings-card{padding:3px 5px;gap:2px}
   .lobby-admin-toggle{height:30px;font-size:10.5px}.lobby-role-chip{height:28px;font-size:9.5px}
   .lobby-match-card{padding:4px;gap:3px}.lobby-card-title{padding-bottom:2px}.lobby-mode-picker button{height:28px}
   .lobby-map-panel{grid-template-rows:auto minmax(86px,1fr) auto}#lobbyMapPreview{min-height:86px}.lobby-map-view.active{overflow:auto}
 .front-header{grid-template-columns:auto minmax(135px,1fr) auto}.menu-brand strong{font-size:12px}.menu-brand [data-app-version]{font-size:9px}.front-profile{max-width:190px}.front-profile label>span{font-size:10px}.front-profile .input{font-size:10.5px}.front-nav-button{padding:0 5px}.front-nav-button small{font-size:9.5px}.front-hero h1{font-size:18px}.join-panel{grid-template-columns:minmax(0,1fr) minmax(200px,.9fr);gap:7px}.join-controls{grid-template-columns:minmax(95px,1fr) auto}
-  .lobby-header{display:grid;grid-template-columns:minmax(0,1fr) auto}.lobby-header-actions .secondary-btn{width:auto;min-width:0;padding:0 5px;font-size:10.5px}.lobby-roster{grid-template-columns:1fr 1fr}.lobby-match-grid{grid-template-columns:minmax(0,1.15fr) minmax(205px,.85fr)}.lobby-bots-row{grid-template-columns:repeat(3,minmax(0,1fr))}.lobby-bots-row .game-control{grid-template-columns:28px minmax(0,1fr) 28px}.lobby-bots-row .game-control-arrow{min-width:28px;width:28px}.lobby-bots-row .game-control-value{font-size:10.5px}.game-cycle .game-control-value{font-size:10.5px}
+  .lobby-header{display:grid;grid-template-columns:minmax(0,1fr) auto}.lobby-header-actions .secondary-btn{width:auto;min-width:0;padding:0 5px;font-size:10.5px}.lobby-roster{grid-template-columns:1fr 1fr}.lobby-match-grid{}.lobby-bots-row{}.lobby-bots-row .game-control{grid-template-columns:28px minmax(0,1fr) 28px}.lobby-bots-row .game-control-arrow{min-width:28px;width:28px}.lobby-bots-row .game-control-value{font-size:10.5px}.game-cycle .game-control-value{font-size:10.5px}
   .lobby-map-toolbar{grid-template-columns:minmax(85px,105px) minmax(0,1fr)}.lobby-map-choice strong{font-size:10.5px}.lobby-map-choice small{font-size:9.5px}
-  .settings-page .settings-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.weapon-fields{grid-template-columns:repeat(4,minmax(0,1fr))}
-.lobby-rules-row{grid-template-columns:minmax(120px,1.25fr) repeat(2,minmax(80px,1fr))}.lobby-bots-row>label:last-child{grid-column:auto}
+  .settings-page .settings-grid{}.weapon-fields{}
+.lobby-rules-row{}.lobby-bots-row>label:last-child{grid-column:auto}
 .lobby-setup-panel>.lobby-section-head>div,.lobby-loadout-panel>.lobby-section-head>div{display:flex;align-items:baseline;gap:6px;min-width:0}.lobby-setup-panel>.lobby-section-head .eyebrow,.lobby-loadout-panel>.lobby-section-head .eyebrow{flex:none}.lobby-setup-panel>.lobby-section-head h2,.lobby-loadout-panel>.lobby-section-head h2{margin:0}
 }
 @media (max-width:480px) and (orientation:landscape){
   .admin-weapon-toolbar{grid-template-columns:1fr!important}.admin-weapon-grid{grid-template-columns:repeat(5,minmax(0,1fr))}.admin-weapon-choice{height:30px;font-size:10.5px}.admin-weapon-toolbar-copy>small{display:none}.lobby-controller-hint{display:none!important}
   .lobby-footer{grid-template-columns:1fr;align-items:stretch}.lobby-footer-copy{display:none}.lobby-footer-actions{justify-content:stretch}.lobby-start{width:100%;min-width:0}
 .front-body{grid-template-columns:135px minmax(0,1fr)}.front-nav-button .ui-icon{display:none}.front-hero,.join-panel{grid-template-columns:1fr;gap:7px}.front-hero .deploy-button{width:100%}
-  .lobby-roster-team-control{grid-template-columns:1fr;gap:4px}.lobby-roster-team-control>span{text-align:left}.lobby-team-picker{grid-template-columns:repeat(2,minmax(0,1fr));}.lobby-match-grid{grid-template-columns:1fr}
+  .lobby-roster-team-control{grid-template-columns:1fr;gap:4px}.lobby-roster-team-control>span{text-align:left}.lobby-team-picker{grid-template-columns:repeat(2,minmax(0,1fr));}.lobby-match-grid{}
   .lobby-map-view.active{overflow:auto}.lobby-map-panel{height:auto;min-height:100%;grid-template-rows:auto minmax(120px,1fr) auto}.lobby-map-toolbar{grid-template-columns:1fr;align-items:start}.lobby-map-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.lobby-map-choice{min-height:42px}
-  .admin-page>.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-bot-controls{grid-template-columns:repeat(3,minmax(0,1fr))}.weapon-fields{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-weapon-toolbar{align-items:start}
+  .admin-page>.settings-grid{}.admin-bot-controls{grid-template-columns:repeat(3,minmax(0,1fr))}.weapon-fields{}.admin-weapon-toolbar{align-items:start}
   .pause-card{grid-template-columns:1fr}.pause-actions-player{grid-template-columns:repeat(3,minmax(0,1fr))}.pause-actions-system{grid-template-columns:repeat(2,minmax(0,1fr))}
 .lobby-roster-team-control{width:100%;min-width:0;justify-content:stretch}.lobby-team-picker{width:100%;min-width:0;justify-self:stretch}.lobby-team-choice{width:100%;min-width:0}
   .admin-shell .modal-foot{grid-template-columns:minmax(0,1fr) auto;align-items:center}.admin-shell .admin-status{width:100%;max-height:none;overflow:visible;font-size:9.5px;line-height:1.15}.admin-shell #adminCancelBtn{grid-column:2}
@@ -404,7 +399,7 @@ body{font-size:var(--ui-md)}
 .front-nav-button{height:40px}.front-nav-button strong{font-size:11px}.front-nav-button small{display:none}
   .lobby-match-card .lobby-control-group{grid-template-columns:1fr}
   .admin-bot-card{grid-template-columns:1fr}.admin-bot-head{padding:0 0 3px;border-right:0;border-bottom:1px solid var(--line)}
-.lobby-rules-row{grid-template-columns:minmax(120px,1.25fr) repeat(2,minmax(80px,1fr))}.lobby-bots-row{grid-template-columns:repeat(3,minmax(0,1fr))}
+.lobby-rules-row{}.lobby-bots-row{}
 .lobby-roster-panel.active{overflow:hidden;grid-template-rows:auto auto minmax(0,1fr)}.lobby-roster-panel.active .lobby-roster{min-height:0;overflow:hidden}
   .settings-page .game-control{grid-template-columns:28px minmax(0,1fr) 28px}.settings-page .game-cycle .game-control-value{font-size:10.5px}
 }
@@ -423,25 +418,10 @@ body{font-size:var(--ui-md)}
   .lobby-host-setup:not(.hide){display:block;overflow:visible}
   .lobby-host-setup .lobby-match-grid,.lobby-loadout-body{overflow:visible;height:auto}
 }
-/* Controller focus is rendered by one geometry-neutral moving sheen overlay.
-   Focus never changes borders, outlines, dimensions, or mount/preview geometry. */
-[data-input-mode="controller"] .controller-focus,
-[data-input-mode="controller"] .controller-focus:focus-visible,
-[data-input-mode="controller"] button:focus-visible,
-[data-input-mode="controller"] [role="tab"]:focus-visible,
-[data-input-mode="controller"] [data-game-control]:focus-visible{outline:0!important;outline-offset:0!important}
-[data-input-mode="controller"] .controller-focus.game-control,
-[data-input-mode="controller"] .controller-focus.game-text-field,
-[data-input-mode="controller"] .controller-focus.game-slider-control{border-color:var(--line)!important;box-shadow:none!important}
-[data-input-mode="controller"] .controller-focus.controller-editing{outline:0!important;filter:brightness(1.12) saturate(1.05);box-shadow:inset 0 -2px 0 rgba(215,255,88,.78)!important}
-[data-input-mode="controller"] .controller-focus.controller-editing .game-control-value{color:#fff;background:rgba(215,255,88,.08);box-shadow:none}
-.controller-focus-shine-layer{position:fixed;left:0;top:0;width:0;height:0;z-index:190;pointer-events:none;opacity:0;overflow:hidden;transform:translate3d(-9999px,-9999px,0);will-change:transform,width,height,opacity;border-radius:8px;background:rgba(215,255,88,.025);box-shadow:0 0 18px rgba(215,255,88,.16),inset 0 0 22px rgba(215,255,88,.055);transition:opacity .08s ease,width .07s ease,height .07s ease,transform .07s ease}
-.controller-focus-shine-layer.visible{opacity:1}
-.controller-focus-shine-layer::before{content:"";position:absolute;inset:-55% -95%;background:linear-gradient(108deg,transparent 34%,rgba(215,255,88,.06) 40%,rgba(255,255,255,.46) 48%,rgba(215,255,88,.19) 55%,transparent 64%);transform:translateX(-48%);animation:controllerFocusSweep 1.05s linear infinite;mix-blend-mode:screen}
-.controller-focus-shine-layer::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(215,255,88,.08),transparent 72%);opacity:.72}
-.controller-focus-shine-layer.editing{background:rgba(215,255,88,.06);box-shadow:0 0 22px rgba(215,255,88,.22),inset 0 -2px 0 rgba(215,255,88,.58)}
-@keyframes controllerFocusSweep{0%{transform:translateX(-50%)}100%{transform:translateX(50%)}}
-/* v1.44.81 Create-a-Class / Gunsmith layout.
+/* Focus belongs to the actual control, so clipping and fullscreen work natively. */
+[data-input-mode="controller"] .controller-focus{outline:2px solid var(--accent)!important;outline-offset:-2px!important}
+[data-input-mode="controller"] .controller-focus.controller-editing{filter:brightness(1.12);box-shadow:inset 0 -2px 0 var(--accent)!important}
+/* v1.44.82 Create-a-Class / Gunsmith layout.
    One responsive system: weapon + live stats share the upper workspace;
    the selected attachment choices own a full-width tray underneath. */
 .class-flow-workspace{height:100%;min-height:0;padding:6px!important;overflow:hidden!important}
@@ -498,8 +478,8 @@ body{font-size:var(--ui-md)}
 .loadout-weapon-page[hidden],.loadout-equipment-page[hidden]{display:none!important}
 
 /* Gunsmith uses the whole canvas. The attachment/weapon tray only consumes a row while it is open. */
-.gunsmith-layout{height:100%;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);gap:8px}
-.gunsmith-layout.tray-open,.gunsmith-layout.picker-open{grid-template-rows:minmax(0,1.58fr) minmax(132px,.82fr)}
+.gunsmith-layout{grid-template-rows:minmax(240px,1fr);overflow:auto;height:100%;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);gap:8px}
+.gunsmith-layout.tray-open,.gunsmith-layout.picker-open{grid-template-rows:minmax(240px,1.58fr) minmax(108px,.82fr);}
 .gunsmith-weapon-column,.gunsmith-inspector{min-width:0;min-height:0;border:1px solid var(--line);border-radius:10px;background:linear-gradient(150deg,rgba(16,22,26,.96),rgba(6,9,11,.92));overflow:hidden}
 .gunsmith-inspector{display:none}
 .gunsmith-layout.tray-open .gunsmith-inspector,.gunsmith-layout.picker-open .gunsmith-inspector{display:block}
@@ -516,18 +496,18 @@ body{font-size:var(--ui-md)}
 .gunsmith-ads-preview:active,.gunsmith-ads-preview.active{border-color:var(--accent);background:#1b2419;color:var(--accent)}
 
 /* Attachment categories stay physically associated with the weapon. */
-.gunsmith-callout-overlay{position:absolute;inset:0;z-index:4;pointer-events:none;transition:opacity .12s ease}
+.gunsmith-callout-overlay{position:absolute;inset:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.5fr) minmax(0,1fr);grid-template-rows:repeat(3,minmax(0,1fr));align-items:center;padding:10px 12px 44px;gap:6px;z-index:4;pointer-events:none;transition:opacity .12s ease}
 .gunsmith-callout-overlay.ads-hidden{opacity:0}
 .gunsmith-callout-lines{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none}
 .gunsmith-callout-lines line{stroke:rgba(191,205,211,.58);stroke-width:1;vector-effect:non-scaling-stroke}
 .gunsmith-callout-lines circle{fill:#c6d4d9;stroke:#11181b;stroke-width:1;vector-effect:non-scaling-stroke}
-.gunsmith-callout{position:absolute;min-width:76px;max-width:106px;padding:6px 7px;border:1px solid rgba(255,255,255,.12);border-radius:7px;background:rgba(8,12,14,.92);color:#95a1a8;text-align:left;pointer-events:auto;display:grid;gap:3px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
-.gunsmith-callout span{font:950 9px/1 system-ui;letter-spacing:.07em}
+.gunsmith-callout{width:max-content;max-width:min(150px,100%);position:relative;padding:6px 7px;border:1px solid rgba(255,255,255,.12);border-radius:7px;background:rgba(8,12,14,.92);color:#95a1a8;text-align:left;pointer-events:auto;display:grid;gap:3px;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+.gunsmith-callout span{white-space:nowrap;font:950 9px/1 system-ui;letter-spacing:.07em}
 .gunsmith-callout strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#dce4e8;font:900 10px/1.05 system-ui}
 .gunsmith-callout.active{border-color:rgba(255,255,255,.12);background:radial-gradient(circle at 28% 24%,rgba(215,255,88,.16),transparent 54%),linear-gradient(135deg,rgba(24,34,25,.98),rgba(9,14,16,.96));box-shadow:0 0 20px rgba(215,255,88,.13),inset 0 0 22px rgba(215,255,88,.05);filter:brightness(1.08)}
 .gunsmith-callout.active span,.gunsmith-callout.active strong{color:#efffc0}
 .gunsmith-callout.equipped:not(.active){border-color:rgba(255,255,255,.12);background:radial-gradient(circle at 24% 22%,rgba(215,255,88,.07),transparent 58%),rgba(8,12,14,.92)}
-.gunsmith-callout-optic{top:6%;right:4%}.gunsmith-callout-muzzle{top:18%;left:3%}.gunsmith-callout-barrel{top:51%;left:3%}.gunsmith-callout-magazine{left:35%;bottom:9%}.gunsmith-callout-underbarrel{right:19%;bottom:9%}.gunsmith-callout-stock{top:49%;right:3%}
+.gunsmith-callout-optic{grid-column:3;grid-row:1;justify-self:end}.gunsmith-callout-muzzle{grid-column:1;grid-row:1}.gunsmith-callout-barrel{grid-column:1;grid-row:2}.gunsmith-callout-magazine{grid-column:1;grid-row:3}.gunsmith-callout-underbarrel{grid-column:3;grid-row:3;justify-self:end}.gunsmith-callout-stock{grid-column:3;grid-row:2;justify-self:end}
 
 /* Live weapon stats occupy their own readable column beside the weapon. */
 .loadout-stat-row{grid-column:2;grid-row:1;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:repeat(6,minmax(0,1fr));gap:4px}
@@ -554,7 +534,7 @@ body{font-size:var(--ui-md)}
 .gunsmith-attachment-head strong{display:inline-block;margin-top:2px;color:#e6ecef;font:950 14px/1 system-ui}.gunsmith-slot-summary{display:inline-block!important;max-width:min(68vw,620px);margin-left:9px;color:#919ea4!important;font:800 9px/1.1 system-ui!important;letter-spacing:0!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;vertical-align:baseline}
 .gunsmith-tray-close{width:30px;height:30px;padding:0;border:0;border-radius:7px;background:transparent;color:#98a4aa;font:900 20px/1 system-ui}
 .gunsmith-tray-close:hover,.gunsmith-tray-close:focus-visible{background:#1b2328;color:#fff}
-.gunsmith-attachment-options{grid-column:1;grid-row:2;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));grid-auto-rows:minmax(0,1fr);gap:7px;overflow:hidden}
+.gunsmith-attachment-options{grid-column:1;grid-row:2;min-height:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));grid-auto-rows:minmax(52px,1fr);gap:7px;overflow:auto}
 .gunsmith-attachment-option{position:relative;min-width:0;min-height:0;padding:9px 10px;border:1px solid rgba(255,255,255,.09);border-radius:8px;background:#0c1114;color:#d2dbe0;text-align:left;display:flex;flex-direction:column;justify-content:center;gap:5px;overflow:hidden}
 .gunsmith-attachment-option strong{overflow:hidden;text-overflow:ellipsis;white-space:normal;font:900 12px/1.05 system-ui}
 .gunsmith-attachment-option small{overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;color:#929fa5;font:750 10px/1.15 system-ui}
@@ -566,7 +546,7 @@ body{font-size:var(--ui-md)}
 .gunsmith-weapon-picker header{padding:1px 1px 6px;border-bottom:1px solid rgba(255,255,255,.07)}
 .gunsmith-weapon-picker header strong{display:block;color:#e2e9ec;font:950 12px/1 system-ui}
 .gunsmith-weapon-picker header small{display:block;margin-top:3px;color:#8e9aa0;font:750 10px/1 system-ui}
-.gunsmith-weapon-picker .loadout-choice-grid{min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(0,1fr);gap:7px;overflow:hidden}
+.gunsmith-weapon-picker .loadout-choice-grid{min-height:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(52px,1fr);gap:7px;overflow:auto}
 .gunsmith-weapon-picker .loadout-choice{min-width:0;min-height:0;padding:8px}
 .gunsmith-weapon-picker .loadout-choice strong{font-size:11px;line-height:1.08}
 
@@ -623,13 +603,13 @@ body{font-size:var(--ui-md)}
   .class-item-card>i{font-size:8px}
   .class-item-equipment>strong{font-size:13px}
 
-  .gunsmith-layout{grid-template-rows:minmax(0,1fr);gap:5px}
-  .gunsmith-layout.tray-open,.gunsmith-layout.picker-open{grid-template-rows:minmax(0,1.55fr) minmax(94px,.82fr)}
+  .gunsmith-layout{gap:5px}
+  .gunsmith-layout.tray-open,.gunsmith-layout.picker-open{}
   .gunsmith-weapon-column{padding:5px;grid-template-columns:minmax(0,1fr) minmax(170px,29%);gap:4px 6px}
   .gunsmith-change-weapon{height:28px;padding:0 8px;font-size:8px}
   .loadout-preview-hint{left:7px;bottom:6px;font-size:9px}
   .gunsmith-ads-preview{width:42px;height:28px;font-size:9px}
-  .gunsmith-callout{min-width:68px;max-width:92px;padding:5px 6px}
+  .gunsmith-callout{padding:5px 6px}
   .gunsmith-callout span{font-size:9px}
   .gunsmith-callout strong{font-size:10px}
 
@@ -675,12 +655,12 @@ body{font-size:var(--ui-md)}
   .loadout-view-nav h3{font-size:14px}
   .item-view-swap{height:28px;min-width:82px;padding:0 9px;font-size:8.5px}
   .gunsmith-back{height:25px;font-size:9px}
-  .gunsmith-layout{grid-template-rows:minmax(0,1fr);gap:4px}
-  .gunsmith-layout.tray-open,.gunsmith-layout.picker-open{grid-template-rows:minmax(0,1fr) 82px}
+  .gunsmith-layout{gap:4px}
+  .gunsmith-layout.tray-open,.gunsmith-layout.picker-open{}
   .gunsmith-weapon-column{padding:4px;grid-template-columns:minmax(0,1fr) minmax(176px,31%);grid-template-rows:minmax(0,1fr);gap:3px 5px}
   .gunsmith-change-weapon{height:24px;padding:0 7px;font-size:9px}
   .gunsmith-ads-preview{width:38px;height:24px;font-size:9px}
-  .gunsmith-callout{min-width:62px;max-width:82px;padding:4px 5px}
+  .gunsmith-callout{padding:4px 5px}
   .gunsmith-callout span{display:none}
   .gunsmith-callout strong{font-size:10px}
   .loadout-stat-row{grid-template-columns:repeat(2,minmax(0,1fr));grid-template-rows:repeat(3,minmax(0,1fr));gap:2px}
@@ -712,8 +692,7 @@ body{font-size:var(--ui-md)}
   .class-browser-head small{display:none}
   .loadout-class-main>small{display:none}
   .gunsmith-weapon-column{grid-template-columns:minmax(0,1fr) minmax(158px,30%)}
-  .gunsmith-callout{min-width:62px;max-width:86px}
-  .gunsmith-callout-underbarrel{right:15%}
+  .gunsmith-callout{}
   .attachment-editor{grid-template-columns:minmax(0,1fr)}
   .gunsmith-attachment-options{gap:4px}
   .gunsmith-attachment-option{padding-left:6px;padding-right:6px}
@@ -729,7 +708,7 @@ body{font-size:var(--ui-md)}
   .loadout-class-main{display:grid;grid-template-columns:minmax(110px,.8fr) minmax(0,1.5fr) auto;align-items:center}
   .loadout-class-main>small{margin-top:0}
   .class-detail-grid{grid-template-columns:1fr;grid-template-rows:repeat(4,120px)}
-  .gunsmith-layout{grid-template-rows:auto auto}
+  .gunsmith-layout{}
   .gunsmith-weapon-column{min-height:430px;grid-template-columns:1fr;grid-template-rows:290px auto}
   .loadout-focus-stage{grid-column:1;grid-row:1}
   .loadout-stat-row{grid-column:1;grid-row:2;grid-template-columns:repeat(3,minmax(0,1fr));grid-template-rows:repeat(2,58px)}
@@ -741,7 +720,7 @@ body{font-size:var(--ui-md)}
     .gunsmith-weapon-picker .loadout-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.81 Gunsmith stat comparison: solid = starting build, hatched = change
+/* v1.44.82 Gunsmith stat comparison: solid = starting build, hatched = change
    from the attachment that was equipped when the active slot was opened. */
 .loadout-stat-bar{position:relative;overflow:hidden;background:#252c30}
 .loadout-stat-bar-solid{position:absolute;inset:0 auto 0 0;display:block;background:#8f9ca4;border-radius:inherit}
@@ -750,13 +729,10 @@ body{font-size:var(--ui-md)}
 .loadout-stat-bar-hatch.loss{background:repeating-linear-gradient(135deg,rgba(255,105,115,.95) 0 2px,rgba(255,105,115,.22) 2px 4px)}
 .loadout-stat-baseline-mark{position:absolute;top:-1px;bottom:-1px;width:1px;display:block;background:rgba(255,255,255,.72);transform:translateX(-1px);box-shadow:0 0 0 1px rgba(0,0,0,.28)}
 .loadout-stat.better .loadout-stat-bar-solid,.loadout-stat.worse .loadout-stat-bar-solid{background:#8f9ca4}
-/* v1.44.81 controller focus visuals: focus must never mutate Gunsmith geometry. */
+/* v1.44.82 controller focus visuals: focus must never mutate Gunsmith geometry. */
 [data-input-mode="controller"] .gunsmith-callout.controller-focus,
 [data-input-mode="controller"] .gunsmith-callout.controller-focus:focus-visible{
-  position:absolute!important;
   transform:none!important;
-  outline:0!important;
-  outline-offset:0!important;
   background:linear-gradient(135deg,rgba(215,255,88,.16),rgba(19,29,22,.98))!important;
   box-shadow:inset 0 0 18px rgba(215,255,88,.06)!important;
 }
@@ -766,8 +742,6 @@ body{font-size:var(--ui-md)}
 [data-input-mode="controller"] .gunsmith-attachment-option.controller-focus:focus-visible,
 [data-input-mode="controller"] .gunsmith-weapon-picker .loadout-choice.controller-focus,
 [data-input-mode="controller"] .gunsmith-weapon-picker .loadout-choice.controller-focus:focus-visible{
-  outline:0!important;
-  outline-offset:0!important;
   background:radial-gradient(circle at 30% 25%,rgba(215,255,88,.12),transparent 58%),linear-gradient(135deg,rgba(24,34,25,.98),rgba(9,14,16,.96))!important;
 }
 [data-input-mode="controller"] .gunsmith-attachment-option.controller-focus strong,
@@ -788,14 +762,11 @@ body{font-size:var(--ui-md)}
 .loadout-class-card.controller-card-focus .loadout-class-weapons span{color:#eef5f1}
 .loadout-class-card.controller-card-focus .loadout-class-main.controller-focus,
 .loadout-class-card.controller-card-focus .loadout-class-main.controller-focus:focus-visible{
-  outline:0!important;
-  outline-offset:0!important;
   box-shadow:none!important;
   background:transparent!important;
 }
 .loadout-class-card.controller-card-focus .loadout-class-edit.controller-focus,
 .loadout-class-card.controller-card-focus .loadout-class-edit.controller-focus:focus-visible{
-  outline:0!important;
   background:rgba(215,255,88,.16)!important;
   color:#efffc0!important;
   box-shadow:inset 0 0 16px rgba(215,255,88,.12)!important;
@@ -804,7 +775,7 @@ body{font-size:var(--ui-md)}
 /* Diagnostics recorder: compact, controller-friendly controls in Settings. */
 .diagnostics-toggle-card small,.diagnostics-status-card small,.diagnostics-log-card small{color:var(--dim);font-size:10px;line-height:1.3;text-transform:none;letter-spacing:0}.diagnostics-toggle-btn{min-width:148px}.diagnostics-toggle-btn.active{background:#1b2419;color:var(--accent);border-color:rgba(215,255,88,.32);box-shadow:inset 0 0 0 1px rgba(215,255,88,.06)}.diagnostics-status-card output{justify-self:start;color:var(--accent);font-size:11px;font-weight:950}.diagnostics-log-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px}.diagnostics-log-actions .secondary-btn{width:100%;height:32px;padding:0 8px}
 
-/* v1.44.81 mobile/controller readability baseline.
+/* v1.44.82 mobile/controller readability baseline.
    Compact by removing secondary copy first; actionable/menu text does not collapse
    into 8–9px labels on short landscape screens. */
 @media (max-width:900px) and (orientation:landscape){
@@ -893,12 +864,12 @@ body{font-size:var(--ui-md)}
   .gunsmith-inspector-empty>strong,.gunsmith-weapon-picker .loadout-choice strong{font-size:10.5px}
 }
 
-/* v1.44.81 immediate-action menu semantics. */
+/* v1.44.82 immediate-action menu semantics. */
 .loadout-foot,.settings-actions{grid-template-columns:minmax(0,1fr) auto}.loadout-foot .modal-action,.settings-actions .modal-action{min-width:92px}.settings-actions #settingsResetBtn{min-width:124px}
 
 
 
-/* v1.44.81 whole-app density audit.
+/* v1.44.82 whole-app density audit.
    Vertical space is treated as scarce: small labels/actions share rows, redundant headings
    are removed, and content gets the reclaimed height instead of shrinking typography. */
 .front-shell{grid-template-rows:48px minmax(0,1fr) auto;gap:6px}
@@ -950,9 +921,6 @@ body{font-size:var(--ui-md)}
 .settings-shell>.controller-menu-hint,.admin-shell>.controller-menu-hint{position:absolute;top:11px;right:12px;z-index:3;max-width:58%;padding:0;border:0;background:transparent;text-align:right;pointer-events:none}
 .modal-head{padding:7px 9px 5px}.modal-head h2{font-size:17px}.settings-tabs,.admin-tabs{padding:4px 7px;gap:4px}.settings-tab,.admin-tab{height:32px}
 .settings-page .settings-category-head{padding:5px 8px 2px}.settings-page .settings-grid{gap:5px;padding:5px 7px 7px}.settings-page .setting{padding:6px;gap:4px}
-/* Exact-fit groups prevent one small orphan card from creating an extra settings row. */
-.settings-page .settings-grid:has(#playerControllerVerticalSensitivity){grid-template-columns:repeat(5,minmax(0,1fr))}
-.settings-page .settings-grid:has(#playerMasterMute){grid-template-columns:repeat(4,minmax(0,1fr))}
 .admin-page{padding:6px}.admin-page>.settings-grid{gap:5px}.admin-page>.settings-grid>.setting{padding:6px;gap:4px}.admin-bot-card{margin-top:5px;padding:6px;gap:5px}
 .modal-foot{padding:4px 7px;gap:5px}.modal-foot>button{height:34px;padding:0 11px}
 
@@ -984,7 +952,6 @@ body{font-size:var(--ui-md)}
   .pause-card{grid-template-columns:1fr}.pause-card>header,.pause-card>.resume-btn,.pause-card>.pause-actions-all,.pause-card>.pause-leave{grid-column:1!important;grid-row:auto!important}.pause-card>.resume-btn{width:100%;margin-top:5px}.pause-card>.pause-actions-all{grid-template-columns:1fr}
   .loadout-classes-view{grid-template-rows:minmax(0,1fr)}
 }
-@media(prefers-reduced-motion:reduce){.controller-focus-shine-layer::before{animation:none!important;background:rgba(215,255,88,.11)}}
 
 @media(prefers-reduced-motion:reduce){[data-input-mode="controller"] .controller-focus{animation:none!important}}
 
@@ -996,7 +963,7 @@ body{font-size:var(--ui-md)}
 [data-input-mode="keyboardMouse"] .lobby-footer:has(#lobbyStatus:empty):has(.lobby-start.hide){display:none}
 
 
-/* v1.44.81 menu convention cleanup. */
+/* v1.44.82 menu convention cleanup. */
 .front-action-only,.join-action-only{border:0!important;background:transparent!important;box-shadow:none!important}
 .front-action-only{display:flex;justify-content:center;align-items:center;padding:0!important}
 .front-action-only .deploy-button{width:min(260px,100%)}
@@ -1054,7 +1021,7 @@ body{font-size:var(--ui-md)}
   .settings-tabs:has([data-settings-tab="developer"]:not(.hide)){grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 
-/* v1.44.81 footer child placement remains stable when empty siblings are hidden. */
+/* v1.44.82 footer child placement remains stable when empty siblings are hidden. */
 .lobby-footer-copy{grid-column:1}
 .lobby-controller-hint{grid-column:2}
 .lobby-footer-actions{grid-column:3}
@@ -1062,7 +1029,7 @@ body{font-size:var(--ui-md)}
 @media (orientation:portrait){.lobby-footer-copy,.lobby-controller-hint,.lobby-footer-actions{grid-column:1}}
 
 
-/* v1.44.81 killstreak setup geometry is state-invariant. Selecting or removing a streak
+/* v1.44.82 killstreak setup geometry is state-invariant. Selecting or removing a streak
    changes only state styling/content; slot, catalog, and footer positions never reflow. */
 .killstreak-setup-panel{grid-template-rows:max-content 54px minmax(0,1fr)}
 .killstreak-equipped-strip{height:54px;min-height:54px;max-height:54px}
@@ -1073,7 +1040,7 @@ body{font-size:var(--ui-md)}
   .killstreak-equipped-slot{height:42px;min-height:42px;max-height:42px}
 }
 
-/* v1.44.81 controller menus follow console list conventions: adjustable values
+/* v1.44.82 controller menus follow console list conventions: adjustable values
    are one item per row so Left/Right can change the value while Up/Down always
    reaches every setting instead of trapping focus inside a desktop grid. */
 [data-input-mode="controller"] .settings-page .settings-grid,

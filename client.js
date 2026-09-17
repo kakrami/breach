@@ -1,27 +1,28 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.81';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.81';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.81';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.81';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.81';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.81';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.81';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.81';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.82';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.82';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.82';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.82';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.82';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.82';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.82';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.82';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.44.81';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.81';
-import { createAudioEngine } from './audio-engine.js?v=1.44.81';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.81';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.81';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.81';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.81';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.81';
-import { createPointerSessions } from './pointer-sessions.js?v=1.44.81';
-import { createSafeStorage } from './browser-storage.js?v=1.44.81';
-import { createCanvasUiBridge } from './canvas-ui.js?v=1.44.81';
+} from './game-config.js?v=1.44.82';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.82';
+import { createAudioEngine } from './audio-engine.js?v=1.44.82';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.82';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.82';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.82';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.82';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.82';
+import { createPointerSessions } from './pointer-sessions.js?v=1.44.82';
+import { createSafeStorage } from './browser-storage.js?v=1.44.82';
+import { createUiFocusScope } from './ui-focus.js?v=1.44.82';
+import { createUiGestures } from './ui-gestures.js?v=1.44.82';
 
 const preferences=createSafeStorage('localStorage');
 let THREE = null;
@@ -225,43 +226,27 @@ function initGameControls(){
       Object.defineProperty(el,'disabled',{configurable:true,get(){return el.classList.contains('disabled');},set(v){el.classList.toggle('disabled',!!v);el.setAttribute('aria-disabled',v?'true':'false');for(const b of el.querySelectorAll('button'))b.disabled=!!v;}});
       for(const key of ['min','max','step'])Object.defineProperty(el,key,{configurable:true,get(){return el.dataset[key]??'';}});
       el.value=initial;
-      const stepButtons=[...el.querySelectorAll('[data-control-step]')];
-      let activeStepPress=null;
-      const setPressedSide=dir=>{
-        const side=dir>0?'1':dir<0?'-1':'';
-        if(side)el.dataset.pressedStep=side;else delete el.dataset.pressedStep;
-        for(const arrow of stepButtons)arrow.classList.toggle('pressed',!!side&&String(arrow.dataset.controlStep)===side);
-      };
-      const repeatStep=()=>{
-        if(!activeStepPress)return;
-        adjustGameControl(el,activeStepPress.dir,{commit:false});
-        const heldFor=performance.now()-activeStepPress.pressStartedAt;
-        const delay=heldFor>=2400?42:heldFor>=1200?68:105;
-        activeStepPress.repeatTimer=setTimeout(repeatStep,delay);
-      };
-      const finishStepPress=e=>{
-        if(!activeStepPress||(e?.pointerId!=null&&e.pointerId!==activeStepPress.pointerId))return;
-        const press=activeStepPress;activeStepPress=null;clearTimeout(press.repeatTimer||0);setPressedSide(0);
-        try{if(press.btn.hasPointerCapture?.(press.pointerId))press.btn.releasePointerCapture(press.pointerId);}catch{}
-        if(e&&e.type!=='pointerup'){el.value=press.startValue;el.dispatchEvent(new Event('input',{bubbles:true}));}
-        if(String(el.value)!==press.startValue||e?.type!=='pointerup')el.dispatchEvent(new Event('change',{bubbles:true}));
-      };
-      for(const btn of stepButtons){
+      for(const btn of el.querySelectorAll('[data-control-step]')){
         const dir=Number(btn.dataset.controlStep)||0;
-        btn.addEventListener('pointerdown',e=>{
-          if(el.disabled||!dir||activeStepPress||(e.pointerType==='mouse'&&e.button!==0))return;
-          e.preventDefault();e.stopPropagation();
-          activeStepPress={btn,dir,pointerId:e.pointerId,repeatTimer:0,pressStartedAt:performance.now(),startValue:String(el.value)};
-          setPressedSide(dir);
-          try{if(e.isTrusted)btn.setPointerCapture?.(e.pointerId);}catch{}
-          adjustGameControl(el,dir,{commit:false});
-          activeStepPress.repeatTimer=setTimeout(repeatStep,360);
+        const clear=()=>{delete el.dataset.pressedStep;btn.classList.remove('pressed');};
+        uiGestures.bind(btn,{
+          start:state=>{state.initial=String(el.value);state.started=performance.now();state.next=state.started+360;el.dataset.pressedStep=String(dir);btn.classList.add('pressed');adjustGameControl(el,dir,{commit:false});},
+          tick:(state,now)=>{if(now<state.next)return;adjustGameControl(el,dir,{commit:false});const held=now-state.started;state.next=now+(held>=2400?42:held>=1200?68:105);},
+          finish:state=>{clear();if(String(el.value)!==state.initial)el.dispatchEvent(new Event('change',{bubbles:true}));},
+          cancel:state=>{clear();setGameControlValue(el,state.initial,{emitInput:true,emitChange:true});},
         });
-        btn.addEventListener('pointerup',finishStepPress);
-        btn.addEventListener('pointercancel',finishStepPress);
-        btn.addEventListener('lostpointercapture',finishStepPress);
-        btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();});
-        btn.addEventListener('contextmenu',e=>e.preventDefault());
+        // A pointer hold has already applied its steps. Keyboard/AT activation
+        // has no pointer contact and performs one normal committed adjustment.
+        btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(e.detail===0)adjustGameControl(el,dir);});
+      }
+      if(type==='slider'){
+        const fromPoint=x=>{const r=(el.querySelector('.game-slider-track')||el).getBoundingClientRect(),min=controlNumber(el,'min',0),max=controlNumber(el,'max',1);setGameControlValue(el,min+(max-min)*Math.max(0,Math.min(1,(x-r.left)/Math.max(1,r.width))),{emitInput:true});};
+        uiGestures.bind(el,{
+          start:(state,e)=>{state.initial=String(el.value);fromPoint(e.clientX);},
+          move:(_,e)=>fromPoint(e.clientX),
+          finish:(state,e)=>{fromPoint(e.clientX);if(String(el.value)!==state.initial)el.dispatchEvent(new Event('change',{bubbles:true}));},
+          cancel:state=>setGameControlValue(el,state.initial,{emitInput:true,emitChange:true}),
+        });
       }
       el.addEventListener('keydown',e=>{if(controllerInputActive()){if(e.key.startsWith('Arrow'))e.preventDefault();return;}if(e.key==='ArrowLeft'||e.key==='ArrowDown'){e.preventDefault();adjustGameControl(el,-1);}else if(e.key==='ArrowRight'||e.key==='ArrowUp'){e.preventDefault();adjustGameControl(el,1);}});
 
@@ -348,7 +333,14 @@ function bindLoadoutWorkspaceTabs(){
   for(const button of document.querySelectorAll('[data-loadout-back-class]')){button.dataset.controllerKey=`back-class:${button.dataset.loadoutBackClass}`;button.addEventListener('click',()=>{const surface=button.dataset.loadoutBackClass,setItem=loadoutFocusSlot[surface]||'primary';setLoadoutWorkspaceMode(surface,'class',{ensurePreview:false});queueControllerUiFocus(`class-item:${surface}-${setItem}`);});}
   for(const button of document.querySelectorAll('[data-loadout-back-classes]')){button.dataset.controllerKey=`back-classes:${button.dataset.loadoutBackClasses}`;button.addEventListener('click',()=>{const surface=button.dataset.loadoutBackClasses;setLoadoutWorkspaceMode(surface,'classes',{ensurePreview:false});queueControllerUiFocus(`class:${surface}:${normalizeLoadoutClassId(loadoutEditClass[surface]||activeClassId)}:main`);});}
   for(const button of document.querySelectorAll('[data-loadout-weapon-picker-toggle]')){const stableKey=button.dataset.loadoutWeaponPickerToggle;button.dataset.controllerKey=`weapon-toggle:${stableKey}`;button.addEventListener('click',()=>{const key=button.dataset.loadoutWeaponPickerToggle,[surface,slot]=key.split('-');if(loadoutWeaponPickerOpen.has(key)){loadoutWeaponPickerOpen.delete(key);renderAttachmentEditor(surface,slot,loadoutDraftForSurface(surface));queueControllerUiFocus(`weapon-toggle:${key}`);}else{loadoutWeaponPickerOpen.add(key);loadoutAttachmentTrayOpen.delete(key);clearLoadoutAttachmentComparisonBase(key);renderAttachmentEditor(surface,slot,loadoutDraftForSurface(surface));queueControllerUiFocus(`loadout:${surface}:${slot}:${loadoutSlotWeapon(loadoutDraftForSurface(surface),slot)}`);}renderLoadoutStats(surface,slot,loadoutSlotWeapon(loadoutDraftForSurface(surface),slot),loadoutSlotAttachments(loadoutDraftForSurface(surface),slot));});}
-  for(const button of document.querySelectorAll('[data-loadout-ads-preview]')){const key=button.dataset.loadoutAdsPreview;const down=e=>{e.preventDefault();if(e.isTrusted)button.setPointerCapture?.(e.pointerId);setLoadoutAdsPreview(key,true);};const up=e=>{e.preventDefault();try{button.releasePointerCapture?.(e.pointerId);}catch{}setLoadoutAdsPreview(key,false);};button.addEventListener('pointerdown',down);button.addEventListener('pointerup',up);button.addEventListener('pointercancel',()=>setLoadoutAdsPreview(key,false));button.addEventListener('lostpointercapture',()=>setLoadoutAdsPreview(key,false));button.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();setLoadoutAdsPreview(key,true);}});button.addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();setLoadoutAdsPreview(key,false);}});button.addEventListener('click',e=>{if(e.detail===0)setLoadoutAdsPreview(key,!loadoutPreviewAdsKeys.has(key));});}
+  for(const button of document.querySelectorAll('[data-loadout-ads-preview]')){
+    const key=button.dataset.loadoutAdsPreview;
+    uiGestures.bind(button,{start:()=>setLoadoutAdsPreview(key,true),finish:()=>setLoadoutAdsPreview(key,false),cancel:()=>setLoadoutAdsPreview(key,false)});
+    button.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();setLoadoutAdsPreview(key,true);}});
+    button.addEventListener('keyup',e=>{if(e.code==='Space'||e.code==='Enter'){e.preventDefault();setLoadoutAdsPreview(key,false);}});
+    button.addEventListener('blur',()=>setLoadoutAdsPreview(key,false));
+    button.addEventListener('click',e=>{if(e.detail===0)setLoadoutAdsPreview(key,!loadoutPreviewAdsKeys.has(key));});
+  }
 }
 function applyLoadoutAttachmentChoice(surface,weaponSlot,slot,id){const live=loadoutDraftForSurface(surface),key=weaponSlot==='primary'?'primaryAttachments':'secondaryAttachments',next={...loadoutSlotAttachments(live,weaponSlot),[slot]:id};if(surface==='lobby'){setLobbyLoadoutDraft({[key]:next});renderAttachmentEditors('lobby',lobbyLoadoutDraft||loadoutDraftForSurface('lobby'));}else{loadoutDraft=normalizeLoadoutChoice({...live,[key]:next});syncMatchLoadoutEditor();commitMatchLoadoutChange();}}
 function renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups){const key=`${surface}-${weaponSlot}`,host=document.querySelector(`[data-gunsmith-callouts="${key}"]`);if(!host)return;host.replaceChildren();const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('gunsmith-callout-lines');svg.setAttribute('aria-hidden','true');host.append(svg);for(const [slot] of groups){const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.dataset.calloutLine=slot;const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.dataset.calloutDot=slot;dot.setAttribute('r','2.8');svg.append(line,dot);const b=document.createElement('button');b.type='button';b.className=`gunsmith-callout gunsmith-callout-${slot}`;b.dataset.calloutSlot=slot;b.dataset.controllerKey=`gunsmith:${key}:slot:${slot}`;const label=document.createElement('span');label.textContent=slot.toUpperCase();const id=current?.[slot]||'',item=id?ATTACHMENTS[id]:null,value=document.createElement('strong');value.textContent=item?.short||item?.name||'NONE';b.append(label,value);b.classList.toggle('active',loadoutAttachmentTrayOpen.has(key)&&loadoutAttachmentSlot[key]===slot);b.classList.toggle('equipped',!!item);b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();loadoutWeaponPickerOpen.delete(key);if(!loadoutAttachmentTrayOpen.has(key)||loadoutAttachmentSlot[key]!==slot)setLoadoutAttachmentComparisonBase(surface,weaponSlot,weapon,slot,current);loadoutAttachmentSlot[key]=slot;loadoutAttachmentTrayOpen.add(key);renderAttachmentEditor(surface,weaponSlot,loadoutDraftForSurface(surface));renderLoadoutStats(surface,weaponSlot,weapon,loadoutSlotAttachments(loadoutDraftForSurface(surface),weaponSlot));const selected=current?.[slot]||'';queueControllerUiFocus(`attachment:${key}:${slot}:${selected||'none'}`);});host.append(b);} }
@@ -359,7 +351,7 @@ function renderAttachmentEditor(surface,weaponSlot,draft){
   const options=document.createElement('div');options.className='gunsmith-attachment-options';for(const item of [null,...activeItems]){const id=item?.id||'',b=document.createElement('button');b.type='button';b.className='gunsmith-attachment-option';b.dataset.controllerKey=`attachment:${key}:${activeSlot}:${id||'none'}`;b.classList.toggle('active',(current?.[activeSlot]||'')===id);const name=document.createElement('strong');name.textContent=item?.name||'NONE';const detailText=item?attachmentDescriptionForWeapon(item,weapon):'';b.append(name);if(detailText){const detail=document.createElement('small');detail.textContent=detailText;b.append(detail);}b.addEventListener('click',()=>{applyLoadoutAttachmentChoice(surface,weaponSlot,activeSlot,id);queueControllerUiFocus(`attachment:${key}:${activeSlot}:${id||'none'}`);});options.append(b);}host.append(head,options);
 }
 function renderAttachmentEditors(surface,draft){syncLoadoutFocusedView(surface,draft);renderAttachmentEditor(surface,'primary',draft);renderAttachmentEditor(surface,'secondary',draft);}
-bindLoadoutWorkspaceTabs();for(const button of document.querySelectorAll('[data-loadout-ads-preview]'))button.dataset.controllerKey=`ads:${button.dataset.loadoutAdsPreview}`;
+for(const button of document.querySelectorAll('[data-loadout-ads-preview]'))button.dataset.controllerKey=`ads:${button.dataset.loadoutAdsPreview}`;
 let adminWeaponSelection='assault';
 function currentAdminWeaponSelection(){return WEAPON_ORDER.includes(adminWeaponSelection)?adminWeaponSelection:(WEAPON_ORDER[0]||'assault');}
 function hydrateWeaponTuneSelector(){
@@ -375,9 +367,11 @@ const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews
 const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbySecondaryButtons=[...document.querySelectorAll('[data-lobby-secondary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbyMapButtons=[...document.querySelectorAll('[data-lobby-map-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
 const matchPrimaryButtons=[...document.querySelectorAll('[data-match-primary-choice]')],matchSecondaryButtons=[...document.querySelectorAll('[data-match-secondary-choice]')],matchTacticalButtons=[...document.querySelectorAll('[data-match-tactical-choice]')],matchLethalButtons=[...document.querySelectorAll('[data-match-lethal-choice]')];
 const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMapPreview=$('lobbyMapPreview'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
-const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),uiCanvas=$('uiCanvas'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
+const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
 const gameTextEditor=$('gameTextEditor'),gameTextEditorTitle=$('gameTextEditorTitle'),gameTextEditorValue=$('gameTextEditorValue'),gameTextEditorPlaceholder=$('gameTextEditorPlaceholder'),gameTextKeyboard=$('gameTextKeyboard'),gameTextShiftBtn=$('gameTextShiftBtn');
+const uiGestures=createUiGestures({root:appRoot,getScope:controllerInputContext});
 initGameControls();
+bindLoadoutWorkspaceTabs();
 document.querySelectorAll('[data-app-version]').forEach(el=>{el.textContent=`Version ${APP_VERSION}`;});
 
 const platform=detectInputPlatform();
@@ -707,6 +701,7 @@ function clearControllerGameplayInput(){
 function setActiveInputMode(mode,{quiet=false}={}){
   if(!Object.values(INPUT_MODE).includes(mode)||mode===activeInputMode)return false;
   const previous=activeInputMode;
+  uiGestures.cancel();
   stopSlide();cancelSprint();endRecoilBurst();
   if(previous===INPUT_MODE.CONTROLLER){clearControllerGameplayInput();clearControllerUiFocus();resetControllerUiAxis();}
   if(mode===INPUT_MODE.CONTROLLER){keys.clear();resetTouchInput();mouseFireDown=false;}
@@ -755,7 +750,7 @@ function setActiveMap(value,{rebuild=true}={}){
 function suspendGameplayInput(){
   keys.clear();
   if(killstreakTargeting)closeKillstreakTargeting();
-  gamepadInput.reset();window.__breachCanvasUi?.cancel?.();
+  gamepadInput.reset();uiGestures.cancel();
   for(const key of [...loadoutPreviewAdsKeys])setLoadoutAdsPreview(key,false);
   stopSlide();cancelSprint();
   resetTouchInput();
@@ -814,7 +809,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.81';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.82';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -850,9 +845,7 @@ async function prepareGameRuntime(){
 }
 
 bindUI();
-let canvasUi=window.__breachCanvasUi||null;
-if(!canvasUi&&uiCanvas){canvasUi=createCanvasUiBridge({canvas:uiCanvas});canvasUi.start();window.__breachCanvasUi=canvasUi;}
-else canvasUi?.invalidate?.();
+createUiFocusScope({root:appRoot,surfaces:[entryScreen,rotateGate,menu,lobbyScreen,connectionOverlay,pause,$('loadoutPanel'),$('settingsPanel'),$('adminPanel'),lobbyQuitConfirm,chatComposer,gameTextEditor],getSurface:controllerUiSurface,onKeyboard:()=>setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true})});
 let controllerUiFrameLast=performance.now();
 function runPreEngineControllerFrame(now){
   if(engineInitialized)return;
@@ -1670,7 +1663,11 @@ function adjustLoadoutPreviewAngle(ctx,horizontalDelta){
 }
 function createLoadoutPreviewContext(key,canvas){
   const previewScene=new THREE.Scene(),previewCamera=new THREE.PerspectiveCamera(28,1,.05,20),previewRenderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'low-power'});previewRenderer.setPixelRatio(1);previewRenderer.outputColorSpace=THREE.SRGBColorSpace;previewRenderer.toneMapping=THREE.ACESFilmicToneMapping;previewRenderer.toneMappingExposure=1.08;previewRenderer.setClearColor(0x000000,0);previewCamera.position.set(0,.18,4.6);previewCamera.lookAt(0,0,0);previewScene.add(new THREE.HemisphereLight(0xeaf6ff,0x29322d,2.5));const keyLight=new THREE.DirectionalLight(0xffffff,2.3);keyLight.position.set(-3,4,4);previewScene.add(keyLight);const rim=new THREE.DirectionalLight(0x9bc7da,1.1);rim.position.set(4,1,-3);previewScene.add(rim);const pivot=new THREE.Group();previewScene.add(pivot);const ctx={key,canvas,scene:previewScene,camera:previewCamera,renderer:previewRenderer,pivot,signature:'',angle:.16,dragging:false,lastX:0,interacted:false,lastRenderedAt:0,adsPreview:loadoutPreviewAdsKeys.has(key)};
-  canvas.addEventListener('pointerdown',e=>{if(ctx.dragging)return;ctx.dragging=true;ctx.interacted=true;ctx.lastX=e.clientX;if(e.isTrusted)canvas.setPointerCapture?.(e.pointerId);ctx.pointerId=e.pointerId;});canvas.addEventListener('pointermove',e=>{if(!ctx.dragging||ctx.pointerId!==e.pointerId)return;const dx=e.clientX-ctx.lastX;ctx.lastX=e.clientX;adjustLoadoutPreviewAngle(ctx,dx);});const end=e=>{if(ctx.pointerId!==e.pointerId)return;ctx.dragging=false;ctx.pointerId=null;try{canvas.releasePointerCapture?.(e.pointerId);}catch{}};canvas.addEventListener('pointerup',end);canvas.addEventListener('pointercancel',end);canvas.addEventListener('lostpointercapture',end);return ctx;
+  uiGestures.bind(canvas,{
+    start:()=>{ctx.dragging=true;ctx.interacted=true;},
+    move:state=>adjustLoadoutPreviewAngle(ctx,state.dx),
+    finish:()=>{ctx.dragging=false;},cancel:()=>{ctx.dragging=false;},
+  });return ctx;
 }
 async function ensureLoadoutPreviewEngine(){if(engineReady)return true;return ensureThreeEngine();}
 function updateLoadoutCalloutLines(key,ctx,model,w,h){const host=document.querySelector(`[data-gunsmith-callouts="${key}"]`);if(!host||!model)return;host.classList.toggle('ads-hidden',!!ctx.adsPreview);if(ctx.adsPreview)return;const svg=host.querySelector('.gunsmith-callout-lines');if(!svg)return;svg.setAttribute('viewBox',`0 0 ${w} ${h}`);ctx.pivot.updateMatrixWorld(true);ctx.camera.updateMatrixWorld(true);const canvasRect=ctx.canvas.getBoundingClientRect(),points=model.userData?.calloutPoints||{};for(const button of host.querySelectorAll('[data-callout-slot]')){const slot=button.dataset.calloutSlot,point=points[slot],line=svg.querySelector(`[data-callout-line="${slot}"]`),dot=svg.querySelector(`[data-callout-dot="${slot}"]`);if(!point||!line){if(line)line.style.display='none';if(dot)dot.style.display='none';continue;}const projected=point.clone();ctx.pivot.localToWorld(projected);projected.project(ctx.camera);const x=(projected.x*.5+.5)*w,y=(-projected.y*.5+.5)*h,br=button.getBoundingClientRect(),bx=br.left-canvasRect.left+br.width*.5,by=br.top-canvasRect.top+br.height*.5,visible=projected.z>=-1&&projected.z<=1&&x>=-w*.15&&x<=w*1.15&&y>=-h*.2&&y<=h*1.2;line.style.display=visible?'':'none';line.setAttribute('x1',String(x));line.setAttribute('y1',String(y));line.setAttribute('x2',String(bx));line.setAttribute('y2',String(by));if(dot){dot.style.display=visible?'':'none';dot.setAttribute('cx',String(x));dot.setAttribute('cy',String(y));}}
@@ -2269,7 +2266,7 @@ function bindUI(){
     loadoutClasses=normalizeLoadoutClasses(setup.loadoutClasses,selectedLoadout());rememberLoadoutClasses(loadoutClasses,setup.classId);send({t:'startMatch',setup});$('lobbyStatus').textContent='Starting match…';
   });
 
-  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();graphicsContextAvailable=false;shell.pause('graphics');suspendGameplayInput();showToast('GRAPHICS INTERRUPTED · WAIT FOR RECOVERY');});
+  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();graphicsContextAvailable=false;shell.pause('graphics');showToast('GRAPHICS INTERRUPTED · WAIT FOR RECOVERY');});
   canvas.addEventListener('webglcontextrestored',()=>{graphicsContextAvailable=true;shell.render('graphics-restored');onResize();hudLastDraw=0;showToast('GRAPHICS RESTORED · RESUME WHEN READY');});
   canvas.addEventListener('contextmenu', e => e.preventDefault());
   canvas.addEventListener('pointerdown', onCanvasPointerDown, {passive:false});
@@ -4241,7 +4238,7 @@ function finishControllerUiAdjustment(){
 function clearControllerUiEditing(){
   finishControllerUiAdjustment();
   if(controllerUiEditing?.classList)controllerUiEditing.classList.remove('controller-editing');
-  controllerUiEditing=null;queueControllerFocusShineSync();
+  controllerUiEditing=null;
 }
 function controllerFocusKey(el){
   if(!el)return'';if(el.dataset?.controllerKey)return`controller:${el.dataset.controllerKey}`;if(el.id)return`id:${el.id}`;
@@ -4249,31 +4246,16 @@ function controllerFocusKey(el){
   for(const key of stableData){const value=el.dataset?.[key];if(value!=null&&value!=='')return`data:${key}:${value}`;}
   const text=String(el.textContent||'').replace(/\s+/g,' ').trim().slice(0,48);return`${el.tagName||''}:${text}`;
 }
-function controllerFocusShineElement(){
-  let layer=document.getElementById('controllerFocusShine');
-  if(layer)return layer;
-  layer=document.createElement('div');layer.id='controllerFocusShine';layer.className='controller-focus-shine-layer';layer.setAttribute('aria-hidden','true');document.body.appendChild(layer);return layer;
-}
-function syncControllerFocusShine(){
-  const layer=controllerFocusShineElement(),el=controllerUiFocus,surface=controllerUiSurface();
-  if(!controllerInputActive()||!controllerElementVisible(el,surface)){layer.classList.remove('visible','editing');return;}
-  const r=el.getBoundingClientRect(),left=Math.max(0,r.left),top=Math.max(0,r.top),right=Math.min(innerWidth,r.right),bottom=Math.min(innerHeight,r.bottom);
-  if(right-left<=2||bottom-top<=2){layer.classList.remove('visible','editing');return;}
-  const style=getComputedStyle(el);layer.style.width=`${right-left}px`;layer.style.height=`${bottom-top}px`;layer.style.transform=`translate3d(${left}px,${top}px,0)`;layer.style.borderRadius=style.borderRadius||'8px';layer.classList.toggle('editing',!!el.classList?.contains('controller-editing'));layer.classList.add('visible');
-}
-function queueControllerFocusShineSync(){requestAnimationFrame(syncControllerFocusShine);}
-window.addEventListener('resize',queueControllerFocusShineSync,{passive:true});
-document.addEventListener('scroll',queueControllerFocusShineSync,true);
 function clearControllerUiFocus(){
   clearControllerUiEditing();
   if(controllerUiFocus?.classList){controllerUiFocus.closest?.('.loadout-class-card')?.classList.remove('controller-card-focus');controllerUiFocus.classList.remove('controller-focus');}
-  controllerUiFocus=null;controllerUiFocusKey='';queueControllerFocusShineSync();
+  controllerUiFocus=null;controllerUiFocusKey='';
 }
 function resetControllerUiAxis(){controllerUiAxisDirection='';controllerUiAxisNextAt=0;controllerUiAxisStartedAt=0;}
 function controllerEditableField(el){return !!el?.matches?.('[data-game-control="cycle"],[data-game-control="stepper"],[data-game-control="slider"]');}
 function setControllerUiEditing(el){
   if(!controllerEditableField(el))return false;
-  clearControllerUiEditing();controllerUiEditing=el;el.classList.add('controller-editing');queueControllerFocusShineSync();return true;
+  clearControllerUiEditing();controllerUiEditing=el;el.classList.add('controller-editing');return true;
 }
 function controllerUiSurface(){
   if(!rotateGate.classList.contains('hide'))return rotateGate;
@@ -4325,15 +4307,12 @@ function controllerRevealFocusedElement(el,surface){
 }
 function setControllerUiFocus(el){
   const surface=controllerUiSurface();if(!controllerElementVisible(el,surface))return false;
-  if(controllerUiFocus===el){queueControllerFocusShineSync();return true;}
+  if(controllerUiFocus===el){return true;}
   if(controllerUiEditing&&controllerUiEditing!==el)clearControllerUiEditing();else finishControllerUiAdjustment();
   if(controllerUiFocus?.classList){controllerUiFocus.closest?.('.loadout-class-card')?.classList.remove('controller-card-focus');controllerUiFocus.classList.remove('controller-focus');}
   controllerUiFocus=el;controllerUiFocusKey=controllerFocusKey(el);controllerRememberFocus(el,surface);el.classList.add('controller-focus');el.closest?.('.loadout-class-card')?.classList.add('controller-card-focus');
-  // Controller focus is app-owned. Do not transfer native DOM focus: :focus-visible
-  // styles would reintroduce browser-style focus borders and are unnecessary because
-  // activation/navigation use controllerUiFocus directly.
-  try{if(document.activeElement&&document.activeElement!==document.body)document.activeElement.blur?.();}catch{}
-  controllerRevealFocusedElement(el,surface);queueControllerFocusShineSync();return true;
+  el.focus?.({preventScroll:true});
+  controllerRevealFocusedElement(el,surface);return true;
 }
 function queueControllerUiFocus(key,{fallback=null}={}){
   if(!controllerInputActive()||!key)return;

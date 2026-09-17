@@ -102,10 +102,9 @@ export function createSessionShell({
   }
   const raf=globalThis.requestAnimationFrame?.bind(globalThis)||((fn)=>setTimeout(fn,0));
   const caf=globalThis.cancelAnimationFrame?.bind(globalThis)||clearTimeout;
-  let viewportFrame=0,viewportSettleTimer=0;
+  let viewportFrame=0;
   function scheduleViewport(reason='viewport'){
     if(!viewportFrame)viewportFrame=raf(()=>{viewportFrame=0;if(syncViewport())render(reason);});
-    clearTimeout(viewportSettleTimer);viewportSettleTimer=setTimeout(()=>{viewportSettleTimer=0;if(syncViewport(true))render(`${reason}-settled`);},90);
   }
   const viewportChanged=()=>scheduleViewport('viewport');
   const resizeObserver=typeof ResizeObserver==='function'?new ResizeObserver(viewportChanged):null;
@@ -120,12 +119,12 @@ export function createSessionShell({
     if(ready())return Promise.resolve(true);
     return new Promise(resolve=>{
       let settled=false;
-      const finish=ok=>{if(settled)return;settled=true;clearTimeout(timer);for(const e of events)document.removeEventListener(e,changed);for(const e of errors)document.removeEventListener(e,failed);pending.delete(cancel);resolve(ok&&!destroyed);};
+      const finish=ok=>{if(settled)return;settled=true;for(const e of events)document.removeEventListener(e,changed);for(const e of errors)document.removeEventListener(e,failed);pending.delete(cancel);resolve(ok&&!destroyed);};
       const changed=()=>{if(ready())finish(true);},failed=()=>finish(false),cancel=()=>finish(false);
-      const timer=setTimeout(()=>finish(ready()),1800);pending.add(cancel);
+      pending.add(cancel);
       for(const e of events)document.addEventListener(e,changed);
       for(const e of errors)document.addEventListener(e,failed);
-      try{const result=invoke();if(result?.then)result.then(changed,failed);changed();}catch{failed();}
+      try{const result=invoke();if(result?.then)result.then(()=>finish(ready()),failed);changed();}catch{failed();}
     });
   }
   function requestFullscreen(){
@@ -244,6 +243,6 @@ export function createSessionShell({
   return {
     platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
     enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,showMatchPresentation,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
-    destroy(){destroyed=true;for(const cancel of [...pending])cancel();resizeObserver?.disconnect();if(viewportFrame)caf(viewportFrame);clearTimeout(viewportSettleTimer);removeEventListener('resize',viewportChanged);removeEventListener('orientationchange',viewportChanged);globalThis.visualViewport?.removeEventListener?.('resize',viewportChanged);for(const [target,type,fn] of listeners)target.removeEventListener(type,fn);}
+    destroy(){destroyed=true;for(const cancel of [...pending])cancel();resizeObserver?.disconnect();if(viewportFrame)caf(viewportFrame);removeEventListener('resize',viewportChanged);removeEventListener('orientationchange',viewportChanged);globalThis.visualViewport?.removeEventListener?.('resize',viewportChanged);for(const [target,type,fn] of listeners)target.removeEventListener(type,fn);}
   };
 }
