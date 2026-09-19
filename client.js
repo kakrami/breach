@@ -1,29 +1,28 @@
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.44.84';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.44.84';
-import * as YardGeometry from './world-geometry-yard.js?v=1.44.84';
-import * as RigGeometry from './world-geometry-rig.js?v=1.44.84';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.44.84';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.84';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.44.84';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.44.84';
+import * as HighlandsGeometry from './world-geometry.js?v=1.44.83';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.44.83';
+import * as YardGeometry from './world-geometry-yard.js?v=1.44.83';
+import * as RigGeometry from './world-geometry-rig.js?v=1.44.83';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.44.83';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.44.83';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.44.83';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.44.83';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.44.84';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.84';
-import { createAudioEngine } from './audio-engine.js?v=1.44.84';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.84';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.84';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.84';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.84';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.84';
-import { createControllerRecording } from './controller-recording.js?v=1.44.84';
-import { createPointerSessions } from './pointer-sessions.js?v=1.44.84';
-import { createSafeStorage } from './browser-storage.js?v=1.44.84';
-import { createUiFocusScope } from './ui-focus.js?v=1.44.84';
-import { createUiGestures } from './ui-gestures.js?v=1.44.84';
+} from './game-config.js?v=1.44.83';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.44.83';
+import { createAudioEngine } from './audio-engine.js?v=1.44.83';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.44.83';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.44.83';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.44.83';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.44.83';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.44.83';
+import { createPointerSessions } from './pointer-sessions.js?v=1.44.83';
+import { createSafeStorage } from './browser-storage.js?v=1.44.83';
+import { createUiFocusScope } from './ui-focus.js?v=1.44.83';
+import { createUiGestures } from './ui-gestures.js?v=1.44.83';
 
 const preferences=createSafeStorage('localStorage');
 let THREE = null;
@@ -479,9 +478,8 @@ function diagnosticsRecordEvent(type,data={}){
   if(!diagnosticsRecordingEnabled())return;
   const event={t:diagnosticsRelativeTime(),type:String(type||'event'),...data};diagnosticsRecorder.events.push(event);if(diagnosticsRecorder.events.length>DIAGNOSTICS_MAX_EVENTS)diagnosticsRecorder.events.splice(0,Math.min(300,diagnosticsRecorder.events.length));
 }
-function diagnosticsDataCount(){return diagnosticsRecorder.samples.length+diagnosticsRecorder.events.length+diagnosticsRecorder.incidents.length+(controllerRecording?.count||0);}
+function diagnosticsDataCount(){return diagnosticsRecorder.samples.length+diagnosticsRecorder.events.length+diagnosticsRecorder.incidents.length;}
 function resetDiagnosticsRecording({markStart=true}={}){
-  controllerRecording?.clear();
   diagnosticsRecorder.startedAt=performance.now();diagnosticsRecorder.startedEpoch=Date.now();diagnosticsRecorder.lastSampleAt=0;diagnosticsRecorder.lastFrameAt=0;diagnosticsRecorder.lastEffectivePitch=NaN;diagnosticsRecorder.lastBasePitch=NaN;diagnosticsRecorder.lastCameraY=NaN;diagnosticsRecorder.lastRecoilDebtPitch=NaN;diagnosticsRecorder.lastFireHeld=false;diagnosticsRecorder.lastIncidentAt=0;diagnosticsRecorder.samples.length=0;diagnosticsRecorder.events.length=0;diagnosticsRecorder.incidents.length=0;resetNetworkDiagnostics();
   if(markStart&&diagnosticsRecordingEnabled())diagnosticsRecordEvent('recording_start',{version:APP_VERSION,protocol:PROTOCOL_VERSION,inputMode:activeInputMode});syncDiagnosticsSettingsUI();hudLastDraw=0;
 }
@@ -516,7 +514,7 @@ function captureGameplayDiagnostics(rawFrameDt,now=performance.now()){
 }
 function diagnosticsExportPayload(){
   const settings=normalizePlayerSettingsValue(playerSettings);delete settings.masterVolume;delete settings.sfxVolume;delete settings.musicVolume;
-  return{format:'breach-diagnostics-v2',recoilModel:'authoritative-aim-debt-v1',exportedAt:new Date().toISOString(),appVersion:APP_VERSION,protocolVersion:PROTOCOL_VERSION,recording:diagnosticsRecordingEnabled(),startedAt:new Date(diagnosticsRecorder.startedEpoch).toISOString(),durationMs:Math.max(0,performance.now()-diagnosticsRecorder.startedAt),environment:{userAgent:navigator.userAgent||'',platform:navigator.platform||'',touch:!!isTouch,inputMode:activeInputMode,unsupportedGamepads:gamepadInput.unsupported(),viewport:{w:viewW||0,h:viewH||0},map:currentMapId||'',matchMode:matchState?.mode||''},playerSettings:settings,controllerInput:controllerRecording?.exportData()??null,network:networkDiagnosticsSnapshot(),sampleIntervalMs:DIAGNOSTICS_SAMPLE_INTERVAL_MS,samples:diagnosticsRecorder.samples,events:diagnosticsRecorder.events,incidents:diagnosticsRecorder.incidents};
+  return{format:'breach-diagnostics-v2',recoilModel:'authoritative-aim-debt-v1',exportedAt:new Date().toISOString(),appVersion:APP_VERSION,protocolVersion:PROTOCOL_VERSION,recording:diagnosticsRecordingEnabled(),startedAt:new Date(diagnosticsRecorder.startedEpoch).toISOString(),durationMs:Math.max(0,performance.now()-diagnosticsRecorder.startedAt),environment:{userAgent:navigator.userAgent||'',platform:navigator.platform||'',touch:!!isTouch,inputMode:activeInputMode,unsupportedGamepads:gamepadInput.unsupported(),viewport:{w:viewW||0,h:viewH||0},map:currentMapId||'',matchMode:matchState?.mode||''},playerSettings:settings,network:networkDiagnosticsSnapshot(),sampleIntervalMs:DIAGNOSTICS_SAMPLE_INTERVAL_MS,samples:diagnosticsRecorder.samples,events:diagnosticsRecorder.events,incidents:diagnosticsRecorder.incidents};
 }
 function exportDiagnosticsRecording(){
   if(!diagnosticsDataCount()){showToast('NO DIAGNOSTICS RECORDED');return;}
@@ -525,7 +523,7 @@ function exportDiagnosticsRecording(){
 function syncDiagnosticsSettingsUI(){
   const active=diagnosticsRecordingEnabled(),el=$('diagnosticsStatus'),hasData=diagnosticsDataCount()>0,button=$('playerDiagnosticsBtn');
   if(button){button.textContent=active?'STOP RECORDING':'START RECORDING';button.setAttribute('aria-pressed',active?'true':'false');button.classList.toggle('active',active);}
-  if(el){const seconds=Math.round(Math.max(0,performance.now()-diagnosticsRecorder.startedAt)/1000);el.textContent=active?`RECORDING · ${seconds}s · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:hasData?(controllerRecording?.count?'RECORDING SAVED':`STOPPED · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`):'OFF';}
+  if(el){const seconds=Math.round(Math.max(0,performance.now()-diagnosticsRecorder.startedAt)/1000);el.textContent=active?`RECORDING · ${seconds}s · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:hasData?`STOPPED · ${diagnosticsRecorder.incidents.length} INCIDENT${diagnosticsRecorder.incidents.length===1?'':'S'}`:'OFF';}
   if($('diagnosticsExportBtn'))$('diagnosticsExportBtn').disabled=!hasData;if($('diagnosticsClearBtn'))$('diagnosticsClearBtn').disabled=!hasData;
 }
 function setDiagnosticsRecording(enabled){
@@ -535,7 +533,6 @@ function setDiagnosticsRecording(enabled){
   playerSettings=normalizePlayerSettingsValue({...playerSettings,diagnostics:next?'on':'off'});
   if(playerSettingsDraft)playerSettingsDraft=normalizePlayerSettingsValue({...playerSettingsDraft,diagnostics:next?'on':'off'});
   savePlayerSettings();
-  controllerRecording?.setEnabled(diagnosticsRecordingEnabled());
   if(next)resetDiagnosticsRecording();else{syncDiagnosticsSettingsUI();hudLastDraw=0;}
   syncPlayerSettingsUI(playerSettingsDraft||playerSettings);
   setSettingsStatus('');
@@ -684,8 +681,7 @@ const gameplayPointers=createPointerSessions(canvas,{onCancel:state=>releaseCanv
 let mouseFireDown=false,akimboLeftCycleStartedAt=0,akimboRightCycleStartedAt=0,akimboCycleSoundPlayed={left:false,right:false},akimboReadyAt={left:0,right:0};
 const AKIMBO_1887_CYCLE_MS=920;
 const touchVisual = { jumpUntil:0, fireUntil:0, reloadUntil:0, swapUntil:0, modeUntil:0, flashUntil:0, stickyUntil:0 };
-let controllerRecording=null;
-const gamepadInput=createGamepadInput({buttonThreshold:CONTROLLER_TRIGGER_THRESHOLD,onPoll:sample=>controllerRecording?.sample(sample)});
+const gamepadInput=createGamepadInput({buttonThreshold:CONTROLLER_TRIGGER_THRESHOLD});
 const INPUT_MODE=Object.freeze({TOUCH:'touch',KEYBOARD_MOUSE:'keyboardMouse',CONTROLLER:'controller'});
 let gamepadFrame=gamepadInput.poll();
 let activeInputMode=isTouch?INPUT_MODE.TOUCH:INPUT_MODE.KEYBOARD_MOUSE;
@@ -808,13 +804,12 @@ const shell=createSessionShell({
 });
 ({w:viewW,h:viewH,dpr:viewDpr}=shell.viewport);
 shell.start();
-controllerRecording=createControllerRecording({version:APP_VERSION,build:BUILD_ID,enabled:diagnosticsRecordingEnabled(),readContext:()=>({inputMode:activeInputMode,scope:controllerInputContext(),shellFocused:shell.snapshot().focused,location:shell.location,paused:shell.paused,panel:shell.panel,selectedController:gamepadFrame.index,controllerConnected:gamepadFrame.connected,controllerMapping:gamepadFrame.mapping})});
 startVersionWatcher();
 
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.84';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.44.83';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
