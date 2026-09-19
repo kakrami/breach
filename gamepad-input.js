@@ -4,18 +4,22 @@ const EMPTY_FRAME=Object.freeze({connected:false,index:-1,id:'',mapping:'',moveX
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,Number.isFinite(Number(v))?Number(v):0));
 function value(b){return clamp(typeof b==='number'?b:b?.value??(b?.pressed?1:0),0,1);}
 function supported(p){return p?.connected&&p.mapping==='standard'&&p.axes?.length>=4&&p.buttons?.length>=16;}
-function pads(){try{return Array.from(globalThis.navigator?.getGamepads?.()||[]).filter(Boolean);}catch{return[];}}
+function pads(onPoll){
+  let result=[],error=null,apiAvailable=false;
+  try{const nav=globalThis.navigator,getPads=nav?.getGamepads;apiAvailable=typeof getPads==='function';result=Array.from(getPads?.call(nav)||[]).filter(Boolean);}catch(cause){error=String(cause?.name||'Error');}
+  onPoll?.({pads:result,apiAvailable,error});return result;
+}
 function radial(x,y,dz,curve){const length=Math.hypot(x,y);if(length<=dz)return{x:0,y:0};const scale=Math.pow(Math.min(1,(length-dz)/(1-dz)),curve)/length;return{x:x*scale,y:y*scale};}
 function active(p){return p.buttons.some(b=>value(b)>.5)||p.axes.slice(0,4).some(a=>Math.abs(a)>.35);}
 
-export function createGamepadInput({stickDeadzone=.16,lookDeadzone=.14,lookCurve=1.45,buttonThreshold=.5}={}){
+export function createGamepadInput({stickDeadzone=.16,lookDeadzone=.14,lookCurve=1.45,buttonThreshold=.5,onPoll=null}={}){
   stickDeadzone=clamp(stickDeadzone,.02,.45);lookDeadzone=clamp(lookDeadzone,.02,.45);lookCurve=clamp(lookCurve,1,2.5);buttonThreshold=clamp(buttonThreshold,.2,.9);
   let selected=-1,key='',scope=null,previous=off(),blocked=off(),axisBlocked=[false,false],needsBaseline=true,destroyed=false;
   let activity=new Map(),lastButtons=zero(),lastAxes=[0,0,0,0];
   const disconnected=event=>{if(event.gamepad?.index===selected){key='';reset();}activity.delete(event.gamepad?.index);};
   globalThis.addEventListener?.('gamepaddisconnected',disconnected);
   function select(){
-    const available=pads().filter(supported),current=available.find(p=>p.index===selected);
+    const available=pads(onPoll).filter(supported),current=available.find(p=>p.index===selected);
     // Connecting an idle pad does not steal an in-use controller. A deliberate
     // input on another pad transfers ownership, with a fresh release barrier.
     const next=available.find(p=>p.index!==selected&&active(p)&&!activity.get(p.index));
