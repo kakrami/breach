@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.83" rel="manifest"/>
-<title>Breach v1.44.83</title>
-<link href="ui.css?v=1.44.83" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.44.84" rel="manifest"/>
+<title>Breach v1.44.84</title>
+<link href="ui.css?v=1.44.84" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -428,7 +428,7 @@
 <script>
 (() => {
   window.__breachModuleBooted = false;
-  const CURRENT_VERSION = '1.44.83', CURRENT_BUILD = '20260917T063825Z', CURRENT_PROTOCOL = 90;
+  const CURRENT_VERSION = '1.44.84', CURRENT_BUILD = '20260919T040408Z', CURRENT_PROTOCOL = 90;
   const ONLINE_API = 'https://breach-online.kiadesignenterprise.workers.dev';
   const GUARD_KEY = 'breach:update-reload', GUARD_MS = 30000;
   const fail = message => {
@@ -442,7 +442,7 @@
     if (target && target !== window && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) fail('Client asset failed to load.');
   }, true);
   window.addEventListener('unhandledrejection', () => { if (!window.__breachModuleBooted) fail('Client failed to start.'); });
-  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.44.83';document.body.appendChild(script); };
+  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.44.84';document.body.appendChild(script); };
   const cleanReloadParams = () => { const url=new URL(location.href);if(url.searchParams.has('__breach_update')||url.searchParams.has('__breach_reload')){url.searchParams.delete('__breach_update');url.searchParams.delete('__breach_reload');history.replaceState(null,'',url);} };
   const reloadFor = manifest => {
     const target=`${manifest.version||'unknown'}|${manifest.build||'unknown'}|${Number(manifest.protocol)||0}`,now=Date.now();
