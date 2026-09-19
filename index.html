@@ -1,212 +1,350 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#080b0d">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=1.26.0">
-<title>Breach v1.26.0</title>
-<link rel="stylesheet" href="ui.css?v=1.26.0">
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover" name="viewport"/>
+<meta content="#080b0d" name="theme-color"/>
+<meta content="yes" name="mobile-web-app-capable"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
+<link href="manifest.webmanifest?v=1.37.33" rel="manifest"/>
+<title>Breach v1.37.33</title>
+<link href="ui.css?v=1.37.33" rel="stylesheet"/>
 </head>
 <body>
-<svg class="svg-sprite" aria-hidden="true" focusable="false">
-  <defs>
-    <symbol id="i-mark" viewBox="0 0 24 24"><path d="M5 4h8.5c3.2 0 5.5 1.7 5.5 4.4 0 1.9-1 3.2-2.8 4 2.2.7 3.3 2.1 3.3 4.1 0 2.8-2.4 4.5-6.1 4.5H5V4Z"/><path d="M9 8h4.1c1.2 0 1.9.5 1.9 1.4 0 .9-.7 1.5-1.9 1.5H9V8Zm0 6.5h4.6c1.3 0 2 .5 2 1.5s-.7 1.5-2 1.5H9v-3Z" class="cut"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="m9 6 9 6-9 6V6Z"/></symbol>
-    <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M19 11a7.5 7.5 0 1 0 .2 3"/></symbol>
-    <symbol id="i-full" viewBox="0 0 24 24"><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"/></symbol>
-    <symbol id="i-sound" viewBox="0 0 24 24"><path d="M5 9v6h4l4.5 3.5v-13L9 9H5Z"/><path d="M16.5 9.2a4 4 0 0 1 0 5.6M19 6.5a7.5 7.5 0 0 1 0 11"/></symbol>
-    <symbol id="i-mute" viewBox="0 0 24 24"><path d="M5 9v6h4l4.5 3.5v-13L9 9H5Z"/><path d="m17 9 4 4m0-4-4 4"/></symbol>
-    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
-    <symbol id="i-enter" viewBox="0 0 24 24"><path d="M13 5h6v14h-6"/><path d="m10 8 4 4-4 4M4 12h10"/></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-2.8 7.5-7 9-4.2-1.5-7-4.5-7-9V6l7-2.5Z"/><path d="m9.2 12 1.8 1.8 3.9-4.4"/></symbol>
-    <symbol id="i-team" viewBox="0 0 24 24"><circle cx="8.5" cy="8" r="2.8"/><circle cx="16.5" cy="9.5" r="2.3"/><path d="M3.5 20c.2-3.8 1.9-5.8 5-5.8s4.9 2 5.1 5.8M14 15.5c3.8 0 6 1.5 6.5 4.5"/></symbol>
-    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
-    <symbol id="i-exit" viewBox="0 0 24 24"><path d="M10 4H5v16h5"/><path d="m14 8 4 4-4 4M8 12h10"/></symbol>
-    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.5 1.5M16.5 16.5 18 18M18 6l-1.5 1.5M7.5 16.5 6 18"/><circle cx="12" cy="12" r="7"/></symbol>
-    <symbol id="i-close" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></symbol>
-  </defs>
+<svg aria-hidden="true" class="svg-sprite" focusable="false">
+<defs>
+<symbol id="i-mark" viewbox="0 0 24 24"><path d="M5 4h8.5c3.2 0 5.5 1.7 5.5 4.4 0 1.9-1 3.2-2.8 4 2.2.7 3.3 2.1 3.3 4.1 0 2.8-2.4 4.5-6.1 4.5H5V4Z"></path><path class="cut" d="M9 8h4.1c1.2 0 1.9.5 1.9 1.4 0 .9-.7 1.5-1.9 1.5H9V8Zm0 6.5h4.6c1.3 0 2 .5 2 1.5s-.7 1.5-2 1.5H9v-3Z"></path></symbol>
+<symbol id="i-play" viewbox="0 0 24 24"><path d="m9 6 9 6-9 6V6Z"></path></symbol>
+<symbol id="i-refresh" viewbox="0 0 24 24"><path d="M20 6v5h-5"></path><path d="M19 11a7.5 7.5 0 1 0 .2 3"></path></symbol>
+<symbol id="i-full" viewbox="0 0 24 24"><path d="M8 4H4v4M16 4h4v4M8 20H4v-4M16 20h4v-4"></path></symbol>
+<symbol id="i-sound" viewbox="0 0 24 24"><path d="M5 9v6h4l4.5 3.5v-13L9 9H5Z"></path><path d="M16.5 9.2a4 4 0 0 1 0 5.6M19 6.5a7.5 7.5 0 0 1 0 11"></path></symbol>
+<symbol id="i-mute" viewbox="0 0 24 24"><path d="M5 9v6h4l4.5 3.5v-13L9 9H5Z"></path><path d="m17 9 4 4m0-4-4 4"></path></symbol>
+<symbol id="i-plus" viewbox="0 0 24 24"><path d="M12 5v14M5 12h14"></path></symbol>
+<symbol id="i-enter" viewbox="0 0 24 24"><path d="M13 5h6v14h-6"></path><path d="m10 8 4 4-4 4M4 12h10"></path></symbol>
+<symbol id="i-shield" viewbox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-2.8 7.5-7 9-4.2-1.5-7-4.5-7-9V6l7-2.5Z"></path><path d="m9.2 12 1.8 1.8 3.9-4.4"></path></symbol>
+<symbol id="i-team" viewbox="0 0 24 24"><circle cx="8.5" cy="8" r="2.8"></circle><circle cx="16.5" cy="9.5" r="2.3"></circle><path d="M3.5 20c.2-3.8 1.9-5.8 5-5.8s4.9 2 5.1 5.8M14 15.5c3.8 0 6 1.5 6.5 4.5"></path></symbol>
+<symbol id="i-copy" viewbox="0 0 24 24"><rect height="11" rx="2" width="11" x="8" y="8"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></symbol>
+<symbol id="i-exit" viewbox="0 0 24 24"><path d="M10 4H5v16h5"></path><path d="m14 8 4 4-4 4M8 12h10"></path></symbol>
+<symbol id="i-settings" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.5 1.5M16.5 16.5 18 18M18 6l-1.5 1.5M7.5 16.5 6 18"></path><circle cx="12" cy="12" r="7"></circle></symbol>
+<symbol id="i-close" viewbox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"></path></symbol>
+<symbol id="i-loadout" viewbox="0 0 24 24"><path d="M3 10h11l3-2h4v4h-4l-3-2H9v3H6v-3H3Z"></path><path d="M9 13v4h4v-4M16 8V5"></path></symbol>
+<symbol id="i-chat" viewbox="0 0 24 24"><path d="M4 5.5h16v10H9l-5 3v-13Z"></path><path d="M8 9h8M8 12h5"></path></symbol>
+</defs>
 </svg>
+<main class="app-root" id="appRoot">
+<div class="game-stage" id="gameStage"><canvas aria-label="Breach gameplay" draggable="false" id="game"></canvas></div>
+<div aria-label="Game chat" aria-modal="false" class="chat-composer hide" id="chatComposer" role="dialog">
+<div class="chat-compose-shell">
+<span class="chat-channel">ALL</span>
+<div aria-label="Chat message" aria-live="polite" class="chat-input" id="chatInput" role="textbox"><span class="chat-input-text" id="chatInputText"></span><span aria-hidden="true" class="chat-caret"></span><span class="chat-placeholder" id="chatPlaceholder">Message</span></div>
+<button class="chat-send" id="chatSendBtn" type="button">SEND</button>
+</div>
+<div aria-label="In-game QWERTY keyboard" class="chat-keyboard" id="chatKeyboard">
+<div class="chat-key-row chat-key-row-numbers">
+<button class="chat-key" data-chat-char="1" type="button">1</button><button class="chat-key" data-chat-char="2" type="button">2</button><button class="chat-key" data-chat-char="3" type="button">3</button><button class="chat-key" data-chat-char="4" type="button">4</button><button class="chat-key" data-chat-char="5" type="button">5</button><button class="chat-key" data-chat-char="6" type="button">6</button><button class="chat-key" data-chat-char="7" type="button">7</button><button class="chat-key" data-chat-char="8" type="button">8</button><button class="chat-key" data-chat-char="9" type="button">9</button><button class="chat-key" data-chat-char="0" type="button">0</button>
+</div>
+<div class="chat-key-row">
+<button class="chat-key" data-chat-char="q" type="button">Q</button><button class="chat-key" data-chat-char="w" type="button">W</button><button class="chat-key" data-chat-char="e" type="button">E</button><button class="chat-key" data-chat-char="r" type="button">R</button><button class="chat-key" data-chat-char="t" type="button">T</button><button class="chat-key" data-chat-char="y" type="button">Y</button><button class="chat-key" data-chat-char="u" type="button">U</button><button class="chat-key" data-chat-char="i" type="button">I</button><button class="chat-key" data-chat-char="o" type="button">O</button><button class="chat-key" data-chat-char="p" type="button">P</button>
+</div>
+<div class="chat-key-row chat-key-row-middle">
+<button class="chat-key" data-chat-char="a" type="button">A</button><button class="chat-key" data-chat-char="s" type="button">S</button><button class="chat-key" data-chat-char="d" type="button">D</button><button class="chat-key" data-chat-char="f" type="button">F</button><button class="chat-key" data-chat-char="g" type="button">G</button><button class="chat-key" data-chat-char="h" type="button">H</button><button class="chat-key" data-chat-char="j" type="button">J</button><button class="chat-key" data-chat-char="k" type="button">K</button><button class="chat-key" data-chat-char="l" type="button">L</button>
+</div>
+<div class="chat-key-row">
+<button class="chat-key chat-key-wide" data-chat-action="shift" id="chatShiftBtn" type="button">SHIFT</button><button class="chat-key" data-chat-char="z" type="button">Z</button><button class="chat-key" data-chat-char="x" type="button">X</button><button class="chat-key" data-chat-char="c" type="button">C</button><button class="chat-key" data-chat-char="v" type="button">V</button><button class="chat-key" data-chat-char="b" type="button">B</button><button class="chat-key" data-chat-char="n" type="button">N</button><button class="chat-key" data-chat-char="m" type="button">M</button><button aria-label="Backspace" class="chat-key chat-key-wide" data-chat-action="backspace" id="chatBackspaceBtn" type="button">⌫</button>
+</div>
+<div class="chat-key-row chat-key-row-bottom">
+<button class="chat-key chat-key-command" data-chat-action="cancel" type="button">CANCEL</button><button class="chat-key" data-chat-char="!" type="button">!</button><button class="chat-key chat-key-space" data-chat-action="space" type="button">SPACE</button><button class="chat-key" data-chat-char="?" type="button">?</button>
+</div>
+</div>
+</div>
+<section aria-label="Breach text editor" class="game-text-editor hide" id="gameTextEditor">
+<div class="game-text-editor-shell">
+<header><div><div class="eyebrow" id="gameTextEditorEyebrow">EDIT</div><h2 id="gameTextEditorTitle">Text</h2></div></header>
+<div class="game-text-editor-display"><span id="gameTextEditorValue"></span><span aria-hidden="true" class="chat-caret"></span><span class="game-text-editor-placeholder" id="gameTextEditorPlaceholder"></span></div>
+<div class="chat-keyboard game-text-keyboard" id="gameTextKeyboard">
+<div class="chat-key-row chat-key-row-numbers"><button class="chat-key" data-editor-char="1" type="button">1</button><button class="chat-key" data-editor-char="2" type="button">2</button><button class="chat-key" data-editor-char="3" type="button">3</button><button class="chat-key" data-editor-char="4" type="button">4</button><button class="chat-key" data-editor-char="5" type="button">5</button><button class="chat-key" data-editor-char="6" type="button">6</button><button class="chat-key" data-editor-char="7" type="button">7</button><button class="chat-key" data-editor-char="8" type="button">8</button><button class="chat-key" data-editor-char="9" type="button">9</button><button class="chat-key" data-editor-char="0" type="button">0</button></div>
+<div class="chat-key-row"><button class="chat-key" data-editor-char="q" type="button">Q</button><button class="chat-key" data-editor-char="w" type="button">W</button><button class="chat-key" data-editor-char="e" type="button">E</button><button class="chat-key" data-editor-char="r" type="button">R</button><button class="chat-key" data-editor-char="t" type="button">T</button><button class="chat-key" data-editor-char="y" type="button">Y</button><button class="chat-key" data-editor-char="u" type="button">U</button><button class="chat-key" data-editor-char="i" type="button">I</button><button class="chat-key" data-editor-char="o" type="button">O</button><button class="chat-key" data-editor-char="p" type="button">P</button></div>
+<div class="chat-key-row chat-key-row-middle"><button class="chat-key" data-editor-char="a" type="button">A</button><button class="chat-key" data-editor-char="s" type="button">S</button><button class="chat-key" data-editor-char="d" type="button">D</button><button class="chat-key" data-editor-char="f" type="button">F</button><button class="chat-key" data-editor-char="g" type="button">G</button><button class="chat-key" data-editor-char="h" type="button">H</button><button class="chat-key" data-editor-char="j" type="button">J</button><button class="chat-key" data-editor-char="k" type="button">K</button><button class="chat-key" data-editor-char="l" type="button">L</button></div>
+<div class="chat-key-row"><button class="chat-key chat-key-wide" data-editor-action="shift" id="gameTextShiftBtn" type="button">SHIFT</button><button class="chat-key" data-editor-char="z" type="button">Z</button><button class="chat-key" data-editor-char="x" type="button">X</button><button class="chat-key" data-editor-char="c" type="button">C</button><button class="chat-key" data-editor-char="v" type="button">V</button><button class="chat-key" data-editor-char="b" type="button">B</button><button class="chat-key" data-editor-char="n" type="button">N</button><button class="chat-key" data-editor-char="m" type="button">M</button><button class="chat-key chat-key-wide" data-editor-action="backspace" type="button">⌫</button></div>
+<div class="chat-key-row chat-key-row-bottom"><button class="chat-key chat-key-command" id="gameTextEditorCancel" data-editor-action="cancel" type="button">CANCEL</button><button class="chat-key" data-editor-char="-" type="button">-</button><button class="chat-key chat-key-space" data-editor-action="space" type="button">SPACE</button><button class="chat-key chat-key-command chat-key-send" data-editor-action="done" type="button">SAVE</button></div>
+</div>
+</div>
+</section><section aria-label="Enter Breach" class="entry-screen" id="entryScreen">
+<div class="entry-card">
+<div class="entry-mark"><svg class="brand-icon"><use href="#i-mark"></use></svg></div>
+<div class="entry-brand">BREACH</div>
+<div class="entry-version" data-app-version=""></div>
+<button class="entry-button" id="enterFullscreenBtn" type="button"><svg class="ui-icon"><use href="#i-full"></use></svg><span>ENTER FULLSCREEN</span></button>
+<div class="entry-status" id="entryStatus">Fullscreen opens the game in landscape.</div>
+</div>
+</section>
+<section aria-label="Rotate to landscape" class="rotate-gate hide" id="rotateGate">
+<div class="rotate-card">
+<div aria-hidden="true" class="rotate-phone"><span></span></div>
+<div><div class="eyebrow">FULLSCREEN ACTIVE</div><h1>Rotate to landscape</h1><p>Breach uses landscape after you enter fullscreen.</p></div>
+</div>
+</section>
+<section aria-label="Breach main menu" class="menu-screen hide" id="menu">
+<div class="front-shell" data-deploy-mode="create" id="menuShell">
+<header class="front-header">
+<div class="menu-brand">
+<div class="menu-logo"><svg class="brand-icon"><use href="#i-mark"></use></svg></div>
+<div><strong>BREACH</strong><span data-app-version=""></span></div>
+</div>
+<div class="front-profile">
+<label><span>CALLSIGN</span><button class="input game-text-field" data-game-control="text" data-maxlength="18" data-placeholder="Player" data-text-mode="callsign" data-value="" id="nameInput" type="button"><span class="game-control-value" data-control-value="">Player</span></button></label>
+</div>
+<div class="menu-actions">
+<button aria-label="Mute all audio" class="square-btn" id="musicBtn"><svg class="ui-icon"><use href="#i-sound" id="musicIconUse"></use></svg></button>
+<button aria-label="Settings" class="square-btn" id="settingsBtn"><svg class="ui-icon"><use href="#i-settings"></use></svg></button>
+</div>
+</header>
+<div class="front-body">
+<nav aria-label="Multiplayer menu" class="front-nav" data-controller-primary-tabs="true" role="tablist">
+<button aria-selected="true" class="front-nav-button active" data-deploy-tab="create" role="tab" type="button"><svg class="ui-icon"><use href="#i-plus"></use></svg><span><strong>HOST</strong><small>Create a new match room</small></span></button>
+<button aria-selected="false" class="front-nav-button" data-deploy-tab="join" role="tab" type="button"><svg class="ui-icon"><use href="#i-enter"></use></svg><span><strong>JOIN</strong><small>Enter a private room code</small></span></button>
+<button aria-selected="false" class="front-nav-button" data-deploy-tab="live" role="tab" type="button"><span class="live-dot"></span><span><strong>BROWSE</strong><small>Find open matches</small></span><b class="tab-count" id="matchCount"></b></button>
+</nav>
+<section class="front-content">
+<div aria-hidden="false" class="deploy-view front-create" data-deploy-view="create">
+<div class="front-hero">
+<div><div class="eyebrow">MULTIPLAYER</div><h1>Create a lobby</h1><p>Create the room first. Set your team and loadout, configure match rules, then deploy when everyone is ready.</p></div>
+<button class="deploy-button primary" id="createBtn"><svg class="ui-icon"><use href="#i-plus"></use></svg><span>CREATE LOBBY</span></button>
+</div>
+</div>
+<div aria-hidden="true" class="deploy-view front-join" data-deploy-view="join" hidden="" inert="">
+<div class="join-panel"><div><div class="eyebrow">PRIVATE MATCH</div><h1>Join by code</h1><p>Enter the four-character room code from the host.</p></div><div class="join-controls"><button aria-label="Match code" class="input code-input game-text-field" data-game-control="text" data-maxlength="4" data-placeholder="ABCD" data-text-mode="code" data-value="" id="codeInput" type="button"><span class="game-control-value" data-control-value="">ABCD</span></button><button class="deploy-button primary" id="joinBtn"><svg class="ui-icon"><use href="#i-enter"></use></svg><span>JOIN LOBBY</span></button></div></div>
+</div>
+<div aria-hidden="true" class="deploy-view front-live" data-deploy-view="live" hidden="" inert="">
+<div class="live-toolbar"><div><div class="eyebrow">PUBLIC ROOMS</div><h1>Live matches</h1></div><button class="small-btn" id="refreshBtn" type="button"><svg class="mini-icon"><use href="#i-refresh"></use></svg><span>REFRESH</span></button></div>
+<div aria-live="polite" class="match-list" id="matchList"><div class="empty">Loading live matches…</div></div>
+</div>
+</section>
+</div>
+<footer aria-live="polite" class="menu-status" id="menuStatus" role="status">Ready.</footer>
+</div>
+</section>
+<section aria-label="Match lobby" class="lobby-screen hide" id="lobbyScreen">
+<div class="lobby-shell">
+<header class="lobby-header">
+<div class="lobby-title">
+<div class="eyebrow">MATCH LOBBY</div>
+<div class="lobby-room-line"><h1 id="lobbyRoomCode">----</h1><span class="lobby-mode-badge" id="lobbyModeBadge">TEAM DEATHMATCH</span><span class="lobby-version" data-app-version=""></span></div>
+<p id="lobbyModeDescription">Teams compete for the elimination limit.</p>
+</div>
+<div class="lobby-header-actions">
+<button aria-label="Player settings" class="square-btn" id="lobbySettingsBtn"><svg class="ui-icon"><use href="#i-settings"></use></svg></button>
+<button class="secondary-btn" id="lobbyCopyBtn"><svg class="mini-icon"><use href="#i-copy"></use></svg><span>INVITE</span></button>
+<button class="secondary-btn danger" id="lobbyLeaveBtn"><svg class="mini-icon"><use href="#i-exit"></use></svg><span>LEAVE LOBBY</span></button>
+</div>
+</header>
+<div class="lobby-main">
+<div class="lobby-side-stack">
+<div aria-label="Lobby panels" class="lobby-side-tabs" data-controller-primary-tabs="true" role="tablist">
+<button aria-selected="true" class="lobby-side-tab active" data-lobby-side-tab="players" role="tab" type="button">PLAYERS</button>
+<button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="match" role="tab" type="button">MATCH</button>
+<button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="map" role="tab" type="button">MAP</button>
+<button aria-selected="false" class="lobby-side-tab" data-lobby-side-tab="loadout" role="tab" type="button">LOADOUT</button>
+<button aria-selected="false" class="lobby-side-tab hide" data-lobby-side-tab="cheats" role="tab" id="lobbyCheatsTab" type="button">CHEATS</button>
+</div>
+<section class="lobby-side-view lobby-roster-panel active" data-lobby-side-view="players">
+<div class="lobby-section-head"><div><h2>Roster</h2></div><div class="lobby-roster-actions"><span class="lobby-count" id="lobbyPlayerCount">1 / 8</span></div></div>
+<div class="lobby-roster-team-control" id="lobbyTeamGroup">
+<span>YOUR TEAM</span>
+<div class="lobby-team-picker"><button class="lobby-team-choice blue" data-lobby-team-choice="blue" type="button"><i></i><strong>BLUE</strong></button><button class="lobby-team-choice red" data-lobby-team-choice="red" type="button"><i></i><strong>RED</strong></button></div>
+</div>
+<div class="lobby-roster" id="lobbyRoster"></div>
+</section>
+<div class="lobby-side-view" data-lobby-side-view="match" hidden="">
+<section class="lobby-setup-panel">
+<div class="lobby-section-head"><div><h2>Match setup</h2></div><span class="lobby-secondary" id="lobbySetupOwnerLabel">Host controls</span></div>
+<div class="lobby-host-setup hide" id="lobbyHostSetup">
+<div class="lobby-match-grid">
+<section class="lobby-match-card lobby-match-rules-card">
+<div class="lobby-card-title"><strong>RULES</strong></div>
+<div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button data-lobby-mode-choice="tdm" type="button">TEAM DEATHMATCH</button><button data-lobby-mode-choice="ffa" type="button">FREE FOR ALL</button><button data-lobby-mode-choice="sandbox" type="button">SANDBOX</button></div></div>
+<div class="lobby-setup-row lobby-rules-row">
+<label><span>MINIMAP</span><div aria-label="Minimap mode" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"standard","label":"Standard"},{"value":"all","label":"Always On"},{"value":"directional","label":"Directional"}]' data-value="standard" id="lobbyMinimapMode" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Standard</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label id="lobbyScoreWrap"><span>SCORE LIMIT</span><div class="input game-control game-stepper" data-game-control="stepper" data-max="100" data-min="5" data-step="5" data-value="5" id="lobbyScoreLimit" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">5</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label>
+<label id="lobbyTimeWrap"><span>TIME LIMIT</span><div class="input game-control game-stepper" data-game-control="stepper" data-max="30" data-min="2" data-step="1" data-value="2" id="lobbyTimeLimit" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">2</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label>
+</div>
+</section>
+<section class="lobby-match-card lobby-match-bots-card">
+<div class="lobby-card-title"><strong>BOTS</strong><small>Opponents &amp; teams</small></div>
+<div class="lobby-setup-row lobby-bots-row">
+<label id="lobbyBlueBotWrap"><span>BLUE BOTS</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"0","label":"0"},{"value":"1","label":"1"},{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"5","label":"5"},{"value":"6","label":"6"},{"value":"7","label":"7"},{"value":"8","label":"8"}]' data-value="0" id="lobbyBlueBotCount" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">0</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label id="lobbyRedBotWrap"><span>RED BOTS</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"0","label":"0"},{"value":"1","label":"1"},{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"5","label":"5"},{"value":"6","label":"6"},{"value":"7","label":"7"},{"value":"8","label":"8"}]' data-value="0" id="lobbyRedBotCount" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">0</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label class="hide" id="lobbyFfaBotWrap"><span>BOTS</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"0","label":"0"},{"value":"1","label":"1"},{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"5","label":"5"},{"value":"6","label":"6"},{"value":"7","label":"7"},{"value":"8","label":"8"}]' data-value="0" id="lobbyFfaBotCount" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">0</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label><span>DIFFICULTY</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"easy","label":"Easy"},{"value":"normal","label":"Normal"},{"value":"hard","label":"Hard"},{"value":"elite","label":"Elite"}]' data-value="easy" id="lobbyBotDifficulty" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Easy</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+</div>
+</section>
+</div>
 
-<main id="appRoot" class="app-root">
-  <div id="gameStage" class="game-stage"><canvas id="game" draggable="false" aria-label="Breach gameplay"></canvas></div>
+</div>
+<div class="lobby-guest-setup" id="lobbyGuestSetup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><span id="lobbyGuestRules">First 30 · 8 min</span><small>The host controls match rules. You can change your team and loadout while you wait.</small></div>
+</section>
+</div>
+<div class="lobby-side-view lobby-map-view" data-lobby-side-view="map" hidden="">
+<section class="lobby-map-panel">
+<div class="lobby-map-toolbar">
+<div><h2>Map selection</h2><p id="lobbyMapDescription">Select a level. Changes save automatically.</p></div>
+<div class="lobby-map-choice-grid" aria-label="Map selection">
+<button class="lobby-map-choice" data-lobby-map-choice="highlands" type="button"><strong>HIGHLANDS</strong><small>Open terrain</small></button>
+<button class="lobby-map-choice" data-lobby-map-choice="depot" type="button"><strong>FREIGHT DEPOT</strong><small>Industrial lanes</small></button>
+<button class="lobby-map-choice" data-lobby-map-choice="yard" type="button"><strong>CONTAINER YARD</strong><small>Dense cover</small></button>
+<button class="lobby-map-choice" data-lobby-map-choice="rig" type="button"><strong>DUST RIG</strong><small>Close quarters</small></button>
+</div>
+</div>
+<div class="lobby-map-canvas-wrap"><canvas aria-label="Full map overview" id="lobbyMapPreview"></canvas><div class="lobby-map-legend"><span><i class="map-legend-building"></i>STRUCTURE</span><span><i class="map-legend-natural"></i>TERRAIN / COVER</span><span>NORTH ↑</span></div></div>
 
-  <section id="entryScreen" class="entry-screen" aria-label="Enter Breach">
-    <div class="entry-card">
-      <div class="entry-mark"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
-      <div class="entry-brand">BREACH</div>
-      <div class="entry-version" data-app-version></div>
-      <button id="enterFullscreenBtn" class="entry-button" type="button"><svg class="ui-icon"><use href="#i-full"/></svg><span>ENTER FULLSCREEN</span></button>
-      <div id="entryStatus" class="entry-status">Fullscreen opens the game in landscape.</div>
-    </div>
-  </section>
+</section>
+</div>
+<div class="lobby-side-view lobby-loadout-view" data-lobby-side-view="loadout" hidden="">
+<section class="lobby-loadout-panel">
+<div class="lobby-section-head"><div><h2>Your loadout</h2></div></div>
+<div class="lobby-loadout-body">
+<div class="loadout-section"><span>PRIMARY</span><div class="loadout-choice-grid primary-grid">
+<button class="loadout-choice" data-lobby-primary-choice="assault" type="button"><strong>ASSAULT RIFLE</strong></button>
+<button class="loadout-choice" data-lobby-primary-choice="ump" type="button"><strong>UMP</strong></button>
+<button class="loadout-choice" data-lobby-primary-choice="shotgun" type="button"><strong>PUMP SHOTGUN</strong></button>
+<button class="loadout-choice" data-lobby-primary-choice="semiShotgun" type="button"><strong>SEMI-AUTO SHOTGUN</strong></button>
+<button class="loadout-choice" data-lobby-primary-choice="sniper" type="button"><strong>SNIPER</strong></button>
+<button class="loadout-choice" data-lobby-primary-choice="grenadeLauncher" type="button"><strong>NOOB TUBE</strong></button>
+<button class="loadout-choice" data-lobby-primary-choice="rpg" type="button"><strong>RPG</strong></button>
+</div></div>
+<div class="loadout-columns">
+<div class="loadout-section"><span>SECONDARY</span><div class="loadout-fixed"><strong>PISTOL</strong></div></div>
+<div class="loadout-section"><span>TACTICAL</span><div class="loadout-choice-grid equipment-grid"><button class="loadout-choice" data-lobby-tactical-choice="flash" type="button"><strong>FLASHBANG</strong></button><button class="loadout-choice" data-lobby-tactical-choice="smoke" type="button"><strong>SMOKE</strong></button></div></div>
+<div class="loadout-section"><span>LETHAL</span><div class="loadout-choice-grid equipment-grid"><button class="loadout-choice" data-lobby-lethal-choice="sticky" type="button"><strong>SEMTEX</strong></button><button class="loadout-choice" data-lobby-lethal-choice="frag" type="button"><strong>FRAG</strong></button></div></div>
+</div>
+</div>
 
-  <section id="rotateGate" class="rotate-gate hide" aria-label="Rotate to landscape">
-    <div class="rotate-card">
-      <div class="rotate-phone" aria-hidden="true"><span></span></div>
-      <div><div class="eyebrow">FULLSCREEN ACTIVE</div><h1>Rotate to landscape</h1><p>Breach uses landscape after you enter fullscreen.</p></div>
-    </div>
-  </section>
-
-  <section id="menu" class="menu-screen hide" aria-label="Breach main menu">
-    <div id="menuShell" class="front-shell" data-deploy-mode="create">
-      <header class="front-header">
-        <div class="menu-brand">
-          <div class="menu-logo"><svg class="brand-icon"><use href="#i-mark"/></svg></div>
-          <div><strong>BREACH</strong><span data-app-version></span></div>
-        </div>
-        <div class="front-profile">
-          <label><span>CALLSIGN</span><input id="nameInput" class="input" maxlength="18" autocomplete="nickname" placeholder="Player"></label>
-        </div>
-        <div class="menu-actions">
-          <button id="musicBtn" class="square-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="musicIconUse" href="#i-sound"/></svg></button>
-          <button id="settingsBtn" class="square-btn" title="Settings" aria-label="Settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button>
-          <button id="exitAppBtn" class="square-btn" title="Exit fullscreen" aria-label="Exit fullscreen"><svg class="ui-icon"><use href="#i-exit"/></svg></button>
-        </div>
-      </header>
-
-      <div class="front-body">
-        <nav class="front-nav" aria-label="Multiplayer menu">
-          <button type="button" class="front-nav-button active" data-deploy-tab="create" aria-selected="true"><svg class="ui-icon"><use href="#i-plus"/></svg><span><strong>CREATE LOBBY</strong><small>Open a new match room</small></span></button>
-          <button type="button" class="front-nav-button" data-deploy-tab="join" aria-selected="false"><svg class="ui-icon"><use href="#i-enter"/></svg><span><strong>JOIN PRIVATE</strong><small>Enter a room code</small></span></button>
-          <button type="button" class="front-nav-button" data-deploy-tab="live" aria-selected="false"><span class="live-dot"></span><span><strong>LIVE MATCHES</strong><small>Browse open rooms</small></span><b id="matchCount" class="tab-count"></b></button>
-        </nav>
-
-        <section class="front-content">
-          <div class="deploy-view front-create" data-deploy-view="create" aria-hidden="false">
-            <div class="front-hero">
-              <div><div class="eyebrow">MULTIPLAYER</div><h1>Create a lobby</h1><p>Create the room first. Game mode, bots, teams, loadouts, God Mode and match rules are configured together inside the lobby.</p></div>
-              <button id="createBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-plus"/></svg><span>CREATE LOBBY</span></button>
-            </div>
-          </div>
-
-          <div class="deploy-view front-join" data-deploy-view="join" hidden inert aria-hidden="true">
-            <div class="join-panel"><div><div class="eyebrow">PRIVATE MATCH</div><h1>Join by code</h1><p>Enter the four-character room code from the host.</p></div><div class="join-controls"><input id="codeInput" class="input code-input" maxlength="4" autocapitalize="characters" autocomplete="off" placeholder="ABCD" aria-label="Match code"><button id="joinBtn" class="deploy-button primary"><svg class="ui-icon"><use href="#i-enter"/></svg><span>JOIN LOBBY</span></button></div></div>
-          </div>
-
-          <div class="deploy-view front-live" data-deploy-view="live" hidden inert aria-hidden="true">
-            <div class="live-toolbar"><div><div class="eyebrow">PUBLIC ROOMS</div><h1>Live matches</h1></div><button id="refreshBtn" type="button" class="small-btn"><svg class="mini-icon"><use href="#i-refresh"/></svg><span>REFRESH</span></button></div>
-            <div id="matchList" class="match-list" aria-live="polite"><div class="empty">Loading live matches…</div></div>
-          </div>
-        </section>
-      </div>
-      <footer id="menuStatus" class="menu-status" role="status" aria-live="polite">Ready.</footer>
-    </div>
-  </section>
-
-  <section id="lobbyScreen" class="lobby-screen hide" aria-label="Match lobby">
-    <div class="lobby-shell">
-      <header class="lobby-header">
-        <div class="lobby-title">
-          <div class="eyebrow">MATCH LOBBY</div>
-          <div class="lobby-room-line"><h1 id="lobbyRoomCode">----</h1><span id="lobbyModeBadge" class="lobby-mode-badge">TEAM DEATHMATCH</span><span class="lobby-version" data-app-version></span></div>
-          <p id="lobbyModeDescription">Teams compete for the elimination limit.</p>
-        </div>
-        <div class="lobby-header-actions">
-          <button id="lobbyMusicBtn" class="square-btn" title="Mute all audio" aria-label="Mute all audio"><svg class="ui-icon"><use id="lobbyMusicIconUse" href="#i-sound"/></svg></button>
-          <button id="lobbySettingsBtn" class="square-btn" title="Player settings" aria-label="Player settings"><svg class="ui-icon"><use href="#i-settings"/></svg></button>
-          <button id="lobbyExitFullscreenBtn" class="square-btn" title="Exit fullscreen" aria-label="Exit fullscreen"><svg class="ui-icon"><use href="#i-exit"/></svg></button>
-          <button id="lobbyCopyBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-copy"/></svg><span>INVITE</span></button>
-          <button id="lobbyLeaveBtn" class="secondary-btn danger"><svg class="mini-icon"><use href="#i-exit"/></svg><span>LEAVE</span></button>
-        </div>
-      </header>
-
-      <div class="lobby-main">
-        <section class="lobby-roster-panel">
-          <div class="lobby-section-head"><div><span class="eyebrow">PLAYERS</span><h2>Roster</h2></div><div class="lobby-roster-actions"><span id="lobbyPlayerCount" class="lobby-count">1 / 8</span><button id="lobbyManagePlayersBtn" type="button" class="lobby-manage-players hide">MANAGE</button></div></div>
-          <div id="lobbyRoster" class="lobby-roster"></div>
-        </section>
-
-        <div class="lobby-side-stack">
-          <section class="lobby-operator-panel">
-            <div class="lobby-section-head"><div><span class="eyebrow">YOUR OPERATOR</span><h2>Loadout</h2></div><span class="lobby-secondary">Pistol secondary</span></div>
-            <div id="lobbyTeamGroup" class="lobby-control-group compact-group"><span>TEAM</span><div class="lobby-team-picker"><button type="button" class="lobby-team-choice blue" data-lobby-team-choice="blue"><i></i><strong>BLUE</strong></button><button type="button" class="lobby-team-choice red" data-lobby-team-choice="red"><i></i><strong>RED</strong></button></div></div>
-            <div class="lobby-control-group compact-group"><span>PRIMARY</span><div class="lobby-loadout-picker"><button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="assault" aria-label="Assault Rifle"><b>AR</b><strong>ASSAULT</strong></button><button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="shotgun" aria-label="Shotgun"><b>SG</b><strong>SHOTGUN</strong></button><button type="button" class="lobby-loadout-choice" data-lobby-primary-choice="sniper" aria-label="Sniper Rifle"><b>SR</b><strong>SNIPER</strong></button></div></div>
-            <div id="lobbyGodWrap" class="lobby-control-group compact-group hide"><button id="lobbyGodBtn" type="button" class="lobby-god-button" aria-pressed="false"><svg class="mini-icon"><use href="#i-shield"/></svg><strong>GOD MODE</strong><b id="lobbyGodState">OFF</b></button></div>
-          </section>
-
-          <section class="lobby-setup-panel">
-            <div class="lobby-section-head"><div><span class="eyebrow">MATCH SETUP</span><h2>Rules</h2></div><span id="lobbySetupOwnerLabel" class="lobby-secondary">Admin controls</span></div>
-            <div id="lobbyHostSetup" class="lobby-host-setup hide">
-              <div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button type="button" data-lobby-mode-choice="tdm">TDM</button><button type="button" data-lobby-mode-choice="ffa">FFA</button><button type="button" data-lobby-mode-choice="sandbox">SANDBOX</button></div></div>
-              <div class="lobby-setup-row">
-                <label id="lobbyBlueBotWrap"><span>BLUE BOTS</span><select id="lobbyBlueBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-                <label id="lobbyRedBotWrap"><span>RED BOTS</span><select id="lobbyRedBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-                <label id="lobbyFfaBotWrap" class="hide"><span>BOTS</span><select id="lobbyFfaBotCount" class="input"><option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option></select></label>
-                <label><span>DIFFICULTY</span><select id="lobbyBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label>
-                <label><span>MINIMAP</span><select id="lobbyMinimapMode" class="input"><option value="standard">Standard</option><option value="all">Show Everyone</option></select></label>
-              </div>
-              <div id="lobbyRuleSummary" class="lobby-rule-summary">First 30 · 8 min</div><button id="lobbyMatchSettingsBtn" class="secondary-btn lobby-match-settings"><svg class="mini-icon"><use href="#i-settings"/></svg><span>ADVANCED MATCH SETTINGS</span></button>
-            </div>
-            <div id="lobbyGuestSetup" class="lobby-guest-setup"><strong id="lobbyGuestMode">TEAM DEATHMATCH</strong><span id="lobbyGuestBots">0 bots · Normal</span><span id="lobbyGuestRules">First 30 · 8 min</span><small>A lobby admin controls match rules. You can change your team and loadout while you wait.</small></div>
-          </section>
-        </div>
-      </div>
-
-      <footer class="lobby-footer">
-        <div><strong id="lobbyStatus">Waiting in lobby</strong><span id="lobbyHint">Choose your team and loadout.</span></div>
-        <button id="lobbyStartBtn" class="primary lobby-start hide"><svg class="ui-icon"><use href="#i-play"/></svg><span>START MATCH</span></button>
-      </footer>
-    </div>
-  </section>
-
-  <section id="connectionOverlay" class="connection-overlay hide" aria-live="polite" aria-label="Connecting">
-    <div class="connection-card"><div class="spinner" aria-hidden="true"></div><div><div class="eyebrow">CONNECTING</div><h2>Stand by</h2><p id="connectionText">Preparing game…</p></div></div>
-  </section>
-
-  <section id="pause" class="pause-screen hide" aria-label="Match menu">
-    <div class="pause-card">
-      <header><div><div class="eyebrow">PAUSED</div><h1>Match menu</h1><div class="pause-context"><span id="pauseRoom">Match ----</span><span id="pauseLoadout">Assault Rifle + Pistol</span></div></div><span id="pauseTeamBadge" class="pause-team">BLUE TEAM</span></header>
-      <button id="resumeBtn" class="resume-btn primary"><svg class="ui-icon"><use href="#i-play"/></svg><span>RESUME</span></button>
-      <div class="pause-actions">
-        <button id="pauseSettingsBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-settings"/></svg><span>Settings</span></button>
-        <button id="teamSwitchBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-team"/></svg><span id="teamSwitchText">Switch on Respawn</span></button>
-        <button id="adminBtn" class="secondary-btn hide"><svg class="mini-icon"><use href="#i-shield"/></svg><span>Match Control</span></button>
-        <button id="copyBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-copy"/></svg><span>Invite</span></button>
-        <button id="fullBtn" class="secondary-btn"><svg class="mini-icon"><use href="#i-exit"/></svg><span>Exit Fullscreen</span></button>
-        <button id="leaveBtn" class="secondary-btn danger"><svg class="mini-icon"><use href="#i-exit"/></svg><span>Leave Match</span></button>
-      </div>
-    </div>
-  </section>
-
-  <section id="settingsPanel" class="modal-screen hide" aria-label="Player settings">
-    <div class="modal-shell settings-shell">
-      <header class="modal-head"><div><div class="eyebrow">PLAYER</div><h2>Settings</h2><p>Saved on this device and applied immediately.</p></div><button id="settingsCloseBtn" class="square-btn" aria-label="Close settings"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
-      <div class="settings-grid player-settings-grid">
-        <label class="setting"><span>Look sensitivity</span><input id="playerLookSensitivity" type="range" min="0.5" max="2" step="0.05"><output id="playerLookSensitivityValue"></output></label>
-        <label class="setting"><span>ADS sensitivity</span><input id="playerAdsSensitivity" type="range" min="0.35" max="1.25" step="0.05"><output id="playerAdsSensitivityValue"></output></label>
-        <label class="setting"><span>Touch sensitivity</span><input id="playerTouchSensitivity" type="range" min="0.5" max="2" step="0.05"><output id="playerTouchSensitivityValue"></output></label>
-        <label class="setting"><span>Master volume</span><input id="playerMasterVolume" type="range" min="0" max="1" step="0.05"><output id="playerMasterVolumeValue"></output></label>
-        <label class="setting"><span>SFX volume</span><input id="playerSfxVolume" type="range" min="0" max="1" step="0.05"><output id="playerSfxVolumeValue"></output></label>
-        <label class="setting"><span>Music volume</span><input id="playerMusicVolume" type="range" min="0" max="1" step="0.05"><output id="playerMusicVolumeValue"></output></label>
-        <label class="setting select-setting"><span>Graphics</span><select id="playerGraphics" class="input"><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></label>
-      </div>
-      <footer class="modal-foot"><span></span><button id="settingsDefaultsBtn" class="secondary-btn">Defaults</button><button id="settingsDoneBtn" class="primary modal-action">Done</button></footer>
-    </div>
-  </section>
-
-  <section id="adminPanel" class="modal-screen hide" aria-label="Match control">
-    <div class="modal-shell admin-shell" data-page="match">
-      <header class="modal-head"><div><div id="adminEyebrow" class="eyebrow">CUSTOM MATCH</div><h2 id="adminTitle">Match control</h2><p id="adminDescription">Server-authoritative room settings.</p></div><button id="adminCloseBtn" class="square-btn" aria-label="Close match control"><svg class="ui-icon"><use href="#i-close"/></svg></button></header>
-      <div class="admin-tabs" role="tablist"><button class="admin-tab active" data-admin-tab="match">SCORE / TIME</button><button class="admin-tab" data-admin-tab="gameplay">GAMEPLAY</button><button class="admin-tab" data-admin-tab="advanced">WEAPONS</button><button class="admin-tab" data-admin-tab="bots">BOTS</button><button class="admin-tab" data-admin-tab="players">PLAYERS</button></div>
-      <div id="adminMatch" class="admin-page" data-admin-page="match"><div class="settings-grid"><label class="setting"><span>Score limit</span><input id="setScoreLimit" type="number" min="5" max="100" step="5"></label><label class="setting"><span>Time limit (minutes)</span><input id="setTimeLimit" type="number" min="2" max="30" step="1"></label></div><div id="adminMatchNote" class="admin-note">Team Deathmatch: first team to 30 eliminations or highest score after 8 minutes.</div></div>
-      <div id="adminGameplay" class="admin-page hide" data-admin-page="gameplay"><div class="settings-grid"><label class="setting"><span>Run speed</span><input id="setRunSpeed" type="number" min="3" max="16" step="0.1"></label><label class="setting"><span>ADS walk speed</span><input id="setWalkSpeed" type="number" min="1.5" max="9" step="0.1"></label><label class="setting"><span>Jump height</span><input id="setJumpHeight" type="number" min="0.4" max="5" step="0.1"></label><label class="setting"><span>Gravity</span><input id="setGravity" type="number" min="8" max="40" step="1"></label><label class="setting"><span>Health regen delay (s)</span><input id="setRegenDelay" type="number" min="0" max="15" step="0.5"></label><label class="setting"><span>Health regen / second</span><input id="setRegenRate" type="number" min="0" max="30" step="0.5"></label><label class="setting"><span>Respawn delay (s)</span><input id="setRespawnDelay" type="number" min="1" max="10" step="0.1"></label></div></div>
-      <div id="adminAdvanced" class="admin-page hide" data-admin-page="advanced"><div class="weapon-settings-grid">
-        <section class="weapon-settings-card"><strong>PISTOL</strong><label>Damage<input id="setPistolDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setPistolSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setPistolReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setPistolCooldown" type="number" min="24" max="1200" step="5"></label></section>
-        <section class="weapon-settings-card assault"><strong>ASSAULT RIFLE</strong><label>Damage<input id="setAssaultDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setAssaultSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setAssaultReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setAssaultCooldown" type="number" min="24" max="1200" step="5"></label></section>
-        <section class="weapon-settings-card"><strong>SHOTGUN</strong><label>Pellet damage<input id="setShotgunDamage" type="number" min="1" max="100" step="1"></label><label>Projectile velocity<input id="setShotgunSpeed" type="number" min="10" max="200" step="1"></label><label>Reload time (s)<input id="setShotgunReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setShotgunCooldown" type="number" min="24" max="600" step="5"></label></section>
-        <section class="weapon-settings-card sniper"><strong>SNIPER</strong><label>Damage<input id="setSniperDamage" type="number" min="1" max="400" step="1"></label><label>Projectile velocity<input id="setSniperSpeed" type="number" min="10" max="400" step="1"></label><label>Reload time (s)<input id="setSniperReload" type="number" min="0.1" max="5" step="0.05"></label><label>Rate (RPM)<input id="setSniperCooldown" type="number" min="24" max="1200" step="5"></label></section>
-      </div></div>
-      <div id="adminBots" class="admin-page hide" data-admin-page="bots"><div class="settings-grid"><label id="adminBlueBotsWrap" class="setting"><span>Blue bots</span><input id="setBlueBots" type="number" min="0" max="8" step="1"></label><label id="adminRedBotsWrap" class="setting"><span>Red bots</span><input id="setRedBots" type="number" min="0" max="8" step="1"></label><label id="adminFfaBotsWrap" class="setting hide"><span>Bots</span><input id="setFfaBots" type="number" min="0" max="8" step="1"></label><label class="setting"><span>Difficulty</span><select id="setBotDifficulty" class="input"><option value="easy">Easy</option><option value="normal">Normal</option><option value="hard">Hard</option><option value="elite">Elite</option></select></label><div class="setting"><span>Difficulty effect</span><div id="botDifficultyHelp" class="difficulty-help"></div></div></div></div>
-      <div id="adminPlayers" class="admin-page hide" data-admin-page="players"><div id="adminPlayerList" class="admin-player-list"></div></div>
-      <footer class="modal-foot"><div id="adminStatus" class="admin-status" role="status" aria-live="polite">Standard match rules are active.</div><button id="adminResetBtn" class="secondary-btn">Reset tab</button><button id="adminSaveBtn" class="primary modal-action">Apply</button></footer>
-    </div>
-  </section>
+</section>
+</div>
+<div class="lobby-side-view lobby-cheats-view" data-lobby-side-view="cheats" hidden="">
+<section class="lobby-cheats-panel">
+<div class="lobby-section-head"><div><h2>Cheats</h2></div><span class="lobby-secondary">Host only</span></div>
+<div class="lobby-cheats-toolbar">
+<div class="lobby-god-control"><div><strong>GOD MODE</strong><small>Invincibility, unlimited ammo, and instant team/loadout changes.</small></div><button aria-checked="false" aria-label="Toggle God Mode" class="switch-toggle" id="lobbyGodModeToggle" role="switch" type="button"><span></span></button></div>
+<div aria-label="Cheat categories" class="lobby-cheat-tabs" role="tablist"><button aria-selected="true" class="lobby-cheat-tab active" data-lobby-cheat-tab="gameplay" role="tab" type="button">GAMEPLAY</button><button aria-selected="false" class="lobby-cheat-tab" data-lobby-cheat-tab="weapons" role="tab" type="button">WEAPONS</button></div>
+</div>
+<div class="lobby-cheat-pages">
+<div class="lobby-cheat-page lobby-gameplay-view active" data-lobby-cheat-page="gameplay">
+<section class="lobby-tuning-panel">
+<div class="lobby-section-head"><div><h2>Gameplay tuning</h2></div></div>
+<div class="lobby-host-control-mount lobby-gameplay-mount" id="lobbyGameplayHostMount"></div>
+</section>
+</div>
+<div class="lobby-cheat-page lobby-weapons-view" data-lobby-cheat-page="weapons" hidden="" inert="">
+<section class="lobby-weapons-panel">
+<div class="lobby-section-head"><div><h2>Weapon tuning</h2></div></div>
+<div class="lobby-host-control-mount lobby-weapons-mount" id="lobbyWeaponsHostMount"></div>
+</section>
+</div>
+</div>
+</section>
+</div>
+</div>
+</div>
+<footer class="lobby-footer">
+<div class="lobby-footer-copy"><strong id="lobbyStatus">Waiting in lobby</strong><span id="lobbyHint">Choose your team and loadout.</span></div>
+<div class="lobby-footer-actions">
+<button class="primary lobby-start hide" id="lobbyStartBtn"><svg class="ui-icon"><use href="#i-play"></use></svg><span>START MATCH</span></button>
+</div>
+</footer>
+</div>
+</section>
+<section aria-label="Connecting" aria-live="polite" class="connection-overlay hide" id="connectionOverlay">
+<div class="connection-card"><div aria-hidden="true" class="spinner"></div><div><div class="eyebrow">CONNECTING</div><h2>Stand by</h2><p id="connectionText">Preparing game…</p></div></div>
+</section>
+<section aria-label="Match menu" class="pause-screen hide" id="pause">
+<div class="pause-card">
+<header><div><div class="eyebrow">PAUSED</div><h1>Match menu</h1><div class="pause-context"><span id="pauseRoom">Match ----</span><span id="pauseLoadout">Assault Rifle + Pistol</span></div></div><span class="pause-team" id="pauseTeamBadge">BLUE TEAM</span></header>
+<button class="resume-btn primary" id="resumeBtn"><svg class="ui-icon"><use href="#i-play"></use></svg><span>RESUME MATCH</span></button>
+<div class="pause-section"><span>PLAYER</span><div class="pause-actions pause-actions-player">
+<button class="secondary-btn" id="pauseLoadoutBtn"><svg class="mini-icon"><use href="#i-loadout"></use></svg><span>Change Loadout</span></button>
+<button class="secondary-btn" id="teamSwitchBtn"><svg class="mini-icon"><use href="#i-team"></use></svg><span id="teamSwitchText">Switch on Respawn</span></button>
+<button class="secondary-btn" id="copyBtn"><svg class="mini-icon"><use href="#i-copy"></use></svg><span>Invite Players</span></button>
+</div></div>
+<div class="pause-section"><span>SYSTEM</span><div class="pause-actions pause-actions-system">
+<button class="secondary-btn" id="pauseSettingsBtn"><svg class="mini-icon"><use href="#i-settings"></use></svg><span>Settings</span></button>
+<button class="secondary-btn hide" id="adminBtn"><svg class="mini-icon"><use href="#i-shield"></use></svg><span>Host Control</span></button>
+</div></div>
+<div class="pause-leave"><button class="secondary-btn danger" id="leaveBtn"><svg class="mini-icon"><use href="#i-exit"></use></svg><span>Return to Lobby</span></button></div>
+</div>
+</section>
+<section aria-label="Change loadout" class="modal-screen hide" id="loadoutPanel">
+<div class="modal-shell loadout-shell">
+<header class="modal-head"><div><h2>Loadout</h2><p id="loadoutDescription">Changes are staged until Save. Your current life stays unchanged.</p></div></header>
+<div class="loadout-editor">
+<div class="loadout-section"><span>PRIMARY</span><div class="loadout-choice-grid primary-grid">
+<button class="loadout-choice" data-match-primary-choice="assault" type="button"><strong>ASSAULT RIFLE</strong></button>
+<button class="loadout-choice" data-match-primary-choice="ump" type="button"><strong>UMP</strong></button>
+<button class="loadout-choice" data-match-primary-choice="shotgun" type="button"><strong>PUMP SHOTGUN</strong></button>
+<button class="loadout-choice" data-match-primary-choice="semiShotgun" type="button"><strong>SEMI-AUTO SHOTGUN</strong></button>
+<button class="loadout-choice" data-match-primary-choice="sniper" type="button"><strong>SNIPER</strong></button>
+<button class="loadout-choice" data-match-primary-choice="grenadeLauncher" type="button"><strong>NOOB TUBE</strong></button>
+<button class="loadout-choice" data-match-primary-choice="rpg" type="button"><strong>RPG</strong></button>
+</div></div>
+<div class="loadout-columns">
+<div class="loadout-section"><span>SECONDARY</span><div class="loadout-fixed"><strong>PISTOL</strong></div></div>
+<div class="loadout-section"><span>TACTICAL</span><div class="loadout-choice-grid equipment-grid"><button class="loadout-choice" data-match-tactical-choice="flash" type="button"><strong>FLASHBANG</strong></button><button class="loadout-choice" data-match-tactical-choice="smoke" type="button"><strong>SMOKE</strong></button></div></div>
+<div class="loadout-section"><span>LETHAL</span><div class="loadout-choice-grid equipment-grid"><button class="loadout-choice" data-match-lethal-choice="sticky" type="button"><strong>SEMTEX</strong></button><button class="loadout-choice" data-match-lethal-choice="frag" type="button"><strong>FRAG</strong></button></div></div>
+</div>
+</div>
+<footer class="modal-foot loadout-foot"><span class="admin-status" id="loadoutStatus">Saved changes equip on your next spawn.</span><button class="secondary-btn" id="loadoutResetBtn">RESET</button><button class="secondary-btn" id="loadoutCancelBtn">CANCEL</button><button class="primary modal-action" id="loadoutSaveBtn">SAVE</button></footer>
+</div>
+</section>
+<section aria-label="Player settings" class="modal-screen hide" id="settingsPanel">
+<div class="modal-shell settings-shell">
+<header class="modal-head"><div><h2>Settings</h2><p>Changes are staged until Save.</p></div></header>
+<div aria-label="Settings categories" class="settings-tabs" data-controller-primary-tabs="true" role="tablist"><button aria-selected="true" class="settings-tab active" data-settings-tab="controls" role="tab" type="button">CONTROLS</button><button aria-selected="false" class="settings-tab" data-settings-tab="audio" role="tab" type="button">AUDIO</button><button aria-selected="false" class="settings-tab" data-settings-tab="display" role="tab" type="button">DISPLAY</button></div><div class="settings-categories player-settings-grid">
+<section class="settings-page active" data-settings-page="controls"><div class="settings-category-head"><h3>Aim &amp; input</h3></div><div class="settings-grid">
+<label class="setting"><span>Look sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="2" data-min="0.5" data-step="0.05" data-value="0.5" id="playerLookSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerLookSensitivityValue"></output></label>
+<label class="setting"><span>ADS sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="1.25" data-min="0.35" data-step="0.05" data-value="0.35" id="playerAdsSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerAdsSensitivityValue"></output></label>
+<label class="setting touch-setting"><span>Touch sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="2" data-min="0.5" data-step="0.05" data-value="0.5" id="playerTouchSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerTouchSensitivityValue"></output></label>
+</div><div class="settings-category-head"><h3>Controller aiming</h3></div><div class="settings-grid">
+<label class="setting"><span>Vertical sensitivity</span><div class="game-slider-control" data-game-control="slider" data-max="1.5" data-min="0.5" data-step="0.05" data-value="1" id="playerControllerVerticalSensitivity" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerControllerVerticalSensitivityValue"></output></label>
+<label class="setting select-setting"><span>Aim response curve</span><div aria-label="Aim response curve" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"dynamic","label":"Dynamic"},{"value":"standard","label":"Standard"},{"value":"linear","label":"Linear"}]' data-value="dynamic" id="playerControllerResponseCurve" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Dynamic</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label class="setting select-setting"><span>Aim assist</span><div aria-label="Aim assist" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"on","label":"On"},{"value":"off","label":"Off"}]' data-value="on" id="playerControllerAimAssist" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">On</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label class="setting"><span>Left stick min deadzone</span><div class="game-slider-control" data-game-control="slider" data-max="0.25" data-min="0.02" data-step="0.01" data-value="0.1" id="playerControllerMoveDeadzone" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerControllerMoveDeadzoneValue"></output></label>
+<label class="setting"><span>Right stick min deadzone</span><div class="game-slider-control" data-game-control="slider" data-max="0.25" data-min="0.02" data-step="0.01" data-value="0.07" id="playerControllerLookDeadzone" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerControllerLookDeadzoneValue"></output></label>
+</div></section>
+<section class="settings-page" data-settings-page="audio" hidden="" inert=""><div class="settings-category-head"><h3>Sound</h3></div><div class="settings-grid">
+<label class="setting"><span>Master volume</span><div class="game-slider-control" data-game-control="slider" data-max="1" data-min="0" data-step="0.05" data-value="0" id="playerMasterVolume" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerMasterVolumeValue"></output></label>
+<label class="setting"><span>SFX volume</span><div class="game-slider-control" data-game-control="slider" data-max="1" data-min="0" data-step="0.05" data-value="0" id="playerSfxVolume" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerSfxVolumeValue"></output></label>
+<label class="setting"><span>Music volume</span><div class="game-slider-control" data-game-control="slider" data-max="1" data-min="0" data-step="0.05" data-value="0" id="playerMusicVolume" role="slider" tabindex="0"><div class="game-slider-track" data-slider-track=""><span class="game-slider-fill" data-slider-fill=""></span><span class="game-slider-knob" data-slider-knob=""></span></div></div><output id="playerMusicVolumeValue"></output></label>
+</div></section>
+<section class="settings-page" data-settings-page="display" hidden="" inert=""><div class="settings-category-head"><h3>Graphics</h3></div><div class="settings-grid">
+<label class="setting select-setting"><span>Graphics quality</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"low","label":"Low"},{"value":"medium","label":"Medium"},{"value":"high","label":"High"}]' data-value="low" id="playerGraphics" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Low</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<label class="setting select-setting"><span>Minimap orientation</span><div aria-label="Minimap orientation" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"heading","label":"Heading Up"},{"value":"north","label":"North Up"}]' data-value="heading" id="playerMinimapOrientation" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Heading Up</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
+<div class="setting setting-action"><span>FULLSCREEN</span><button class="secondary-btn" id="settingsFullscreenBtn" type="button">ENTER FULLSCREEN</button></div></div></section>
+</div>
+<footer class="modal-foot settings-actions"><span class="admin-status" id="settingsStatus">Saved settings</span><button class="secondary-btn" id="settingsResetBtn">RESET</button><button class="secondary-btn" id="settingsCancelBtn">CANCEL</button><button class="primary modal-action" id="settingsSaveBtn">SAVE</button></footer>
+</div>
+</section>
+<section aria-label="Match control" class="modal-screen hide" id="adminPanel">
+<div class="modal-shell admin-shell" data-page="gameplay">
+<header class="modal-head"><div><h2 id="adminTitle">Host control</h2><p id="adminDescription">Changes are staged until Apply. Player commands act immediately.</p></div></header>
+<div class="admin-tabs" data-controller-primary-tabs="true" role="tablist"><button class="admin-tab active" data-admin-tab="gameplay" role="tab">GAMEPLAY</button><button class="admin-tab" data-admin-tab="advanced" role="tab">WEAPONS</button><button class="admin-tab" data-admin-tab="players" role="tab">PLAYERS</button></div>
+<span hidden="" id="adminGameplayHome"></span><div class="admin-page" data-admin-page="gameplay" id="adminGameplay"><div class="settings-grid"><label class="setting"><span>Run speed</span><div class="game-control game-stepper" data-game-control="stepper" data-max="16" data-min="3" data-step="0.1" data-value="3" id="setRunSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">3</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label class="setting"><span>ADS walk speed</span><div class="game-control game-stepper" data-game-control="stepper" data-max="9" data-min="1.5" data-step="0.1" data-value="1.5" id="setWalkSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1.5</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label class="setting"><span>Jump height</span><div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.4" data-step="0.1" data-value="0.4" id="setJumpHeight" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.4</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label class="setting"><span>Gravity</span><div class="game-control game-stepper" data-game-control="stepper" data-max="40" data-min="8" data-step="1" data-value="8" id="setGravity" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">8</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label class="setting"><span>Health regen delay (s)</span><div class="game-control game-stepper" data-game-control="stepper" data-max="15" data-min="0" data-step="0.5" data-value="0" id="setRegenDelay" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label class="setting"><span>Health regen / second</span><div class="game-control game-stepper" data-game-control="stepper" data-max="100" data-min="0" data-step="1" data-value="0" id="setRegenRate" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label class="setting"><span>Respawn delay (s)</span><div class="game-control game-stepper" data-game-control="stepper" data-max="10" data-min="1" data-step="0.1" data-value="1" id="setRespawnDelay" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div><section class="admin-bot-card" aria-label="Live bot controls"><div class="admin-bot-head"><div><span class="eyebrow">LIVE BOTS</span><strong>Bot roster</strong><small id="adminBotHelp">Changes reconcile the live match immediately after Apply.</small></div><span class="admin-bot-summary" id="adminBotSummary">0 / 8 bots · Normal</span></div><div class="admin-bot-controls"><label id="adminBlueBotWrap"><span>BLUE BOTS</span><div class="game-control game-cycle" data-game-control="cycle" data-options='[{"value":"0","label":"0"},{"value":"1","label":"1"},{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"5","label":"5"},{"value":"6","label":"6"},{"value":"7","label":"7"},{"value":"8","label":"8"}]' data-value="0" id="adminBlueBotCount" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value>0</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label><label id="adminRedBotWrap"><span>RED BOTS</span><div class="game-control game-cycle" data-game-control="cycle" data-options='[{"value":"0","label":"0"},{"value":"1","label":"1"},{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"5","label":"5"},{"value":"6","label":"6"},{"value":"7","label":"7"},{"value":"8","label":"8"}]' data-value="0" id="adminRedBotCount" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value>0</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label><label class="hide" id="adminFfaBotWrap"><span>BOTS</span><div class="game-control game-cycle" data-game-control="cycle" data-options='[{"value":"0","label":"0"},{"value":"1","label":"1"},{"value":"2","label":"2"},{"value":"3","label":"3"},{"value":"4","label":"4"},{"value":"5","label":"5"},{"value":"6","label":"6"},{"value":"7","label":"7"},{"value":"8","label":"8"}]' data-value="0" id="adminFfaBotCount" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value>0</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label><label><span>DIFFICULTY</span><div class="game-control game-cycle" data-game-control="cycle" data-options='[{"value":"easy","label":"Easy"},{"value":"normal","label":"Normal"},{"value":"hard","label":"Hard"},{"value":"elite","label":"Elite"}]' data-value="normal" id="adminBotDifficulty" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value>Normal</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label></div></section></div>
+<span hidden="" id="adminAdvancedHome"></span><div class="admin-page hide" data-admin-page="advanced" id="adminAdvanced"><div class="admin-weapon-toolbar"><label><span>WEAPON</span><div aria-label="" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"assault","label":"Assault Rifle"},{"value":"ump","label":"UMP"},{"value":"shotgun","label":"Pump Shotgun"},{"value":"semiShotgun","label":"Semi-Auto Shotgun"},{"value":"sniper","label":"Sniper"},{"value":"grenadeLauncher","label":"Grenade Launcher"},{"value":"rpg","label":"RPG"},{"value":"pistol","label":"Pistol"}]' data-value="assault" id="adminWeaponSelect" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Assault Rifle</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label><span>Choose a weapon to tune its ballistic handling.</span></div><div class="weapon-settings-grid">
+<section class="weapon-settings-card" data-admin-weapon-editor="pistol" hidden=""><strong>PISTOL</strong><div class="weapon-fields"><label>Damage<div class="game-control game-stepper" data-game-control="stepper" data-max="400" data-min="1" data-step="1" data-value="1" id="setPistolDamage" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Projectile velocity<div class="game-control game-stepper" data-game-control="stepper" data-max="800" data-min="10" data-step="1" data-value="10" id="setPistolSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">10</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Reload time (s)<div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.1" data-step="0.05" data-value="0.1" id="setPistolReload" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Rate (RPM)<div class="game-control game-stepper" data-game-control="stepper" data-max="1200" data-min="24" data-step="5" data-value="24" id="setPistolCooldown" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">24</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div></section>
+<section class="weapon-settings-card assault" data-admin-weapon-editor="assault"><strong>ASSAULT RIFLE</strong><div class="weapon-fields"><label>Damage<div class="game-control game-stepper" data-game-control="stepper" data-max="400" data-min="1" data-step="1" data-value="1" id="setAssaultDamage" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Projectile velocity<div class="game-control game-stepper" data-game-control="stepper" data-max="800" data-min="10" data-step="1" data-value="10" id="setAssaultSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">10</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Reload time (s)<div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.1" data-step="0.05" data-value="0.1" id="setAssaultReload" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Rate (RPM)<div class="game-control game-stepper" data-game-control="stepper" data-max="1200" data-min="24" data-step="5" data-value="24" id="setAssaultCooldown" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">24</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div></section>
+<section class="weapon-settings-card" data-admin-weapon-editor="ump" hidden=""><strong>UMP</strong><div class="weapon-fields"><label>Damage<div class="game-control game-stepper" data-game-control="stepper" data-max="400" data-min="1" data-step="1" data-value="1" id="setUmpDamage" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Projectile velocity<div class="game-control game-stepper" data-game-control="stepper" data-max="800" data-min="10" data-step="1" data-value="10" id="setUmpSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">10</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Reload time (s)<div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.1" data-step="0.05" data-value="0.1" id="setUmpReload" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Rate (RPM)<div class="game-control game-stepper" data-game-control="stepper" data-max="1200" data-min="24" data-step="5" data-value="24" id="setUmpCooldown" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">24</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div></section>
+<section class="weapon-settings-card" data-admin-weapon-editor="shotgun" hidden=""><strong>PUMP SHOTGUN</strong><div class="weapon-fields"><label>Pellet damage<div class="game-control game-stepper" data-game-control="stepper" data-max="100" data-min="1" data-step="1" data-value="1" id="setShotgunDamage" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Projectile velocity<div class="game-control game-stepper" data-game-control="stepper" data-max="800" data-min="10" data-step="1" data-value="10" id="setShotgunSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">10</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Reload time (s)<div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.1" data-step="0.05" data-value="0.1" id="setShotgunReload" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Rate (RPM)<div class="game-control game-stepper" data-game-control="stepper" data-max="600" data-min="24" data-step="5" data-value="24" id="setShotgunCooldown" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">24</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div></section>
+<section class="weapon-settings-card" data-admin-weapon-editor="semiShotgun" hidden=""><strong>SEMI-AUTO SHOTGUN</strong><div class="weapon-fields"><label>Pellet damage<div class="game-control game-stepper" data-game-control="stepper" data-max="100" data-min="1" data-step="1" data-value="1" id="setSemiShotgunDamage" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Projectile velocity<div class="game-control game-stepper" data-game-control="stepper" data-max="800" data-min="10" data-step="1" data-value="10" id="setSemiShotgunSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">10</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Reload time (s)<div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.1" data-step="0.05" data-value="0.1" id="setSemiShotgunReload" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Rate (RPM)<div class="game-control game-stepper" data-game-control="stepper" data-max="900" data-min="24" data-step="5" data-value="24" id="setSemiShotgunCooldown" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">24</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div></section>
+<section class="weapon-settings-card sniper" data-admin-weapon-editor="sniper" hidden=""><strong>SNIPER</strong><div class="weapon-fields"><label>Damage<div class="game-control game-stepper" data-game-control="stepper" data-max="400" data-min="1" data-step="1" data-value="1" id="setSniperDamage" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Projectile velocity<div class="game-control game-stepper" data-game-control="stepper" data-max="800" data-min="10" data-step="1" data-value="10" id="setSniperSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">10</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Reload time (s)<div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.1" data-step="0.05" data-value="0.1" id="setSniperReload" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Rate (RPM)<div class="game-control game-stepper" data-game-control="stepper" data-max="1200" data-min="24" data-step="5" data-value="24" id="setSniperCooldown" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">24</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div></section>
+<section class="weapon-settings-card" data-admin-weapon-editor="grenadeLauncher" hidden=""><strong>GRENADE LAUNCHER</strong><div class="weapon-fields"><label>Direct damage<div class="game-control game-stepper" data-game-control="stepper" data-max="400" data-min="1" data-step="1" data-value="1" id="setGrenadeLauncherDamage" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Projectile velocity<div class="game-control game-stepper" data-game-control="stepper" data-max="800" data-min="10" data-step="1" data-value="10" id="setGrenadeLauncherSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">10</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Reload time (s)<div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.1" data-step="0.05" data-value="0.1" id="setGrenadeLauncherReload" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Rate (RPM)<div class="game-control game-stepper" data-game-control="stepper" data-max="600" data-min="24" data-step="5" data-value="24" id="setGrenadeLauncherCooldown" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">24</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div></section>
+<section class="weapon-settings-card" data-admin-weapon-editor="rpg" hidden=""><strong>RPG</strong><div class="weapon-fields"><label>Direct damage<div class="game-control game-stepper" data-game-control="stepper" data-max="400" data-min="1" data-step="1" data-value="1" id="setRpgDamage" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Projectile velocity<div class="game-control game-stepper" data-game-control="stepper" data-max="800" data-min="10" data-step="1" data-value="10" id="setRpgSpeed" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">10</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Reload time (s)<div class="game-control game-stepper" data-game-control="stepper" data-max="5" data-min="0.1" data-step="0.05" data-value="0.1" id="setRpgReload" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">0.1</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label><label>Rate (RPM)<div class="game-control game-stepper" data-game-control="stepper" data-max="600" data-min="24" data-step="5" data-value="24" id="setRpgCooldown" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">24</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label></div></section>
+</div></div>
+<div class="admin-page hide" data-admin-page="players" id="adminPlayers"><div class="admin-player-list" id="adminPlayerList"></div></div>
+<footer class="modal-foot"><div aria-live="polite" class="admin-status" id="adminStatus" role="status">Standard match rules are active.</div><button class="secondary-btn" id="adminResetBtn">RESET</button><button class="secondary-btn" id="adminCancelBtn">CANCEL</button><button class="primary modal-action" id="adminSaveBtn">APPLY</button></footer>
+</div>
+</section>
 </main>
-
 <script>
 (() => {
   window.__breachModuleBooted = false;
@@ -225,6 +363,6 @@
   });
 })();
 </script>
-<script type="module" src="client.js?v=1.26.0"></script>
+<script src="client.js?v=1.37.33" type="module"></script>
 </body>
 </html>

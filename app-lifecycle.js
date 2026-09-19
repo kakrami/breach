@@ -1,4 +1,4 @@
-export const SHELL_PANEL = Object.freeze({ NONE:'', SETTINGS:'settings', ADMIN:'admin' });
+export const SHELL_PANEL = Object.freeze({ NONE:'', SETTINGS:'settings', ADMIN:'admin', LOADOUT:'loadout' });
 
 function fullscreenElement(){
   return document.fullscreenElement || document.webkitFullscreenElement || document.webkitCurrentFullScreenElement || null;
@@ -7,8 +7,9 @@ function standaloneMode(){
   return navigator.standalone===true || matchMedia('(display-mode: standalone)').matches || matchMedia('(display-mode: fullscreen)').matches;
 }
 function measure(el){
-  const r=el.getBoundingClientRect();
-  return {w:Math.max(1,Math.round(r.width||innerWidth||1)),h:Math.max(1,Math.round(r.height||innerHeight||1))};
+  const r=el.getBoundingClientRect(),vv=globalThis.visualViewport;
+  const w=r.width||el.clientWidth||vv?.width||globalThis.innerWidth||1,h=r.height||el.clientHeight||vv?.height||globalThis.innerHeight||1;
+  return {w:Math.max(1,Math.round(w)),h:Math.max(1,Math.round(h)),dpr:Math.max(.5,Math.min(4,Number(globalThis.devicePixelRatio)||1))};
 }
 export function detectInputPlatform(){
   const touchPoints=Math.max(0,Number(navigator.maxTouchPoints)||0),touchCapable=touchPoints>0;
@@ -22,7 +23,7 @@ export function detectInputPlatform(){
 
 export function createSessionShell({
   root,stage,canvas,platform=detectInputPlatform(),elements={},
-  onSuspend=()=>{},onStateChange=()=>{},onViewport=()=>{},onPointerLockUnavailable=()=>{},
+  onSuspend=()=>{},onStateChange=()=>{},onViewport=()=>{},onPointerLockUnavailable=()=>{},alternateInputReady=()=>false,
 }={}){
   if(!root||!stage||!canvas)throw new Error('Session shell requires root, stage, and canvas.');
 
@@ -44,13 +45,14 @@ export function createSessionShell({
   const fullscreen=()=>!!fullscreenElement();
   const immersive=()=>platform.standalone||fullscreen();
   const pointerLocked=()=>document.pointerLockElement===canvas;
+  const alternateReady=()=>{try{return !!alternateInputReady();}catch{return false;}};
   hadPointerLock=pointerLocked();
   const landscapeReady=()=>!platform.touchControls||viewport.w>=viewport.h;
   const fullscreenSupported=()=>platform.standalone||((document.fullscreenEnabled??document.webkitFullscreenEnabled)!==false&&!!(root.requestFullscreen||root.webkitRequestFullscreen));
 
   function snapshot(){
     const entered=immersive(),landscape=landscapeReady(),match=inMatch(),blocked=entered&&platform.touchControls&&!landscape;
-    const inputReady=platform.touchControls||pointerLocked();
+    const inputReady=platform.touchControls||pointerLocked()||alternateReady();
     const playSurfaceReady=platform.touchControls?(entered&&landscape):true;
     return Object.freeze({
       location,inMatch:match,inLobby:inLobby(),paused:match?paused:false,pauseReason:match?pauseReason:'',panel,connecting,connectionText,
@@ -70,6 +72,7 @@ export function createSessionShell({
     visible(elements.pause,matchUsable&&s.inMatch&&s.paused&&!s.panel&&!s.connecting);
     visible(elements.settings,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.SETTINGS);
     visible(elements.admin,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.ADMIN);
+    visible(elements.loadout,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.LOADOUT);
     visible(elements.connection,(s.inMatch?matchUsable:frontUsable)&&s.connecting);
     if(elements.connectionText)elements.connectionText.textContent=s.connectionText||'Connecting…';
     if(elements.entryButton){
@@ -83,15 +86,26 @@ export function createSessionShell({
     if(lastCanPlay&&!s.canPlay)onSuspend(reason,s);lastCanPlay=s.canPlay;onStateChange(s,reason);return s;
   }
 
-  function syncViewport(){
-    const next=measure(stage);if(next.w===viewport.w&&next.h===viewport.h)return false;
+  function syncViewport(force=false){
+    const next=measure(stage),changed=next.w!==viewport.w||next.h!==viewport.h||Math.abs(next.dpr-viewport.dpr)>.001;
+    if(!changed&&!force)return false;
     viewport=next;onViewport({...viewport});
     if(platform.touchControls&&immersive()&&!landscapeReady()&&inMatch()&&!paused){paused=true;pauseReason='orientation';panel=SHELL_PANEL.NONE;}
     return true;
   }
-  const viewportChanged=()=>{if(syncViewport())render('viewport');};
+  const raf=globalThis.requestAnimationFrame?.bind(globalThis)||((fn)=>setTimeout(fn,0));
+  const caf=globalThis.cancelAnimationFrame?.bind(globalThis)||clearTimeout;
+  let viewportFrame=0,viewportSettleTimer=0;
+  function scheduleViewport(reason='viewport'){
+    if(!viewportFrame)viewportFrame=raf(()=>{viewportFrame=0;if(syncViewport())render(reason);});
+    clearTimeout(viewportSettleTimer);viewportSettleTimer=setTimeout(()=>{viewportSettleTimer=0;if(syncViewport(true))render(`${reason}-settled`);},90);
+  }
+  const viewportChanged=()=>scheduleViewport('viewport');
   const resizeObserver=typeof ResizeObserver==='function'?new ResizeObserver(viewportChanged):null;
-  resizeObserver?.observe(stage);if(!resizeObserver)addEventListener('resize',viewportChanged);
+  resizeObserver?.observe(stage);
+  addEventListener('resize',viewportChanged,{passive:true});
+  addEventListener('orientationchange',viewportChanged,{passive:true});
+  globalThis.visualViewport?.addEventListener?.('resize',viewportChanged,{passive:true});
 
   async function requestFullscreen(){
     if(platform.standalone||fullscreen())return true;if(!fullscreenSupported())return false;
@@ -136,11 +150,11 @@ export function createSessionShell({
     return render('lobby');
   }
   async function prepareInputFromGesture(){
-    if(!immersive()){
+    if(platform.touchControls&&!immersive()){
       if(!(await requestFullscreen()))return false;
       await lockLandscape();syncViewport();render('input-fullscreen');
     }
-    return platform.touchControls?true:requestPointerLock();
+    return platform.touchControls||alternateReady()?true:requestPointerLock();
   }
   async function capturePointerFromGesture(){return platform.touchControls?true:requestPointerLock();}
   async function enterMatch(){
@@ -163,11 +177,16 @@ export function createSessionShell({
         await lockLandscape();syncViewport();
       }
       if(!landscapeReady())return false;
-    }else if(!(await requestPointerLock()))return false;
+    }else if(!alternateReady()&&!(await requestPointerLock()))return false;
     paused=false;pauseReason='';render('resume');return true;
   }
+  function resumeFromAlternateInput(){
+    if(!inMatch()||panel||!alternateReady())return false;
+    if(platform.touchControls&&(!immersive()||!landscapeReady()))return false;
+    paused=false;pauseReason='';render('resume-alternate');return true;
+  }
   function openPanel(name){
-    if(name!==SHELL_PANEL.SETTINGS&&name!==SHELL_PANEL.ADMIN)return snapshot();
+    if(name!==SHELL_PANEL.SETTINGS&&name!==SHELL_PANEL.ADMIN&&name!==SHELL_PANEL.LOADOUT)return snapshot();
     if(inMatch()&&!paused){paused=true;pauseReason='panel';if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();}
     panel=name;return render(`panel-open:${name}`);
   }
@@ -179,23 +198,23 @@ export function createSessionShell({
 
   function fullscreenChanged(){
     if(!immersive()){if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}if(!platform.touchControls&&pointerLocked())document.exitPointerLock?.();unlockLandscape();}
-    syncViewport();render('fullscreen');
+    syncViewport(true);scheduleViewport('fullscreen');render('fullscreen');
   }
   function pointerLockChanged(){
     if(platform.touchControls)return;
     const locked=pointerLocked();
     if(locked){hadPointerLock=true;return;}
     const lostOwnedPointer=hadPointerLock;hadPointerLock=false;
-    if(lostOwnedPointer&&inMatch()&&!paused)pause('pointer');
+    if(lostOwnedPointer&&inMatch()&&!paused&&!alternateReady())pause('pointer');
   }
   function visibilityChanged(){if(document.hidden&&inMatch()&&!paused)pause('background');}
   const fullscreenEvent=('fullscreenEnabled'in document||'fullscreenElement'in document)?'fullscreenchange':'webkitfullscreenchange';
   document.addEventListener(fullscreenEvent,fullscreenChanged);document.addEventListener('pointerlockchange',pointerLockChanged);document.addEventListener('pointerlockerror',()=>{onPointerLockUnavailable();});document.addEventListener('visibilitychange',visibilityChanged);addEventListener('pagehide',visibilityChanged);
 
-  function start(){syncViewport();onViewport({...viewport});return render('start');}
+  function start(){syncViewport(true);return render('start');}
   return {
     platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
-    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,pause,resumeFromGesture,openPanel,closePanel,leaveToMenu,
-    destroy(){resizeObserver?.disconnect();if(!resizeObserver)removeEventListener('resize',viewportChanged);document.removeEventListener(fullscreenEvent,fullscreenChanged);document.removeEventListener('pointerlockchange',pointerLockChanged);document.removeEventListener('visibilitychange',visibilityChanged);removeEventListener('pagehide',visibilityChanged);}
+    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
+    destroy(){resizeObserver?.disconnect();if(viewportFrame)caf(viewportFrame);clearTimeout(viewportSettleTimer);removeEventListener('resize',viewportChanged);removeEventListener('orientationchange',viewportChanged);globalThis.visualViewport?.removeEventListener?.('resize',viewportChanged);document.removeEventListener(fullscreenEvent,fullscreenChanged);document.removeEventListener('pointerlockchange',pointerLockChanged);document.removeEventListener('visibilitychange',visibilityChanged);removeEventListener('pagehide',visibilityChanged);}
   };
 }
