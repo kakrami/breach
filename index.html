@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.44.84" rel="manifest"/>
-<title>Breach v1.44.84</title>
-<link href="ui.css?v=1.44.84" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.45.0" rel="manifest"/>
+<title>Breach v1.45.0</title>
+<link href="ui.css?v=1.45.0" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -167,6 +167,7 @@
 <div class="lobby-card-title"><strong>RULES</strong></div>
 <div class="lobby-control-group compact-group"><span>GAME MODE</span><div class="lobby-mode-picker"><button data-lobby-mode-choice="tdm" type="button">TEAM DEATHMATCH</button><button data-lobby-mode-choice="ffa" type="button">FREE FOR ALL</button><button data-lobby-mode-choice="sandbox" type="button">SANDBOX</button></div></div>
 <div class="lobby-setup-row lobby-rules-row">
+<label><span>MOD</span><div aria-label="Match mod" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"normal","label":"Normal"},{"value":"moon","label":"Moon"}]' data-value="normal" id="lobbyMod" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Normal</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <label><span>MINIMAP</span><div aria-label="Minimap mode" class="input game-control game-cycle" data-game-control="cycle" data-options='[{"value":"standard","label":"Standard"},{"value":"all","label":"Always On"},{"value":"directional","label":"Directional"}]' data-value="standard" id="lobbyMinimapMode" role="combobox" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">‹</button><span class="game-control-value" data-control-value="">Standard</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">›</button></div></label>
 <label id="lobbyScoreWrap"><span>SCORE LIMIT</span><div class="input game-control game-stepper" data-game-control="stepper" data-max="100" data-min="5" data-step="5" data-value="5" id="lobbyScoreLimit" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">5</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label>
 <label id="lobbyTimeWrap"><span>TIME LIMIT</span><div class="input game-control game-stepper" data-game-control="stepper" data-max="30" data-min="2" data-step="1" data-value="2" id="lobbyTimeLimit" role="spinbutton" tabindex="0"><button class="game-control-arrow" data-control-step="-1" tabindex="-1" type="button">−</button><span class="game-control-value" data-control-value="">2</span><button class="game-control-arrow" data-control-step="1" tabindex="-1" type="button">+</button></div></label>
@@ -428,7 +429,7 @@
 <script>
 (() => {
   window.__breachModuleBooted = false;
-  const CURRENT_VERSION = '1.44.84', CURRENT_BUILD = '20260919T040408Z', CURRENT_PROTOCOL = 90;
+  const CURRENT_VERSION = '1.45.0', CURRENT_BUILD = '20260919T180000Z', CURRENT_PROTOCOL = 91;
   const ONLINE_API = 'https://breach-online.kiadesignenterprise.workers.dev';
   const GUARD_KEY = 'breach:update-reload', GUARD_MS = 30000;
   const fail = message => {
@@ -442,7 +443,7 @@
     if (target && target !== window && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) fail('Client asset failed to load.');
   }, true);
   window.addEventListener('unhandledrejection', () => { if (!window.__breachModuleBooted) fail('Client failed to start.'); });
-  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.44.84';document.body.appendChild(script); };
+  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.45.0';document.body.appendChild(script); };
   const cleanReloadParams = () => { const url=new URL(location.href);if(url.searchParams.has('__breach_update')||url.searchParams.has('__breach_reload')){url.searchParams.delete('__breach_update');url.searchParams.delete('__breach_reload');history.replaceState(null,'',url);} };
   const reloadFor = manifest => {
     const target=`${manifest.version||'unknown'}|${manifest.build||'unknown'}|${Number(manifest.protocol)||0}`,now=Date.now();

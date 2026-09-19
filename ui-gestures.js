@@ -1,4 +1,4 @@
-import { createPointerSessions } from './pointer-sessions.js?v=1.44.84';
+import { createPointerSessions } from './pointer-sessions.js?v=1.45.0';
 
 // Custom drags/holds only. Buttons, SVG hit testing and scrolling stay native.
 export function createUiGestures({root=document.body,getScope=()=>''}={}) {

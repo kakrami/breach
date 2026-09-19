@@ -160,7 +160,8 @@ body{font-size:var(--ui-md)}
 .lobby-mode-picker{gap:5px}
 .lobby-mode-picker button{min-width:0;height:35px;white-space:normal;overflow-wrap:anywhere;line-height:1.05;padding:2px 5px}
 .lobby-match-card .lobby-setup-row{margin-top:0;gap:6px}
-.lobby-rules-row{grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));}
+.lobby-rules-row{grid-template-columns:repeat(4,minmax(0,1fr));}
+@media(max-width:1100px){.lobby-rules-row{grid-template-columns:repeat(2,minmax(0,1fr));}}
 .lobby-bots-row{grid-template-columns:repeat(auto-fit,minmax(min(100%,120px),1fr));}
 .lobby-match-card .input{width:100%;max-width:none}
 .lobby-rule-summary{margin-top:0;width:100%;min-width:0;text-align:left;line-height:1.2}
