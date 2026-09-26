@@ -1,7 +1,7 @@
-import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.50.0';
+import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.51.0';
 
 export function createProjectileCollisionGrid({
-  staticBoxes = [], pyramids = [], naturalObstacles = [], buildingParts = [],
+  staticBoxes = [], staticColliders = null, pyramids = [], naturalObstacles = [], buildingParts = [],
   terrainHeight, naturalGroundBase, cellSize = 8, cellHeight = 3,
 }) {
   const grid = new Map(), entries = [];
@@ -21,7 +21,12 @@ export function createProjectileCollisionGrid({
     }
   };
 
-  for (const o of staticBoxes) { const base = terrainHeight(o.x, o.z)+finite(o.yOffset,0),a=boxAabb(o); add({ type:'box', source:o, ...a, minY:base, maxY:base+o.h }); }
+  if(Array.isArray(staticColliders)){
+    for(const o of staticColliders){
+      if(o.type==='round')add({type:'round',source:o,minX:o.x-o.r,maxX:o.x+o.r,minY:o.minY,maxY:o.maxY,minZ:o.z-o.r,maxZ:o.z+o.r});
+      else{const a=boxAabb(o);add({type:'box',source:o,...a,minY:o.minY,maxY:o.maxY});}
+    }
+  }else for (const o of staticBoxes) { const base = terrainHeight(o.x, o.z)+finite(o.yOffset,0),a=boxAabb(o); add({ type:'box', source:o, ...a, minY:base, maxY:base+o.h }); }
   for (const o of pyramids) { const base = terrainHeight(o.x, o.z); add({ type:'pyramid', source:o, minX:o.x-o.base/2, maxX:o.x+o.base/2, minY:base, maxY:base+o.h, minZ:o.z-o.base/2, maxZ:o.z+o.base/2 }); }
   for (const o of naturalObstacles) { const base = naturalGroundBase(o.type, o.x, o.z, o.r); add({ type:'round', source:o, minX:o.x-o.r, maxX:o.x+o.r, minY:base, maxY:base+o.h+.18, minZ:o.z-o.r, maxZ:o.z+o.r }); }
   for (const p of buildingParts) if (p.projectileSolid !== false) { const a=boxAabb(p); add({ type:'box', source:p, ...a, minY:p.bottomY, maxY:p.topY }); }

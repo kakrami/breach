@@ -1,34 +1,34 @@
-import { createMoonSky } from './mod-environment.js?v=1.50.0';
+import { createMoonSky } from './mod-environment.js?v=1.51.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.50.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.50.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.50.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.50.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.50.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.50.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.50.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.50.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.51.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.51.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.51.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.51.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.51.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.51.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.51.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.51.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.50.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.50.0';
-import { createAudioEngine } from './audio-engine.js?v=1.50.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.50.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.50.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.50.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.50.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.50.0';
-import { createControllerRecording } from './controller-recording.js?v=1.50.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.50.0';
-import { createSafeStorage } from './browser-storage.js?v=1.50.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.50.0';
-import { createUiGestures } from './ui-gestures.js?v=1.50.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.50.0';
-import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.50.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.50.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.50.0';
+} from './game-config.js?v=1.51.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.51.0';
+import { createAudioEngine } from './audio-engine.js?v=1.51.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.51.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.51.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.51.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.51.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.51.0';
+import { createControllerRecording } from './controller-recording.js?v=1.51.0';
+import { createPointerSessions } from './pointer-sessions.js?v=1.51.0';
+import { createSafeStorage } from './browser-storage.js?v=1.51.0';
+import { createUiFocusScope } from './ui-focus.js?v=1.51.0';
+import { createUiGestures } from './ui-gestures.js?v=1.51.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.51.0';
+import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.51.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.51.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.51.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -56,7 +56,7 @@ function displayMapSpec(value){const id=normalizeMapId(value);if(id==='custom-ma
 let currentMapId=DEFAULT_MAP_ID,activeCustomMapFingerprint='';
 let worldGeometry=HighlandsGeometry;
 let activeWorldCollision=HighlandsWorldCollision;
-let ROADS=worldGeometry.ROADS||[],STATIC_BOXES=worldGeometry.STATIC_BOXES,BUILDINGS=worldGeometry.BUILDINGS,PYRAMIDS=worldGeometry.PYRAMIDS,NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES,LADDERS=worldGeometry.LADDERS||[];
+let ROADS=worldGeometry.ROADS||[],STATIC_BOXES=worldGeometry.STATIC_BOXES,STATIC_PROJECTILE_COLLIDERS=worldGeometry.STATIC_PROJECTILE_COLLIDERS||null,BUILDINGS=worldGeometry.BUILDINGS,PYRAMIDS=worldGeometry.PYRAMIDS,NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES,LADDERS=worldGeometry.LADDERS||[];
 let TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE,TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS,BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY,BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
 let terrainHeight=worldGeometry.terrainHeight,naturalGroundBase=worldGeometry.naturalGroundBase,worldSupportHeight=worldGeometry.worldSupportHeight,worldStepUpHeight=worldGeometry.worldStepUpHeight,resolveCeilingCollision=worldGeometry.resolveCeilingCollision,groundMaterialCode=worldGeometry.groundMaterialCode||(()=>0),authoredEnvironment=worldGeometry.AUTHORED_ENVIRONMENT||null;
 function worldBlockedAt(...args){return activeWorldCollision.worldBlockedAt(...args);}
@@ -691,7 +691,7 @@ const SIM_HEARTBEAT_MS=33;
 const SIM_LEADER_STALE_MS=750;
 let lastSimHeartbeat=0;
 let trajectoryCollision=createProjectileCollisionGrid({
-  staticBoxes:STATIC_BOXES,pyramids:PYRAMIDS,naturalObstacles:NATURAL_OBSTACLES,buildingParts:BUILDING_PARTS,
+  staticBoxes:STATIC_BOXES,staticColliders:STATIC_PROJECTILE_COLLIDERS,pyramids:PYRAMIDS,naturalObstacles:NATURAL_OBSTACLES,buildingParts:BUILDING_PARTS,
   terrainHeight,naturalGroundBase,cellSize:8,cellHeight:3
 });
 const mapObstacles = [];
@@ -754,7 +754,7 @@ let hudLayout=null;
 let viewW=1,viewH=1,viewDpr=1,graphicsContextAvailable=true;
 
 function rebuildTrajectoryCollision(){
-  trajectoryCollision=createProjectileCollisionGrid({staticBoxes:STATIC_BOXES,pyramids:PYRAMIDS,naturalObstacles:NATURAL_OBSTACLES,buildingParts:BUILDING_PARTS,terrainHeight,naturalGroundBase,cellSize:8,cellHeight:3});
+  trajectoryCollision=createProjectileCollisionGrid({staticBoxes:STATIC_BOXES,staticColliders:STATIC_PROJECTILE_COLLIDERS,pyramids:PYRAMIDS,naturalObstacles:NATURAL_OBSTACLES,buildingParts:BUILDING_PARTS,terrainHeight,naturalGroundBase,cellSize:8,cellHeight:3});
 }
 function setActiveMap(value,{rebuild=true}={}){
   const nextId=normalizeMapId(value),nextCustomFingerprint=nextId==='custom-map'?customMapFingerprintValue:'',changed=nextId!==currentMapId||(nextId==='custom-map'&&nextCustomFingerprint!==activeCustomMapFingerprint);
@@ -762,7 +762,7 @@ function setActiveMap(value,{rebuild=true}={}){
   const bundle=CLIENT_WORLD_BUNDLES[nextId]||CLIENT_WORLD_BUNDLES[DEFAULT_MAP_ID];
   worldGeometry=bundle.geometry;
   activeWorldCollision=bundle.collision;
-  ROADS=worldGeometry.ROADS||[];STATIC_BOXES=worldGeometry.STATIC_BOXES;BUILDINGS=worldGeometry.BUILDINGS;PYRAMIDS=worldGeometry.PYRAMIDS;NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;LADDERS=worldGeometry.LADDERS||[];
+  ROADS=worldGeometry.ROADS||[];STATIC_BOXES=worldGeometry.STATIC_BOXES;STATIC_PROJECTILE_COLLIDERS=worldGeometry.STATIC_PROJECTILE_COLLIDERS||null;BUILDINGS=worldGeometry.BUILDINGS;PYRAMIDS=worldGeometry.PYRAMIDS;NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;LADDERS=worldGeometry.LADDERS||[];
   TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE;TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS;BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY;BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
   terrainHeight=worldGeometry.terrainHeight;naturalGroundBase=worldGeometry.naturalGroundBase;worldSupportHeight=worldGeometry.worldSupportHeight;worldStepUpHeight=worldGeometry.worldStepUpHeight;resolveCeilingCollision=worldGeometry.resolveCeilingCollision;groundMaterialCode=worldGeometry.groundMaterialCode||(()=>0);authoredEnvironment=worldGeometry.AUTHORED_ENVIRONMENT||null;
   rebuildTrajectoryCollision();minimapStaticCache=null;hudLastDraw=0;
@@ -833,7 +833,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.50.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.51.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2086,20 +2086,27 @@ function addStaticInstancedMesh(geometry,material,transforms,{castShadow=true,re
   }
   mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);mesh.instanceMatrix.needsUpdate=true;mesh.castShadow=castShadow&&!isTouch;mesh.receiveShadow=receiveShadow&&!isTouch;mesh.computeBoundingBox?.();mesh.computeBoundingSphere?.();worldRoot.add(mesh);return mesh;
 }
+function appendRoadSurface(data,road,{width=road.d,offset=.012,patches=null}={}){
+  const angle=(Number(road.rot)||0)*Math.PI/180,ca=Math.cos(angle),sa=Math.sin(angle),toWorld=(lx,lz)=>({x:road.x+lx*ca-lz*sa,z:road.z+lx*sa+lz*ca});
+  const addQuad=(cx,cz,w,d,u0=0,u1=1)=>{const corners=[[-w/2,-d/2],[w/2,-d/2],[w/2,d/2],[-w/2,d/2]],base=data.positions.length/3;for(let i=0;i<4;i++){const q=toWorld(cx+corners[i][0],cz+corners[i][1]),y=terrainHeight(q.x,q.z)+offset;data.positions.push(q.x,y,q.z);data.uvs.push(i===0||i===3?u0:u1,i<2?0:1);}data.indices.push(base,base+2,base+1,base,base+3,base+2);};
+  if(Array.isArray(patches)){for(const q of patches)addQuad(q.x||0,q.z||0,q.w,q.d,q.u0||0,q.u1||1);return;}
+  const segments=Math.max(1,Math.ceil(road.w/2.4)),step=road.w/segments;for(let i=0;i<segments;i++){const cx=-road.w/2+step*(i+.5);addQuad(cx,0,step+.018,width,i/segments,(i+1)/segments);}
+}
+function roadGeometryFromData(data){const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(data.positions,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(data.uvs,2));geo.setIndex(data.indices);geo.computeVertexNormals();return geo;}
 function addRoadsBatch(){
   if(!ROADS.length)return;
-  const unit=new THREE.BoxGeometry(1,1,1),materials={
-    street:worldMat(0x2e3336,'concrete',.98,0),alley:worldMat(0x3c4244,'concrete',.99,0),service:worldMat(0x353a3d,'concrete',.98,0),dirt:worldMat(0x806b4e,'stone',1,0),sidewalk:worldMat(0x777d80,'concrete',.98,0),crosswalk:worldMat(0x44494c,'concrete',.98,0)
-  },groups=new Map(),marks=[];
-  const push=(kind,t)=>{if(!groups.has(kind))groups.set(kind,[]);groups.get(kind).push(t);};
-  for(const road of ROADS){
-    const kind=materials[road.kind]?road.kind:'street',long=road.w,short=road.d,angle=(Number(road.rot)||0)*Math.PI/180,ca=Math.cos(angle),sa=Math.sin(angle),segments=Math.max(1,Math.ceil(long/3.2)),step=long/segments,toWorld=(lx,lz)=>({x:road.x+lx*ca-lz*sa,z:road.z+lx*sa+lz*ca});
-    for(let i=0;i<segments;i++){const along=-long/2+step*(i+.5),q=toWorld(along,0),y=terrainHeight(q.x,q.z)+.026;push(kind,{x:q.x,y,z:q.z,sx:step+.08,sy:.045,sz:short,ry:angle});if((kind==='street'||kind==='service')&&i%2===0)marks.push({x:q.x,y:y+.031,z:q.z,sx:Math.min(1.65,step*.62),sy:.018,sz:.13,ry:angle,kind});}
-    if(kind==='crosswalk'){const stripeCount=Math.max(3,Math.floor(short/.65));for(let i=0;i<stripeCount;i++){const off=-short/2+(i+.5)*short/stripeCount,q=toWorld(0,off),y=terrainHeight(q.x,q.z)+.058;marks.push({x:q.x,y,z:q.z,sx:Math.min(long,4.5),sy:.018,sz:short/stripeCount*.55,ry:angle,kind:'crosswalk'});}}
+  const colors={street:0x2e3336,alley:0x3c4244,service:0x353a3d,dirt:0x806b4e,sidewalk:0x777d80,crosswalk:0x44494c},groups=new Map(),markGroups=new Map(),dataFor=(map,key)=>{if(!map.has(key))map.set(key,{positions:[],uvs:[],indices:[]});return map.get(key);};
+  for(let ri=0;ri<ROADS.length;ri++){
+    const road=ROADS[ri],kind=colors[road.kind]!=null?road.kind:'street',surfaceOffset=.012+ri*.00004;appendRoadSurface(dataFor(groups,kind),road,{offset:surfaceOffset});
+    const patches=[];let markKey='white';
+    if(kind==='street'||kind==='service'){markKey=kind==='street'?'yellow':'white';const dash=2.1,gap=2.0,total=dash+gap;for(let x=-road.w/2+dash/2;x<road.w/2-dash/3;x+=total)patches.push({x,z:0,w:Math.min(dash,road.w),d:.13});}
+    else if(kind==='crosswalk'){const stripeCount=Math.max(3,Math.floor(road.d/.65)),stripeD=road.d/stripeCount*.52;for(let i=0;i<stripeCount;i++)patches.push({x:0,z:-road.d/2+(i+.5)*road.d/stripeCount,w:Math.min(road.w,4.5),d:stripeD});}
+    if(patches.length)appendRoadSurface(dataFor(markGroups,markKey),road,{offset:surfaceOffset+.006,patches});
   }
-  for(const [kind,transforms] of groups)addStaticInstancedMesh(unit,materials[kind],transforms,{castShadow:false,receiveShadow:true});
-  if(marks.length){const yellow=marks.filter(m=>m.kind==='street'),white=marks.filter(m=>m.kind!=='street');if(yellow.length)addStaticInstancedMesh(unit,worldMat(0xd0ad49,'paintedMetal',.92,0),yellow,{castShadow:false,receiveShadow:false});if(white.length)addStaticInstancedMesh(unit,worldMat(0xd8dcda,'paintedMetal',.92,0),white,{castShadow:false,receiveShadow:false});}
+  for(const [kind,data] of groups){const mat=worldMat(colors[kind],'concrete',kind==='dirt'?1:.98,0).clone();mat.polygonOffset=true;mat.polygonOffsetFactor=-1;mat.polygonOffsetUnits=-3;const mesh=new THREE.Mesh(roadGeometryFromData(data),mat);mesh.receiveShadow=!isTouch;mesh.castShadow=false;mesh.renderOrder=2;worldRoot.add(mesh);}
+  for(const [key,data] of markGroups){const mat=worldMat(key==='yellow'?0xd0ad49:0xd8dcda,'paintedMetal',.92,0).clone();mat.polygonOffset=true;mat.polygonOffsetFactor=-2;mat.polygonOffsetUnits=-12;const mesh=new THREE.Mesh(roadGeometryFromData(data),mat);mesh.receiveShadow=false;mesh.castShadow=false;mesh.renderOrder=20;worldRoot.add(mesh);}
 }
+
 function addBoundaryWallsBatch(mat){
   const pieces=16,span=ARENA_LIMIT*2,piece=span/pieces,edge=ARENA_LIMIT+1,transforms=[];
   for(let i=0;i<pieces;i++){
@@ -2143,8 +2150,8 @@ function addSpecialStaticProps(){
       const g=new THREE.Group();g.position.set(o.x,ground,o.z);g.rotation.y=objectRot;worldRoot.add(g);addCompoundPropBox(g,rust,0,o.h*.46,0,o.w,o.h*.92,o.d);addCompoundPropBox(g,darkMetal,0,o.h*.68,-o.d*.505,o.w*.66,.58,.05);addCompoundPropBox(g,darkMetal,0,o.h*.68,o.d*.505,o.w*.66,.58,.05);addCompoundPropBox(g,metal,0,o.h+.10,0,o.w*1.10,.20,o.d*1.10);continue;
     }
     if(o.kind==='sandbag'){
-      const g=new THREE.Group();g.position.set(o.x,ground,o.z);g.rotation.y=objectRot;worldRoot.add(g);const longX=o.w>=o.d,length=Math.max(o.w,o.d),count=Math.max(4,Math.floor(length/.72)),step=length/count,rows=Math.max(2,Math.round(o.h/.38));
-      for(let row=0;row<rows;row++)for(let i=0;i<Math.max(2,count-row);i++){const bag=new THREE.Mesh(new THREE.CapsuleGeometry(.23,.38,3,6),sand);bag.rotation.z=Math.PI/2;bag.rotation.y=longX?0:Math.PI/2;const rowCount=Math.max(2,count-row),rowStep=length/rowCount,along=-length/2+rowStep*(i+.5);bag.position.set(longX?along:0,.23+row*.38,longX?0:along);g.add(bag);}continue;
+      const g=new THREE.Group();g.position.set(o.x,ground,o.z);g.rotation.y=objectRot;worldRoot.add(g);const longX=o.w>=o.d,length=Math.max(o.w,o.d),depth=Math.min(o.w,o.d),count=Math.max(4,Math.floor(length/.72)),rows=Math.max(2,Math.round(o.h/.38)),depthRows=Math.max(1,Math.ceil(depth/.48)),crossStep=depth/depthRows;
+      for(let row=0;row<rows;row++)for(let dr=0;dr<depthRows;dr++){const cross=-depth/2+crossStep*(dr+.5);for(let i=0;i<Math.max(2,count-row);i++){const bag=new THREE.Mesh(new THREE.CapsuleGeometry(.23,.38,3,6),sand);bag.rotation.z=Math.PI/2;bag.rotation.y=longX?0:Math.PI/2;const rowCount=Math.max(2,count-row),rowStep=length/rowCount,along=-length/2+rowStep*(i+.5);bag.position.set(longX?along:cross,.23+row*.38,longX?cross:along);g.add(bag);}}continue;
     }
     if(o.kind==='brokenWall'){
       const g=new THREE.Group();g.position.set(o.x,ground,o.z);g.rotation.y=objectRot;worldRoot.add(g);const longX=o.w>=o.d,length=Math.max(o.w,o.d),depth=Math.min(o.w,o.d),pieces=5,seg=length/pieces;
