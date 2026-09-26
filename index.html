@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.52.1" rel="manifest"/>
-<title>Breach v1.52.1</title>
-<link href="ui.css?v=1.52.1" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.52.2" rel="manifest"/>
+<title>Breach v1.52.2</title>
+<link href="ui.css?v=1.52.2" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -26,6 +26,7 @@
 <symbol id="i-shield" viewbox="0 0 24 24"><path d="M12 3.5 19 6v5.5c0 4.5-2.8 7.5-7 9-4.2-1.5-7-4.5-7-9V6l7-2.5Z"></path><path d="m9.2 12 1.8 1.8 3.9-4.4"></path></symbol>
 <symbol id="i-team" viewbox="0 0 24 24"><circle cx="8.5" cy="8" r="2.8"></circle><circle cx="16.5" cy="9.5" r="2.3"></circle><path d="M3.5 20c.2-3.8 1.9-5.8 5-5.8s4.9 2 5.1 5.8M14 15.5c3.8 0 6 1.5 6.5 4.5"></path></symbol>
 <symbol id="i-copy" viewbox="0 0 24 24"><rect height="11" rx="2" width="11" x="8" y="8"></rect><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"></path></symbol>
+<symbol id="i-download" viewbox="0 0 24 24"><path d="M12 4v10"></path><path d="m8 10 4 4 4-4"></path><path d="M5 18h14"></path></symbol>
 <symbol id="i-exit" viewbox="0 0 24 24"><path d="M10 4H5v16h5"></path><path d="m14 8 4 4-4 4M8 12h10"></path></symbol>
 <symbol id="i-settings" viewbox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M12 3.5v2M12 18.5v2M3.5 12h2M18.5 12h2M6 6l1.5 1.5M16.5 16.5 18 18M18 6l-1.5 1.5M7.5 16.5 6 18"></path><circle cx="12" cy="12" r="7"></circle></symbol>
 <symbol id="i-close" viewbox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"></path></symbol>
@@ -321,6 +322,7 @@
 <button class="secondary-btn" id="teamSwitchBtn"><svg class="mini-icon"><use href="#i-team"></use></svg><span id="teamSwitchText">Switch Team</span></button>
 <button class="secondary-btn" id="copyBtn"><svg class="mini-icon"><use href="#i-copy"></use></svg><span>Invite Players</span></button>
 <button class="secondary-btn" id="pauseSettingsBtn"><svg class="mini-icon"><use href="#i-settings"></use></svg><span>Settings</span></button>
+<button class="secondary-btn" id="pauseDiagnosticsBtn"><svg class="mini-icon"><use href="#i-download"></use></svg><span>Download Diagnostics</span></button>
 <button class="secondary-btn hide" id="adminBtn"><svg class="mini-icon"><use href="#i-shield"></use></svg><span>Host Options</span></button>
 </div>
 <div class="pause-leave"><button class="secondary-btn danger" id="leaveBtn"><svg class="mini-icon"><use href="#i-exit"></use></svg><span>Leave Match</span></button></div>
@@ -435,7 +437,7 @@
 <script>
 (() => {
   window.__breachModuleBooted = false;
-  const CURRENT_VERSION = '1.52.1', CURRENT_BUILD = '20260926T070437Z', CURRENT_PROTOCOL = 96;
+  const CURRENT_VERSION = '1.52.2', CURRENT_BUILD = '20260926T072041Z', CURRENT_PROTOCOL = 96;
   const ONLINE_API = 'https://breach-online.kiadesignenterprise.workers.dev';
   const GUARD_KEY = 'breach:update-reload', GUARD_MS = 30000;
   const fail = message => {
@@ -449,7 +451,7 @@
     if (target && target !== window && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) fail('Client asset failed to load.');
   }, true);
   window.addEventListener('unhandledrejection', () => { if (!window.__breachModuleBooted) fail('Client failed to start.'); });
-  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.52.1';document.body.appendChild(script); };
+  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.52.2';document.body.appendChild(script); };
   const cleanReloadParams = () => { const url=new URL(location.href);if(url.searchParams.has('__breach_update')||url.searchParams.has('__breach_reload')){url.searchParams.delete('__breach_update');url.searchParams.delete('__breach_reload');history.replaceState(null,'',url);} };
   const reloadFor = manifest => {
     const target=`${manifest.version||'unknown'}|${manifest.build||'unknown'}|${Number(manifest.protocol)||0}`,now=Date.now();
