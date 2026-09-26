@@ -1,4 +1,4 @@
-import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.47.0';
+import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.49.0';
 
 export function createProjectileCollisionGrid({
   staticBoxes = [], pyramids = [], naturalObstacles = [], buildingParts = [],
@@ -6,6 +6,10 @@ export function createProjectileCollisionGrid({
 }) {
   const grid = new Map(), entries = [];
   const keyFor = (cx, cy, cz) => `${cx},${cy},${cz}`;
+  const finite=(v,f=0)=>Number.isFinite(Number(v))?Number(v):f;
+  const normalizeRot=v=>{let r=finite(v)%360;if(r<0)r+=360;return r;};
+  const boxAabb=o=>{const a=normalizeRot(o.rot||0)*Math.PI/180,c=Math.abs(Math.cos(a)),sn=Math.abs(Math.sin(a)),hx=o.w/2*c+o.d/2*sn,hz=o.w/2*sn+o.d/2*c;return{minX:o.x-hx,maxX:o.x+hx,minZ:o.z-hz,maxZ:o.z+hz};};
+  function segmentOrientedBoxFirstT(x1,y1,z1,x2,y2,z2,o,minY,maxY,r=0){const a=-normalizeRot(o.rot||0)*Math.PI/180,c=Math.cos(a),sn=Math.sin(a),rot=(x,z)=>{const dx=x-o.x,dz=z-o.z;return{x:dx*c-dz*sn,z:dx*sn+dz*c};},p1=rot(x1,z1),p2=rot(x2,z2);return segmentAabbFirstT(p1.x,y1,p1.z,p2.x,y2,p2.z,-o.w/2-r,o.w/2+r,minY-r,maxY+r,-o.d/2-r,o.d/2+r);}
   const add = (entry) => {
     entry.visit = 0; entries.push(entry);
     const minCX = Math.floor(entry.minX / cellSize), maxCX = Math.floor(entry.maxX / cellSize);
@@ -17,10 +21,10 @@ export function createProjectileCollisionGrid({
     }
   };
 
-  for (const o of staticBoxes) { const base = terrainHeight(o.x, o.z); add({ type:'box', source:o, minX:o.x-o.w/2, maxX:o.x+o.w/2, minY:base, maxY:base+o.h, minZ:o.z-o.d/2, maxZ:o.z+o.d/2 }); }
+  for (const o of staticBoxes) { const base = terrainHeight(o.x, o.z)+finite(o.yOffset,0),a=boxAabb(o); add({ type:'box', source:o, ...a, minY:base, maxY:base+o.h }); }
   for (const o of pyramids) { const base = terrainHeight(o.x, o.z); add({ type:'pyramid', source:o, minX:o.x-o.base/2, maxX:o.x+o.base/2, minY:base, maxY:base+o.h, minZ:o.z-o.base/2, maxZ:o.z+o.base/2 }); }
   for (const o of naturalObstacles) { const base = naturalGroundBase(o.type, o.x, o.z, o.r); add({ type:'round', source:o, minX:o.x-o.r, maxX:o.x+o.r, minY:base, maxY:base+o.h+.18, minZ:o.z-o.r, maxZ:o.z+o.r }); }
-  for (const p of buildingParts) if (p.projectileSolid !== false) add({ type:'box', source:p, minX:p.x-p.w/2, maxX:p.x+p.w/2, minY:p.bottomY, maxY:p.topY, minZ:p.z-p.d/2, maxZ:p.z+p.d/2 });
+  for (const p of buildingParts) if (p.projectileSolid !== false) { const a=boxAabb(p); add({ type:'box', source:p, ...a, minY:p.bottomY, maxY:p.topY }); }
 
   let stamp = 0;
   function firstHitT(x1, y1, z1, x2, y2, z2, radius = 0) {
@@ -37,7 +41,7 @@ export function createProjectileCollisionGrid({
         if (entry.visit === stamp) continue;
         entry.visit = stamp;
         let t;
-        if (entry.type === 'box') t = segmentAabbFirstT(x1,y1,z1,x2,y2,z2,entry.minX-r,entry.maxX+r,entry.minY-r,entry.maxY+r,entry.minZ-r,entry.maxZ+r);
+        if (entry.type === 'box') t = segmentOrientedBoxFirstT(x1,y1,z1,x2,y2,z2,entry.source,entry.minY,entry.maxY,r);
         else if (entry.type === 'round') { const o = entry.source; t = segmentCylinderFirstT(x1,y1,z1,x2,y2,z2,o.x,o.z,o.r+r,entry.minY-r,entry.maxY+r); }
         else { const o = entry.source; t = segmentPyramidFirstT(x1,y1,z1,x2,y2,z2,o.x,o.z,o.base+2*r,o.h+r,entry.minY-r,entry.maxY+r); }
         if (t != null && (best == null || t < best)) best = t;
