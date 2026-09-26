@@ -1,55 +1,64 @@
-import { createMoonSky } from './mod-environment.js?v=1.49.0';
+import { createMoonSky } from './mod-environment.js?v=1.50.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.49.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.49.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.49.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.49.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.49.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.49.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.49.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.49.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.50.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.50.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.50.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.50.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.50.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.50.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.50.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.50.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.49.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.49.0';
-import { createAudioEngine } from './audio-engine.js?v=1.49.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.49.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.49.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.49.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.49.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.49.0';
-import { createControllerRecording } from './controller-recording.js?v=1.49.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.49.0';
-import { createSafeStorage } from './browser-storage.js?v=1.49.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.49.0';
-import { createUiGestures } from './ui-gestures.js?v=1.49.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.49.0';
-import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.49.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.49.0';
+} from './game-config.js?v=1.50.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.50.0';
+import { createAudioEngine } from './audio-engine.js?v=1.50.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.50.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.50.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.50.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.50.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.50.0';
+import { createControllerRecording } from './controller-recording.js?v=1.50.0';
+import { createPointerSessions } from './pointer-sessions.js?v=1.50.0';
+import { createSafeStorage } from './browser-storage.js?v=1.50.0';
+import { createUiFocusScope } from './ui-focus.js?v=1.50.0';
+import { createUiGestures } from './ui-gestures.js?v=1.50.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.50.0';
+import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.50.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.50.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.50.0';
 
 const preferences=createSafeStorage('localStorage');
-const CustomGeometry=createAuthoredWorldGeometry(CUSTOM_MAP_DEFINITION);
-const CustomWorldCollision=createAuthoredWorldCollision(CustomGeometry);
+const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
+let customMapDefinition=FALLBACK_CUSTOM_MAP_DEFINITION,customMapFingerprintValue=customMapFingerprint(FALLBACK_CUSTOM_MAP_DEFINITION),customMapLoaded=false,customMapSource='fallback';
+function compileCustomClientBundle(definition){const safe=sanitizeUploadedMapDefinition(definition),geometry=createAuthoredWorldGeometry(safe),collision=createAuthoredWorldCollision(geometry);return{safe,bundle:Object.freeze({geometry,collision}),summary:customMapSummary(safe),fingerprint:customMapFingerprint(safe)};}
+const initialCustom=compileCustomClientBundle(FALLBACK_CUSTOM_MAP_DEFINITION);
 let THREE = null;
 
-// A room owns one authoritative map. Both maps export the same world contract,
-// so movement, traversal, minimap, rendering and prediction switch together.
+// A room owns one authoritative map. Built-ins are static; an uploaded map is
+// compiled into the same geometry/collision contract before it can be selected.
 const {PLAYER_HEIGHT,PLAYER_RADIUS,ARENA_LIMIT,MAX_STEP_HEIGHT}=HighlandsGeometry;
-const CLIENT_WORLD_BUNDLES=Object.freeze({
+const CLIENT_WORLD_BUNDLES={
   highlands:Object.freeze({geometry:HighlandsGeometry,collision:HighlandsWorldCollision}),
   depot:Object.freeze({geometry:DepotGeometry,collision:DepotWorldCollision}),
   yard:Object.freeze({geometry:YardGeometry,collision:YardWorldCollision}),
   rig:Object.freeze({geometry:RigGeometry,collision:RigWorldCollision}),
-  'custom-map':Object.freeze({geometry:CustomGeometry,collision:CustomWorldCollision}),
-});
-let currentMapId=DEFAULT_MAP_ID;
+  'custom-map':initialCustom.bundle,
+};
+function installCustomMapDefinition(raw,{persist=false,source='local',quiet=false}={}){
+  const safe=sanitizeUploadedMapDefinition(raw),fingerprint=customMapFingerprint(safe);let summary;if(customMapLoaded&&fingerprint===customMapFingerprintValue){customMapDefinition=safe;summary=customMapSummary(safe);}else{const geometry=createAuthoredWorldGeometry(safe),collision=createAuthoredWorldCollision(geometry);customMapDefinition=safe;customMapFingerprintValue=fingerprint;CLIENT_WORLD_BUNDLES['custom-map']=Object.freeze({geometry,collision});minimapStaticCache=null;summary=customMapSummary(safe);}
+  customMapLoaded=true;customMapSource=source;if(persist){try{preferences.setItem('breachCustomMap',JSON.stringify(safe));}catch{}}updateCustomMapLobbyUi?.();if(!quiet)showToast?.(`CUSTOM MAP LOADED · ${summary.name}`);return summary;
+}
+function restoreSavedCustomMap(){try{const raw=preferences.getItem('breachCustomMap');if(!raw)return false;installCustomMapDefinition(JSON.parse(raw),{persist:false,source:'saved',quiet:true});return true;}catch{try{preferences.removeItem?.('breachCustomMap');}catch{}return false;}}
+function displayMapSpec(value){const id=normalizeMapId(value);if(id==='custom-map'&&customMapLoaded){const base=mapSpec(id),name=String(customMapDefinition?.meta?.name||'CUSTOM MAP').slice(0,64);return{...base,name,short:name.length>18?name.slice(0,17)+'…':name};}return mapSpec(id);}
+let currentMapId=DEFAULT_MAP_ID,activeCustomMapFingerprint='';
 let worldGeometry=HighlandsGeometry;
 let activeWorldCollision=HighlandsWorldCollision;
 let ROADS=worldGeometry.ROADS||[],STATIC_BOXES=worldGeometry.STATIC_BOXES,BUILDINGS=worldGeometry.BUILDINGS,PYRAMIDS=worldGeometry.PYRAMIDS,NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES,LADDERS=worldGeometry.LADDERS||[];
 let TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE,TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS,BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY,BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
-let terrainHeight=worldGeometry.terrainHeight,naturalGroundBase=worldGeometry.naturalGroundBase,worldSupportHeight=worldGeometry.worldSupportHeight,worldStepUpHeight=worldGeometry.worldStepUpHeight,resolveCeilingCollision=worldGeometry.resolveCeilingCollision;
+let terrainHeight=worldGeometry.terrainHeight,naturalGroundBase=worldGeometry.naturalGroundBase,worldSupportHeight=worldGeometry.worldSupportHeight,worldStepUpHeight=worldGeometry.worldStepUpHeight,resolveCeilingCollision=worldGeometry.resolveCeilingCollision,groundMaterialCode=worldGeometry.groundMaterialCode||(()=>0),authoredEnvironment=worldGeometry.AUTHORED_ENVIRONMENT||null;
 function worldBlockedAt(...args){return activeWorldCollision.worldBlockedAt(...args);}
 function worldMoveBlockedAt(...args){return activeWorldCollision.worldMoveBlockedAt(...args);}
 function worldHeightExpansionBlockedAt(...args){return activeWorldCollision.worldHeightExpansionBlockedAt(...args);}
@@ -740,6 +749,7 @@ const chatMessages=[];
 let chatOpen=false,chatDraft='',chatShift=false,chatScroll=0,chatDrag=null,chatPanel=null;
 let aimedRemoteId='',aimTagRaycaster=null,nextAimTagCheckAt=0;
 let minimapStaticCache=null;
+restoreSavedCustomMap();
 let hudLayout=null;
 let viewW=1,viewH=1,viewDpr=1,graphicsContextAvailable=true;
 
@@ -747,14 +757,14 @@ function rebuildTrajectoryCollision(){
   trajectoryCollision=createProjectileCollisionGrid({staticBoxes:STATIC_BOXES,pyramids:PYRAMIDS,naturalObstacles:NATURAL_OBSTACLES,buildingParts:BUILDING_PARTS,terrainHeight,naturalGroundBase,cellSize:8,cellHeight:3});
 }
 function setActiveMap(value,{rebuild=true}={}){
-  const nextId=normalizeMapId(value),changed=nextId!==currentMapId;
-  currentMapId=nextId;
+  const nextId=normalizeMapId(value),nextCustomFingerprint=nextId==='custom-map'?customMapFingerprintValue:'',changed=nextId!==currentMapId||(nextId==='custom-map'&&nextCustomFingerprint!==activeCustomMapFingerprint);
+  currentMapId=nextId;activeCustomMapFingerprint=nextCustomFingerprint;
   const bundle=CLIENT_WORLD_BUNDLES[nextId]||CLIENT_WORLD_BUNDLES[DEFAULT_MAP_ID];
   worldGeometry=bundle.geometry;
   activeWorldCollision=bundle.collision;
   ROADS=worldGeometry.ROADS||[];STATIC_BOXES=worldGeometry.STATIC_BOXES;BUILDINGS=worldGeometry.BUILDINGS;PYRAMIDS=worldGeometry.PYRAMIDS;NATURAL_OBSTACLES=worldGeometry.NATURAL_OBSTACLES;LADDERS=worldGeometry.LADDERS||[];
   TERRAIN_SIZE=worldGeometry.TERRAIN_SIZE;TERRAIN_SEGMENTS=worldGeometry.TERRAIN_SEGMENTS;BUILDING_GEOMETRY=worldGeometry.BUILDING_GEOMETRY;BUILDING_PARTS=worldGeometry.BUILDING_PARTS;
-  terrainHeight=worldGeometry.terrainHeight;naturalGroundBase=worldGeometry.naturalGroundBase;worldSupportHeight=worldGeometry.worldSupportHeight;worldStepUpHeight=worldGeometry.worldStepUpHeight;resolveCeilingCollision=worldGeometry.resolveCeilingCollision;
+  terrainHeight=worldGeometry.terrainHeight;naturalGroundBase=worldGeometry.naturalGroundBase;worldSupportHeight=worldGeometry.worldSupportHeight;worldStepUpHeight=worldGeometry.worldStepUpHeight;resolveCeilingCollision=worldGeometry.resolveCeilingCollision;groundMaterialCode=worldGeometry.groundMaterialCode||(()=>0);authoredEnvironment=worldGeometry.AUTHORED_ENVIRONMENT||null;
   rebuildTrajectoryCollision();minimapStaticCache=null;hudLastDraw=0;
   if(changed&&rebuild&&engineInitialized&&scene)rebuildWorldVisuals();
   return changed;
@@ -823,7 +833,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.49.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.50.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1294,7 +1304,7 @@ function collectLobbyStartSetup(){
   if(blue+red>MAX_BOTS)return null;
   const gameplay=collectAdminGameplayPatch(),weapons=collectAdminWeaponsPatch(),scoreLimit=Math.max(5,Math.min(100,Math.round(Number(draft.scoreLimit)||spec.scoreLimit))),timeLimit=Math.max(2,Math.min(30,Math.round(Number(draft.timeLimit)||Math.max(2,spec.timeLimitMs/60000))));
   return{
-    mode:normalizeGameMode(draft.mode),mapId:normalizeMapId(lobbyMapDraft||currentMapId),
+    mode:normalizeGameMode(draft.mode),mapId:normalizeMapId(lobbyMapDraft||currentMapId),customMapDefinition:normalizeMapId(lobbyMapDraft||currentMapId)==='custom-map'?customMapDefinition:undefined,
     rules:{scoreLimit,timeLimitMs:spec.scoreType==='none'||spec.cooperative?0:timeLimit*60000},
     bots:{blueBots:blue,redBots:red,difficulty:String(draft.difficulty||'normal')},
     minimap:{revealAll:draft.minimap!=='standard',directional:draft.minimap==='directional'},
@@ -1309,7 +1319,7 @@ function renderLobbySetupControls(){
   for(const btn of lobbyTacticalButtons)btn.classList.toggle('active',btn.dataset.lobbyTacticalChoice===draftLoadout.tactical);
   for(const btn of lobbyLethalButtons)btn.classList.toggle('active',btn.dataset.lobbyLethalChoice===draftLoadout.lethal);
   for(const btn of lobbyModeButtons)btn.classList.toggle('active',btn.dataset.lobbyModeChoice===draft.mode);
-  const mapChoice=host?(lobbyMapDraft||currentMapId):currentMapId;for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===mapChoice);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}renderLobbyMapPreview(mapChoice);
+  const mapChoice=host?(lobbyMapDraft||currentMapId):currentMapId;for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===mapChoice);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}const customLoad=$('lobbyLoadCustomMapBtn');if(customLoad)customLoad.disabled=!host||!matchAllowsLobbyEdits(matchState);updateCustomMapLobbyUi();renderLobbyMapPreview(mapChoice);
   if(host){
     const draftFfa=!draftSpec.teamBased;$('lobbyBlueBotWrap').classList.toggle('hide',draftFfa);$('lobbyRedBotWrap').classList.toggle('hide',draftFfa);$('lobbyFfaBotWrap').classList.toggle('hide',!draftFfa);
     lobbyBlueBotCount.value=String(draft.blueBots);lobbyRedBotCount.value=String(draft.redBots);lobbyFfaBotCount.value=String(draft.ffaBots);lobbyBotDifficulty.value=draft.difficulty;lobbyMinimapMode.value=draft.minimap;lobbyMod.value=draft.mod;lobbyMod.disabled=!matchAllowsLobbyEdits(matchState);
@@ -1325,7 +1335,7 @@ function renderLobbyShell(){
   const startBtn=$('lobbyStartBtn');startBtn.classList.toggle('hide',!host);startBtn.disabled=!matchAllowsLobbyEdits(matchState);
   for(const btn of lobbyTeamButtons)btn.classList.toggle('active',displaySpec.teamBased&&btn.dataset.lobbyTeamChoice===myTeam);
   
-  const committedRule=committedSpec.cooperative?'Survive escalating waves':committedSpec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||committedSpec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||committedSpec.timeLimitMs)/60000))} min`,committedMinimap=`Minimap: ${lobbyMinimapModeFromState()==='directional'?'Directional':(lobbyMinimapModeFromState()==='all'?'Always On':'Standard')}`,committedMap=mapSpec(currentMapId).name;
+  const committedRule=committedSpec.cooperative?'Survive escalating waves':committedSpec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||committedSpec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||committedSpec.timeLimitMs)/60000))} min`,committedMinimap=`Minimap: ${lobbyMinimapModeFromState()==='directional'?'Directional':(lobbyMinimapModeFromState()==='all'?'Always On':'Standard')}`,committedMap=displayMapSpec(currentMapId).name;
   $('lobbyGuestMode').textContent=`${committedSpec.name} · ${committedMap} · ${gameModSpec(worldSettings.mod).name}`;$('lobbyGuestBots').textContent=committedSpec.cooperative?'Melee zombies · Return next wave':`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${committedRule} · ${committedMinimap}${matchCustom?' · Custom rules':''}`;
 }
 function syncLobby({setup=true,roster=true}={}){if(!shell.inLobby)return;renderLobbyShell();if(setup){try{renderLobbySetupControls();}catch(error){console.error('Loadout/setup UI render failed without interrupting lobby session state.',error);}}setLobbyActionState();if(roster)renderLobbyRoster(lobbyDisplayMode());}
@@ -1337,7 +1347,13 @@ function updateLobbyMatchDraftFromControls(){
   lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());renderLobbyShell();renderLobbySetupControls();setLobbyActionState();
 }
 function setLobbyModeDraft(mode){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;if(!lobbyMatchDraft)lobbyMatchDraft=committedLobbyMatchDraft();lobbyMatchDraft={...lobbyMatchDraft,mode:normalizeGameMode(mode)};lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());syncLobby();}
-function setLobbyMapDraft(mapId){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;lobbyMapDraft=normalizeMapId(mapId);lobbyMapDirty=lobbyMapDraft!==normalizeMapId(currentMapId);renderLobbySetupControls();setLobbyActionState();}
+function updateCustomMapLobbyUi(){
+  const card=document.querySelector('[data-lobby-map-choice="custom-map"]'),load=$('lobbyLoadCustomMapBtn'),status=$('lobbyCustomMapStatus');if(card){const strong=card.querySelector('strong'),small=card.querySelector('small');if(strong)strong.textContent=customMapLoaded?String(customMapDefinition.meta?.name||'CUSTOM MAP').toUpperCase():'CUSTOM MAP';if(small)small.textContent=customMapLoaded?`Schema ${customMapDefinition.schemaVersion} · ${Math.round(customMapSummary(customMapDefinition).bytes/1024)} KB`:'Upload .breachmap.json';}if(load)load.textContent=customMapLoaded?'REPLACE MAP':'LOAD MAP';if(status){if(customMapLoaded){const q=customMapSummary(customMapDefinition);status.textContent=`${q.name} · ${q.buildings} buildings · ${q.props} props · ${q.spawns} team spawns`;}else status.textContent='Builder export · .breachmap.json';}}
+function requestCustomMapFile(){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;const input=$('lobbyCustomMapFile');if(input){input.value='';input.click();}}
+async function loadCustomMapFile(file){
+  if(!file)return false;const status=$('lobbyCustomMapStatus');try{if(file.size>MAX_CUSTOM_MAP_BYTES*1.35)throw new Error(`File is too large (${Math.ceil(file.size/1024)} KB).`);if(status)status.textContent='Validating map…';const parsed=JSON.parse(await file.text()),summary=installCustomMapDefinition(parsed,{persist:true,source:'upload',quiet:true});lobbyMapDraft='custom-map';lobbyMapDirty=lobbyMapDraft!==normalizeMapId(currentMapId)||customMapFingerprintValue!==activeCustomMapFingerprint;renderLobbySetupControls();setLobbyActionState();updateCustomMapLobbyUi();showToast(`CUSTOM MAP READY · ${summary.name}`);return true;}catch(error){if(status)status.textContent=String(error?.message||'Could not load map.');showToast(`MAP LOAD FAILED · ${String(error?.message||'invalid file').slice(0,80)}`,{priority:3,key:'custom-map-load'});return false;}
+}
+function setLobbyMapDraft(mapId){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;const next=normalizeMapId(mapId);if(next==='custom-map'&&!customMapLoaded){requestCustomMapFile();return;}lobbyMapDraft=next;lobbyMapDirty=lobbyMapDraft!==normalizeMapId(currentMapId)||(next==='custom-map'&&customMapFingerprintValue!==activeCustomMapFingerprint);renderLobbySetupControls();setLobbyActionState();}
 function setLobbyLoadoutDraft(next={}){
   if(!lobbyClassDrafts)lobbyClassDrafts=normalizeLoadoutClasses(loadoutClasses,selectedLoadout());if(!lobbyLoadoutDraft)lobbyLoadoutDraft=classLoadout(lobbyClassDrafts,loadoutEditClass.lobby||activeClassId);
   lobbyLoadoutDraft=normalizeLoadoutChoice({...lobbyLoadoutDraft,...next});lobbyClassDrafts=writeClassLoadout(lobbyClassDrafts,loadoutEditClass.lobby,lobbyLoadoutDraft);markLobbyLoadoutDirty();renderLobbySetupControls();setLobbyActionState();syncLobbyClassesToServer();
@@ -1345,7 +1361,7 @@ function setLobbyLoadoutDraft(next={}){
 
 function syncPauseContext(){
   if(shell.inMatch)syncLobbyHostControlPlacement();const spec=currentModeSpec(),badge=$('pauseTeamBadge');if(badge){badge.textContent=spec.cooperative?'SURVIVOR':spec.teamBased?`${myTeam.toUpperCase()} TEAM`:spec.short;const color=spec.teamBased?TEAM_COLORS[myTeam]:HUD_ACCENT;badge.style.color=color;badge.style.borderColor=`${color}88`;badge.style.background=`${color}22`;}
-  if($('pauseRoom'))$('pauseRoom').textContent=`${mapSpec(currentMapId).short} · ${spec.short}${worldSettings.mod==='normal'?'':' · '+gameModSpec(worldSettings.mod).name.toUpperCase()}`;
+  if($('pauseRoom'))$('pauseRoom').textContent=`${displayMapSpec(currentMapId).short} · ${spec.short}${worldSettings.mod==='normal'?'':' · '+gameModSpec(worldSettings.mod).name.toUpperCase()}`;
   if($('pauseLoadout'))$('pauseLoadout').textContent=loadoutClassById(loadoutClasses,pendingClassId||activeClassId).name;
   const adminBtn=$('adminBtn');if(adminBtn)adminBtn.classList.toggle('hide',!isMatchAdmin);
   const leave=$('leaveBtn');if(leave){leave.disabled=false;const label=leave.querySelector('span');if(label)label.textContent='Leave Match';}
@@ -2003,14 +2019,13 @@ function applyWorldEnvironment(){
   if(!scene||!THREE)return;
   restoreSolarEnvironment();
   if(modSkyRoot){scene.remove(modSkyRoot);disposeObject3D(modSkyRoot);modSkyRoot=null;}
-  const moon=gameModSpec(worldSettings.mod).environment==='moon',depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig';
-  const sky=moon?0x02040b:rig?0xb9a27f:yard?0x7e878d:depot?0x89979d:0x9acde6;
-  scene.background=new THREE.Color(sky);
-  scene.fog=moon?null:new THREE.Fog(sky,rig?72:yard?58:depot?90:95,rig?205:yard?145:depot?260:285);
-  if(worldHemiLight){worldHemiLight.color.set(moon?0xb4caff:0xdaf4ff);worldHemiLight.groundColor.set(moon?0x444b65:0x52604c);worldHemiLight.intensity=moon?1.65:2.2;thermalOpticLightStates.delete(worldHemiLight);}
-  if(worldSunLight){worldSunLight.color.set(moon?0xd3e2ff:0xffffff);worldSunLight.intensity=moon?2.4:2.15;thermalOpticLightStates.delete(worldSunLight);}
-  thermalOpticBackgroundState=null;thermalOpticFogState=null;
-  if(moon){modSkyRoot=createMoonSky(THREE);scene.add(modSkyRoot);}
+  const moon=gameModSpec(worldSettings.mod).environment==='moon',depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig',custom=currentMapId==='custom-map'&&authoredEnvironment&&Object.keys(authoredEnvironment).length;
+  let sky=moon?0x02040b:rig?0xb9a27f:yard?0x7e878d:depot?0x89979d:0x9acde6,fogNear=rig?72:yard?58:depot?90:95,fogFar=rig?205:yard?145:depot?260:285,hemiIntensity=moon?1.65:2.2,sunIntensity=moon?2.4:2.15,hemiColor=moon?0xb4caff:0xdaf4ff,groundColor=moon?0x444b65:0x52604c,sunColor=moon?0xd3e2ff:0xffffff;
+  if(custom&&!moon){const e=authoredEnvironment,night=Number(e.sunElevation)<0,storm=e.weather==='storm',overcast=e.weather==='overcast'||Number(e.cloudAmount)>.7;if(night)sky=0x0b1427;else if(storm)sky=0x3d464c;else if(overcast)sky=0x76848a;else if(Number(e.sunElevation)<20)sky=0xca9167;else sky=0x7eb0cc;const fog=Math.max(0,Math.min(.85,Number(e.fogAmount)||0));fogFar=Math.max(70,285-fog*235);fogNear=Math.max(18,fogFar*(.28+fog*.10));hemiIntensity=Math.max(.35,Math.min(2.7,(Number(e.ambient)||.72)*3));sunIntensity=night?.55:Math.max(.65,2.25*(.55+Math.max(0,Number(e.sunElevation)||0)/120));hemiColor=night?0x889bc2:overcast?0xd5e1e4:0xdaf4ff;groundColor=night?0x283044:0x52604c;sunColor=night?0xc9d8eb:Number(e.sunElevation)<20?0xffbe73:0xffedbe;if(worldSunLight){const az=(Number(e.sunAzimuth)||0)*Math.PI/180,el=(Number(e.sunElevation)||0)*Math.PI/180,r=55;worldSunLight.position.set(Math.cos(el)*Math.cos(az)*r,Math.sin(el)*r,Math.cos(el)*Math.sin(az)*r);}}
+  scene.background=new THREE.Color(sky);scene.fog=moon?null:new THREE.Fog(sky,fogNear,fogFar);
+  if(worldHemiLight){worldHemiLight.color.set(hemiColor);worldHemiLight.groundColor.set(groundColor);worldHemiLight.intensity=hemiIntensity;thermalOpticLightStates.delete(worldHemiLight);}
+  if(worldSunLight){worldSunLight.color.set(sunColor);worldSunLight.intensity=sunIntensity;thermalOpticLightStates.delete(worldSunLight);}
+  thermalOpticBackgroundState=null;thermalOpticFogState=null;if(moon){modSkyRoot=createMoonSky(THREE);scene.add(modSkyRoot);}
 }
 function buildWorldVisuals(){
   if(!scene||!THREE)return;
@@ -2036,31 +2051,23 @@ function rebuildWorldVisuals(){
 }
 
 function addTerrain(){
-  const size=TERRAIN_SIZE,segments=TERRAIN_SEGMENTS;
-  const geo=new THREE.PlaneGeometry(size,size,segments,segments),pos=geo.attributes.position;
-  const colors=[];
-  const depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig',low=new THREE.Color(rig?0x8f7957:(yard?0x686c6d:(depot?0x62655f:0x587552))),mid=new THREE.Color(rig?0xa58d66:(yard?0x747878:(depot?0x777972:0x78915f))),high=new THREE.Color(rig?0xb59a70:(yard?0x7d8080:(depot?0x756d60:0x807a65))),peak=new THREE.Color(rig?0xc0a77c:(yard?0x858888:(depot?0x8b8375:0x9a9586)));
+  const size=TERRAIN_SIZE,segments=TERRAIN_SEGMENTS,geo=new THREE.PlaneGeometry(size,size,segments,segments),pos=geo.attributes.position,colors=[];
+  const depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig',customMaterials=currentMapId==='custom-map'&&worldGeometry.AUTHORED_MATERIAL_SURFACE,wet=Math.max(0,Math.min(1,Number(authoredEnvironment?.wetness)||0)),low=new THREE.Color(rig?0x8f7957:(yard?0x686c6d:(depot?0x62655f:0x587552))),mid=new THREE.Color(rig?0xa58d66:(yard?0x747878:(depot?0x777972:0x78915f))),high=new THREE.Color(rig?0xb59a70:(yard?0x7d8080:(depot?0x756d60:0x807a65))),peak=new THREE.Color(rig?0xc0a77c:(yard?0x858888:(depot?0x8b8375:0x9a9586))),materialPalette=[0x6c7b62,0x557947,0x80664a,0xb79b6b,0x777a76,0x858b8c,0x5f4c3d,0x696a65,0xd9e1e2];
   for(let i=0;i<pos.count;i++){
-    const x=pos.getX(i),z=-pos.getY(i),h=terrainHeight(x,z);pos.setZ(i,h);
-    const color=new THREE.Color();
-    if(h<1.5)color.lerpColors(low,mid,THREE.MathUtils.clamp((h+2.4)/3.9,0,1));
-    else if(h<7)color.lerpColors(mid,high,(h-1.5)/5.5);
-    else color.lerpColors(high,peak,THREE.MathUtils.clamp((h-7)/6.8,0,1));
+    const x=pos.getX(i),z=-pos.getY(i),h=terrainHeight(x,z);pos.setZ(i,h);let color;
+    if(customMaterials){const code=Math.max(0,Math.min(8,Math.round(groundMaterialCode(x,z)||0)));if(code){color=new THREE.Color(materialPalette[code]);const noise=.94+((Math.sin(x*1.73+z*2.91)+Math.cos(x*.57-z*1.31))*.025);color.multiplyScalar(noise*(1-wet*.18));}else{color=new THREE.Color();if(h<1.5)color.lerpColors(low,mid,THREE.MathUtils.clamp((h+2.4)/3.9,0,1));else if(h<7)color.lerpColors(mid,high,(h-1.5)/5.5);else color.lerpColors(high,peak,THREE.MathUtils.clamp((h-7)/6.8,0,1));}}else{color=new THREE.Color();if(h<1.5)color.lerpColors(low,mid,THREE.MathUtils.clamp((h+2.4)/3.9,0,1));else if(h<7)color.lerpColors(mid,high,(h-1.5)/5.5);else color.lerpColors(high,peak,THREE.MathUtils.clamp((h-7)/6.8,0,1));}
     colors.push(color.r,color.g,color.b);
   }
-  geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));
-  geo.computeVertexNormals();
-  const terrainTexture=makeTerrainTexture();
-  const mat=new THREE.MeshStandardMaterial({vertexColors:true,map:terrainTexture,roughness:1,metalness:0});
-  const ground=new THREE.Mesh(geo,mat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=!isTouch;worldRoot.add(ground);
+  geo.setAttribute('color',new THREE.Float32BufferAttribute(colors,3));geo.computeVertexNormals();const terrainTexture=makeTerrainTexture(),mat=new THREE.MeshStandardMaterial({vertexColors:true,map:terrainTexture,roughness:1,metalness:0}),ground=new THREE.Mesh(geo,mat);ground.rotation.x=-Math.PI/2;ground.receiveShadow=!isTouch;worldRoot.add(ground);
 }
 function makeTerrainTexture(){
   const size=256,c=document.createElement('canvas');c.width=c.height=size;const x=c.getContext('2d');
-  const image=x.createImageData(size,size),depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig';let seed=rig?0x9f5e2b:(yard?0x413c37:(depot?0x6d4f23:0x51f15e));
+  const image=x.createImageData(size,size),depot=currentMapId==='depot',yard=currentMapId==='yard',rig=currentMapId==='rig',customMaterials=currentMapId==='custom-map'&&worldGeometry.AUTHORED_MATERIAL_SURFACE;let seed=rig?0x9f5e2b:(yard?0x413c37:(depot?0x6d4f23:0x51f15e));
   const rand=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/4294967296;};
   for(let py=0;py<size;py++)for(let px=0;px<size;px++){
     const i=(py*size+px)*4,n=rand(),wave=Math.sin(px*.19+Math.sin(py*.07))*5+Math.cos(py*.15)*4;
-    if(rig){const v=Math.max(142,Math.min(205,176+(n-.5)*34+wave*.42));image.data[i]=v;image.data[i+1]=Math.round(v*.86);image.data[i+2]=Math.round(v*.64);image.data[i+3]=255;}
+    if(customMaterials){const v=Math.max(202,Math.min(246,226+(n-.5)*20+wave*.18));image.data[i]=image.data[i+1]=image.data[i+2]=v;image.data[i+3]=255;}
+    else if(rig){const v=Math.max(142,Math.min(205,176+(n-.5)*34+wave*.42));image.data[i]=v;image.data[i+1]=Math.round(v*.86);image.data[i+2]=Math.round(v*.64);image.data[i+3]=255;}
     else if(yard){const v=Math.max(118,Math.min(174,145+(n-.5)*24+wave*.35));image.data[i]=v;image.data[i+1]=v+2;image.data[i+2]=v+3;image.data[i+3]=255;}
     else{const v=Math.max(depot?128:168,Math.min(depot?202:238,(depot?168:211)+(n-.5)*(depot?36:30)+wave));image.data[i]=Math.round(v*(depot?.94:.96));image.data[i+1]=Math.round(v*(depot?.93:1));image.data[i+2]=Math.round(v*(depot?.89:.88));image.data[i+3]=255;}
   }
@@ -2305,6 +2312,7 @@ function bindUI(){
   for(const el of [lobbyBlueBotCount,lobbyRedBotCount,lobbyFfaBotCount,lobbyBotDifficulty,lobbyScoreLimit,lobbyTimeLimit,lobbyMinimapMode,lobbyMod])el.addEventListener('input',updateLobbyMatchDraftFromControls);
   for(const root of [$('adminGameplay'),$('adminAdvanced')]){root?.addEventListener('input',()=>{if(shell.inLobby)setLobbyActionState();});root?.addEventListener('change',()=>{if(shell.inLobby)setLobbyActionState();else if(shell.inMatch&&isMatchAdmin)saveAdminSettings(root.id==='adminAdvanced'?'advanced':'gameplay');});}
   for(const btn of lobbyMapButtons)btn.addEventListener('click',()=>setLobbyMapDraft(btn.dataset.lobbyMapChoice));
+  $('lobbyLoadCustomMapBtn')?.addEventListener('click',requestCustomMapFile);$('lobbyCustomMapFile')?.addEventListener('change',event=>{const file=event.target.files?.[0];if(file)void loadCustomMapFile(file);});updateCustomMapLobbyUi();
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
     const setup=collectLobbyStartSetup();if(!setup){$('lobbyStatus').textContent=`Maximum ${MAX_BOTS} bots per match.`;return;}
@@ -2683,7 +2691,7 @@ function renderMatches(rooms){
     const row=document.createElement('div');row.className='match';
     const left=document.createElement('div');const blue=Number(room.blue)||0,red=Number(room.red)||0,blueBots=Number(room.blueBots)||0,redBots=Number(room.redBots)||0;
     const codeEl=document.createElement('div');codeEl.className='match-code';codeEl.textContent=String(room.code||'');
-    const botMeta=document.createElement('div');botMeta.className='match-meta';const roomMode=normalizeGameMode(room.mode),roomSpec=gameModeSpec(roomMode),scoreText=roomSpec.scoreType==='team'?`${Number(room.blueScore)||0}-${Number(room.redScore)||0} / ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:roomSpec.scoreType==='player'?`First ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:'Open play';botMeta.textContent=`${room.custom?'CUSTOM · ':''}${mapSpec(room.mapId).short} · ${roomSpec.short} · ${String(room.matchStatus||'waiting').toUpperCase()} · ${scoreText} · Bots ${blueBots+redBots}`;if(room.custom)codeEl.classList.add('custom-match');
+    const botMeta=document.createElement('div');botMeta.className='match-meta';const roomMode=normalizeGameMode(room.mode),roomSpec=gameModeSpec(roomMode),scoreText=roomSpec.scoreType==='team'?`${Number(room.blueScore)||0}-${Number(room.redScore)||0} / ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:roomSpec.scoreType==='player'?`First ${Number(room.scoreLimit)||roomSpec.scoreLimit}`:'Open play';botMeta.textContent=`${room.custom?'CUSTOM · ':''}${room.mapId==='custom-map'&&room.mapName?String(room.mapName).slice(0,24):displayMapSpec(room.mapId).short} · ${roomSpec.short} · ${String(room.matchStatus||'waiting').toUpperCase()} · ${scoreText} · Bots ${blueBots+redBots}`;if(room.custom)codeEl.classList.add('custom-match');
     const teamCounts=document.createElement('div');teamCounts.className='team-counts';
     if(roomSpec.teamBased){const blueChip=document.createElement('span');blueChip.className='team-chip blue';blueChip.textContent=`BLUE ${blue}`;const redChip=document.createElement('span');redChip.className='team-chip red';redChip.textContent=`RED ${red}`;teamCounts.append(blueChip,redChip);}else{const ffaChip=document.createElement('span');ffaChip.className='team-chip ffa';ffaChip.textContent=`COMBATANTS ${blue+red}`;teamCounts.append(ffaChip);}
     left.append(codeEl,botMeta,teamCounts);
@@ -2784,6 +2792,7 @@ function resetMatchPresentationForLobby(){
   traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;moveVelocityX=moveVelocityZ=0;verticalVelocity=0;knockX=knockZ=0;jumpBufferedUntil=0;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();setAim(false);hudLayout=null;hudLastDraw=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();
 }
 function handleMatchLobby(m){
+  if(m.customMapDefinition){try{installCustomMapDefinition(m.customMapDefinition,{persist:false,source:'room',quiet:true});}catch(error){showToast(`CUSTOM MAP SYNC FAILED · ${String(error?.message||'invalid map')}`,{priority:3});}}if(m.mapId)setActiveMap(m.mapId,{rebuild:true});
   applyClientMatchState(m.match);matchCustom=!!m.custom;const players=Array.isArray(m.players)?m.players:[],bots=Array.isArray(m.bots)?m.bots:[],self=players.find(player=>samePlayerId(player?.id,clientId))||null;
   if(self){myTeam=self.team||myTeam;rememberTeam(myTeam);pendingTeam='';if(self.activeClassId)activeClassId=normalizeLoadoutClassId(self.activeClassId);pendingClassId=self.pendingClassId?normalizeLoadoutClassId(self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(self.primaryWeapon)?self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(self.secondaryWeapon)?self.secondaryWeapon:secondaryWeapon;applyAttachmentState(self);tacticalEquipment=normalizeTactical(self.tactical);lethalEquipment=normalizeLethal(self.lethal);pendingLoadout=null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);currentWeapon=primaryWeapon;godMode=!!self.godMode;hp=Math.max(0,Math.min(100,Number(self.hp??100)||0));myStats={kills:Number(self.kills)||0,deaths:Number(self.deaths)||0};ammo=normalizeClientAmmo(self.ammo);equipment=normalizeEquipment(self.equipment);selfColor=currentModeSpec().teamBased?(TEAM_COLORS[myTeam]||selfColor):TEAM_COLORS.blue;syncLocalWeaponModel();}
   lobbyLoadoutDraft=null;lobbyClassDrafts=null;lobbyLoadoutDirty=false;lobbyStartingClassId=normalizeLoadoutClassId(activeClassId);loadoutEditClass.lobby=normalizeLoadoutClassId(activeClassId);rememberLoadoutClasses(loadoutClasses,activeClassId);pendingGameSnapshot=self?gameSnapshot(self,players,bots,m.match?.serverTime):null;replaceLobbyParticipants(players,bots);resetMatchPresentationForLobby();syncModeVisuals();syncPauseContext();showLobby();
@@ -2795,7 +2804,7 @@ function handleMessage(m){
     if(Number(m.protocol)!==PROTOCOL_VERSION){void checkForClientUpdate('welcome-protocol');showToast('CLIENT / SERVER VERSION MISMATCH');leaveMatch();return;}
     if((m.gameVersion&&String(m.gameVersion)!==APP_VERSION)||(m.buildId&&String(m.buildId)!==BUILD_ID))void checkForClientUpdate('welcome-build');
     if(Number.isFinite(Number(m.serverTime)))serverClockOffset=Number(m.serverTime)-Date.now();
-    setActiveMap(m.mapId,{rebuild:true});currentRoom=m.code;isMatchAdmin=!!m.isAdmin;matchOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;myTeam=m.self.team||myTeam;rememberTeam(myTeam);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;moveVelocityX=moveVelocityZ=0;onGround=m.self.grounded!==false;lastGroundedAt=onGround?performance.now():0;jumpBufferedUntil=0;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;stopSlide();cancelSprint();jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};applyKillstreakState(m.self.killstreak||{});wastedUntil=m.self.wastedUntil||0;loadoutClasses=normalizeLoadoutClasses(m.self.loadoutClasses??loadoutClasses,selectedLoadout());activeClassId=normalizeLoadoutClassId(m.self.activeClassId??activeClassId);pendingClassId=m.self.pendingClassId?normalizeLoadoutClassId(m.self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(m.self.secondaryWeapon)?m.self.secondaryWeapon:secondaryWeapon;applyAttachmentState(m.self);tacticalEquipment=normalizeTactical(m.self.tactical);lethalEquipment=normalizeLethal(m.self.lethal);pendingLoadout=m.self.pendingLoadout?normalizeLoadoutChoice(m.self.pendingLoadout):null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);rememberLoadoutClasses(loadoutClasses,pendingClassId||activeClassId);pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon===secondaryWeapon||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
+    if(m.customMapDefinition){try{installCustomMapDefinition(m.customMapDefinition,{persist:false,source:'room',quiet:true});}catch(error){showToast(`CUSTOM MAP SYNC FAILED · ${String(error?.message||'invalid map')}`,{priority:3});}}setActiveMap(m.mapId,{rebuild:true});currentRoom=m.code;isMatchAdmin=!!m.isAdmin;matchOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;myTeam=m.self.team||myTeam;rememberTeam(myTeam);selfColor=TEAM_COLORS[myTeam]||m.self.color||selfColor;godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;moveVelocityX=moveVelocityZ=0;onGround=m.self.grounded!==false;lastGroundedAt=onGround?performance.now():0;jumpBufferedUntil=0;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;stopSlide();cancelSprint();jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};applyKillstreakState(m.self.killstreak||{});wastedUntil=m.self.wastedUntil||0;loadoutClasses=normalizeLoadoutClasses(m.self.loadoutClasses??loadoutClasses,selectedLoadout());activeClassId=normalizeLoadoutClassId(m.self.activeClassId??activeClassId);pendingClassId=m.self.pendingClassId?normalizeLoadoutClassId(m.self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(m.self.secondaryWeapon)?m.self.secondaryWeapon:secondaryWeapon;applyAttachmentState(m.self);tacticalEquipment=normalizeTactical(m.self.tactical);lethalEquipment=normalizeLethal(m.self.lethal);pendingLoadout=m.self.pendingLoadout?normalizeLoadoutChoice(m.self.pendingLoadout):null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);rememberLoadoutClasses(loadoutClasses,pendingClassId||activeClassId);pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon===secondaryWeapon||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
     yaw=m.self.yaw||0;pitch=m.self.pitch||0;recoilDebtPitch=recoilDebtYaw=recoilPatternPitch=recoilPatternYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();pendingGameSnapshot=gameSnapshot(m.self,m.players||[],m.bots||[],m.serverTime);replaceLobbyParticipants(m.players||[],m.bots||[]);
     syncModeVisuals();syncLocalStatus();syncPauseContext();if(matchAllowsLobbyEdits(matchState))showLobby();else{void enterGame(pendingGameSnapshot);}return;
   }
@@ -2846,7 +2855,7 @@ function handleMessage(m){
   if(m.t==='teamQueued'){if(m.id===clientId){pendingTeam=m.pendingTeam||'';syncPauseContext();showToast(pendingTeam?`TEAM SWITCH QUEUED · ${pendingTeam.toUpperCase()}`:'TEAM SWITCH CANCELED');syncLobby();}return;}
   if(m.t==='matchLobby'){handleMatchLobby(m);return;}
   if(m.t==='match'){applyClientMatchState(m.match);matchCustom=!!m.custom;if(shell.panel===SHELL_PANEL.ADMIN&&m.rulesUpdated&&m.by===clientId)setAdminStatus('');if(matchAllowsLobbyEdits(matchState)){syncLobby();syncModeVisuals();}return;}
-  if(m.t==='matchReset'){if(m.mapId)setActiveMap(m.mapId,{rebuild:true});if(m.settings)applyWorldSettings(m.settings);if(m.botConfig)botConfig=normalizeBotConfig(m.botConfig);lobbyMatchDraft=null;lobbyMatchDirty=false;lobbyMapDraft='';lobbyMapDirty=false;lobbyLoadoutDraft=null;lobbyClassDrafts=null;lobbyLoadoutDirty=false;lobbyLoadoutRevision=0;lobbyLoadoutAckRevision=0;lobbyKillstreakDraft=[...killstreakSelection];lobbyKillstreakRevision=0;lobbyKillstreakAckRevision=0;lobbyKillstreakSyncPending=false;applyClientMatchState(m.match);matchCustom=!!m.custom;myStats={kills:0,deaths:0};resetKillstreakClientState();const players=m.players||[],bots=m.bots||[],self=players.find(pl=>pl?.id===clientId)||null;if(self){myTeam=self.team||myTeam;pendingTeam='';if(self.activeClassId)activeClassId=normalizeLoadoutClassId(self.activeClassId);pendingClassId=self.pendingClassId?normalizeLoadoutClassId(self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(self.primaryWeapon)?self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(self.secondaryWeapon)?self.secondaryWeapon:secondaryWeapon;applyAttachmentState(self);tacticalEquipment=normalizeTactical(self.tactical);lethalEquipment=normalizeLethal(self.lethal);pendingLoadout=null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);rememberLoadoutClasses(loadoutClasses,activeClassId);}pendingGameSnapshot=gameSnapshot(self,players,bots,m.match?.serverTime);replaceLobbyParticipants(players,bots);syncModeVisuals();if(shell.inLobby||!engineReady){void enterGame(pendingGameSnapshot,{resetRound:true});}else applyGameSnapshot(pendingGameSnapshot,{resetRound:true});return;}
+  if(m.t==='matchReset'){if(m.customMapDefinition){try{installCustomMapDefinition(m.customMapDefinition,{persist:false,source:'room',quiet:true});}catch(error){showToast(`CUSTOM MAP SYNC FAILED · ${String(error?.message||'invalid map')}`,{priority:3});}}if(m.mapId)setActiveMap(m.mapId,{rebuild:true});if(m.settings)applyWorldSettings(m.settings);if(m.botConfig)botConfig=normalizeBotConfig(m.botConfig);lobbyMatchDraft=null;lobbyMatchDirty=false;lobbyMapDraft='';lobbyMapDirty=false;lobbyLoadoutDraft=null;lobbyClassDrafts=null;lobbyLoadoutDirty=false;lobbyLoadoutRevision=0;lobbyLoadoutAckRevision=0;lobbyKillstreakDraft=[...killstreakSelection];lobbyKillstreakRevision=0;lobbyKillstreakAckRevision=0;lobbyKillstreakSyncPending=false;applyClientMatchState(m.match);matchCustom=!!m.custom;myStats={kills:0,deaths:0};resetKillstreakClientState();const players=m.players||[],bots=m.bots||[],self=players.find(pl=>pl?.id===clientId)||null;if(self){myTeam=self.team||myTeam;pendingTeam='';if(self.activeClassId)activeClassId=normalizeLoadoutClassId(self.activeClassId);pendingClassId=self.pendingClassId?normalizeLoadoutClassId(self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(self.primaryWeapon)?self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(self.secondaryWeapon)?self.secondaryWeapon:secondaryWeapon;applyAttachmentState(self);tacticalEquipment=normalizeTactical(self.tactical);lethalEquipment=normalizeLethal(self.lethal);pendingLoadout=null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);rememberLoadoutClasses(loadoutClasses,activeClassId);}pendingGameSnapshot=gameSnapshot(self,players,bots,m.match?.serverTime);replaceLobbyParticipants(players,bots);syncModeVisuals();if(shell.inLobby||!engineReady){void enterGame(pendingGameSnapshot,{resetRound:true});}else applyGameSnapshot(pendingGameSnapshot,{resetRound:true});return;}
   if(m.t==='kill'){handleKill(m);return;}
   if(m.t==='settings'){applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);if(typeof m.custom==='boolean')matchCustom=m.custom;const section=m.section==='advanced'?'advanced':'gameplay';if(shell.panel===SHELL_PANEL.ADMIN){if(m.by===clientId){if(section==='advanced')populateAdminWeapons(worldSettings);else populateAdminGameplay(worldSettings);setAdminStatus('');}else if(activeAdminTab!==section){if(section==='advanced')populateAdminWeapons(worldSettings);else populateAdminGameplay(worldSettings);}}syncLobby();return;}
   if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncLobbyBots(m.bots||[]);if(shell.inMatch&&engineReady)syncBotRoster(m.bots||[]);syncLobby();if(shell.panel===SHELL_PANEL.ADMIN){populateAdminBots(botConfig);setAdminStatus('');}return;}
@@ -5120,7 +5129,7 @@ function minimapObstacles(geometry=worldGeometry){
   const out=[];for(const o of geometry.STATIC_BOXES||[])out.push({type:'box',x:o.x,z:o.z,w:o.w,d:o.d,rot:o.rot||0,kind:o.kind||'cover'});for(const b of geometry.BUILDINGS||[])out.push({type:'building',x:b.x,z:b.z,w:b.w,d:b.d,rot:b.rot||0});for(const e of geometry.ELEVATION_OBJECTS||[])out.push({type:'box',x:e.x,z:e.z,w:e.w,d:e.d,rot:e.rot||0,kind:e.kind||'platform'});for(const p of geometry.PYRAMIDS||[])out.push({type:'pyramid',x:p.x,z:p.z,base:p.base});for(const o of geometry.NATURAL_OBSTACLES||[])out.push({type:o.type,x:o.x,z:o.z,r:o.r,h:o.h});return out;
 }
 function getMinimapStatic(w=512,h=512,mapId=currentMapId){
-  const id=normalizeMapId(mapId),geometry=CLIENT_WORLD_BUNDLES[id]?.geometry||worldGeometry,mapLimit=minimapWorldLimit(geometry),key=`${id}:${mapLimit}:${Math.round(w)}x${Math.round(h)}`;if(minimapStaticCache?.key===key)return minimapStaticCache.canvas;
+  const id=normalizeMapId(mapId),geometry=CLIENT_WORLD_BUNDLES[id]?.geometry||worldGeometry,mapLimit=minimapWorldLimit(geometry),mapRevision=id==='custom-map'?customMapFingerprintValue:'builtin',key=`${id}:${mapRevision}:${mapLimit}:${Math.round(w)}x${Math.round(h)}`;if(minimapStaticCache?.key===key)return minimapStaticCache.canvas;
   const q=document.createElement('canvas');q.width=Math.max(1,Math.round(w));q.height=Math.max(1,Math.round(h));const c=q.getContext('2d'),iw=q.width,ih=q.height,terrainCells=32,cellW=iw/terrainCells,cellH=ih/terrainCells,terrainFn=geometry.terrainHeight||terrainHeight;
   c.fillStyle='rgba(19,27,26,.94)';c.fillRect(0,0,iw,ih);for(let gy=0;gy<terrainCells;gy++)for(let gx=0;gx<terrainCells;gx++){const wx=-mapLimit+(gx+.5)/terrainCells*mapLimit*2,wz=-mapLimit+(gy+.5)/terrainCells*mapLimit*2,hv=terrainFn(wx,wz),t=Math.max(0,Math.min(1,(hv+2.4)/16.2));c.fillStyle=`rgba(${Math.round(58+72*t)},${Math.round(78+46*t)},${Math.round(57+31*t)},${.34+.34*t})`;c.fillRect(gx*cellW,gy*cellH,cellW+.7,cellH+.7);}
   const toX=x=>(x+mapLimit)/(mapLimit*2)*iw,toY=z=>(z+mapLimit)/(mapLimit*2)*ih;const drawRotRect=(x,z,w,d,rot,fill,stroke='')=>{const cx=toX(x),cy=toY(z),sx=w/(mapLimit*2)*iw,sy=d/(mapLimit*2)*ih,a=(Number(rot)||0)*Math.PI/180;c.save();c.translate(cx,cy);c.rotate(a);c.fillStyle=fill;c.fillRect(-sx/2,-sy/2,sx,sy);if(stroke){c.strokeStyle=stroke;c.lineWidth=Math.max(1,iw/512);c.strokeRect(-sx/2+.5,-sy/2+.5,Math.max(0,sx-1),Math.max(0,sy-1));}c.restore();};for(const road of geometry.ROADS||[]){const kind=road.kind||'street',fill=kind==='dirt'?'rgba(123,101,72,.72)':kind==='sidewalk'?'rgba(125,132,135,.68)':'rgba(48,54,57,.86)',cx=toX(road.x),cy=toY(road.z),sx=road.w/(mapLimit*2)*iw,a=(Number(road.rot)||0)*Math.PI/180;drawRotRect(road.x,road.z,road.w,road.d,road.rot,fill);if(kind==='street'||kind==='service'){c.save();c.translate(cx,cy);c.rotate(a);c.strokeStyle=kind==='street'?'rgba(211,174,72,.72)':'rgba(228,230,226,.54)';c.lineWidth=Math.max(1,iw/512);c.setLineDash([5,5]);c.beginPath();c.moveTo(-sx/2,0);c.lineTo(sx/2,0);c.stroke();c.restore();c.setLineDash([]);}}for(const b of minimapObstacles(geometry)){if(b.type==='box'||b.type==='building'){drawRotRect(b.x,b.z,b.w,b.d,b.rot||0,b.type==='building'?'rgba(226,231,234,.64)':'rgba(190,199,204,.43)',b.type==='building'?'rgba(255,255,255,.30)':'');}else if(b.type==='pyramid'){const px=toX(b.x),py=toY(b.z),rr=b.base/(mapLimit*2)*iw*.55;c.beginPath();c.moveTo(px,py-rr);c.lineTo(px+rr,py+rr);c.lineTo(px-rr,py+rr);c.closePath();c.fillStyle='rgba(207,199,170,.62)';c.fill();}else{const px=toX(b.x),py=toY(b.z),rr=Math.max(1.6,(b.r||1)/(mapLimit*2)*iw*1.6);c.beginPath();c.arc(px,py,rr,0,Math.PI*2);c.fillStyle=b.type==='tree'?'rgba(41,101,52,.84)':b.type==='bush'?'rgba(65,116,59,.76)':'rgba(148,154,153,.72)';c.fill();}}

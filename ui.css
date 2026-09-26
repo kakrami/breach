@@ -1052,3 +1052,12 @@ body{font-size:var(--ui-md)}
 [data-input-mode="controller"] .lobby-match-card .lobby-setup-row,
 [data-input-mode="controller"] .admin-bot-controls,
 [data-input-mode="controller"] .weapon-fields{grid-template-columns:1fr!important}
+
+/* v1.50 custom authored-map loading */
+.lobby-map-toolbar{grid-template-columns:minmax(0,1fr)!important;align-items:stretch!important}
+.lobby-custom-map-tools{min-width:0;display:flex;align-items:center;gap:8px;padding-top:5px;border-top:1px solid rgba(255,255,255,.08)}
+.lobby-custom-map-load{height:34px;min-width:108px;flex:0 0 auto}
+#lobbyCustomMapStatus{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted);font-size:9.5px;font-weight:800;letter-spacing:.025em}
+.lobby-map-choice[data-lobby-map-choice="custom-map"]{border-style:dashed}
+.lobby-map-choice[data-lobby-map-choice="custom-map"].active{border-style:solid}
+@media(max-width:620px){.lobby-custom-map-tools{gap:6px}.lobby-custom-map-load{min-width:92px;height:32px}#lobbyCustomMapStatus{font-size:9px}.lobby-map-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
