@@ -1,4 +1,4 @@
-import { createTraversalPlan, traversalPose } from './movement-model.js?v=1.52.2';
+import { createTraversalPlan, traversalPose } from './movement-model.js?v=1.53.0';
 
 const TRAVERSE_PROBE = 1.65;
 const VAULT_MAX_RISE = 1.10;

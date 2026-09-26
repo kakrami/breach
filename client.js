@@ -1,34 +1,34 @@
-import { createMoonSky } from './mod-environment.js?v=1.52.2';
+import { createMoonSky } from './mod-environment.js?v=1.53.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.52.2';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.52.2';
-import * as YardGeometry from './world-geometry-yard.js?v=1.52.2';
-import * as RigGeometry from './world-geometry-rig.js?v=1.52.2';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.52.2';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.52.2';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.52.2';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.52.2';
+import * as HighlandsGeometry from './world-geometry.js?v=1.53.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.53.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.53.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.53.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.53.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.53.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.53.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.53.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, TEAM_COLORS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.52.2';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.52.2';
-import { createAudioEngine } from './audio-engine.js?v=1.52.2';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.52.2';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.52.2';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.52.2';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.52.2';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.52.2';
-import { createControllerRecording } from './controller-recording.js?v=1.52.2';
-import { createPointerSessions } from './pointer-sessions.js?v=1.52.2';
-import { createSafeStorage } from './browser-storage.js?v=1.52.2';
-import { createUiFocusScope } from './ui-focus.js?v=1.52.2';
-import { createUiGestures } from './ui-gestures.js?v=1.52.2';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.52.2';
-import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.52.2';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.52.2';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.52.2';
+} from './game-config.js?v=1.53.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.53.0';
+import { createAudioEngine } from './audio-engine.js?v=1.53.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.53.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.53.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.53.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.53.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.53.0';
+import { createControllerRecording } from './controller-recording.js?v=1.53.0';
+import { createPointerSessions } from './pointer-sessions.js?v=1.53.0';
+import { createSafeStorage } from './browser-storage.js?v=1.53.0';
+import { createUiFocusScope } from './ui-focus.js?v=1.53.0';
+import { createUiGestures } from './ui-gestures.js?v=1.53.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.53.0';
+import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.53.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.53.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.53.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -67,6 +67,20 @@ function findTraversalCandidate(...args){return activeWorldCollision.findTravers
 // Change only this line if Cloudflare gives your Worker a different URL.
 const GRENADE_LAUNCH_PITCH=(Number(WEAPON_SPECS.grenadeLauncher?.launchPitchDeg)||0)*Math.PI/180;
 const ONLINE_API = 'https://breach-online.kiadesignenterprise.workers.dev';
+let mapGalleryTab='official',mapLibraryMine=[],mapLibraryLoading=false,selectedLibraryMap=null;
+const OFFICIAL_MAP_GALLERY=Object.freeze([
+ {id:'highlands',name:'HIGHLANDS',detail:'Open terrain',source:'official'},
+ {id:'depot',name:'FREIGHT DEPOT',detail:'Industrial lanes',source:'official'},
+ {id:'yard',name:'CONTAINER YARD',detail:'Dense cover',source:'official'},
+ {id:'rig',name:'DUST RIG',detail:'Close quarters',source:'official'}
+]);
+async function mapLibraryRequest(path,payload={}){const response=await fetch(`${ONLINE_API}${path}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({client:clientId,auth:clientAuth,...payload}),cache:'no-store'});let data={};try{data=await response.json();}catch{}if(!response.ok)throw new Error(data.error||'Map library unavailable.');return data;}
+async function refreshMapLibrary({quiet=false}={}){if(mapLibraryLoading)return;mapLibraryLoading=true;try{const data=await mapLibraryRequest('/maps/list');mapLibraryMine=Array.isArray(data.mine)?data.mine:[];renderMapGallery();}catch(error){if(!quiet)showToast(`MAP LIBRARY · ${String(error?.message||'unavailable').slice(0,70)}`);}finally{mapLibraryLoading=false;}}
+function libraryMapLabel(entry){return String(entry?.name||'UNTITLED MAP').toUpperCase().slice(0,40);}
+function renderMapGallery(){const host=$('lobbyMapGallery');if(!host)return;const editBtn=$('lobbyEditMapBtn');if(editBtn){editBtn.disabled=!(mapGalleryTab==='mine'&&selectedLibraryMap?.id&&isMatchAdmin&&matchAllowsLobbyEdits(matchState));}const editable=isMatchAdmin&&matchAllowsLobbyEdits(matchState);host.replaceChildren();const rows=mapGalleryTab==='mine'?mapLibraryMine:OFFICIAL_MAP_GALLERY;if(!rows.length){const empty=document.createElement('div');empty.className='lobby-map-empty';empty.innerHTML='<div>NO SAVED MAPS YET<br><small>Create a map and save it to your Breach library.</small></div>';host.appendChild(empty);return;}for(const entry of rows){const b=document.createElement('button');b.type='button';b.className='lobby-map-choice';b.dataset.mapSource=entry.source||'user';if(entry.source==='official'){b.dataset.lobbyMapChoice=entry.id;b.disabled=!editable;b.classList.toggle('active',(lobbyMapDraft||currentMapId)===entry.id);b.innerHTML=`<strong>${libraryMapLabel(entry)}</strong><small>${entry.detail||'Official map'}</small>`;b.addEventListener('click',()=>setLobbyMapDraft(entry.id));}else{b.dataset.libraryMapId=entry.id;b.disabled=!editable;b.classList.toggle('active',selectedLibraryMap?.id===entry.id&&(lobbyMapDraft||currentMapId)==='custom-map');const rev=Number(entry.publishedRevision)||0;b.innerHTML=`<strong>${libraryMapLabel(entry)}</strong><small>${rev?`Published · Revision ${rev}`:'Draft only'}</small><span class="map-revision">${entry.summary?.buildings||0} buildings · ${entry.summary?.props||0} props</span>`;b.addEventListener('click',()=>void selectLibraryMap(entry));}host.appendChild(b);}}
+async function selectLibraryMap(entry){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;try{const data=await mapLibraryRequest('/maps/get',{mapId:entry.id,revision:Number(entry.publishedRevision)||0});installCustomMapDefinition(data.definition,{persist:true,source:'library',quiet:true});selectedLibraryMap={id:entry.id,name:entry.name,revision:data.revision||0};lobbyMapDraft='custom-map';lobbyMapDirty=lobbyMapDraft!==normalizeMapId(currentMapId)||customMapFingerprintValue!==activeCustomMapFingerprint;renderLobbySetupControls();setLobbyActionState();showToast(`MAP READY · ${libraryMapLabel(entry)}`);}catch(error){showToast(`MAP LOAD FAILED · ${String(error?.message||'unavailable').slice(0,80)}`,{priority:3});}}
+function openIntegratedMapBuilder(mapId=''){const q=new URLSearchParams();q.set('return','index.html');if(mapId)q.set('mapId',mapId);location.href=`map-builder.html?${q.toString()}`;}
+
 const MOBILE_MOVE_ZONE_RATIO = .35;
 const CLIENT_FIXED_STEP_SEC = 1/60;
 const CLIENT_MAX_FRAME_SEC = .12;
@@ -850,7 +864,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.52.2';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.53.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1339,7 +1353,7 @@ function renderLobbySetupControls(){
   for(const btn of lobbyTacticalButtons)btn.classList.toggle('active',btn.dataset.lobbyTacticalChoice===draftLoadout.tactical);
   for(const btn of lobbyLethalButtons)btn.classList.toggle('active',btn.dataset.lobbyLethalChoice===draftLoadout.lethal);
   for(const btn of lobbyModeButtons)btn.classList.toggle('active',btn.dataset.lobbyModeChoice===draft.mode);
-  const mapChoice=host?(lobbyMapDraft||currentMapId):currentMapId;for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===mapChoice);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}const customLoad=$('lobbyLoadCustomMapBtn');if(customLoad)customLoad.disabled=!host||!matchAllowsLobbyEdits(matchState);updateCustomMapLobbyUi();renderLobbyMapPreview(mapChoice);
+  const mapChoice=host?(lobbyMapDraft||currentMapId):currentMapId;for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===mapChoice);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}const customLoad=$('lobbyLoadCustomMapBtn');if(customLoad)customLoad.disabled=!host||!matchAllowsLobbyEdits(matchState);renderMapGallery();updateCustomMapLobbyUi();renderLobbyMapPreview(mapChoice);
   if(host){
     const draftFfa=!draftSpec.teamBased;$('lobbyBlueBotWrap').classList.toggle('hide',draftFfa);$('lobbyRedBotWrap').classList.toggle('hide',draftFfa);$('lobbyFfaBotWrap').classList.toggle('hide',!draftFfa);
     lobbyBlueBotCount.value=String(draft.blueBots);lobbyRedBotCount.value=String(draft.redBots);lobbyFfaBotCount.value=String(draft.ffaBots);lobbyBotDifficulty.value=draft.difficulty;lobbyMinimapMode.value=draft.minimap;lobbyMod.value=draft.mod;lobbyMod.disabled=!matchAllowsLobbyEdits(matchState);
@@ -1368,7 +1382,7 @@ function updateLobbyMatchDraftFromControls(){
 }
 function setLobbyModeDraft(mode){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;if(!lobbyMatchDraft)lobbyMatchDraft=committedLobbyMatchDraft();lobbyMatchDraft={...lobbyMatchDraft,mode:normalizeGameMode(mode)};lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());syncLobby();}
 function updateCustomMapLobbyUi(){
-  const card=document.querySelector('[data-lobby-map-choice="custom-map"]'),load=$('lobbyLoadCustomMapBtn'),status=$('lobbyCustomMapStatus');if(card){const strong=card.querySelector('strong'),small=card.querySelector('small');if(strong)strong.textContent=customMapLoaded?String(customMapDefinition.meta?.name||'CUSTOM MAP').toUpperCase():'CUSTOM MAP';if(small)small.textContent=customMapLoaded?`Schema ${customMapDefinition.schemaVersion} · ${Math.round(customMapSummary(customMapDefinition).bytes/1024)} KB`:'Upload .breachmap.json';}if(load)load.textContent=customMapLoaded?'REPLACE MAP':'LOAD MAP';if(status){if(customMapLoaded){const q=customMapSummary(customMapDefinition);status.textContent=`${q.name} · ${q.buildings} buildings · ${q.props} props · ${q.spawns} team spawns`;}else status.textContent='Builder export · .breachmap.json';}}
+  const load=$('lobbyLoadCustomMapBtn'),status=$('lobbyCustomMapStatus');if(load)load.textContent='IMPORT FILE';if(status){if(selectedLibraryMap)status.textContent=`${selectedLibraryMap.name} · server map · revision ${selectedLibraryMap.revision||'draft'}`;else if(customMapLoaded&&customMapSource==='upload'){const q=customMapSummary(customMapDefinition);status.textContent=`Imported file · ${q.name} · ${q.buildings} buildings · ${q.props} props`;}else status.textContent='Saved maps sync automatically · file import is optional';}}
 function requestCustomMapFile(){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;const input=$('lobbyCustomMapFile');if(input){input.value='';input.click();}}
 async function loadCustomMapFile(file){
   if(!file)return false;const status=$('lobbyCustomMapStatus');try{if(file.size>MAX_CUSTOM_MAP_BYTES*1.35)throw new Error(`File is too large (${Math.ceil(file.size/1024)} KB).`);if(status)status.textContent='Validating map…';const parsed=JSON.parse(await file.text()),summary=installCustomMapDefinition(parsed,{persist:true,source:'upload',quiet:true});lobbyMapDraft='custom-map';lobbyMapDirty=lobbyMapDraft!==normalizeMapId(currentMapId)||customMapFingerprintValue!==activeCustomMapFingerprint;renderLobbySetupControls();setLobbyActionState();updateCustomMapLobbyUi();showToast(`CUSTOM MAP READY · ${summary.name}`);return true;}catch(error){if(status)status.textContent=String(error?.message||'Could not load map.');showToast(`MAP LOAD FAILED · ${String(error?.message||'invalid file').slice(0,80)}`,{priority:3,key:'custom-map-load'});return false;}
@@ -2181,8 +2195,8 @@ function addSpecialStaticProps(){
 }
 function addLaddersBatch(){
   if(!LADDERS.length)return;const metal=worldMat(0x8d8170,'rustedMetal',.82,.35);
-  for(const ladder of LADDERS){const g=new THREE.Group(),height=Math.max(.8,ladder.topY-ladder.bottomY),cx=ladder.x+ladder.nx*.05,cz=ladder.z+ladder.nz*.05;g.position.set(cx,ladder.bottomY,cz);worldRoot.add(g);const horizontal=Math.abs(ladder.tx)>.5;
-    const railOffset=ladder.width*.43;for(const side of [-1,1]){const rail=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,height,8),metal);rail.position.set(ladder.tx*railOffset*side,height/2,ladder.tz*railOffset*side);g.add(rail);}
+  for(const ladder of LADDERS){const frame=ladderFrame(ladder);if(!frame)continue;const g=new THREE.Group(),height=Math.max(.8,ladder.topY-ladder.bottomY),cx=ladder.x+frame.nx*.05,cz=ladder.z+frame.nz*.05;g.position.set(cx,ladder.bottomY,cz);worldRoot.add(g);const horizontal=Math.abs(frame.tx)>.5;
+    const railOffset=ladder.width*.43;for(const side of [-1,1]){const rail=new THREE.Mesh(new THREE.CylinderGeometry(.045,.045,height,8),metal);rail.position.set(frame.tx*railOffset*side,height/2,frame.tz*railOffset*side);g.add(rail);}
     const rungCount=Math.max(4,Math.floor(height/.34));for(let i=0;i<=rungCount;i++){const rung=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,ladder.width*.90,8),metal);rung.position.y=.18+(height-.36)*(i/rungCount);if(horizontal)rung.rotation.z=Math.PI/2;else rung.rotation.x=Math.PI/2;g.add(rung);}
   }
 }
@@ -2340,7 +2354,7 @@ function bindUI(){
   for(const el of [lobbyBlueBotCount,lobbyRedBotCount,lobbyFfaBotCount,lobbyBotDifficulty,lobbyScoreLimit,lobbyTimeLimit,lobbyMinimapMode,lobbyMod])el.addEventListener('input',updateLobbyMatchDraftFromControls);
   for(const root of [$('adminGameplay'),$('adminAdvanced')]){root?.addEventListener('input',()=>{if(shell.inLobby)setLobbyActionState();});root?.addEventListener('change',()=>{if(shell.inLobby)setLobbyActionState();else if(shell.inMatch&&isMatchAdmin)saveAdminSettings(root.id==='adminAdvanced'?'advanced':'gameplay');});}
   for(const btn of lobbyMapButtons)btn.addEventListener('click',()=>setLobbyMapDraft(btn.dataset.lobbyMapChoice));
-  $('lobbyLoadCustomMapBtn')?.addEventListener('click',requestCustomMapFile);$('lobbyCustomMapFile')?.addEventListener('change',event=>{const file=event.target.files?.[0];if(file)void loadCustomMapFile(file);});updateCustomMapLobbyUi();
+  $('lobbyLoadCustomMapBtn')?.addEventListener('click',requestCustomMapFile);$('lobbyCustomMapFile')?.addEventListener('change',event=>{const file=event.target.files?.[0];if(file)void loadCustomMapFile(file);});$('lobbyCreateMapBtn')?.addEventListener('click',()=>openIntegratedMapBuilder());$('lobbyEditMapBtn')?.addEventListener('click',()=>{if(selectedLibraryMap?.id)openIntegratedMapBuilder(selectedLibraryMap.id)});document.querySelectorAll('[data-map-gallery-tab]').forEach(btn=>btn.addEventListener('click',()=>{mapGalleryTab=btn.dataset.mapGalleryTab==='mine'?'mine':'official';document.querySelectorAll('[data-map-gallery-tab]').forEach(x=>x.classList.toggle('active',x===btn));if(mapGalleryTab==='mine')void refreshMapLibrary({quiet:true});renderMapGallery();}));void refreshMapLibrary({quiet:true});updateCustomMapLobbyUi();
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
     const setup=collectLobbyStartSetup();if(!setup){$('lobbyStatus').textContent=`Maximum ${MAX_BOTS} bots per match.`;return;}
