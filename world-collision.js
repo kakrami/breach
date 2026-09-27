@@ -1,5 +1,5 @@
-import { ARENA_LIMIT, PLAYER_HEIGHT, PLAYER_RADIUS, WORLD_PLAYER_COLLIDERS, BUILDING_WINDOW_PORTALS, worldSupportHeight, terrainHeight } from './world-geometry.js?v=1.60.0';
-import { createTraversalResolver } from './traversal-resolver.js?v=1.60.0';
+import { ARENA_LIMIT, PLAYER_HEIGHT, PLAYER_RADIUS, WORLD_PLAYER_COLLIDERS, BUILDING_WINDOW_PORTALS, worldSupportHeight, terrainHeight } from './world-geometry.js?v=1.62.0';
+import { createTraversalResolver } from './traversal-resolver.js?v=1.62.0';
 
 const CELL_SIZE = 8;
 const CELL_HEIGHT = 3;

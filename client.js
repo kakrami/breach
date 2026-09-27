@@ -1,36 +1,36 @@
-import { createMoonSky } from './mod-environment.js?v=1.60.0';
+import { createMoonSky } from './mod-environment.js?v=1.62.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.60.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.60.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.60.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.60.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.60.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.60.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.60.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.60.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.62.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.62.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.62.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.62.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.62.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.62.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.62.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.62.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.60.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.60.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.60.0';
-import { createAudioEngine } from './audio-engine.js?v=1.60.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.60.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.60.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.60.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.60.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.60.0';
-import { createControllerRecording } from './controller-recording.js?v=1.60.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.60.0';
-import { createSafeStorage } from './browser-storage.js?v=1.60.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=1.60.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.60.0';
-import { createUiGestures } from './ui-gestures.js?v=1.60.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.60.0';
-import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.60.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.60.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.60.0';
+} from './game-config.js?v=1.62.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.62.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.62.0';
+import { createAudioEngine } from './audio-engine.js?v=1.62.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.62.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.62.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.62.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.62.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.62.0';
+import { createControllerRecording } from './controller-recording.js?v=1.62.0';
+import { createPointerSessions } from './pointer-sessions.js?v=1.62.0';
+import { createSafeStorage } from './browser-storage.js?v=1.62.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=1.62.0';
+import { createUiFocusScope } from './ui-focus.js?v=1.62.0';
+import { createUiGestures } from './ui-gestures.js?v=1.62.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.62.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=1.62.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.62.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.62.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -77,11 +77,18 @@ const OFFICIAL_MAP_GALLERY=Object.freeze([
  {id:'rig',name:'DUST RIG',detail:'Close quarters',source:'official'}
 ]);
 async function mapLibraryRequest(path,payload={}){const response=await fetch(`${ONLINE_API}${path}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({client:clientId,auth:clientAuth,...payload}),cache:'no-store'});let data={};try{data=await response.json();}catch{}if(!response.ok)throw new Error(data.error||'Map library unavailable.');return data;}
-async function refreshMapLibrary({quiet=false}={}){if(mapLibraryLoading)return;mapLibraryLoading=true;try{const data=await mapLibraryRequest('/maps/list');mapLibraryMine=Array.isArray(data.mine)?data.mine:[];renderMapGallery();}catch(error){if(!quiet)showToast(`MAP LIBRARY · ${String(error?.message||'unavailable').slice(0,70)}`);}finally{mapLibraryLoading=false;}}
+async function refreshMapLibrary({quiet=false}={}){if(mapLibraryLoading)return;mapLibraryLoading=true;try{const data=await mapLibraryRequest('/maps/list');mapLibraryMine=Array.isArray(data.mine)?data.mine:[];if(selectedLibraryMap?.id&&!mapLibraryMine.some(entry=>entry.id===selectedLibraryMap.id)){selectedLibraryMap=null;if((lobbyMapDraft||currentMapId)==='custom-map'&&customMapSource==='library')setLobbyMapDraft(DEFAULT_MAP_ID);}renderMapGallery();}catch(error){if(!quiet)showToast(`MAP LIBRARY · ${String(error?.message||'unavailable').slice(0,70)}`);}finally{mapLibraryLoading=false;}}
 function libraryMapLabel(entry){return String(entry?.name||'UNTITLED MAP').toUpperCase().slice(0,40);}
-function renderMapGallery(){const host=$('lobbyMapGallery');if(!host)return;const editBtn=$('lobbyEditMapBtn');if(editBtn){editBtn.disabled=!(mapGalleryTab==='mine'&&selectedLibraryMap?.id&&isMatchAdmin&&matchAllowsLobbyEdits(matchState));}const editable=isMatchAdmin&&matchAllowsLobbyEdits(matchState);host.replaceChildren();const rows=mapGalleryTab==='mine'?mapLibraryMine:OFFICIAL_MAP_GALLERY;if(!rows.length){const empty=document.createElement('div');empty.className='lobby-map-empty';empty.innerHTML='<div>NO SAVED MAPS YET<br><small>Create a map and save it to your Breach library.</small></div>';host.appendChild(empty);return;}for(const entry of rows){const b=document.createElement('button');b.type='button';b.className='lobby-map-choice';b.dataset.mapSource=entry.source||'user';if(entry.source==='official'){b.dataset.lobbyMapChoice=entry.id;b.disabled=!editable;b.classList.toggle('active',(lobbyMapDraft||currentMapId)===entry.id);b.innerHTML=`<strong>${libraryMapLabel(entry)}</strong><small>${entry.detail||'Official map'}</small>`;b.addEventListener('click',()=>setLobbyMapDraft(entry.id));}else{b.dataset.libraryMapId=entry.id;b.disabled=!editable;b.classList.toggle('active',selectedLibraryMap?.id===entry.id&&(lobbyMapDraft||currentMapId)==='custom-map');const rev=Number(entry.publishedRevision)||0;b.innerHTML=`<strong>${libraryMapLabel(entry)}</strong><small>${rev?`Published · Revision ${rev}`:'Draft only'}</small><span class="map-revision">${entry.summary?.buildings||0} buildings · ${entry.summary?.props||0} props</span>`;b.addEventListener('click',()=>void selectLibraryMap(entry));}host.appendChild(b);}}
+function renderMapGallery(){const host=$('lobbyMapGallery');if(!host)return;const manageable=mapGalleryTab==='mine'&&!!selectedLibraryMap?.id&&isMatchAdmin&&matchAllowsLobbyEdits(matchState);const editBtn=$('lobbyEditMapBtn'),deleteBtn=$('lobbyDeleteMapBtn');if(editBtn)editBtn.disabled=!manageable;if(deleteBtn)deleteBtn.disabled=!manageable;const editable=isMatchAdmin&&matchAllowsLobbyEdits(matchState);host.replaceChildren();const rows=mapGalleryTab==='mine'?mapLibraryMine:OFFICIAL_MAP_GALLERY;if(!rows.length){const empty=document.createElement('div');empty.className='lobby-map-empty';empty.innerHTML='<div>NO SAVED MAPS YET<br><small>Create a map and save it to your Breach library.</small></div>';host.appendChild(empty);return;}for(const entry of rows){const b=document.createElement('button');b.type='button';b.className='lobby-map-choice';b.dataset.mapSource=entry.source||'user';if(entry.source==='official'){b.dataset.lobbyMapChoice=entry.id;b.disabled=!editable;b.classList.toggle('active',(lobbyMapDraft||currentMapId)===entry.id);b.innerHTML=`<strong>${libraryMapLabel(entry)}</strong><small>${entry.detail||'Official map'}</small>`;b.addEventListener('click',()=>setLobbyMapDraft(entry.id));}else{b.dataset.libraryMapId=entry.id;b.disabled=!editable;b.classList.toggle('active',selectedLibraryMap?.id===entry.id&&(lobbyMapDraft||currentMapId)==='custom-map');const rev=Number(entry.publishedRevision)||0;b.innerHTML=`<strong>${libraryMapLabel(entry)}</strong><small>${rev?`Published · Revision ${rev}`:'Draft only'}</small><span class="map-revision">${entry.summary?.buildings||0} buildings · ${entry.summary?.props||0} props</span>`;b.addEventListener('click',()=>void selectLibraryMap(entry));}host.appendChild(b);}}
 async function selectLibraryMap(entry){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;try{const data=await mapLibraryRequest('/maps/get',{mapId:entry.id,revision:Number(entry.publishedRevision)||0});installCustomMapDefinition(data.definition,{persist:true,source:'library',quiet:true});selectedLibraryMap={id:entry.id,name:entry.name,revision:data.revision||0};lobbyMapDraft='custom-map';lobbyMapDirty=lobbyMapDraft!==normalizeMapId(currentMapId)||customMapFingerprintValue!==activeCustomMapFingerprint;renderLobbySetupControls();setLobbyActionState();showToast(`MAP READY · ${libraryMapLabel(entry)}`);}catch(error){showToast(`MAP LOAD FAILED · ${String(error?.message||'unavailable').slice(0,80)}`,{priority:3});}}
-let integratedMapBuilder=null;
+let pendingMapDelete=null;
+function mapDeletePromptOpen(){return !!mapDeleteConfirm&&!mapDeleteConfirm.classList.contains('hide');}
+function openMapDeleteConfirm(){if(!(mapGalleryTab==='mine'&&selectedLibraryMap?.id&&isMatchAdmin&&matchAllowsLobbyEdits(matchState)))return false;const entry=mapLibraryMine.find(item=>item.id===selectedLibraryMap.id);if(!entry)return false;pendingMapDelete=entry;const copy=$('mapDeleteConfirmText');if(copy)copy.textContent=`${libraryMapLabel(entry)} and all saved revisions will be removed from My Maps.`;mapDeleteConfirm.classList.remove('hide');clearControllerUiEditing();clearControllerUiFocus();if(controllerInputActive())requestAnimationFrame(()=>setControllerUiFocus($('mapDeleteCancelBtn')));return true;}
+function closeMapDeleteConfirm(){if(!mapDeletePromptOpen())return false;pendingMapDelete=null;mapDeleteConfirm.classList.add('hide');clearControllerUiFocus();return true;}
+async function confirmMapDelete(){const entry=pendingMapDelete;if(!entry)return false;const label=libraryMapLabel(entry),button=$('mapDeleteConfirmBtn');if(button)button.disabled=true;try{await mapLibraryRequest('/maps/delete',{mapId:entry.id});mapLibraryMine=mapLibraryMine.filter(item=>item.id!==entry.id);if(selectedLibraryMap?.id===entry.id){selectedLibraryMap=null;if((lobbyMapDraft||currentMapId)==='custom-map'&&customMapSource==='library')setLobbyMapDraft(DEFAULT_MAP_ID);}pendingMapDelete=null;mapDeleteConfirm.classList.add('hide');renderMapGallery();updateCustomMapLobbyUi();setLobbyActionState();showToast(`MAP DELETED · ${label}`);void refreshMapLibrary({quiet:true});return true;}catch(error){showToast(`MAP DELETE FAILED · ${String(error?.message||'unavailable').slice(0,80)}`,{priority:3});return false;}finally{if(button)button.disabled=false;}}
+let integratedMapBuilder=null,mapBuilderWarmScheduled=false;
+function scheduleMapBuilderWarmup(){if(integratedMapBuilder||mapBuilderWarmScheduled)return;mapBuilderWarmScheduled=true;const warm=()=>{mapBuilderWarmScheduled=false;if(integratedMapBuilder||!shell.inLobby)return;try{ensureIntegratedMapBuilder();}catch(error){console.warn('Map builder warmup failed',error);}};if(typeof requestIdleCallback==='function')requestIdleCallback(warm,{timeout:1200});else setTimeout(warm,220);}
+
 function ensureIntegratedMapBuilder(){
   if(integratedMapBuilder)return integratedMapBuilder;
   integratedMapBuilder=createIntegratedMapBuilder({
@@ -111,9 +118,8 @@ function ensureIntegratedMapBuilder(){
 }
 async function openIntegratedMapBuilder(mapId=''){
   if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;
-  shell.enterBuilder();
-  try{await ensureIntegratedMapBuilder().open({mapId});}
-  catch(error){shell.exitBuilder();showToast(`MAP BUILDER · ${String(error?.message||'unavailable').slice(0,80)}`,{priority:3});}
+  try{const builder=ensureIntegratedMapBuilder();shell.enterBuilder();await builder.open({mapId});}
+  catch(error){if(shell.inBuilder)shell.exitBuilder();showToast(`MAP BUILDER · ${String(error?.message||'unavailable').slice(0,80)}`,{priority:3});}
 }
 
 
@@ -430,7 +436,7 @@ function hydrateWeaponTuneSelector(){
   for(const id of WEAPON_ORDER){const button=document.createElement('button');button.type='button';button.className='admin-weapon-choice';button.dataset.adminWeaponChoice=id;button.dataset.controllerKey=`admin-weapon:${id}`;button.setAttribute('role','tab');button.textContent=WEAPON_SPECS[id]?.name||id;button.addEventListener('click',()=>syncAdminWeaponEditor(id));grid.append(button);}
 }
 hydrateWeaponTuneSelector();
-const appRoot=$('appRoot'), gameStage=$('gameStage'), entryScreen=$('entryScreen'), rotateGate=$('rotateGate'), menu=$('menu'), lobbyScreen=$('lobbyScreen'), pause=$('pause'), lobbyQuitConfirm=$('lobbyQuitConfirm');
+const appRoot=$('appRoot'), gameStage=$('gameStage'), entryScreen=$('entryScreen'), rotateGate=$('rotateGate'), menu=$('menu'), lobbyScreen=$('lobbyScreen'), pause=$('pause'), lobbyQuitConfirm=$('lobbyQuitConfirm'), mapDeleteConfirm=$('mapDeleteConfirm');
 const nameInput=$('nameInput'),codeInput=$('codeInput'),menuStatus=$('menuStatus');
 const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews=[...document.querySelectorAll('[data-deploy-view]')];
 const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbySecondaryButtons=[...document.querySelectorAll('[data-lobby-secondary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbyMapButtons=[...document.querySelectorAll('[data-lobby-map-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
@@ -905,7 +911,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.60.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.62.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -941,7 +947,7 @@ async function prepareGameRuntime(){
 }
 
 bindUI();
-createUiFocusScope({root:appRoot,surfaces:[entryScreen,rotateGate,menu,lobbyScreen,connectionOverlay,pause,$('loadoutPanel'),$('settingsPanel'),$('adminPanel'),lobbyQuitConfirm,chatComposer,gameTextEditor],getSurface:controllerUiSurface,onKeyboard:()=>setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true})});
+createUiFocusScope({root:appRoot,surfaces:[entryScreen,rotateGate,menu,lobbyScreen,connectionOverlay,pause,$('loadoutPanel'),$('settingsPanel'),$('adminPanel'),lobbyQuitConfirm,mapDeleteConfirm,chatComposer,gameTextEditor],getSurface:controllerUiSurface,onKeyboard:()=>setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true})});
 let controllerUiFrameLast=performance.now();
 function runPreEngineControllerFrame(now){
   if(engineInitialized)return;
@@ -1427,6 +1433,7 @@ function renderLobbyShell(){
   if(!shell.inLobby)return;refreshLobbyDraftOwnership();syncLobbyHostControlPlacement();const host=!!isMatchAdmin,displayMode=lobbyDisplayMode(),displaySpec=gameModeSpec(displayMode),committedMode=currentGameMode(),committedSpec=gameModeSpec(committedMode),total=lobbyBotTotal();
   $('lobbyRoomCode').textContent=currentRoom||'----';$('lobbyModeBadge').textContent=displaySpec.name+(gameModSpec(host?lobbyMatchDraft?.mod:worldSettings.mod).id==='normal'?'':' · '+gameModSpec(host?lobbyMatchDraft?.mod:worldSettings.mod).name.toUpperCase());
   $('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbyCheatsTab')?.classList.toggle('hide',!host);
+  if(host)scheduleMapBuilderWarmup();
   const godToggle=$('lobbyGodModeToggle');if(godToggle){godToggle.classList.toggle('active',!!godMode);godToggle.setAttribute('aria-checked',String(!!godMode));godToggle.disabled=!host||socket?.readyState!==WebSocket.OPEN;}
   const startBtn=$('lobbyStartBtn');startBtn.classList.toggle('hide',!host);startBtn.disabled=!matchAllowsLobbyEdits(matchState);
   
@@ -1469,7 +1476,7 @@ function switchLobbySide(name='players'){
   if(next==='cheats'&&!isMatchAdmin)next='players';
   for(const tab of lobbySideTabs){const active=tab.dataset.lobbySideTab===next;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));}
   for(const view of lobbySideViews){const active=view.dataset.lobbySideView===next;view.classList.toggle('active',active);view.hidden=!active;view.inert=!active;}
-  if(next==='map')requestAnimationFrame(renderLobbyMapPreview);if(next==='loadout'){setLoadoutWorkspaceMode('lobby','classes',{ensurePreview:false});renderAttachmentEditors('lobby',lobbyLoadoutDraft||normalizeLoadoutChoice(selectedLoadout()));}if(next==='killstreaks'){lobbyKillstreakDraft=[...killstreakSelection];renderLobbyKillstreakSetup();}
+  if(next==='map'){requestAnimationFrame(renderLobbyMapPreview);scheduleMapBuilderWarmup();}if(next==='loadout'){setLoadoutWorkspaceMode('lobby','classes',{ensurePreview:false});renderAttachmentEditors('lobby',lobbyLoadoutDraft||normalizeLoadoutChoice(selectedLoadout()));}if(next==='killstreaks'){lobbyKillstreakDraft=[...killstreakSelection];renderLobbyKillstreakSetup();}
 }
 function switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,name){
   const tabs=[...document.querySelectorAll(tabSelector)],pages=[...document.querySelectorAll(pageSelector)];if(!tabs.length||!pages.length)return;
@@ -2190,15 +2197,16 @@ function roadGeometryFromData(data){const geo=new THREE.BufferGeometry();geo.set
 function addRoadsBatch(){
   if(!ROADS.length)return;
   const colors={street:0x2e3336,alley:0x3c4244,service:0x353a3d,dirt:0x806b4e,sidewalk:0x777d80,crosswalk:0x44494c},groups=new Map(),markGroups=new Map(),dataFor=(map,key)=>{if(!map.has(key))map.set(key,{positions:[],uvs:[],indices:[]});return map.get(key);};
-  for(let ri=0;ri<ROADS.length;ri++){
-    const road=ROADS[ri],kind=colors[road.kind]!=null?road.kind:'street',surfaceOffset=.012+ri*.00004;appendRoadSurface(dataFor(groups,kind),road,{offset:surfaceOffset});
+  for(const road of ROADS){
+    const kind=colors[road.kind]!=null?road.kind:'street',surface=authoredRoadSurfacePolicy(kind);appendRoadSurface(dataFor(groups,kind),road,{offset:surface.surfaceOffset});
     const patches=[];let markKey='white';
     if(kind==='street'||kind==='service'){markKey=kind==='street'?'yellow':'white';const dash=2.1,gap=2.0,total=dash+gap;for(let x=-road.w/2+dash/2;x<road.w/2-dash/3;x+=total)patches.push({x,z:0,w:Math.min(dash,road.w),d:.13});}
     else if(kind==='crosswalk'){const stripeCount=Math.max(3,Math.floor(road.d/.65)),stripeD=road.d/stripeCount*.52;for(let i=0;i<stripeCount;i++)patches.push({x:0,z:-road.d/2+(i+.5)*road.d/stripeCount,w:Math.min(road.w,4.5),d:stripeD});}
-    if(patches.length)appendRoadSurface(dataFor(markGroups,markKey),road,{offset:surfaceOffset+.006,patches});
+    if(patches.length)appendRoadSurface(dataFor(markGroups,markKey),road,{offset:AUTHORED_ROAD_MARKING_POLICY.surfaceOffset,patches});
   }
-  for(const [kind,data] of groups){const mat=worldMat(colors[kind],'concrete',kind==='dirt'?1:.98,0).clone();mat.polygonOffset=true;mat.polygonOffsetFactor=-1;mat.polygonOffsetUnits=-3;const mesh=new THREE.Mesh(roadGeometryFromData(data),mat);mesh.receiveShadow=!isTouch;mesh.castShadow=false;mesh.renderOrder=2;worldRoot.add(mesh);}
-  for(const [key,data] of markGroups){const mat=worldMat(key==='yellow'?0xd0ad49:0xd8dcda,'paintedMetal',.92,0).clone();mat.polygonOffset=true;mat.polygonOffsetFactor=-2;mat.polygonOffsetUnits=-12;const mesh=new THREE.Mesh(roadGeometryFromData(data),mat);mesh.receiveShadow=false;mesh.castShadow=false;mesh.renderOrder=20;worldRoot.add(mesh);}
+  const orderedGroups=[...groups.entries()].sort((a,b)=>authoredRoadSurfacePolicy(a[0]).priority-authoredRoadSurfacePolicy(b[0]).priority);
+  for(const [kind,data] of orderedGroups){const surface=authoredRoadSurfacePolicy(kind),mat=worldMat(colors[kind],'concrete',kind==='dirt'?1:.98,0).clone();mat.depthTest=true;mat.depthWrite=false;mat.depthFunc=THREE.LessDepth;mat.polygonOffset=true;mat.polygonOffsetFactor=surface.polygonOffsetFactor;mat.polygonOffsetUnits=surface.polygonOffsetUnits;const mesh=new THREE.Mesh(roadGeometryFromData(data),mat);mesh.receiveShadow=!isTouch;mesh.castShadow=false;mesh.renderOrder=surface.renderOrder;worldRoot.add(mesh);}
+  for(const [key,data] of markGroups){const mat=worldMat(key==='yellow'?0xd0ad49:0xd8dcda,'paintedMetal',.92,0).clone();mat.depthTest=true;mat.depthWrite=false;mat.depthFunc=THREE.LessDepth;mat.polygonOffset=true;mat.polygonOffsetFactor=AUTHORED_ROAD_MARKING_POLICY.polygonOffsetFactor;mat.polygonOffsetUnits=AUTHORED_ROAD_MARKING_POLICY.polygonOffsetUnits;const mesh=new THREE.Mesh(roadGeometryFromData(data),mat);mesh.receiveShadow=false;mesh.castShadow=false;mesh.renderOrder=AUTHORED_ROAD_MARKING_POLICY.renderOrder;worldRoot.add(mesh);}
 }
 
 function addBoundaryWallsBatch(mat){
@@ -2456,7 +2464,7 @@ function bindUI(){
   for(const el of [lobbyBotDifficulty,lobbyScoreLimit,lobbyTimeLimit,lobbyMinimapMode,lobbyMod])el.addEventListener('input',updateLobbyMatchDraftFromControls);
   for(const root of [$('adminGameplay'),$('adminAdvanced'),$('adminPlayers')]){root?.addEventListener('input',()=>{if(shell.inLobby)setLobbyActionState();});root?.addEventListener('change',()=>{if(shell.inLobby)setLobbyActionState();else if(shell.inMatch&&isMatchAdmin)saveAdminSettings(root.id==='adminAdvanced'?'advanced':root.id==='adminPlayers'?'players':'gameplay');});}
   for(const btn of lobbyMapButtons)btn.addEventListener('click',()=>setLobbyMapDraft(btn.dataset.lobbyMapChoice));
-  $('lobbyLoadCustomMapBtn')?.addEventListener('click',requestCustomMapFile);$('lobbyCustomMapFile')?.addEventListener('change',event=>{const file=event.target.files?.[0];if(file)void loadCustomMapFile(file);});$('lobbyCreateMapBtn')?.addEventListener('click',()=>openIntegratedMapBuilder());$('lobbyEditMapBtn')?.addEventListener('click',()=>{if(selectedLibraryMap?.id)openIntegratedMapBuilder(selectedLibraryMap.id)});document.querySelectorAll('[data-map-gallery-tab]').forEach(btn=>btn.addEventListener('click',()=>{mapGalleryTab=btn.dataset.mapGalleryTab==='mine'?'mine':'official';document.querySelectorAll('[data-map-gallery-tab]').forEach(x=>x.classList.toggle('active',x===btn));if(mapGalleryTab==='mine')void refreshMapLibrary({quiet:true});renderMapGallery();}));void refreshMapLibrary({quiet:true});updateCustomMapLobbyUi();
+  $('lobbyLoadCustomMapBtn')?.addEventListener('click',requestCustomMapFile);$('lobbyCustomMapFile')?.addEventListener('change',event=>{const file=event.target.files?.[0];if(file)void loadCustomMapFile(file);});$('lobbyCreateMapBtn')?.addEventListener('click',()=>openIntegratedMapBuilder());$('lobbyEditMapBtn')?.addEventListener('click',()=>{if(selectedLibraryMap?.id)openIntegratedMapBuilder(selectedLibraryMap.id)});$('lobbyDeleteMapBtn')?.addEventListener('click',openMapDeleteConfirm);$('mapDeleteCancelBtn')?.addEventListener('click',closeMapDeleteConfirm);$('mapDeleteConfirmBtn')?.addEventListener('click',()=>void confirmMapDelete());document.querySelectorAll('[data-map-gallery-tab]').forEach(btn=>btn.addEventListener('click',()=>{mapGalleryTab=btn.dataset.mapGalleryTab==='mine'?'mine':'official';document.querySelectorAll('[data-map-gallery-tab]').forEach(x=>x.classList.toggle('active',x===btn));if(mapGalleryTab==='mine')void refreshMapLibrary({quiet:true});renderMapGallery();}));void refreshMapLibrary({quiet:true});updateCustomMapLobbyUi();scheduleMapBuilderWarmup();
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
     const setup=collectLobbyStartSetup();if(!setup){$('lobbyStatus').textContent=`Maximum ${MAX_MATCH_BOTS} bots per match.`;return;}
@@ -2494,6 +2502,7 @@ function bindUI(){
   document.addEventListener('keydown', e => {
     if(gameTextEditorTarget){handlePhysicalGameTextKey(e);return;}
     if(chatOpen){handlePhysicalChatKey(e);return;}
+    if(mapDeletePromptOpen()&&e.code==='Escape'&&!e.repeat){e.preventDefault();closeMapDeleteConfirm();return;}
     if(lobbyQuitPromptOpen()&&e.code==='Escape'&&!e.repeat){e.preventDefault();closeLobbyQuitConfirm();return;}
     if(isEditableTarget(e.target)) return;
     if(killstreakTargeting){
@@ -3038,7 +3047,7 @@ function closeLobbyQuitConfirm(){
 function confirmLobbyQuit(){if(lobbyQuitConfirm)lobbyQuitConfirm.classList.add('hide');lobbyQuitReturnFocusKey='';leaveMatch();}
 
 function leaveMatch(){
-  if(lobbyQuitConfirm)lobbyQuitConfirm.classList.add('hide');lobbyQuitReturnFocusKey='';cancelInitialConnection('',{silent:true});if(chatOpen)void dismissChat({restorePointer:false});chatMessages.length=0;
+  if(lobbyQuitConfirm)lobbyQuitConfirm.classList.add('hide');if(mapDeleteConfirm)mapDeleteConfirm.classList.add('hide');pendingMapDelete=null;lobbyQuitReturnFocusKey='';cancelInitialConnection('',{silent:true});if(chatOpen)void dismissChat({restorePointer:false});chatMessages.length=0;
   shell.leaveToMenu();disableMenu(false);serverClockOffset=0;lastPingLocalAt=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();clearTimeout(reconnectTimer);if(socket){try{socket.close(1000,'Left match')}catch{}}socket=null;currentRoom='';isMatchAdmin=false;matchOwnerId='';lobbyParticipants.clear();pendingGameSnapshot=null;lobbyMatchDraft=null;lobbyMatchDirty=false;lobbyMapDraft='';lobbyMapDirty=false;lobbyLoadoutDraft=null;lobbyClassDrafts=null;lobbyLoadoutDirty=false;lobbyLoadoutRevision=0;lobbyLoadoutAckRevision=0;syncLobbyHostControlPlacement();applyWorldSettings(DEFAULT_WORLD_SETTINGS);
   resetTouchInput();clearRemotes();clearTeammateDeathMarkers();clearBullets();clearBulletImpactFx();clearRocketTrailPuffs();clearThrowables();clearTacticalFx();clearSmokeClouds();keys.clear();hp=100;wastedUntil=0;godMode=false;pendingTeam='';matchState=normalizeClientMatch(null);matchCustom=false;loadoutClasses=normalizeLoadoutClasses(preferredLoadoutClasses);activeClassId=normalizeLoadoutClassId(preferredActiveClassId);pendingClassId='';killstreakSelection=normalizeKillstreakSelection(preferredKillstreakSelection);lobbyKillstreakDraft=null;lobbyKillstreakRevision=0;lobbyKillstreakAckRevision=0;lobbyKillstreakSyncPending=false;{const c=loadoutClassById(loadoutClasses,activeClassId);primaryWeapon=c.primaryWeapon;secondaryWeapon=c.secondaryWeapon;primaryAttachments={...c.primaryAttachments};secondaryAttachments={...c.secondaryAttachments};tacticalEquipment=c.tactical;lethalEquipment=c.lethal;}pendingLoadout=null;currentWeapon=primaryWeapon;crouchWanted=false;crouched=false;crouchBlend=0;stopSlide();cancelSprint();viewFeetY=NaN;verticalVelocity=moveVelocityX=moveVelocityZ=0;lastGroundedAt=0;jumpBufferedUntil=0;recoilDebtPitch=recoilDebtYaw=recoilPatternPitch=recoilPatternYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;lastLocalShotAt=0;localShotHeat=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localShotHeatAt=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));localRecoilStep=Object.fromEntries(WEAPON_ORDER.map(name=>[name,-1]));localWeaponShotSequence=Object.fromEntries(WEAPON_ORDER.map(name=>[name,0]));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;ammo=freshClientAmmo();equipment=freshClientEquipment(tacticalEquipment,lethalEquipment);reloadRequestPending=false;lastStateSent=0;lastSentState={x:NaN,y:NaN,z:NaN,yaw:NaN,pitch:NaN,ads:false,adsAmount:0,crouched:false,sprinting:false,sliding:false,grounded:true,moveX:0,moveZ:0,ladderId:'',ladderMove:0};pendingWeapon='';reloadUntil=0;reloadWeapon='';reloadStartedAt=0;weaponSwapStartedAt=0;deathAnimStartedAt=0;localMoveAmount=0;landingKick=0;nextFootstepAt=0;footstepSide=0;shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;fireReadyAt=freshClientFireReady();akimboReadyAt={left:0,right:0};akimboLeftCycleStartedAt=akimboRightCycleStartedAt=0;akimboCycleSoundPlayed={left:false,right:false};clearFireInput();resetSniperBreath();localEquipmentCooldownUntil=0;lastSimHeartbeat=0;cancelEquipmentAction();killFeed.length=0;bloodSplats.length=0;damageIndicators.length=0;flashUntil=flashPeakUntil=0;hurtUntil=hitUntil=0;blastFeedbackUntil=blastFeedbackPower=blastFeedbackSeed=0;lastShotVisualAt=0;myStats={kills:0,deaths:0};scoreboardOpen=false;killConfirmUntil=0;killConfirmHeadshot=false;killConfirmDistance=0;headshotUntil=0;announcerCurrent=null;announcerQueue.length=0;clearToastNotifications();setAim(false);syncLocalWeaponModel();
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshMatches();
@@ -4541,6 +4550,7 @@ function setControllerUiEditing(el){
 function controllerUiSurface(){
   if(!rotateGate.classList.contains('hide'))return rotateGate;
   if(!entryScreen.classList.contains('hide'))return entryScreen;
+  if(mapDeletePromptOpen())return mapDeleteConfirm;
   if(lobbyQuitPromptOpen())return lobbyQuitConfirm;
   if(shell.connecting)return connectionOverlay;
   if(gameTextEditorTarget)return gameTextEditor;
@@ -4562,6 +4572,7 @@ function controllerUiScopeId(surface=controllerUiSurface()){
   if(surface===$('settingsPanel'))return`settings:${surface.querySelector('[data-settings-tab].active')?.dataset?.settingsTab||'controls'}`;
   if(surface===$('adminPanel'))return`admin:${activeAdminTab||'gameplay'}`;
   if(surface===$('loadoutPanel'))return`loadout:${controllerLoadoutScope('match')}`;
+  if(surface===mapDeleteConfirm)return'map-delete';
   if(surface===lobbyQuitConfirm)return'lobby-quit';
   if(surface===pause)return'pause';
   if(surface===chatComposer)return'chat';
@@ -4602,6 +4613,7 @@ function queueControllerUiFocus(key,{fallback=null}={}){
 }
 function controllerPreferredRegion(surface){
   if(!surface)return null;
+  if(surface===mapDeleteConfirm)return surface.querySelector('.lobby-quit-card')||surface;
   if(surface===lobbyQuitConfirm)return surface.querySelector('.lobby-quit-card')||surface;
   if(surface===lobbyScreen)return surface.querySelector('[data-lobby-side-view].active:not([hidden])')||surface;
   if(surface===menu)return surface.querySelector('.deploy-view:not([hidden]):not(.hide)')||surface;
@@ -4723,6 +4735,7 @@ function handleControllerUiNavigation(pressed){
     if(pressed[GAMEPAD_BUTTON.MENU]){submitChat();return true;}
   }
   if(pressed[GAMEPAD_BUTTON.B]){
+    if(mapDeletePromptOpen()){closeMapDeleteConfirm();return true;}
     if(lobbyQuitPromptOpen()){closeLobbyQuitConfirm();return true;}
     if(shell.connecting&&initialConnectionAttempt){cancelInitialConnection('Connection canceled.');return true;}
     if(controllerUiEditing){clearControllerUiEditing();return true;}

@@ -8,9 +8,9 @@
 <meta content="yes" name="mobile-web-app-capable"/>
 <meta content="yes" name="apple-mobile-web-app-capable"/>
 <meta content="black-translucent" name="apple-mobile-web-app-status-bar-style"/>
-<link href="manifest.webmanifest?v=1.60.0" rel="manifest"/>
-<title>Breach v1.60.0</title>
-<link href="ui.css?v=1.60.0" rel="stylesheet"/>
+<link href="manifest.webmanifest?v=1.62.0" rel="manifest"/>
+<title>Breach v1.62.0</title>
+<link href="ui.css?v=1.62.0" rel="stylesheet"/>
 </head>
 <body>
 <svg aria-hidden="true" class="svg-sprite" focusable="false">
@@ -184,7 +184,7 @@
 <div class="lobby-side-view lobby-map-view" data-lobby-side-view="map" hidden="">
 <section class="lobby-map-panel">
 <div class="lobby-map-toolbar">
-<div class="lobby-map-gallery-head"><div class="lobby-map-gallery-tabs"><button class="lobby-map-gallery-tab active" data-map-gallery-tab="official" type="button">OFFICIAL</button><button class="lobby-map-gallery-tab" data-map-gallery-tab="mine" type="button">MY MAPS</button></div><div class="lobby-map-gallery-actions"><button class="secondary-btn lobby-map-edit" id="lobbyEditMapBtn" type="button" disabled>EDIT</button><button class="secondary-btn lobby-map-create" id="lobbyCreateMapBtn" type="button">+ CREATE MAP</button></div></div>
+<div class="lobby-map-gallery-head"><div class="lobby-map-gallery-tabs"><button class="lobby-map-gallery-tab active" data-map-gallery-tab="official" type="button">OFFICIAL</button><button class="lobby-map-gallery-tab" data-map-gallery-tab="mine" type="button">MY MAPS</button></div><div class="lobby-map-gallery-actions"><button class="secondary-btn lobby-map-edit" id="lobbyEditMapBtn" type="button" disabled>EDIT</button><button class="secondary-btn danger lobby-map-delete" id="lobbyDeleteMapBtn" type="button" disabled>DELETE</button><button class="secondary-btn lobby-map-create" id="lobbyCreateMapBtn" type="button">+ CREATE MAP</button></div></div>
 <div class="lobby-map-choice-grid" id="lobbyMapGallery" aria-label="Map selection"></div>
 <div class="lobby-custom-map-tools">
 <button class="secondary-btn lobby-custom-map-load" id="lobbyLoadCustomMapBtn" type="button">IMPORT FILE</button>
@@ -295,6 +295,17 @@
 <button class="secondary-btn danger" id="lobbyQuitLeaveBtn" type="button">LEAVE LOBBY</button>
 </div>
 <div class="controller-menu-hint">A SELECT · B STAY</div>
+</div>
+</section>
+<section aria-label="Delete map confirmation" aria-modal="true" class="lobby-quit-confirm hide" id="mapDeleteConfirm" role="dialog">
+<div class="lobby-quit-card">
+<h2>Delete map?</h2>
+<p id="mapDeleteConfirmText">This map and its saved revisions will be removed from My Maps.</p>
+<div class="lobby-quit-actions">
+<button class="secondary-btn" data-controller-default="true" id="mapDeleteCancelBtn" type="button">KEEP MAP</button>
+<button class="secondary-btn danger" id="mapDeleteConfirmBtn" type="button">DELETE MAP</button>
+</div>
+<div class="controller-menu-hint">A SELECT · B KEEP MAP</div>
 </div>
 </section>
 <section aria-label="Connecting" aria-live="polite" class="connection-overlay hide" id="connectionOverlay">
@@ -425,7 +436,7 @@
 <script>
 (() => {
   window.__breachModuleBooted = false;
-  const CURRENT_VERSION = '1.60.0', CURRENT_BUILD = '20260927T044500Z', CURRENT_PROTOCOL = 96;
+  const CURRENT_VERSION = '1.62.0', CURRENT_BUILD = '20260927T053142Z', CURRENT_PROTOCOL = 96;
   const ONLINE_API = 'https://breach-online.kiadesignenterprise.workers.dev';
   const GUARD_KEY = 'breach:bootstrap-update-reload';
   const fail = message => {
@@ -439,7 +450,7 @@
     if (target && target !== window && (target.tagName === 'SCRIPT' || target.tagName === 'LINK')) fail('Client asset failed to load.');
   }, true);
   window.addEventListener('unhandledrejection', () => { if (!window.__breachModuleBooted) fail('Client failed to start.'); });
-  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.60.0';document.body.appendChild(script); };
+  const loadClient = () => { const script=document.createElement('script');script.type='module';script.src='client.js?v=1.62.0';document.body.appendChild(script); };
   const cleanReloadParams = () => { const url=new URL(location.href);if(url.searchParams.has('__breach_update')||url.searchParams.has('__breach_reload')){url.searchParams.delete('__breach_update');url.searchParams.delete('__breach_reload');history.replaceState(null,'',url);} };
   const reloadFor = manifest => {
     const target=`${manifest.version||'unknown'}|${Number(manifest.protocol)||0}`,now=Date.now();
