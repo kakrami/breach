@@ -1,4 +1,4 @@
-import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.55.0';
+import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT } from './collision-primitives.js?v=1.55.1';
 
 export function createProjectileCollisionGrid({
   staticBoxes = [], staticColliders = null, pyramids = [], naturalObstacles = [], buildingParts = [],
