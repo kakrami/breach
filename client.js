@@ -1,36 +1,36 @@
-import { createMoonSky } from './mod-environment.js?v=1.59.0';
+import { createMoonSky } from './mod-environment.js?v=1.60.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.59.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.59.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.59.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.59.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.59.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.59.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.59.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.59.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.60.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.60.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.60.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.60.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.60.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.60.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.60.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.60.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.59.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.59.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.59.0';
-import { createAudioEngine } from './audio-engine.js?v=1.59.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.59.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.59.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.59.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.59.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.59.0';
-import { createControllerRecording } from './controller-recording.js?v=1.59.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.59.0';
-import { createSafeStorage } from './browser-storage.js?v=1.59.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=1.59.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.59.0';
-import { createUiGestures } from './ui-gestures.js?v=1.59.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.59.0';
-import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.59.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.59.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.59.0';
+} from './game-config.js?v=1.60.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.60.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.60.0';
+import { createAudioEngine } from './audio-engine.js?v=1.60.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.60.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.60.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.60.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.60.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.60.0';
+import { createControllerRecording } from './controller-recording.js?v=1.60.0';
+import { createPointerSessions } from './pointer-sessions.js?v=1.60.0';
+import { createSafeStorage } from './browser-storage.js?v=1.60.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=1.60.0';
+import { createUiFocusScope } from './ui-focus.js?v=1.60.0';
+import { createUiGestures } from './ui-gestures.js?v=1.60.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.60.0';
+import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.60.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.60.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.60.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -433,9 +433,9 @@ hydrateWeaponTuneSelector();
 const appRoot=$('appRoot'), gameStage=$('gameStage'), entryScreen=$('entryScreen'), rotateGate=$('rotateGate'), menu=$('menu'), lobbyScreen=$('lobbyScreen'), pause=$('pause'), lobbyQuitConfirm=$('lobbyQuitConfirm');
 const nameInput=$('nameInput'),codeInput=$('codeInput'),menuStatus=$('menuStatus');
 const deployTabs=[...document.querySelectorAll('[data-deploy-tab]')],deployViews=[...document.querySelectorAll('[data-deploy-view]')];
-const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyTeamButtons=[...document.querySelectorAll('[data-lobby-team-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbySecondaryButtons=[...document.querySelectorAll('[data-lobby-secondary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbyMapButtons=[...document.querySelectorAll('[data-lobby-map-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
+const lobbyModeButtons=[...document.querySelectorAll('[data-lobby-mode-choice]')],lobbyPrimaryButtons=[...document.querySelectorAll('[data-lobby-primary-choice]')],lobbySecondaryButtons=[...document.querySelectorAll('[data-lobby-secondary-choice]')],lobbyTacticalButtons=[...document.querySelectorAll('[data-lobby-tactical-choice]')],lobbyLethalButtons=[...document.querySelectorAll('[data-lobby-lethal-choice]')],lobbyMapButtons=[...document.querySelectorAll('[data-lobby-map-choice]')],lobbySideTabs=[...document.querySelectorAll('[data-lobby-side-tab]')],lobbySideViews=[...document.querySelectorAll('[data-lobby-side-view]')];
 const matchPrimaryButtons=[...document.querySelectorAll('[data-match-primary-choice]')],matchSecondaryButtons=[...document.querySelectorAll('[data-match-secondary-choice]')],matchTacticalButtons=[...document.querySelectorAll('[data-match-tactical-choice]')],matchLethalButtons=[...document.querySelectorAll('[data-match-lethal-choice]')];
-const lobbyRoster=$('lobbyRoster'),lobbyBlueBotCount=$('lobbyBlueBotCount'),lobbyRedBotCount=$('lobbyRedBotCount'),lobbyFfaBotCount=$('lobbyFfaBotCount'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMapPreview=$('lobbyMapPreview'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyMod=$('lobbyMod'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
+const lobbyRoster=$('lobbyRoster'),lobbyBotDifficulty=$('lobbyBotDifficulty'),lobbyMapPreview=$('lobbyMapPreview'),lobbyMinimapMode=$('lobbyMinimapMode'),lobbyMod=$('lobbyMod'),lobbyScoreLimit=$('lobbyScoreLimit'),lobbyTimeLimit=$('lobbyTimeLimit');
 const matchList=$('matchList'),matchCount=$('matchCount'),canvas=$('game'),connectionOverlay=$('connectionOverlay'),connectionText=$('connectionText'),chatComposer=$('chatComposer'),chatInput=$('chatInput'),chatInputText=$('chatInputText'),chatPlaceholder=$('chatPlaceholder'),chatKeyboard=$('chatKeyboard'),chatSendBtn=$('chatSendBtn'),chatShiftBtn=$('chatShiftBtn');
 const gameTextEditor=$('gameTextEditor'),gameTextEditorTitle=$('gameTextEditorTitle'),gameTextEditorValue=$('gameTextEditorValue'),gameTextEditorPlaceholder=$('gameTextEditorPlaceholder'),gameTextKeyboard=$('gameTextKeyboard'),gameTextShiftBtn=$('gameTextShiftBtn');
 const uiGestures=createUiGestures({root:appRoot,getScope:controllerInputContext});
@@ -905,7 +905,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.59.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.60.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1315,13 +1315,28 @@ function configuredLobbyBots(mode=currentGameMode()){
   const rows=[];for(let i=0;i<blue;i++)rows.push({id:`draft-bot-blue-${i+1}`,name:spec.teamBased?`${teamLabel('blue')} Bot ${i+1}`:`Bot ${i+1}`,team:'blue',bot:true,godMode:false,admin:false,primaryWeapon:'assault',secondaryWeapon:'pistol',tactical:'flash',lethal:'frag',kills:0,deaths:0,self:false});for(let i=0;i<red;i++)rows.push({id:`draft-bot-red-${i+1}`,name:spec.teamBased?`${teamLabel('red')} Bot ${i+1}`:`Bot ${blue+i+1}`,team:'red',bot:true,godMode:false,admin:false,primaryWeapon:'assault',secondaryWeapon:'pistol',tactical:'flash',lethal:'frag',kills:0,deaths:0,self:false});return rows;
 }
 function lobbyRosterSnapshot(mode=currentGameMode()){const rows=lobbySnapshot(),preview=configuredLobbyBots(mode);return preview===null?rows:[...rows.filter(row=>!row.bot),...preview];}
+function adjustLobbyBotDraft(team,delta){
+  if(!shell.inLobby||!isMatchAdmin||!matchAllowsLobbyEdits(matchState)||!delta)return;
+  refreshLobbyDraftOwnership();const draft={...(lobbyMatchDraft||committedLobbyMatchDraft())},spec=gameModeSpec(draft.mode);if(spec.cooperative)return;
+  if(spec.teamBased){const normalized=normalizeTeam(team),key=normalized==='red'?'redBots':'blueBots';draft[key]=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(draft[key])||0)+Math.sign(delta)));}
+  else draft.ffaBots=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number(draft.ffaBots)||0)+Math.sign(delta)));
+  lobbyMatchDraft=draft;lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());renderLobbyRoster(draft.mode);renderLobbySetupControls();setLobbyActionState();
+}
 function renderLobbyRoster(modeOverride=currentGameMode()){
-  if(!lobbyRoster)return;const mode=normalizeGameMode(modeOverride),rows=lobbyRosterSnapshot(mode),teamBased=gameModeSpec(mode).teamBased;
-  const humanCount=rows.filter(x=>!x.bot).length,botCount=rows.filter(x=>x.bot).length;$('lobbyPlayerCount').textContent=`${humanCount} / ${MAX_PLAYERS} · ${botCount} bots`;
+  if(!lobbyRoster)return;const mode=normalizeGameMode(modeOverride),spec=gameModeSpec(mode),rows=lobbyRosterSnapshot(mode),teamBased=spec.teamBased,editable=!!isMatchAdmin&&matchAllowsLobbyEdits(matchState),draft=lobbyMatchDraft||committedLobbyMatchDraft();
+  const humanCount=rows.filter(x=>!x.bot).length,botCount=rows.filter(x=>x.bot).length;$('lobbyPlayerCount').textContent=spec.cooperative?`${humanCount}/${MAX_PLAYERS} PLAYERS`:`${humanCount}/${MAX_PLAYERS} PLAYERS · ${botCount}/${MAX_MATCH_BOTS} BOTS`;
   const hostActions=p=>{if(!isMatchAdmin||p.bot||p.id===matchOwnerId||p.self)return'';return`<div class="lobby-player-actions"><button class="lobby-admin-action ${p.admin?'danger':''}" data-lobby-admin-role="${escapeHtml(p.id)}" type="button">${p.admin?'REMOVE ADMIN':'MAKE ADMIN'}</button></div>`;};
-  const playerRow=p=>{const owner=p.id===matchOwnerId,role=owner?'HOST':p.admin?'ADMIN':'',roleChip=role?` <span class="lobby-role-chip">${role}</span>`:'';return`<div class="lobby-player ${p.self?'self':''}"><span class="lobby-player-color ${teamBased?teamKey(p.team):'ffa'}"></span><div class="lobby-player-copy"><strong>${escapeHtml(p.bot?'[BOT] '+p.name:p.name)}${p.self?' · YOU':''}${roleChip}</strong><small>${teamBased?(gameModeSpec(mode).cooperative?'SURVIVOR':teamLabel(p.team))+' · ':''}${escapeHtml(WEAPON_SPECS[p.primaryWeapon]?.name||'ASSAULT RIFLE')}</small></div>${hostActions(p)}</div>`;};
-  if(gameModeSpec(mode).cooperative){lobbyRoster.className='lobby-roster ffa';lobbyRoster.innerHTML=`<div class="lobby-team-column"><div class="lobby-team-title">SURVIVORS</div><div class="lobby-team-players">${rows.filter(p=>!p.bot).map(playerRow).join('')}</div></div>`;}else if(!teamBased){const body=rows.sort((a,b)=>Number(b.self)-Number(a.self)||a.name.localeCompare(b.name)).map(playerRow).join('');lobbyRoster.className='lobby-roster ffa';lobbyRoster.innerHTML=`<div class="lobby-team-column ffa"><div class="lobby-team-title"><span>FREE FOR ALL</span><b>${rows.length}</b></div><div class="lobby-team-players">${body||'<div class="lobby-empty-team">Open slot</div>'}</div></div>`;}else{lobbyRoster.className='lobby-roster';const column=team=>{const list=rows.filter(p=>p.team===team),name=teamLabel(team),body=list.map(playerRow).join('')||'<div class="lobby-empty-team">Open slot</div>';return `<div class="lobby-team-column ${teamKey(team)}"><div class="lobby-team-title"><span>${name}</span><b>${list.length}</b></div><div class="lobby-team-players">${body}</div></div>`;};lobbyRoster.innerHTML=column('blue')+column('red');}
+  const playerRow=p=>{const owner=p.id===matchOwnerId,role=p.bot?'BOT':owner?'HOST':p.admin?'ADMIN':'',roleChip=role?` <span class="lobby-role-chip${p.bot?' bot':''}">${role}</span>`:'';return`<div class="lobby-player ${p.self?'self':''}${p.bot?' bot':''}"><span class="lobby-player-color ${teamBased?teamKey(p.team):'ffa'}"></span><div class="lobby-player-copy"><strong>${escapeHtml(p.name)}${p.self?' · YOU':''}${roleChip}</strong><small>${escapeHtml(WEAPON_SPECS[p.primaryWeapon]?.name||'ASSAULT RIFLE')}</small></div>${hostActions(p)}</div>`;};
+  const botControl=(team,count)=>{if(!editable||spec.cooperative)return'';const minus=count<=0?' disabled':'',plus=count>=(team==='ffa'?MAX_MATCH_BOTS:MAX_BOTS_PER_TEAM)?' disabled':'';return`<div class="lobby-team-bot-control" aria-label="${team==='ffa'?'Match':teamLabel(team)} bot count"><span>BOTS</span><button data-lobby-bot-step="${team}" data-bot-delta="-1" data-controller-key="lobby-bots:${team}:down" type="button"${minus}>−</button><b>${count}</b><button data-lobby-bot-step="${team}" data-bot-delta="1" data-controller-key="lobby-bots:${team}:up" type="button"${plus}>+</button></div>`;};
+  const joinControl=team=>{if(!teamBased||spec.cooperative)return'';const mine=myTeam===team,disabled=mine||socket?.readyState!==WebSocket.OPEN?' disabled':'';return`<button class="lobby-team-join ${mine?'active':''}" data-lobby-team-choice="${team}" data-controller-key="lobby-team:${team}" type="button"${disabled}>${mine?'YOU':'JOIN'}</button>`;};
+  if(spec.cooperative){lobbyRoster.className='lobby-roster ffa';const humans=rows.filter(p=>!p.bot);lobbyRoster.innerHTML=`<div class="lobby-team-column"><div class="lobby-team-title"><div class="lobby-team-label"><span>SURVIVORS</span><small>${humans.length} PLAYER${humans.length===1?'':'S'}</small></div></div><div class="lobby-team-players">${humans.map(playerRow).join('')||'<div class="lobby-empty-team">Open slot</div>'}</div></div>`;}
+  else if(!teamBased){const sorted=[...rows].sort((a,b)=>Number(b.self)-Number(a.self)||Number(a.bot)-Number(b.bot)||a.name.localeCompare(b.name)),ffaBots=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number(draft.ffaBots)||0)));lobbyRoster.className='lobby-roster ffa';lobbyRoster.innerHTML=`<div class="lobby-team-column ffa"><div class="lobby-team-title"><div class="lobby-team-label"><span>FREE FOR ALL</span><small>${humanCount}P · ${botCount}B</small></div><div class="lobby-team-title-actions">${botControl('ffa',ffaBots)}</div></div><div class="lobby-team-players">${sorted.map(playerRow).join('')||'<div class="lobby-empty-team">Open slot</div>'}</div></div>`;}
+  else{
+    lobbyRoster.className='lobby-roster';const column=team=>{const list=rows.filter(p=>p.team===team).sort((a,b)=>Number(b.self)-Number(a.self)||Number(a.bot)-Number(b.bot)||a.name.localeCompare(b.name)),humans=list.filter(p=>!p.bot).length,bots=list.filter(p=>p.bot).length,configured=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(team==='red'?draft.redBots:draft.blueBots)||0)));return`<div class="lobby-team-column ${teamKey(team)}"><div class="lobby-team-title"><div class="lobby-team-label"><span>${teamLabel(team)}</span><small>${humans}P · ${bots}B</small></div><div class="lobby-team-title-actions">${joinControl(team)}${botControl(team,configured)}</div></div><div class="lobby-team-players">${list.map(playerRow).join('')||'<div class="lobby-empty-team">Open slot</div>'}</div></div>`;};lobbyRoster.innerHTML=column('blue')+column('red');
+  }
   for(const btn of lobbyRoster.querySelectorAll('[data-lobby-admin-role]'))btn.addEventListener('click',()=>{const id=btn.dataset.lobbyAdminRole,pl=lobbySnapshot().find(x=>x.id===id);if(pl&&!pl.self)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});
+  for(const btn of lobbyRoster.querySelectorAll('[data-lobby-team-choice]'))btn.addEventListener('click',()=>{if(socket?.readyState===WebSocket.OPEN)send({t:'team',team:btn.dataset.lobbyTeamChoice});});
+  for(const btn of lobbyRoster.querySelectorAll('[data-lobby-bot-step]'))btn.addEventListener('click',()=>adjustLobbyBotDraft(btn.dataset.lobbyBotStep,Number(btn.dataset.botDelta)||0));
 }
 function lobbyBotTotal(value=botConfig){return Math.max(0,Math.min(MAX_MATCH_BOTS,(value.blueBots||0)+(value.redBots||0)));}
 function lobbyMinimapModeFromState(state=matchState){return state.minimapDirectional?'directional':(state.minimapRevealAll?'all':'standard');}
@@ -1366,10 +1381,10 @@ function syncLobbyHostControlPlacement(){
   $('lobbyCheatsTab')?.classList.toggle('hide',!dock);
   if(dock){
     if(!lobbyHostControlsDocked){$('lobbyGameplayHostMount')?.append(gameplay);$('lobbyWeaponsHostMount')?.append(weapons);gameplay?.classList.remove('hide');weapons?.classList.remove('hide');populateAdminGameplay(worldSettings);populateAdminWeapons(worldSettings);syncAdminWeaponEditor(currentAdminWeaponSelection());lobbyHostControlsDocked=true;}
-    document.querySelector('.admin-bot-card')?.classList.add('hide');
+    $('adminBotsCard')?.classList.add('hide');
   }else if(lobbyHostControlsDocked){
     restoreAdminTuningNode('adminGameplay','adminGameplayHome');restoreAdminTuningNode('adminAdvanced','adminAdvancedHome');lobbyHostControlsDocked=false;
-    const liveBots=document.querySelector('.admin-bot-card');liveBots?.classList.toggle('hide',!shell.inMatch||!!currentModeSpec().cooperative);
+    const liveBots=$('adminBotsCard');liveBots?.classList.toggle('hide',!shell.inMatch||!!currentModeSpec().cooperative);
     if(shell.panel===SHELL_PANEL.ADMIN)switchAdminTab(activeAdminTab);
   }
   if(!dock&&document.querySelector('[data-lobby-side-tab="cheats"]')?.classList.contains('active'))switchLobbySide('players');
@@ -1402,20 +1417,18 @@ function renderLobbySetupControls(){
   for(const btn of lobbyLethalButtons)btn.classList.toggle('active',btn.dataset.lobbyLethalChoice===draftLoadout.lethal);
   for(const btn of lobbyModeButtons)btn.classList.toggle('active',btn.dataset.lobbyModeChoice===draft.mode);
   const mapChoice=host?(lobbyMapDraft||currentMapId):currentMapId;for(const btn of lobbyMapButtons){btn.classList.toggle('active',btn.dataset.lobbyMapChoice===mapChoice);btn.disabled=!host||!matchAllowsLobbyEdits(matchState);}const customLoad=$('lobbyLoadCustomMapBtn');if(customLoad)customLoad.disabled=!host||!matchAllowsLobbyEdits(matchState);renderMapGallery();updateCustomMapLobbyUi();renderLobbyMapPreview(mapChoice);
+  const coop=!!draftSpec.cooperative;$('lobbyBotDifficultyWrap')?.classList.toggle('hide',!host||coop);$('lobbyZombieInfo')?.classList.toggle('hide',!coop);
   if(host){
-    const draftFfa=!draftSpec.teamBased;$('lobbyBlueBotWrap').classList.toggle('hide',draftFfa);$('lobbyRedBotWrap').classList.toggle('hide',draftFfa);$('lobbyFfaBotWrap').classList.toggle('hide',!draftFfa);
-    lobbyBlueBotCount.value=String(draft.blueBots);lobbyRedBotCount.value=String(draft.redBots);lobbyFfaBotCount.value=String(draft.ffaBots);lobbyBotDifficulty.value=draft.difficulty;lobbyMinimapMode.value=draft.minimap;lobbyMod.value=draft.mod;lobbyMod.disabled=!matchAllowsLobbyEdits(matchState);
-    const coop=!!draftSpec.cooperative;document.querySelector('.lobby-bots-row').classList.toggle('hide',coop);$('lobbyZombieInfo').classList.toggle('hide',!coop);$('lobbyBotsTitle').textContent=coop?'SURVIVAL':'BOTS';
+    lobbyBotDifficulty.value=draft.difficulty;lobbyBotDifficulty.disabled=!matchAllowsLobbyEdits(matchState);lobbyMinimapMode.value=draft.minimap;lobbyMod.value=draft.mod;lobbyMod.disabled=!matchAllowsLobbyEdits(matchState);
     const sandbox=draftSpec.scoreType==='none'||coop;lobbyScoreLimit.value=sandbox?'':String(draft.scoreLimit);lobbyTimeLimit.value=sandbox?'':String(draft.timeLimit);lobbyScoreLimit.disabled=sandbox;lobbyTimeLimit.disabled=sandbox;$('lobbyScoreWrap')?.classList.toggle('disabled-setting',sandbox);$('lobbyTimeWrap')?.classList.toggle('disabled-setting',sandbox);$('lobbyScoreWrap')?.classList.toggle('hide',coop);$('lobbyTimeWrap')?.classList.toggle('hide',coop);
   }
 }
 function renderLobbyShell(){
   if(!shell.inLobby)return;refreshLobbyDraftOwnership();syncLobbyHostControlPlacement();const host=!!isMatchAdmin,displayMode=lobbyDisplayMode(),displaySpec=gameModeSpec(displayMode),committedMode=currentGameMode(),committedSpec=gameModeSpec(committedMode),total=lobbyBotTotal();
   $('lobbyRoomCode').textContent=currentRoom||'----';$('lobbyModeBadge').textContent=displaySpec.name+(gameModSpec(host?lobbyMatchDraft?.mod:worldSettings.mod).id==='normal'?'':' · '+gameModSpec(host?lobbyMatchDraft?.mod:worldSettings.mod).name.toUpperCase());
-  $('lobbyTeamGroup').classList.toggle('hide',!displaySpec.teamBased||!!displaySpec.cooperative);$('lobbyBotsCard')?.classList.toggle('hide',!host);$('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbyCheatsTab')?.classList.toggle('hide',!host);
+  $('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbyCheatsTab')?.classList.toggle('hide',!host);
   const godToggle=$('lobbyGodModeToggle');if(godToggle){godToggle.classList.toggle('active',!!godMode);godToggle.setAttribute('aria-checked',String(!!godMode));godToggle.disabled=!host||socket?.readyState!==WebSocket.OPEN;}
   const startBtn=$('lobbyStartBtn');startBtn.classList.toggle('hide',!host);startBtn.disabled=!matchAllowsLobbyEdits(matchState);
-  for(const btn of lobbyTeamButtons)btn.classList.toggle('active',displaySpec.teamBased&&btn.dataset.lobbyTeamChoice===myTeam);
   
   const committedRule=committedSpec.cooperative?'Survive escalating waves':committedSpec.scoreType==='none'?'No score / time limit':`First ${matchState.scoreLimit||committedSpec.scoreLimit} · ${Math.max(2,Math.round((matchState.timeLimitMs||committedSpec.timeLimitMs)/60000))} min`,committedMinimap=`Minimap: ${lobbyMinimapModeFromState()==='directional'?'Directional':(lobbyMinimapModeFromState()==='all'?'Always On':'Standard')}`,committedMap=displayMapSpec(currentMapId).name;
   $('lobbyGuestMode').textContent=`${committedSpec.name} · ${committedMap} · ${gameModSpec(worldSettings.mod).name}`;$('lobbyGuestBots').textContent=committedSpec.cooperative?'Melee zombies · Return next wave':`${total} bot${total===1?'':'s'} · ${(botConfig.difficulty||'normal').replace(/^./,c=>c.toUpperCase())}`;$('lobbyGuestRules').textContent=`${committedRule} · ${committedMinimap}${matchCustom?' · Custom rules':''}`;
@@ -1423,7 +1436,7 @@ function renderLobbyShell(){
 function syncLobby({setup=true,roster=true}={}){if(!shell.inLobby)return;renderLobbyShell();if(setup){try{renderLobbySetupControls();}catch(error){console.error('Loadout/setup UI render failed without interrupting lobby session state.',error);}}setLobbyActionState();if(roster)renderLobbyRoster(lobbyDisplayMode());}
 function showLobby(){finishInitialConnectionAttempt();const leave=$('leaveBtn');if(leave){leave.disabled=false;const label=leave.querySelector('span');if(label)label.textContent='Leave Match';}shell.enterLobby();refreshLobbyDraftOwnership();syncLobby();const url=new URL(location.href);url.searchParams.set('room',currentRoom);history.replaceState(null,'',url);}
 function updateLobbyMatchDraftFromControls(){
-  if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;if(!lobbyMatchDraft)lobbyMatchDraft=committedLobbyMatchDraft();const spec=gameModeSpec(lobbyMatchDraft.mode),ffa=!spec.teamBased;let blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(lobbyBlueBotCount.value)||0))),red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(lobbyRedBotCount.value)||0))),ffaBots=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number(lobbyFfaBotCount.value)||0)));
+  if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;if(!lobbyMatchDraft)lobbyMatchDraft=committedLobbyMatchDraft();const spec=gameModeSpec(lobbyMatchDraft.mode),blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(lobbyMatchDraft.blueBots)||0))),red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(lobbyMatchDraft.redBots)||0))),ffaBots=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number(lobbyMatchDraft.ffaBots)||0)));
   lobbyMatchDraft={...lobbyMatchDraft,mod:normalizeGameMod(lobbyMod.value),blueBots:blue,redBots:red,ffaBots,difficulty:lobbyBotDifficulty.value,scoreLimit:spec.scoreType==='none'?lobbyMatchDraft.scoreLimit:Math.max(5,Math.min(100,Math.round(Number(lobbyScoreLimit.value)||spec.scoreLimit))),timeLimit:spec.scoreType==='none'?lobbyMatchDraft.timeLimit:Math.max(2,Math.min(30,Math.round(Number(lobbyTimeLimit.value)||spec.timeLimitMs/60000))),minimap:['standard','all','directional'].includes(lobbyMinimapMode.value)?lobbyMinimapMode.value:'standard'};
   lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());renderLobbyShell();renderLobbySetupControls();renderLobbyRoster(lobbyDisplayMode());setLobbyActionState();
 }
@@ -2417,7 +2430,7 @@ function bindUI(){
   $('teamSwitchBtn').addEventListener('click',()=>requestTeamChange(godMode?otherTeam(myTeam):(pendingTeam?myTeam:otherTeam(myTeam))));
   $('adminBtn').addEventListener('click',()=>openAdminPanel('gameplay'));
   $('adminCancelBtn').addEventListener('click',closeAdminPanel);
-  for(const id of ['adminBlueBotCount','adminRedBotCount','adminFfaBotCount','adminBotDifficulty'])$(id)?.addEventListener('change',syncAdminBotDraftSummary);
+  $('adminBotDifficulty')?.addEventListener('change',syncAdminBotDraftSummary);
   const adminTabs=[...document.querySelectorAll('[data-admin-tab]')];
   for(const tab of adminTabs){
     tab.addEventListener('click',()=>switchAdminTab(tab.dataset.adminTab));
@@ -2435,13 +2448,12 @@ function bindUI(){
   for(const tab of lobbySideTabs)tab.addEventListener('click',()=>switchLobbySide(tab.dataset.lobbySideTab));
   $('lobbyGodModeToggle')?.addEventListener('click',()=>{if(isMatchAdmin&&socket?.readyState===WebSocket.OPEN)send({t:'god',enabled:!godMode});});
   switchLobbySide('players');
-  for(const btn of lobbyTeamButtons)btn.addEventListener('click',()=>{if(socket?.readyState===WebSocket.OPEN)send({t:'team',team:btn.dataset.lobbyTeamChoice});});
   for(const btn of lobbyPrimaryButtons)btn.addEventListener('click',()=>setLobbyLoadoutDraft({primaryWeapon:btn.dataset.lobbyPrimaryChoice}));
   for(const btn of lobbySecondaryButtons)btn.addEventListener('click',()=>setLobbyLoadoutDraft({secondaryWeapon:btn.dataset.lobbySecondaryChoice}));
   for(const btn of lobbyTacticalButtons)btn.addEventListener('click',()=>setLobbyLoadoutDraft({tactical:btn.dataset.lobbyTacticalChoice}));
   for(const btn of lobbyLethalButtons)btn.addEventListener('click',()=>setLobbyLoadoutDraft({lethal:btn.dataset.lobbyLethalChoice}));
   for(const btn of lobbyModeButtons)btn.addEventListener('click',()=>setLobbyModeDraft(btn.dataset.lobbyModeChoice));
-  for(const el of [lobbyBlueBotCount,lobbyRedBotCount,lobbyFfaBotCount,lobbyBotDifficulty,lobbyScoreLimit,lobbyTimeLimit,lobbyMinimapMode,lobbyMod])el.addEventListener('input',updateLobbyMatchDraftFromControls);
+  for(const el of [lobbyBotDifficulty,lobbyScoreLimit,lobbyTimeLimit,lobbyMinimapMode,lobbyMod])el.addEventListener('input',updateLobbyMatchDraftFromControls);
   for(const root of [$('adminGameplay'),$('adminAdvanced'),$('adminPlayers')]){root?.addEventListener('input',()=>{if(shell.inLobby)setLobbyActionState();});root?.addEventListener('change',()=>{if(shell.inLobby)setLobbyActionState();else if(shell.inMatch&&isMatchAdmin)saveAdminSettings(root.id==='adminAdvanced'?'advanced':root.id==='adminPlayers'?'players':'gameplay');});}
   for(const btn of lobbyMapButtons)btn.addEventListener('click',()=>setLobbyMapDraft(btn.dataset.lobbyMapChoice));
   $('lobbyLoadCustomMapBtn')?.addEventListener('click',requestCustomMapFile);$('lobbyCustomMapFile')?.addEventListener('change',event=>{const file=event.target.files?.[0];if(file)void loadCustomMapFile(file);});$('lobbyCreateMapBtn')?.addEventListener('click',()=>openIntegratedMapBuilder());$('lobbyEditMapBtn')?.addEventListener('click',()=>{if(selectedLibraryMap?.id)openIntegratedMapBuilder(selectedLibraryMap.id)});document.querySelectorAll('[data-map-gallery-tab]').forEach(btn=>btn.addEventListener('click',()=>{mapGalleryTab=btn.dataset.mapGalleryTab==='mine'?'mine':'official';document.querySelectorAll('[data-map-gallery-tab]').forEach(x=>x.classList.toggle('active',x===btn));if(mapGalleryTab==='mine')void refreshMapLibrary({quiet:true});renderMapGallery();}));void refreshMapLibrary({quiet:true});updateCustomMapLobbyUi();
@@ -3039,7 +3051,7 @@ let activeAdminTab='gameplay';
 function availableAdminTabs(){return [...document.querySelectorAll('[data-admin-tab]')].filter(tab=>!tab.classList.contains('hide'));}
 function syncAdminContext(){
   $('adminTitle').textContent='Host Options';
-  const liveBots=document.querySelector('.admin-bot-card');
+  const liveBots=$('adminBotsCard');
   liveBots?.classList.toggle('hide',!shell.inMatch||!!currentModeSpec().cooperative);
   }
 function switchAdminTab(tab){
@@ -3050,17 +3062,19 @@ function switchAdminTab(tab){
   const players=activeAdminTab==='players',closeBtn=$('adminCancelBtn');if(closeBtn)closeBtn.textContent='CLOSE';document.querySelector('.admin-shell').dataset.page=activeAdminTab;if(players){setAdminStatus('');populateAdminBots(botConfig);renderAdminPlayers(true);}
 }
 function syncAdminBotDraftSummary(){
-  const ffa=normalizeGameMode(matchState.mode)==='ffa',blue=Math.max(0,Math.floor(Number($('adminBlueBotCount')?.value)||0)),red=Math.max(0,Math.floor(Number($('adminRedBotCount')?.value)||0)),total=ffa?Math.max(0,Math.floor(Number($('adminFfaBotCount')?.value)||0)):blue+red,diff=String($('adminBotDifficulty')?.value||botConfig.difficulty||'normal');
-  if($('adminBotSummary'))$('adminBotSummary').textContent=`${Math.min(MAX_MATCH_BOTS,total)} / ${MAX_MATCH_BOTS} bots · ${diff.replace(/^./,c=>c.toUpperCase())}`;
+  const cfg=normalizeBotConfig(botConfig),total=Math.min(MAX_MATCH_BOTS,cfg.blueBots+cfg.redBots);if($('adminBotSummary'))$('adminBotSummary').textContent=`${total}/${MAX_MATCH_BOTS} BOTS`;
 }
 function populateAdminBots(value=botConfig){
-  const cfg=normalizeBotConfig(value),ffa=normalizeGameMode(matchState.mode)==='ffa',total=Math.min(MAX_MATCH_BOTS,cfg.blueBots+cfg.redBots);
-  $('adminBlueBotWrap')?.classList.toggle('hide',ffa);$('adminRedBotWrap')?.classList.toggle('hide',ffa);$('adminFfaBotWrap')?.classList.toggle('hide',!ffa);
-  if($('adminBlueBotCount'))$('adminBlueBotCount').value=String(cfg.blueBots);if($('adminRedBotCount'))$('adminRedBotCount').value=String(cfg.redBots);if($('adminFfaBotCount'))$('adminFfaBotCount').value=String(total);if($('adminBotDifficulty'))$('adminBotDifficulty').value=cfg.difficulty;
-  syncAdminBotDraftSummary();
+  const cfg=normalizeBotConfig(value);if($('adminBotDifficulty'))$('adminBotDifficulty').value=cfg.difficulty;syncAdminBotDraftSummary();
 }
 function collectAdminBotConfig(){
-  const ffa=normalizeGameMode(matchState.mode)==='ffa';let blue,red;if(ffa){const total=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number($('adminFfaBotCount')?.value)||0)));blue=Math.ceil(total/2);red=Math.floor(total/2);}else{blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number($('adminBlueBotCount')?.value)||0)));red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number($('adminRedBotCount')?.value)||0)));if(blue+red>MAX_MATCH_BOTS)return null;}return{blueBots:blue,redBots:red,difficulty:String($('adminBotDifficulty')?.value||'normal')};
+  const cfg=normalizeBotConfig(botConfig);return{blueBots:cfg.blueBots,redBots:cfg.redBots,difficulty:String($('adminBotDifficulty')?.value||cfg.difficulty||'normal')};
+}
+function adjustAdminBotCount(team,delta){
+  if(!shell.inMatch||!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!delta||currentModeSpec().cooperative)return;const cfg=normalizeBotConfig(botConfig),diff=String($('adminBotDifficulty')?.value||cfg.difficulty||'normal'),ffa=normalizeGameMode(matchState.mode)==='ffa';let blue=cfg.blueBots,red=cfg.redBots;
+  if(ffa){const total=Math.max(0,Math.min(MAX_MATCH_BOTS,blue+red+Math.sign(delta)));blue=Math.ceil(total/2);red=Math.floor(total/2);}
+  else{const normalized=normalizeTeam(team);if(normalized==='red')red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,red+Math.sign(delta)));else blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,blue+Math.sign(delta)));}
+  send({t:'adminBots',blueBots:blue,redBots:red,difficulty:diff});setAdminStatus('UPDATING BOTS…');
 }
 function populateAdminGameplay(value){const x=normalizeWorldSettings(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);}
 function populateAdminWeapons(value){const x=normalizeWorldSettings(value);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=(w.reloadMs/1000).toFixed(2);$(`set${cap}Cooldown`).value=Math.round(60000/w.cooldownMs);$(`set${cap}Recoil`).value=Math.round(w.recoilScale);}}
@@ -3069,15 +3083,16 @@ function collectAdminGameplayPatch(){return{movement:{runSpeed:$('setRunSpeed').
 function collectAdminWeaponsPatch(){return{weapons:Object.fromEntries(WEAPON_ORDER.map(name=>{const cap=name[0].toUpperCase()+name.slice(1);return[name,{damage:$(`set${cap}Damage`).value,speed:$(`set${cap}Speed`).value,reloadMs:Number($(`set${cap}Reload`).value)*1000,cooldownMs:60000/Math.max(24,Number($(`set${cap}Cooldown`).value)||60),recoilScale:$(`set${cap}Recoil`).value}]}))};}
 function adminPlayerSnapshot(){if(shell.inLobby)return lobbyRosterSnapshot(lobbyDisplayMode()).map(r=>({id:r.id,name:r.name,team:r.team,bot:!!r.bot,zombie:!!r.zombie,godMode:!!r.godMode,admin:!!r.admin,self:!!r.self}));return[{id:clientId,name:myName||'You',team:myTeam,bot:false,zombie:false,godMode,admin:isMatchAdmin,self:true},...Array.from(remotes.values()).map(r=>({id:r.id,name:r.name,team:r.team,bot:!!r.bot,zombie:!!r.zombie,godMode:!!r.godMode,admin:!!r.admin,self:false}))].sort((a,b)=>Number(b.self)-Number(a.self)||Number(a.bot)-Number(b.bot)||a.team.localeCompare(b.team)||a.name.localeCompare(b.name));}
 function renderAdminPlayers(force=false){
-  const root=$('adminPlayerList');if(!root)return;if(!force&&(shell.panel!==SHELL_PANEL.ADMIN||activeAdminTab!=='players'))return;root.innerHTML='';
-  for(const pl of adminPlayerSnapshot()){
-    const row=document.createElement('div');row.className=`admin-player-row${pl.bot?' bot':''}`;const owner=pl.id===matchOwnerId,self=!!pl.self,safeId=escapeHtml(pl.id),role=pl.zombie?'ZOMBIE':pl.bot?'BOT':owner?'HOST':pl.admin?'ADMIN':'',roleChip=role?`<span class="admin-role-chip">${role}</span>`:'';
-    const godAction=pl.bot?'':`<div class="admin-player-toggle"><span>GOD MODE</span><button aria-checked="${pl.godMode}" aria-label="God Mode for ${escapeHtml(pl.name)}" class="switch-toggle admin-god-toggle ${pl.godMode?'active':''}" data-admin-god="${safeId}" data-controller-key="admin-player:${safeId}:god" role="switch" type="button"><span></span></button></div>`;
-    const roleAction=(pl.bot||owner||self)?'':`<button class="btn admin-mini ${pl.admin?'danger':''}" data-admin-role="${safeId}" data-controller-key="admin-player:${safeId}:role">${pl.admin?'REMOVE ADMIN':'MAKE ADMIN'}</button>`;
-    row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${currentModeSpec().teamBased?teamKey(pl.team):'ffa'}"></span><div><strong>${escapeHtml(pl.name)}${self?' (You)':''}${roleChip}</strong><small>${currentModeSpec().teamBased?teamLabel(pl.team):'FFA'}${pl.bot?' · AI':''}</small></div></div><div class="admin-player-actions">${godAction}${roleAction}</div>`;root.appendChild(row);
-  }
+  const root=$('adminPlayerList');if(!root)return;if(!force&&(shell.panel!==SHELL_PANEL.ADMIN||activeAdminTab!=='players'))return;root.innerHTML='';const rows=adminPlayerSnapshot(),spec=currentModeSpec(),editable=!!isMatchAdmin&&shell.inMatch;
+  const playerMarkup=pl=>{const owner=pl.id===matchOwnerId,self=!!pl.self,safeId=escapeHtml(pl.id),role=pl.zombie?'ZOMBIE':pl.bot?'BOT':owner?'HOST':pl.admin?'ADMIN':'',roleChip=role?`<span class="admin-role-chip">${role}</span>`:'',godAction=pl.bot?'':`<div class="admin-player-toggle"><span>GOD MODE</span><button aria-checked="${pl.godMode}" aria-label="God Mode for ${escapeHtml(pl.name)}" class="switch-toggle admin-god-toggle ${pl.godMode?'active':''}" data-admin-god="${safeId}" data-controller-key="admin-player:${safeId}:god" role="switch" type="button"><span></span></button></div>`,roleAction=(pl.bot||owner||self)?'':`<button class="btn admin-mini ${pl.admin?'danger':''}" data-admin-role="${safeId}" data-controller-key="admin-player:${safeId}:role">${pl.admin?'REMOVE ADMIN':'MAKE ADMIN'}</button>`;return`<div class="admin-player-row${pl.bot?' bot':''}"><div class="admin-player-identity"><span class="admin-team-dot ${spec.teamBased?teamKey(pl.team):'ffa'}"></span><div><strong>${escapeHtml(pl.name)}${self?' (You)':''}${roleChip}</strong><small>${pl.bot?'AI':spec.teamBased?teamLabel(pl.team):'FFA'}</small></div></div><div class="admin-player-actions">${godAction}${roleAction}</div></div>`;};
+  const botControl=(team,count)=>{if(!editable||spec.cooperative)return'';const max=team==='ffa'?MAX_MATCH_BOTS:MAX_BOTS_PER_TEAM;return`<div class="admin-team-bot-control"><span>BOTS</span><button data-admin-bot-step="${team}" data-bot-delta="-1" data-controller-key="admin-bots:${team}:down" type="button"${count<=0?' disabled':''}>−</button><b>${count}</b><button data-admin-bot-step="${team}" data-bot-delta="1" data-controller-key="admin-bots:${team}:up" type="button"${count>=max?' disabled':''}>+</button></div>`;};
+  const section=(label,list,team='ffa',botCount=0)=>{const humans=list.filter(x=>!x.bot&&!x.zombie).length,bots=list.filter(x=>x.bot).length,zombies=list.filter(x=>x.zombie).length,meta=zombies?`${humans}P · ${zombies}Z`:`${humans}P · ${bots}B`;return`<section class="admin-team-section ${team==='ffa'?'ffa':teamKey(team)}"><header><div><strong>${label}</strong><small>${meta}</small></div>${botControl(team,botCount)}</header><div class="admin-team-rows">${list.map(playerMarkup).join('')||'<div class="admin-team-empty">No players</div>'}</div></section>`;};
+  if(spec.cooperative)root.innerHTML=section('SURVIVORS',rows,'ffa',0);
+  else if(!spec.teamBased){const cfg=normalizeBotConfig(botConfig),total=Math.min(MAX_MATCH_BOTS,cfg.blueBots+cfg.redBots);root.innerHTML=section('FREE FOR ALL',rows,'ffa',total);}
+  else{const cfg=normalizeBotConfig(botConfig),blue=rows.filter(x=>x.team==='blue'),red=rows.filter(x=>x.team==='red');root.innerHTML=section('ALPHA',blue,'blue',cfg.blueBots)+section('BRAVO',red,'red',cfg.redBots);}
   for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});
   for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl&&!pl.self)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});
+  for(const btn of root.querySelectorAll('[data-admin-bot-step]'))btn.addEventListener('click',()=>adjustAdminBotCount(btn.dataset.adminBotStep,Number(btn.dataset.botDelta)||0));
 }
 function requestTeamChange(team){if(!shell.inMatch||socket?.readyState!==WebSocket.OPEN)return;send({t:'team',team:normalizeTeam(team)});}
 function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
