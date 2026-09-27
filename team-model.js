@@ -1,8 +1,8 @@
 // blue/red are legacy protocol/storage IDs. Alpha/Bravo are faction labels; colors are presentation outputs only.
 export const TEAM_IDS=Object.freeze(['blue','red']);
 export const TEAM_META=Object.freeze({
-  blue:Object.freeze({id:'blue',key:'alpha',label:'ALPHA',color:'#54a9ff'}),
-  red:Object.freeze({id:'red',key:'bravo',label:'BRAVO',color:'#ff3b45'}),
+  blue:Object.freeze({id:'blue',key:'alpha',label:'ALPHA',color:'#b69b68',uniform:Object.freeze({base:'#b69b68',dark:'#66583c',light:'#d4c08f',pattern:'desert'})}),
+  red:Object.freeze({id:'red',key:'bravo',label:'BRAVO',color:'#6f7b52',uniform:Object.freeze({base:'#6f7b52',dark:'#37432d',light:'#a0a77a',pattern:'woodland'})}),
 });
 export const RELATIONSHIP=Object.freeze({SELF:'self',FRIENDLY_HUMAN:'friendly-human',FRIENDLY_BOT:'friendly-bot',ENEMY:'enemy'});
 export const RELATIONSHIP_COLORS=Object.freeze({
@@ -16,6 +16,7 @@ export function otherTeam(value){return normalizeTeam(value)==='red'?'blue':'red
 export function teamLabel(value){return TEAM_META[normalizeTeam(value)].label;}
 export function teamKey(value){return TEAM_META[normalizeTeam(value)].key;}
 export function factionColor(value){return TEAM_META[normalizeTeam(value)].color;}
+export function factionUniform(value){return TEAM_META[normalizeTeam(value)].uniform;}
 export function relationshipFor({viewerTeam,actorTeam,teamBased=true,self=false,bot=false}={}){
   if(self)return RELATIONSHIP.SELF;
   if(!teamBased||normalizeTeam(actorTeam)!==normalizeTeam(viewerTeam))return RELATIONSHIP.ENEMY;
