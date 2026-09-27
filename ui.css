@@ -1133,3 +1133,130 @@ body{font-size:var(--ui-md)}
   .lobby-player-toolbar{flex-wrap:wrap}.lobby-player-toolbar .lobby-zombie-info{width:100%;text-align:left}.lobby-roster{grid-template-columns:1fr!important;overflow:auto!important}.lobby-team-column{min-height:130px}.lobby-team-title-actions{flex-wrap:wrap}
   .admin-player-list{grid-template-columns:1fr!important;overflow:auto!important}.admin-team-section.ffa{grid-column:auto}
 }
+
+/* v1.63.0 compact menu system: the Players tab is the visual baseline for every Breach menu. */
+:root{--compact-gap:5px;--compact-pad:6px;--compact-radius:7px;--compact-row:31px}
+
+/* One consistent lobby surface instead of each tab inventing its own outer card. */
+.lobby-side-view[data-lobby-side-view="match"].active,
+.lobby-side-view[data-lobby-side-view="map"].active,
+.lobby-side-view[data-lobby-side-view="loadout"].active,
+.lobby-side-view[data-lobby-side-view="killstreaks"].active,
+.lobby-side-view[data-lobby-side-view="cheats"].active{
+  height:100%;min-height:0;padding:var(--compact-pad);overflow:hidden;scrollbar-gutter:auto;
+  border:1px solid var(--line);border-radius:10px;background:rgba(14,19,23,.94)
+}
+
+/* MATCH — one compact rules surface, with the mode and values where they are used. */
+.lobby-side-view[data-lobby-side-view="match"] .lobby-setup-panel{height:100%;min-height:0!important;padding:0!important;overflow:auto;background:transparent}
+.lobby-side-view[data-lobby-side-view="match"] .lobby-host-setup:not(.hide){height:100%;min-height:0;display:block}
+.lobby-match-grid{height:100%;grid-template-columns:minmax(0,1fr)!important;gap:var(--compact-gap)!important}
+.lobby-match-card{min-height:0;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;gap:var(--compact-gap)!important}
+.lobby-card-title{min-height:var(--compact-row);display:flex;align-items:center;padding:0 2px 5px!important;border-bottom:1px solid var(--line)}
+.lobby-card-title strong{font-size:10px!important;letter-spacing:.055em}
+.lobby-match-card .lobby-control-group{display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;align-items:center;gap:6px!important;margin:0!important}
+.lobby-match-card .lobby-control-group>span{font-size:8.5px!important;white-space:nowrap}
+.lobby-mode-picker{gap:4px!important}
+.lobby-mode-picker button{height:30px!important;padding:0 6px!important;border:1px solid var(--line)!important;border-radius:6px!important;background:#090d10!important;color:var(--muted)!important;font-size:9px!important;font-weight:950!important;letter-spacing:.035em!important}
+.lobby-mode-picker button.active,.lobby-mode-picker button[aria-pressed="true"]{border-color:rgba(215,255,88,.34)!important;background:#1a2118!important;color:var(--accent)!important;box-shadow:inset 0 -2px 0 rgba(215,255,88,.55)}
+.lobby-match-card .lobby-setup-row{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:var(--compact-gap)!important;margin:0!important}
+.lobby-match-card .lobby-setup-row>label{min-width:0;display:grid;grid-template-columns:minmax(0,1fr);gap:3px;padding:5px;border:1px solid var(--line);border-radius:var(--compact-radius);background:#090d10}
+.lobby-match-card .lobby-setup-row label>span{font-size:8px!important;letter-spacing:.055em!important}
+.lobby-match-card .input,.lobby-match-card .game-control{height:28px!important;border-radius:5px!important}
+.lobby-guest-setup{min-height:0!important;height:auto!important;display:flex!important;flex-wrap:wrap;align-items:center;gap:5px;padding:6px 7px;border:1px solid var(--line);border-radius:var(--compact-radius);background:#090d10}
+.lobby-guest-setup strong{font-size:10px}.lobby-guest-setup span{font-size:9px!important}
+
+/* MAP — gallery and preview share the available width instead of stacking large islands. */
+.lobby-map-view.active{overflow:hidden!important}
+.lobby-map-panel{height:100%!important;min-height:0!important;display:grid!important;grid-template-columns:minmax(250px,.82fr) minmax(0,1.18fr)!important;grid-template-rows:minmax(0,1fr)!important;gap:var(--compact-gap)!important;padding:0!important}
+.lobby-map-toolbar{grid-column:1;min-width:0;min-height:0;display:grid!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(0,1fr) auto!important;align-items:stretch!important;gap:var(--compact-gap)!important;padding-right:var(--compact-gap);border-right:1px solid var(--line);overflow:hidden!important}
+.lobby-map-gallery-head{min-height:var(--compact-row);margin:0!important;padding:0 0 5px;border-bottom:1px solid var(--line);gap:5px!important}
+.lobby-map-gallery-tabs,.lobby-map-gallery-actions{gap:3px!important}
+.lobby-map-gallery-tab,.lobby-map-create,.lobby-map-edit,.lobby-map-delete,.lobby-custom-map-load{height:27px!important;min-width:0!important;padding:0 7px!important;border-radius:5px!important;font-size:8px!important;letter-spacing:.045em!important}
+.lobby-map-choice-grid{min-height:0;grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(52px,auto);gap:4px!important;align-content:start;overflow:auto;overscroll-behavior:contain;padding-right:1px}
+.lobby-map-choice{min-height:52px!important;padding:18px 5px 5px!important;border-radius:6px!important;gap:1px!important}
+.lobby-map-choice::before{height:17px!important;border-radius:5px 5px 0 0!important}
+.lobby-map-choice strong{font-size:9.5px!important;line-height:1.05}.lobby-map-choice small{font-size:8px!important;line-height:1.1}.lobby-map-choice .map-revision{font-size:7px!important}
+.lobby-map-empty{min-height:62px!important;padding:8px!important;font-size:9px!important}
+.lobby-custom-map-tools{min-height:31px;padding-top:4px!important;gap:5px!important}.lobby-custom-map-tools #lobbyCustomMapStatus{font-size:8px!important}
+.lobby-map-canvas-wrap{grid-column:2;grid-row:1;min-height:0;border-radius:var(--compact-radius)!important}
+#lobbyMapPreview{min-height:0!important}
+
+/* LOADOUT — preserve the gunsmith workflow, but make overview cards match the roster density. */
+.lobby-loadout-view.active{padding:var(--compact-pad)!important}
+.lobby-loadout-panel{height:100%!important;min-height:0!important;padding:0!important;overflow:hidden!important;background:transparent!important}
+.lobby-loadout-view .class-flow-workspace{height:100%!important;min-height:0!important;padding:0!important}
+.loadout-classes-view.active{height:100%;min-height:0;display:grid!important;grid-template-rows:minmax(0,1fr)}
+.loadout-class-list{height:100%;min-height:0;grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-template-rows:minmax(0,1fr)!important;gap:var(--compact-gap)!important;overflow:hidden!important}
+.loadout-class-card{grid-template-columns:minmax(0,1fr) 42px!important;border-radius:var(--compact-radius)!important;background:#090d10!important}
+.loadout-class-main{padding:7px!important;gap:4px!important}.loadout-class-edit{width:42px!important}
+.loadout-class-card-head strong{font-size:11px!important}.loadout-class-card-head span{margin-top:2px!important;font-size:7px!important}.loadout-class-weapons{gap:2px!important}.loadout-class-weapons span{font-size:8px!important}
+.loadout-view-nav{min-height:var(--compact-row);padding:0 2px 5px!important;gap:6px!important}.loadout-view-nav h3{font-size:14px!important}.class-name-edit{font-size:14px!important}
+.class-detail-grid{gap:var(--compact-gap)!important}
+.class-item-card{padding:7px 9px!important;gap:3px!important;border-radius:var(--compact-radius)!important;background:#090d10!important}
+.class-item-card>span{font-size:7.5px!important}.class-item-card>strong{font-size:13px!important}.class-item-card>small{font-size:8px!important}
+
+/* KILLSTREAKS — same toolbar + compact cards pattern as Players. */
+.killstreak-setup-panel{padding:0!important;gap:var(--compact-gap)!important;grid-template-rows:auto 42px minmax(0,1fr)!important}
+.killstreak-setup-head{min-height:var(--compact-row);padding:0 2px 5px!important;gap:7px!important}.killstreak-setup-head strong{font-size:10px!important}.killstreak-setup-head span{font-size:8px!important}
+.killstreak-equipped-strip{height:42px!important;min-height:42px!important;max-height:42px!important;gap:4px!important}
+.killstreak-equipped-slot{padding:4px 6px!important;border-radius:6px!important;gap:5px!important}.killstreak-equipped-slot .kill-count{min-width:25px!important;font-size:14px!important}.killstreak-equipped-slot strong{font-size:9px!important}.killstreak-equipped-slot small{font-size:7px!important;margin-top:1px!important}
+.killstreak-choice-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:minmax(76px,1fr)!important;gap:4px!important;padding-right:1px!important}
+.killstreak-choice{min-height:76px!important;padding:6px!important;border-radius:var(--compact-radius)!important;gap:3px!important;background:#090d10!important}.killstreak-choice-kills{font-size:14px!important}.killstreak-choice-state{font-size:7px!important}.killstreak-choice strong{font-size:9.5px!important}.killstreak-choice p{font-size:7.5px!important;line-height:1.15!important}
+
+/* HOST OPTIONS — one compact toolbar, one content surface; no nested panel-on-panel look. */
+.lobby-cheats-panel{height:100%;min-height:0;grid-template-rows:auto minmax(0,1fr)!important;gap:var(--compact-gap)!important;padding:0!important;border:0!important;background:transparent!important}
+.lobby-cheats-toolbar{min-height:var(--compact-row);padding:0 0 5px;border-bottom:1px solid var(--line)}
+.lobby-cheat-tabs{width:auto!important;max-width:360px;padding:2px!important;gap:3px!important;border-radius:6px!important}
+.lobby-cheat-tab{height:27px!important;border-radius:5px!important;font-size:8.5px!important}
+.lobby-cheat-pages{min-height:0;overflow:auto;overscroll-behavior:contain}
+.lobby-tuning-panel,.lobby-weapons-panel{height:auto!important;min-height:100%!important;padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;overflow:visible!important}
+.lobby-god-control{min-height:34px;padding:4px 6px!important;border:1px solid var(--line);border-radius:var(--compact-radius);background:#090d10}
+.lobby-host-control-mount{padding-top:var(--compact-gap)!important}
+#lobbyGameplayHostMount .settings-grid,#lobbyWeaponsHostMount .settings-grid{gap:4px!important;padding:0!important}
+#lobbyGameplayHostMount .setting,#lobbyWeaponsHostMount .setting{padding:5px 6px!important;border-radius:6px!important;background:#090d10!important}
+
+/* SETTINGS + live HOST OPTIONS — same compact row/card language, not oversized tiles. */
+.settings-tabs,.admin-tabs{padding:3px 6px!important;gap:3px!important;border-bottom:1px solid var(--line)}
+.settings-tab,.admin-tab{height:29px!important;border-radius:5px!important;font-size:9px!important}
+.settings-page .settings-category-head{min-height:25px;padding:5px 7px 2px!important}.settings-page .settings-category-head h3{margin:0;font-size:9px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.settings-page .settings-grid,.admin-page>.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4px!important;padding:4px 6px 6px!important}
+.settings-page .setting,.admin-page>.settings-grid>.setting{min-height:40px;padding:5px 6px!important;gap:4px!important;border-radius:6px!important;background:#090d10!important}
+.settings-page .setting:not(.setting-switch),.admin-page>.settings-grid>.setting:not(.setting-switch){grid-template-columns:minmax(80px,.75fr) minmax(0,1fr) auto;align-items:center}
+.settings-page .select-setting,.admin-page>.settings-grid>.select-setting{grid-template-columns:minmax(80px,.75fr) minmax(110px,1fr)}
+.settings-page .setting-switch,.admin-page>.settings-grid>.setting-switch{grid-template-columns:minmax(0,1fr) auto;align-items:center}
+.settings-page .setting>span,.admin-page>.settings-grid>.setting>span{font-size:8px!important;line-height:1.15}.settings-page .setting output{font-size:8px!important}
+.settings-page .game-control,.admin-page>.settings-grid .game-control{height:27px!important;border-radius:5px!important}.settings-page .game-slider-control{min-width:70px}
+.admin-page{padding:5px!important}.weapon-settings-grid{gap:4px!important}.weapon-settings-card{border-radius:6px!important;background:#090d10!important}.weapon-settings-card strong{padding:5px 6px!important;font-size:9px!important}.weapon-fields{gap:4px!important;padding:5px!important}.weapon-settings-card label{gap:3px!important;font-size:7.5px!important}
+
+/* Pause / front menu follow the same density without changing their workflow. */
+.pause-card{border-radius:10px!important}.pause-card>.pause-actions-all{gap:3px!important}.pause-card>.pause-actions-all .secondary-btn,.pause-leave .secondary-btn{height:31px!important;border-radius:6px!important;font-size:9px!important}.pause-card>.resume-btn{height:34px!important;border-radius:6px!important}
+.front-nav{padding:6px!important;gap:4px!important}.front-nav-button{height:52px!important;padding:0 9px!important;border-radius:6px!important}.front-content{border-radius:10px!important}
+
+@media(max-width:900px){
+  .lobby-map-panel{grid-template-columns:minmax(220px,.9fr) minmax(0,1.1fr)!important}
+  .loadout-class-list{grid-template-columns:repeat(3,minmax(0,1fr))!important;grid-template-rows:repeat(2,minmax(0,1fr))!important}
+  .killstreak-choice-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+@media(max-width:760px),(max-height:430px) and (orientation:landscape){
+  :root{--compact-pad:4px;--compact-gap:4px;--compact-row:28px}
+  .lobby-side-view[data-lobby-side-view="match"].active,.lobby-side-view[data-lobby-side-view="map"].active,.lobby-side-view[data-lobby-side-view="loadout"].active,.lobby-side-view[data-lobby-side-view="killstreaks"].active,.lobby-side-view[data-lobby-side-view="cheats"].active{padding:4px}
+  .lobby-match-card .lobby-setup-row{grid-template-columns:repeat(4,minmax(0,1fr))!important}.lobby-match-card .lobby-setup-row>label{padding:3px}.lobby-mode-picker button{height:27px!important;font-size:8px!important}.lobby-match-card .input,.lobby-match-card .game-control{height:25px!important}
+  .lobby-map-panel{grid-template-columns:minmax(200px,.8fr) minmax(0,1.2fr)!important}.lobby-map-gallery-tab,.lobby-map-create,.lobby-map-edit,.lobby-map-delete,.lobby-custom-map-load{height:24px!important;padding:0 5px!important}.lobby-map-choice{min-height:43px!important;padding:15px 4px 4px!important}.lobby-map-choice::before{height:14px!important}.lobby-map-choice strong{font-size:8.5px!important}.lobby-map-choice small{display:none}
+  .loadout-class-list{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-template-rows:minmax(0,1fr)!important}.loadout-class-card{grid-template-columns:minmax(0,1fr) 32px!important}.loadout-class-edit{width:32px!important}.loadout-class-main{padding:5px!important}.loadout-class-card-head strong{font-size:9.5px!important}.loadout-class-weapons span{font-size:7px!important}
+  .killstreak-choice-grid{grid-template-columns:repeat(5,minmax(0,1fr))!important;grid-auto-rows:minmax(64px,1fr)!important}.killstreak-choice{min-height:64px!important;padding:4px!important}.killstreak-choice p{display:none}.killstreak-equipped-slot small{display:none}
+  .settings-page .settings-grid,.admin-page>.settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}.settings-page .setting,.admin-page>.settings-grid>.setting{min-height:34px;padding:4px 5px!important}.settings-page .game-control,.admin-page>.settings-grid .game-control{height:25px!important}
+}
+@media(orientation:portrait),(max-width:560px){
+  .lobby-side-view[data-lobby-side-view="match"].active,.lobby-side-view[data-lobby-side-view="map"].active,.lobby-side-view[data-lobby-side-view="loadout"].active,.lobby-side-view[data-lobby-side-view="killstreaks"].active,.lobby-side-view[data-lobby-side-view="cheats"].active{overflow:auto}
+  .lobby-match-card .lobby-setup-row{grid-template-columns:repeat(2,minmax(0,1fr))!important}.lobby-match-card .lobby-control-group{grid-template-columns:1fr!important}
+  .lobby-map-panel{height:auto!important;min-height:100%!important;grid-template-columns:minmax(0,1fr)!important;grid-template-rows:auto minmax(180px,1fr)!important}.lobby-map-toolbar{grid-column:1;grid-row:1;padding-right:0;border-right:0;border-bottom:1px solid var(--line);padding-bottom:5px}.lobby-map-canvas-wrap{grid-column:1;grid-row:2;min-height:180px}.lobby-map-choice-grid{max-height:210px}
+  .loadout-class-list{grid-template-columns:1fr!important;grid-template-rows:repeat(5,58px)!important;overflow:auto!important}.loadout-class-card{grid-template-columns:minmax(0,1fr) 42px!important}
+  .killstreak-choice-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;grid-auto-rows:minmax(76px,auto)!important}.killstreak-choice p{display:block}
+  .settings-page .settings-grid,.admin-page>.settings-grid{grid-template-columns:1fr!important}.settings-page .setting:not(.setting-switch),.admin-page>.settings-grid>.setting:not(.setting-switch){grid-template-columns:minmax(88px,.75fr) minmax(0,1fr) auto}
+}
+/* Map gallery needs enough width to keep its compact toolbar on one clean row. */
+.lobby-map-panel{grid-template-columns:minmax(320px,.9fr) minmax(0,1.1fr)!important}
+@media(max-width:900px){.lobby-map-panel{grid-template-columns:minmax(300px,.9fr) minmax(0,1.1fr)!important}}
+@media(max-width:760px),(max-height:430px) and (orientation:landscape){.lobby-map-panel{grid-template-columns:minmax(285px,.9fr) minmax(0,1.1fr)!important}}
+@media(orientation:portrait),(max-width:560px){.lobby-map-panel{grid-template-columns:minmax(0,1fr)!important}}
