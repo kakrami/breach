@@ -288,3 +288,64 @@
   .terrainbar,.envbar{padding-bottom:3px!important}
   .terrainbar>#terrainOptions,.envbar>#environmentDone{position:static!important;right:auto!important;bottom:auto!important;width:auto!important;height:38px!important}
 }
+
+/* Walk-around builder: a single, touch-first construction surface. */
+.simple-builder .top,.simple-builder .modebar,.simple-builder .mobile-viewbar,
+.simple-builder .status,.simple-builder .terrainbar,.simple-builder .envbar,
+.simple-builder .analysisbar,.simple-builder .analysislegend,.simple-builder .placement,
+.simple-builder .hint,.simple-builder .threebar,.simple-builder .threehelp,
+.simple-builder .playhud,.simple-builder .selectionbar{display:none!important}
+.simple-builder .stage{inset:0;top:0;height:100%;min-height:0}
+.simple-builder.walk-active #map2d{display:none!important}
+.simple-builder.walk-active #map3d{display:block!important}
+.simple-builder #walkUI{position:absolute;inset:0;z-index:35;pointer-events:none;color:#eff8ff;font:600 13px system-ui,sans-serif}
+#walkUI button{font:inherit;color:inherit;border:1px solid #44596c;border-radius:12px;background:#203346;padding:10px 14px;min-height:44px;cursor:pointer;touch-action:manipulation;pointer-events:auto}
+#walkUI button:hover,#walkUI button.active,#walkUI button.selected{background:#315871;border-color:#83d8ec}
+#walkUI button:focus-visible{outline:3px solid #fff;outline-offset:2px}
+#walkUI button:disabled{opacity:.4;cursor:default}
+#walkUI button.accent{background:#9df2cc;color:#102c28;border-color:#b4ffe0;font-weight:800}
+#walkUI .walk-top{position:absolute;left:12px;right:12px;top:max(10px,env(safe-area-inset-top));display:flex;gap:6px;align-items:center}
+#walkUI .walk-spacer{flex:1}
+#walkUI .walk-tip{position:absolute;top:70px;left:50%;transform:translateX(-50%);max-width:90%;width:max-content;background:#14283bd9;padding:7px 12px;border-radius:20px;font-size:12px;pointer-events:none;text-align:center}
+#walkUI .walk-bottom{position:absolute;bottom:max(12px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:7px;width:min(620px,98%)}
+#walkUI .walk-actions{display:flex;gap:5px;justify-content:center;width:100%}
+#walkUI .walk-actions button{padding:7px 10px;font-size:12px;white-space:nowrap}
+#walkUI .walk-hotbar{display:flex;gap:5px;padding:6px;border-radius:18px;background:#10263ae8}
+#walkUI .walk-card{width:86px;padding:4px 5px 7px;display:flex;flex-direction:column;align-items:center;background:#253a4c;border-radius:10px;gap:0}
+#walkUI .walk-card img{width:72px;height:54px;object-fit:contain;pointer-events:none}
+#walkUI .walk-card span{font-size:11px;white-space:nowrap}
+#walkUI .walk-place{position:absolute;left:calc(100% + 14px);bottom:4px;min-width:90px;height:66px;font-size:16px}
+#walkUI .walk-lift{position:absolute;right:16px;top:43%;display:flex;flex-direction:column;gap:7px}
+#walkUI .walk-lift button{width:48px;font-size:22px;padding:6px}
+#walkUI .walk-picker{position:absolute;inset:auto 12px 12px;max-width:620px;max-height:70%;margin:auto;background:#14283bf5;border:1px solid #557086;border-radius:20px;padding:12px;pointer-events:auto;overflow:auto;box-shadow:0 12px 40px #0008}
+#walkUI [hidden]{display:none!important}
+#walkUI .walk-picker header{display:flex;align-items:center;justify-content:space-between;font-size:17px}
+#walkUI .walk-picker header button{font-size:22px;min-width:44px;padding:0}
+#walkUI .walk-picker nav{display:flex;gap:6px;margin:10px 0;overflow:auto}
+#walkUI .walk-picker nav button{flex:1;font-size:12px;padding:8px}
+#walkUI .walk-items{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px}
+#walkUI .walk-items .walk-card{width:100%;min-height:96px}
+#walkUI .walk-menu{position:absolute;right:12px;top:64px;background:#14283bf5;border-radius:16px;padding:8px;display:flex;flex-direction:column;gap:5px;pointer-events:auto}
+.simple-builder.walk-testing .walk-bottom{display:none}
+.simple-builder.walk-overhead .walk-bottom,.simple-builder.walk-overhead .walk-lift,.simple-builder.walk-overhead .walk-tip{display:none}
+.simple-builder.walk-testing .walk-tip:empty{display:none}
+.simple-builder .touchplay{z-index:25;bottom:0}
+.simple-builder .movezone{bottom:170px;left:15px;width:108px;height:108px}
+.simple-builder .lookzone{bottom:165px;right:80px;top:110px;width:45%}
+.simple-builder .playCrosshair,.simple-builder #playCrosshair{pointer-events:none}
+.simple-builder .overlay,.simple-builder .drawer{z-index:80}
+@media(max-width:700px){
+ #walkUI .walk-top{left:7px;right:7px;gap:4px}#walkUI .walk-top button{padding:7px 8px;font-size:11px;border-radius:10px}
+ #walkUI .walk-bottom{bottom:max(7px,env(safe-area-inset-bottom));gap:5px;width:100%}
+ #walkUI .walk-actions{gap:3px}#walkUI .walk-actions button{font-size:10px;padding:6px 7px;min-height:40px}
+ #walkUI .walk-hotbar{gap:3px;padding:4px;margin-right:66px}
+ #walkUI .walk-hotbar .walk-card{width:calc((100vw - 106px)/5);max-width:74px;padding:3px 1px 5px}
+ #walkUI .walk-hotbar .walk-card img{width:100%;height:41px}#walkUI .walk-card span{font-size:10px}
+ #walkUI .walk-place{left:auto;right:6px;bottom:2px;min-width:62px;width:62px;height:67px;font-size:12px;padding:5px}
+ #walkUI .walk-lift{right:10px;top:42%}#walkUI .walk-tip{top:62px;font-size:11px}
+}
+@media(max-height:500px){#walkUI .walk-hotbar .walk-card img{height:30px}#walkUI .walk-bottom{width:min(500px,80%)}.simple-builder .movezone{bottom:100px}#walkUI .walk-tip{top:56px}#walkUI .walk-picker{max-height:80%}}
+
+.app.simple-builder{display:block;grid-template-rows:none}.simple-builder .stage{height:100%;width:100%}
+
+.simple-builder.walk-testing .walk-lift button{font-size:12px;width:66px}.walk-menu small{text-align:center;opacity:.6;padding:6px}
