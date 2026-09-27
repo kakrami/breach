@@ -27,7 +27,7 @@ export function createSessionShell({
 }={}){
   if(!root||!stage||!canvas)throw new Error('Session shell requires root, stage, and canvas.');
 
-  let location='menu'; // menu | lobby | match
+  let location='menu'; // menu | lobby | builder | match
   let paused=false;
   let pauseReason='';
   let panel=SHELL_PANEL.NONE;
@@ -48,6 +48,7 @@ export function createSessionShell({
 
   const inMatch=()=>location==='match';
   const inLobby=()=>location==='lobby';
+  const inBuilder=()=>location==='builder';
   const fullscreen=()=>!!fullscreenElement();
   const immersive=()=>platform.standalone||fullscreen();
   const pointerLocked=()=>document.pointerLockElement===canvas;
@@ -61,7 +62,7 @@ export function createSessionShell({
     const inputReady=!pointerInputRequired()||pointerLocked()||alternateReady();
     const playSurfaceReady=platform.touchControls?(surfaceReady&&landscape):true;
     return Object.freeze({
-      location,inMatch:match,inLobby:inLobby(),paused:match?paused:false,pauseReason:match?pauseReason:'',panel,connecting,connectionText,
+      location,inMatch:match,inLobby:inLobby(),inBuilder:inBuilder(),paused:match?paused:false,pauseReason:match?pauseReason:'',panel,connecting,connectionText,
       surfaceReady,immersive:immersive(),fullscreen:fullscreen(),standalone:platform.standalone,touchControls:platform.touchControls,landscapeReady:landscape,orientationBlocked:blocked,
       hidden:document.hidden,focused,inputReady,canPlay:gameplayAvailable()&&playSurfaceReady&&match&&!paused&&!panel&&!connecting&&!document.hidden&&focused,
       viewport:Object.freeze({...viewport}),fullscreenSupported:fullscreenSupported(),
@@ -75,6 +76,7 @@ export function createSessionShell({
     visible(elements.rotate,platform.touchControls&&s.surfaceReady&&s.orientationBlocked);
     visible(elements.menu,frontUsable&&s.location==='menu'&&!s.panel&&!s.connecting);
     visible(elements.lobby,frontUsable&&s.location==='lobby'&&!s.panel&&!s.connecting);
+    visible(elements.builder,frontUsable&&s.location==='builder'&&!s.panel&&!s.connecting);
     visible(elements.pause,matchUsable&&s.inMatch&&s.paused&&!s.panel&&!s.connecting);
     visible(elements.settings,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.SETTINGS);
     visible(elements.admin,(s.inMatch?matchUsable:frontUsable)&&s.panel===SHELL_PANEL.ADMIN);
@@ -175,6 +177,17 @@ export function createSessionShell({
     if(pointerLocked())document.exitPointerLock?.();
     return render('lobby');
   }
+  function enterBuilder(){
+    revision++;
+    location='builder';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    if(pointerLocked())document.exitPointerLock?.();
+    return render('builder');
+  }
+  function exitBuilder(){
+    if(!inBuilder())return snapshot();
+    location='lobby';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    return render('builder-exit');
+  }
   async function prepareInputFromGesture(){
     if(platform.touchControls){entered=true;syncViewport();render('input-ready');}
     return !pointerInputRequired()||alternateReady()?true:requestPointerLock();
@@ -241,8 +254,8 @@ export function createSessionShell({
 
   function start(){syncViewport(true);return render('start');}
   return {
-    platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
-    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,prepareInputFromGesture,capturePointerFromGesture,enterMatch,showMatchPresentation,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
+    platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get inBuilder(){return inBuilder();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
+    enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,enterBuilder,exitBuilder,prepareInputFromGesture,capturePointerFromGesture,enterMatch,showMatchPresentation,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
     destroy(){destroyed=true;for(const cancel of [...pending])cancel();resizeObserver?.disconnect();if(viewportFrame)caf(viewportFrame);removeEventListener('resize',viewportChanged);removeEventListener('orientationchange',viewportChanged);globalThis.visualViewport?.removeEventListener?.('resize',viewportChanged);for(const [target,type,fn] of listeners)target.removeEventListener(type,fn);}
   };
 }
