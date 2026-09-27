@@ -33,13 +33,13 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 @media(max-width:1100px){.lobby-mode-picker{grid-template-columns:repeat(2,minmax(0,1fr));}}.lobby-mode-picker button{border:1px solid var(--line);border-radius:7px;background:#090d10;color:var(--muted);font-size:11px;font-weight:950;cursor:pointer;}.lobby-mode-picker button.active{border-color:var(--accent);background:#1a2118;color:var(--accent)}.lobby-setup-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-top:7px}.lobby-setup-row label{min-width:0;display:grid;gap:4px}.lobby-setup-row .input{height:31px;padding:0 7px;font-size:11px}.lobby-rule-summary{padding:5px 7px;border:1px solid var(--line);border-radius:6px;background:#090d10;color:var(--muted);font-size:11px;font-weight:850;}.lobby-guest-setup{display:grid;place-content:center;gap:5px;text-align:center;color:var(--muted);}.lobby-guest-setup strong{color:var(--text);font-size:12px}.lobby-guest-setup span{font-size:11px}.lobby-guest-setup small{max-width:300px;font-size:11px;line-height:1.45}.lobby-footer{min-width:0;display:grid;align-items:center;gap:10px;border:1px solid var(--line);border-radius:9px;background:#0d1216;}.lobby-footer strong{font-size:11px}.lobby-footer-copy span{color:var(--muted);font-size:11px}.lobby-start{letter-spacing:.05em;}
 
 /* Connection and match menu. */
-.connection-overlay{z-index:70;display:grid;place-items:center;padding:18px;background:rgba(4,6,8,.78);backdrop-filter:blur(8px)}
-.lobby-quit-confirm{position:fixed;inset:0;z-index:118;display:grid;place-items:center;padding:calc(var(--safe-top) + 14px) calc(var(--safe-right) + 14px) calc(var(--safe-bottom) + 14px) calc(var(--safe-left) + 14px);background:rgba(3,5,6,.88);backdrop-filter:blur(10px)}
+.connection-overlay{z-index:70;display:grid;place-items:center;padding:18px;background:rgba(4,6,8,.78);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.lobby-quit-confirm{position:fixed;inset:0;z-index:118;display:grid;place-items:center;padding:calc(var(--safe-top) + 14px) calc(var(--safe-right) + 14px) calc(var(--safe-bottom) + 14px) calc(var(--safe-left) + 14px);background:rgba(3,5,6,.88);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .lobby-quit-card{width:min(430px,100%);display:grid;gap:10px;padding:18px;border:1px solid var(--line2);border-radius:12px;background:linear-gradient(145deg,#12181d,#090d10);box-shadow:var(--shadow)}
 .lobby-quit-card h2{margin:0;font-size:21px}.lobby-quit-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.lobby-quit-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:3px}.lobby-quit-actions .secondary-btn{width:100%;height:40px}
 .controller-keyboard-hint{padding:4px 6px;border:1px solid rgba(255,255,255,.10);border-radius:6px;background:rgba(9,13,16,.86);font-size:9.5px}
 .connection-card{width:min(360px,100%);display:grid;align-items:center;gap:15px;padding:19px;border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.connection-card h2{margin:2px 0 4px;font-size:18px}.connection-card p{margin:0;color:var(--muted);font-size:11px}.connection-card .connection-status{color:var(--text);font-size:13px;font-weight:900;letter-spacing:.02em}.spinner{width:29px;height:29px;border:3px solid var(--line);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}
-.pause-screen{z-index:75;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.82);backdrop-filter:blur(8px)}.pause-card{border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.pause-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}.pause-card h1{margin:2px 0 0;}.pause-context{display:flex;gap:7px;margin-top:6px;color:var(--muted);}.pause-context span+span::before{content:"·";margin-right:7px}.pause-team{border:1px solid var(--line);border-radius:6px;font-weight:950;}.resume-btn{width:100%;height:50px;font-size:12px;}.pause-actions{margin-top:6px;}
+.pause-screen{z-index:75;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.82);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}.pause-card{border:1px solid var(--line2);border-radius:13px;background:#0d1216;box-shadow:var(--shadow);}.pause-card header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid var(--line)}.pause-card h1{margin:2px 0 0;}.pause-context{display:flex;gap:7px;margin-top:6px;color:var(--muted);}.pause-context span+span::before{content:"·";margin-right:7px}.pause-team{border:1px solid var(--line);border-radius:6px;font-weight:950;}.resume-btn{width:100%;height:50px;font-size:12px;}.pause-actions{margin-top:6px;}
 
 /* Settings and Match Control share one modal architecture. */
 .modal-screen{z-index:80;display:grid;}.modal-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border-bottom:1px solid var(--line);}.modal-head h2{margin:2px 0 0;font-size:19px}.modal-head p{margin:4px 0 0;color:var(--muted);font-size:11px}.settings-grid{min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;padding:9px;overflow:auto}.setting{min-width:0;display:grid;align-content:start;gap:6px;padding:9px;border:1px solid var(--line);border-radius:8px;background:#10161a;color:var(--muted);font-size:11px;font-weight:850;letter-spacing:.04em;text-transform:uppercase}.setting output{justify-self:end;color:var(--accent);font-weight:900;}.setting input[type=range]{width:100%;height:auto;padding:0;accent-color:var(--accent)}.modal-foot{display:grid;grid-template-columns:minmax(0,1fr) auto auto auto;align-items:center;gap:6px;border-top:1px solid var(--line);background:#090d10;}.admin-tabs{overflow-x:auto;scrollbar-width:none;}.admin-tabs::-webkit-scrollbar{display:none}.admin-tab{flex:0 0 auto;border-radius:7px;background:transparent;color:var(--muted);font-size:11px;font-weight:950;cursor:pointer;}.admin-tab.active{background:var(--surface3);color:var(--accent)}.admin-note{margin-top:8px;padding:8px;border:1px solid var(--line);border-radius:7px;color:var(--muted);font-size:11px}.weapon-settings-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;}.weapon-settings-card{min-width:0;border:1px solid var(--line);border-radius:8px;background:#10161a;}.weapon-settings-card strong{border-bottom:1px solid var(--line);}.weapon-settings-card label{min-width:0;display:grid;color:var(--muted);font-weight:850;text-transform:uppercase;}.weapon-settings-card.assault strong{color:#f1d577}.weapon-settings-card.sniper strong{color:#8fd7ff}.difficulty-help{min-height:38px;display:flex;align-items:center;padding:7px;border:1px solid var(--line);border-radius:7px;background:#090d10;color:var(--muted);font-size:11px;line-height:1.35;text-transform:none;letter-spacing:0}.admin-status{min-width:0;color:var(--muted);font-size:11px;font-weight:850;white-space:nowrap;text-overflow:ellipsis;}.admin-status.ok{color:var(--ok)}.admin-status.error{color:var(--danger)}.admin-player-list{display:grid;gap:6px}.admin-player-row{min-width:0;display:flex;align-items:center;justify-content:space-between;gap:9px;border:1px solid var(--line);border-radius:8px;background:#10161a;}.admin-player-identity{min-width:0;display:flex;align-items:center;gap:7px}.admin-player-identity>div{min-width:0;display:grid;gap:2px}.admin-player-identity strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.admin-player-identity small{color:var(--dim);}.admin-team-dot{width:6px;height:26px;border-radius:4px;background:var(--dim)}.admin-team-dot.alpha{background:var(--alpha)}.admin-team-dot.bravo{background:var(--bravo)}.admin-player-actions{display:flex;gap:4px}.admin-mini{padding:0 7px;}.admin-mini.active{border-color:rgba(215,255,88,.45);color:#e9ff98}
@@ -53,14 +53,14 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 /* In-match room chat. Breach owns the QWERTY keyboard and text buffer;
    no mobile OS/browser keyboard is invoked. */
 .chat-composer{position:fixed;z-index:68;left:50%;bottom:calc(var(--safe-bottom) + 14px);width:min(760px,calc(100vw - var(--safe-left) - var(--safe-right) - 24px));transform:translateX(-50%);display:grid;gap:6px;pointer-events:auto;user-select:none;-webkit-user-select:none}
-.chat-compose-shell{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;padding:6px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(7,10,12,.96);box-shadow:0 10px 34px rgba(0,0,0,.42);backdrop-filter:blur(8px)}
+.chat-compose-shell{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:6px;padding:6px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(7,10,12,.96);box-shadow:0 10px 34px rgba(0,0,0,.42);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .chat-channel{height:32px;display:grid;place-items:center;padding:0 8px;border-radius:6px;background:#171d21;color:var(--accent);font-size:11px;font-weight:1000;letter-spacing:.08em}
 .chat-input{position:relative;min-width:0;height:32px;padding:0 9px;border:1px solid rgba(215,255,88,.48);border-radius:6px;background:#050809;color:#fff;font:800 12px/32px system-ui,sans-serif;white-space:nowrap;overflow:hidden;box-shadow:0 0 0 1px rgba(215,255,88,.10)}
 .chat-input-text{position:relative;z-index:2}.chat-placeholder{position:absolute;left:9px;top:0;color:#667078;font-weight:750;pointer-events:none}.chat-input.has-text .chat-placeholder{display:none}
 .chat-caret{display:inline-block;width:1px;height:14px;margin-left:2px;vertical-align:-2px;background:var(--accent);animation:chatCaretBlink 1s steps(1,end) infinite}
 @keyframes chatCaretBlink{0%,48%{opacity:1}49%,100%{opacity:0}}
 .chat-send{height:32px;padding:0 11px;border:1px solid rgba(215,255,88,.32);border-radius:6px;background:#1a2118;color:var(--accent);font-size:11px;font-weight:1000;letter-spacing:.06em;cursor:pointer;touch-action:manipulation}
-.chat-keyboard{display:grid;gap:5px;padding:7px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(7,10,12,.96);box-shadow:0 14px 42px rgba(0,0,0,.48);backdrop-filter:blur(10px);touch-action:manipulation}
+.chat-keyboard{display:grid;gap:5px;padding:7px;border:1px solid rgba(255,255,255,.15);border-radius:10px;background:rgba(7,10,12,.96);box-shadow:0 14px 42px rgba(0,0,0,.48);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);touch-action:manipulation}
 .chat-key-row{display:flex;justify-content:center;gap:5px;min-width:0}.chat-key-row-middle{padding:0 4.2%}.chat-key-row-bottom{padding-top:1px}
 .chat-key{height:38px;flex:1 1 0;min-width:0;max-width:58px;padding:0 3px;border:1px solid rgba(255,255,255,.18);border-bottom-color:rgba(0,0,0,.7);border-radius:6px;background:linear-gradient(#252d32,#151b1f);color:#f0f4f6;font:900 11px system-ui,sans-serif;box-shadow:0 2px 0 rgba(0,0,0,.42);touch-action:manipulation;cursor:pointer}
 .chat-key:active,.chat-key.pressed{transform:translateY(1px);background:#303a3f;box-shadow:0 1px 0 rgba(0,0,0,.35)}
@@ -183,7 +183,7 @@ body{font-size:var(--ui-md)}
 .lobby-map-canvas-wrap{position:relative;min-width:0;min-height:0;display:grid;place-items:center;overflow:hidden;border:1px solid var(--line);border-radius:10px;background:#080d10}
 #lobbyMapPreview{display:block;width:100%;height:100%;min-height:120px;object-fit:contain}
 /* Utility surfaces shrink to content when possible; the content row owns real overflow. */
-.modal-screen{place-items:center;padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 9px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 9px);background:rgba(3,5,6,.86);backdrop-filter:blur(8px)}
+.modal-screen{place-items:center;padding:calc(var(--safe-top) + 7px) calc(var(--safe-right) + 9px) calc(var(--safe-bottom) + 7px) calc(var(--safe-left) + 9px);background:rgba(3,5,6,.86);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .modal-shell{width:min(var(--content-max),100%);height:auto;min-height:0;display:grid;overflow:hidden;border:1px solid var(--line2);border-radius:12px;background:#0d1216;box-shadow:var(--shadow);}
 .modal-head{padding:9px 11px 7px}
 .modal-head p{display:block;line-height:1.25}
@@ -320,7 +320,7 @@ body{font-size:var(--ui-md)}
 .game-slider-fill{position:absolute;inset:1px auto 1px 1px;width:0;border-radius:99px;background:var(--accent)}
 .game-slider-knob{position:absolute;top:50%;left:0;width:14px;height:14px;border:2px solid #111605;border-radius:50%;background:var(--accent);transform:translate(-50%,-50%);box-shadow:0 0 0 1px rgba(215,255,88,.45)}
 /* Standalone in-game text editor. */
-.game-text-editor{position:fixed;inset:0;z-index:125;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.92);backdrop-filter:blur(10px)}
+.game-text-editor{position:fixed;inset:0;z-index:125;display:grid;place-items:center;padding:calc(var(--safe-top) + 10px) calc(var(--safe-right) + 10px) calc(var(--safe-bottom) + 10px) calc(var(--safe-left) + 10px);background:rgba(3,5,6,.92);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
 .game-text-editor-shell{width:min(760px,100%);max-height:100%;display:grid;gap:8px;padding:10px;border:1px solid var(--line2);border-radius:12px;background:#0d1216;box-shadow:var(--shadow)}
 .game-text-editor-shell>header{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .game-text-editor-shell h2{margin:2px 0 0;font-size:18px}
@@ -1134,7 +1134,7 @@ body{font-size:var(--ui-md)}
   .admin-player-list{grid-template-columns:1fr!important;overflow:auto!important}.admin-team-section.ffa{grid-column:auto}
 }
 
-/* v1.63.0 compact menu system: the Players tab is the visual baseline for every Breach menu. */
+/* v1.64.0 compact menu system: the Players tab is the visual baseline for every Breach menu. */
 :root{--compact-gap:5px;--compact-pad:6px;--compact-radius:7px;--compact-row:31px}
 
 /* One consistent lobby surface instead of each tab inventing its own outer card. */
@@ -1260,3 +1260,43 @@ body{font-size:var(--ui-md)}
 @media(max-width:900px){.lobby-map-panel{grid-template-columns:minmax(300px,.9fr) minmax(0,1.1fr)!important}}
 @media(max-width:760px),(max-height:430px) and (orientation:landscape){.lobby-map-panel{grid-template-columns:minmax(285px,.9fr) minmax(0,1.1fr)!important}}
 @media(orientation:portrait),(max-width:560px){.lobby-map-panel{grid-template-columns:minmax(0,1fr)!important}}
+
+/* v1.64.0 content-sized navigation: compact controls do not stretch just to fill a row. */
+.lobby-side-tabs{
+  display:flex!important;justify-content:flex-start!important;align-items:stretch;gap:4px!important;
+  overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.lobby-side-tabs::-webkit-scrollbar,.settings-tabs::-webkit-scrollbar,.admin-tabs::-webkit-scrollbar,.lobby-cheat-tabs::-webkit-scrollbar{display:none}
+.lobby-side-tab{
+  flex:0 0 auto!important;width:auto!important;min-width:82px!important;max-width:none!important;
+  padding-left:12px!important;padding-right:12px!important
+}
+.lobby-side-tab[data-lobby-side-tab="killstreaks"]{min-width:106px!important}
+.lobby-side-tab[data-lobby-side-tab="cheats"]{min-width:112px!important}
+.settings-tabs,.admin-tabs{
+  display:flex!important;grid-template-columns:none!important;justify-content:flex-start!important;align-items:center;
+  overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.settings-tab,.admin-tab{flex:0 0 auto!important;width:auto!important;min-width:84px!important;padding-left:12px!important;padding-right:12px!important}
+.lobby-cheat-tabs{
+  display:flex!important;grid-template-columns:none!important;justify-content:flex-start!important;align-items:center;
+  width:auto!important;max-width:100%!important;overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;-webkit-overflow-scrolling:touch
+}
+.lobby-cheat-tab{flex:0 0 auto!important;width:auto!important;min-width:88px!important;padding-left:10px!important;padding-right:10px!important}
+.front-body{grid-template-columns:112px minmax(0,1fr)!important}
+.front-nav-button{width:100%!important;min-width:0!important}
+
+/* Safari/WebKit rendering parity for translucent overlays and momentum scrollers. */
+.safari .scroll,.safari .lobby-team-players,.safari .admin-team-rows,.safari .lobby-cheat-pages,.safari .lobby-map-choice-grid,.safari .settings-page,.safari .admin-page{-webkit-overflow-scrolling:touch}
+
+@media(max-width:760px),(max-height:430px) and (orientation:landscape){
+  .lobby-side-tab{min-width:70px!important;padding-left:9px!important;padding-right:9px!important;font-size:8.5px!important}
+  .lobby-side-tab[data-lobby-side-tab="killstreaks"]{min-width:91px!important}.lobby-side-tab[data-lobby-side-tab="cheats"]{min-width:96px!important}
+  .settings-tab,.admin-tab{min-width:72px!important;padding-left:9px!important;padding-right:9px!important}
+  .lobby-cheat-tab{min-width:76px!important;padding-left:8px!important;padding-right:8px!important}
+  .front-body{grid-template-columns:96px minmax(0,1fr)!important}
+}
+@media(orientation:portrait),(max-width:560px){
+  .lobby-side-tab{min-width:76px!important}.settings-tab,.admin-tab{min-width:78px!important}
+  .front-body{grid-template-columns:92px minmax(0,1fr)!important}
+}

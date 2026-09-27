@@ -17,8 +17,11 @@ export function detectInputPlatform(){
   const ua=String(navigator.userAgent||''),platformName=String(navigator.platform||'');
   const mobileUa=navigator.userAgentData?.mobile===true||/Android|iPhone|iPod|Mobile/i.test(ua);
   const ipadDesktopUa=touchPoints>1&&(/iPad/i.test(ua)||(/Macintosh|MacIntel/i.test(`${ua} ${platformName}`)));
+  const ios=/iPhone|iPad|iPod/i.test(ua)||ipadDesktopUa;
+  const apple=/Macintosh|MacIntel|iPhone|iPad|iPod/i.test(`${ua} ${platformName}`);
+  const safari=/Safari/i.test(ua)&&!/Chrome|CriOS|Chromium|Edg|EdgiOS|FxiOS|OPiOS|Android/i.test(ua);
   const touchControls=touchCapable&&(media('(pointer: coarse)')||media('(hover: none)')||mobileUa||ipadDesktopUa);
-  return Object.freeze({touchControls,touchCapable,standalone:standaloneMode()});
+  return Object.freeze({touchControls,touchCapable,standalone:standaloneMode(),apple,safari,ios});
 }
 
 export function createSessionShell({
@@ -45,13 +48,16 @@ export function createSessionShell({
 
   root.classList.toggle('touch',platform.touchControls);
   root.classList.toggle('desktop',!platform.touchControls);
+  root.classList.toggle('apple',!!platform.apple);
+  root.classList.toggle('safari',!!platform.safari);
+  root.classList.toggle('ios',!!platform.ios);
 
   const inMatch=()=>location==='match';
   const inLobby=()=>location==='lobby';
   const inBuilder=()=>location==='builder';
   const fullscreen=()=>!!fullscreenElement();
   const immersive=()=>platform.standalone||fullscreen();
-  const pointerLocked=()=>document.pointerLockElement===canvas;
+  const pointerLocked=()=>document.pointerLockElement===canvas||document.webkitPointerLockElement===canvas;
   const alternateReady=()=>{try{return !!alternateInputReady();}catch{return false;}};
   hadPointerLock=pointerLocked();
   const landscapeReady=()=>!platform.touchControls||viewport.w>=viewport.h;
@@ -114,6 +120,7 @@ export function createSessionShell({
   addEventListener('resize',viewportChanged,{passive:true});
   addEventListener('orientationchange',viewportChanged,{passive:true});
   globalThis.visualViewport?.addEventListener?.('resize',viewportChanged,{passive:true});
+  globalThis.visualViewport?.addEventListener?.('scroll',viewportChanged,{passive:true});
 
   // Both promise and legacy void APIs complete through browser events. Subscribe
   // before requesting; never assume the void return means success or failure.
@@ -132,7 +139,7 @@ export function createSessionShell({
   function requestFullscreen(){
     if(platform.standalone||fullscreen())return Promise.resolve(true);
     if(!fullscreenSupported())return Promise.resolve(false);
-    return browserRequest(()=>root.requestFullscreen?root.requestFullscreen({navigationUI:'hide'}):root.webkitRequestFullscreen(),fullscreen,['fullscreenchange','webkitfullscreenchange'],['fullscreenerror','webkitfullscreenerror']);
+    return browserRequest(()=>{if(root.requestFullscreen){try{return root.requestFullscreen({navigationUI:'hide'});}catch{return root.requestFullscreen();}}return root.webkitRequestFullscreen?.();},fullscreen,['fullscreenchange','webkitfullscreenchange'],['fullscreenerror','webkitfullscreenerror']);
   }
   function exitFullscreen(){
     if(platform.standalone||!fullscreen())return Promise.resolve(false);
@@ -147,8 +154,8 @@ export function createSessionShell({
   function unlockLandscape(){try{screen.orientation?.unlock?.();}catch{}}
   async function requestPointerLock(){
     if(pointerLocked())return true;
-    if(!canvas.requestPointerLock){onPointerLockUnavailable();return false;}
-    const ok=await browserRequest(()=>canvas.requestPointerLock(),pointerLocked,['pointerlockchange'],['pointerlockerror']);
+    const fn=canvas.requestPointerLock||canvas.webkitRequestPointerLock;if(!fn){onPointerLockUnavailable();return false;}
+    const ok=await browserRequest(()=>fn.call(canvas),pointerLocked,['pointerlockchange','webkitpointerlockchange'],['pointerlockerror','webkitpointerlockerror']);
     if(!ok)onPointerLockUnavailable();return ok;
   }
   async function enterFullscreenFromGesture(){
@@ -163,7 +170,7 @@ export function createSessionShell({
   }
   async function exitFullscreenFromGesture(){
     if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}
-    if(pointerLocked())document.exitPointerLock?.();unlockLandscape();
+    if(pointerLocked())(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);unlockLandscape();
     const exited=await exitFullscreen();if(!exited&&immersive())render('fullscreen-exit-failed');return exited;
   }
 
@@ -174,13 +181,13 @@ export function createSessionShell({
 
   function enterLobby(){
     location='lobby';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
-    if(pointerLocked())document.exitPointerLock?.();
+    if(pointerLocked())(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);
     return render('lobby');
   }
   function enterBuilder(){
     revision++;
     location='builder';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
-    if(pointerLocked())document.exitPointerLock?.();
+    if(pointerLocked())(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);
     return render('builder');
   }
   function exitBuilder(){
@@ -207,7 +214,7 @@ export function createSessionShell({
   }
   function pause(reason='pause'){
     revision++;if(!inMatch()||paused){onSuspend(reason,snapshot());return snapshot();}paused=true;pauseReason=reason;panel=SHELL_PANEL.NONE;
-    if(pointerLocked())document.exitPointerLock?.();return render(reason);
+    if(pointerLocked())(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);return render(reason);
   }
   async function resumeFromGesture(){
     if(!inMatch()||panel||document.hidden||!focused||!gameplayAvailable())return false;
@@ -225,18 +232,18 @@ export function createSessionShell({
   function openPanel(name){
     revision++;
     if(name!==SHELL_PANEL.SETTINGS&&name!==SHELL_PANEL.ADMIN&&name!==SHELL_PANEL.LOADOUT)return snapshot();
-    if(inMatch()&&!paused){paused=true;pauseReason='panel';if(pointerLocked())document.exitPointerLock?.();}
+    if(inMatch()&&!paused){paused=true;pauseReason='panel';if(pointerLocked())(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);}
     panel=name;return render(`panel-open:${name}`);
   }
   function closePanel(){panel=SHELL_PANEL.NONE;return render('panel-close');}
   function leaveToMenu(){
     revision++;
     location='menu';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
-    if(pointerLocked())document.exitPointerLock?.();return render('menu');
+    if(pointerLocked())(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);return render('menu');
   }
 
   function fullscreenChanged(){
-    if(!immersive()){if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}if(pointerLocked())document.exitPointerLock?.();unlockLandscape();}
+    if(!immersive()){if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}if(pointerLocked())(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);unlockLandscape();}
     syncViewport(true);scheduleViewport('fullscreen');render('fullscreen');
   }
   function pointerLockChanged(){
@@ -249,13 +256,13 @@ export function createSessionShell({
   function visibilityChanged(){if(document.hidden)suspend('background');else{focused=document.hasFocus?.()!==false;syncViewport(true);render('foreground');}}
   const blurred=()=>suspend('blur'),pageHidden=()=>suspend('pagehide');
   const gainedFocus=()=>{focused=true;syncViewport(true);render('focus');};
-  const listeners=[[document,'fullscreenchange',fullscreenChanged],[document,'webkitfullscreenchange',fullscreenChanged],[document,'pointerlockchange',pointerLockChanged],[document,'visibilitychange',visibilityChanged],[globalThis,'blur',blurred],[globalThis,'focus',gainedFocus],[globalThis,'pagehide',pageHidden],[globalThis,'pageshow',gainedFocus]];
+  const listeners=[[document,'fullscreenchange',fullscreenChanged],[document,'webkitfullscreenchange',fullscreenChanged],[document,'pointerlockchange',pointerLockChanged],[document,'webkitpointerlockchange',pointerLockChanged],[document,'visibilitychange',visibilityChanged],[globalThis,'blur',blurred],[globalThis,'focus',gainedFocus],[globalThis,'pagehide',pageHidden],[globalThis,'pageshow',gainedFocus]];
   for(const [target,type,fn] of listeners)target.addEventListener(type,fn);
 
   function start(){syncViewport(true);return render('start');}
   return {
     platform,get location(){return location;},get inMatch(){return inMatch();},get inLobby(){return inLobby();},get inBuilder(){return inBuilder();},get paused(){return inMatch()?paused:false;},get panel(){return panel;},get canPlay(){return snapshot().canPlay;},get viewport(){return {...viewport};},get fullscreen(){return fullscreen();},get immersive(){return immersive();},get connecting(){return connecting;},snapshot,render,start,
     enterFullscreenFromGesture,exitFullscreenFromGesture,beginConnection,updateConnection,endConnection,cancelConnection,enterLobby,enterBuilder,exitBuilder,prepareInputFromGesture,capturePointerFromGesture,enterMatch,showMatchPresentation,pause,resumeFromGesture,resumeFromAlternateInput,openPanel,closePanel,leaveToMenu,
-    destroy(){destroyed=true;for(const cancel of [...pending])cancel();resizeObserver?.disconnect();if(viewportFrame)caf(viewportFrame);removeEventListener('resize',viewportChanged);removeEventListener('orientationchange',viewportChanged);globalThis.visualViewport?.removeEventListener?.('resize',viewportChanged);for(const [target,type,fn] of listeners)target.removeEventListener(type,fn);}
+    destroy(){destroyed=true;for(const cancel of [...pending])cancel();resizeObserver?.disconnect();if(viewportFrame)caf(viewportFrame);removeEventListener('resize',viewportChanged);removeEventListener('orientationchange',viewportChanged);globalThis.visualViewport?.removeEventListener?.('resize',viewportChanged);globalThis.visualViewport?.removeEventListener?.('scroll',viewportChanged);for(const [target,type,fn] of listeners)target.removeEventListener(type,fn);}
   };
 }

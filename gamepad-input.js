@@ -2,11 +2,13 @@ export const GAMEPAD_BUTTON=Object.freeze({A:0,B:1,X:2,Y:3,LB:4,RB:5,LT:6,RT:7,V
 const zero=()=>Array(18).fill(0),off=()=>Array(18).fill(false);
 const EMPTY_FRAME=Object.freeze({connected:false,index:-1,id:'',mapping:'',moveX:0,moveY:0,lookX:0,lookY:0,rawMoveX:0,rawMoveY:0,rawLookX:0,rawLookY:0,physicalHeld:Object.freeze(off()),buttons:Object.freeze(zero()),held:Object.freeze(off()),pressed:Object.freeze(off()),released:Object.freeze(off()),meaningful:false});
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,Number.isFinite(Number(v))?Number(v):0));
-function value(b){return clamp(typeof b==='number'?b:b?.value??(b?.pressed?1:0),0,1);}
-function supported(p){return p?.connected&&p.mapping==='standard'&&p.axes?.length>=4&&p.buttons?.length>=16;}
+function value(b){if(typeof b==='number')return clamp(b,0,1);const analog=Number.isFinite(Number(b?.value))?Number(b.value):0;return clamp(Math.max(analog,b?.pressed?1:0),0,1);}
+function standardLikeId(id){return /xbox|xinput|dualshock|dualsense|wireless controller|playstation|8bitdo|pro controller|nintendo|gamepad/i.test(String(id||''));}
+function normalizedMapping(p){return p?.mapping==='standard'?'standard':(!p?.mapping&&standardLikeId(p?.id)?'standard-compat':String(p?.mapping||''));}
+function supported(p){return !!p&&p.connected!==false&&p.axes?.length>=4&&p.buttons?.length>=16&&normalizedMapping(p).startsWith('standard');}
 function pads(onPoll){
   let result=[],error=null,apiAvailable=false;
-  try{const nav=globalThis.navigator,getPads=nav?.getGamepads;apiAvailable=typeof getPads==='function';result=Array.from(getPads?.call(nav)||[]).filter(Boolean);}catch(cause){error=String(cause?.name||'Error');}
+  try{const nav=globalThis.navigator,getPads=nav?.getGamepads||nav?.webkitGetGamepads;apiAvailable=typeof getPads==='function';result=Array.from(getPads?.call(nav)||[]).filter(Boolean);}catch(cause){error=String(cause?.name||'Error');}
   onPoll?.({pads:result,apiAvailable,error});return result;
 }
 function radial(x,y,dz,curve){const length=Math.hypot(x,y);if(length<=dz)return{x:0,y:0};const scale=Math.pow(Math.min(1,(length-dz)/(1-dz)),curve)/length;return{x:x*scale,y:y*scale};}
@@ -16,7 +18,9 @@ export function createGamepadInput({stickDeadzone=.16,lookDeadzone=.14,lookCurve
   stickDeadzone=clamp(stickDeadzone,.02,.45);lookDeadzone=clamp(lookDeadzone,.02,.45);lookCurve=clamp(lookCurve,1,2.5);buttonThreshold=clamp(buttonThreshold,.2,.9);
   let selected=-1,key='',scope=null,previous=off(),blocked=off(),axisBlocked=[false,false],needsBaseline=true,destroyed=false;
   let activity=new Map(),lastButtons=zero(),lastAxes=[0,0,0,0];
-  const disconnected=event=>{if(event.gamepad?.index===selected){key='';reset();}activity.delete(event.gamepad?.index);};
+  const connected=event=>{const index=event.gamepad?.index;if(Number.isInteger(index)){activity.set(index,false);if(selected<0){selected=index;key='';reset();}}};
+  const disconnected=event=>{if(event.gamepad?.index===selected){selected=-1;key='';reset();}activity.delete(event.gamepad?.index);};
+  globalThis.addEventListener?.('gamepadconnected',connected);
   globalThis.addEventListener?.('gamepaddisconnected',disconnected);
   function select(){
     const available=pads(onPoll).filter(supported),current=available.find(p=>p.index===selected);
@@ -43,14 +47,14 @@ export function createGamepadInput({stickDeadzone=.16,lookDeadzone=.14,lookCurve
     lastButtons=rawButtons.slice();lastAxes=axes.slice();
     const buttons=rawButtons.map((v,i)=>{if(blocked[i]&&v<=.12)blocked[i]=false;return blocked[i]?0:v;});
     for(let s=0;s<2;s++){if(Math.hypot(axes[s*2],axes[s*2+1])<=(s?lookDeadzone:stickDeadzone))axisBlocked[s]=false;if(axisBlocked[s])axes[s*2]=axes[s*2+1]=0;}
-    if(!enabled){reset();return Object.freeze({...EMPTY_FRAME,connected:true,index:pad.index,id:String(pad.id),mapping:pad.mapping});}
+    if(!enabled){reset();return Object.freeze({...EMPTY_FRAME,connected:true,index:pad.index,id:String(pad.id),mapping:normalizedMapping(pad)});}
     const held=buttons.map((v,i)=>v>=(previous[i]?buttonThreshold*.75:buttonThreshold));
     const pressed=held.map((v,i)=>v&&!previous[i]),released=held.map((v,i)=>!v&&previous[i]);previous=held;
     const move=radial(axes[0],axes[1],stickDeadzone,1),look=radial(axes[2],axes[3],lookDeadzone,lookCurve);
-    return Object.freeze({connected:true,index:pad.index,id:String(pad.id),mapping:pad.mapping,moveX:move.x,moveY:move.y,lookX:look.x,lookY:look.y,rawMoveX:axes[0],rawMoveY:axes[1],rawLookX:axes[2],rawLookY:axes[3],physicalHeld:Object.freeze(rawButtons.map(v=>v>=buttonThreshold)),buttons:Object.freeze(buttons),held:Object.freeze(held),pressed:Object.freeze(pressed),released:Object.freeze(released),meaningful});
+    return Object.freeze({connected:true,index:pad.index,id:String(pad.id),mapping:normalizedMapping(pad),moveX:move.x,moveY:move.y,lookX:look.x,lookY:look.y,rawMoveX:axes[0],rawMoveY:axes[1],rawLookX:axes[2],rawLookY:axes[3],physicalHeld:Object.freeze(rawButtons.map(v=>v>=buttonThreshold)),buttons:Object.freeze(buttons),held:Object.freeze(held),pressed:Object.freeze(pressed),released:Object.freeze(released),meaningful});
   }
   function hasConnected(){return !destroyed&&pads().some(supported);}
   function unsupported(){return pads().filter(p=>p.connected&&!supported(p)).map(p=>String(p.id||'Controller'));}
-  function destroy(){destroyed=true;reset();activity.clear();globalThis.removeEventListener?.('gamepaddisconnected',disconnected);}
+  function destroy(){destroyed=true;reset();activity.clear();globalThis.removeEventListener?.('gamepadconnected',connected);globalThis.removeEventListener?.('gamepaddisconnected',disconnected);}
   return Object.freeze({poll,hasConnected,unsupported,reset,destroy});
 }

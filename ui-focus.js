@@ -6,9 +6,10 @@ export function createUiFocusScope({root,surfaces,getSurface,onKeyboard=()=>{}})
   const remembered=new WeakMap();
   const usable=el=>el&&!el.disabled&&!el.closest('.hide,[hidden],[inert],[aria-disabled="true"]')&&el.getClientRects().length>0&&getComputedStyle(el).visibility!=='hidden';
   const controls=surface=>[...surface.querySelectorAll('button,a[href],[tabindex]')].filter(el=>el.tabIndex>=0&&usable(el));
+  function focusControl(el){if(!el)return;try{el.focus({preventScroll:true});}catch{try{el.focus();}catch{}}}
   function focusSurface(surface){
     const saved=remembered.get(surface),next=usable(saved)?saved:controls(surface)[0];
-    next?.focus({preventScroll:true});
+    focusControl(next);
   }
   function sync(){
     const next=getSurface(),changed=next!==current,previous=current;

@@ -1,36 +1,36 @@
-import { createMoonSky } from './mod-environment.js?v=1.63.0';
+import { createMoonSky } from './mod-environment.js?v=1.64.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.63.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.63.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.63.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.63.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.63.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.63.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.63.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.63.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.64.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.64.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.64.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.64.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.64.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.64.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.64.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.64.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.63.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.63.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.63.0';
-import { createAudioEngine } from './audio-engine.js?v=1.63.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.63.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.63.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.63.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.63.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.63.0';
-import { createControllerRecording } from './controller-recording.js?v=1.63.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.63.0';
-import { createSafeStorage } from './browser-storage.js?v=1.63.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=1.63.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.63.0';
-import { createUiGestures } from './ui-gestures.js?v=1.63.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.63.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=1.63.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.63.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.63.0';
+} from './game-config.js?v=1.64.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.64.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.64.0';
+import { createAudioEngine } from './audio-engine.js?v=1.64.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.64.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.64.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.64.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.64.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.64.0';
+import { createControllerRecording } from './controller-recording.js?v=1.64.0';
+import { createPointerSessions } from './pointer-sessions.js?v=1.64.0';
+import { createSafeStorage } from './browser-storage.js?v=1.64.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=1.64.0';
+import { createUiFocusScope } from './ui-focus.js?v=1.64.0';
+import { createUiGestures } from './ui-gestures.js?v=1.64.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.64.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=1.64.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.64.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.64.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -742,7 +742,7 @@ function resetKillstreakClientState({clearRewards=true}={}){if(clearRewards)kill
 function cycleKillstreak(direction=1){const ready=readyKillstreakKinds();if(!ready.length){showToast('NO KILLSTREAK READY');return false;}let index=ready.indexOf(killstreakSelected);if(index<0)index=0;else index=(index+(direction<0?-1:1)+ready.length)%ready.length;killstreakSelected=ready[index];const spec=KILLSTREAK_SPECS[killstreakSelected];showToast(`${spec?.short||killstreakSelected.toUpperCase()} SELECTED`,{duration:900,key:'streak-select'});hudLastDraw=0;return true;}
 function killstreakCanUse(kind){const id=normalizeKillstreak(kind);return !!id&&shell.canPlay&&matchAllowsCombat(matchState)&&hp>0&&serverNow()>=killstreakControlUntil&&killstreakStatus.available.includes(id);}
 function closeKillstreakTargeting({recapture=false}={}){if(!killstreakTargeting)return;killstreakTargeting=null;killstreakTargetRect=null;killstreakTargetConfirmRect=null;killstreakTargetCancelRect=null;hudLastDraw=0;if(recapture&&activeInputMode===INPUT_MODE.KEYBOARD_MOUSE)void shell.capturePointerFromGesture();}
-function openKillstreakTargeting(kind){const id=normalizeKillstreak(kind),spec=KILLSTREAK_SPECS[id];if(!spec?.targeted||!killstreakCanUse(id))return false;keys.clear();resetTouchInput();clearFireInput();cancelEquipmentAction();cancelSprint();scoreboardOpen=false;killstreakSelected=id;killstreakTargeting={kind:id,x:position?.x||0,z:position?.z||0,chosen:false};killstreakTargetRect=null;killstreakTargetConfirmRect=null;killstreakTargetCancelRect=null;if(document.pointerLockElement===canvas)document.exitPointerLock?.();hudLastDraw=0;return true;}
+function openKillstreakTargeting(kind){const id=normalizeKillstreak(kind),spec=KILLSTREAK_SPECS[id];if(!spec?.targeted||!killstreakCanUse(id))return false;keys.clear();resetTouchInput();clearFireInput();cancelEquipmentAction();cancelSprint();scoreboardOpen=false;killstreakSelected=id;killstreakTargeting={kind:id,x:position?.x||0,z:position?.z||0,chosen:false};killstreakTargetRect=null;killstreakTargetConfirmRect=null;killstreakTargetCancelRect=null;if((document.pointerLockElement||document.webkitPointerLockElement)===canvas)(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);hudLastDraw=0;return true;}
 function confirmKillstreakTarget({recapture=false}={}){if(!killstreakTargeting||!killstreakCanUse(killstreakTargeting.kind))return false;if(!killstreakTargeting.chosen){showToast('SELECT A TARGET FIRST',{duration:900,key:'streak-target'});return false;}const target={...killstreakTargeting};send({t:'killstreak',kind:target.kind,x:target.x,z:target.z});closeKillstreakTargeting({recapture});return true;}
 function requestKillstreak(kind=killstreakSelected){const id=normalizeKillstreak(kind);if(!killstreakCanUse(id)){showToast(id?'KILLSTREAK NOT READY':'NO KILLSTREAK READY');return false;}killstreakSelected=id;if(KILLSTREAK_SPECS[id]?.targeted)return openKillstreakTargeting(id);clearFireInput();cancelEquipmentAction();send({t:'killstreak',kind:id});return true;}
 function killstreakTargetFromCanvas(x,y,{choose=true}={}){const r=killstreakTargetRect;if(!r||!pointInRect(x,y,r)||!killstreakTargeting)return false;const limit=minimapWorldLimit();killstreakTargeting.x=THREE.MathUtils.clamp(((x-r.x)/r.w*2-1)*limit,-limit,limit);killstreakTargeting.z=THREE.MathUtils.clamp(((y-r.y)/r.h*2-1)*limit,-limit,limit);if(choose)killstreakTargeting.chosen=true;hudLastDraw=0;return true;}
@@ -911,7 +911,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.63.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.64.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2490,7 +2490,7 @@ function bindUI(){
   document.addEventListener('gestureend',suppressNativeUI,{passive:false,capture:true});
 
   document.addEventListener('mousemove', e => {
-    if(chatOpen||scoreboardOpen||killstreakTargeting||!shell.canPlay||!matchAllowsMovement(matchState)||hp<=0||document.pointerLockElement!==canvas) return;
+    if(chatOpen||scoreboardOpen||killstreakTargeting||!shell.canPlay||!matchAllowsMovement(matchState)||hp<=0||(document.pointerLockElement||document.webkitPointerLockElement)!==canvas) return;
     if(Math.abs(e.movementX)+Math.abs(e.movementY)>.01)setActiveInputMode(INPUT_MODE.KEYBOARD_MOUSE,{quiet:true});
     const beforePitch=pitch,sens=aimSensitivityScale()*playerSettings.lookSensitivity;applyPlayerAimDelta(-e.movementX*.0023*sens,-e.movementY*.0020*sens);if(diagnosticsRecordingEnabled()&&fireInputHeld()&&Math.abs(pitch-beforePitch)>.02)diagnosticsRecordEvent('mouse_look',{dx:diagnosticsRound(e.movementX,2),dy:diagnosticsRound(e.movementY,2),pitchDelta:diagnosticsRound(pitch-beforePitch)});
   });
@@ -2639,7 +2639,7 @@ function handlePhysicalChatKey(e){
 function openChat(){
   if(chatOpen||!shell.inMatch||shell.paused||shell.panel||shell.connecting||hp<=0||!matchAllowsMovement(matchState))return false;
   chatOpen=true;chatScroll=0;chatDrag=null;chatPanel=null;scoreboardOpen=false;chatShift=false;setChatDraft('');suspendGameplayInput();chatComposer.classList.remove('hide');
-  if(document.pointerLockElement===canvas)document.exitPointerLock?.();
+  if((document.pointerLockElement||document.webkitPointerLockElement)===canvas)(document.exitPointerLock||document.webkitExitPointerLock)?.call(document);
   hudLayout=null;hudLastDraw=0;return true;
 }
 async function dismissChat({restorePointer=true}={}){
@@ -2699,7 +2699,7 @@ function onCanvasPointerDown(e){
       return;
     }
   ensureAudio();
-  if(!directTouch&&document.pointerLockElement!==canvas){void shell.capturePointerFromGesture();return;}
+  if(!directTouch&&(document.pointerLockElement||document.webkitPointerLockElement)!==canvas){void shell.capturePointerFromGesture();return;}
   if(directTouch){
     e.preventDefault();
     const layout=hudLayout||computeHudLayout();
@@ -2762,7 +2762,7 @@ function onCanvasPointerDown(e){
 // Pointer events signal contact transitions; mouse events also report chorded
 // buttons (for example, aiming while the fire button is already held).
 function onMouseButtonDown(e){
-  if(e.target!==canvas||document.pointerLockElement!==canvas||!shell.canPlay||chatOpen||scoreboardOpen||killstreakTargeting||!matchAllowsCombat(matchState)||hp<=0)return;
+  if(e.target!==canvas||(document.pointerLockElement||document.webkitPointerLockElement)!==canvas||!shell.canPlay||chatOpen||scoreboardOpen||killstreakTargeting||!matchAllowsCombat(matchState)||hp<=0)return;
   if(e.button===0){if(currentWeapon==='akimbo1887')requestShot('right');else pressMouseFire();}
   else if(e.button===2){if(currentWeapon==='akimbo1887')requestShot('left');else toggleAim();}
 }
@@ -4542,7 +4542,7 @@ function clearControllerUiFocus(){
   controllerUiFocus=null;controllerUiFocusKey='';
 }
 function resetControllerUiAxis(){controllerUiAxisDirection='';controllerUiAxisNextAt=0;controllerUiAxisStartedAt=0;}
-function controllerEditableField(el){return !!el?.matches?.('[data-game-control="cycle"],[data-game-control="stepper"],[data-game-control="slider"]');}
+function controllerEditableField(el){return !!el?.matches?.('[data-game-control="cycle"],[data-game-control="stepper"],[data-game-control="slider"],select:not([disabled]),input[type="range"]:not([disabled]),input[type="number"]:not([disabled])');}
 function setControllerUiEditing(el){
   if(!controllerEditableField(el))return false;
   clearControllerUiEditing();controllerUiEditing=el;el.classList.add('controller-editing');return true;
@@ -4590,7 +4590,7 @@ function controllerElementVisible(el,surface){
 }
 function controllerFocusableElements(){
   const surface=controllerUiSurface();if(!surface)return[];
-  const selector='button:not([disabled]):not(.game-control-arrow):not(.gunsmith-ads-preview),[role="tab"]:not([disabled]),[data-game-control][tabindex="0"]:not(.disabled),[data-controller-focusable="true"]';
+  const selector='button:not([disabled]):not(.game-control-arrow):not(.gunsmith-ads-preview),[role="tab"]:not([disabled]),[data-game-control][tabindex="0"]:not(.disabled),[data-controller-focusable="true"],select:not([disabled]),input[type="range"]:not([disabled]),input[type="number"]:not([disabled]),input[type="checkbox"]:not([disabled]),input[type="radio"]:not([disabled])';
   return [...new Set(surface.querySelectorAll(selector))].filter(el=>controllerElementVisible(el,surface));
 }
 function controllerRevealFocusedElement(el,surface){
@@ -4603,7 +4603,7 @@ function setControllerUiFocus(el){
   if(controllerUiEditing&&controllerUiEditing!==el)clearControllerUiEditing();else finishControllerUiAdjustment();
   if(controllerUiFocus?.classList){controllerUiFocus.closest?.('.loadout-class-card')?.classList.remove('controller-card-focus');controllerUiFocus.classList.remove('controller-focus');}
   controllerUiFocus=el;controllerUiFocusKey=controllerFocusKey(el);controllerRememberFocus(el,surface);el.classList.add('controller-focus');el.closest?.('.loadout-class-card')?.classList.add('controller-card-focus');
-  el.focus?.({preventScroll:true});
+  try{el.focus?.({preventScroll:true});}catch{try{el.focus?.();}catch{}}
   controllerRevealFocusedElement(el,surface);return true;
 }
 function queueControllerUiFocus(key,{fallback=null}={}){
@@ -4709,7 +4709,17 @@ function controllerFieldAdjustHeld(){
 function stepControllerField(el,dir){
   if(!controllerEditableField(el)||!dir)return false;
   if(controllerUiAdjusting?.el!==el){finishControllerUiAdjustment();controllerUiAdjusting={el,startValue:String(el.value)};el.classList.add('controller-adjusting');}
-  return adjustGameControl(el,dir,{commit:false});
+  if(el.matches?.('[data-game-control]'))return adjustGameControl(el,dir,{commit:false});
+  if(el.tagName==='SELECT'){
+    const options=[...el.options].filter(option=>!option.disabled);if(!options.length)return false;
+    let index=options.indexOf(el.selectedOptions?.[0]);if(index<0)index=0;const next=options[(index+dir+options.length)%options.length];
+    el.value=next.value;el.dispatchEvent(new Event('change',{bubbles:true}));return true;
+  }
+  if(el.matches?.('input[type="range"],input[type="number"]')){
+    const cur=Number(el.value)||0,min=Number.isFinite(Number(el.min))?Number(el.min):-Infinity,max=Number.isFinite(Number(el.max))?Number(el.max):Infinity,step=Math.abs(Number(el.step))>0?Math.abs(Number(el.step)):1;
+    el.value=String(Math.max(min,Math.min(max,cur+step*dir)));el.dispatchEvent(new Event('input',{bubbles:true}));return true;
+  }
+  return false;
 }
 function cycleControllerTabs(direction){
   const surface=controllerUiSurface();if(!surface)return false;const tablist=controllerPrimaryTablist(surface);if(!tablist)return false;
@@ -4720,7 +4730,7 @@ function cycleControllerTabs(direction){
   return true;
 }
 function handleControllerUiNavigation(pressed){
-  if(shell.inBuilder){if(pressed[GAMEPAD_BUTTON.B]){integratedMapBuilder?.requestExit();return true;}return false;}
+  if(shell.inBuilder)return !!integratedMapBuilder?.handleControllerFrame?.(gamepadFrame,0);
   const surface=controllerUiSurface();if(!surface){clearControllerUiFocus();resetControllerUiAxis();return false;}const focus=ensureControllerUiFocus();
   if(controllerUiAdjusting&&(controllerUiAdjusting.el!==focus||!controllerFieldAdjustHeld()))finishControllerUiAdjustment();
   if(gameTextEditorTarget){
@@ -4754,7 +4764,7 @@ function handleControllerUiNavigation(pressed){
   if(pressed[GAMEPAD_BUTTON.A]&&focus){
     finishControllerUiAdjustment();
     if(controllerEditableField(focus)){if(controllerUiEditing===focus)clearControllerUiEditing();else setControllerUiEditing(focus);return true;}
-    if(focus.tagName==='BUTTON'||focus.dataset?.gameControl==='text'){focus.click();return true;}
+    if(focus.tagName==='BUTTON'||focus.dataset?.gameControl==='text'||focus.matches?.('input[type="checkbox"],input[type="radio"]')){focus.click();return true;}
     return true;
   }
   const nav=controllerUiDirection(pressed);
@@ -4807,6 +4817,7 @@ function updateGamepadInput(dt){
   if(!controllerInputActive())return;
 
   const pressed=gamepadFrame.pressed,released=gamepadFrame.released,buttons=gamepadFrame.buttons;
+  if(shell.inBuilder){clearControllerGameplayInput();clearControllerUiFocus();integratedMapBuilder?.handleControllerFrame?.(gamepadFrame,dt);return;}
   if(chatOpen||gameTextEditorTarget){
     clearControllerGameplayInput();
     handleControllerUiNavigation(pressed);
