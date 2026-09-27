@@ -1,36 +1,36 @@
-import { createMoonSky } from './mod-environment.js?v=1.56.0';
+import { createMoonSky } from './mod-environment.js?v=1.56.1';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.56.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.56.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.56.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.56.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.56.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.56.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.56.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.56.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.56.1';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.56.1';
+import * as YardGeometry from './world-geometry-yard.js?v=1.56.1';
+import * as RigGeometry from './world-geometry-rig.js?v=1.56.1';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.56.1';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.56.1';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.56.1';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.56.1';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.56.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, relationshipFor, relationshipColor } from './team-model.js?v=1.56.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.56.0';
-import { createAudioEngine } from './audio-engine.js?v=1.56.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.56.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.56.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.56.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.56.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.56.0';
-import { createControllerRecording } from './controller-recording.js?v=1.56.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.56.0';
-import { createSafeStorage } from './browser-storage.js?v=1.56.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=1.56.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.56.0';
-import { createUiGestures } from './ui-gestures.js?v=1.56.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.56.0';
-import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.56.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.56.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.56.0';
+} from './game-config.js?v=1.56.1';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, relationshipFor, relationshipColor } from './team-model.js?v=1.56.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.56.1';
+import { createAudioEngine } from './audio-engine.js?v=1.56.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.56.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.56.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.56.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.56.1';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.56.1';
+import { createControllerRecording } from './controller-recording.js?v=1.56.1';
+import { createPointerSessions } from './pointer-sessions.js?v=1.56.1';
+import { createSafeStorage } from './browser-storage.js?v=1.56.1';
+import { createIntegratedMapBuilder } from './map-builder.js?v=1.56.1';
+import { createUiFocusScope } from './ui-focus.js?v=1.56.1';
+import { createUiGestures } from './ui-gestures.js?v=1.56.1';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.56.1';
+import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.56.1';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.56.1';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.56.1';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -649,16 +649,15 @@ let lobbyMapDraft='',lobbyMapDirty=false;
 let lobbyLoadoutDraft=null,lobbyClassDrafts=null,lobbyLoadoutDirty=false,lobbyLoadoutRevision=0,lobbyLoadoutAckRevision=0,lobbyStartingClassId=activeClassId,matchLoadoutRevision=0,matchLoadoutAckRevision=0;
 let lobbyKillstreakDraft=null,lobbyKillstreakRevision=0,lobbyKillstreakAckRevision=0,lobbyKillstreakSyncPending=false;
 const VERSION_CHECK_INTERVAL_MS=60*1000;
-const VERSION_RELOAD_GUARD_MS=30*1000;
-const VERSION_RELOAD_GUARD_KEY='breach:update-reload';
-let versionCheckPromise=null,versionIntervalId=0,versionGuardTimer=0,pendingClientUpdate=null,pendingClientUpdateNotice='',updateReloading=false;
+const VERSION_RELOAD_GUARD_KEY='breach:runtime-update-reload';
+let versionCheckPromise=null,versionIntervalId=0,pendingClientUpdate=null,pendingClientUpdateNotice='',updateReloading=false;
 function normalizeVersionMeta(value,source=''){
   const raw=value&&typeof value==='object'?value:{};
   const version=String(raw.version??raw.game??raw.gameVersion??'').trim(),build=String(raw.build??raw.buildId??'').trim(),n=Number(raw.protocol);
   return{version,build,protocol:Number.isFinite(n)?Math.floor(n):0,source};
 }
-function versionMetaDiffers(meta){return!!meta&&((meta.version&&meta.version!==APP_VERSION)||(meta.build&&meta.build!==BUILD_ID)||(meta.protocol&&meta.protocol!==PROTOCOL_VERSION));}
-function updateTargetKey(meta){return`${meta?.version||'unknown'}|${meta?.build||'unknown'}|${meta?.protocol||0}`;}
+function versionMetaDiffers(meta){return!!meta&&((meta.version&&meta.version!==APP_VERSION)||(meta.protocol&&meta.protocol!==PROTOCOL_VERSION));}
+function updateTargetKey(meta){return`${meta?.version||'unknown'}|${meta?.protocol||0}`;}
 function activeMatchForUpdate(){return!!shell.inMatch&&matchState?.status!==MATCH_STATUS.ENDED;}
 function clearSuccessfulUpdateGuard(){
   try{sessionStorage.removeItem(VERSION_RELOAD_GUARD_KEY);}catch{}
@@ -668,8 +667,8 @@ function forceClientUpdateReload(meta){
   if(updateReloading)return false;const now=Date.now(),target=updateTargetKey(meta);
   try{
     const old=JSON.parse(sessionStorage.getItem(VERSION_RELOAD_GUARD_KEY)||'null');
-    if(old?.target===target&&now-Number(old.at||0)<VERSION_RELOAD_GUARD_MS){
-      const wait=Math.max(250,VERSION_RELOAD_GUARD_MS-(now-Number(old.at||0))+100);clearTimeout(versionGuardTimer);versionGuardTimer=setTimeout(()=>{versionGuardTimer=0;void checkForClientUpdate('reload-guard');},wait);return false;
+    if(old?.target===target){
+      if(pendingClientUpdateNotice!=='reload-stalled'){pendingClientUpdateNotice='reload-stalled';showToast('UPDATE PENDING · REOPEN BREACH',{priority:2,key:'client-update-stalled'});}return false;
     }
     sessionStorage.setItem(VERSION_RELOAD_GUARD_KEY,JSON.stringify({target,at:now,runningVersion:APP_VERSION,runningBuild:BUILD_ID}));
   }catch{}
@@ -904,7 +903,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.56.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.56.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2884,7 +2883,7 @@ function handleMessage(m){
   if(m.t==='welcome'){
     finishInitialConnectionAttempt();
     if(Number(m.protocol)!==PROTOCOL_VERSION){void checkForClientUpdate('welcome-protocol');showToast('CLIENT / SERVER VERSION MISMATCH');leaveMatch();return;}
-    if((m.gameVersion&&String(m.gameVersion)!==APP_VERSION)||(m.buildId&&String(m.buildId)!==BUILD_ID))void checkForClientUpdate('welcome-build');
+    if(m.gameVersion&&String(m.gameVersion)!==APP_VERSION)void checkForClientUpdate('welcome-version');else if(m.buildId&&String(m.buildId)!==BUILD_ID)console.debug('Breach rolling deploy build differs',m.buildId,BUILD_ID);
     if(Number.isFinite(Number(m.serverTime)))serverClockOffset=Number(m.serverTime)-Date.now();
     if(m.customMapDefinition){try{installCustomMapDefinition(m.customMapDefinition,{persist:false,source:'room',quiet:true});}catch(error){showToast(`CUSTOM MAP SYNC FAILED · ${String(error?.message||'invalid map')}`,{priority:3});}}setActiveMap(m.mapId,{rebuild:true});currentRoom=m.code;isMatchAdmin=!!m.isAdmin;matchOwnerId=String(m.ownerClientId||'');applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);botConfig=normalizeBotConfig(m.botConfig);matchState=normalizeClientMatch(m.match);matchCustom=!!m.custom;setLocalTeam(m.self.team||myTeam,{source:'welcome',refresh:false});godMode=!!m.self.godMode;verticalVelocity=Number.isFinite(Number(m.self.verticalVelocity))?Number(m.self.verticalVelocity):0;moveVelocityX=moveVelocityZ=0;onGround=m.self.grounded!==false;lastGroundedAt=onGround?performance.now():0;jumpBufferedUntil=0;crouched=!!m.self.crouched;crouchWanted=crouched;crouchBlend=crouched?1:0;stopSlide();cancelSprint();jumpSeq=Math.max(0,Math.floor(Number(m.self.jumpSeq)||0));traversal=null;ladderState=null;traversalIntentUntil=0;traversalIntentSeq=0;traversalConsumedIntentSeq=0;hp=m.self.hp??100;myStats={kills:Number(m.self.kills)||0,deaths:Number(m.self.deaths)||0};applyKillstreakState(m.self.killstreak||{});wastedUntil=m.self.wastedUntil||0;loadoutClasses=normalizeLoadoutClasses(m.self.loadoutClasses??loadoutClasses,selectedLoadout());activeClassId=normalizeLoadoutClassId(m.self.activeClassId??activeClassId);pendingClassId=m.self.pendingClassId?normalizeLoadoutClassId(m.self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(m.self.primaryWeapon)?m.self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(m.self.secondaryWeapon)?m.self.secondaryWeapon:secondaryWeapon;applyAttachmentState(m.self);tacticalEquipment=normalizeTactical(m.self.tactical);lethalEquipment=normalizeLethal(m.self.lethal);pendingLoadout=m.self.pendingLoadout?normalizeLoadoutChoice(m.self.pendingLoadout):null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);rememberLoadoutClasses(loadoutClasses,pendingClassId||activeClassId);pendingTeam=m.self.pendingTeam||'';currentWeapon=(m.self.weapon===secondaryWeapon||m.self.weapon===primaryWeapon)?m.self.weapon:primaryWeapon;ammo=normalizeClientAmmo(m.self.ammo);equipment=normalizeEquipment(m.self.equipment);pendingWeapon='';reloadRequestPending=false;reloadUntil=m.self.reloadAt||0;reloadWeapon=m.self.reloadWeapon||'';reloadStartedAt=reloadUntil?reloadUntil-weaponRules(reloadWeapon||currentWeapon).reloadMs:0;warmWeaponAudio(currentWeapon);syncLocalWeaponModel();
     yaw=m.self.yaw||0;pitch=m.self.pitch||0;recoilDebtPitch=recoilDebtYaw=recoilPatternPitch=recoilPatternYaw=0;recoilBurstActive=false;recoilBurstWeapon='';recoilBurstReleaseAt=0;recoilBurstEndedAt=performance.now();weaponKickZ=weaponKickVelocity=0;resetLocalPredictionHistory();resetRemoteNetworkTiming();pendingGameSnapshot=gameSnapshot(m.self,m.players||[],m.bots||[],m.serverTime);replaceLobbyParticipants(m.players||[],m.bots||[]);
