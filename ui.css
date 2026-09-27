@@ -121,7 +121,7 @@ body{font-size:var(--ui-md)}
 .lobby-side-tab:hover{border-color:var(--line);background:#151c21;color:var(--text)}
 .lobby-side-tab.active{border-color:rgba(215,255,88,.34);background:linear-gradient(180deg,#1d2618,#151c14);color:var(--accent);box-shadow:inset 0 -2px 0 rgba(215,255,88,.75),0 0 0 1px rgba(215,255,88,.04)}
 .lobby-side-view.active{display:block;width:100%;height:100%;min-width:0;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable}
-.lobby-roster-panel.active{display:grid;grid-template-rows:auto auto minmax(0,1fr);gap:9px;height:100%;padding:10px;overflow:hidden}
+.lobby-roster-panel.active{display:grid;grid-template-rows:auto auto auto minmax(0,1fr);gap:9px;height:100%;padding:10px;overflow:hidden}
 .lobby-setup-panel,.lobby-loadout-panel{width:100%;height:auto;min-width:0;min-height:100%;margin:0;padding:8px;border:0;background:transparent;overscroll-behavior:contain}.lobby-setup-panel{display:block;overflow:visible}.lobby-host-setup:not(.hide){min-height:0;display:block;overflow:visible}.lobby-host-setup .lobby-match-grid{min-height:0;overflow:visible}.lobby-guest-setup{height:auto;min-height:100%;overflow:visible}.lobby-loadout-panel{display:block;overflow:visible}.lobby-loadout-body{min-height:0;overflow:visible;padding-right:1px}
 /* Killstreak setup is a player-owned three-slot loadout. Changes commit only when all three slots are filled. */
 .lobby-killstreak-view.active{overflow:hidden;scrollbar-gutter:auto}
@@ -240,7 +240,8 @@ body{font-size:var(--ui-md)}
 .weapon-settings-card label{font-size:9.5px;gap:4px}
 .weapon-fields{grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));display:grid;gap:6px}
 .weapon-settings-card input{width:100%;max-width:none}
-.admin-page[data-admin-page="players"]{overflow:hidden}
+.admin-page[data-admin-page="players"]{overflow:hidden;display:grid;grid-template-rows:auto minmax(0,1fr);gap:7px}
+.admin-page[data-admin-page="players"]>.admin-bot-card{margin-top:0}
 .admin-player-list{height:100%;min-height:0;padding-right:3px}
 .admin-player-row{padding:8px 9px}
 .admin-player-identity strong{font-size:11px}
@@ -403,7 +404,7 @@ body{font-size:var(--ui-md)}
   .lobby-match-card .lobby-control-group{grid-template-columns:1fr}
   .admin-bot-card{grid-template-columns:1fr}.admin-bot-head{padding:0 0 3px;border-right:0;border-bottom:1px solid var(--line)}
 .lobby-rules-row{}.lobby-bots-row{}
-.lobby-roster-panel.active{overflow:hidden;grid-template-rows:auto auto minmax(0,1fr)}.lobby-roster-panel.active .lobby-roster{min-height:0;overflow:hidden}
+.lobby-roster-panel.active{overflow:hidden;grid-template-rows:auto auto auto minmax(0,1fr)}.lobby-roster-panel.active .lobby-roster{min-height:0;overflow:hidden}
   .settings-page .game-control{grid-template-columns:28px minmax(0,1fr) 28px}.settings-page .game-cycle .game-control-value{font-size:10.5px}
 }
 @media (max-height:300px) and (orientation:landscape){
@@ -1069,3 +1070,5 @@ body{font-size:var(--ui-md)}
 /* Native map-builder surface: same Breach document/fullscreen lifecycle. */
 .map-builder-screen{z-index:72;overflow:hidden;background:#090c0f;contain:strict}
 #mapBuilderHost{display:block;width:100%;height:100%;min-width:0;min-height:0;overflow:hidden}
+
+.admin-player-row.bot{background:#0b1013}.admin-player-row.bot .admin-role-chip{color:#8fb2c6;border-color:rgba(143,178,198,.35);background:rgba(143,178,198,.08)}

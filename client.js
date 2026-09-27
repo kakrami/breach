@@ -1,36 +1,36 @@
-import { createMoonSky } from './mod-environment.js?v=1.57.0';
+import { createMoonSky } from './mod-environment.js?v=1.59.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.57.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.57.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.57.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.57.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.57.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.57.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.57.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.57.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.59.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.59.0';
+import * as YardGeometry from './world-geometry-yard.js?v=1.59.0';
+import * as RigGeometry from './world-geometry-rig.js?v=1.59.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.59.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.59.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.59.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.59.0';
 import {
-  APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
+  APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.57.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.57.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.57.0';
-import { createAudioEngine } from './audio-engine.js?v=1.57.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.57.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.57.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.57.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.57.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.57.0';
-import { createControllerRecording } from './controller-recording.js?v=1.57.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.57.0';
-import { createSafeStorage } from './browser-storage.js?v=1.57.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=1.57.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.57.0';
-import { createUiGestures } from './ui-gestures.js?v=1.57.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.57.0';
-import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.57.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.57.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.57.0';
+} from './game-config.js?v=1.59.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.59.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.59.0';
+import { createAudioEngine } from './audio-engine.js?v=1.59.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.59.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.59.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.59.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.59.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.59.0';
+import { createControllerRecording } from './controller-recording.js?v=1.59.0';
+import { createPointerSessions } from './pointer-sessions.js?v=1.59.0';
+import { createSafeStorage } from './browser-storage.js?v=1.59.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=1.59.0';
+import { createUiFocusScope } from './ui-focus.js?v=1.59.0';
+import { createUiGestures } from './ui-gestures.js?v=1.59.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.59.0';
+import { createAuthoredWorldGeometry } from './authored-world-geometry.js?v=1.59.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.59.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.59.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -905,7 +905,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.57.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.59.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1310,15 +1310,20 @@ function lobbySnapshot(){
   for(const row of lobbyParticipants.values())rows.push({...row,self:false});
   return rows;
 }
+function configuredLobbyBots(mode=currentGameMode()){
+  if(!shell.inLobby||!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return null;const draft=lobbyMatchDraft||committedLobbyMatchDraft(),spec=gameModeSpec(mode);if(spec.cooperative)return[];let blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(draft.blueBots)||0))),red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(draft.redBots)||0)));if(!spec.teamBased){const total=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number(draft.ffaBots)||0)));blue=Math.ceil(total/2);red=Math.floor(total/2);}
+  const rows=[];for(let i=0;i<blue;i++)rows.push({id:`draft-bot-blue-${i+1}`,name:spec.teamBased?`${teamLabel('blue')} Bot ${i+1}`:`Bot ${i+1}`,team:'blue',bot:true,godMode:false,admin:false,primaryWeapon:'assault',secondaryWeapon:'pistol',tactical:'flash',lethal:'frag',kills:0,deaths:0,self:false});for(let i=0;i<red;i++)rows.push({id:`draft-bot-red-${i+1}`,name:spec.teamBased?`${teamLabel('red')} Bot ${i+1}`:`Bot ${blue+i+1}`,team:'red',bot:true,godMode:false,admin:false,primaryWeapon:'assault',secondaryWeapon:'pistol',tactical:'flash',lethal:'frag',kills:0,deaths:0,self:false});return rows;
+}
+function lobbyRosterSnapshot(mode=currentGameMode()){const rows=lobbySnapshot(),preview=configuredLobbyBots(mode);return preview===null?rows:[...rows.filter(row=>!row.bot),...preview];}
 function renderLobbyRoster(modeOverride=currentGameMode()){
-  if(!lobbyRoster)return;const rows=lobbySnapshot(),mode=normalizeGameMode(modeOverride),teamBased=gameModeSpec(mode).teamBased;
+  if(!lobbyRoster)return;const mode=normalizeGameMode(modeOverride),rows=lobbyRosterSnapshot(mode),teamBased=gameModeSpec(mode).teamBased;
   const humanCount=rows.filter(x=>!x.bot).length,botCount=rows.filter(x=>x.bot).length;$('lobbyPlayerCount').textContent=`${humanCount} / ${MAX_PLAYERS} · ${botCount} bots`;
   const hostActions=p=>{if(!isMatchAdmin||p.bot||p.id===matchOwnerId||p.self)return'';return`<div class="lobby-player-actions"><button class="lobby-admin-action ${p.admin?'danger':''}" data-lobby-admin-role="${escapeHtml(p.id)}" type="button">${p.admin?'REMOVE ADMIN':'MAKE ADMIN'}</button></div>`;};
   const playerRow=p=>{const owner=p.id===matchOwnerId,role=owner?'HOST':p.admin?'ADMIN':'',roleChip=role?` <span class="lobby-role-chip">${role}</span>`:'';return`<div class="lobby-player ${p.self?'self':''}"><span class="lobby-player-color ${teamBased?teamKey(p.team):'ffa'}"></span><div class="lobby-player-copy"><strong>${escapeHtml(p.bot?'[BOT] '+p.name:p.name)}${p.self?' · YOU':''}${roleChip}</strong><small>${teamBased?(gameModeSpec(mode).cooperative?'SURVIVOR':teamLabel(p.team))+' · ':''}${escapeHtml(WEAPON_SPECS[p.primaryWeapon]?.name||'ASSAULT RIFLE')}</small></div>${hostActions(p)}</div>`;};
   if(gameModeSpec(mode).cooperative){lobbyRoster.className='lobby-roster ffa';lobbyRoster.innerHTML=`<div class="lobby-team-column"><div class="lobby-team-title">SURVIVORS</div><div class="lobby-team-players">${rows.filter(p=>!p.bot).map(playerRow).join('')}</div></div>`;}else if(!teamBased){const body=rows.sort((a,b)=>Number(b.self)-Number(a.self)||a.name.localeCompare(b.name)).map(playerRow).join('');lobbyRoster.className='lobby-roster ffa';lobbyRoster.innerHTML=`<div class="lobby-team-column ffa"><div class="lobby-team-title"><span>FREE FOR ALL</span><b>${rows.length}</b></div><div class="lobby-team-players">${body||'<div class="lobby-empty-team">Open slot</div>'}</div></div>`;}else{lobbyRoster.className='lobby-roster';const column=team=>{const list=rows.filter(p=>p.team===team),name=teamLabel(team),body=list.map(playerRow).join('')||'<div class="lobby-empty-team">Open slot</div>';return `<div class="lobby-team-column ${teamKey(team)}"><div class="lobby-team-title"><span>${name}</span><b>${list.length}</b></div><div class="lobby-team-players">${body}</div></div>`;};lobbyRoster.innerHTML=column('blue')+column('red');}
   for(const btn of lobbyRoster.querySelectorAll('[data-lobby-admin-role]'))btn.addEventListener('click',()=>{const id=btn.dataset.lobbyAdminRole,pl=lobbySnapshot().find(x=>x.id===id);if(pl&&!pl.self)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});
 }
-function lobbyBotTotal(value=botConfig){return Math.max(0,Math.min(MAX_BOTS,(value.blueBots||0)+(value.redBots||0)));}
+function lobbyBotTotal(value=botConfig){return Math.max(0,Math.min(MAX_MATCH_BOTS,(value.blueBots||0)+(value.redBots||0)));}
 function lobbyMinimapModeFromState(state=matchState){return state.minimapDirectional?'directional':(state.minimapRevealAll?'all':'standard');}
 function committedLobbyMatchDraft(){const mode=currentGameMode(),spec=gameModeSpec(mode),total=lobbyBotTotal();return{mode,mod:worldSettings.mod,blueBots:Math.max(0,Number(botConfig.blueBots)||0),redBots:Math.max(0,Number(botConfig.redBots)||0),ffaBots:total,difficulty:botConfig.difficulty||'normal',scoreLimit:Number(matchState.scoreLimit||spec.scoreLimit)||spec.scoreLimit,timeLimit:Math.max(2,Math.round((matchState.timeLimitMs||spec.timeLimitMs)/60000)),minimap:lobbyMinimapModeFromState(matchState)};}
 function sameLobbyMatchDraft(a,b){if(!a||!b)return false;return a.mode===b.mode&&a.mod===b.mod&&Number(a.blueBots)===Number(b.blueBots)&&Number(a.redBots)===Number(b.redBots)&&Number(a.ffaBots)===Number(b.ffaBots)&&a.difficulty===b.difficulty&&Number(a.scoreLimit)===Number(b.scoreLimit)&&Number(a.timeLimit)===Number(b.timeLimit)&&a.minimap===b.minimap;}
@@ -1375,10 +1380,10 @@ function setLobbyActionState(){
 }
 function collectLobbyStartSetup(){
   refreshLobbyDraftOwnership();
-  const draft={...(lobbyMatchDraft||committedLobbyMatchDraft())},spec=gameModeSpec(draft.mode);let blue=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(draft.blueBots)||0))),red=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(draft.redBots)||0)));
-  if(!spec.teamBased){const total=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(draft.ffaBots)||0)));blue=Math.ceil(total/2);red=Math.floor(total/2);}
+  const draft={...(lobbyMatchDraft||committedLobbyMatchDraft())},spec=gameModeSpec(draft.mode);let blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(draft.blueBots)||0))),red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(draft.redBots)||0)));
+  if(!spec.teamBased){const total=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number(draft.ffaBots)||0)));blue=Math.ceil(total/2);red=Math.floor(total/2);}
   if(spec.cooperative){blue=0;red=0;}
-  if(blue+red>MAX_BOTS)return null;
+  if(blue+red>MAX_MATCH_BOTS)return null;
   const gameplay=collectAdminGameplayPatch(),weapons=collectAdminWeaponsPatch(),scoreLimit=Math.max(5,Math.min(100,Math.round(Number(draft.scoreLimit)||spec.scoreLimit))),timeLimit=Math.max(2,Math.min(30,Math.round(Number(draft.timeLimit)||Math.max(2,spec.timeLimitMs/60000))));
   return{
     mode:normalizeGameMode(draft.mode),mapId:normalizeMapId(lobbyMapDraft||currentMapId),customMapDefinition:normalizeMapId(lobbyMapDraft||currentMapId)==='custom-map'?customMapDefinition:undefined,
@@ -1407,7 +1412,7 @@ function renderLobbySetupControls(){
 function renderLobbyShell(){
   if(!shell.inLobby)return;refreshLobbyDraftOwnership();syncLobbyHostControlPlacement();const host=!!isMatchAdmin,displayMode=lobbyDisplayMode(),displaySpec=gameModeSpec(displayMode),committedMode=currentGameMode(),committedSpec=gameModeSpec(committedMode),total=lobbyBotTotal();
   $('lobbyRoomCode').textContent=currentRoom||'----';$('lobbyModeBadge').textContent=displaySpec.name+(gameModSpec(host?lobbyMatchDraft?.mod:worldSettings.mod).id==='normal'?'':' · '+gameModSpec(host?lobbyMatchDraft?.mod:worldSettings.mod).name.toUpperCase());
-  $('lobbyTeamGroup').classList.toggle('hide',!displaySpec.teamBased||!!displaySpec.cooperative);$('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbyCheatsTab')?.classList.toggle('hide',!host);
+  $('lobbyTeamGroup').classList.toggle('hide',!displaySpec.teamBased||!!displaySpec.cooperative);$('lobbyBotsCard')?.classList.toggle('hide',!host);$('lobbyHostSetup').classList.toggle('hide',!host);$('lobbyGuestSetup').classList.toggle('hide',host);$('lobbyCheatsTab')?.classList.toggle('hide',!host);
   const godToggle=$('lobbyGodModeToggle');if(godToggle){godToggle.classList.toggle('active',!!godMode);godToggle.setAttribute('aria-checked',String(!!godMode));godToggle.disabled=!host||socket?.readyState!==WebSocket.OPEN;}
   const startBtn=$('lobbyStartBtn');startBtn.classList.toggle('hide',!host);startBtn.disabled=!matchAllowsLobbyEdits(matchState);
   for(const btn of lobbyTeamButtons)btn.classList.toggle('active',displaySpec.teamBased&&btn.dataset.lobbyTeamChoice===myTeam);
@@ -1418,10 +1423,9 @@ function renderLobbyShell(){
 function syncLobby({setup=true,roster=true}={}){if(!shell.inLobby)return;renderLobbyShell();if(setup){try{renderLobbySetupControls();}catch(error){console.error('Loadout/setup UI render failed without interrupting lobby session state.',error);}}setLobbyActionState();if(roster)renderLobbyRoster(lobbyDisplayMode());}
 function showLobby(){finishInitialConnectionAttempt();const leave=$('leaveBtn');if(leave){leave.disabled=false;const label=leave.querySelector('span');if(label)label.textContent='Leave Match';}shell.enterLobby();refreshLobbyDraftOwnership();syncLobby();const url=new URL(location.href);url.searchParams.set('room',currentRoom);history.replaceState(null,'',url);}
 function updateLobbyMatchDraftFromControls(){
-  if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;if(!lobbyMatchDraft)lobbyMatchDraft=committedLobbyMatchDraft();const spec=gameModeSpec(lobbyMatchDraft.mode),ffa=!spec.teamBased;let blue=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(lobbyBlueBotCount.value)||0))),red=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(lobbyRedBotCount.value)||0))),ffaBots=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(lobbyFfaBotCount.value)||0)));
-  if(!ffa&&blue+red>MAX_BOTS){showToast(`MAX ${MAX_BOTS} BOTS`);const committed=committedLobbyMatchDraft();blue=committed.blueBots;red=committed.redBots;}
+  if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;if(!lobbyMatchDraft)lobbyMatchDraft=committedLobbyMatchDraft();const spec=gameModeSpec(lobbyMatchDraft.mode),ffa=!spec.teamBased;let blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(lobbyBlueBotCount.value)||0))),red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(lobbyRedBotCount.value)||0))),ffaBots=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number(lobbyFfaBotCount.value)||0)));
   lobbyMatchDraft={...lobbyMatchDraft,mod:normalizeGameMod(lobbyMod.value),blueBots:blue,redBots:red,ffaBots,difficulty:lobbyBotDifficulty.value,scoreLimit:spec.scoreType==='none'?lobbyMatchDraft.scoreLimit:Math.max(5,Math.min(100,Math.round(Number(lobbyScoreLimit.value)||spec.scoreLimit))),timeLimit:spec.scoreType==='none'?lobbyMatchDraft.timeLimit:Math.max(2,Math.min(30,Math.round(Number(lobbyTimeLimit.value)||spec.timeLimitMs/60000))),minimap:['standard','all','directional'].includes(lobbyMinimapMode.value)?lobbyMinimapMode.value:'standard'};
-  lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());renderLobbyShell();renderLobbySetupControls();setLobbyActionState();
+  lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());renderLobbyShell();renderLobbySetupControls();renderLobbyRoster(lobbyDisplayMode());setLobbyActionState();
 }
 function setLobbyModeDraft(mode){if(!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return;if(!lobbyMatchDraft)lobbyMatchDraft=committedLobbyMatchDraft();lobbyMatchDraft={...lobbyMatchDraft,mode:normalizeGameMode(mode)};lobbyMatchDirty=!sameLobbyMatchDraft(lobbyMatchDraft,committedLobbyMatchDraft());syncLobby();}
 function updateCustomMapLobbyUi(){
@@ -2243,7 +2247,50 @@ function addLaddersBatch(){
     const rungCount=Math.max(4,Math.floor(height/.34));for(let i=0;i<=rungCount;i++){const rung=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,ladder.width*.90,8),metal);rung.position.y=.18+(height-.36)*(i/rungCount);if(horizontal)rung.rotation.z=Math.PI/2;else rung.rotation.x=Math.PI/2;g.add(rung);}
   }
 }
+function addCanonicalAuthoredStaticProps(){
+  const parts=worldGeometry?.STATIC_PARTS;if(!Array.isArray(parts)||!parts.length)return false;
+  const unitBox=new THREE.BoxGeometry(1,1,1),unitRound=new THREE.CylinderGeometry(1,1,1,14),boxGroups=new Map(),roundGroups=new Map();
+  const roleKey=role=>{
+    const r=String(role||'');
+    if(r.includes('Wheel'))return 'wheel';
+    if(r.startsWith('burntCar')||r.startsWith('burntBus'))return r.includes('Cabin')||r.includes('Upper')?'vehicleUpper':'vehicleBody';
+    if(r.startsWith('fuelTank'))return 'fuelTank';
+    if(r.startsWith('dumpster'))return 'dumpster';
+    if(r.startsWith('checkpoint'))return 'checkpoint';
+    if(r==='sandbag')return 'sandbag';
+    if(r==='brokenWall')return 'brokenWall';
+    if(r==='crate')return 'crate';
+    if(r==='pipe')return 'pipe';
+    if(r==='tank')return 'tank';
+    if(r==='shed')return 'shed';
+    if(r==='barrier'||r==='boundary')return 'concrete';
+    if(r==='containerBlue')return 'containerBlue';
+    if(r==='containerRed')return 'containerRed';
+    if(r==='containerGreen')return 'containerGreen';
+    if(r==='containerTan')return 'containerTan';
+    return 'default';
+  };
+  const materials={
+    wheel:new THREE.MeshStandardMaterial({color:0x111213,roughness:1}),
+    vehicleBody:worldMat(0x252728,'charredMetal',.94,.12),vehicleUpper:worldMat(0x5f4030,'rustedMetal',.97,.04),
+    fuelTank:worldMat(0x485056,'paintedMetal',.84,.18),dumpster:worldMat(0x303438,'charredMetal',.92,.12),checkpoint:worldMat(0x76523a,'rustedMetal',.96,.05),
+    sandbag:worldMat(0x8b7753,'sandbag',1,0),brokenWall:worldMat(0x8e8a80,'concrete',.98,0),crate:worldMat(0x755437,'wood',.96,0),pipe:worldMat(0x6d665d,'rustedMetal',.76,.18),
+    tank:worldMat(0x82755f,'rustedMetal',.80,.12),shed:worldMat(0x765744,'corrugatedMetal',.88,.08),concrete:worldMat(0x9a8b70,'concrete',.96,0),
+    containerBlue:worldMat(0x385f78,'corrugatedMetal',.82,.06),containerRed:worldMat(0x8a473f,'corrugatedMetal',.84,.06),containerGreen:worldMat(0x4f6d58,'corrugatedMetal',.86,.06),containerTan:worldMat(0x847457,'corrugatedMetal',.88,.05),
+    default:worldMat(0x6f706d,'concrete',.95,0),
+  };
+  const push=(map,key,t)=>{if(!map.has(key))map.set(key,[]);map.get(key).push(t);};
+  for(const part of parts){
+    const key=roleKey(part.role),bottom=Number(part.minY??part.bottomY),top=Number(part.maxY??part.topY),h=top-bottom;if(!(h>0))continue;
+    if(part.type==='round')push(roundGroups,key,{x:part.x,y:(bottom+top)/2,z:part.z,sx:part.r,sy:h,sz:part.r});
+    else push(boxGroups,key,{x:part.x,y:(bottom+top)/2,z:part.z,sx:part.w,sy:h,sz:part.d,ry:(Number(part.rot)||0)*Math.PI/180});
+  }
+  for(const [key,transforms] of boxGroups)addStaticInstancedMesh(unitBox,materials[key]||materials.default,transforms);
+  for(const [key,transforms] of roundGroups)addStaticInstancedMesh(unitRound,materials[key]||materials.default,transforms);
+  return true;
+}
 function addStaticBoxesBatch(mat){
+  if(currentMapId==='custom-map'&&addCanonicalAuthoredStaticProps()){for(const o of STATIC_BOXES)mapObstacles.push({type:'box',x:o.x,z:o.z,w:o.w,d:o.d,rot:o.rot||0});return;}
   const unit=new THREE.BoxGeometry(1,1,1),customKinds=new Set(['burntCar','burntBus','dumpster','fuelTank','checkpoint','sandbag','brokenWall']);
   const palette={
     boundary:worldMat(currentMapId==='yard'?0x3d4448:currentMapId==='rig'?0x5a4f41:0x626a6e,currentMapId==='yard'?'paintedMetal':(currentMapId==='rig'?'stone':'concrete'),.95,currentMapId==='yard'?.08:0),
@@ -2395,12 +2442,12 @@ function bindUI(){
   for(const btn of lobbyLethalButtons)btn.addEventListener('click',()=>setLobbyLoadoutDraft({lethal:btn.dataset.lobbyLethalChoice}));
   for(const btn of lobbyModeButtons)btn.addEventListener('click',()=>setLobbyModeDraft(btn.dataset.lobbyModeChoice));
   for(const el of [lobbyBlueBotCount,lobbyRedBotCount,lobbyFfaBotCount,lobbyBotDifficulty,lobbyScoreLimit,lobbyTimeLimit,lobbyMinimapMode,lobbyMod])el.addEventListener('input',updateLobbyMatchDraftFromControls);
-  for(const root of [$('adminGameplay'),$('adminAdvanced')]){root?.addEventListener('input',()=>{if(shell.inLobby)setLobbyActionState();});root?.addEventListener('change',()=>{if(shell.inLobby)setLobbyActionState();else if(shell.inMatch&&isMatchAdmin)saveAdminSettings(root.id==='adminAdvanced'?'advanced':'gameplay');});}
+  for(const root of [$('adminGameplay'),$('adminAdvanced'),$('adminPlayers')]){root?.addEventListener('input',()=>{if(shell.inLobby)setLobbyActionState();});root?.addEventListener('change',()=>{if(shell.inLobby)setLobbyActionState();else if(shell.inMatch&&isMatchAdmin)saveAdminSettings(root.id==='adminAdvanced'?'advanced':root.id==='adminPlayers'?'players':'gameplay');});}
   for(const btn of lobbyMapButtons)btn.addEventListener('click',()=>setLobbyMapDraft(btn.dataset.lobbyMapChoice));
   $('lobbyLoadCustomMapBtn')?.addEventListener('click',requestCustomMapFile);$('lobbyCustomMapFile')?.addEventListener('change',event=>{const file=event.target.files?.[0];if(file)void loadCustomMapFile(file);});$('lobbyCreateMapBtn')?.addEventListener('click',()=>openIntegratedMapBuilder());$('lobbyEditMapBtn')?.addEventListener('click',()=>{if(selectedLibraryMap?.id)openIntegratedMapBuilder(selectedLibraryMap.id)});document.querySelectorAll('[data-map-gallery-tab]').forEach(btn=>btn.addEventListener('click',()=>{mapGalleryTab=btn.dataset.mapGalleryTab==='mine'?'mine':'official';document.querySelectorAll('[data-map-gallery-tab]').forEach(x=>x.classList.toggle('active',x===btn));if(mapGalleryTab==='mine')void refreshMapLibrary({quiet:true});renderMapGallery();}));void refreshMapLibrary({quiet:true});updateCustomMapLobbyUi();
   $('lobbyStartBtn').addEventListener('click',async()=>{
     if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN||!matchAllowsLobbyEdits(matchState))return;
-    const setup=collectLobbyStartSetup();if(!setup){$('lobbyStatus').textContent=`Maximum ${MAX_BOTS} bots per match.`;return;}
+    const setup=collectLobbyStartSetup();if(!setup){$('lobbyStatus').textContent=`Maximum ${MAX_MATCH_BOTS} bots per match.`;return;}
     const button=$('lobbyStartBtn');button.disabled=true;$('lobbyStatus').textContent='Preparing match…';
     // Validate first. Fullscreen/input capture happens only for a setup that can actually start.
     if(!(await shell.prepareInputFromGesture())){button.disabled=false;$('lobbyStatus').textContent='Fullscreen / game input is required to start.';return;}
@@ -2943,7 +2990,7 @@ function handleMessage(m){
   if(m.t==='matchReset'){if(m.customMapDefinition){try{installCustomMapDefinition(m.customMapDefinition,{persist:false,source:'room',quiet:true});}catch(error){showToast(`CUSTOM MAP SYNC FAILED · ${String(error?.message||'invalid map')}`,{priority:3});}}if(m.mapId)setActiveMap(m.mapId,{rebuild:true});if(m.settings)applyWorldSettings(m.settings);if(m.botConfig)botConfig=normalizeBotConfig(m.botConfig);lobbyMatchDraft=null;lobbyMatchDirty=false;lobbyMapDraft='';lobbyMapDirty=false;lobbyLoadoutDraft=null;lobbyClassDrafts=null;lobbyLoadoutDirty=false;lobbyLoadoutRevision=0;lobbyLoadoutAckRevision=0;lobbyKillstreakDraft=[...killstreakSelection];lobbyKillstreakRevision=0;lobbyKillstreakAckRevision=0;lobbyKillstreakSyncPending=false;applyClientMatchState(m.match);matchCustom=!!m.custom;myStats={kills:0,deaths:0};resetKillstreakClientState();const players=m.players||[],bots=m.bots||[],self=players.find(pl=>pl?.id===clientId)||null;if(self){setLocalTeam(self.team||myTeam,{source:'match_reset',refresh:false});pendingTeam='';if(self.activeClassId)activeClassId=normalizeLoadoutClassId(self.activeClassId);pendingClassId=self.pendingClassId?normalizeLoadoutClassId(self.pendingClassId):'';primaryWeapon=PRIMARY_WEAPONS.includes(self.primaryWeapon)?self.primaryWeapon:primaryWeapon;secondaryWeapon=SECONDARY_WEAPONS.includes(self.secondaryWeapon)?self.secondaryWeapon:secondaryWeapon;applyAttachmentState(self);tacticalEquipment=normalizeTactical(self.tactical);lethalEquipment=normalizeLethal(self.lethal);pendingLoadout=null;rememberPrimary(primaryWeapon);rememberSecondary(secondaryWeapon);rememberAttachments(primaryAttachments,secondaryAttachments);rememberEquipment(tacticalEquipment,lethalEquipment);rememberLoadoutClasses(loadoutClasses,activeClassId);}pendingGameSnapshot=gameSnapshot(self,players,bots,m.match?.serverTime);replaceLobbyParticipants(players,bots);syncRelationshipPresentation();if(shell.inLobby||!engineReady){void enterGame(pendingGameSnapshot,{resetRound:true});}else applyGameSnapshot(pendingGameSnapshot,{resetRound:true});return;}
   if(m.t==='kill'){handleKill(m);return;}
   if(m.t==='settings'){applyWorldSettings(m.settings||DEFAULT_WORLD_SETTINGS);if(typeof m.custom==='boolean')matchCustom=m.custom;const section=m.section==='advanced'?'advanced':'gameplay';if(shell.panel===SHELL_PANEL.ADMIN){if(m.by===clientId){if(section==='advanced')populateAdminWeapons(worldSettings);else populateAdminGameplay(worldSettings);setAdminStatus('');}else if(activeAdminTab!==section){if(section==='advanced')populateAdminWeapons(worldSettings);else populateAdminGameplay(worldSettings);}}syncLobby();return;}
-  if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncLobbyBots(m.bots||[]);if(shell.inMatch&&engineReady)syncBotRoster(m.bots||[]);syncLobby();if(shell.panel===SHELL_PANEL.ADMIN){populateAdminBots(botConfig);setAdminStatus('');}return;}
+  if(m.t==='bots'){botConfig=normalizeBotConfig(m.config);syncLobbyBots(m.bots||[]);if(shell.inMatch&&engineReady)syncBotRoster(m.bots||[]);syncLobby();if(shell.panel===SHELL_PANEL.ADMIN){populateAdminBots(botConfig);renderAdminPlayers(true);setAdminStatus('');}return;}
   if(m.t==='notice'){showToast(m.text||'Server notice',{priority:m.tone==='error'?3:1,key:`notice:${m.text||'server'}`});if(shell.panel===SHELL_PANEL.ADMIN)setAdminStatus(m.text||'Server notice',m.tone==='error'?'error':'');return;}
   if(m.t==='pong'){const echoed=Number(m.clientAt)||lastPingLocalAt;if(echoed&&Number.isFinite(Number(m.at))){const received=Date.now(),mid=echoed+(received-echoed)/2,estimate=Number(m.at)-mid;recordNetPong(echoed,received,m.net);serverClockOffset=serverClockOffset*.7+estimate*.3;}return;}
   if(m.t==='health'){if(m.id===clientId){hp=Math.max(0,Math.min(100,Number(m.hp)||0));syncLocalStatus();}else{const r=remotes.get(m.id);if(r)r.hp=Math.max(0,Math.min(100,Number(m.hp)||0));}return;}
@@ -2985,7 +3032,7 @@ function leaveMatch(){
   const url=new URL(location.href);url.searchParams.delete('room');history.replaceState(null,'',url);refreshMatches();
 }
 
-function normalizeBotConfig(value){const v=value&&typeof value==='object'?value:{};const blueBots=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(v.blueBots)||0))),redBots=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number(v.redBots)||0)));const diff=['easy','normal','hard','elite'].includes(String(v.difficulty||'normal').toLowerCase())?String(v.difficulty||'normal').toLowerCase():'normal';return{blueBots,redBots,difficulty:diff};}
+function normalizeBotConfig(value){const v=value&&typeof value==='object'?value:{};const blueBots=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(v.blueBots)||0))),redBots=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(v.redBots)||0)));const diff=['easy','normal','hard','elite'].includes(String(v.difficulty||'normal').toLowerCase())?String(v.difficulty||'normal').toLowerCase():'normal';return{blueBots,redBots,difficulty:diff};}
 function syncBotRoster(list){const incoming=new Set((list||[]).map(b=>b.id));for(const [id,r] of remotes){if(r.bot&&!incoming.has(id))removeRemote(id);}for(const b of list||[])upsertRemote(b,true);syncPauseContext();}
 function setAdminStatus(text,tone=''){const el=$('adminStatus');el.textContent=text;el.className=`admin-status ${tone}`;}
 let activeAdminTab='gameplay';
@@ -3000,34 +3047,34 @@ function switchAdminTab(tab){
   activeAdminTab=requested?.dataset.adminTab||tabs[0]?.dataset.adminTab||'match';
   for(const page of document.querySelectorAll('[data-admin-page]'))page.classList.toggle('hide',page.dataset.adminPage!==activeAdminTab);
   for(const b of document.querySelectorAll('[data-admin-tab]')){const active=b.dataset.adminTab===activeAdminTab;b.classList.toggle('active',active);b.setAttribute('aria-selected',String(active));b.tabIndex=active?0:-1;}
-  const players=activeAdminTab==='players',closeBtn=$('adminCancelBtn');if(closeBtn)closeBtn.textContent='CLOSE';document.querySelector('.admin-shell').dataset.page=activeAdminTab;if(players){setAdminStatus('');renderAdminPlayers(true);}
+  const players=activeAdminTab==='players',closeBtn=$('adminCancelBtn');if(closeBtn)closeBtn.textContent='CLOSE';document.querySelector('.admin-shell').dataset.page=activeAdminTab;if(players){setAdminStatus('');populateAdminBots(botConfig);renderAdminPlayers(true);}
 }
 function syncAdminBotDraftSummary(){
   const ffa=normalizeGameMode(matchState.mode)==='ffa',blue=Math.max(0,Math.floor(Number($('adminBlueBotCount')?.value)||0)),red=Math.max(0,Math.floor(Number($('adminRedBotCount')?.value)||0)),total=ffa?Math.max(0,Math.floor(Number($('adminFfaBotCount')?.value)||0)):blue+red,diff=String($('adminBotDifficulty')?.value||botConfig.difficulty||'normal');
-  if($('adminBotSummary'))$('adminBotSummary').textContent=`${Math.min(MAX_BOTS,total)} / ${MAX_BOTS} bots · ${diff.replace(/^./,c=>c.toUpperCase())}`;
+  if($('adminBotSummary'))$('adminBotSummary').textContent=`${Math.min(MAX_MATCH_BOTS,total)} / ${MAX_MATCH_BOTS} bots · ${diff.replace(/^./,c=>c.toUpperCase())}`;
 }
 function populateAdminBots(value=botConfig){
-  const cfg=normalizeBotConfig(value),ffa=normalizeGameMode(matchState.mode)==='ffa',total=Math.min(MAX_BOTS,cfg.blueBots+cfg.redBots);
+  const cfg=normalizeBotConfig(value),ffa=normalizeGameMode(matchState.mode)==='ffa',total=Math.min(MAX_MATCH_BOTS,cfg.blueBots+cfg.redBots);
   $('adminBlueBotWrap')?.classList.toggle('hide',ffa);$('adminRedBotWrap')?.classList.toggle('hide',ffa);$('adminFfaBotWrap')?.classList.toggle('hide',!ffa);
   if($('adminBlueBotCount'))$('adminBlueBotCount').value=String(cfg.blueBots);if($('adminRedBotCount'))$('adminRedBotCount').value=String(cfg.redBots);if($('adminFfaBotCount'))$('adminFfaBotCount').value=String(total);if($('adminBotDifficulty'))$('adminBotDifficulty').value=cfg.difficulty;
   syncAdminBotDraftSummary();
 }
 function collectAdminBotConfig(){
-  const ffa=normalizeGameMode(matchState.mode)==='ffa';let blue,red;if(ffa){const total=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number($('adminFfaBotCount')?.value)||0)));blue=Math.ceil(total/2);red=Math.floor(total/2);}else{blue=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number($('adminBlueBotCount')?.value)||0)));red=Math.max(0,Math.min(MAX_BOTS,Math.floor(Number($('adminRedBotCount')?.value)||0)));if(blue+red>MAX_BOTS)return null;}return{blueBots:blue,redBots:red,difficulty:String($('adminBotDifficulty')?.value||'normal')};
+  const ffa=normalizeGameMode(matchState.mode)==='ffa';let blue,red;if(ffa){const total=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number($('adminFfaBotCount')?.value)||0)));blue=Math.ceil(total/2);red=Math.floor(total/2);}else{blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number($('adminBlueBotCount')?.value)||0)));red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number($('adminRedBotCount')?.value)||0)));if(blue+red>MAX_MATCH_BOTS)return null;}return{blueBots:blue,redBots:red,difficulty:String($('adminBotDifficulty')?.value||'normal')};
 }
-function populateAdminGameplay(value){const x=normalizeWorldSettings(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);populateAdminBots(botConfig);}
+function populateAdminGameplay(value){const x=normalizeWorldSettings(value);$('setRunSpeed').value=x.movement.runSpeed;$('setWalkSpeed').value=x.movement.walkSpeed;$('setJumpHeight').value=x.movement.jumpHeight;$('setGravity').value=x.movement.gravity;$('setRegenDelay').value=(x.combat.regenDelayMs/1000).toFixed(1);$('setRegenRate').value=x.combat.regenPerSecond;$('setRespawnDelay').value=(x.combat.respawnMs/1000).toFixed(1);}
 function populateAdminWeapons(value){const x=normalizeWorldSettings(value);for(const name of WEAPON_ORDER){const cap=name[0].toUpperCase()+name.slice(1),w=x.weapons[name];$(`set${cap}Damage`).value=w.damage;$(`set${cap}Speed`).value=w.speed;$(`set${cap}Reload`).value=(w.reloadMs/1000).toFixed(2);$(`set${cap}Cooldown`).value=Math.round(60000/w.cooldownMs);$(`set${cap}Recoil`).value=Math.round(w.recoilScale);}}
-function populateAdminSettings(value){populateAdminGameplay(value);populateAdminWeapons(value);}
+function populateAdminSettings(value){populateAdminGameplay(value);populateAdminWeapons(value);populateAdminBots(botConfig);}
 function collectAdminGameplayPatch(){return{movement:{runSpeed:$('setRunSpeed').value,walkSpeed:$('setWalkSpeed').value,jumpHeight:$('setJumpHeight').value,gravity:$('setGravity').value},combat:{regenDelayMs:Number($('setRegenDelay').value)*1000,regenPerSecond:$('setRegenRate').value,respawnMs:Number($('setRespawnDelay').value)*1000}};}
 function collectAdminWeaponsPatch(){return{weapons:Object.fromEntries(WEAPON_ORDER.map(name=>{const cap=name[0].toUpperCase()+name.slice(1);return[name,{damage:$(`set${cap}Damage`).value,speed:$(`set${cap}Speed`).value,reloadMs:Number($(`set${cap}Reload`).value)*1000,cooldownMs:60000/Math.max(24,Number($(`set${cap}Cooldown`).value)||60),recoilScale:$(`set${cap}Recoil`).value}]}))};}
-function adminPlayerSnapshot(){if(shell.inLobby)return lobbySnapshot().filter(r=>!r.bot).map(r=>({id:r.id,name:r.name,team:r.team,godMode:!!r.godMode,admin:!!r.admin,self:!!r.self}));return[{id:clientId,name:myName||'You',team:myTeam,godMode,admin:isMatchAdmin,self:true},...Array.from(remotes.values()).filter(r=>!r.bot).map(r=>({id:r.id,name:r.name,team:r.team,godMode:!!r.godMode,admin:!!r.admin,self:false}))];}
+function adminPlayerSnapshot(){if(shell.inLobby)return lobbyRosterSnapshot(lobbyDisplayMode()).map(r=>({id:r.id,name:r.name,team:r.team,bot:!!r.bot,zombie:!!r.zombie,godMode:!!r.godMode,admin:!!r.admin,self:!!r.self}));return[{id:clientId,name:myName||'You',team:myTeam,bot:false,zombie:false,godMode,admin:isMatchAdmin,self:true},...Array.from(remotes.values()).map(r=>({id:r.id,name:r.name,team:r.team,bot:!!r.bot,zombie:!!r.zombie,godMode:!!r.godMode,admin:!!r.admin,self:false}))].sort((a,b)=>Number(b.self)-Number(a.self)||Number(a.bot)-Number(b.bot)||a.team.localeCompare(b.team)||a.name.localeCompare(b.name));}
 function renderAdminPlayers(force=false){
   const root=$('adminPlayerList');if(!root)return;if(!force&&(shell.panel!==SHELL_PANEL.ADMIN||activeAdminTab!=='players'))return;root.innerHTML='';
   for(const pl of adminPlayerSnapshot()){
-    const row=document.createElement('div');row.className='admin-player-row';const owner=pl.id===matchOwnerId,self=!!pl.self,safeId=escapeHtml(pl.id),role=owner?'HOST':pl.admin?'ADMIN':'',roleChip=role?`<span class="admin-role-chip">${role}</span>`:'';
-    const godAction=`<div class="admin-player-toggle"><span>GOD MODE</span><button aria-checked="${pl.godMode}" aria-label="God Mode for ${escapeHtml(pl.name)}" class="switch-toggle admin-god-toggle ${pl.godMode?'active':''}" data-admin-god="${safeId}" data-controller-key="admin-player:${safeId}:god" role="switch" type="button"><span></span></button></div>`;
-    const roleAction=(owner||self)?'':`<button class="btn admin-mini ${pl.admin?'danger':''}" data-admin-role="${safeId}" data-controller-key="admin-player:${safeId}:role">${pl.admin?'REMOVE ADMIN':'MAKE ADMIN'}</button>`;
-    row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${currentModeSpec().teamBased?teamKey(pl.team):'ffa'}"></span><div><strong>${escapeHtml(pl.name)}${self?' (You)':''}${roleChip}</strong><small>${currentModeSpec().teamBased?teamLabel(pl.team):'FFA'}</small></div></div><div class="admin-player-actions">${godAction}${roleAction}</div>`;root.appendChild(row);
+    const row=document.createElement('div');row.className=`admin-player-row${pl.bot?' bot':''}`;const owner=pl.id===matchOwnerId,self=!!pl.self,safeId=escapeHtml(pl.id),role=pl.zombie?'ZOMBIE':pl.bot?'BOT':owner?'HOST':pl.admin?'ADMIN':'',roleChip=role?`<span class="admin-role-chip">${role}</span>`:'';
+    const godAction=pl.bot?'':`<div class="admin-player-toggle"><span>GOD MODE</span><button aria-checked="${pl.godMode}" aria-label="God Mode for ${escapeHtml(pl.name)}" class="switch-toggle admin-god-toggle ${pl.godMode?'active':''}" data-admin-god="${safeId}" data-controller-key="admin-player:${safeId}:god" role="switch" type="button"><span></span></button></div>`;
+    const roleAction=(pl.bot||owner||self)?'':`<button class="btn admin-mini ${pl.admin?'danger':''}" data-admin-role="${safeId}" data-controller-key="admin-player:${safeId}:role">${pl.admin?'REMOVE ADMIN':'MAKE ADMIN'}</button>`;
+    row.innerHTML=`<div class="admin-player-identity"><span class="admin-team-dot ${currentModeSpec().teamBased?teamKey(pl.team):'ffa'}"></span><div><strong>${escapeHtml(pl.name)}${self?' (You)':''}${roleChip}</strong><small>${currentModeSpec().teamBased?teamLabel(pl.team):'FFA'}${pl.bot?' · AI':''}</small></div></div><div class="admin-player-actions">${godAction}${roleAction}</div>`;root.appendChild(row);
   }
   for(const btn of root.querySelectorAll('[data-admin-god]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminGod,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl)send({t:'adminPlayer',targetId:id,action:'god',enabled:!pl.godMode});});
   for(const btn of root.querySelectorAll('[data-admin-role]'))btn.addEventListener('click',()=>{const id=btn.dataset.adminRole,pl=adminPlayerSnapshot().find(x=>x.id===id);if(pl&&!pl.self)send({t:'adminPlayer',targetId:id,action:'admin',enabled:!pl.admin});});
@@ -3082,7 +3129,8 @@ function closeAdminPanel(){shell.closePanel(SHELL_PANEL.ADMIN);}
 function saveAdminSettings(section=activeAdminTab){
   if(shell.inLobby){setAdminStatus('');return;}
   if(!isMatchAdmin||socket?.readyState!==WebSocket.OPEN){setAdminStatus('Host connection unavailable.','error');return;}
-  if(section==='gameplay'){const bots=collectAdminBotConfig();if(!bots){setAdminStatus(`Maximum ${MAX_BOTS} bots per match.`,'error');return;}send({t:'adminSettings',section:'gameplay',patch:collectAdminGameplayPatch()});send({t:'adminBots',...bots});setAdminStatus('');return;}
+  if(section==='gameplay'){send({t:'adminSettings',section:'gameplay',patch:collectAdminGameplayPatch()});setAdminStatus('');return;}
+  if(section==='players'){const bots=collectAdminBotConfig();if(!bots){setAdminStatus(`Maximum ${MAX_MATCH_BOTS} bots per match.`,'error');return;}send({t:'adminBots',...bots});setAdminStatus('');return;}
   if(section==='advanced'){send({t:'adminSettings',section:'advanced',patch:collectAdminWeaponsPatch()});setAdminStatus('');}
 }
 
