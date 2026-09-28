@@ -1,9 +1,9 @@
-import {APP_VERSION} from './game-config.js?v=1.72.0';
-import {createBuilderHUD} from './builder-hud.js?v=1.72.0';
-import {BUILDING_ASSETS,PROP_ASSETS,resolveAsset,assetResizeMode} from './object-catalog.js?v=1.72.0';
-import {createAuthoredWorldGeometry} from './authored-world-geometry.js?v=1.72.0';
-import {createAuthoredWorldCollision} from './authored-world-collision.js?v=1.72.0';
-import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.72.0';
+import {APP_VERSION} from './game-config.js?v=1.72.1';
+import {createBuilderHUD} from './builder-hud.js?v=1.72.1';
+import {BUILDING_ASSETS,PROP_ASSETS,resolveAsset,assetResizeMode} from './object-catalog.js?v=1.72.1';
+import {createAuthoredWorldGeometry} from './authored-world-geometry.js?v=1.72.1';
+import {createAuthoredWorldCollision} from './authored-world-collision.js?v=1.72.1';
+import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.72.1';
 const rad=d=>d*Math.PI/180,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const WALK_ITEMS=Object.freeze([
  {key:'house',label:'House',group:'Buildings',type:'building',archetype:'rowhouse',...BUILDING_ASSETS.rowhouse,label:'House'},
