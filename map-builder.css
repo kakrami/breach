@@ -349,3 +349,21 @@
 .app.simple-builder{display:block;grid-template-rows:none}.simple-builder .stage{height:100%;width:100%}
 
 .simple-builder.walk-testing .walk-lift button{font-size:12px;width:66px}.walk-menu small{text-align:center;opacity:.6;padding:6px}
+/* In-world tools share the game's charcoal / lime control language. The game
+   canvas owns movement, look and touch buttons; tools leave those corners free. */
+.uses-game-runtime.playtest #map3d,.uses-game-runtime.playtest #map2d,.uses-game-runtime.playtest #weatherFx,.uses-game-runtime #touchPlay{display:none!important}
+.uses-game-runtime #walkUI .walk-lift{display:none}
+#walkUI button{background:rgba(9,11,13,.88);border:1px solid rgba(255,255,255,.22);border-radius:7px;color:#f1f3f5;font-weight:800}
+#walkUI button.accent,#walkUI button.active,#walkUI button.selected{background:#d7ff58;color:#10130a;border-color:#d7ff58}
+#walkUI button:disabled{opacity:.42}
+#walkUI .walk-hotbar{display:none}
+#walkUI .walk-bottom{top:64px;bottom:auto;left:12px;right:12px;width:auto;transform:none;display:block;pointer-events:none}
+#walkUI .walk-actions{display:flex;justify-content:center;flex-wrap:wrap;gap:5px;pointer-events:none}
+#walkUI .walk-actions button{pointer-events:auto;min-height:40px;font-size:12px;padding:7px 10px}
+#walkUI .walk-place{position:fixed;left:50%;right:auto;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);height:48px;min-width:110px;width:auto;pointer-events:auto;font-size:14px;padding:8px 16px}
+#walkUI .walk-tip{top:112px;background:rgba(9,11,13,.82);color:#edf1e7;border-radius:6px}
+#walkUI .walk-picker,#walkUI .walk-menu{background:#101315f5;border-color:#ffffff38;border-radius:9px}
+#walkUI .walk-ground{position:absolute;top:155px;left:50%;transform:translateX(-50%);max-width:92%;display:flex;flex-wrap:wrap;justify-content:center;gap:5px;pointer-events:auto;background:#101315e8;padding:8px;border-radius:8px}
+#walkUI .walk-ground small{flex-basis:100%;text-align:center;font-size:11px;color:#b8c0b6}
+@media(max-width:600px){#walkUI .walk-top button{font-size:10px;padding:6px}#walkUI .walk-actions button{font-size:11px;padding:6px 8px}#walkUI .walk-bottom{left:4px;right:4px;top:60px}#walkUI .walk-tip{top:155px;max-width:92%}#walkUI .walk-ground{top:194px}#walkUI .walk-place{height:44px;min-width:100px}}
+@media(max-height:500px) and (min-width:601px){#walkUI .walk-top{top:5px}#walkUI .walk-bottom{top:51px}#walkUI .walk-tip{top:99px}#walkUI .walk-ground{top:134px}#walkUI .walk-actions button{min-height:34px}}

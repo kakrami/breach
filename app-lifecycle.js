@@ -57,7 +57,7 @@ export function createSessionShell({
   const inBuilder=()=>location==='builder';
   const fullscreen=()=>!!fullscreenElement();
   const immersive=()=>platform.standalone||fullscreen();
-  const pointerLocked=()=>document.pointerLockElement===canvas||document.webkitPointerLockElement===canvas;
+  const pointerLocked=()=>canvas.getRootNode().pointerLockElement===canvas||document.pointerLockElement===canvas||document.webkitPointerLockElement===canvas;
   const alternateReady=()=>{try{return !!alternateInputReady();}catch{return false;}};
   hadPointerLock=pointerLocked();
   const landscapeReady=()=>!platform.touchControls||viewport.w>=viewport.h;
