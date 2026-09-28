@@ -290,11 +290,12 @@
 }
 
 /* Walk-around builder: a single, touch-first construction surface. */
-.simple-builder .top,.simple-builder .modebar,.simple-builder .mobile-viewbar,
-.simple-builder .status,.simple-builder .terrainbar,.simple-builder .envbar,
-.simple-builder .analysisbar,.simple-builder .analysislegend,.simple-builder .placement,
-.simple-builder .hint,.simple-builder .threebar,.simple-builder .threehelp,
-.simple-builder .playhud,.simple-builder .selectionbar{display:none!important}
+.simple-builder .top,.simple-builder .mobile-viewbar,.simple-builder .status,
+.simple-builder .threebar,.simple-builder .threehelp,.simple-builder .playhud{display:none!important}
+.simple-builder:not(.walk-overhead) .modebar,.simple-builder:not(.walk-overhead) .terrainbar,
+.simple-builder:not(.walk-overhead) .envbar,.simple-builder:not(.walk-overhead) .analysisbar,
+.simple-builder:not(.walk-overhead) .analysislegend,.simple-builder:not(.walk-overhead) .placement,
+.simple-builder:not(.walk-overhead) .hint,.simple-builder:not(.walk-overhead) .selectionbar{display:none!important}
 .simple-builder .stage{inset:0;top:0;height:100%;min-height:0}
 .simple-builder.walk-active #map2d{display:none!important}
 .simple-builder.walk-active #map3d{display:block!important}
@@ -352,7 +353,7 @@
 /* In-world tools share the game's charcoal / lime control language. The game
    canvas owns movement, look and touch buttons; tools leave those corners free. */
 .uses-game-runtime.playtest #map3d,.uses-game-runtime.playtest #map2d,.uses-game-runtime.playtest #weatherFx,.uses-game-runtime #touchPlay{display:none!important}
-.uses-game-runtime #walkUI .walk-lift{display:none}
+.uses-game-runtime #walkUI .walk-lift{display:flex}.simple-builder.walk-testing #walkUI .walk-lift,.simple-builder.walk-overhead #walkUI .walk-lift{display:none}
 #walkUI button{background:rgba(9,11,13,.88);border:1px solid rgba(255,255,255,.22);border-radius:7px;color:#f1f3f5;font-weight:800}
 #walkUI button.accent,#walkUI button.active,#walkUI button.selected{background:#d7ff58;color:#10130a;border-color:#d7ff58}
 #walkUI button:disabled{opacity:.42}
@@ -367,3 +368,14 @@
 #walkUI .walk-ground small{flex-basis:100%;text-align:center;font-size:11px;color:#b8c0b6}
 @media(max-width:600px){#walkUI .walk-top button{font-size:10px;padding:6px}#walkUI .walk-actions button{font-size:11px;padding:6px 8px}#walkUI .walk-bottom{left:4px;right:4px;top:60px}#walkUI .walk-tip{top:155px;max-width:92%}#walkUI .walk-ground{top:194px}#walkUI .walk-place{height:44px;min-width:100px}}
 @media(max-height:500px) and (min-width:601px){#walkUI .walk-top{top:5px}#walkUI .walk-bottom{top:51px}#walkUI .walk-tip{top:99px}#walkUI .walk-ground{top:134px}#walkUI .walk-actions button{min-height:34px}}
+
+/* Restore the existing editor workspaces, below the shared map navigation. */
+.simple-builder.walk-overhead .modebar{top:66px!important}
+.simple-builder.walk-overhead .drawer{top:66px!important}
+.simple-builder.walk-overhead .terrainbar:not(.hide),.simple-builder.walk-overhead .envbar:not(.hide),.simple-builder.walk-overhead .analysisbar:not(.hide){top:66px!important}
+#walkUI .walk-menu{max-height:calc(100% - 80px);overflow-y:auto;min-width:180px;overscroll-behavior:contain}
+#walkUI .walk-lift button{width:72px;min-height:48px;font-size:13px;touch-action:none;user-select:none}
+#walkUI .walk-actions{max-width:100%;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;scrollbar-width:thin}
+#walkUI .walk-actions button{flex:0 0 auto}
+.simple-builder.walk-overhead .selectionbar .advanced-selection:not([style*="display: none"]){display:inline-flex!important}
+@media(max-width:850px){.simple-builder.walk-overhead .modebar{top:auto!important}.simple-builder.walk-overhead .terrainbar:not(.hide),.simple-builder.walk-overhead .envbar:not(.hide),.simple-builder.walk-overhead .analysisbar:not(.hide){top:auto!important}}

@@ -1,38 +1,38 @@
-import { BUILDING_MATERIALS } from './object-catalog.js?v=1.71.0';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=1.71.0';
-import { createMoonSky } from './mod-environment.js?v=1.71.0';
+import { BUILDING_MATERIALS } from './object-catalog.js?v=1.71.1';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=1.71.1';
+import { createMoonSky } from './mod-environment.js?v=1.71.1';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.71.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.71.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.71.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.71.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.71.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.71.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.71.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.71.0';
+import * as HighlandsGeometry from './world-geometry.js?v=1.71.1';
+import * as DepotGeometry from './world-geometry-depot.js?v=1.71.1';
+import * as YardGeometry from './world-geometry-yard.js?v=1.71.1';
+import * as RigGeometry from './world-geometry-rig.js?v=1.71.1';
+import * as HighlandsWorldCollision from './world-collision.js?v=1.71.1';
+import * as DepotWorldCollision from './world-collision-depot.js?v=1.71.1';
+import * as YardWorldCollision from './world-collision-yard.js?v=1.71.1';
+import * as RigWorldCollision from './world-collision-rig.js?v=1.71.1';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.71.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.71.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.71.0';
-import { createAudioEngine } from './audio-engine.js?v=1.71.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.71.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.71.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.71.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.71.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.71.0';
-import { createControllerRecording } from './controller-recording.js?v=1.71.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.71.0';
-import { createSafeStorage } from './browser-storage.js?v=1.71.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=1.71.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.71.0';
-import { createUiGestures } from './ui-gestures.js?v=1.71.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.71.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=1.71.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.71.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.71.0';
+} from './game-config.js?v=1.71.1';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.71.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=1.71.1';
+import { createAudioEngine } from './audio-engine.js?v=1.71.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.71.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.71.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.71.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.71.1';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.71.1';
+import { createControllerRecording } from './controller-recording.js?v=1.71.1';
+import { createPointerSessions } from './pointer-sessions.js?v=1.71.1';
+import { createSafeStorage } from './browser-storage.js?v=1.71.1';
+import { createIntegratedMapBuilder } from './map-builder.js?v=1.71.1';
+import { createUiFocusScope } from './ui-focus.js?v=1.71.1';
+import { createUiGestures } from './ui-gestures.js?v=1.71.1';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.71.1';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=1.71.1';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.71.1';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.71.1';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -934,7 +934,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.71.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.71.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -2493,7 +2493,7 @@ function bindUI(){
     if(e.code==='Escape'&&!e.repeat&&shell.inLobby){e.preventDefault();openLobbyQuitConfirm();return;}
     if(shell.inBuilder){
       if(!playerMovementActive()||isEditableTarget(canvas.getRootNode().activeElement))return;
-      if(['KeyW','KeyA','KeyS','KeyD','ShiftLeft','ShiftRight','Space','KeyC'].includes(e.code)){e.preventDefault();keys.add(e.code);if(!e.repeat&&e.code==='Space')tryJump();if(!e.repeat&&e.code==='KeyC')toggleCrouch();}
+      if(['KeyW','KeyA','KeyS','KeyD','ShiftLeft','ShiftRight','Space','KeyC'].includes(e.code)){e.preventDefault();keys.add(e.code);if(!builderSession.editor.walk.state.building){if(!e.repeat&&e.code==='Space')tryJump();if(!e.repeat&&e.code==='KeyC')toggleCrouch();}}
       return;
     }
     if(!shell.inMatch)return;
@@ -2665,8 +2665,8 @@ function onCanvasPointerDown(e){
   if(builderSession){
     if(!directTouch){if(!playerPointerLocked()){const request=canvas.requestPointerLock?.();request?.catch?.(()=>{});}else if(e.button===0)builderSession.editor.walk.action('place');return;}
     e.preventDefault();const layout=hudLayout||computeHudLayout();
-    if(pointInCircle(p.x,p.y,layout.jump)){touchRoles.set(e.pointerId,'jump');touchVisual.jumpUntil=performance.now()+150;tryJump();return;}
-    if(pointInCircle(p.x,p.y,layout.crouch)){touchRoles.set(e.pointerId,'crouch');toggleCrouch();return;}
+    if(!builderSession.editor.walk.state.building&&pointInCircle(p.x,p.y,layout.jump)){touchRoles.set(e.pointerId,'jump');touchVisual.jumpUntil=performance.now()+150;tryJump();return;}
+    if(!builderSession.editor.walk.state.building&&pointInCircle(p.x,p.y,layout.crouch)){touchRoles.set(e.pointerId,'crouch');toggleCrouch();return;}
     if(!touchRoleActive('joy')&&joystickSpawnAllowed(p,layout)){joy.centerX=p.x;joy.centerY=p.y;touchRoles.set(e.pointerId,'joy');updateJoy(p.x,p.y,{x:p.x,y:p.y,r:layout.joy.r});return;}
     if(p.x>viewW*MOBILE_MOVE_ZONE_RATIO&&!touchRoleActive('look')){touchRoles.set(e.pointerId,'look');look.x=p.x;look.y=p.y;}return;
   }
@@ -4909,7 +4909,7 @@ function updateGamepadInput(dt){
 
   const pressed=gamepadFrame.pressed,released=gamepadFrame.released,buttons=gamepadFrame.buttons;
   if(replayPlayback){clearControllerGameplayInput();clearControllerUiFocus();if(replayPlayback.kind==='killcam'&&(pressed[GAMEPAD_BUTTON.A]||pressed[GAMEPAD_BUTTON.B]))skipReplayPlayback();return;}
-  if(shell.inBuilder){clearControllerUiFocus();if(playerMovementActive()){applyControllerAim(dt);if(pressed[GAMEPAD_BUTTON.A])tryJump();if(pressed[GAMEPAD_BUTTON.B])toggleCrouch();if(pressed[GAMEPAD_BUTTON.LS])toggleSprint();}integratedMapBuilder?.handleControllerFrame?.(gamepadFrame,dt);return;}
+  if(shell.inBuilder){clearControllerUiFocus();if(playerMovementActive()){applyControllerAim(dt);if(!builderSession.editor.walk.state.building){if(pressed[GAMEPAD_BUTTON.A])tryJump();if(pressed[GAMEPAD_BUTTON.B])toggleCrouch();if(pressed[GAMEPAD_BUTTON.LS])toggleSprint();}}integratedMapBuilder?.handleControllerFrame?.(gamepadFrame,dt);return;}
   if(chatOpen||gameTextEditorTarget){
     clearControllerGameplayInput();
     handleControllerUiNavigation(pressed);
@@ -5582,6 +5582,7 @@ function drawSniperBreathMeter(c,w,h){
 }
 function drawTouchControls(c,L,now,movementOnly=false){
   c.save();if(touchRoleActive('joy')){const j={x:joy.centerX,y:joy.centerY,r:L.joy.r};c.beginPath();c.arc(j.x,j.y,j.r,0,Math.PI*2);c.fillStyle='rgba(9,11,13,.42)';c.fill();c.strokeStyle='rgba(255,255,255,.24)';c.lineWidth=1.5;c.stroke();c.beginPath();c.arc(j.x,j.y,j.r*.72,0,Math.PI*2);c.strokeStyle='rgba(255,255,255,.08)';c.stroke();const max=j.r*.45,sx=j.x+joy.x*max,sy=j.y+joy.y*max;c.beginPath();c.arc(sx,sy,j.r*.40,0,Math.PI*2);c.fillStyle='rgba(215,255,88,.16)';c.fill();c.strokeStyle='rgba(215,255,88,.42)';c.stroke();c.fillStyle='rgba(255,255,255,.58)';c.font='900 10px system-ui';c.textAlign='center';c.fillText(sprinting?'SPRINT':'MOVE',j.x,j.y+j.r*.70);}c.restore();
+  if(movementOnly==='fly')return;
   if(movementOnly){drawRoundControl(c,L.crouch,crouched,'crouch');drawRoundControl(c,L.jump,now<touchVisual.jumpUntil,'jump');return;}
   const weaponLocked=!combatWeaponAvailable(now);
   drawRoundControl(c,L.leftFire,now<touchVisual.fireUntil,'fire',weaponLocked);drawRoundControl(c,L.crouch,crouched,'crouch');drawRoundControl(c,L.flash,equipmentAimKind()===tacticalEquipment||now<touchVisual.flashUntil,'flash');drawRoundControl(c,L.sticky,equipmentAimKind()===lethalEquipment||now<touchVisual.stickyUntil,'sticky');
@@ -5713,15 +5714,20 @@ const builderGameRuntime={
  jump:()=>tryJump(),crouch:()=>toggleCrouch(),
  pauseInput(){keys.clear();resetTouchInput();cancelSprint();if(playerPointerLocked())document.exitPointerLock?.();}
 };
+function updateBuilderFlight(dt){
+ const state=builderSession.editor.walk.state,input=movementInput(),speed=movementSettings.runSpeed*(keys.has('ShiftLeft')||keys.has('ShiftRight')?SPRINT_SPEED_MULTIPLIER:1),sin=Math.sin(yaw),cos=Math.cos(yaw),lift=Math.max(-1,Math.min(1,(state.lift||0)+(controllerInputActive()?(state.controllerLift||0):0)+(keys.has('Space')?1:0)-(keys.has('KeyC')?1:0)));
+ position.x=THREE.MathUtils.clamp(position.x+(input.mx*cos+input.mz*sin)*speed*dt,-ARENA_LIMIT+1,ARENA_LIMIT-1);position.z=THREE.MathUtils.clamp(position.z+(-input.mx*sin+input.mz*cos)*speed*dt,-ARENA_LIMIT+1,ARENA_LIMIT-1);const floor=terrainHeight(position.x,position.z);position.y=THREE.MathUtils.clamp(position.y+lift*speed*dt,floor,Math.max(60,floor+40));
+ verticalVelocity=moveVelocityX=moveVelocityZ=0;crouched=crouchWanted=false;crouchBlend=0;onGround=false;resetViewVertical();
+}
 function frameBuilderRuntime(dt){
  const b=builderSession,e=b.editor;if(!e.play.active)return;
  if(b.revision!==e.sceneRev){const runtime=e.runtimePhysical();clearBuilderGhost();currentMapId='custom-map';applyWorldGeometry(runtime.geometry,runtime.collision);rebuildWorldVisuals();b.revision=e.sceneRev;
-   if(activeWorldCollision.worldBlockedAt(position.x,position.z,position.y,currentPlayerHeight(),PLAYER_RADIUS)){const sp=e.doc.spawns.find(s=>!activeWorldCollision.worldBlockedAt(s.x,s.z,terrainHeight(s.x,s.z),PLAYER_HEIGHT,PLAYER_RADIUS));position.set(sp?.x||0,terrainHeight(sp?.x||0,sp?.z||0)+(sp?.yOffset||0),sp?.z||0);resetViewVertical(position.y);resetBuilderMotion();}
+   if(!e.walk?.state.building&&activeWorldCollision.worldBlockedAt(position.x,position.z,position.y,currentPlayerHeight(),PLAYER_RADIUS)){const sp=e.doc.spawns.find(s=>!activeWorldCollision.worldBlockedAt(s.x,s.z,terrainHeight(s.x,s.z),PLAYER_HEIGHT,PLAYER_RADIUS));position.set(sp?.x||0,terrainHeight(sp?.x||0,sp?.z||0)+(sp?.yOffset||0),sp?.z||0);resetViewVertical(position.y);resetBuilderMotion();}
  }
- if(builderControlsAvailable()){const steps=Math.max(1,Math.min(CLIENT_MAX_SIM_STEPS,Math.ceil(dt/(CLIENT_FIXED_STEP_SEC*1.35))));for(let i=0;i<steps;i++){updateCrouchState(dt/steps);updateMovement(Math.min(MAX_PLAYER_PHYSICS_STEP_SEC,dt/steps));}}else{keys.clear();resetTouchInput();moveVelocityX=moveVelocityZ=0;}
+ if(builderControlsAvailable()&&e.walk?.state.building){updateBuilderFlight(dt);}else if(builderControlsAvailable()){const steps=Math.max(1,Math.min(CLIENT_MAX_SIM_STEPS,Math.ceil(dt/(CLIENT_FIXED_STEP_SEC*1.35))));for(let i=0;i<steps;i++){updateCrouchState(dt/steps);updateMovement(Math.min(MAX_PLAYER_PHYSICS_STEP_SEC,dt/steps));}}else{keys.clear();resetTouchInput();moveVelocityX=moveVelocityZ=0;}
  updateGameFrame(Math.min(dt,MAX_PLAYER_PHYSICS_STEP_SEC));Object.assign(e.play,{x:camera.position.x,y:camera.position.y,z:camera.position.z,yaw:-camera.rotation.y,pitch:camera.rotation.x,feetY:position.y,bodyHeight:currentPlayerHeight()});e.walk?.update();
  const src=e.walk?.state.building&&!e.walk.state.menu?e.walk.state.ghost:null;
  if(src!==b.ghostSource){clearBuilderGhost();b.ghostSource=src;if(src){b.ghost=new THREE.Group();const color=e.walk.state.valid?0xd7ff58:0xff5f67;for(const p of src.parts){const lo=p.minY??p.bottomY,hi=p.maxY??p.topY,w=p.w||p.r*2,d=p.d||p.r*2;if(!Number.isFinite(lo+hi+w+d)||hi<=lo)continue;const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,hi-lo,d),new THREE.MeshBasicMaterial({color,transparent:true,opacity:.28,depthWrite:false}));mesh.position.set(p.x,(lo+hi)/2,p.z);mesh.rotation.y=-(p.rot||0)*Math.PI/180;b.ghost.add(mesh);}scene.add(b.ghost);}}
- const c=hudCtx;c.setTransform(hudScale,0,0,hudScale,0,0);c.clearRect(0,0,viewW,viewH);c.textBaseline='middle';if(touchGameplayControlsVisible())drawTouchControls(c,hudLayout||computeHudLayout(),performance.now(),true);hudTexture.needsUpdate=true;
+ const c=hudCtx;c.setTransform(hudScale,0,0,hudScale,0,0);c.clearRect(0,0,viewW,viewH);c.textBaseline='middle';if(touchGameplayControlsVisible())drawTouchControls(c,hudLayout||computeHudLayout(),performance.now(),e.walk?.state.building?'fly':true);hudTexture.needsUpdate=true;
  renderer.autoClear=true;renderer.render(scene,camera);renderer.autoClear=false;renderer.clearDepth();renderer.render(hudScene,hudCamera);renderer.autoClear=true;
 }
