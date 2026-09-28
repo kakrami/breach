@@ -1,9 +1,9 @@
-import {APP_VERSION} from './game-config.js?v=1.73.0';
-import {createBuilderHUD} from './builder-hud.js?v=1.73.0';
-import {BUILDING_ASSETS,PROP_ASSETS,resolveAsset,assetResizeMode} from './object-catalog.js?v=1.73.0';
-import {createAuthoredWorldGeometry} from './authored-world-geometry.js?v=1.73.0';
-import {createAuthoredWorldCollision} from './authored-world-collision.js?v=1.73.0';
-import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.73.0';
+import {APP_VERSION} from './game-config.js?v=1.74.0';
+import {createBuilderHUD} from './builder-hud.js?v=1.74.0';
+import {BUILDING_ASSETS,PROP_ASSETS,resolveAsset,assetResizeMode} from './object-catalog.js?v=1.74.0';
+import {createAuthoredWorldGeometry} from './authored-world-geometry.js?v=1.74.0';
+import {createAuthoredWorldCollision} from './authored-world-collision.js?v=1.74.0';
+import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.74.0';
 const rad=d=>d*Math.PI/180,clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 export const WALK_ITEMS=Object.freeze([
  {key:'house',label:'House',group:'Buildings',type:'building',archetype:'rowhouse',...BUILDING_ASSETS.rowhouse,label:'House'},
@@ -52,17 +52,9 @@ export function createWalkBuilder({editor:e,root,add,remove,patch,makeId,prepare
  // Canvas presentation and game input share a single action model.
  const place={textContent:'Place',disabled:true};let hud=null;
  state.panel=null;state.page=0;state.tool='select';state.tip='';
- const menuItems=[['pick','Objects'],['select','Select'],['terrain','Terrain'],['save','Save'],['publish','Publish'],['check','Map Check'],['rename','Rename'],['download','Export'],['import','Import'],['restore','Restore autosave'],['roads','Roads'],['setup','Starts & ladders'],['paint','Paint ground'],['weather','Light & weather'],['layers','Layers'],['prefabs','Saved groups'],['snap','Snap settings'],['settings','Map options'],['debug-player','Player collision'],['debug-projectile','Shot collision'],['debug-off','Hide collision'],['help','Controls'],['exit','Back to maps']];
- function panelModel(){
-  if(e.panel)return e.panel.model();
-  if(!state.panel)return null;
-  if(state.panel==='objects')return {title:'Objects',items:[...['Buildings','Pieces','Cover','Nature'].map(g=>({id:'group:'+g,label:g,selected:group===g})),...WALK_ITEMS.filter(i=>i.group===group).map(i=>({id:'item:'+i.key,label:i.label,thumbnail:thumbnail(i),selected:state.item.key===i.key})),{id:'all-objects',label:'More objects'}]};
-  if(state.panel==='terrain')return {title:'Terrain',items:[...['raise','lower','smooth','flatten'].map(b=>({id:b,label:b[0].toUpperCase()+b.slice(1),selected:state.brush===b})),{id:'brush-small',label:'Small brush'},{id:'brush-large',label:'Large brush'},{id:'paint',label:'Paint ground'},{id:'terrain-settings',label:'Brush settings'}]};
-  if(state.panel==='transform')return {title:'Transform',items:[['move','Move with aim'],['copy','Copy'],['erase','Delete'],['rotate','Rotate 90°'],['turn-left','Rotate −15°'],['turn-right','Rotate +15°'],['raise-object','Object up'],['lower-object','Object down'],['edit',assetResizeMode(e.doc.get(state.selectedId))==='parametric'?'Size & properties':'Properties']].map(([id,label])=>({id,label}))};
-  return {title:'Map · '+APP_VERSION,items:menuItems.map(([id,label])=>({id,label}))};
- }
+ function panelModel(){return e.panel?e.panel.model():null;}
  function renderHUD(){hud?.render();}
- function hudModel(){return {vertical:e.doc?.get(state.selectedId)?.type!=='natural',gizmo:gizmoModel(),resizable:assetResizeMode(e.doc?.get(state.selectedId))==='parametric',building:state.building,overview:state.overview,tool:state.mode==='terrain'?'terrain':state.tool,item:state.mode==='place'?state.item.key:null,selected:state.overview?!!e.selected?.size:!!state.selectedId,multi:!!e.multiSelect,pending:!!state.copy,tip:state.tip,primary:place.textContent,valid:!place.disabled,undo:(state.building||state.overview)&&!!e.commands.undoStack?.length,redo:(state.building||state.overview)&&!!e.commands.redoStack?.length,snap:e.snapConfig?.grid!==false,panel:panelModel(),page:state.page,hotbar:['house','wall','floor','stairs','crate'].map(k=>{const i=WALK_ITEMS.find(i=>i.key===k);return {...i,thumbnail:thumbnail(i)}})};}
+ function hudModel(){return {modeLabel:e.flow?.label(),mode:state.copy?'transform':state.mode,placing:state.mode==='place'&&!state.copy,vertical:['building','prop','elevation','spawn'].includes(e.doc?.get(state.selectedId)?.type),gizmo:gizmoModel(),resizable:assetResizeMode(e.doc?.get(state.selectedId))==='parametric',building:state.building,overview:state.overview,tool:state.mode==='terrain'?'terrain':state.tool,item:state.mode==='place'?state.item.key:null,selected:state.overview?!!e.selected?.size:!!state.selectedId,multi:!!e.multiSelect,pending:!!state.copy,tip:state.tip,primary:place.textContent,valid:!place.disabled,undo:(state.building||state.overview)&&!!e.commands.undoStack?.length,redo:(state.building||state.overview)&&!!e.commands.redoStack?.length,snap:e.snapConfig?.grid!==false,panel:panelModel(),page:state.page,hotbar:['house','wall','floor','stairs','crate'].map(k=>{const i=WALK_ITEMS.find(i=>i.key===k);return {...i,thumbnail:thumbnail(i)}})};}
  let transformStart=null;
  function gizmoModel(){
   const o=state.ghost?.object||e.doc?.get(state.selectedId);if(!o||!state.selectedId||!state.building||state.overview||state.menu||!e.gameRuntime?.project)return null;
@@ -91,31 +83,37 @@ export function createWalkBuilder({editor:e,root,add,remove,patch,makeId,prepare
  function compileObject(o){return createAuthoredWorldGeometry({terrain:{preset:'flat'},[o.type==='building'?'buildings':o.type==='elevation'?'elevationObjects':o.type==='natural'?'naturalObstacles':'staticBoxes']:[o.type==='natural'?{...o,type:o.kind}:o]});}
  function objectParts(g,o){return o.type==='building'?g.BUILDING_GEOMETRY[0].parts:o.type==='elevation'?g.ELEVATION_GEOMETRY[0].parts:o.type==='natural'?g.NATURAL_PLAYER_COLLIDERS:g.STATIC_PARTS;}
  let group='Buildings';
- function choose(item){if(state.overview)overview();state.item=item;state.fixedPosition=null;state.selectedId=null;state.mode='place';state.tool='select';state.copy=null;state.moveId=null;state.key='';closePanels();sync();}
+ function choose(item){if(e.flow)return e.flow.choose(item);state.item=item;state.fixedPosition=null;state.selectedId=null;state.mode='place';state.tool='select';state.copy=null;state.moveId=null;state.key='';closePanels();sync();}
  function sync(){app.classList.toggle('walk-active',!!e.doc&&!state.overview);app.classList.toggle('walk-overhead',state.overview);app.classList.toggle('walk-testing',!state.building&&!state.overview);renderHUD();}
  function setTip(text){state.tip=state.issue||text;renderHUD();}
  function closePanels(){e.clearPanel?.();e.panel=null;state.lift=0;state.controllerLift=0;e.gameRuntime?.pauseInput();state.panel=null;state.page=0;state.menu=false;e.play.keys.clear();e.play.moveX=e.play.moveY=0;renderHUD();}
- function openPanel(panel){closePanels();state.panel=panel;state.menu=true;renderHUD();}
- function enter(){if(!e.doc)return;state.selectedId=null;state.fixedPosition=null;state.revision=-1;state.issue='';state.eye=1.65;state.velocity=0;state.overview=false;state.building=true;state.key='';state.moveId=null;state.copy=null;state.mode='place';closePanels();e.startPlay();if(!e.doc.buildings.length&&!e.doc.props.length){e.play.x=0;e.play.z=12;e.play.y=1.65;}e.play.pitch=-.22;e.gameRuntime?.teleport(e.play);sync();}
+ function enter(){if(!e.doc)return;state.selectedId=null;state.fixedPosition=null;state.revision=-1;state.issue='';state.eye=1.65;state.velocity=0;state.overview=false;state.building=true;state.key='';state.moveId=null;state.copy=null;state.mode='select';state.tool='select';if(e.flow){e.flow.state.roadStart=null;e.curveDraft=null;}closePanels();e.startPlay();if(!e.doc.buildings.length&&!e.doc.props.length){e.play.x=0;e.play.z=12;e.play.y=1.65;}e.play.pitch=-.22;e.gameRuntime?.teleport(e.play);sync();}
  function exit(){state.selectedId=null;state.fixedPosition=null;state.moveId=null;state.copy=null;state.building=false;state.overview=false;state.ghost=null;closePanels();app.classList.remove('walk-active','walk-overhead');}
- function toggleTest(){cancelEdit();if(state.overview){state.overview=false;state.building=true;e.startPlay();}state.building=!state.building;setTip(state.building?'Aim where you want to build':'Walk around to try your map');state.key='';closePanels();if(!state.building){prepareStarts();const g=e.runtimePhysical().geometry,c=e.runtimePhysical().collision;let y=g.worldSupportHeight(e.play.x,e.play.z,e.play.y-1.65,false);if(c.worldBlockedAt(e.play.x,e.play.z,y)){const s=e.doc.spawns[0];if(s){e.play.x=s.x;e.play.z=s.z;y=g.terrainHeight(s.x,s.z);}}e.play.y=y+1.65;state.eye=1.65;state.velocity=0;}else{e.play.y+=1.65-state.eye;state.eye=1.65;}e.gameRuntime?.teleport(e.play);sync();}
+ function toggleTest(){const returning=!state.building&&!state.overview;if(!returning)state.testReturn={overview:state.overview,mode:state.mode,tool:state.tool};if(state.overview){state.overview=false;state.building=true;e.startPlay();}state.building=!state.building;setTip(state.building?'Aim where you want to build':'Walk around to try your map');state.key='';closePanels();if(!state.building){prepareStarts();const g=e.runtimePhysical().geometry,c=e.runtimePhysical().collision;let y=g.worldSupportHeight(e.play.x,e.play.z,e.play.y-1.65,false);if(c.worldBlockedAt(e.play.x,e.play.z,y)){const s=e.doc.spawns[0];if(s){e.play.x=s.x;e.play.z=s.z;y=g.terrainHeight(s.x,s.z);}}e.play.y=y+1.65;state.eye=1.65;state.velocity=0;}else{e.play.y+=1.65-state.eye;state.eye=1.65;}e.gameRuntime?.teleport(e.play);if(returning&&state.testReturn){const saved=state.testReturn;state.mode=saved.mode;state.tool=saved.tool;if(saved.overview){state.overview=true;state.building=false;e.stopPlay();e.draw();}state.testReturn=null;}sync();}
  function overview(){closePanels();if(state.overview){state.overview=false;state.building=true;const pose=state.overheadPose;e.startPlay();if(pose){Object.assign(e.play,pose);e.gameRuntime?.teleport(e.play);}state.overheadPose=null;}else{state.overheadPose={x:e.play.x,y:e.play.y,z:e.play.z,yaw:e.play.yaw,pitch:e.play.pitch};state.overview=true;state.building=false;e.stopPlay();e.viewMode='2d';e.c2.hidden=false;e.draw();}sync();}
- function overheadTool(mode){closePanels();if(!state.overview)overview();e.setMode(mode);}
+ function overheadTool(mode){closePanels();e.setMode(mode);}
  function objectHeight(delta){const o=e.doc.get(state.selectedId);if(!o||o.type==='natural')return;if(state.mode!=='place'||state.moveId!==o.id){beginEdit(o,true);state.fixedPosition={...o};}state.fixedPosition.yOffset=clamp((state.fixedPosition.yOffset||0)+delta,0,20);state.key='';sync();}
 
  function cancelEdit(){state.transforming=false;transformStart=null;state.fixedPosition=null;state.moveId=null;state.copy=null;state.mode='select';state.key='';state.ghost=null;sync();}
- function beginEdit(o,move){state.tool=move?'move':'select';state.fixedPosition=null;state.copy={...o,key:o.id,label:o.type==='building'?'Building':'Object'};state.moveId=move?o.id:null;state.rot=o.rot||0;state.mode='place';state.key='';sync();}
+ function beginEdit(o,move){state.tool=move?'move':'select';state.fixedPosition=null;state.copy={...o,key:o.id,label:o.type==='building'?'Building':'Object'};state.moveId=move?o.id:null;state.rot=o.rot??o.yaw??0;state.mode='place';state.key='';sync();}
  function action(name){if(!e.doc||!name)return;if(e.panel&&(name==='close'||name.startsWith('ui:')||name.startsWith('text:'))){e.onUIAction(name);return;}if(state.copy&&['overview','test','playtest','save','publish','download','import','restore','exit'].includes(name)){closePanels();setTip('Apply or Cancel this edit first');return;}
+  if(e.flow){
+   if(name==='select'){e.flow.select();return;}
+   if(name==='cancel'){e.flow.cancel();return;}if(name==='done'){e.flow.select();return;}
+   if(name==='overview'){e.flow.switchView();return;}if(name==='rotate'&&state.overview&&e.placement){state.rot=(state.rot+90)%360;e.draw();return;}
+   if(name==='pick'||name==='all-objects'){if(e.flow.ready()){closePanels();e.onUI('library');}return;}
+   if(name==='terrain'||name==='tools'||name==='menu'){if(e.flow.ready()){closePanels();e.onUI(name==='menu'?'map':name);}return;}
+  }
   if(name.startsWith('axis-')){const axis=name.slice(5);transform('start',axis,0);transform('move',axis,axis==='rotation'?15:1);transform('end',axis,0);return;}
-  if(['pick','terrain','select'].includes(name)&&!state.building&&!state.overview){state.overview?overview():toggleTest();}
+  if(['pick','terrain','select'].includes(name)&&!state.building&&!state.overview){toggleTest();}
   if(name==='previous'||name==='next'){state.page=Math.max(0,state.page+(name==='next'?1:-1));renderHUD();return;}
   if(name.startsWith('group:')){group=name.slice(6);state.page=0;renderHUD();return;}
   if(name.startsWith('item:')){const item=WALK_ITEMS.find(i=>i.key===name.slice(5));if(item)choose(item);return;}
-  if(name==='build'){if(!state.building){state.overview?overview():toggleTest();}return;}
+  if(name==='build'){if(!state.building&&!state.overview)toggleTest();return;}
   if(name==='playtest'){if(state.building||state.overview)toggleTest();return;}
   if(name==='snap-toggle'){if(e.snapConfig)e.snapConfig.grid=!e.snapConfig.grid;state.key='';renderHUD();return;}
   if(name.startsWith('debug-')){e.gameRuntime?.debugCollision?.(name.slice(6));closePanels();return;}
-  if(name==='rotate-tool'||name==='scale-tool'){if(state.selectedId&&(name!=='scale-tool'||assetResizeMode(e.doc.get(state.selectedId))==='parametric')){cancelEdit();state.tool=name;state.mode='select';state.key='';sync();}return;}
+  if(name==='rotate-tool'&&state.selectedId){const o=e.doc.get(state.selectedId);if(!('rot'in o)&&!('yaw'in o))return;}if(name==='rotate-tool'||name==='scale-tool'){if(state.selectedId&&(name!=='scale-tool'||assetResizeMode(e.doc.get(state.selectedId))==='parametric')){cancelEdit();state.tool=name;state.mode='select';state.key='';sync();}return;}
   if(name==='brush-small'||name==='brush-large'){state.brushRadius=name==='brush-small'?6:12;closePanels();return;}
   if(name==='fly-step-up'||name==='fly-step-down'){if(state.building){e.play.y+=name==='fly-step-up'?1:-1;e.gameRuntime?.teleport(e.play);}return;}
   if(state.panel&&!['menu','pick','close'].includes(name))closePanels();
@@ -131,36 +129,42 @@ export function createWalkBuilder({editor:e,root,add,remove,patch,makeId,prepare
   if(name==='select'&&state.overview){closePanels();e.setMode('select',false);return;}
   if(name==='terrain'&&state.overview){closePanels();e.onUI('terrain');return;}
   if(name==='select'){closePanels();cancelEdit();state.selectedId=null;state.tool='select';sync();return;}
-  if(name==='terrain'){if(e.layerLocked?.('terrain')){setTip('Unlock Terrain in Layers first');return;}cancelEdit();state.mode='terrain';state.selectedId=null;state.tool='terrain';openPanel('terrain');sync();return;}
+  if(name==='terrain'){if(e.layerLocked?.('terrain')){setTip('Unlock Terrain in Layers first');return;}cancelEdit();state.mode='terrain';state.selectedId=null;state.tool='terrain';e.onUI('terrain');sync();return;}
   if(['raise','lower','smooth','flatten'].includes(name)){state.brush=name;state.mode='terrain';state.key='';closePanels();sync();return;}
 if(['place','rotate','erase','move','copy','undo','redo','pick'].includes(name))state.issue='';
-  if(name==='pick'){state.panel==='objects'?closePanels():openPanel('objects');return;}
+  if(name==='pick'){e.onUI('library');return;}
   if(name==='close'){closePanels();return;}
-  if(name==='menu'){state.panel==='menu'?closePanels():openPanel('menu');return;}
+  if(name==='menu'){e.onUI('map');return;}
   if(name==='overview'){overview();return;}if(name==='test'){toggleTest();return;}if(['exit','save','publish','download','import','restore','rename','help'].includes(name)){closePanels();e.onUI(name);return;}if(name==='undo'||name==='redo'){if(!state.building&&!state.overview)return;e.commands[name]();cancelEdit();if(state.selectedId&&(!e.doc.get(state.selectedId)||e.layerLocked?.(e.layerFor(e.doc.get(state.selectedId)))))state.selectedId=null;sync();return;}if(state.overview){if(name==='copy')e.duplicateSelected();if(name==='erase')e.deleteSelected();if(name==='rotate')e.rotateSelected(90);if(name==='cancel')e.endPlacement();return;}if(!state.building)return;
-  if(['move','copy','erase','rotate'].includes(name)&&state.selectedId&&state.mode==='select'){const o=e.doc.get(state.selectedId);if(!o){state.selectedId=null;return;}if(name==='erase'){remove(o.id);state.selectedId=null;state.key='';return;}beginEdit(o,name!=='copy');if(name==='rotate'){state.rot=(state.rot+90)%360;state.fixedPosition={...o};}return;}
+  if(['move','copy','erase','rotate'].includes(name)&&state.selectedId&&state.mode==='select'){const o=e.doc.get(state.selectedId);if(!o){state.selectedId=null;return;}if(name==='move'&&o.type==='ladder'&&o.parentId){setTip('Detach this ladder in Edit before moving it');return;}if(name==='rotate'&&!('rot'in o)&&!('yaw'in o))return;if(name==='erase'){remove(o.id);state.selectedId=null;state.key='';return;}beginEdit(o,name!=='copy');if(name==='rotate'){state.rot=(state.rot+90)%360;state.fixedPosition={...o};}return;}
   if(name==='rotate'){state.rot=(state.rot+90)%360;state.key='';return;}
-  if(['erase','move','copy'].includes(name)){state.mode=state.mode===name?'place':name;state.moveId=null;state.copy=null;state.key='';sync();return;}
+  if(['erase','move','copy'].includes(name)){setTip('Select an object first');return;}
   if(name==='place')commit();
  }
  hud=createHUD({stage:$('stage'),active:()=>isActive()&&!!e.doc,model:hudModel,action,lift:value=>{state.lift=state.building&&!state.menu?value:0;},pause:()=>e.gameRuntime?.pauseInput(),transform});
- function sceneObjects(){const runtime=e.runtimePhysical(),g=runtime.geometry,objects=[];e.doc.buildings.forEach((o,i)=>objects.push({o,parts:g.BUILDING_GEOMETRY[i]?.parts||[]}));e.doc.props.forEach((o,i)=>objects.push({o,parts:g.STATIC_GEOMETRY[i]?.parts||[]}));e.doc.elevation.forEach((o,i)=>objects.push({o,parts:g.ELEVATION_GEOMETRY[i]?.parts||[]}));e.doc.naturals.forEach((o,i)=>objects.push({o,parts:[g.NATURAL_PLAYER_COLLIDERS[i]].filter(Boolean)}));return objects;}
+ function sceneObjects(){const runtime=e.runtimePhysical(),g=runtime.geometry,objects=[];e.doc.buildings.forEach((o,i)=>objects.push({o,parts:g.BUILDING_GEOMETRY[i]?.parts||[]}));e.doc.props.forEach((o,i)=>objects.push({o,parts:g.STATIC_GEOMETRY[i]?.parts||[]}));e.doc.elevation.forEach((o,i)=>objects.push({o,parts:g.ELEVATION_GEOMETRY[i]?.parts||[]}));e.doc.naturals.forEach((o,i)=>objects.push({o,parts:[g.NATURAL_PLAYER_COLLIDERS[i]].filter(Boolean)}));for(const o of [...(e.doc.roads||[]),...(e.doc.spawns||[]),...(e.doc.ladders||[]),...(e.doc.mounds||[])])objects.push({o,parts:e.placementParts?.([o],true)||[]});return objects;}
  function aim(){const cam=e.play,cp=Math.cos(cam.pitch),dir={x:Math.sin(cam.yaw)*cp,y:Math.sin(cam.pitch),z:-Math.cos(cam.yaw)*cp},g=e.runtimePhysical().geometry;let best=null;
-  for(const entry of state.parts){if(entry.o.id===state.moveId)continue;for(const part of entry.parts){const p=boxFor(part);if(part.decorative||!p.w||!p.d)continue;const hit=rayBox(cam,dir,p,best?.t||60);if(hit)best={...hit,object:entry.o};}}
+  for(const entry of state.parts){if(entry.o.id===state.moveId)continue;for(const part of entry.parts){const p=boxFor(part);if(part.decorative&&(!part.selectable||state.mode!=='select')||!p.w||!p.d)continue;const hit=rayBox(cam,dir,p,best?.t||60);if(hit)best={...hit,object:entry.o};}}
   let previous=0;for(let t=.25;t<=Math.min(best?.t||60,60);t+=.25){const x=cam.x+dir.x*t,z=cam.z+dir.z*t,y=cam.y+dir.y*t;if(y<=g.terrainHeight(x,z)){let lo=previous,hi=t;for(let n=0;n<8;n++){const mid=(lo+hi)/2;if(cam.y+dir.y*mid<=g.terrainHeight(cam.x+dir.x*mid,cam.z+dir.z*mid))hi=mid;else lo=mid;}const h=(lo+hi)/2;best={x:cam.x+dir.x*h,y:g.terrainHeight(cam.x+dir.x*h,cam.z+dir.z*h),z:cam.z+dir.z*h,t:h,nx:0,ny:1,nz:0,object:null};break;}previous=t;}
   return best;
  }
  function update(){if(!e.doc||!e.play.active||!state.building)return;if(state.revision!==e.sceneRev){state.parts=sceneObjects();state.revision=e.sceneRev;state.key='';}if(state.selectedId&&(!e.doc.get(state.selectedId)||e.layerLocked?.(e.layerFor(e.doc.get(state.selectedId))))){state.selectedId=null;sync();}state.target=aim();const hit=state.fixedPosition?{x:state.fixedPosition.x,z:state.fixedPosition.z,y:e.runtimePhysical().geometry.terrainHeight(state.fixedPosition.x,state.fixedPosition.z)+(state.fixedPosition.yOffset||0),ny:1,nx:0,nz:0,object:state.fixedPosition}:state.target;
-  if(state.mode==='terrain'){const key='ground|'+[e.sceneRev,state.brush,hit?.x?.toFixed(2),hit?.z?.toFixed(2),hit?.object?.id].join('|');if(key!==state.key){state.key=key;state.ghost=hit&&!hit.object?{parts:[{x:hit.x,z:hit.z,w:(state.brushRadius||12)*2,d:(state.brushRadius||12)*2,minY:hit.y+.03,maxY:hit.y+.06}]}:null;}state.valid=!!hit&&!hit.object;place.disabled=!state.valid;place.textContent={raise:'Raise',lower:'Lower',smooth:'Smooth',flatten:'Flatten'}[state.brush];setTip(state.valid?'Aim at open ground · buildings stay protected':'Aim at open ground');return;}
+  if(state.mode==='terrain'||state.mode==='paint'){state.brush=e.brush.tool;state.brushRadius=state.mode==='paint'?e.materialBrush.radius:e.brush.radius;const key='ground|'+[e.sceneRev,state.brush,hit?.x?.toFixed(2),hit?.z?.toFixed(2),hit?.object?.id].join('|');if(key!==state.key){state.key=key;state.ghost=hit&&!hit.object?{parts:[{x:hit.x,z:hit.z,w:(state.brushRadius||12)*2,d:(state.brushRadius||12)*2,minY:hit.y+.03,maxY:hit.y+.06}]}:null;}state.valid=!!hit&&!hit.object;place.disabled=!state.valid;place.textContent=state.mode==='paint'?'Paint':{raise:'Raise',lower:'Lower',smooth:'Smooth',flatten:'Flatten',level:'Flatten'}[state.brush];setTip(state.valid?'Aim at open ground · buildings stay protected':'Aim at open ground');return;}
+  if(e.flow?.special()){
+   const key=['plan',e.sceneRev,state.item.key,hit?.x?.toFixed(2),hit?.z?.toFixed(2),JSON.stringify(e.flow.state.roadStart),JSON.stringify(e.curveDraft)].join('|');
+   if(key!==state.key){state.key=key;state.plan=hit?e.flow.pointPlan(hit):null;state.ghost=hit?{parts:state.plan.objects.length?e.placementParts(state.plan.objects):[{x:hit.x,z:hit.z,w:1,d:1,minY:hit.y+.04,maxY:hit.y+.1}]}:null;}
+   state.valid=!!hit&&Math.abs(hit.x)<e.doc.arenaLimit-2&&Math.abs(hit.z)<e.doc.arenaLimit-2;
+   place.disabled=!state.valid;place.textContent=state.plan?.label||'Place';setTip(state.plan?.label||'Aim at the ground');return;
+  }
   if(state.mode==='select'){const o=e.doc.get(state.selectedId),key='select|'+(o?.id||hit?.object?.id||'')+'|'+e.sceneRev;if(key!==state.key){state.key=key;state.ghost=(o||hit?.object)?{parts:state.parts.find(p=>p.o.id===(o||hit.object).id)?.parts||[]}:null;}state.valid=!!(o||hit?.object);place.disabled=!hit?.object;place.textContent='Select';setTip(o?'Selected · Move, Rotate, Copy or Delete':hit?.object?'Select this object':'Aim at an object');return;}
 
   if(state.mode!=='place'){const key='target|'+(hit?.object?.id||'')+'|'+state.mode+'|'+e.sceneRev;if(state.key!==key){state.key=key;state.ghost=hit?.object?{parts:state.parts.find(p=>p.o.id===hit.object.id)?.parts||[]}:null;}state.valid=!!hit?.object;place.disabled=!state.valid;place.textContent={erase:'Erase',move:'Move',copy:'Copy'}[state.mode];setTip(hit?.object?`${place.textContent} this ${hit.object.type==='building'?'building':'object'}`:'Aim at an object');return;}
   place.textContent=state.moveId?(state.fixedPosition?'Apply':'Place here'):'Place';if(!hit){state.ghost=null;state.valid=false;place.disabled=true;setTip('Look down to find a place');return;}
-  const src=state.fixedPosition?{...state.copy,...state.fixedPosition}:state.copy||state.item,h=src.h??src.rise??((src.levels||1)*(src.floorH||1)),w=src.w||src.r*2,d=src.d||src.r*2,a=rad(state.rot),nx=hit.nx,nz=hit.nz,extent=(Math.abs(nx*Math.cos(a)+nz*Math.sin(a))*w+Math.abs(-nx*Math.sin(a)+nz*Math.cos(a))*d)/2;
+  const src=state.fixedPosition?{...state.copy,...state.fixedPosition}:state.copy||state.item,h=src.h??src.rise??((src.levels||1)*(src.floorH||1)),w=src.w||src.r*2||src.base||1,d=src.d||src.r*2||src.base||1,a=rad(state.rot),nx=hit.nx,nz=hit.nz,extent=(Math.abs(nx*Math.cos(a)+nz*Math.sin(a))*w+Math.abs(-nx*Math.sin(a)+nz*Math.cos(a))*d)/2;
   let x=hit.x+nx*(extent+.04),z=hit.z+nz*(extent+.04),base=hit.y;if(hit.ny===0)base=hit.object?e.runtimePhysical().geometry.terrainHeight(hit.object.x,hit.object.z)+(hit.object.yOffset||0):hit.y;if(hit.ny<0)base=hit.y-h;
   const step=e.snapConfig?.grid===false?.01:(e.snapConfig?.gridSize||1),snap=v=>Math.round(v/step)*step;if(hit.ny!==0){x=snap(x);z=snap(z);}else{const tx=-nz,tz=nx,t=snap(x*tx+z*tz),n=x*nx+z*nz;x=nx*n+tx*t;z=nz*n+tz*t;}base=Math.round(base*1000)/1000;if(state.fixedPosition){x=state.fixedPosition.x;z=state.fixedPosition.z;}
   const key=[e.sceneRev,src.key||src.id,state.rot,x,z,base,state.fixedPosition?.yOffset||0,state.moveId].join('|');if(key===state.key){renderHUD();return;}state.key=key;
-  const ground=e.runtimePhysical().geometry.terrainHeight(x,z),o={...src,id:state.moveId||'walk-preview',x,z,rot:state.rot,yOffset:state.fixedPosition?state.fixedPosition.yOffset||0:hit.object?base-ground:0};delete o.groupId;
+  const ground=e.runtimePhysical().geometry.terrainHeight(x,z),o={...src,id:state.moveId||'walk-preview',x,z,rot:state.rot,yOffset:state.fixedPosition?state.fixedPosition.yOffset||0:hit.object?base-ground:0};delete o.groupId;if(o.type==='spawn')o.yaw=state.rot;
   if(o.type==='natural'&&Math.abs(base-ground)>.25){state.ghost=null;state.valid=false;place.disabled=true;setTip('Put nature on the ground');return;}
   const candidate=e.previewObject?.(o,state.moveId),preview=candidate?.geometry||compileObject({...o,yOffset:base}),parts=candidate?.parts||objectParts(preview,o);state.ghost={object:o,parts};state.valid=true;state.reason='';
   if(Math.abs(x)+Math.hypot(w,d)/2>e.doc.arenaLimit-2||Math.abs(z)+Math.hypot(w,d)/2>e.doc.arenaLimit-2){state.valid=false;state.reason='Move away from the edge';}
@@ -171,7 +175,7 @@ if(['place','rotate','erase','move','copy','undo','redo','pick'].includes(name))
   if(state.valid&&createAuthoredWorldCollision(preview).worldBlockedAt(e.play.x,e.play.z,e.play.feetY??e.play.y-1.7,e.play.bodyHeight??1.7,.38)){state.valid=false;state.reason='Take a step back';}
   place.disabled=!state.valid;setTip(state.valid?`${src.label||'Object'} · ready to place`:state.reason);
  }
- function commit(){if(state.menu||!state.building)return;if(state.target?.object&&e.layerLocked?.(e.layerFor(state.target.object))&&state.mode!=='place'){setTip('This object is on a locked layer');return;}update();if(state.mode==='terrain'){if(state.valid){const n=e.shapeGround(state.target.x,state.target.z,state.brush,state.brushRadius||12);if(!n)setTip('This ground is protected or has reached its safe limit');state.key='';}return;}if(state.mode==='select'){state.selectedId=state.target?.object?.id||null;state.key='';sync();return;}if(state.mode!=='place'){const o=state.target?.object;if(!o)return;if(state.mode==='erase'){remove(o.id);state.key='';return;}state.copy={...o,key:o.id,label:o.type==='building'?'Building':'Object'};state.moveId=state.mode==='move'?o.id:null;state.rot=o.rot||0;state.mode='place';state.key='';sync();return;}
+ function commit(){if(state.menu||!state.building)return;if(state.target?.object&&e.layerLocked?.(e.layerFor(state.target.object))&&state.mode!=='place'){setTip('This object is on a locked layer');return;}update();if(state.mode==='paint'){if(state.valid)e.flow.paint(state.target);state.key='';return;}if(e.flow?.special()){if(state.valid)e.flow.commitPoint(state.target);return;}if(state.mode==='terrain'){if(state.valid){const n=e.shapeGround(state.target.x,state.target.z,state.brush,state.brushRadius||12);if(!n)setTip('This ground is protected or has reached its safe limit');state.key='';}return;}if(state.mode==='select'){state.selectedId=state.target?.object?.id||null;e.selected=new Set(state.selectedId?[state.selectedId]:[]);state.key='';sync();return;}if(state.mode!=='place'){const o=state.target?.object;if(!o)return;if(state.mode==='erase'){remove(o.id);state.key='';return;}state.copy={...o,key:o.id,label:o.type==='building'?'Building':'Object'};state.moveId=state.mode==='move'?o.id:null;state.rot=o.rot??o.yaw??0;state.mode='place';state.key='';sync();return;}
   if(!state.valid||!state.ghost)return;const o={...state.ghost.object,id:state.moveId||makeId(state.ghost.object.type)};for(const k of ['key','group','label','icon'])delete o[k];if(state.moveId){const before=e.doc.get(state.moveId);patch(before,o);state.selectedId=o.id;state.fixedPosition=null;state.moveId=null;state.copy=null;state.mode='select';}else {add(o);if(state.copy){state.selectedId=o.id;state.copy=null;state.mode='select';}}state.key='';sync();
  }
  function draw(renderer){if(!state.building||state.menu||!state.ghost)return;let mesh=state.ghost.mesh;if(!mesh){const pos=[],col=[],color=state.mode==='erase'?'#ff647d':state.valid?'#55edbd':'#ff647d';for(const part of state.ghost.parts){const p=boxFor(part),y=p.minY??p.bottomY,h=(p.maxY??p.topY)-y;if(h>0){if(part.type==='round')renderer.round(pos,col,part,y,h,color);else renderer.box(pos,col,p,y,h,color);}}for(let i=3;i<col.length;i+=4)col[i]=.38;mesh=state.ghost.mesh={pos:new Float32Array(pos),col:new Float32Array(col),count:pos.length/3};}const gl=renderer.gl;gl.enable(gl.BLEND);gl.blendFunc(gl.SRC_ALPHA,gl.ONE_MINUS_SRC_ALPHA);gl.depthMask(false);renderer.drawGeometry(mesh.pos,mesh.col,mesh.count,true);gl.depthMask(true);gl.disable(gl.BLEND);}
@@ -183,11 +187,11 @@ if(['place','rotate','erase','move','copy','undo','redo','pick'].includes(name))
   if(p[B.MENU]){action('menu');return true;}
   if(p[B.VIEW]){action('test');return true;}
   if(!state.building)return true;
-  if(p[B.RT])action('place');if(p[B.X])action('rotate');if(p[B.Y])state.selectedId?openPanel('transform'):action('pick');if(p[B.B])action('cancel');
+  if(p[B.RT])action('place');if(p[B.X])action('rotate');if(p[B.Y])action(state.selectedId?'edit':'pick');if(p[B.B])action('cancel');
   if(p[B.DPAD_UP])action('raise-object');if(p[B.DPAD_DOWN])action('lower-object');if(p[B.DPAD_LEFT])action('select');if(p[B.DPAD_RIGHT])action('rotate-tool');return true;
  }
 
  window.addEventListener('blur',()=>{state.lift=0;state.controllerLift=0;e.play.keys.clear();e.play.moveX=e.play.moveY=0;});
  function showIssue(issue){closePanels();if(!state.building||state.overview){state.overview=false;state.building=true;if(!e.play.active)e.startPlay();}const o=e.doc.get(issue?.target);if(o){const distance=Math.max(8,Math.hypot(o.w||4,o.d||4));e.play.x=o.x;e.play.z=clamp(o.z+distance,-e.doc.arenaLimit+1,e.doc.arenaLimit-1);e.play.y=e.runtimePhysical().geometry.terrainHeight(o.x,o.z)+5;e.play.yaw=0;e.play.pitch=-.3;e.gameRuntime?.teleport(e.play);state.issue='This spot needs attention. Move or erase the object.';setTip(state.issue);}else setTip('Could not finish checking this map. Your edits are still here.');sync();}
- return {state,enter,exit,update,draw,key,controller,action,choose,commit,closePanels,sync,showIssue,renderHUD,transform};
+ return {state,enter,exit,update,draw,key,controller,action,choose,commit,closePanels,sync,showIssue,renderHUD,transform,thumbnail,cancelEdit,switchView:overview};
 }

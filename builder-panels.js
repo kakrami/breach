@@ -1,7 +1,8 @@
+import {WALK_ITEMS} from './walk-builder.js?v=1.74.0';
 // Canvas panel descriptions and commands. No DOM controls or browser prompts.
-import {APP_VERSION} from './game-config.js?v=1.73.0';
-import {assetResizeMode,BUILDING_MATERIALS} from './object-catalog.js?v=1.73.0';
-import {CATALOG,MATERIALS,ENV_PRESETS,EnvironmentRules,SettingsCommand,EnvironmentCommand,PatchCommand,Validator,IssueGuide,clone,uid,clamp} from './builder-model.js?v=1.73.0';
+import {APP_VERSION} from './game-config.js?v=1.74.0';
+import {assetResizeMode,BUILDING_MATERIALS} from './object-catalog.js?v=1.74.0';
+import {CATALOG,MATERIALS,ENV_PRESETS,EnvironmentRules,SettingsCommand,EnvironmentCommand,PatchCommand,Validator,IssueGuide,clone,uid,clamp} from './builder-model.js?v=1.74.0';
 export function createBuilderPanels({editor:e,save,publish,exit,importFile,exportFile,restore}){
  let screen=null,history=[],actions=new Map(),keyboard=null,busy=false,checkRevision=-1,checkDoc=null,checkIssues=[];
  const selection=()=>{if(e.play.active)e.selected=new Set(e.walk.state.selectedId?[e.walk.state.selectedId]:[]);return e.allSelected();};
@@ -17,7 +18,8 @@ export function createBuilderPanels({editor:e,save,publish,exit,importFile,expor
  function setProperty(key,value){const before=selection().map(clone),after=before.map(o=>({...o,[key]:value}));if(before.length)e.commands.execute(new PatchCommand(e.doc,before,after,'Property'));}
  function changeSetting(change){const before=e.settingsSnapshot(),after=clone(before);change(after);e.commands.execute(new SettingsCommand(e,before,after));e.fit();}
  function environment(change){const before=clone(e.doc.environment),after=clone(before);change(after);e.commands.execute(new EnvironmentCommand(e,before,after));}
- function topTool(mode,itemToPlace){if(e.walk.state.copy){e.toast('Apply or Cancel this edit first');return;}dismiss();e.toOverview();e.setMode(mode,false);if(itemToPlace)e.beginPlacement(itemToPlace);e.draw();}
+ function activate(mode,itemToPlace){if(itemToPlace)return e.flow.choose(itemToPlace);if(mode==='analysis'){if(!e.walk.state.overview){show('analysis-view');return;}dismiss();e.setMode('analysis',false);e.draw();return;}e.flow.terrain(mode==='environment');}
+
  async function task(run){if(busy)return;busy=true;e.syncUI();try{await run();}catch(error){show('error',{message:String(error?.message||error)},false);}finally{busy=false;e.syncUI();}}
  function confirm(title,message,run){show('confirm',{title,message,run});}
  function model(){
@@ -33,26 +35,30 @@ export function createBuilderPanels({editor:e,save,publish,exit,importFile,expor
    title='Object properties';const objects=selection(),o=objects[0];if(!o){description='Select an object first';items=[item('Select',()=>{dismiss();e.walk.action('select');})];}
    else{
     description=objects.length>1?`${objects.length} selected`:IssueGuide.objectLabel(o);
-    items=[item('Copy',()=>{e.duplicateSelected();if(e.play.active)e.walk.state.selectedId=[...e.selected][0]||null;e.syncUI();}),item('Delete',()=>{e.deleteSelected();if(e.walk)e.walk.state.selectedId=null;dismiss();}),item('Rotate left',()=>e.rotateSelected(-15)),item('Rotate right',()=>e.rotateSelected(15)),item('Raise objects',()=>e.elevateSelected(1)),item('Lower objects',()=>e.elevateSelected(-1)),item(objects.some(x=>x.groupId)?'Ungroup':'Group',()=>objects.some(x=>x.groupId)?e.ungroupSelected():e.groupSelected()),item('Save group',()=>editText('Group name',`Piece ${e.prefabs.length+1}`,saveGroup))];
+    items=[...(e.play.active?[item('Move',()=>{dismiss();e.walk.action('move');},{disabled:o.type==='ladder'&&!!o.parentId}),...('rot'in o||'yaw'in o?[item('Rotate tool',()=>{dismiss();e.walk.action('rotate-tool');})]:[])]:[]),item('Copy',()=>{e.duplicateSelected();if(e.play.active)e.walk.state.selectedId=[...e.selected][0]||null;e.syncUI();}),item('Delete',()=>{e.deleteSelected();if(e.walk)e.walk.state.selectedId=null;dismiss();}),...(objects.length>1||'rot'in o||'yaw'in o?[item('Rotate left',()=>e.rotateSelected(-15)),item('Rotate right',()=>e.rotateSelected(15))]:[]),item('Raise objects',()=>e.elevateSelected(1)),item('Lower objects',()=>e.elevateSelected(-1)),item(objects.some(x=>x.groupId)?'Ungroup':'Group',()=>objects.some(x=>x.groupId)?e.ungroupSelected():e.groupSelected()),item('Save group',()=>editText('Group name',`Piece ${e.prefabs.length+1}`,saveGroup))];
     if(objects.length===1){for(const [key,label,min,max,step]of [['x','X',-e.doc.arenaLimit,e.doc.arenaLimit,.5],['z','Z',-e.doc.arenaLimit,e.doc.arenaLimit,.5],['rot','Rotation',0,359,15],['yOffset','Height',-8,20,.25],['yaw','Facing',0,359,15]])if(key in o)items.push(field(label,o[key],v=>setProperty(key,v),{min,max,step}));
      if(assetResizeMode(o)==='parametric')for(const [key,label,min,max,step]of [['w','Width',o.type==='building'?8:1,80,.5],['d','Depth',o.type==='building'?6:1,80,.5],['h','Height',.2,40,.25],['levels','Floors',1,8,1],['floorH','Floor height',2.2,5,.1],['balcony','Balcony',0,10,.5],['rise','Rise',.5,24,.25],['base','Base',2,60,.5]])if(key in o)items.push(field(label,o[key],v=>setProperty(key,v),{min,max,step}));
      if(o.type==='building')items.push(item('Material: '+o.style,()=>choice('Building material',Object.keys(BUILDING_MATERIALS),o.style,v=>setProperty('style',v))));
      if(o.type==='spawn')items.push(item('Team: '+o.team,()=>choice('Team',[['blue','Alpha'],['red','Bravo'],['ffa','Free for all']],o.team,v=>setProperty('team',v))));
-     if(o.type==='ladder')for(const key of ['width','bottomY','topY'])items.push(field(key,o[key],v=>setProperty(key,v),{min:key==='width'?.5:-8,max:key==='width'?5:60,step:.25}));
+     if(o.type==='ladder'&&o.parentId)items.push(item('Detach ladder',()=>{const before=clone(o),after={...before,parentId:null,attached:false};e.commands.execute(new PatchCommand(e.doc,[before],[after],'Detach ladder'));}));if(o.type==='ladder')for(const key of (o.parentId?['width']:['width','bottomY','topY']))items.push(field(key,o[key],v=>setProperty(key,v),{min:key==='width'?.5:-8,max:key==='width'?5:60,step:.25}));
     }
    }
   }
+  else if(name==='library'){title='Place objects';items=[...['Buildings','Pieces','Cover','Nature'].map(group=>item(group,()=>show('objects',{group}))),item('Roads',()=>show('roads')),item('Starts & ladders',()=>show('setup')),item('Saved groups',()=>show('prefabs'))];}
+  else if(name==='objects'){title='Place · '+data.group;items=WALK_ITEMS.filter(o=>o.group===data.group).map(o=>item(o.label,()=>e.flow.choose(o),{thumbnail:e.walk.thumbnail(o)}));if(data.group==='Pieces')items.push(...CATALOG.build.filter(o=>o.type==='mound'||o.kind==='platform').map(o=>item(o.label,()=>e.flow.choose(o))));}
+  else if(name==='tools'){title='Build tools';items=[item('Terrain',()=>show('terrain')),item('Paint ground',()=>show('paint')),item('Light & weather',()=>show('weather')),item('Snapping',()=>show('snap')),item('Layers',()=>show('layers')),item('Map analysis',()=>show('analysis'))];}
+  else if(name==='analysis-view'){title='Map analysis';description='Analysis overlays are available in Top view.';items=[item('Switch to Top view',()=>{dismiss();e.flow.switchView();e.setMode('analysis',false);e.draw();}),item('Back',close)];}
   else if(name==='roads'||name==='setup'||name==='catalog'){
    title=name==='roads'?'Roads':name==='setup'?'Starts & ladders':'Object library';const group=name==='roads'?'roads':name==='setup'?'gameplay':data.group||'build';
    if(name==='setup')items.push(item('Auto setup',()=>e.autoGameplay()),item('Rebuild bot routes',()=>e.autoFlow()));
-   if(name==='catalog')for(const g of ['build','props'])items.push(item(g==='build'?'Structures':'Props & nature',()=>show('catalog',{group:g},false),{selected:g===group}));
-   items.push(...CATALOG[group].map(o=>item(o.label,()=>topTool('select',o))));
+   
+   items.push(...CATALOG[group].map(o=>item(o.label,()=>activate('select',o))));
   }
   else if(name==='paint'){
-   title='Paint ground';items=Object.entries(MATERIALS).map(([key,v])=>item(v.label,()=>{e.materialBrush.material=key;topTool('environment');},{selected:e.materialBrush.material===key}));items.push(field('Brush radius',e.materialBrush.radius,v=>{e.materialBrush.radius=v;},{min:2,max:30,step:2}));
+   title='Paint ground';items=Object.entries(MATERIALS).map(([key,v])=>item(v.label,()=>{e.materialBrush.material=key;activate('environment');},{selected:e.materialBrush.material===key}));items.push(field('Brush radius',e.materialBrush.radius,v=>{e.materialBrush.radius=v;},{min:2,max:30,step:2}));
   }
   else if(name==='terrain'){
-   title='Shape ground';items=['raise','lower','smooth','level'].map(tool=>item(tool==='level'?'Flatten':tool[0].toUpperCase()+tool.slice(1),()=>{e.brush.tool=tool;topTool('terrain');},{selected:e.brush.tool===tool}));items.push(field('Brush radius',e.brush.radius,v=>{e.brush.radius=v;},{min:2,max:30,step:2}),field('Strength',e.brush.power,v=>{e.brush.power=v;},{min:.1,max:1,step:.1}),item('Sample flatten height: '+(e.brush.sampleHeight?'On':'Off'),()=>{e.brush.sampleHeight=!e.brush.sampleHeight;}),field('Flatten height',e.brush.level,v=>{e.brush.level=v;},{min:-6,max:6,step:.25}),item('Flatten entire map',()=>confirm('Flatten ground','This replaces all terrain shaping. Undo can restore it.',()=>e.resetTerrainSurface('flat'))),item('Reset shaping',()=>confirm('Reset shaping','Restore the base terrain. Undo can restore your edits.',()=>e.resetTerrainSurface('base'))));
+   title='Shape ground';items=['raise','lower','smooth','level'].map(tool=>item(tool==='level'?'Flatten':tool[0].toUpperCase()+tool.slice(1),()=>{e.brush.tool=tool;activate('terrain');},{selected:e.brush.tool===tool}));items.push(field('Brush radius',e.brush.radius,v=>{e.brush.radius=v;},{min:2,max:30,step:2}),field('Strength',e.brush.power,v=>{e.brush.power=v;},{min:.1,max:1,step:.1}),item('Sample flatten height: '+(e.brush.sampleHeight?'On':'Off'),()=>{e.brush.sampleHeight=!e.brush.sampleHeight;}),field('Flatten height',e.brush.level,v=>{e.brush.level=v;},{min:-6,max:6,step:.25}),item('Flatten entire map',()=>confirm('Flatten ground','This replaces all terrain shaping. Undo can restore it.',()=>e.resetTerrainSurface('flat'))),item('Reset shaping',()=>confirm('Reset shaping','Restore the base terrain. Undo can restore your edits.',()=>e.resetTerrainSurface('base'))));
   }
   else if(name==='weather'){
    title='Light & weather';items=Object.entries(ENV_PRESETS).map(([key,v])=>item(v.label,()=>{const before=clone(e.doc.environment);e.commands.execute(new EnvironmentCommand(e,before,EnvironmentRules.preset(key)));},{selected:e.doc.environment.preset===key}));
@@ -66,7 +72,7 @@ export function createBuilderPanels({editor:e,save,publish,exit,importFile,expor
    title='Layers · top view';description='Visibility applies to the top view. Locks protect edits.';for(const [key,v]of Object.entries(e.layerState)){items.push(item(key+': '+(v.visible?'Visible':'Hidden'),()=>{v.visible=!v.visible;e.draw();}),item(key+': '+(v.locked?'Locked':'Unlocked'),()=>{v.locked=!v.locked;e.selected=new Set(e.allSelected().map(o=>o.id));e.syncUI();e.draw();}));}
   }
   else if(name==='prefabs'){
-   title='Saved groups';items=[item('Save selection',()=>{if(!selection().length){e.toast('Select objects first');return;}editText('Group name',`Piece ${e.prefabs.length+1}`,saveGroup);})];for(const p of e.prefabs)items.push(item('Place '+p.name,()=>topTool('select',{type:'prefab',label:p.name,prefabId:p.id})),item('Remove '+p.name,()=>confirm('Remove saved group',p.name,()=>{e.prefabs=e.prefabs.filter(x=>x.id!==p.id);e.persistPrefabs();})));
+   title='Saved groups';items=[item('Save selection',()=>{if(!selection().length){e.toast('Select objects first');return;}editText('Group name',`Piece ${e.prefabs.length+1}`,saveGroup);})];for(const p of e.prefabs)items.push(item('Place '+p.name,()=>activate('select',{type:'prefab',label:p.name,prefabId:p.id})),item('Remove '+p.name,()=>confirm('Remove saved group',p.name,()=>{e.prefabs=e.prefabs.filter(x=>x.id!==p.id);e.persistPrefabs();})));
   }
   else if(name==='settings'){
    title='Map settings';items=[item('Name: '+e.doc.meta.name,()=>editText('Map name',e.doc.meta.name,v=>changeSetting(a=>{a.meta.name=v.trim().slice(0,64)||'NEW MAP';}))),item('Base: '+e.doc.theme,()=>choice('Base terrain',['flat','highlands','depot','yard','rig'],e.doc.theme,v=>changeSetting(a=>{a.theme=v;}))),field('Play area',e.doc.arenaLimit,v=>changeSetting(a=>{a.arenaLimit=v;a.minimapLimit=Math.min(a.minimapLimit,v);a.terrain.heightfield=e.doc.terrain.resample(v).serialize();a.terrain.materials=e.doc.materials.resample(v).serialize();}),{min:Math.ceil(e.minimumArena()),max:300,step:5}),field('Minimap area',e.doc.minimapLimit,v=>changeSetting(a=>{a.minimapLimit=v;}),{min:20,max:e.doc.arenaLimit,step:5}),item('Rebuild bot routes',()=>e.autoFlow()),item('Generate map',()=>show('generate')),item('Starting maps',()=>show('templates'))];
@@ -84,7 +90,7 @@ export function createBuilderPanels({editor:e,save,publish,exit,importFile,expor
    title=data.guide.title;description=data.guide.fix;items=[item('Show location',()=>{dismiss();if(data.issue.target)e.focusTarget(data.issue.target);else e.showChecks();}),item('Undo last edit',()=>e.commands.undo()),item('Check again',()=>show('check',{},false))];
   }
   else if(name==='analysis'){
-   title='Map analysis';items=['elevation','slope','walkability','spawns','sightlines','integrity'].map(v=>item(v,()=>{e.analysisView=v;e.r2.raster=null;topTool('analysis');}));items.push(item('Contours: '+(e.analysisContours?'On':'Off'),()=>{e.analysisContours=!e.analysisContours;e.r2.raster=null;e.draw();}));
+   title='Map analysis';items=['elevation','slope','walkability','spawns','sightlines','integrity'].map(v=>item(v,()=>{e.analysisView=v;e.r2.raster=null;activate('analysis');}));items.push(item('Contours: '+(e.analysisContours?'On':'Off'),()=>{e.analysisContours=!e.analysisContours;e.r2.raster=null;e.draw();}));
   }
   else if(name==='help'){
    title='Controls';description=e.play.active?'Build: move/look with game controls. Space/C or RB/LB fly up/down. E/RT places. Q/Y opens objects. Tab/Menu opens tools. View switches Build/Test.':'Top view: drag objects or handles. Drag empty ground to pan; pinch/wheel to zoom. Shift selects several; controller X toggles the map cursor.';items=[item('Objects',()=>{dismiss();e.walk.action('pick');}),item('Properties',()=>show('edit')),item('Terrain tools',()=>show('terrain'))];
@@ -92,9 +98,9 @@ export function createBuilderPanels({editor:e,save,publish,exit,importFile,expor
   else if(name==='exit'){
    title='Unsaved map';description='Save this draft before returning to Maps?';items=[item('Keep editing',dismiss),item('Save & exit',()=>task(async()=>{await save();exit();})),item('Discard & exit',exit)];
   }
-  else {title='Map · '+APP_VERSION;items=[item('Save',()=>task(save)),item('Publish',()=>task(publish)),item('Map Check',()=>show('check')),item('Map name',()=>editText('Map name',e.doc.meta.name,v=>changeSetting(a=>{a.meta.name=v.trim().slice(0,64)||'NEW MAP';}))),item('Import file',()=>importFile()),item('Export file',()=>exportFile()),item('Restore autosave',()=>confirm('Restore autosave','Replace the current map with the saved local draft?',restore))];}
+  else {title='Map · '+APP_VERSION;items=[item('Save',()=>task(save)),item('Publish',()=>task(publish)),item('Map Check',()=>show('check')),item('Build tools',()=>show('tools')),item('Map settings',()=>show('settings')),item('Controls',()=>show('help')),item('Back to maps',()=>{dismiss();e.onUI('exit');}),item('Map name',()=>editText('Map name',e.doc.meta.name,v=>changeSetting(a=>{a.meta.name=v.trim().slice(0,64)||'NEW MAP';}))),item('Import file',()=>importFile()),item('Export file',()=>exportFile()),item('Restore autosave',()=>confirm('Restore autosave','Replace the current map with the saved local draft?',restore))];}
   if(busy){title='Working…';items=items.map(i=>({...i,disabled:true}));}
-  return {title,description,items};
+  return {title,description,items,back:history.length>0};
  }
  function saveGroup(name){const objects=selection();if(!objects.length)return;const ids=new Set(objects.map(o=>o.id));for(const l of e.doc.ladders)if(ids.has(l.parentId))ids.add(l.id);const all=[...ids].map(id=>clone(e.doc.get(id))),center=e.groupCenter(objects);for(const o of all){o.x-=center.x;o.z-=center.z;}e.prefabs.push({id:uid('prefab'),name:name.trim().slice(0,48)||'Piece',objects:all,created:Date.now()});e.persistPrefabs();e.toast('Group saved');}
  function action(id){

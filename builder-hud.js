@@ -1,6 +1,6 @@
 // Presentation and hit testing only. All edits go through the builder's command stack.
 // Layout is shared by painting, pointer input, keyboard focus and controller focus.
-import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.73.0';
+import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.74.0';
 const inside=(p,r)=>p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h;
 export function hudLayout(w,h,model,insets={}){
  const left=insets.left||0,right=insets.right||0,topInset=insets.top||0,bottom=insets.bottom||0;
@@ -11,24 +11,24 @@ export function hudLayout(w,h,model,insets={}){
  add('undo','↶',m+49,top,44,44,{aria:'Undo',disabled:!model.undo});
  add('redo','↷',m+98,top,44,44,{aria:'Redo',disabled:!model.redo});
  const modeX=small?w-m-117:(w-117)/2;
- add('build','Build',modeX,top,56,44,{selected:model.building});
- add('playtest','Test',modeX+61,top,56,44,{selected:!model.building&&!model.overview});
+ add('build','Build',modeX,top,56,44,{selected:model.building||model.overview,disabled:!!model.pending});
+ add('playtest','Test',modeX+61,top,56,44,{selected:!model.building&&!model.overview,disabled:!!model.pending});
  const viewY=small?66:top;
- add('overview',model.overview?'3D view':'Top view',w-m-149,viewY,78);
+ add('overview',model.overview?'3D view':'Top view',w-m-149,viewY,78,44,{disabled:!!model.pending});
  add('snap-toggle','Snap',w-m-66,viewY,66,44,{selected:model.snap});
  if(model.building&&!model.overview){
-  const railY=Math.min(small?120:76,h-208);
-  [['select','Select'],['move','Move'],['rotate-tool','Rotate'],model.selected&&model.resizable?['scale-tool','Size']:['terrain','Terrain']].forEach(([id,label],i)=>add(id,label,m,railY+i*49,66,44,{selected:model.tool===id,disabled:(id==='move'||id==='rotate-tool')&&!model.selected}));
+  const railY=Math.max(104,Math.min(small?120:104,h-195));
+  [['select','Select'],['pick','Place'],['terrain','Terrain'],['tools','Tools']].forEach(([id,label],i)=>add(id,label,m,railY+i*49,66,44,{disabled:!!model.pending,selected:id==='select'?model.mode==='select':id==='pick'?model.placing:id==='terrain'?['terrain','paint'].includes(model.mode):false}));
   // Leave the lower-left joystick and right-hand look zone to the game.
   const compact=h<450,liftY=compact?(small?120:76):Math.max(small?120:80,Math.min(h*.38,h-212));
   add('up','↑',w-m-(compact?101:48),liftY,48,48,{aria:'Fly up',hold:1});
   add('down','↓',w-m-48,liftY+(compact?0:53),48,48,{aria:'Fly down',hold:-1});
   if(!model.selected&&!model.pending)add('place',model.primary||'Place',w-m-78,h-150,78,56,{accent:true,disabled:!model.valid});
-  const count=small?2:5,bw=small?58:64,total=(count+1)*bw+count*gap,x=(w-total)/2,y=h-76;
-  add('pick','Objects',x,y,bw,64,{aria:'Object library'});
-  (model.hotbar||[]).slice(0,count).forEach((item,i)=>add('item:'+item.key,item.label,x+(i+1)*(bw+gap),y,bw,64,{selected:model.item===item.key,thumbnail:item.thumbnail}));
+  const count=model.placing?(small?2:5):0,bw=small?58:64,total=(count+1)*bw+count*gap,x=(w-total)/2,y=h-76;
+  if(model.placing)add('done','Done',x,y,bw,64,{aria:'Finish placing'});
+  (model.placing?model.hotbar||[]:[]).slice(0,count).forEach((item,i)=>add('item:'+item.key,item.label,x+(i+1)*(bw+gap),y,bw,64,{selected:model.item===item.key,thumbnail:item.thumbnail}));
   if(model.selected||model.pending){
-   const options=model.pending?[['place','Apply'],['cancel','Cancel']]:[['edit','Properties'],['copy','Copy'],['erase','Delete'],...(model.vertical===false?[]:[['raise-object','Object ↑'],['lower-object','Object ↓']])];
+   const options=model.pending?[['place','Apply'],['cancel','Cancel']]:[['place','Select'],['edit','Edit'],['erase','Delete'],...(model.vertical===false?[]:[['raise-object','Object ↑'],['lower-object','Object ↓']])];
    // One compact row, never a wrapped toolbar over the crosshair.
    const bw2=small?56:78,rowW=options.length*bw2+(options.length-1)*gap;
    options.forEach(([id,label],i)=>add(id,label,(w-rowW)/2+i*(bw2+gap),h-129,bw2,44,{disabled:id==='place'&&!model.valid,accent:id==='place'}));
@@ -38,13 +38,15 @@ export function hudLayout(w,h,model,insets={}){
  }
  if(model.overview&&!model.panel){
   const bw=Math.min(90,(w-44)/5),x=(w-(bw*5+20))/2;
-  [['select','Select'],['pick','Objects'],['terrain','Terrain'],['edit','Properties'],['multi','Multi']].forEach(([id,label],i)=>add(id,label,x+(bw+5)*i,h-56,bw,44,{disabled:id==='edit'&&!model.selected,selected:id==='multi'&&model.multi}));
-  if(model.selected){const opts=[['copy','Copy'],['erase','Delete'],['raise-object','Object ↑'],['lower-object','Object ↓']];opts.forEach(([id,label],i)=>add(id,label,(w-249)/2+i*64,h-105,59,44));}
+  [['select','Select'],['pick','Place'],['terrain','Terrain'],['edit','Properties'],['multi','Multi']].forEach(([id,label],i)=>add(id,label,x+(bw+5)*i,h-56,bw,44,{disabled:id==='edit'&&!model.selected,selected:id==='multi'?model.multi:id==='select'?model.mode==='select':id==='pick'?model.placing:id==='terrain'?['terrain','paint'].includes(model.mode):false}));
+  if(model.placing){add('done','Done',(w-100)/2,h-105,100,44);}
+  if(model.selected&&!model.placing){const opts=[['copy','Copy'],['erase','Delete'],['raise-object','Object ↑'],['lower-object','Object ↓']];opts.forEach(([id,label],i)=>add(id,label,(w-249)/2+i*64,h-105,59,44));}
   if(model.tip)labels.push({text:model.tip,x:w/2,y:h-(model.selected?121:72),maxWidth:w-40});
  }
 
+ if(!model.panel&&model.modeLabel){const r={x:12,y:62,w:Math.max(110,Math.min(330,w-185)),h:32,mode:true};panels.push(r);labels.push({text:model.modeLabel,x:r.x+8,y:r.y+16,align:'left',maxWidth:r.w-16});}
  if(model.panel){
-  buttons.length=0;labels.length=0;
+  buttons.length=0;labels.length=0;panels.length=0;
   const keyboard=model.panel.kind==='keyboard',pw=keyboard?Math.min(640,w-24):Math.min(380,w-24),px=keyboard?(w-pw)/2:w-m-pw,py=12,ph=h-24;
   panels.push({x:px,y:py,w:pw,h:ph});
   labels.push({text:model.panel.title,x:px+16,y:py+25,align:'left',maxWidth:pw-80});
@@ -57,15 +59,15 @@ export function hudLayout(w,h,model,insets={}){
    const cols=Math.max(1,Math.floor((pw-19)/49)),bw=(pw-24-(cols-1)*5)/cols;
    keys.forEach((it,i)=>add(it.id,it.label,px+12+(i%cols)*(bw+5),py+78+Math.floor(i/cols)*49,bw,44,it));
   }else{
-   add('close','×',px+pw-52,py+4,44,44,{aria:'Close panel',disabled:model.panel.title==='Working…'});
+   add('close',model.panel.back?'Back':'×',px+pw-52,py+4,44,44,{aria:'Close panel',disabled:model.panel.title==='Working…'});
    const lines=[],words=(model.panel.description||'').split(/\s+/),limit=Math.max(12,Math.floor((pw-32)/7));let line='';
    for(const word of words){if((line+' '+word).length>limit&&line){lines.push(line);line=word;}else line+=(line?' ':'')+word;}if(line)lines.push(line);
    const maxLines=Math.max(1,Math.floor((ph-160)/18)),textPages=Math.max(1,Math.ceil(lines.length/maxLines));
    const lastLines=lines.slice((textPages-1)*maxLines),offsetLast=lastLines.length?74+lastLines.length*18:56;
-   const rows=Math.max(1,Math.floor((ph-offsetLast-56)/54)),pageSize=rows*2,items=model.panel.items||[];
+   const items=model.panel.items||[],row=items.some(i=>i.thumbnail)?78:54,rows=Math.max(1,Math.floor((ph-offsetLast-56)/row)),pageSize=rows*2;
    const pages=textPages-1+Math.max(1,Math.ceil(items.length/pageSize)),page=Math.min(model.page||0,pages-1),textPage=Math.min(page,textPages-1),shown=lines.slice(textPage*maxLines,(textPage+1)*maxLines);
    shown.forEach((text,i)=>labels.push({text,x:px+16,y:py+63+i*18,align:'left',maxWidth:pw-32}));
-   if(page>=textPages-1){const offset=shown.length?74+shown.length*18:56,itemPage=page-(textPages-1);items.slice(itemPage*pageSize,(itemPage+1)*pageSize).forEach((it,i)=>add(it.id,it.label,px+12+(i%2)*(pw-19)/2,py+offset+Math.floor(i/2)*54,(pw-29)/2,49,it));}
+   if(page>=textPages-1){const offset=shown.length?74+shown.length*18:56,itemPage=page-(textPages-1);items.slice(itemPage*pageSize,(itemPage+1)*pageSize).forEach((it,i)=>add(it.id,it.label,px+12+(i%2)*(pw-19)/2,py+offset+Math.floor(i/2)*row,(pw-29)/2,row-5,it));}
    if(pages>1){add('previous','‹',px+12,py+ph-51,44,44,{disabled:page===0});add('next','›',px+pw-56,py+ph-51,44,44,{disabled:page===pages-1});labels.push({text:`${page+1} / ${pages}`,x:px+pw/2,y:py+ph-28,maxWidth:120});}
 
   }
@@ -86,7 +88,7 @@ function icon(c,id,x,y){
 }
 export function paintHUD(c,layout,{focus='',pressed='',images=new Map()}={}){
  for(const line of layout.lines||[]){c.strokeStyle=line.color;c.lineWidth=3;c.beginPath();c.moveTo(line.x,line.y);c.lineTo(line.x2,line.y2);c.stroke();}
- for(const panel of layout.panels)box(c,panel,'rgba(13,18,21,.97)','#4c585e');
+ for(const panel of layout.panels)box(c,panel,'rgba(13,18,21,.97)',panel.mode?'#8da6b5':'#4c585e');
  c.textBaseline='middle';c.textAlign='center';
  for(const b of layout.buttons){
   c.globalAlpha=b.disabled?.42:1;
@@ -94,9 +96,9 @@ export function paintHUD(c,layout,{focus='',pressed='',images=new Map()}={}){
   box(c,b,active?'#d7ff58':'rgba(13,18,21,.9)',focus===b.id||pressed===b.id?'#ffffff':'#596268');
   if(focus===b.id){c.strokeStyle='#fff';c.lineWidth=2;c.stroke();}
   const img=b.thumbnail&&images.get(b.thumbnail);
-  if(img)c.drawImage(img,b.x+7,b.y+3,b.w-14,b.h-22);
+  if(img){const scale=Math.min((b.w-14)/(img.width||144),(b.h-22)/(img.height||112)),iw=(img.width||144)*scale,ih=(img.height||112)*scale;c.drawImage(img,b.x+(b.w-iw)/2,b.y+3,iw,ih);}
   c.fillStyle=active?'#11170d':'#edf1f2';c.font=`600 ${b.label.length>10?11:12}px system-ui, sans-serif`;
-  if(!icon(c,b.id,b.x+b.w/2,b.y+b.h/2))c.fillText(b.label,b.x+b.w/2,b.y+(img?b.h-10:b.h/2),b.w-10);
+  if(!(b.id==='close'&&b.label==='Back')&&icon(c,b.id,b.x+b.w/2,b.y+b.h/2)){}else c.fillText(b.label,b.x+b.w/2,b.y+(img?b.h-10:b.h/2),b.w-10);
  }
  c.globalAlpha=1;
  for(const l of layout.labels){c.font='600 12px system-ui, sans-serif';c.textAlign=l.align||'center';c.fillStyle='#f0f3f4';c.shadowColor='#000';c.shadowBlur=5;c.fillText(l.text,l.x,l.y,l.maxWidth);c.shadowBlur=0;}
