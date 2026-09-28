@@ -1,0 +1,1118 @@
+import {
+  DocumentOperations,
+  MapDocument,
+  ModelRules,
+  Resolver,
+  RuntimeCompiler,
+  Storage,
+  Validator,
+  AddManyCommand,
+  DeleteCommand,
+  PatchCommand,
+  TerrainCommand,
+  MaterialCommand,
+  clone,
+  uid,
+  clamp,
+  rad,
+  presetTerrain,
+  BUILDINGS,
+  PROPS,
+  ELEVATION,
+  templateToDoc,
+  MATERIAL_KEYS,
+} from "./builder-model.js?v=2.0.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.0.0";
+import { safeTerrainBrush } from "./safe-terrain.js?v=2.0.0";
+import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.0.0";
+const box = (p) => (p.type === "round" ? { ...p, w: p.r * 2, d: p.r * 2 } : p);
+const pose = (p) => ({ x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch });
+
+// One history stores committed document snapshots, never viewport or preview state.
+// Compilation happens before the new revision becomes visible to the game frame.
+export class EditorHistory {
+  constructor(session) {
+    this.session = session;
+    this.undoStack = [];
+    this.redoStack = [];
+  }
+  execute(command) {
+    const e = this.session;
+    if (e.state.phase !== "edit" || e.transaction) return false;
+    const before = e.doc.serializeInternal();
+    try {
+      command.do();
+      e.prepareCommit();
+    } catch (error) {
+      e.doc = new MapDocument(before);
+      Resolver.resolve(e.doc);
+      throw error;
+    }
+    const after = e.doc.serializeInternal();
+    if (JSON.stringify(before) === JSON.stringify(after)) return false;
+    this.undoStack.push({ before, after, label: command.label || "Edit" });
+    if (this.undoStack.length > 100) this.undoStack.shift();
+    this.redoStack = [];
+    e.committed();
+    return true;
+  }
+  replace(data, label = "Replace map") {
+    return this.execute({
+      label,
+      do: () => {
+        this.session.doc = new MapDocument(data);
+      },
+    });
+  }
+  restore(from, to, key) {
+    const e = this.session;
+    if (e.transaction) {
+      e.cancel();
+      return false;
+    }
+    if (e.state.phase !== "edit") return false;
+    const c = from.at(-1);
+    if (!c) return false;
+    const old = e.doc;
+    try {
+      e.doc = new MapDocument(c[key]);
+      e.prepareCommit();
+    } catch (error) {
+      e.doc = old;
+      throw error;
+    }
+    from.pop();
+    to.push(c);
+    e.committed();
+    return true;
+  }
+  undo() {
+    return this.restore(this.undoStack, this.redoStack, "before");
+  }
+  redo() {
+    return this.restore(this.redoStack, this.undoStack, "after");
+  }
+  clear() {
+    this.undoStack = [];
+    this.redoStack = [];
+  }
+}
+export class EditorSession extends DocumentOperations {
+  constructor({ stage, gameRuntime, onMutation = () => {}, onUI = () => {} }) {
+    super();
+    this.stage = stage;
+    this.gameRuntime = gameRuntime;
+    this.onMutation = onMutation;
+    this.onUI = onUI;
+    this.doc = null;
+    this.state = {
+      phase: "edit",
+      tool: "select",
+      camera: "perspective",
+      page: 0,
+      lift: 0,
+      controllerLift: 0,
+    };
+    this.camera = { x: 0, z: 0, span: 100 };
+    this.play = { active: false, x: 0, y: 10, z: 20, yaw: 0, pitch: -0.3 };
+    this.selected = new Set();
+    this.item = null;
+    this.rotation = 0;
+    this.placementHeight = 0;
+    this.transaction = null;
+    this.roadPoints = [];
+    this.pointer = null;
+    this.target = null;
+    this.ghost = null;
+    this.valid = false;
+    this.tip = "Select an object, or open Objects";
+    this.sceneRev = 0;
+    this.terrainRev = 0;
+    this.materialRev = 0;
+    this.environmentRev = 0;
+    this.brush = {
+      tool: "raise",
+      radius: 6,
+      power: 0.35,
+      level: 0,
+      sampleHeight: true,
+    };
+    this.materialBrush = { material: "grass", radius: 6 };
+    this.snapConfig = {
+      grid: true,
+      gridSize: 1,
+      objects: true,
+      roads: true,
+      angle: 15,
+    };
+    this.snapGuides = [];
+    this.layerState = Object.fromEntries(
+      ["terrain", "roads", "build", "props", "gameplay", "flow"].map((k) => [
+        k,
+        { visible: k !== "flow", locked: false },
+      ]),
+    );
+    this.prefabs = this.loadPrefabs();
+    this.commands = new EditorHistory(this);
+    this.saveTask = Promise.resolve();
+    this.saveState = "saved";
+    this.panel = null;
+    this.epoch = 0;
+    this.analysisView = "integrity";
+  }
+  prepareCommit() {
+    for (const [field, limit] of Object.entries({
+      roads: 256,
+      props: 512,
+      buildings: 128,
+      elevation: 128,
+      mounds: 128,
+      naturals: 256,
+      ladders: 128,
+      flow: 512,
+    }))
+      if (this.doc[field].length > limit)
+        throw new Error(
+          `This map supports up to ${limit} ${field}. Remove an object before adding another.`,
+        );
+    ModelRules.normalizeDocument(this.doc);
+    Resolver.resolve(this.doc);
+    const next = RuntimeCompiler.compile(this.doc);
+    this.runtimeCache = next;
+  }
+  committed() {
+    this.sceneRev++;
+    this.terrainRev++;
+    this.materialRev++;
+    this.environmentRev++;
+    this.analysisCache = null;
+    this.partsCache = null;
+    this.previewKey = "";
+    this.selected = new Set(
+      [...this.selected].filter((id) => this.doc.get(id)),
+    );
+    this.onMutation();
+    this.scheduleSave();
+    this.syncUI();
+  }
+  scheduleSave() {
+    const epoch = this.epoch,
+      rev = this.sceneRev,
+      snapshot = new MapDocument(this.doc.serializeInternal());
+    this.saveState = "saving";
+    this.saveTask = this.saveTask
+      .catch(() => {})
+      .then(() => Storage.save(snapshot))
+      .then((result) => {
+        if (epoch === this.epoch && rev === this.sceneRev) {
+          this.saveState = result.persistent ? "local" : "session";
+          this.syncUI();
+        }
+      })
+      .catch((error) => {
+        if (epoch === this.epoch) {
+          this.saveState = "error";
+          this.reportProblem(error);
+        }
+      });
+  }
+  openDocument(doc) {
+    this.epoch++;
+    this.doc = doc instanceof MapDocument ? doc : new MapDocument(doc);
+    this.prepareCommit();
+    this.commands.clear();
+    this.selected.clear();
+    this.transaction = null;
+    this.item = null;
+    this.roadPoints = [];
+    this.state = {
+      phase: "edit",
+      tool: "select",
+      camera: "perspective",
+      page: 0,
+      lift: 0,
+      controllerLift: 0,
+    };
+    this.panel = null;
+    this.sceneRev++;
+    this.partsCache = null;
+    this.previewKey = "";
+    this.camera = {
+      x: 0,
+      z: 0,
+      span: Math.min(160, this.doc.arenaLimit * 2.2),
+    };
+    Object.assign(this.play, {
+      active: true,
+      x: 0,
+      y: this.runtimeCache.geometry.terrainHeight(0, 20) + 12,
+      z: 20,
+      yaw: 0,
+      pitch: -0.45,
+    });
+    this.gameRuntime.attach(this);
+    this.syncUI();
+  }
+  setDoc(doc) {
+    if (!this.doc) return this.openDocument(doc);
+    this.cancel();
+    this.commands.replace(
+      doc instanceof MapDocument ? doc.serializeInternal() : doc,
+    );
+    this.selected.clear();
+    this.syncUI();
+  }
+  async validate() {
+    const key = this.epoch + ":" + this.sceneRev;
+    if (this.validation?.key === key) return this.validation.promise;
+    const data = this.doc.serializeInternal(),
+      promise =
+        typeof Worker === "undefined"
+          ? Promise.resolve().then(() =>
+              Validator.validate(new MapDocument(data), true),
+            )
+          : new Promise((resolve, reject) => {
+              const worker = new Worker(
+                new URL(
+                  "./editor-validation-worker.js?v=2.0.0",
+                  import.meta.url,
+                ),
+                { type: "module" },
+              );
+              worker.onmessage = ({ data }) => {
+                worker.terminate();
+                data.error
+                  ? reject(new Error(data.error))
+                  : resolve(data.issues);
+              };
+              worker.onerror = (error) => {
+                worker.terminate();
+                reject(new Error(error.message || "Map Check failed"));
+              };
+              worker.postMessage(data);
+            });
+    this.validation = { key, promise };
+    return promise;
+  }
+  runtimePhysical() {
+    return this.runtimeCache;
+  }
+  setSaveState(state) {
+    this.saveState = state;
+    this.syncUI();
+  }
+  syncUI() {
+    this.hud?.render();
+  }
+  draw() {
+    this.syncUI();
+  }
+  toast(text) {
+    this.tip = String(text);
+    this.syncUI();
+  }
+  reportProblem(error) {
+    this.onUI("error", { message: String(error?.message || error) });
+  }
+  closeDrawers() {
+    this.clearPanel?.();
+    this.panel = null;
+    this.state.page = 0;
+    this.gameRuntime.pauseInput();
+  }
+  showChecks() {
+    this.onUI("check");
+  }
+  renderEdit() {
+    this.onUI("edit");
+  }
+  cancelInteraction() {
+    this.input?.cancel();
+  }
+  ready() {
+    if (this.transaction) {
+      this.toast("Apply or Cancel the current edit");
+      return false;
+    }
+    if (this.state.phase === "test") return false;
+    return true;
+  }
+  choose(item) {
+    if (!this.ready()) return false;
+    const defaults =
+      item.type === "building"
+        ? BUILDINGS[item.archetype]
+        : item.type === "prop"
+          ? PROPS[item.kind]
+          : item.type === "elevation"
+            ? ELEVATION[item.kind]
+            : {};
+    this.item = { ...defaults, ...item };
+    this.state.tool = "place";
+    this.rotation = 0;
+    this.placementHeight = 0;
+    this.roadPoints = [];
+    this.selected.clear();
+    this.closeDrawers();
+    this.previewKey = "";
+    this.update();
+    return true;
+  }
+  selectTool(tool = "select") {
+    if (!this.ready()) return false;
+    if (["move", "rotate", "scale"].includes(tool) && !this.selected.size)
+      return false;
+    if (
+      tool === "scale" &&
+      this.allSelected().some((o) => assetResizeMode(o) !== "parametric")
+    )
+      return false;
+    this.state.tool = tool;
+    this.roadPoints = [];
+    this.ghost = null;
+    this.previewKey = "";
+    this.closeDrawers();
+    this.update();
+    return true;
+  }
+  terrain(paint = false) {
+    if (!this.ready() || this.layerLocked("terrain")) return;
+    this.state.tool = paint ? "paint" : "terrain";
+    this.selected.clear();
+    this.roadPoints = [];
+    this.closeDrawers();
+    this.previewKey = "";
+    this.update();
+  }
+  switchView() {
+    this.gameRuntime.cancelTransform?.();
+    this.gameRuntime.pauseInput();
+    this.state.camera = this.state.camera === "top" ? "perspective" : "top";
+    this.pointer = null;
+    this.previewKey = "";
+    this.syncUI();
+  }
+  fit() {
+    this.camera = { x: 0, z: 0, span: this.doc.arenaLimit * 2.2 };
+    this.syncUI();
+  }
+  focusTarget(id) {
+    const o = this.doc.get(id);
+    if (!o) return;
+    this.closeDrawers();
+    this.selected = new Set(this.expandGroupSelection(id));
+    this.state.tool = "select";
+    this.camera.x = o.x;
+    this.camera.z = o.z;
+    if (this.state.camera === "perspective") {
+      Object.assign(this.play, {
+        x: o.x,
+        z: o.z + Math.max(10, o.d || 6),
+        y: Resolver.objectTop(this.doc, o) + 5,
+        yaw: 0,
+        pitch: -0.5,
+      });
+      this.gameRuntime.teleport(this.play);
+    }
+    this.previewKey = "";
+    this.update();
+  }
+  toggleTest() {
+    if (this.transaction) {
+      this.toast("Apply or Cancel before testing");
+      return;
+    }
+    this.closeDrawers();
+    if (this.state.phase === "edit") {
+      const issues = Validator.validate(this.doc, false),
+        blocked = issues.filter((i) => i.tone === "bad");
+      if (blocked.length) {
+        this.showChecks();
+        return;
+      }
+      this.testReturn = { camera: this.state.camera, pose: pose(this.play) };
+      this.state.phase = "test";
+      this.state.camera = "perspective";
+      const g = this.runtimePhysical().geometry,
+        c = this.runtimePhysical().collision,
+        s = this.doc.spawns.find(
+          (s) =>
+            !c.worldBlockedAt(
+              s.x,
+              s.z,
+              g.terrainHeight(s.x, s.z) + (s.yOffset || 0),
+              g.PLAYER_HEIGHT,
+              g.PLAYER_RADIUS,
+            ),
+        );
+      if (!s) {
+        this.state.phase = "edit";
+        this.toast("Add a clear starting point first");
+        return;
+      }
+      Object.assign(this.play, {
+        x: s.x,
+        z: s.z,
+        y: g.terrainHeight(s.x, s.z) + (s.yOffset || 0) + g.PLAYER_HEIGHT,
+        yaw: rad(s.yaw || 0),
+        pitch: 0,
+      });
+    } else {
+      this.state.phase = "edit";
+      this.state.camera = this.testReturn?.camera || "perspective";
+      Object.assign(this.play, this.testReturn?.pose || {});
+    }
+    this.ghost = null;
+    this.gameRuntime.teleport(this.play);
+    this.previewKey = "";
+    this.syncUI();
+  }
+  stopPlay() {
+    this.play.active = false;
+    this.gameRuntime.suspend?.();
+  }
+  sceneObjects() {
+    if (this.partsCache) return this.partsCache;
+    this.partsCache = this.doc
+      .all()
+      .filter((o) => this.layerVisible(this.layerFor(o)))
+      .map((o) => {
+        const parts = this.placementParts([o], true);
+        return { o, parts, bounds: partsBounds(parts) };
+      });
+    return this.partsCache;
+  }
+  pick(ray) {
+    if (!ray) return null;
+    const { origin, dir } = ray,
+      g = this.runtimePhysical().geometry,
+      max = this.state.camera === "top" ? 1500 : 100;
+    let best = null;
+    const omitted = new Set(this.transaction?.before.map((o) => o.id) || []);
+    for (const { o, parts, bounds } of this.sceneObjects()) {
+      if (bounds) {
+        const inside =
+          Math.abs(origin.x - bounds.x) <= bounds.w / 2 &&
+          Math.abs(origin.z - bounds.z) <= bounds.d / 2 &&
+          origin.y >= bounds.minY &&
+          origin.y <= bounds.maxY;
+        if (!inside && !rayBox(origin, dir, bounds, best?.t || max)) continue;
+      }
+      if (omitted.has(o.id)) continue;
+      for (const src of parts) {
+        if (
+          src.decorative &&
+          (!src.selectable ||
+            !["select", "move", "rotate", "scale"].includes(this.state.tool))
+        )
+          continue;
+        const p = box(src);
+        if (!p.w || !p.d) continue;
+        const hit = rayBox(origin, dir, p, best?.t || max);
+        if (hit) best = { ...hit, object: o };
+      }
+    }
+    let previous = 0;
+    for (let t = 0.5; t <= Math.min(best?.t || max, max); t += 0.5) {
+      const x = origin.x + dir.x * t,
+        z = origin.z + dir.z * t;
+      if (origin.y + dir.y * t <= g.terrainHeight(x, z)) {
+        let lo = previous,
+          hi = t;
+        for (let i = 0; i < 9; i++) {
+          const mid = (lo + hi) / 2;
+          if (
+            origin.y + dir.y * mid <=
+            g.terrainHeight(origin.x + dir.x * mid, origin.z + dir.z * mid)
+          )
+            hi = mid;
+          else lo = mid;
+        }
+        const t0 = (lo + hi) / 2;
+        best = {
+          x: origin.x + dir.x * t0,
+          z: origin.z + dir.z * t0,
+          y: g.terrainHeight(origin.x + dir.x * t0, origin.z + dir.z * t0),
+          t: t0,
+          nx: 0,
+          ny: 1,
+          nz: 0,
+          object: null,
+        };
+        break;
+      }
+      previous = t;
+    }
+    return best;
+  }
+  selectionParts() {
+    return this.allSelected().flatMap((o) => this.placementParts([o], true));
+  }
+  plan(hit) {
+    if (!hit) return [];
+    const item = {
+        ...this.item,
+        rot: this.rotation,
+        yOffset: this.placementHeight,
+      },
+      p = this.snapRoadPoint(hit);
+    if (item.type === "road")
+      return this.roadPoints.length
+        ? [this.roadFromPoints(this.roadPoints[0], p, item.kind)]
+        : [];
+    if (item.type === "roadcurve")
+      return this.roadPoints.length === 2
+        ? this.curveSegments(
+            this.roadPoints[0],
+            this.roadPoints[1],
+            p,
+            item.kind,
+          )
+        : [];
+    const w = item.w || item.r * 2 || 1,
+      d = item.d || item.r * 2 || 1,
+      a = rad(this.rotation),
+      extent =
+        (Math.abs(hit.nx * Math.cos(a) + hit.nz * Math.sin(a)) * w +
+          Math.abs(-hit.nx * Math.sin(a) + hit.nz * Math.cos(a)) * d) /
+        2;
+    const x = hit.x + hit.nx * (extent + 0.05),
+      z = hit.z + hit.nz * (extent + 0.05),
+      objects = this.makePlacement(item, x, z);
+    if (
+      hit.object &&
+      ["building", "prop", "elevation", "spawn"].includes(item.type)
+    ) {
+      const ground = this.runtimePhysical().geometry.terrainHeight(x, z),
+        base = hit.ny > 0 ? hit.y : Resolver.objectBase(this.doc, hit.object);
+      for (const o of objects) o.yOffset = base - ground + this.placementHeight;
+    }
+    return objects;
+  }
+  candidate(objects, before = []) {
+    const d = new MapDocument(this.doc.serializeInternal());
+    for (const o of before) d.remove(o.id);
+    for (const o of objects) d.add(clone(o));
+    ModelRules.normalizeDocument(d);
+    Resolver.resolve(d);
+    const runtime = RuntimeCompiler.compile(d),
+      parts = objects.flatMap((o) =>
+        this.placementParts.call(
+          { doc: d, runtimePhysical: () => runtime },
+          [o],
+          true,
+        ),
+      );
+    let reason = "";
+    const skip = new Set(before.map((o) => o.id));
+    for (const o of objects) {
+      const size = Math.hypot(o.w || o.r * 2 || 1, o.d || o.r * 2 || 1) / 2;
+      if (
+        Math.abs(o.x) + size > this.doc.arenaLimit - 1 ||
+        Math.abs(o.z) + size > this.doc.arenaLimit - 1
+      )
+        reason = "Keep objects inside the map";
+      if ((o.yOffset || 0) > 30 || (o.yOffset || 0) < -8)
+        reason = "Choose a lower height";
+    }
+    const others = d
+      .all()
+      .filter(
+        (other) =>
+          !skip.has(other.id) && !objects.some((o) => o.id === other.id),
+      )
+      .map((o) => ({
+        o,
+        parts: this.placementParts.call(
+          { doc: d, runtimePhysical: () => runtime },
+          [o],
+          true,
+        ),
+      }));
+    if (!reason)
+      outer: for (const pa0 of parts) {
+        if (pa0.decorative) continue;
+        const pa = box(pa0);
+        for (const entry of others) {
+          const bounds =
+            entry.bounds ?? (entry.bounds = partsBounds(entry.parts));
+          if (bounds && !boxesOverlap(pa, bounds)) continue;
+          for (const pb0 of entry.parts) {
+            if (pb0.decorative) continue;
+            const pb = box(pb0);
+            if (pa.w && pb.w && boxesOverlap(pa, pb)) {
+              reason = "Objects overlap · move to a clear spot";
+              break outer;
+            }
+          }
+        }
+      }
+    return {
+      objects: objects.map((o) => d.get(o.id) || o),
+      parts,
+      valid: !reason,
+      reason,
+    };
+  }
+  update() {
+    if (!this.doc || this.panel || this.state.phase !== "edit") {
+      this.ghost = null;
+      this.syncUI();
+      return;
+    }
+    this.target = this.pick(
+      this.gameRuntime.ray?.(this.state.camera === "top" ? this.pointer : null),
+    );
+    const t = this.target,
+      tool = this.state.tool;
+    if (this.transaction) {
+      this.ghost = this.transaction.preview;
+      this.valid = this.ghost?.valid !== false;
+      this.tip = this.ghost?.reason || "Preview · Apply or Cancel";
+      this.syncUI();
+      return;
+    }
+    const planned = tool === "place" && t ? this.plan(t) : null;
+    const placementKey = planned?.length
+      ? JSON.stringify(
+          planned.map((o) =>
+            Object.fromEntries(
+              Object.entries(o).filter(
+                ([key]) => !["id", "groupId", "parentId"].includes(key),
+              ),
+            ),
+          ),
+        )
+      : null;
+    const key = [
+      this.sceneRev,
+      tool,
+      this.rotation,
+      this.placementHeight,
+      this.item?.key || this.item?.label,
+      JSON.stringify(this.roadPoints),
+      [...this.selected].join(","),
+      placementKey || t?.x?.toFixed(2),
+      placementKey ? null : t?.y?.toFixed(2),
+      placementKey ? null : t?.z?.toFixed(2),
+      t?.object?.id,
+      this.brush.tool,
+      this.brush.radius,
+      this.materialBrush.material,
+    ].join("|");
+    if (key === this.previewKey) {
+      this.syncUI();
+      return;
+    }
+    this.previewKey = key;
+    this.ghost = null;
+    if (["select", "move", "rotate", "scale"].includes(tool)) {
+      this.valid = !!t?.object;
+      const parts = this.selectionParts();
+      this.ghost = parts.length
+        ? { parts, selection: true }
+        : t?.object
+          ? { parts: this.placementParts([t.object], true), selection: true }
+          : null;
+      this.tip = this.selected.size
+        ? `${this.selected.size} selected · choose Move, Rotate or Resize`
+        : "Select · tap an object";
+    } else if (tool === "place") {
+      this.valid = !!t;
+      this.tip = "Place · aim at a surface";
+      if (t) {
+        const objects = planned;
+        this.ghost = objects.length
+          ? this.candidate(objects)
+          : {
+              parts: [
+                {
+                  x: t.x,
+                  z: t.z,
+                  w: 1,
+                  d: 1,
+                  minY: t.y + 0.04,
+                  maxY: t.y + 0.1,
+                },
+              ],
+              objects: [],
+              valid: true,
+            };
+        this.valid = this.ghost.valid;
+        this.tip =
+          this.ghost.reason ||
+          (["road", "roadcurve"].includes(this.item.type)
+            ? [
+                "Choose start",
+                this.item.type === "roadcurve" ? "Choose bend" : "Choose end",
+                "Choose end",
+              ][this.roadPoints.length]
+            : `Place · ${this.item.label || this.item.kind}`);
+      }
+    } else if (tool === "terrain" || tool === "paint") {
+      this.valid = !!t && !t.object;
+      const r =
+        tool === "terrain" ? this.brush.radius : this.materialBrush.radius;
+      if (this.valid)
+        this.ghost = {
+          parts: [
+            {
+              x: t.x,
+              z: t.z,
+              w: r * 2,
+              d: r * 2,
+              minY: t.y + 0.05,
+              maxY: t.y + 0.08,
+            },
+          ],
+          brush: true,
+        };
+      this.tip = this.valid
+        ? "Ground · existing objects stay protected"
+        : "Aim at open ground";
+    }
+    this.syncUI();
+  }
+  primary() {
+    if (this.panel) return;
+    if (this.state.phase === "test") return this.gameRuntime.testShot?.();
+    if (this.transaction) return this.apply();
+    this.update();
+    const t = this.target;
+    if (["select", "move", "rotate", "scale"].includes(this.state.tool)) {
+      if (t?.object && !this.layerLocked(this.layerFor(t.object))) {
+        const ids = this.expandGroupSelection(t.object.id);
+        if (this.multiSelect)
+          for (const id of ids)
+            this.selected.has(id)
+              ? this.selected.delete(id)
+              : this.selected.add(id);
+        else this.selected = new Set(ids);
+      } else this.selected.clear();
+      this.previewKey = "";
+      this.update();
+      return;
+    }
+    if (!this.valid) return;
+    if (this.state.tool === "place") {
+      if (
+        ["road", "roadcurve"].includes(this.item.type) &&
+        this.roadPoints.length < (this.item.type === "road" ? 1 : 2)
+      ) {
+        this.roadPoints.push(this.snapRoadPoint(t));
+      } else {
+        const objects = this.ghost.objects;
+        this.commands.execute(new AddManyCommand(this.doc, objects));
+        this.roadPoints = [];
+      }
+    } else this.stroke(t.x, t.z);
+    this.previewKey = "";
+    this.update();
+  }
+  stroke(x, z) {
+    return this.strokePath([{ x, z }]);
+  }
+  strokePath(points) {
+    if (this.layerLocked("terrain") || !points.length) return;
+    const paint = this.state.tool === "paint",
+      brush = { ...this.brush };
+    if (
+      !paint &&
+      brush.sampleHeight &&
+      ["level", "flatten"].includes(brush.tool)
+    )
+      brush.level = Resolver.rawTerrainHeight(
+        this.doc,
+        points[0].x,
+        points[0].z,
+      );
+    let changed = false;
+    this.commands.execute({
+      label: paint ? "Paint ground" : "Shape ground",
+      do: () => {
+        const surface = paint ? this.doc.materials : this.doc.terrain;
+        for (const { x, z } of points) {
+          if (paint) {
+            const r = this.materialBrush.radius,
+              code = Math.max(
+                0,
+                MATERIAL_KEYS.indexOf(this.materialBrush.material),
+              );
+            for (let iz = 0; iz < surface.size; iz++)
+              for (let ix = 0; ix < surface.size; ix++) {
+                const p = surface.world(ix, iz),
+                  i = surface.index(ix, iz);
+                if (
+                  Math.hypot(p.x - x, p.z - z) <= r &&
+                  surface.values[i] !== code
+                ) {
+                  surface.values[i] = code;
+                  changed = true;
+                }
+              }
+          } else {
+            const changes = safeTerrainBrush({
+              terrain: surface,
+              objects: this.doc.all(),
+              x,
+              z,
+              ...brush,
+              baseHeight: (a, b) => presetTerrain(this.doc.theme, a, b),
+            });
+            for (const c of changes) surface.values[c.i] = c.after;
+            changed ||= changes.length > 0;
+          }
+        }
+      },
+    });
+    if (!changed) this.toast("This ground is protected or at its safe limit");
+  }
+  beginTransform(copy = false) {
+    if (this.transaction) return true;
+    const before = this.allSelected().map(clone);
+    if (copy) {
+      const parents = new Set(before.map((o) => o.id));
+      for (const ladder of this.doc.ladders)
+        if (parents.has(ladder.parentId) && !parents.has(ladder.id))
+          before.push(clone(ladder));
+    }
+    if (!before.length) return false;
+    if (!copy && before.some((o) => o.type === "ladder" && o.parentId)) {
+      this.toast("Detach the ladder in Properties before moving it");
+      return false;
+    }
+    let after = clone(before);
+    if (copy) {
+      const ids = new Map(after.map((o) => [o.id, uid(o.type)])),
+        groups = new Map();
+      for (const o of after) {
+        o.id = ids.get(o.id);
+        if (o.groupId) {
+          if (!groups.has(o.groupId)) groups.set(o.groupId, uid("group"));
+          o.groupId = groups.get(o.groupId);
+        }
+        if (o.parentId) o.parentId = ids.get(o.parentId) || null;
+      }
+    }
+    this.transaction = {
+      before: copy ? [] : before,
+      source: before,
+      after,
+      copy,
+      preview: null,
+    };
+    this.previewTransform(after);
+    return true;
+  }
+  previewTransform(objects) {
+    if (!this.transaction) return;
+    this.transaction.after = clone(objects);
+    this.transaction.preview = this.candidate(objects, this.transaction.before);
+    this.ghost = this.transaction.preview;
+    this.valid = this.ghost.valid;
+    this.syncUI();
+  }
+  nudge(axis, delta) {
+    if (!this.beginTransform()) return;
+    const objects = clone(this.transaction.after);
+    for (const o of objects) {
+      if (
+        axis === "y" &&
+        ["building", "prop", "elevation", "spawn"].includes(o.type)
+      )
+        o.yOffset = (o.yOffset || 0) + delta;
+      else if (axis === "x" || axis === "z") o[axis] += delta;
+    }
+    this.previewTransform(objects);
+  }
+  turn(delta) {
+    if (this.state.tool === "place" && !this.transaction) {
+      this.rotation = (this.rotation + delta + 360) % 360;
+      this.previewKey = "";
+      this.update();
+      return;
+    }
+    if (!this.beginTransform()) return;
+    const objects = clone(this.transaction.after),
+      center = this.groupCenter(objects),
+      a = rad(delta);
+    for (const o of objects) {
+      const x = o.x - center.x,
+        z = o.z - center.z;
+      o.x = center.x + x * Math.cos(a) - z * Math.sin(a);
+      o.z = center.z + x * Math.sin(a) + z * Math.cos(a);
+      if ("rot" in o) o.rot = (o.rot + delta + 360) % 360;
+      if ("yaw" in o) o.yaw = (o.yaw + delta + 360) % 360;
+    }
+    this.previewTransform(objects);
+  }
+  scale(factor) {
+    if (
+      this.allSelected().some((o) => assetResizeMode(o) !== "parametric") ||
+      !this.beginTransform()
+    )
+      return;
+    const objects = clone(this.transaction.after);
+    for (const o of objects)
+      for (const key of ["w", "d", "h", "rise"])
+        if (key in o) o[key] = clamp(o[key] * factor, 0.2, 80);
+    this.previewTransform(objects);
+  }
+  duplicateSelected() {
+    if (!this.ready()) return;
+    this.beginTransform(true);
+    this.state.tool = "move";
+    this.toast("Copy preview · move it, then Apply");
+  }
+  apply() {
+    const t = this.transaction;
+    if (!t) return;
+    if (!t.preview?.valid) {
+      this.toast(t.preview?.reason || "Cannot apply this edit");
+      return;
+    }
+    this.transaction = null;
+    const after = t.preview.objects;
+    this.commands.execute(
+      t.copy
+        ? new AddManyCommand(this.doc, after)
+        : new PatchCommand(this.doc, t.before, after, "Transform"),
+    );
+    this.selected = new Set(after.map((o) => o.id));
+    this.previewKey = "";
+    this.update();
+  }
+  cancel() {
+    if (this.transaction) {
+      this.transaction = null;
+      this.ghost = null;
+      this.previewKey = "";
+      this.gameRuntime.cancelTransform?.();
+      this.update();
+      return;
+    }
+    if (this.roadPoints.length) {
+      this.roadPoints = [];
+      this.previewKey = "";
+      this.update();
+      return;
+    }
+    this.selectTool();
+  }
+  action(id) {
+    if (
+      this.panel &&
+      (id === "close" || id.startsWith("ui:") || id.startsWith("text:"))
+    )
+      return this.onUIAction(id);
+    if (id === "previous" || id === "next") {
+      this.state.page = Math.max(0, this.state.page + (id === "next" ? 1 : -1));
+      this.syncUI();
+      return;
+    }
+    if (id === "cancel") return this.cancel();
+    if (id === "place" || id === "apply") return this.primary();
+    if (id === "overview") return this.switchView();
+    if (id === "playtest" || id === "build") return this.toggleTest();
+    if (id === "undo" || id === "redo") {
+      this.commands[id]();
+      return;
+    }
+    if (id === "snap-toggle") {
+      this.snapConfig.grid = !this.snapConfig.grid;
+      this.previewKey = "";
+      return;
+    }
+    if (
+      id === "up" ||
+      id === "down" ||
+      id === "fly-step-up" ||
+      id === "fly-step-down"
+    ) {
+      this.play.y += id.includes("up") ? 1 : -1;
+      this.gameRuntime.teleport(this.play);
+      return;
+    }
+    if (id === "select" || id === "done") return this.selectTool();
+    if (["move", "rotate-tool", "scale-tool"].includes(id))
+      return this.selectTool(
+        { move: "move", "rotate-tool": "rotate", "scale-tool": "scale" }[id],
+      );
+    if (id === "rotate" || id === "turn-right")
+      return this.turn(this.snapConfig.angle);
+    if (id === "turn-left") return this.turn(-this.snapConfig.angle);
+    if (id === "scale-up" || id === "scale-down")
+      return this.scale(id === "scale-up" ? 1.1 : 1 / 1.1);
+    if (id === "raise-object" || id === "lower-object")
+      return this.nudge("y", id === "raise-object" ? 1 : -1);
+    if (id.startsWith("nudge:")) {
+      const [_, axis, n] = id.split(":");
+      return this.nudge(axis, Number(n) * this.snapConfig.gridSize);
+    }
+    if (id === "copy") return this.duplicateSelected();
+    if (id === "erase") {
+      if (this.ready()) this.deleteSelected();
+      return;
+    }
+    if (id === "multi") {
+      this.multiSelect = !this.multiSelect;
+      this.syncUI();
+      return;
+    }
+    if (id.startsWith("debug-")) {
+      this.gameRuntime.debugCollision(id.slice(6));
+      return;
+    }
+    if (id === "menu" && this.state.phase === "test") {
+      this.onUI("test-menu");
+      return;
+    }
+    if (this.ready()) {
+      this.onUI({ menu: "map", pick: "library", edit: "edit" }[id] || id);
+    }
+  }
+  hudModel() {
+    const s = this.state,
+      selected = this.allSelected();
+    return {
+      mode: s.tool,
+      tool: s.tool,
+      modeLabel:
+        s.phase === "test"
+          ? "TEST · Game controls"
+          : this.transaction
+            ? "PREVIEW · Apply or Cancel"
+            : s.tool.toUpperCase(),
+      building: s.phase === "edit",
+      overview: s.camera === "top",
+      selected: !!selected.length,
+      pending: !!this.transaction,
+      vertical: selected.some((o) =>
+        ["building", "prop", "elevation", "spawn"].includes(o.type),
+      ),
+      rotatable:
+        selected.length > 1 || selected.some((o) => "rot" in o || "yaw" in o),
+      resizable:
+        selected.length > 0 &&
+        selected.every((o) => assetResizeMode(o) === "parametric"),
+      placing: s.tool === "place",
+      valid: this.valid,
+      primary: this.transaction
+        ? "Apply"
+        : s.tool === "place"
+          ? "Place"
+          : s.tool === "terrain"
+            ? { level: "Flatten" }[this.brush.tool] || this.brush.tool
+            : s.tool === "paint"
+              ? "Paint"
+              : "Select",
+      tip: this.tip,
+      undo: s.phase === "edit" && !!this.commands.undoStack.length,
+      redo: s.phase === "edit" && !!this.commands.redoStack.length,
+      snap: this.snapConfig.grid,
+      multi: this.multiSelect,
+      panel: this.panel?.model(),
+      page: s.page,
+    };
+  }
+}

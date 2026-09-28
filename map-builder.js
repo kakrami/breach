@@ -1,39 +1,304 @@
-import {createBuilderFlow} from './builder-flow.js?v=1.74.0';
-import {Editor,MapDocument,Storage,Validator,templateToDoc,AddCommand,DeleteCommand,PatchCommand,TerrainCommand,MaterialCommand,uid,clamp} from './builder-model.js?v=1.74.0';
-import {createWalkBuilder,WALK_ITEMS} from './walk-builder.js?v=1.74.0';
-import {createBuilderPanels} from './builder-panels.js?v=1.74.0';
-import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.74.0';
-export function createIntegratedMapBuilder({host,apiBase,getIdentity,onExit,onSaved,gameRuntime}={}){
- const root=host.shadowRoot||host.attachShadow({mode:'open'});root.replaceChildren();
- const css=document.createElement('link');css.rel='stylesheet';css.href=new URL('./map-builder.css?v=1.74.0',import.meta.url).href;
- const app=document.createElement('div');app.className='app';const stage=document.createElement('main');stage.className='stage';stage.id='stage';const canvas=document.createElement('canvas');canvas.id='map2d';stage.appendChild(canvas);app.appendChild(stage);root.append(css,app);
- // Only file transfer uses an OS picker. Editing, choices and text entry are canvas UI.
- const file=document.createElement('input');file.type='file';file.accept='.json,.breachmap.json,application/json';file.hidden=true;root.appendChild(file);
- let active=false,serverMapId='',dirty=false,loading=false,operation=null;const cursor={enabled:false,road:null};
- const editor=new Editor({stage,canvas,gameRuntime,onMutation:()=>{if(!loading)dirty=true;},onUI:(name,data)=>route(name,data)});
- const panels=createBuilderPanels({editor,save:saveServerMap,publish:publishServerMap,exit:completeExit,importFile:()=>file.click(),exportFile,restore});
- editor.clearPanel=()=>panels.reset();editor.onUIAction=id=>panels.action(id);editor.loadTemplate=k=>editor.setDoc(templateToDoc(k));
- function prepareStarts(){if(!editor.doc)return;const {geometry:g,collision:c}=editor.runtimePhysical();const bad=editor.doc.spawns.filter(o=>c.worldBlockedAt(o.x,o.z,g.terrainHeight(o.x,o.z)+(o.yOffset||0),g.PLAYER_HEIGHT,.8));if(bad.length)editor.commands.execute(new DeleteCommand(editor.doc,bad.map(o=>o.id)));if(bad.length||['blue','red'].some(t=>editor.doc.spawns.filter(o=>o.team===t).length<4))editor.autoGameplay();if(!editor.doc.flow.length)editor.autoFlow();}
- editor.walk=createWalkBuilder({editor,root,isActive:()=>active,makeId:uid,add:o=>editor.commands.execute(new AddCommand(editor.doc,o)),remove:id=>editor.commands.execute(new DeleteCommand(editor.doc,[id])),patch:(before,after)=>editor.commands.execute(new PatchCommand(editor.doc,[before],[after],'Move')),prepareStarts});
- editor.flow=createBuilderFlow(editor);
- async function api(path,payload={}){const identity=getIdentity?.();if(!identity?.client||!identity?.auth)throw new Error('Return to the lobby to reconnect, then try again.');const response=await fetch(`${apiBase}${path}`,{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({client:identity.client,auth:identity.auth,...payload}),cache:'no-store'});let data={};try{data=await response.json();}catch{}if(!response.ok)throw new Error(data.error||'The server could not complete this action.');return data;}
- async function saveServerMap(){const rev=editor.sceneRev,out=editor.exportData();const data=await api('/maps/save',{mapId:serverMapId||undefined,name:out.meta?.name,map:out});serverMapId=data.mapId||data.map?.id||serverMapId;if(rev===editor.sceneRev)dirty=false;editor.setSaveState('saved');editor.toast('Draft saved');onSaved?.({mapId:serverMapId,published:false,map:data.map||null});return data;}
- async function publishServerMap(){prepareStarts();const issues=Validator.validate(editor.doc,true);if(!Validator.statusFrom(issues).exportable){panels.show('check');return;}await saveServerMap();const data=await api('/maps/publish',{mapId:serverMapId});editor.toast(`Published revision ${data.revision}`);onSaved?.({mapId:serverMapId,published:true,revision:data.revision,map:data.map||null});return data;}
- function run(task){if(operation)return operation;editor.gameRuntime?.pauseInput();panels.show('working',{},false);operation=Promise.resolve().then(task).then(()=>{if(editor.panel?.model().title==='Working…')panels.dismiss();}).catch(error=>panels.show('error',{message:error.message},false)).finally(()=>{operation=null;editor.syncUI();});return operation;}
- function route(name,data={}){if(name==='exit')return requestExit();if(name==='save')return run(saveServerMap);if(name==='publish')return run(publishServerMap);if(name==='import')return file.click();if(name==='download')return exportFile();if(name==='restore')return panels.show('restore');panels.show(({rename:'settings',build:'catalog',props:'catalog',gameplay:'setup',environment:'paint',select:'edit'})[name]||name,data);}
- function exportFile(){prepareStarts();const blob=new Blob([JSON.stringify(editor.exportData(),null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=(editor.doc.meta.name||'map').replace(/[^\w-]/g,'_')+'.breachmap.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);editor.toast('Map exported');}
- async function restore(){const data=await Storage.load();if(!data)throw new Error('No local autosave is available.');editor.setDoc(data instanceof MapDocument?data:new MapDocument(data));}
- file.addEventListener('change',async()=>{const selected=file.files?.[0];file.value='';if(!selected)return;try{const data=JSON.parse(await selected.text());panels.show('confirm',{title:'Import map',message:'Replace the current map with this file?',run:()=>editor.importData(data)});}catch(error){editor.reportProblem(error);}});
- function completeExit(){panels.dismiss();editor.walk.exit();editor.stopPlay();gameRuntime?.close();active=false;cursor.enabled=false;editor.controllerCursorActive=false;onExit?.({mapId:serverMapId});}
- function requestExit(){if(operation)return;if(dirty)panels.show('exit');else completeExit();}
- for(const [event,method]of [['pointerdown','onDown'],['pointermove','onMove'],['pointerup','onUp'],['pointercancel','onCancel']])canvas.addEventListener(event,ev=>{if(active&&!editor.play.active&&!editor.panel)editor[method](ev);});
- canvas.addEventListener('wheel',ev=>{if(active&&!editor.play.active&&!editor.panel)editor.wheel(ev);},{passive:false});canvas.addEventListener('contextmenu',ev=>ev.preventDefault());
- window.addEventListener('keydown',ev=>{if(!active)return;if(panels.key(ev)||editor.walk.key(ev)){ev.preventDefault();ev.stopImmediatePropagation();return;}if(editor.play.active||editor.panel)return;const k=ev.key.toLowerCase();if(k==='delete'||k==='backspace')editor.deleteSelected();else if(k==='r')editor.walk.action('rotate');else if(k==='escape')editor.flow.cancel();else if(k==='pageup'||k==='pagedown')editor.elevateSelected(k==='pageup'?1:-1);else if((ev.ctrlKey||ev.metaKey)&&k==='z')editor.commands[ev.shiftKey?'redo':'undo']();else if((ev.ctrlKey||ev.metaKey)&&k==='s')route('save');else return;ev.preventDefault();ev.stopImmediatePropagation();},true);
- const resize=new ResizeObserver(()=>{if(active&&editor.doc)editor.draw();});resize.observe(stage);
- function mapAction(){const w=editor.pointerWorld;if(!w)return;if(editor.editorMode==='terrain'||editor.editorMode==='environment'){const terrain=editor.editorMode==='terrain',changes=new Map();editor[terrain?'terrainApply':'materialApply'](w.x,w.z,changes);if(changes.size)editor.commands.commitApplied(new (terrain?TerrainCommand:MaterialCommand)(editor,[...changes.values()]));return;}
-  if(editor.placement){if(editor.flow.special())editor.flow.commitPoint(w);else editor.placeAt(w.x,w.z);}else{const hit=editor.hit(w.x,w.z);if(editor.multiSelect&&hit){const ids=editor.expandGroupSelection(hit.id);for(const id of ids)editor.selected.has(id)?editor.selected.delete(id):editor.selected.add(id);}else editor.selected=new Set(hit?editor.expandGroupSelection(hit.id):[]);}editor.syncUI();editor.draw();}
- function handleControllerFrame(frame,dt=.016){if(!active||!frame?.connected)return false;if(editor.walk.controller(frame,dt))return true;const p=frame.pressed||[];if(p[B.MENU]){editor.walk.action('menu');return true;}if(p[B.VIEW]){editor.walk.action('overview');return true;}if(p[B.X]){cursor.enabled=!cursor.enabled;editor.controllerCursorActive=cursor.enabled;editor.pointerWorld||={x:0,z:0};}if(p[B.B])editor.flow.cancel();if(p[B.Y]&&editor.selected.size)panels.show('edit');const speed=Math.max(10,editor.doc.arenaLimit*.3)*dt;if(cursor.enabled){const w=editor.pointerWorld;w.x=clamp(w.x+(frame.moveX||0)*speed,-editor.doc.arenaLimit,editor.doc.arenaLimit);w.z=clamp(w.z+(frame.moveY||0)*speed,-editor.doc.arenaLimit,editor.doc.arenaLimit);if(cursor.road&&editor.drag)editor.drag.lastWorld=editor.snapRoadPoint(w);if(p[B.A])mapAction();}else{editor.view.ox-=(frame.moveX||0)*speed*editor.view.scale;editor.view.oy-=(frame.moveY||0)*speed*editor.view.scale;}const zoom=(frame.buttons?.[B.RT]||0)-(frame.buttons?.[B.LT]||0);editor.view.scale=clamp(editor.view.scale*Math.exp(zoom*1.8*dt),.45,14);editor.draw();return true;}
- async function open({mapId=''}={}){let doc;if(mapId){const data=await api('/maps/get',{mapId});doc=new MapDocument(data.definition);for(const o of doc.all())if(data.definition.editor?.groups?.[o.id])o.groupId=data.definition.editor.groups[o.id];}else doc=templateToDoc('blank');gameRuntime?.close();active=true;serverMapId=String(mapId||'');cursor.enabled=false;cursor.road=null;loading=!!mapId;try{editor.setDoc(doc);dirty=!mapId;}catch(error){active=false;gameRuntime?.close();throw error;}finally{loading=false;}requestAnimationFrame(()=>{if(active)editor.draw();});return true;}
- window.__BreachBuilder={getEditor:()=>editor,getDoc:()=>editor.doc?.serializeInternal(),walk:()=>editor.walk.state,walkAction:a=>editor.walk.action(a),walkChoose:key=>editor.walk.choose(WALK_ITEMS.find(i=>i.key===key)),exportData:()=>editor.exportData(),runtimeParity:()=>editor.runtimeParity(),validateDeep:()=>Validator.validate(editor.doc,true),undo:()=>editor.commands.undo(),redo:()=>editor.commands.redo()};
- return Object.freeze({open,close({force=false}={}){if(!active)return true;if(!force&&dirty){requestExit();return false;}completeExit();return true;},suspend(){active=false;panels.dismiss();editor.walk.exit();editor.stopPlay();gameRuntime?.close();},requestExit,handleControllerFrame,get active(){return active;},get mapId(){return serverMapId;},get saveState(){return editor.saveState;},exportData:()=>editor.doc?editor.exportData():null});
+import { EditorSession } from "./editor-session.js?v=2.0.0";
+import {
+  MapDocument,
+  Storage,
+  Validator,
+  templateToDoc,
+} from "./builder-model.js?v=2.0.0";
+import { createBuilderPanels } from "./builder-panels.js?v=2.0.0";
+import { createBuilderHUD } from "./builder-hud.js?v=2.0.0";
+import { createEditorInput } from "./editor-input.js?v=2.0.0";
+export function createIntegratedMapBuilder({
+  host,
+  apiBase,
+  getIdentity,
+  onExit,
+  onSaved,
+  gameRuntime,
+} = {}) {
+  const root = host.shadowRoot || host.attachShadow({ mode: "open" });
+  root.replaceChildren();
+  const css = document.createElement("link");
+  css.rel = "stylesheet";
+  css.href = new URL("./map-builder.css?v=2.0.0", import.meta.url).href;
+  const app = document.createElement("div");
+  app.className = "app";
+  const stage = document.createElement("main");
+  stage.className = "stage";
+  stage.id = "stage";
+  app.appendChild(stage);
+  root.append(css, app);
+  // OS file transfer only; all editor controls and choices are painted on canvas.
+  const file = document.createElement("input");
+  file.type = "file";
+  file.accept = ".json,.breachmap.json,application/json";
+  file.hidden = true;
+  root.appendChild(file);
+  let active = false,
+    serverMapId = "",
+    dirty = false,
+    operation = null;
+  const editor = new EditorSession({
+    stage,
+    gameRuntime,
+    onMutation: () => {
+      dirty = true;
+    },
+    onUI: route,
+  });
+  const panels = createBuilderPanels({
+    editor,
+    save: () => run(saveServerMap),
+    publish: () => run(publishServerMap),
+    exit: completeExit,
+    importFile: () => file.click(),
+    exportFile,
+    restore,
+  });
+  editor.clearPanel = () => panels.reset();
+  editor.onUIAction = (id) => panels.action(id);
+  editor.loadTemplate = (k) => editor.setDoc(templateToDoc(k));
+  editor.loadCollisionLab = async () => {
+    const response = await fetch(
+      new URL("./maps/collision-lab.breachmap.json", import.meta.url),
+    );
+    if (!response.ok) throw new Error("Collision test map could not load");
+    editor.importData(await response.json());
+  };
+  editor.hud = createBuilderHUD({
+    stage,
+    active: () => active,
+    model: () => editor.hudModel(),
+    action: (id) => editor.action(id),
+    lift: (value) => {
+      editor.state.lift = editor.state.phase === "edit" ? value : 0;
+    },
+    pause: () => gameRuntime.pauseInput(),
+  });
+  editor.input = createEditorInput(editor, () => active, panels);
+  async function api(path, payload = {}) {
+    const identity = getIdentity?.();
+    if (!identity?.client || !identity?.auth)
+      throw new Error("Return to the lobby to reconnect, then try again.");
+    const response = await fetch(`${apiBase}${path}`, {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        client: identity.client,
+        auth: identity.auth,
+        ...payload,
+      }),
+      cache: "no-store",
+    });
+    let data = {};
+    try {
+      data = await response.json();
+    } catch {}
+    if (!response.ok)
+      throw new Error(
+        data.error || "The server could not complete this action.",
+      );
+    return data;
+  }
+  async function saveServerMap() {
+    const epoch = editor.epoch,
+      rev = editor.sceneRev,
+      out = editor.exportData();
+    const data = await api("/maps/save", {
+      mapId: serverMapId || undefined,
+      name: out.meta?.name,
+      map: out,
+    });
+    if (epoch !== editor.epoch) return data;
+    serverMapId = data.mapId || data.map?.id || serverMapId;
+    if (rev === editor.sceneRev) {
+      dirty = false;
+      editor.setSaveState("saved");
+    }
+    editor.toast("Draft saved");
+    onSaved?.({ mapId: serverMapId, published: false, map: data.map || null });
+    return data;
+  }
+  async function publishServerMap() {
+    const issues = await editor.validate();
+    if (!Validator.statusFrom(issues).exportable) {
+      panels.show("check", {}, false);
+      return;
+    }
+    await saveServerMap();
+    const data = await api("/maps/publish", { mapId: serverMapId });
+    editor.toast(`Published revision ${data.revision}`);
+    onSaved?.({
+      mapId: serverMapId,
+      published: true,
+      revision: data.revision,
+      map: data.map || null,
+    });
+  }
+  function run(task) {
+    if (operation) return operation;
+    if (editor.transaction) {
+      editor.toast("Apply or Cancel before saving");
+      return Promise.resolve();
+    }
+    gameRuntime.pauseInput();
+    operation = Promise.resolve()
+      .then(task)
+      .catch((error) => {
+        panels.show("error", { message: error.message }, false);
+        throw error;
+      })
+      .finally(() => {
+        operation = null;
+        editor.syncUI();
+      });
+    return operation;
+  }
+  function route(name, data = {}) {
+    if (name === "exit") return requestExit();
+    if (name === "save" || name === "publish") {
+      panels.show("working", {}, false);
+      run(name === "save" ? saveServerMap : publishServerMap)
+        .then(() => {
+          if (editor.panel?.model().title === "Working…") panels.dismiss();
+        })
+        .catch(() => {});
+      return;
+    }
+    if (name === "import") return file.click();
+    if (name === "download") return exportFile();
+    panels.show(
+      {
+        rename: "settings",
+        build: "library",
+        props: "library",
+        gameplay: "setup",
+        environment: "paint",
+      }[name] || name,
+      data,
+    );
+  }
+  function exportFile() {
+    const blob = new Blob([JSON.stringify(editor.exportData(), null, 2)], {
+        type: "application/json",
+      }),
+      url = URL.createObjectURL(blob),
+      a = document.createElement("a");
+    a.href = url;
+    a.download =
+      (editor.doc.meta.name || "map").replace(/[^\w-]/g, "_") +
+      ".breachmap.json";
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    editor.toast("Map exported");
+  }
+  async function restore() {
+    const data = await Storage.load();
+    if (!data) throw new Error("No local autosave is available.");
+    editor.setDoc(data);
+  }
+  file.addEventListener("change", async () => {
+    const selected = file.files?.[0];
+    file.value = "";
+    if (!selected) return;
+    try {
+      if (selected.size > 10 * 1024 * 1024)
+        throw new Error("This map file is too large");
+      const data = JSON.parse(await selected.text());
+      panels.show("confirm", {
+        title: "Import map",
+        message: "Replace this map? Undo can restore it.",
+        run: () => editor.importData(data),
+      });
+    } catch (error) {
+      editor.reportProblem(error);
+    }
+  });
+  function completeExit() {
+    panels.dismiss();
+    editor.input.cancel();
+    editor.stopPlay();
+    gameRuntime.close();
+    active = false;
+    editor.syncUI();
+    onExit?.({ mapId: serverMapId });
+  }
+  function requestExit() {
+    if (operation) return;
+    if (editor.transaction) {
+      editor.toast("Apply or Cancel before leaving");
+      return;
+    }
+    if (dirty) panels.show("exit");
+    else completeExit();
+  }
+  async function open({ mapId = "" } = {}) {
+    if (operation) await operation;
+    let doc;
+    if (mapId) {
+      const data = await api("/maps/get", { mapId });
+      doc = new MapDocument(data.definition);
+      for (const o of doc.all())
+        if (data.definition.editor?.groups?.[o.id])
+          o.groupId = data.definition.editor.groups[o.id];
+    } else doc = templateToDoc("blank");
+    editor.input.cancel();
+    panels.reset();
+    gameRuntime.close();
+    serverMapId = String(mapId || "");
+    active = true;
+    try {
+      editor.openDocument(doc);
+      dirty = !mapId;
+    } catch (error) {
+      active = false;
+      gameRuntime.close();
+      throw error;
+    }
+    editor.syncUI();
+    return true;
+  }
+  window.__BreachBuilder = {
+    getEditor: () => editor,
+    getDoc: () => editor.doc?.serializeInternal(),
+    action: (a) => editor.action(a),
+    choose: (i) => editor.choose(i),
+    exportData: () => editor.exportData(),
+    runtimeParity: () => editor.runtimeParity(),
+    validateDeep: () => Validator.validate(editor.doc, true),
+    undo: () => editor.commands.undo(),
+    redo: () => editor.commands.redo(),
+  };
+  return Object.freeze({
+    open,
+    close({ force = false } = {}) {
+      if (!active) return true;
+      if (!force && (dirty || editor.transaction)) {
+        requestExit();
+        return false;
+      }
+      completeExit();
+      return true;
+    },
+    suspend() {
+      active = false;
+      panels.dismiss();
+      editor.input.cancel();
+      editor.stopPlay();
+      gameRuntime.close();
+      editor.syncUI();
+    },
+    requestExit,
+    handleControllerFrame: (f, dt) => editor.input.controller(f, dt),
+    get active() {
+      return active;
+    },
+    get mapId() {
+      return serverMapId;
+    },
+    get saveState() {
+      return editor.saveState;
+    },
+    exportData: () => (editor.doc ? editor.exportData() : null),
+  });
 }

@@ -1,38 +1,39 @@
-import { BUILDING_MATERIALS } from './object-catalog.js?v=1.74.0';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=1.74.0';
-import { createMoonSky } from './mod-environment.js?v=1.74.0';
+let EditorScene;
+import { BUILDING_MATERIALS } from './object-catalog.js?v=2.0.0';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.0.0';
+import { createMoonSky } from './mod-environment.js?v=2.0.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=1.74.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=1.74.0';
-import * as YardGeometry from './world-geometry-yard.js?v=1.74.0';
-import * as RigGeometry from './world-geometry-rig.js?v=1.74.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=1.74.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=1.74.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=1.74.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=1.74.0';
+import * as HighlandsGeometry from './world-geometry.js?v=2.0.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=2.0.0';
+import * as YardGeometry from './world-geometry-yard.js?v=2.0.0';
+import * as RigGeometry from './world-geometry-rig.js?v=2.0.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=2.0.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=2.0.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=2.0.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=2.0.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=1.74.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=1.74.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=1.74.0';
-import { createAudioEngine } from './audio-engine.js?v=1.74.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=1.74.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=1.74.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=1.74.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=1.74.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=1.74.0';
-import { createControllerRecording } from './controller-recording.js?v=1.74.0';
-import { createPointerSessions } from './pointer-sessions.js?v=1.74.0';
-import { createSafeStorage } from './browser-storage.js?v=1.74.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=1.74.0';
-import { createUiFocusScope } from './ui-focus.js?v=1.74.0';
-import { createUiGestures } from './ui-gestures.js?v=1.74.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=1.74.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=1.74.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=1.74.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=1.74.0';
+} from './game-config.js?v=2.0.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.0.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=2.0.0';
+import { createAudioEngine } from './audio-engine.js?v=2.0.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.0.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.0.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.0.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.0.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.0.0';
+import { createControllerRecording } from './controller-recording.js?v=2.0.0';
+import { createPointerSessions } from './pointer-sessions.js?v=2.0.0';
+import { createSafeStorage } from './browser-storage.js?v=2.0.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=2.0.0';
+import { createUiFocusScope } from './ui-focus.js?v=2.0.0';
+import { createUiGestures } from './ui-gestures.js?v=2.0.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.0.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.0.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.0.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=2.0.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -935,7 +936,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=1.74.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.0.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -943,7 +944,7 @@ async function ensureThreeEngine(){
   if(engineLoadPromise)return engineLoadPromise;
   engineLoadPromise=(async()=>{
     try{
-      const mod=await import(ENGINE_MODULE_URL);
+      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.0.0')).EditorScene;
       if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
       THREE=mod;
       position=new THREE.Vector3(0,0,0);
@@ -2252,10 +2253,7 @@ function addLaddersBatch(){
     const rungCount=Math.max(4,Math.floor(height/.34));for(let i=0;i<=rungCount;i++){const rung=new THREE.Mesh(new THREE.CylinderGeometry(.032,.032,ladder.width*.90,8),metal);rung.position.y=.18+(height-.36)*(i/rungCount);rung.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),new THREE.Vector3(frame.tx,0,frame.tz));g.add(rung);}
   }
 }
-function addCanonicalAuthoredStaticProps(){
-  const parts=worldGeometry?.STATIC_PARTS;if(!Array.isArray(parts)||!parts.length)return false;
-  const unitBox=new THREE.BoxGeometry(1,1,1),unitRound=new THREE.CylinderGeometry(1,1,1,14),boxGroups=new Map(),roundGroups=new Map();
-  const roleKey=role=>{
+function authoredPropRole(role){
     const r=String(role||'');
     if(r.includes('Wheel'))return 'wheel';
     if(r.startsWith('burntCar')||r.startsWith('burntBus'))return r.includes('Cabin')||r.includes('Upper')?'vehicleUpper':'vehicleBody';
@@ -2274,8 +2272,8 @@ function addCanonicalAuthoredStaticProps(){
     if(r==='containerGreen')return 'containerGreen';
     if(r==='containerTan')return 'containerTan';
     return 'default';
-  };
-  const materials={
+  }
+function authoredPropMaterials(){return {
     wheel:new THREE.MeshStandardMaterial({color:0x111213,roughness:1}),
     vehicleBody:worldMat(0x252728,'charredMetal',.94,.12),vehicleUpper:worldMat(0x5f4030,'rustedMetal',.97,.04),
     fuelTank:worldMat(0x485056,'paintedMetal',.84,.18),dumpster:worldMat(0x303438,'charredMetal',.92,.12),checkpoint:worldMat(0x76523a,'rustedMetal',.96,.05),
@@ -2283,7 +2281,11 @@ function addCanonicalAuthoredStaticProps(){
     tank:worldMat(0x82755f,'rustedMetal',.80,.12),shed:worldMat(0x765744,'corrugatedMetal',.88,.08),concrete:worldMat(0x9a8b70,'concrete',.96,0),
     containerBlue:worldMat(0x385f78,'corrugatedMetal',.82,.06),containerRed:worldMat(0x8a473f,'corrugatedMetal',.84,.06),containerGreen:worldMat(0x4f6d58,'corrugatedMetal',.86,.06),containerTan:worldMat(0x847457,'corrugatedMetal',.88,.05),
     default:worldMat(0x6f706d,'concrete',.95,0),
-  };
+  };}
+function addCanonicalAuthoredStaticProps(){
+  const parts=worldGeometry?.STATIC_PARTS;if(!Array.isArray(parts)||!parts.length)return false;
+  const unitBox=new THREE.BoxGeometry(1,1,1),unitRound=new THREE.CylinderGeometry(1,1,1,14),boxGroups=new Map(),roundGroups=new Map();
+  const roleKey=authoredPropRole,materials=authoredPropMaterials();
   const push=(map,key,t)=>{if(!map.has(key))map.set(key,[]);map.get(key).push(t);};
   for(const part of parts){
     const key=roleKey(part.role),bottom=Number(part.minY??part.bottomY),top=Number(part.maxY??part.topY),h=top-bottom;if(!(h>0))continue;
@@ -2303,11 +2305,11 @@ function addPyramidsBatch(mat){
   for(const p of PYRAMIDS){const radius=p.base/Math.sqrt(2),ground=terrainHeight(p.x,p.z);transforms.push({x:p.x,y:ground+p.h/2-.05,z:p.z,ry:Math.PI/4,sx:radius,sy:p.h,sz:radius});mapObstacles.push({type:'pyramid',x:p.x,z:p.z,base:p.base});}
   addStaticInstancedMesh(new THREE.ConeGeometry(1,1,4,1),mat,transforms);
 }
-function addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat){
+function naturalVisualBatches(objects,baseHeight){
   const trunks=[],crowns=[],bushes=[],rocks=[];
   const bushOffsets=[[0,0,1],[-.55,0,.72],[.55,.08,.68],[0,.48,.63]];
-  for(const o of NATURAL_OBSTACLES){
-    const base=naturalGroundBase(o.type,o.x,o.z,o.r);mapObstacles.push({type:o.type,x:o.x,z:o.z,r:o.r,h:o.h});
+  for(const o of objects){
+    const base=baseHeight(o);
     if(o.type==='tree'){
       trunks.push({x:o.x,y:base+o.h*.32,z:o.z,sx:o.r,sy:o.h*.64,sz:o.r});
       crowns.push({x:o.x,y:base+o.h*.62,z:o.z,sx:o.r*3.0,sy:o.h*.48,sz:o.r*3.0});
@@ -2316,10 +2318,13 @@ function addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat){
       for(const [ox,oz,scale] of bushOffsets){const r=o.r*scale*.72;bushes.push({x:o.x+ox*o.r*.45,y:base+o.h*.42,z:o.z+oz*o.r*.45,sx:r,sy:r*.62,sz:r});}
     }else rocks.push({x:o.x,y:base+o.h/2,z:o.z,ry:.4,sx:o.r,sy:o.h,sz:o.r});
   }
-  addStaticInstancedMesh(new THREE.CylinderGeometry(.72,1,1,8),trunkMat,trunks);
-  addStaticInstancedMesh(new THREE.ConeGeometry(1,1,9),leafMat,crowns);
-  addStaticInstancedMesh(new THREE.SphereGeometry(1,8,6),bushMat,bushes,{castShadow:false,receiveShadow:false});
-  addStaticInstancedMesh(new THREE.CylinderGeometry(.62,1,1,7,2,false),rockMat,rocks,{castShadow:false,receiveShadow:false});
+return [trunks,crowns,bushes,rocks];
+}
+function naturalVisualGeometries(){return [new THREE.CylinderGeometry(.72,1,1,8),new THREE.ConeGeometry(1,1,9),new THREE.SphereGeometry(1,8,6),new THREE.CylinderGeometry(.62,1,1,7,2,false)];}
+function addNaturalObstaclesBatch(trunkMat,leafMat,bushMat,rockMat){
+const batches=naturalVisualBatches(NATURAL_OBSTACLES,o=>naturalGroundBase(o.type,o.x,o.z,o.r)),geometries=naturalVisualGeometries(),materials=[trunkMat,leafMat,bushMat,rockMat];
+for(const o of NATURAL_OBSTACLES)mapObstacles.push({type:o.type,x:o.x,z:o.z,r:o.r,h:o.h});
+for(let i=0;i<4;i++)addStaticInstancedMesh(geometries[i],materials[i],batches[i],i>=2?{castShadow:false,receiveShadow:false}:{});
 }
 function addBuildingsBatch(){
   const unitBox=new THREE.BoxGeometry(1,1,1);
@@ -2495,7 +2500,7 @@ function bindUI(){
     if(shell.inBuilder){
       if(e.ctrlKey||e.metaKey||e.altKey)return;
       if(!playerMovementActive()||isEditableTarget(canvas.getRootNode().activeElement)||canvas.getRootNode().activeElement?.closest?.('.builder-access'))return;
-      if(['KeyW','KeyA','KeyS','KeyD','ShiftLeft','ShiftRight','Space','KeyC'].includes(e.code)){e.preventDefault();keys.add(e.code);if(!builderSession.editor.walk.state.building){if(!e.repeat&&e.code==='Space')tryJump();if(!e.repeat&&e.code==='KeyC')toggleCrouch();}}
+      if(['KeyW','KeyA','KeyS','KeyD','ShiftLeft','ShiftRight','Space','KeyC'].includes(e.code)){e.preventDefault();keys.add(e.code);if(builderSession.editor.state.phase==='test'){if(!e.repeat&&e.code==='Space')tryJump();if(!e.repeat&&e.code==='KeyC')toggleCrouch();}}
       return;
     }
     if(!shell.inMatch)return;
@@ -2665,10 +2670,10 @@ function onCanvasPointerDown(e){
   const p=canvasPoint(e);
   const gesture=gameplayPointers.begin(e,{capture:directTouch||!!killstreakTargeting||chatOpen||scoreboardOpen});if(!gesture)return;
   if(builderSession){
-    if(!directTouch){if(!playerPointerLocked()){const request=canvas.requestPointerLock?.();request?.catch?.(()=>{});}else if(e.button===0)builderSession.editor.walk.action('place');return;}
+    if(!directTouch){if(!playerPointerLocked()){const request=canvas.requestPointerLock?.();request?.catch?.(()=>{});}else if(e.button===0)builderSession.editor.primary();return;}
     e.preventDefault();const layout=hudLayout||computeHudLayout();
-    if(!builderSession.editor.walk.state.building&&pointInCircle(p.x,p.y,layout.jump)){touchRoles.set(e.pointerId,'jump');touchVisual.jumpUntil=performance.now()+150;tryJump();return;}
-    if(!builderSession.editor.walk.state.building&&pointInCircle(p.x,p.y,layout.crouch)){touchRoles.set(e.pointerId,'crouch');toggleCrouch();return;}
+    if(builderSession.editor.state.phase==='test'&&pointInCircle(p.x,p.y,layout.jump)){touchRoles.set(e.pointerId,'jump');touchVisual.jumpUntil=performance.now()+150;tryJump();return;}
+    if(builderSession.editor.state.phase==='test'&&pointInCircle(p.x,p.y,layout.crouch)){touchRoles.set(e.pointerId,'crouch');toggleCrouch();return;}
     if(!touchRoleActive('joy')&&joystickSpawnAllowed(p,layout)){joy.centerX=p.x;joy.centerY=p.y;touchRoles.set(e.pointerId,'joy');updateJoy(p.x,p.y,{x:p.x,y:p.y,r:layout.joy.r});return;}
     if(p.x>viewW*MOBILE_MOVE_ZONE_RATIO&&!touchRoleActive('look')){touchRoles.set(e.pointerId,'look');look.x=p.x;look.y=p.y;}return;
   }
@@ -2803,6 +2808,8 @@ function canvasPoint(e){const r=canvas.getBoundingClientRect(),rw=Math.max(1,r.w
 function pointInCircle(x,y,c){return Math.hypot(x-c.x,y-c.y)<=c.r;}
 function pointNearCircle(x,y,c,padding=0){return Math.hypot(x-c.x,y-c.y)<=c.r+padding;}
 function joystickSpawnAllowed(p,layout){
+  // Editor HUD consumes its visible controls before this shared movement handler.
+  if(builderSession)return p.x<=layout.moveBoundary;
   const buttons=[layout.leftFire,layout.flash,layout.sticky];if(currentWeapon==='assault')buttons.push(layout.mode);
   if(p.x>layout.moveBoundary||buttons.some(c=>pointNearCircle(p.x,p.y,c,TOUCH_JOY_BUTTON_PADDING)))return false;
   return !combatOverviewVisible()||!pointInRect(p.x,p.y,{x:layout.streak.x-TOUCH_JOY_BUTTON_PADDING,y:layout.streak.y-TOUCH_JOY_BUTTON_PADDING,w:layout.streak.w+TOUCH_JOY_BUTTON_PADDING*2,h:layout.streak.h+TOUCH_JOY_BUTTON_PADDING*2});
@@ -4911,7 +4918,7 @@ function updateGamepadInput(dt){
 
   const pressed=gamepadFrame.pressed,released=gamepadFrame.released,buttons=gamepadFrame.buttons;
   if(replayPlayback){clearControllerGameplayInput();clearControllerUiFocus();if(replayPlayback.kind==='killcam'&&(pressed[GAMEPAD_BUTTON.A]||pressed[GAMEPAD_BUTTON.B]))skipReplayPlayback();return;}
-  if(shell.inBuilder){clearControllerUiFocus();if(playerMovementActive()){applyControllerAim(dt);if(!builderSession.editor.walk.state.building){if(pressed[GAMEPAD_BUTTON.A])tryJump();if(pressed[GAMEPAD_BUTTON.B])toggleCrouch();if(pressed[GAMEPAD_BUTTON.LS])toggleSprint();}}integratedMapBuilder?.handleControllerFrame?.(gamepadFrame,dt);return;}
+  if(shell.inBuilder){clearControllerUiFocus();if(playerMovementActive()){applyControllerAim(dt);if(builderSession.editor.state.phase==='test'){if(pressed[GAMEPAD_BUTTON.A])tryJump();if(pressed[GAMEPAD_BUTTON.B])toggleCrouch();if(pressed[GAMEPAD_BUTTON.LS])toggleSprint();}}integratedMapBuilder?.handleControllerFrame?.(gamepadFrame,dt);return;}
   if(chatOpen||gameTextEditorTarget){
     clearControllerGameplayInput();
     handleControllerUiNavigation(pressed);
@@ -5680,7 +5687,7 @@ window.breachCollisionDebug=(mode='player')=>{
  if(!mode||mode==='off')return;
  const root=new THREE.Group();collisionOverlay=root;
  for(const p of collisionDebugShapes(worldGeometry,mode)){
-  let mesh;const material=new THREE.MeshBasicMaterial({color:mode==='player'?0x00ffff:0xff44cc,wireframe:true,depthTest:false,transparent:true,opacity:.65});
+  let mesh;const material=new THREE.MeshBasicMaterial({color:(p.channel||mode)==='player'?0x00ffff:0xff44cc,wireframe:true,depthTest:false,transparent:true,opacity:.65});
   if(p.type==='box'){mesh=new THREE.Mesh(new THREE.BoxGeometry(p.w,p.maxY-p.minY,p.d),material);mesh.position.set(p.x,(p.minY+p.maxY)/2,p.z);mesh.rotation.y=authoredYaw(p.rot);}
   else if(p.type==='round'){mesh=new THREE.Mesh(new THREE.CylinderGeometry(p.r,p.r,p.maxY-p.minY,16),material);mesh.position.set(p.x,(p.minY+p.maxY)/2,p.z);}
   else if(p.type==='pyramid'){mesh=new THREE.Mesh(new THREE.ConeGeometry(p.base/Math.sqrt(2),p.h,4),material);mesh.position.set(p.x,p.minY+p.h/2,p.z);mesh.rotation.y=Math.PI/4;}
@@ -5697,41 +5704,60 @@ window.breachCollisionDebug=(mode='player')=>{
 
 // Map editing is another local world session in the game engine. No second
 // first-person renderer, controller, movement simulation or network player.
-function builderControlsAvailable(){const e=builderSession?.editor;return !!(e?.play.active&&!e.walk?.state.menu&&!e.walk?.state.transforming&&!e.panel);}
+function builderControlsAvailable(){const e=builderSession?.editor;return !!(e?.play.active&&!e.panel&&!e.dragging&&e.state.camera==='perspective');}
 function playerMovementActive(){return builderSession?builderControlsAvailable():shell.canPlay&&matchAllowsMovement(matchState);}
 function playerPointerLocked(){return (canvas.getRootNode().pointerLockElement||document.pointerLockElement||document.webkitPointerLockElement)===canvas;}
 function resetBuilderMotion(){keys.clear();resetTouchInput();stopSlide();cancelSprint();traversal=null;ladderState=null;moveVelocityX=moveVelocityZ=verticalVelocity=knockX=knockZ=0;onGround=false;crouched=crouchWanted=false;crouchBlend=0;jumpBufferedUntil=traversalIntentUntil=0;correctionViewX=correctionViewY=correctionViewZ=0;adsWanted=false;adsBlend=0;sniperSwayYaw=sniperSwayPitch=0;}
 function clearBuilderGhost(){const b=builderSession;if(!b?.ghost)return;scene.remove(b.ghost);b.ghost.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});b.ghost=null;b.ghostSource=null;}
+
+const editorThumbnailCache=new Map();
+function editorThumbnail(item){
+ const key=JSON.stringify(item);if(editorThumbnailCache.has(key))return editorThumbnailCache.get(key);const e=builderSession?.editor;if(!e)return null;
+ const object={...item,id:'asset-preview',x:0,z:0,rot:0,yOffset:0},candidate=e.previewObject(object),parts=candidate.parts,previewScene=new THREE.Scene(),group=new THREE.Group();previewScene.background=new THREE.Color(0x253137);previewScene.add(group);previewScene.add(new THREE.AmbientLight(0xffffff,3));previewScene.add(new THREE.HemisphereLight(0xffffff,0x555566,2));const light=new THREE.DirectionalLight(0xffffff,3);light.position.set(-20,40,30);previewScene.add(light);
+ const styles=BUILDING_MATERIALS[item.style]||BUILDING_MATERIALS.industrial,materials=item.type==='building'?{wall:worldMat(styles[0],buildingWallTexture(item.style),.92),trim:worldMat(styles[1],'paintedMetal',.78,.1),floor:worldMat(styles[2],'concrete',.97)}:authoredPropMaterials();
+ for(const p of parts){const lo=p.minY??p.bottomY,hi=p.maxY??p.topY;if(!(hi>lo))continue;const role=item.type==='building'?(p.role==='wall'?'wall':['trim','rail','roof','stairSide'].includes(p.role)?'trim':'floor'):authoredPropRole(p.role),mesh=new THREE.Mesh(p.type==='round'?new THREE.CylinderGeometry(p.r,p.r,hi-lo,14):new THREE.BoxGeometry(p.w,hi-lo,p.d),materials[role]||materials.default);mesh.position.set(p.x,(lo+hi)/2,p.z);mesh.rotation.y=authoredYaw(p.rot);group.add(mesh);}
+ if(item.type==='natural'){for(const mesh of [...group.children]){group.remove(mesh);mesh.geometry.dispose();}const batches=naturalVisualBatches([{...object,type:item.kind}],()=>candidate.geometry.terrainHeight(0,0)),geos=naturalVisualGeometries(),colors=[0x594333,0x41582e,0x465b2c,0x77776d];for(let i=0;i<4;i++){const material=new THREE.MeshStandardMaterial({color:colors[i],roughness:1});materials['nature'+i]=material;for(const t of batches[i]){const mesh=new THREE.Mesh(geos[i],material);mesh.position.set(t.x,t.y,t.z);mesh.scale.set(t.sx,t.sy,t.sz);mesh.rotation.y=t.ry||0;group.add(mesh);}}}
+ const bounds=new THREE.Box3().setFromObject(group),center=bounds.getCenter(new THREE.Vector3()),size=bounds.getSize(new THREE.Vector3()),span=Math.max(2,size.x,size.y,size.z)*.85,cam=new THREE.OrthographicCamera(-span*1.3,span*1.3,span,-span,.1,1000);cam.position.copy(center).add(new THREE.Vector3(60,48,70));cam.lookAt(center);const target=new THREE.WebGLRenderTarget(192,144),prior=renderer.getRenderTarget(),oldAlpha=renderer.getClearAlpha(),oldColor=renderer.getClearColor(new THREE.Color());renderer.setRenderTarget(target);renderer.setClearColor(0x10191d,1);renderer.clear();renderer.render(previewScene,cam);const bytes=new Uint8Array(192*144*4);renderer.readRenderTargetPixels(target,0,0,192,144,bytes);renderer.setRenderTarget(prior);renderer.setClearColor(oldColor,oldAlpha);const c=document.createElement('canvas');c.width=192;c.height=144;const context=c.getContext('2d'),image=context.createImageData(192,144);for(let y=0;y<144;y++)image.data.set(bytes.subarray((143-y)*192*4,(144-y)*192*4),y*192*4);context.putImageData(image,0,0);const url=c.toDataURL();target.dispose();group.traverse(o=>o.geometry?.dispose());for(const material of Object.values(materials))material.dispose();editorThumbnailCache.set(key,url);return url;
+}
+function builderTestShot(){
+ const b=builderSession;if(!b||b.editor.state.phase!=='test')return null;const ray=b.adapter.ray(),end={x:ray.origin.x+ray.dir.x*250,y:ray.origin.y+ray.dir.y*250,z:ray.origin.z+ray.dir.z*250};let hit=null,previous={...ray.origin};for(let distance=1;distance<=250&&!hit;distance++){const next={x:ray.origin.x+ray.dir.x*distance,y:ray.origin.y+ray.dir.y*distance,z:ray.origin.z+ray.dir.z*distance};hit=trajectorySegmentHit(previous.x,previous.y,previous.z,next.x,next.y,next.z,previous.y-terrainHeight(previous.x,previous.z)-.08,next.y-terrainHeight(next.x,next.z)-.08,0);previous=next;}const point=hit||end;
+ if(b.shot){scene.remove(b.shot);b.shot.geometry.dispose();b.shot.material.dispose();}const geometry=new THREE.BufferGeometry().setFromPoints([ray.origin.clone(),new THREE.Vector3(point.x,point.y,point.z)]);b.shot=new THREE.Line(geometry,tracerMaterial(hit?0xffaa55:0x66eebb));b.shotUntil=performance.now()+600;scene.add(b.shot);b.editor.toast(hit?'Projectile hit · '+Math.hypot(point.x-ray.origin.x,point.y-ray.origin.y,point.z-ray.origin.z).toFixed(1)+' m':'Projectile path clear');return {hit:!!hit,point};
+}
 const builderGameRuntime={
  attach(editor){
    if(!engineReady)throw new Error('Game engine is not ready');
    if(!builderSession){builderSession={editor,revision:-1,parent:canvas.parentNode,next:canvas.nextSibling,style:canvas.getAttribute('style'),map:currentMapId,pose:position.clone(),yaw,pitch,hp,hidden:[]};
      for(const o of [pistolGroup,akimboLeftGroup,akimboRightGroup,assaultGroup,umpGroup,machineGunGroup,shotgunGroup,semiShotgunGroup,sniperGroup,grenadeLauncherGroup,rpgGroup,mantleHands,firstPersonHands])if(o){builderSession.hidden.push([o,o.visible]);o.visible=false;}
    }
-   builderSession.editor=editor;builderSession.revision=-1;canvas.classList.add('builder-game-canvas');editor.stage.prepend(canvas);canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;z-index:2;touch-action:none';editor.stage.classList.add('uses-game-runtime');resetBuilderMotion();hp=100;this.teleport(editor.play);onResize();
+   builderSession.editor=editor;builderSession.revision=-1;builderSession.adapter?.dispose();builderSession.adapter=new EditorScene(editor,scene,camera,canvas);canvas.classList.add('builder-game-canvas');editor.stage.prepend(canvas);canvas.style.cssText='position:absolute;inset:0;width:100%;height:100%;display:block;z-index:2;touch-action:none';editor.stage.classList.add('uses-game-runtime');resetBuilderMotion();hp=100;this.teleport(editor.play);onResize();
  },
  teleport(p){if(!builderSession)return;position.set(p.x,p.y-PLAYER_HEIGHT,p.z);yaw=-p.yaw;pitch=p.pitch;resetViewVertical(position.y);resetBuilderMotion();},
  suspend(){if(!builderSession)return;resetBuilderMotion();canvas.style.display='none';clearBuilderGhost();if(playerPointerLocked())document.exitPointerLock?.();},
- close(){const b=builderSession;if(!b)return;this.suspend();canvas.classList.remove('builder-game-canvas');b.editor.stage.classList.remove('uses-game-runtime');b.parent.insertBefore(canvas,b.next?.parentNode===b.parent?b.next:null);if(b.style===null)canvas.removeAttribute('style');else canvas.setAttribute('style',b.style);builderSession=null;setActiveMap(b.map,{rebuild:false});rebuildWorldVisuals();position.copy(b.pose);yaw=b.yaw;pitch=b.pitch;hp=b.hp;resetViewVertical(position.y);for(const [o,visible]of b.hidden)o.visible=visible;onResize();},
+ close(){const b=builderSession;if(!b)return;this.suspend();if(b.shot){scene.remove(b.shot);b.shot.geometry.dispose();b.shot.material.dispose();}b.adapter?.dispose();canvas.classList.remove('builder-game-canvas');b.editor.stage.classList.remove('uses-game-runtime');b.parent.insertBefore(canvas,b.next?.parentNode===b.parent?b.next:null);if(b.style===null)canvas.removeAttribute('style');else canvas.setAttribute('style',b.style);builderSession=null;setActiveMap(b.map,{rebuild:false});rebuildWorldVisuals();position.copy(b.pose);yaw=b.yaw;pitch=b.pitch;hp=b.hp;resetViewVertical(position.y);for(const [o,visible]of b.hidden)o.visible=visible;onResize();},
  jump:()=>tryJump(),crouch:()=>toggleCrouch(),
+ testShot:builderTestShot,
+ thumbnail:editorThumbnail,
  debugCollision:mode=>window.breachCollisionDebug(mode),
- project(point){if(!builderSession)return null;const p=new THREE.Vector3(point.x,point.y,point.z).project(camera);if(p.z< -1||p.z>1)return null;const rect=builderSession.editor.stage.getBoundingClientRect();return {x:(p.x+1)*rect.width/2,y:(1-p.y)*rect.height/2};},
+ ray(point){return builderSession?.adapter.ray(point);},
+ transformPointer(kind,event){return builderSession?.adapter.pointer(kind,event)||false;},
+ cancelTransform(){builderSession?.adapter.cancel();},
+ project(point){return builderSession?.adapter.project(point);},
  pauseInput(){keys.clear();resetTouchInput();cancelSprint();if(playerPointerLocked())document.exitPointerLock?.();}
 };
 function updateBuilderFlight(dt){
- const state=builderSession.editor.walk.state,input=movementInput(),speed=movementSettings.runSpeed*(keys.has('ShiftLeft')||keys.has('ShiftRight')?SPRINT_SPEED_MULTIPLIER:1),sin=Math.sin(yaw),cos=Math.cos(yaw),lift=Math.max(-1,Math.min(1,(state.lift||0)+(controllerInputActive()?(state.controllerLift||0):0)+(keys.has('Space')?1:0)-(keys.has('KeyC')?1:0)));
+ const state=builderSession.editor.state,input=movementInput(),speed=movementSettings.runSpeed*(keys.has('ShiftLeft')||keys.has('ShiftRight')?SPRINT_SPEED_MULTIPLIER:1),sin=Math.sin(yaw),cos=Math.cos(yaw),lift=Math.max(-1,Math.min(1,(state.lift||0)+(controllerInputActive()?(state.controllerLift||0):0)+(keys.has('Space')?1:0)-(keys.has('KeyC')?1:0)));
  position.x=THREE.MathUtils.clamp(position.x+(input.mx*cos+input.mz*sin)*speed*dt,-ARENA_LIMIT+1,ARENA_LIMIT-1);position.z=THREE.MathUtils.clamp(position.z+(-input.mx*sin+input.mz*cos)*speed*dt,-ARENA_LIMIT+1,ARENA_LIMIT-1);const floor=terrainHeight(position.x,position.z);position.y=THREE.MathUtils.clamp(position.y+lift*speed*dt,floor,Math.max(60,floor+40));
  verticalVelocity=moveVelocityX=moveVelocityZ=0;crouched=crouchWanted=false;crouchBlend=0;onGround=false;resetViewVertical();
 }
 function frameBuilderRuntime(dt){
- const b=builderSession,e=b.editor;if(!e.play.active)return;
+ const b=builderSession,e=b.editor;if(!e.play.active)return;if(b.shot&&performance.now()>b.shotUntil){scene.remove(b.shot);b.shot.geometry.dispose();b.shot.material.dispose();b.shot=null;}
  if(b.revision!==e.sceneRev){const runtime=e.runtimePhysical();clearBuilderGhost();currentMapId='custom-map';applyWorldGeometry(runtime.geometry,runtime.collision);rebuildWorldVisuals();b.revision=e.sceneRev;
-   if(!e.walk?.state.building&&activeWorldCollision.worldBlockedAt(position.x,position.z,position.y,currentPlayerHeight(),PLAYER_RADIUS)){const sp=e.doc.spawns.find(s=>!activeWorldCollision.worldBlockedAt(s.x,s.z,terrainHeight(s.x,s.z),PLAYER_HEIGHT,PLAYER_RADIUS));position.set(sp?.x||0,terrainHeight(sp?.x||0,sp?.z||0)+(sp?.yOffset||0),sp?.z||0);resetViewVertical(position.y);resetBuilderMotion();}
+   if(e.state.phase==='test'&&activeWorldCollision.worldBlockedAt(position.x,position.z,position.y,currentPlayerHeight(),PLAYER_RADIUS)){const sp=e.doc.spawns.find(s=>!activeWorldCollision.worldBlockedAt(s.x,s.z,terrainHeight(s.x,s.z),PLAYER_HEIGHT,PLAYER_RADIUS));position.set(sp?.x||0,terrainHeight(sp?.x||0,sp?.z||0)+(sp?.yOffset||0),sp?.z||0);resetViewVertical(position.y);resetBuilderMotion();}
  }
- if(builderControlsAvailable()&&e.walk?.state.building){updateBuilderFlight(dt);}else if(builderControlsAvailable()){const steps=Math.max(1,Math.min(CLIENT_MAX_SIM_STEPS,Math.ceil(dt/(CLIENT_FIXED_STEP_SEC*1.35))));for(let i=0;i<steps;i++){updateCrouchState(dt/steps);updateMovement(Math.min(MAX_PLAYER_PHYSICS_STEP_SEC,dt/steps));}}else{keys.clear();resetTouchInput();moveVelocityX=moveVelocityZ=0;}
- updateGameFrame(Math.min(dt,MAX_PLAYER_PHYSICS_STEP_SEC));Object.assign(e.play,{x:camera.position.x,y:camera.position.y,z:camera.position.z,yaw:-camera.rotation.y,pitch:camera.rotation.x,feetY:position.y,bodyHeight:currentPlayerHeight()});e.walk?.update();
- const src=e.walk?.state.building&&!e.walk.state.menu?e.walk.state.ghost:null;
- if(src!==b.ghostSource){clearBuilderGhost();b.ghostSource=src;if(src){b.ghost=new THREE.Group();const selecting=e.walk.state.mode==='select',color=selecting?0x65c6ff:e.walk.state.valid?0xd7ff58:0xff5f67;for(const p of src.parts){const lo=p.minY??p.bottomY,hi=p.maxY??p.topY,w=p.w||p.r*2,d=p.d||p.r*2;if(!Number.isFinite(lo+hi+w+d)||hi<=lo)continue;const mesh=new THREE.Mesh(new THREE.BoxGeometry(w,hi-lo,d),new THREE.MeshBasicMaterial({color,wireframe:selecting,transparent:true,opacity:selecting?.8:.28,depthWrite:false}));mesh.position.set(p.x,(lo+hi)/2,p.z);mesh.rotation.y=-(p.rot||0)*Math.PI/180;b.ghost.add(mesh);}scene.add(b.ghost);}}
- const c=hudCtx;c.setTransform(hudScale,0,0,hudScale,0,0);c.clearRect(0,0,viewW,viewH);c.textBaseline='middle';if(touchGameplayControlsVisible())drawTouchControls(c,hudLayout||computeHudLayout(),performance.now(),e.walk?.state.building?'fly':true);hudTexture.needsUpdate=true;
- renderer.autoClear=true;renderer.render(scene,camera);renderer.autoClear=false;renderer.clearDepth();renderer.render(hudScene,hudCamera);renderer.autoClear=true;
+ if(builderControlsAvailable()&&(e.state.phase==='edit')){updateBuilderFlight(dt);}else if(builderControlsAvailable()){const steps=Math.max(1,Math.min(CLIENT_MAX_SIM_STEPS,Math.ceil(dt/(CLIENT_FIXED_STEP_SEC*1.35))));for(let i=0;i<steps;i++){updateCrouchState(dt/steps);updateMovement(Math.min(MAX_PLAYER_PHYSICS_STEP_SEC,dt/steps));}}else{keys.clear();resetTouchInput();moveVelocityX=moveVelocityZ=0;}
+ updateGameFrame(Math.min(dt,MAX_PLAYER_PHYSICS_STEP_SEC));Object.assign(e.play,{x:camera.position.x,y:camera.position.y,z:camera.position.z,yaw:-camera.rotation.y,pitch:camera.rotation.x,feetY:position.y,bodyHeight:currentPlayerHeight()});e.update();b.adapter.update();
+ const src=e.state.phase==='edit'&&!e.panel?e.ghost:null;
+ if(src!==b.ghostSource){clearBuilderGhost();b.ghostSource=src;if(src){b.ghost=new THREE.Group();const selecting=!!src.selection,color=selecting?0x65c6ff:src.valid!==false?0xd7ff58:0xff5f67;for(const p of src.parts){const lo=p.minY??p.bottomY,hi=p.maxY??p.topY,w=p.w||p.r*2,d=p.d||p.r*2;if(!Number.isFinite(lo+hi+w+d)||hi<=lo)continue;const mesh=new THREE.Mesh((p.type==='round'?new THREE.CylinderGeometry(p.r,p.r,hi-lo,12):new THREE.BoxGeometry(w,hi-lo,d)),new THREE.MeshBasicMaterial({color,wireframe:selecting,transparent:true,opacity:selecting?.8:.28,depthWrite:false}));mesh.position.set(p.x,(lo+hi)/2,p.z);mesh.rotation.y=-(p.rot||0)*Math.PI/180;b.ghost.add(mesh);}scene.add(b.ghost);}}
+ const c=hudCtx;c.setTransform(hudScale,0,0,hudScale,0,0);c.clearRect(0,0,viewW,viewH);c.textBaseline='middle';if(touchGameplayControlsVisible())drawTouchControls(c,hudLayout||computeHudLayout(),performance.now(),(e.state.phase==='edit')?'fly':true);hudTexture.needsUpdate=true;
+ renderer.autoClear=true;const savedFog=scene.fog;if(e.state.camera==='top')scene.fog=null;renderer.render(scene,b.adapter.activeCamera());scene.fog=savedFog;renderer.autoClear=false;renderer.clearDepth();renderer.render(hudScene,hudCamera);renderer.autoClear=true;
 }
