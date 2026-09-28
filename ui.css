@@ -1134,7 +1134,7 @@ body{font-size:var(--ui-md)}
   .admin-player-list{grid-template-columns:1fr!important;overflow:auto!important}.admin-team-section.ffa{grid-column:auto}
 }
 
-/* v1.72.1 compact menu system: the Players tab is the visual baseline for every Breach menu. */
+/* v1.73.0 compact menu system: the Players tab is the visual baseline for every Breach menu. */
 :root{--compact-gap:5px;--compact-pad:6px;--compact-radius:7px;--compact-row:31px}
 
 /* One consistent lobby surface instead of each tab inventing its own outer card. */
@@ -1261,7 +1261,7 @@ body{font-size:var(--ui-md)}
 @media(max-width:760px),(max-height:430px) and (orientation:landscape){.lobby-map-panel{grid-template-columns:minmax(285px,.9fr) minmax(0,1.1fr)!important}}
 @media(orientation:portrait),(max-width:560px){.lobby-map-panel{grid-template-columns:minmax(0,1fr)!important}}
 
-/* v1.72.1 content-sized navigation: compact controls do not stretch just to fill a row. */
+/* v1.73.0 content-sized navigation: compact controls do not stretch just to fill a row. */
 .lobby-side-tabs{
   display:flex!important;justify-content:flex-start!important;align-items:stretch;gap:4px!important;
   overflow-x:auto!important;overflow-y:hidden!important;scrollbar-width:none;-webkit-overflow-scrolling:touch

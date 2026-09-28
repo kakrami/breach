@@ -1,6 +1,6 @@
 // Presentation and hit testing only. All edits go through the builder's command stack.
 // Layout is shared by painting, pointer input, keyboard focus and controller focus.
-import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.72.1';
+import {GAMEPAD_BUTTON as B} from './gamepad-input.js?v=1.73.0';
 const inside=(p,r)=>p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h;
 export function hudLayout(w,h,model,insets={}){
  const left=insets.left||0,right=insets.right||0,topInset=insets.top||0,bottom=insets.bottom||0;
@@ -36,19 +36,41 @@ export function hudLayout(w,h,model,insets={}){
   const tipY=model.selected||model.pending?h-147:h-91;
   if(model.tip)labels.push({text:model.tip,x:w/2,y:tipY,maxWidth:Math.max(100,w-190)});
  }
- if(model.panel){
-  // Panels own input while open. Pagination makes every item reachable even on short screens.
-  const pw=Math.min(332,w-24),px=w-m-pw,py=small?116:66,ph=Math.max(164,h-py-12);
-  panels.push({x:px,y:py,w:pw,h:ph});
-  buttons.length=0;
-  labels.length=0;
-  labels.push({text:model.panel.title,x:px+16,y:py+26,align:'left',maxWidth:pw-80});
-  add('close','×',px+pw-52,py+4,44,44,{aria:'Close panel'});
-  const rows=Math.max(1,Math.floor((ph-112)/54)),pageSize=rows*2;
-  const items=model.panel.items||[],pages=Math.max(1,Math.ceil(items.length/pageSize)),page=Math.min(model.page||0,pages-1);
-  items.slice(page*pageSize,(page+1)*pageSize).forEach((it,i)=>add(it.id,it.label,px+12+(i%2)*(pw-19)/2,py+56+Math.floor(i/2)*54,(pw-29)/2,49,it));
-  if(pages>1){add('previous','‹',px+12,py+ph-51,44,44,{disabled:page===0});add('next','›',px+pw-56,py+ph-51,44,44,{disabled:page===pages-1});labels.push({text:`${page+1} / ${pages}`,x:px+pw/2,y:py+ph-28,maxWidth:120});}
+ if(model.overview&&!model.panel){
+  const bw=Math.min(90,(w-44)/5),x=(w-(bw*5+20))/2;
+  [['select','Select'],['pick','Objects'],['terrain','Terrain'],['edit','Properties'],['multi','Multi']].forEach(([id,label],i)=>add(id,label,x+(bw+5)*i,h-56,bw,44,{disabled:id==='edit'&&!model.selected,selected:id==='multi'&&model.multi}));
+  if(model.selected){const opts=[['copy','Copy'],['erase','Delete'],['raise-object','Object ↑'],['lower-object','Object ↓']];opts.forEach(([id,label],i)=>add(id,label,(w-249)/2+i*64,h-105,59,44));}
+  if(model.tip)labels.push({text:model.tip,x:w/2,y:h-(model.selected?121:72),maxWidth:w-40});
  }
+
+ if(model.panel){
+  buttons.length=0;labels.length=0;
+  const keyboard=model.panel.kind==='keyboard',pw=keyboard?Math.min(640,w-24):Math.min(380,w-24),px=keyboard?(w-pw)/2:w-m-pw,py=12,ph=h-24;
+  panels.push({x:px,y:py,w:pw,h:ph});
+  labels.push({text:model.panel.title,x:px+16,y:py+25,align:'left',maxWidth:pw-80});
+  if(keyboard){
+   labels.push({text:(model.panel.value||'')+'│',x:px+16,y:py+62,align:'left',maxWidth:pw-32});
+   const numeric=model.panel.numeric,digits=numeric||model.panel.digits,chars=digits?'1234567890.-_':'qwertyuiopasdfghjklzxcvbnm';
+   const keys=[...chars].map(ch=>({id:'text:'+(model.panel.caps?ch.toUpperCase():ch),label:model.panel.caps?ch.toUpperCase():ch}));
+   if(!numeric)keys.push({id:'text:digits',label:digits?'ABC':'123'},{id:'text:caps',label:'Shift'},{id:'text:space',label:'Space'});
+   keys.push({id:'text:back',label:'Back',aria:'Backspace'},{id:'text:clear',label:'Clear'},{id:'text:cancel',label:'Cancel'},{id:'text:done',label:'Done',accent:true});
+   const cols=Math.max(1,Math.floor((pw-19)/49)),bw=(pw-24-(cols-1)*5)/cols;
+   keys.forEach((it,i)=>add(it.id,it.label,px+12+(i%cols)*(bw+5),py+78+Math.floor(i/cols)*49,bw,44,it));
+  }else{
+   add('close','×',px+pw-52,py+4,44,44,{aria:'Close panel',disabled:model.panel.title==='Working…'});
+   const lines=[],words=(model.panel.description||'').split(/\s+/),limit=Math.max(12,Math.floor((pw-32)/7));let line='';
+   for(const word of words){if((line+' '+word).length>limit&&line){lines.push(line);line=word;}else line+=(line?' ':'')+word;}if(line)lines.push(line);
+   const maxLines=Math.max(1,Math.floor((ph-160)/18)),textPages=Math.max(1,Math.ceil(lines.length/maxLines));
+   const lastLines=lines.slice((textPages-1)*maxLines),offsetLast=lastLines.length?74+lastLines.length*18:56;
+   const rows=Math.max(1,Math.floor((ph-offsetLast-56)/54)),pageSize=rows*2,items=model.panel.items||[];
+   const pages=textPages-1+Math.max(1,Math.ceil(items.length/pageSize)),page=Math.min(model.page||0,pages-1),textPage=Math.min(page,textPages-1),shown=lines.slice(textPage*maxLines,(textPage+1)*maxLines);
+   shown.forEach((text,i)=>labels.push({text,x:px+16,y:py+63+i*18,align:'left',maxWidth:pw-32}));
+   if(page>=textPages-1){const offset=shown.length?74+shown.length*18:56,itemPage=page-(textPages-1);items.slice(itemPage*pageSize,(itemPage+1)*pageSize).forEach((it,i)=>add(it.id,it.label,px+12+(i%2)*(pw-19)/2,py+offset+Math.floor(i/2)*54,(pw-29)/2,49,it));}
+   if(pages>1){add('previous','‹',px+12,py+ph-51,44,44,{disabled:page===0});add('next','›',px+pw-56,py+ph-51,44,44,{disabled:page===pages-1});labels.push({text:`${page+1} / ${pages}`,x:px+pw/2,y:py+ph-28,maxWidth:120});}
+
+  }
+ }
+
  return {buttons,panels,labels};
 }
 function box(c,r,fill,stroke){c.beginPath();c.roundRect(r.x,r.y,r.w,r.h,7);c.fillStyle=fill;c.fill();if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
@@ -92,7 +114,7 @@ export function createBuilderHUD({stage,active,model,action,lift,pause,transform
   if(m.gizmo&&!m.panel){layout.lines=[];const {origin,axes}=m.gizmo;for(const a of axes){const b={id:'axis-'+a.axis,label:a.label,x:a.end.x-22,y:a.end.y-22,w:44,h:44,axis:a.axis,origin,dx:a.end.x-origin.x,dy:a.end.y-origin.y,length:a.length};if(b.x<80||b.x+b.w>w-100||b.y<70||b.y+b.h>h-160||layout.buttons.some(r=>b.x<r.x+r.w&&b.x+b.w>r.x&&b.y<r.y+r.h&&b.y+b.h>r.y))continue;layout.lines.push({x:origin.x,y:origin.y,x2:a.end.x,y2:a.end.y,color:a.color});layout.buttons.push(b);}}
   for(const b of layout.buttons)if(b.thumbnail&&!images.has(b.thumbnail)){const img=new Image();images.set(b.thumbnail,img);img.onload=()=>{imageVersion++;render();};img.src=b.thumbnail;}
   const paintKey=JSON.stringify([w,h,scale,layout,focus,pressed?.id,imageVersion]);if(paintKey===paintSignature)return;paintSignature=paintKey;ctx.setTransform(scale,0,0,scale,0,0);ctx.clearRect(0,0,w,h);paintHUD(ctx,layout,{focus,pressed:pressed?.id,images});
-  if(status.textContent!==m.tip)status.textContent=m.tip||'';
+  const announcement=m.panel?[m.panel.title,m.panel.description,m.panel.value].filter(Boolean).join('. '):m.tip||'';if(status.textContent!==announcement)status.textContent=announcement;
   if(!layout.buttons.some(b=>b.id===focus&&!b.disabled))focus='';
   const sig=layout.buttons.map(b=>[b.id,b.label,!!b.disabled,!!b.selected].join(':')).join('|');
   if(signature!==sig){signature=sig;const hadFocus=access.contains(stage.getRootNode().activeElement);access.replaceChildren(...layout.buttons.map(b=>{const el=document.createElement('button');el.textContent=b.aria||b.label;el.dataset.hud=b.id;el.disabled=!!b.disabled;el.setAttribute('aria-pressed',String(!!b.selected));el.onclick=()=>{if(b.hold)action(b.hold>0?'fly-step-up':'fly-step-down');else action(b.id);render();};el.onfocus=()=>{focus=b.id;pause?.();render();};return el;}));if(hadFocus)access.querySelector(`[data-hud="${focus}"]`)?.focus();}
@@ -100,7 +122,7 @@ export function createBuilderHUD({stage,active,model,action,lift,pause,transform
  function point(ev){const r=stage.getBoundingClientRect();return{x:ev.clientX-r.left,y:ev.clientY-r.top};}
  function stop(ev){ev.preventDefault();ev.stopImmediatePropagation();}
  function down(ev){
-  if(!active()||ev.button>0||ev.composedPath().some(n=>n!==canvas&&n!==stage&&n?.matches?.('button,input,select,textarea,.drawer,.overlay')))return;
+  if(!active()||ev.button>0||ev.composedPath().some(n=>n!==canvas&&n!==stage&&n?.matches?.('button,input')))return;
   // A locked mouse controls the crosshair, never buttons underneath it.
   if(stage.getRootNode().pointerLockElement||document.pointerLockElement)return;
   render();const p=point(ev),b=[...layout.buttons].reverse().find(b=>inside(p,b));
@@ -115,8 +137,15 @@ export function createBuilderHUD({stage,active,model,action,lift,pause,transform
  const observer=new ResizeObserver(render);observer.observe(stage);
  function controller(frame){
   const p=frame.pressed||[];if(!model().panel)return false;
-  render();const list=layout.buttons.filter(b=>!b.disabled);let i=list.findIndex(b=>b.id===focus);if(i<0)i=list.length>1?1:0;
-  if(p[B.B]||p[B.MENU])action('close');else if(p[B.A])action(list[i]?.id);else{const delta=p[B.DPAD_RIGHT]?1:p[B.DPAD_LEFT]?-1:p[B.DPAD_DOWN]?2:p[B.DPAD_UP]?-2:0;if(delta)i=(i+delta+list.length)%list.length;focus=list[i]?.id||'';}render();return true;
+  render();const list=layout.buttons.filter(b=>!b.disabled);let i=list.findIndex(b=>b.id===focus);if(i<0)i=list[0]?.id==='close'&&list.length>1?1:0;
+  if(p[B.B]||p[B.MENU])action('close');else if(p[B.A])action(list[i]?.id);else{
+   const dx=p[B.DPAD_RIGHT]?1:p[B.DPAD_LEFT]?-1:0,dy=p[B.DPAD_DOWN]?1:p[B.DPAD_UP]?-1:0;
+   if((dx||dy)&&list[i]){const a=list[i],ax=a.x+a.w/2,ay=a.y+a.h/2;let best=null,score=Infinity;
+    for(const b of list){const x=b.x+b.w/2-ax,y=b.y+b.h/2-ay;if(dx*x+dy*y<=1)continue;const n=Math.hypot(x,y)+Math.abs(dx?y:x)*2;if(n<score){score=n;best=b;}}if(best)i=list.indexOf(best);
+   }focus=list[i]?.id||'';
+  }render();return true;
  }
- return {render,controller,reset,get layout(){return layout;},destroy(){observer.disconnect();window.removeEventListener('blur',reset);for(const [event,fn]of [['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',cancel],['lostpointercapture',cancel]])stage.removeEventListener(event,fn,true);canvas.remove();access.remove();status.remove();}};
+ function key(ev){const map={ArrowLeft:B.DPAD_LEFT,ArrowRight:B.DPAD_RIGHT,ArrowUp:B.DPAD_UP,ArrowDown:B.DPAD_DOWN,Enter:B.A,Escape:B.B};if(!(ev.key in map))return false;const pressed=[];pressed[map[ev.key]]=true;return controller({pressed});}
+
+ return {render,controller,key,reset,get layout(){return layout;},destroy(){observer.disconnect();window.removeEventListener('blur',reset);for(const [event,fn]of [['pointerdown',down],['pointermove',move],['pointerup',up],['pointercancel',cancel],['lostpointercapture',cancel]])stage.removeEventListener(event,fn,true);canvas.remove();access.remove();status.remove();}};
 }

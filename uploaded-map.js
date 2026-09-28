@@ -1,4 +1,4 @@
-import { resolveAsset } from './object-catalog.js?v=1.72.1';
+import { resolveAsset } from './object-catalog.js?v=1.73.0';
 const finite=(v,f=0)=>Number.isFinite(Number(v))?Number(v):f;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const text=(v,max=64,f='')=>String(v??f).replace(/[\u0000-\u001f\u007f]/g,'').slice(0,max);
