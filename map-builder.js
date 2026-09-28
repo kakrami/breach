@@ -1,13 +1,13 @@
-import { EditorSession } from "./editor-session.js?v=2.1.0";
+import { EditorSession } from "./editor-session.js?v=2.2.0";
 import {
   MapDocument,
   Storage,
   Validator,
   templateToDoc,
-} from "./builder-model.js?v=2.1.0";
-import { createBuilderPanels } from "./builder-panels.js?v=2.1.0";
-import { createBuilderHUD } from "./builder-hud.js?v=2.1.0";
-import { createEditorInput } from "./editor-input.js?v=2.1.0";
+} from "./builder-model.js?v=2.2.0";
+import { createBuilderPanels } from "./builder-panels.js?v=2.2.0";
+import { createBuilderHUD } from "./builder-hud.js?v=2.2.0";
+import { createEditorInput } from "./editor-input.js?v=2.2.0";
 export function createIntegratedMapBuilder({
   host,
   apiBase,
@@ -20,7 +20,7 @@ export function createIntegratedMapBuilder({
   root.replaceChildren();
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = new URL("./map-builder.css?v=2.1.0", import.meta.url).href;
+  css.href = new URL("./map-builder.css?v=2.2.0", import.meta.url).href;
   const app = document.createElement("div");
   app.className = "app";
   const stage = document.createElement("main");
@@ -73,7 +73,7 @@ export function createIntegratedMapBuilder({
     lift: (value) => {
       editor.state.lift = editor.state.phase === "edit" ? value : 0;
     },
-    pause: () => gameRuntime.pauseInput(),
+    pause: () => {editor.input?.cancel();gameRuntime.pauseInput();},
   });
   editor.input = createEditorInput(editor, () => active, panels);
   async function api(path, payload = {}) {
@@ -137,8 +137,8 @@ export function createIntegratedMapBuilder({
   }
   function run(task) {
     if (operation) return operation;
-    if (editor.transaction) {
-      editor.toast("Apply or Cancel before saving");
+    if (editor.transaction || editor.roadPoints.length) {
+      editor.toast("Finish or Cancel before saving");
       return Promise.resolve();
     }
     gameRuntime.pauseInput();

@@ -1,50 +1,37 @@
-# Breach 2.1.0 — verification and release status
+# Breach 2.2.0 — verification and release status
 
-This package is a release candidate. It has not been deployed to the public site. Client and server must be updated together (protocol 97).
+This is a release candidate, not a public deployment. Update both supplied folders together: protocol 98 preserves the new road path contract.
 
-## UI revision 2.1.0
+## Changes
 
-Replaced the tool rail and oversized generic grids with a compact bottom hotbar, recent-object thumbnails, contextual object actions and a tabbed visual library. The map menu fits in one page at the tested landscape sizes. Terrain uses a surface-following brush ring and inline size/strength sliders. Numeric property fields also use sliders rather than a modal numeric keyboard. Cancelled slider drags never change document state. Settings drawers size to their contents. Controller LT offers focus access to all visible toolbar actions. Thumbnail caching waits for texture readiness and uses the correct output color space. The shared game HUD requests CPU-backed Canvas2D rasterization before each WebGL texture upload. Browser comparisons reproduced retained joystick pixels with GPU-backed drawing surfaces; the CPU-backed source cleared them in a normal screenshot run without diagnostic pixel reads or forced repainting. The existing canvas and renderer ownership are retained.
+- Edit mode uses orbit, pan and anchored pinch/wheel zoom. Player movement is reserved for Test. Touching an object selects it; active placement/terrain tools own their gestures. Camera changes never select a different tool. Move still provides object height controls.
+- Terrain and ground paint follow the dragging finger/pointer. The runtime preview updates before release; a completed stroke produces one undo entry. Cancellation, blur, toolbar activation and a second finger discard the interrupted stroke. Two fingers then navigate. Controller sticks pan/orbit, bumpers zoom and RT holds the brush; disconnect cancels the stroke.
+- Roads are saved paths with editable points, smooth curves, midpoint bend handles, endpoint extension, width and transform. Finish commits the path once. Legacy rectangular roads can also be edited as paths. Move/Rotate preserve path coordinates. Map Check follows expanded paths.
+- Road surfaces and markings are split along the exact terrain triangles. This addresses ground protruding between mismatched surface triangles. Markings are clipped at other road footprints; curved sections share a continuous dash phase.
+- Existing shared catalog, geometry/collision, command history, canvas UI, object selection/transforms, height, undo/redo, import/export, templates, Test, save and publish remain available.
 
-Desktop and emulated-touch browser passes include the new library, brush sliders, single-page map menu and the full placement/edit/test/save/publish/reopen workflow. These checks use a local server-sanitizer harness, not a production deployment.
+## Verified for this revision
 
-## Rebuilt
+- Actual headless Chromium/WebGL2 mouse and emulated-touch sessions: orbit/zoom without moving the player; live brush preview, one-command undo, interrupted-stroke cancellation; road drawing, handle reshaping, surface selection, save, publish and reopen. No page JavaScript errors occurred in successful runs.
+- Full desktop application regression: library, object placement, selection, transform gizmo/cancellation, nudge, apply, undo/redo, camera toggle, game Test movement, save, publish, reopen and close. Game movement checks exercised doorway traversal, sprinting into a wall, crouching, jumping and a projectile through the doorway.
+- 4,880 generated road triangles checked at multiple interior points on flat and uneven terrain. Their interpolated heights match the underlying canonical terrain plus the surface offset. Path shape, smoothness and width survive client/server sanitization and reopen; undo/redo, move/rotate and cancellation preserve path identity.
+- 2,489 geometry/lifecycle assertions, including 2,436 wall checks and official/custom parity fixtures; 48 movement sweeps.
+- Session regression across 34 presets, detached previews, history, import, terrain, roads, starts, mounds, generation and attached ladders.
+- 3,528 workspace layout checks and 3,804 panel/library/input checks, plus road toolbar cases, for bounds, target sizes and overlap. Pointer/controller adapter checks cover cancellation, idle-controller ownership and disconnect.
+- JavaScript syntax, dependency closure, matching client/server shared modules and version/protocol consistency.
 
-The editor now has one session state, one command/history pipeline, detached transform previews, and independent camera and tool choices. It uses the game's scene, renderer, movement, input and collision. The previous walk-builder and builder-flow controllers and 2D editor renderer were removed. The object library is defined in the shared catalog. Asset IDs survive save/export/publish; old maps retain compatibility normalization.
-
-Canvas controls provide Place, Select, Move, Rotate, supported Resize, object height, flight Up/Down, terrain tools, undo/redo, groups, properties, roads, starts, templates, import/export, Map Check, Test, save and publish. Test uses game movement and a projectile collision probe. Both camera views show the same world. Map Check runs canonical geometry validation in a worker. Collision overlays show player, projectile or both channels.
-
-## Automated checks completed
-
-- 2,489 geometry/lifecycle assertions, including 2,436 wall checks; four official/custom fixtures and shared client/server contracts.
-- 48 movement sweeps covering standing, crouch/slide heights, floor seams, ceilings and doorway/window projectile openings, plus rotated/scaled pieces.
-- All 34 library presets, detached previews, cancellation, history, import, terrain, roads/curves, starts, generation and attached ladder rotation/deletion.
-- 3,760 main-workspace layout checks and 3,804 panel/keyboard/library checks for bounds, minimum 44-pixel targets and button overlap across narrow and desktop sizes.
-- Input adapter checks for pointer cancellation, blur, held flight, multitouch, controller menu actions and teardown.
-- Terrain drag commits once; interrupted strokes and two-finger camera gestures leave document/history unchanged.
-- Spatial-index optimization preserves exact geometry/collision/terrain signatures against the previous compiler in ten fixtures.
-- JavaScript syntax, local module dependency closure, release metadata and matching shared client/server sources.
-
-## Actual browser checks
-
-Headless Chromium with real WebGL2/software rendering exercised canvas controls for placement, selection, modification, undo/redo, camera switching, Test, save, publish, reopen and close. Desktop mouse dragging exercised the Three.js transform gizmo and cancellation. Touch emulation exercised joystick movement and interrupted flight holds. Actual game movement functions checked doorway traversal, sprinting into a wall, crouching, jumping and a projectile passing through a doorway.
-
-The local API harness calls the shipped server sanitizers. It is not a live authenticated server or online multiplayer session. Browser setup uses test-only hooks which are not included in the shipped source.
-
-## Collision laboratory
-
-Use Map menu → Starting maps → Collision test map (replacement is undoable), or import `maps/collision-lab.breachmap.json`. The fixture contains 172 objects on a flat heightfield, all 34 library presets in rotated variations, scalable pieces, ladders and team starts. Its canonical signature is `06fa4d74`. Use the collision overlay and Test to inspect it.
+Browser save/publish tests use a local API harness with the shipped server sanitizers. They do not constitute a live authenticated production-server test. Test hooks and QA files are excluded from the two release folders.
 
 ## Remaining release gates
 
-- Real Apple devices/Safari: touch gestures, safe areas, keyboard, WebGL context recovery and file import/export.
-- Physical gamepads: bindings, focus recovery and device reconnect behavior.
-- Live server: authentication, durable save/reopen, publish permissions and loading the published map into multiplayer play.
-- Full hands-on collision laboratory traversal: mantle/climb, repeated slides, upper-floor impacts, seams/corners and deliberate escape attempts across every variation.
-- Performance on intended lower-end devices and large user maps; committed edits currently rebuild the runtime world atomically.
+- Real Apple/Safari devices: gestures, safe areas, keyboard, graphics recovery and file import/export.
+- Physical controllers, including focus recovery and reconnect behavior.
+- Live server authentication, durable storage, publish permissions and published-map multiplayer loading.
+- Full hands-on collision laboratory course: mantle/climb, repeated slides, upper-floor impacts, seams, corners and escape attempts across every variation.
+- Performance on intended lower-end devices and large maps. Brush previews are throttled, but still rebuild the affected runtime through the existing whole-world rebuild path.
 
-These are unverified gates, not claims of known failure. Automated and emulated checks do not certify a defect-free release.
+These checks remain unverified; this package is not certified defect-free or production-ready. The collision laboratory remains available under Starting maps and `maps/collision-lab.breachmap.json`.
 
-## Reused implementation and license
+## Reuse
 
-Three.js r185 TransformControls is included under its MIT license (`vendor/THREE-LICENSE.txt`), matching the game's renderer revision. Research and architecture references are recorded in `EDITOR_ARCHITECTURE.md`.
+The editor continues using the game's renderer, assets and collision. Three.js r185 TransformControls is MIT licensed; see `vendor/THREE-LICENSE.txt`. Architecture and research references are in `EDITOR_ARCHITECTURE.md`.

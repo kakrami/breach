@@ -1,10 +1,10 @@
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.1.0";
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.2.0";
 // Canvas panel descriptions and commands. No DOM controls or browser prompts.
-import { APP_VERSION } from "./game-config.js?v=2.1.0";
+import { APP_VERSION } from "./game-config.js?v=2.2.0";
 import {
   assetResizeMode,
   BUILDING_MATERIALS,
-} from "./object-catalog.js?v=2.1.0";
+} from "./object-catalog.js?v=2.2.0";
 import {
   CATALOG,
   MATERIALS,
@@ -18,7 +18,7 @@ import {
   clone,
   uid,
   clamp,
-} from "./builder-model.js?v=2.1.0";
+} from "./builder-model.js?v=2.2.0";
 export function createBuilderPanels({
   editor: e,
   save,
@@ -302,7 +302,7 @@ export function createBuilderPanels({
             ["yOffset", "Height", -8, 20, 0.25],
             ["yaw", "Facing", 0, 359, 15],
           ])
-            if (key in o)
+            if (key in o && !(o.type==="road" && key==="yOffset"))
               items.push(
                 field(label, o[key], (v) => setProperty(key, v), {
                   min,
@@ -310,7 +310,8 @@ export function createBuilderPanels({
                   step,
                 }),
               );
-          if (assetResizeMode(o) === "parametric")
+          if(o.type==="road")items.push(field("Road width",o.d,v=>setProperty("d",v),{min:1,max:40,step:.5}));
+          if (o.type!=="road" && assetResizeMode(o) === "parametric")
             for (const [key, label, min, max, step] of [
               ["w", "Width", o.type === "building" ? 8 : 1, 80, 0.5],
               ["d", "Depth", o.type === "building" ? 6 : 1, 80, 0.5],
@@ -848,7 +849,7 @@ export function createBuilderPanels({
     } else if (name === "help") {
       title = "Controls";
       description =
-        "Walk view uses game movement/look. Space/C or RB/LB fly. E/RT performs the highlighted action. Q/Y opens Objects. LT focuses the toolbar; D-pad chooses controls and adjusts sliders; A activates, B returns to building. V selects. Top view: tap to select/place, two fingers or right drag to pan, pinch/wheel to zoom. Move/Rotate/Resize preview changes; Apply commits, Cancel restores. Ctrl/Cmd+Z undoes. Menu opens map actions.";
+        "Tap objects to select. Drag to orbit; two fingers or right-drag pan; pinch or wheel zoom. In Ground, drag directly to paint or shape; two fingers navigate without painting. Place previews with a tap, then Place confirms. Roads: tap points, drag numbered handles or + to bend, then Finish. Other end extends the opposite end. Test uses the game’s movement. Controller: left stick pans, right stick orbits, bumpers zoom; LT focuses tools. A activates, B cancels. F focuses selection. Ctrl/Cmd+Z undoes.";
       items = [
         item("Objects", () => {
           dismiss();

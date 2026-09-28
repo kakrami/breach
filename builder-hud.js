@@ -1,6 +1,6 @@
 // Presentation and hit testing only. All edits go through the builder's command stack.
 // Layout is shared by painting, pointer input, keyboard focus and controller focus.
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.1.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.2.0";
 const inside = (p, r) =>
   p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 export function hudLayout(w, h, model, insets = {}) {
@@ -50,7 +50,7 @@ export function hudLayout(w, h, model, insets = {}) {
   add("menu", "☰", m, m, 44, 44, { aria: "Map menu" });
   add("undo", "↶", 58, m, 44, 44, { aria: "Undo", disabled: !model.undo });
   add("redo", "↷", 106, m, 44, 44, { aria: "Redo", disabled: !model.redo });
-  add("overview", model.overview ? "Walk" : "Top", w - 126, m, 56, 44, {
+  add("overview", model.overview ? "Orbit" : "Top", w - 126, m, 56, 44, {
     aria: "Change camera",
     disabled: !model.building,
   });
@@ -60,10 +60,6 @@ export function hudLayout(w, h, model, insets = {}) {
   });
   if (w >= 600) label(model.modeLabel || "SELECT", w / 2, 32, w - 300);
   if (model.building) {
-    if (!model.overview) {
-      add("up", "↑", w - 54, 72, 44, 44, { hold: 1, aria: "Fly up" });
-      add("down", "↓", w - 54, 120, 44, 44, { hold: -1, aria: "Fly down" });
-    }
     const isBrush = ["terrain", "paint"].includes(model.mode),
       barY = h - 56;
     const base = [
@@ -112,11 +108,16 @@ export function hudLayout(w, h, model, insets = {}) {
             : []),
           ["copy", "Copy"],
           ["erase", "Delete"],
-          ["edit", "More"],
+          ...(w>=600 ? [["focus", "Focus"]] : []),
+          ...(model.roadSelected?[["road-edit","Path"]]:[]),
+          ["edit","More"],
         ],
         h - 106,
         64,
       );
+    } else if (model.roadMode) {
+      row([["road-smooth",model.roadSmooth?"Curve":"Straight",{selected:model.roadSmooth}],["road-back","Back",{disabled:!model.roadCount}],["road-finish","Finish",{accent:true,disabled:model.roadCount<2}],["done","Cancel"]],h-106,76);
+      if(model.roadCount>1)row([["road-reverse","Other end"]],h-156,100);
     } else if (model.placing) {
       row(
         [
@@ -201,7 +202,7 @@ export function hudLayout(w, h, model, insets = {}) {
         );
       row(
         [
-          ["place", model.primary || "Paint", { accent: true }],
+          
           ["brush-settings", "Options"],
           ["done", "Done"],
         ],
@@ -217,7 +218,7 @@ export function hudLayout(w, h, model, insets = {}) {
         w - 40,
       );
   } else add("place", "Fire test", w - 100, h - 104, 90, 44, { accent: true });
-  if (!model.overview && !model.panel) label("+", w / 2, h / 2, 20);
+  if ((!model.building || model.controllerAiming) && !model.panel) label("+", w / 2, h / 2, 20);
   if (model.panel) {
     buttons.length = panels.length = labels.length = 0;
     const p = model.panel,
@@ -380,6 +381,7 @@ export function hudLayout(w, h, model, insets = {}) {
       }
     }
   }
+  if(!model.panel)for(const p of model.roadHandles||[])if(p.x>24&&p.x<w-24&&p.y>72&&p.y<h-170)labels.push({text:p.label,x:p.x,y:p.y,maxWidth:30,align:"center",node:true});
   return { buttons, panels, labels };
 }
 function box(c, r, fill, stroke) {
@@ -626,9 +628,11 @@ export function paintHUD(
   }
   c.globalAlpha = 1;
   for (const l of layout.labels) {
+    if(l.node){c.fillStyle=l.text==='+'?'#172329':'#dcff4a';c.strokeStyle='#dcff4a';c.lineWidth=2;c.beginPath();c.arc(l.x,l.y,14,0,Math.PI*2);c.fill();c.stroke();}
     c.font = "600 13px system-ui, sans-serif";
     c.textAlign = l.align || "center";
-    c.fillStyle = "#f0f3f4";
+    c.fillStyle = l.node && l.text!=="+" ? "#172329" : "#f0f3f4";
+    c.textBaseline="middle";
     c.shadowColor = "#000";
     c.shadowBlur = 5;
     c.fillText(l.text, l.x, l.y, l.maxWidth);

@@ -1,7 +1,7 @@
-import * as THREE from "./vendor/three.module.min.js?v=2.1.0";
+import * as THREE from "./vendor/three.module.min.js?v=2.2.0";
 import { TransformControls } from "./vendor/TransformControls.js";
-import { clone, rad, Resolver } from "./builder-model.js?v=2.1.0";
-import { assetResizeMode } from "./object-catalog.js?v=2.1.0";
+import { clone, rad, Resolver } from "./builder-model.js?v=2.2.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.2.0";
 // Scene adapters own no document state. The game supplies its existing scene/camera.
 export class EditorScene {
   constructor(editor, scene, camera, canvas) {
@@ -9,6 +9,7 @@ export class EditorScene {
     this.scene = scene;
     this.camera = camera;
     this.canvas = canvas;
+    this.orbit = new THREE.PerspectiveCamera(50, 1, .1, 2000);
     this.top = new THREE.OrthographicCamera(-50, 50, 50, -50, 0.1, 2000);
     this.top.up.set(0, 0, -1);
     this.raycaster = new THREE.Raycaster();
@@ -42,7 +43,13 @@ export class EditorScene {
   }
   activeCamera() {
     const e = this.editor;
-    if (e.state.camera !== "top") return this.camera;
+    if(e.state.phase === "test") return this.camera;
+    if(e.state.camera !== "top") {
+      const r=e.stage.getBoundingClientRect(),v=e.camera,a=v.yaw??.65,p=v.pitch??.85,d=v.span;
+      this.orbit.aspect=r.width/Math.max(1,r.height);
+      this.orbit.position.set(v.x+Math.sin(a)*Math.cos(p)*d,(v.y||0)+Math.sin(p)*d,v.z+Math.cos(a)*Math.cos(p)*d);
+      this.orbit.lookAt(v.x,v.y||0,v.z);this.orbit.updateProjectionMatrix();this.orbit.updateMatrixWorld();return this.orbit;
+    }
     const r = e.stage.getBoundingClientRect(),
       half = e.camera.span / 2,
       aspect = r.width / Math.max(1, r.height);
@@ -220,8 +227,7 @@ export class EditorScene {
       { move: "translate", rotate: "rotate", scale: "scale" }[e.state.tool],
     );
     c.showX = c.showZ = e.state.tool !== "rotate";
-    c.showY =
-      e.state.tool !== "scale" || objects.every((o) => o.type !== "building");
+    c.showY = e.state.tool === "rotate" || (e.state.tool === "move" ? objects.every(o=>["building","prop","elevation","spawn"].includes(o.type)) : objects.every(o=>o.type!=="building"));
     c.showE = false;
     c.showXYZE = false;
     c.setTranslationSnap(e.snapConfig.grid ? e.snapConfig.gridSize : null);

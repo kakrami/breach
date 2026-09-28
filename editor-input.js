@@ -1,5 +1,5 @@
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.1.0";
-import { clamp } from "./builder-model.js?v=2.1.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.2.0";
+import { clamp } from "./builder-model.js?v=2.2.0";
 // Screen navigation is independent of document tools. Editing actions share one dispatcher.
 export function createEditorInput(e, active, panels) {
   const pointers = new Map();
@@ -13,145 +13,69 @@ export function createEditorInput(e, active, panels) {
     ev.preventDefault();
     ev.stopImmediatePropagation();
   };
+  function pan(v,dx,dy){const u=v.span/e.stage.getBoundingClientRect().height,a=e.state.camera==='top'?0:(v.yaw??.65);e.camera.x=v.x-(dx*Math.cos(a)+dy*Math.sin(a))*u;e.camera.z=v.z+(dx*Math.sin(a)-dy*Math.cos(a))*u;}
+  function planeAt(p,y){const r=e.gameRuntime.ray(p);if(!r||Math.abs(r.dir.y)<1e-5)return null;const t=(y-r.origin.y)/r.dir.y;return t>0?{x:r.origin.x+r.dir.x*t,z:r.origin.z+r.dir.z*t}:null;}
   function cancel() {
-    if (e.dragging) e.cancel();
-    pointers.clear();
-    gesture = null;
-    pinch = null;
-    e.state.lift = e.state.controllerLift = 0;
-    e.gameRuntime.pauseInput();
+    if(gesture?.roadBefore)e.roadPoints=gesture.roadBefore;e.roadNodeDragging=false;
+    e.endBrush?.(false);if(e.dragging){e.gameRuntime.cancelTransform?.();e.cancel();}
+    pointers.clear();gesture=null;pinch=null;e.state.lift=e.state.controllerLift=0;e.gameRuntime.pauseInput();
   }
   function down(ev) {
-    if (active() && e.gameRuntime.transformPointer?.("down", ev)) {
-      stop(ev);
-      return;
+    if(!active()||e.panel||e.state.phase!=='edit')return;
+    e.controllerAiming=false;stop(ev);const p=point(ev);pointers.set(ev.pointerId,p);e.stage.setPointerCapture(ev.pointerId);
+    if(pointers.size>=2){
+      if(gesture?.roadBefore)e.roadPoints=gesture.roadBefore;e.roadNodeDragging=false;
+      e.endBrush(false);if(e.dragging){e.gameRuntime.cancelTransform?.();e.cancel();}
+      const [a,b]=[...pointers.values()],mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+      gesture=null;pinch={distance:Math.hypot(a.x-b.x,a.y-b.y),...mid,camera:{...e.camera},anchor:e.pick(e.gameRuntime.ray(mid))};return;
     }
-    if (
-      !active() ||
-      e.panel ||
-      e.state.camera !== "top" ||
-      e.state.phase !== "edit"
-    )
-      return;
-    stop(ev);
-    const p = point(ev);
-    pointers.set(ev.pointerId, p);
-    e.stage.setPointerCapture(ev.pointerId);
-    e.pointer = p;
-    if (pointers.size === 2) {
-      const [a, b] = [...pointers.values()];
-      gesture = null;
-      pinch = {
-        distance: Math.hypot(a.x - b.x, a.y - b.y),
-        x: (a.x + b.x) / 2,
-        y: (a.y + b.y) / 2,
-        camera: { ...e.camera },
-      };
-      return;
-    }
-    gesture = {
-      id: ev.pointerId,
-      start: p,
-      last: p,
-      pan: ev.button !== 0,
-      moved: false,
-      camera: { ...e.camera },
-    };
-    if (ev.button === 0 && ["terrain", "paint"].includes(e.state.tool)) {
-      const hit = e.pick(e.gameRuntime.ray(p));
-      if (hit && !hit.object) gesture.brush = [{ x: hit.x, z: hit.z }];
-    }
+    e.pointer=p;
+    gesture={id:ev.pointerId,start:p,last:p,moved:false,pan:ev.button===2||ev.button===1||ev.shiftKey,camera:{...e.camera}};
+    if(ev.button===0){const h=e.roadHandles?.().find(h=>Math.hypot(h.x-p.x,h.y-p.y)<22);if(h){gesture.roadBefore=e.roadPoints.map(p=>({...p}));if(!Number.isInteger(h.index)){e.roadPoints.splice(Math.ceil(h.index),0,h.point);h.index=Math.ceil(h.index);}gesture.roadIndex=h.index;e.roadNodeDragging=true;return;}}
+    if(ev.button===0 && e.gameRuntime.transformPointer?.('down',ev)){gesture.handle=true;return;}
+    if(ev.button===0 && ['terrain','paint'].includes(e.state.tool)){
+      const hit=e.pick(e.gameRuntime.ray(p));if(hit&&!hit.object){e.beginBrush(hit);gesture.brush=true;}
+      else gesture.blocked=true;
+    }else if(ev.button===0&&e.state.tool==='place'){gesture.placing=true;e.placementHit=e.pick(e.gameRuntime.ray(p));e.update();}
   }
   function move(ev) {
-    if (active() && e.gameRuntime.transformPointer?.("move", ev)) {
-      stop(ev);
-      return;
+    if(!active()||e.panel||e.state.phase!=='edit')return;
+    const p=point(ev);e.controllerAiming=false;e.pointer=p;
+    if(pointers.has(ev.pointerId)){stop(ev);pointers.set(ev.pointerId,p);}
+    if(pinch&&pointers.size>=2){
+      const [a,b]=[...pointers.values()],mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
+      e.camera.span=clamp(pinch.camera.span*pinch.distance/Math.max(1,Math.hypot(a.x-b.x,a.y-b.y)),8,700);
+      pan(pinch.camera,mid.x-pinch.x,mid.y-pinch.y);
+      if(pinch.anchor){const q=planeAt(mid,pinch.anchor.y);if(q){e.camera.x+=pinch.anchor.x-q.x;e.camera.z+=pinch.anchor.z-q.z;}}return;
     }
-    if (!active() || e.panel || e.state.camera !== "top") return;
-    const p = point(ev);
-    e.pointer = p;
-    if (pointers.has(ev.pointerId)) {
-      stop(ev);
-      pointers.set(ev.pointerId, p);
-    }
-    if (pinch && pointers.size === 2) {
-      const [a, b] = [...pointers.values()],
-        distance = Math.hypot(a.x - b.x, a.y - b.y);
-      e.camera.span = clamp(
-        (pinch.camera.span * pinch.distance) / Math.max(1, distance),
-        12,
-        700,
-      );
-      const unit = pinch.camera.span / e.stage.getBoundingClientRect().height;
-      e.camera.x = pinch.camera.x - ((a.x + b.x) / 2 - pinch.x) * unit;
-      e.camera.z = pinch.camera.z - ((a.y + b.y) / 2 - pinch.y) * unit;
-      return;
-    }
-    if (gesture?.id === ev.pointerId) {
-      if (gesture.brush) {
-        const hit = e.pick(e.gameRuntime.ray(p)),
-          last = gesture.brush.at(-1);
-        if (
-          hit &&
-          !hit.object &&
-          Math.hypot(hit.x - last.x, hit.z - last.z) >
-            Math.max(0.5, e.brush.radius * 0.1)
-        )
-          gesture.brush.push({ x: hit.x, z: hit.z });
-        return;
-      }
-      gesture.moved ||=
-        Math.hypot(p.x - gesture.start.x, p.y - gesture.start.y) > 7;
-      if (gesture.moved) {
-        const unit =
-          gesture.camera.span / e.stage.getBoundingClientRect().height;
-        e.camera.x = gesture.camera.x - (p.x - gesture.start.x) * unit;
-        e.camera.z = gesture.camera.z - (p.y - gesture.start.y) * unit;
-      }
-    }
+    if(pinch)return;
+    if(gesture?.id===ev.pointerId){
+      if(gesture.roadIndex!=null){const hit=e.pick(e.gameRuntime.ray(p));if(hit){const q=e.snapPoint(hit.x,hit.z);e.roadPoints[gesture.roadIndex]={x:q.x,z:q.z};e.previewKey='';e.update();}return;}
+      if(gesture.handle){e.gameRuntime.transformPointer?.('move',ev);return;}
+      gesture.moved ||= Math.hypot(p.x-gesture.start.x,p.y-gesture.start.y)>6;
+      if(gesture.brush){const hit=e.pick(e.gameRuntime.ray(p));if(hit&&!hit.object)e.extendBrush(hit);return;}
+      if(gesture.blocked)return;
+      if(gesture.placing){e.placementHit=e.pick(e.gameRuntime.ray(p));e.update();return;}
+      if(gesture.moved){if(gesture.pan||e.state.camera==='top')pan(gesture.camera,p.x-gesture.start.x,p.y-gesture.start.y);else{e.camera.yaw=(gesture.camera.yaw??.65)-(p.x-gesture.start.x)*.008;e.camera.pitch=clamp((gesture.camera.pitch??.85)+(p.y-gesture.start.y)*.008,.12,1.48);}}
+    }else if(ev.pointerType==='mouse'&&e.state.tool==='place'){e.placementHit=e.pick(e.gameRuntime.ray(p));e.update();}
   }
   function up(ev) {
-    if (active() && e.gameRuntime.transformPointer?.("up", ev)) {
-      stop(ev);
-      return;
+    if(!pointers.has(ev.pointerId))return;
+    stop(ev);const g=gesture;pointers.delete(ev.pointerId);
+    if(g?.id===ev.pointerId){
+      if(g.roadIndex!=null){e.roadNodeDragging=false;e.previewKey='';e.update();}
+      else if(g.handle)e.gameRuntime.transformPointer?.('up',ev);
+      else if(g.brush)e.endBrush(true);
+      else if(!pinch&&!g.moved&&!g.pan&&!g.blocked){
+        e.pointer=point(ev);
+        if(!g.placing||['road','roadcurve'].includes(e.item?.type)){const multi=e.multiSelect;e.multiSelect=multi||!!ev.shiftKey;e.primary();e.multiSelect=multi;}
+      }
     }
-    if (!pointers.has(ev.pointerId)) return;
-    stop(ev);
-    pointers.delete(ev.pointerId);
-    const brush = gesture?.brush;
-    const tap =
-      !brush &&
-      gesture?.id === ev.pointerId &&
-      !gesture.moved &&
-      !gesture.pan &&
-      !pinch;
-    gesture = null;
-    if (!pointers.size) pinch = null;
-    if (e.stage.hasPointerCapture?.(ev.pointerId))
-      e.stage.releasePointerCapture(ev.pointerId);
-    if (brush) e.strokePath(brush);
-    else if (tap) {
-      e.pointer = point(ev);
-      const multi = e.multiSelect;
-      e.multiSelect = multi || !!ev.shiftKey;
-      e.primary();
-      e.multiSelect = multi;
-    }
+    gesture=null;if(!pointers.size)pinch=null;
+    if(e.stage.hasPointerCapture?.(ev.pointerId))e.stage.releasePointerCapture(ev.pointerId);
   }
-  function cancelled(ev) {
-    if (active() && e.gameRuntime.transformPointer?.("cancel", ev)) {
-      stop(ev);
-      return;
-    }
-    if (!pointers.has(ev.pointerId)) return;
-    stop(ev);
-    cancel();
-  }
-  function wheel(ev) {
-    if (!active() || e.panel || e.state.camera !== "top") return;
-    stop(ev);
-    e.camera.span = clamp(e.camera.span * Math.exp(ev.deltaY * 0.001), 12, 700);
-  }
+  function cancelled(ev){if(!pointers.has(ev.pointerId))return;stop(ev);cancel();}
+  function wheel(ev){if(!active()||e.panel||e.state.phase!=='edit')return;stop(ev);const p=point(ev),anchor=e.pick(e.gameRuntime.ray(p));e.camera.span=clamp(e.camera.span*Math.exp(ev.deltaY*.001),8,700);if(anchor){const q=planeAt(p,anchor.y);if(q){e.camera.x+=anchor.x-q.x;e.camera.z+=anchor.z-q.z;}}}
   function key(ev) {
     if (!active()) return;
     if (panels.key(ev) || e.hud.key(ev)) {
@@ -175,15 +99,20 @@ export function createEditorInput(e, active, panels) {
     else if (k === "delete" || k === "backspace") action = "erase";
     else if (k === "pageup") action = "raise-object";
     else if (k === "pagedown") action = "lower-object";
-    else if (k === "f") action = "overview";
+    else if (k === "f") action = "focus";
+    else if(k === "enter" && e.roadPoints.length>1)action="road-finish";
     if (action) {
       stop(ev);
       if (!ev.repeat) e.action(action);
     }
   }
   function controller(frame, dt) {
-    if (!active() || !frame?.connected) return false;
+    if (!active())return false;
+    if(!frame?.connected){if(e.controllerAiming)e.endBrush(false);e.controllerAiming=false;return false;}
+    if(!frame.meaningful&&!frame.pressed?.some(Boolean)&&!frame.released?.some(Boolean)&&!frame.held?.some(Boolean)&&!frame.moveX&&!frame.moveY&&!frame.lookX&&!frame.lookY)return true;
+    e.controllerAiming=true;
     if (e.hud.controller(frame)) {
+      if(e.brushStroke)e.endBrush(false);
       e.state.controllerLift = 0;
       return true;
     }
@@ -199,18 +128,17 @@ export function createEditorInput(e, active, panels) {
       if (p[B.RT]) e.primary();
       return true;
     }
-    if (s.camera === "top") {
-      const speed = e.camera.span * 0.5 * dt;
-      e.camera.x += (frame.moveX || 0) * speed;
-      e.camera.z += (frame.moveY || 0) * speed;
-      e.camera.span = clamp(
-        e.camera.span * Math.exp((frame.lookY || 0) * dt),
-        12,
-        700,
-      );
-      e.pointer = null;
-    }
-    if (p[B.RT] || p[B.A]) e.action("place");
+    if(frame.held?.[B.LB]||frame.held?.[B.RB])e.camera.span=clamp(e.camera.span*Math.exp(((frame.held?.[B.LB]?1:0)-(frame.held?.[B.RB]?1:0))*dt),8,700);
+    const a=s.camera==='top'?0:e.camera.yaw||0,speed=e.camera.span*.5*dt;
+    e.camera.x+=((frame.moveX||0)*Math.cos(a)+(frame.moveY||0)*Math.sin(a))*speed;
+    e.camera.z+=(-(frame.moveX||0)*Math.sin(a)+(frame.moveY||0)*Math.cos(a))*speed;
+    if(s.camera!=='top'){e.camera.yaw=(e.camera.yaw||0)-(frame.lookX||0)*dt*2;e.camera.pitch=clamp((e.camera.pitch||.85)+(frame.lookY||0)*dt*2,.12,1.48);}
+    e.pointer=null;e.placementHit=null;
+    if(['terrain','paint'].includes(s.tool)){
+      if(frame.held?.[B.RT]){const hit=e.pick(e.gameRuntime.ray(null));if(hit&&!hit.object){if(!e.brushStroke)e.beginBrush(hit);else e.extendBrush(hit);}}
+      else if(e.brushStroke)e.endBrush(true);
+      if(p[B.A])e.action("place");
+    }else if (p[B.RT] || p[B.A]) e.action("place");
     if (p[B.Y]) e.action(e.selected.size ? "edit" : "pick");
     if (p[B.B]) e.action("cancel");
     if (p[B.X]) e.action("rotate");

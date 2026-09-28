@@ -1,4 +1,5 @@
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.1.0";
+import { roadNodes, roadSegments } from './road-path.js?v=2.2.0';
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.2.0";
 import {
   DocumentOperations,
   MapDocument,
@@ -22,10 +23,10 @@ import {
   ELEVATION,
   templateToDoc,
   MATERIAL_KEYS,
-} from "./builder-model.js?v=2.1.0";
-import { assetResizeMode } from "./object-catalog.js?v=2.1.0";
-import { safeTerrainBrush } from "./safe-terrain.js?v=2.1.0";
-import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.1.0";
+} from "./builder-model.js?v=2.2.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.2.0";
+import { safeTerrainBrush } from "./safe-terrain.js?v=2.2.0";
+import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.2.0";
 const box = (p) => (p.type === "round" ? { ...p, w: p.r * 2, d: p.r * 2 } : p);
 const pose = (p) => ({ x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch });
 
@@ -114,7 +115,7 @@ export class EditorSession extends DocumentOperations {
       lift: 0,
       controllerLift: 0,
     };
-    this.camera = { x: 0, z: 0, span: 100 };
+    this.camera = { x: 0, z: 0, span: 70, yaw:.65,pitch:.85,y:0 };
     this.play = { active: false, x: 0, y: 10, z: 20, yaw: 0, pitch: -0.3 };
     this.selected = new Set();
     this.item = null;
@@ -241,7 +242,7 @@ export class EditorSession extends DocumentOperations {
     this.camera = {
       x: 0,
       z: 0,
-      span: Math.min(160, this.doc.arenaLimit * 2.2),
+      span: Math.min(110, this.doc.arenaLimit), yaw:.65,pitch:.85,y:0,
     };
     Object.assign(this.play, {
       active: true,
@@ -275,7 +276,7 @@ export class EditorSession extends DocumentOperations {
           : new Promise((resolve, reject) => {
               const worker = new Worker(
                 new URL(
-                  "./editor-validation-worker.js?v=2.1.0",
+                  "./editor-validation-worker.js?v=2.2.0",
                   import.meta.url,
                 ),
                 { type: "module" },
@@ -296,7 +297,7 @@ export class EditorSession extends DocumentOperations {
     return promise;
   }
   runtimePhysical() {
-    return this.runtimeCache;
+    return this.brushStroke?.runtime || this.runtimeCache;
   }
   setSaveState(state) {
     this.saveState = state;
@@ -331,6 +332,7 @@ export class EditorSession extends DocumentOperations {
     this.input?.cancel();
   }
   ready() {
+    if(this.roadPoints.length){this.toast("Finish or Cancel the road first");return false;}
     if (this.transaction) {
       this.toast("Apply or Cancel the current edit");
       return false;
@@ -348,6 +350,8 @@ export class EditorSession extends DocumentOperations {
           : item.type === "elevation"
             ? ELEVATION[item.kind]
             : {};
+    this.roadEditingId=null;this.roadSmooth=item.type==="roadcurve";
+    this.placementHit=null;
     this.item = { ...defaults, ...item };
     this.recentItems = [
       item,
@@ -371,10 +375,11 @@ export class EditorSession extends DocumentOperations {
       return false;
     if (
       tool === "scale" &&
-      this.allSelected().some((o) => assetResizeMode(o) !== "parametric")
+      this.allSelected().some((o) => o.type==="road" || assetResizeMode(o) !== "parametric")
     )
       return false;
     this.state.tool = tool;
+    this.roadEditingId=null;this.roadNodeDragging=false;
     this.roadPoints = [];
     this.ghost = null;
     this.previewKey = "";
@@ -400,7 +405,7 @@ export class EditorSession extends DocumentOperations {
     this.syncUI();
   }
   fit() {
-    this.camera = { x: 0, z: 0, span: this.doc.arenaLimit * 2.2 };
+    this.camera = { ...this.camera, x: 0, y:0, z: 0, span: this.doc.arenaLimit * 2.2 };
     this.syncUI();
   }
   focusTarget(id) {
@@ -411,22 +416,14 @@ export class EditorSession extends DocumentOperations {
     this.state.tool = "select";
     this.camera.x = o.x;
     this.camera.z = o.z;
-    if (this.state.camera === "perspective") {
-      Object.assign(this.play, {
-        x: o.x,
-        z: o.z + Math.max(10, o.d || 6),
-        y: Resolver.objectTop(this.doc, o) + 5,
-        yaw: 0,
-        pitch: -0.5,
-      });
-      this.gameRuntime.teleport(this.play);
-    }
+    this.camera.y=Resolver.objectTop(this.doc,o)*.5;
+    this.camera.span=Math.max(16,Math.max(o.w||8,o.d||8,Resolver.objectTop(this.doc,o))*2);
     this.previewKey = "";
     this.update();
   }
   toggleTest() {
-    if (this.transaction) {
-      this.toast("Apply or Cancel before testing");
+    if (this.transaction || this.roadPoints.length) {
+      this.toast("Finish or Cancel before testing");
       return;
     }
     this.closeDrawers();
@@ -454,6 +451,7 @@ export class EditorSession extends DocumentOperations {
         );
       if (!s) {
         this.state.phase = "edit";
+        this.state.camera=this.testReturn.camera;
         this.toast("Add a clear starting point first");
         return;
       }
@@ -493,10 +491,11 @@ export class EditorSession extends DocumentOperations {
     if (!ray) return null;
     const { origin, dir } = ray,
       g = this.runtimePhysical().geometry,
-      max = this.state.camera === "top" ? 1500 : 100;
+      max = 1800;
     let best = null;
     const omitted = new Set(this.transaction?.before.map((o) => o.id) || []);
     for (const { o, parts, bounds } of this.sceneObjects()) {
+      if(o.type==="road")continue;
       if (bounds) {
         const inside =
           Math.abs(origin.x - bounds.x) <= bounds.w / 2 &&
@@ -550,6 +549,11 @@ export class EditorSession extends DocumentOperations {
       }
       previous = t;
     }
+    if(best&&!best.object&&["select","move","rotate","scale"].includes(this.state.tool)){
+      for(const {o} of this.sceneObjects())if(o.type==='road'&&!omitted.has(o.id)){
+        if(roadSegments(o).some(r=>{const p=Resolver.localPoint(r,best.x,best.z);return Math.abs(p.x)<=r.w/2&&Math.abs(p.z)<=r.d/2 || r.pathIndex>0&&Math.hypot(p.x+r.w/2,p.z)<=r.d/2;})){best.object=o;break;}
+      }
+    }
     return best;
   }
   selectionParts() {
@@ -563,19 +567,14 @@ export class EditorSession extends DocumentOperations {
         yOffset: this.placementHeight,
       },
       p = this.snapRoadPoint(hit);
-    if (item.type === "road")
-      return this.roadPoints.length
-        ? [this.roadFromPoints(this.roadPoints[0], p, item.kind)]
-        : [];
-    if (item.type === "roadcurve")
-      return this.roadPoints.length === 2
-        ? this.curveSegments(
-            this.roadPoints[0],
-            this.roadPoints[1],
-            p,
-            item.kind,
-          )
-        : [];
+    if (["road","roadcurve"].includes(item.type)) {
+      const points=[...this.roadPoints];
+      if(!this.roadNodeDragging && !this.roadEditingId && (!points.length||Math.hypot(p.x-points.at(-1).x,p.z-points.at(-1).z)>.1))points.push(p);
+      if(points.length<2)return [];
+      const o=this.roadFromPath(points,item.kind,this.roadSmooth??item.type==='roadcurve');
+      if(this.roadEditingId){const old=this.doc.get(this.roadEditingId);Object.assign(o,{id:old.id,d:old.d,groupId:old.groupId});}
+      return [o];
+    }
     const w = item.w || item.r * 2 || 1,
       d = item.d || item.r * 2 || 1,
       a = rad(this.rotation),
@@ -613,6 +612,7 @@ export class EditorSession extends DocumentOperations {
     let reason = "";
     const skip = new Set(before.map((o) => o.id));
     for (const o of objects) {
+      if(o.type==='road'&&o.path){if(roadNodes(o).some(p=>Math.abs(p.x)+o.d/2>this.doc.arenaLimit-1||Math.abs(p.z)+o.d/2>this.doc.arenaLimit-1))reason="Keep the road inside the map";continue;}
       const size = Math.hypot(o.w || o.r * 2 || 1, o.d || o.r * 2 || 1) / 2;
       if (
         Math.abs(o.x) + size > this.doc.arenaLimit - 1 ||
@@ -667,9 +667,7 @@ export class EditorSession extends DocumentOperations {
       this.syncUI();
       return;
     }
-    this.target = this.pick(
-      this.gameRuntime.ray?.(this.state.camera === "top" ? this.pointer : null),
-    );
+    this.target = this.state.tool==='place'&&this.placementHit ? this.placementHit : this.pick(this.gameRuntime.ray?.(this.state.phase === "edit" ? this.pointer : null));
     const t = this.target,
       tool = this.state.tool;
     if (this.transaction) {
@@ -730,7 +728,7 @@ export class EditorSession extends DocumentOperations {
       if (t) {
         const objects = planned;
         this.ghost = objects.length
-          ? this.candidate(objects)
+          ? this.candidate(objects,this.roadEditingId?[this.doc.get(this.roadEditingId)]:[])
           : {
               parts: [
                 {
@@ -749,11 +747,7 @@ export class EditorSession extends DocumentOperations {
         this.tip =
           this.ghost.reason ||
           (["road", "roadcurve"].includes(this.item.type)
-            ? [
-                "Choose start",
-                this.item.type === "roadcurve" ? "Choose bend" : "Choose end",
-                "Choose end",
-              ][this.roadPoints.length]
+            ? (this.roadPoints.length ? "Tap to extend · drag points to reshape · Finish" : "Tap the road’s starting point")
             : `Place · ${this.item.label || this.item.kind}`);
       }
     } else if (tool === "terrain" || tool === "paint") {
@@ -775,8 +769,8 @@ export class EditorSession extends DocumentOperations {
           brush: true,
         };
       this.tip = this.valid
-        ? "Ground · existing objects stay protected"
-        : "Aim at open ground";
+        ? "Drag to shape · two fingers navigate"
+        : "Drag on open ground";
     }
     this.syncUI();
   }
@@ -802,19 +796,63 @@ export class EditorSession extends DocumentOperations {
     }
     if (!this.valid) return;
     if (this.state.tool === "place") {
-      if (
-        ["road", "roadcurve"].includes(this.item.type) &&
-        this.roadPoints.length < (this.item.type === "road" ? 1 : 2)
-      ) {
-        this.roadPoints.push(this.snapRoadPoint(t));
-      } else {
-        const objects = this.ghost.objects;
-        this.commands.execute(new AddManyCommand(this.doc, objects));
-        this.roadPoints = [];
-      }
+      if (["road","roadcurve"].includes(this.item.type)) {
+        const p=this.snapRoadPoint(t);
+        if(this.roadPoints.length>=64){this.toast("Finish this road before starting another");return;}
+        if(this.roadPoints.length&&Math.hypot(p.x-this.roadPoints.at(-1).x,p.z-this.roadPoints.at(-1).z)<.2)return;
+        this.roadPoints.push({x:p.x,z:p.z});
+      } else this.commands.execute(new AddManyCommand(this.doc,this.ghost.objects));
     } else this.stroke(t.x, t.z);
     this.previewKey = "";
     this.update();
+  }
+  roadHandles() {
+    if(this.state.tool!=="place"||!["road","roadcurve"].includes(this.item?.type))return [];
+    const g=this.runtimePhysical().geometry,points=this.roadPoints,out=[];
+    for(let i=0;i<points.length;i++){const p=points[i],screen=this.gameRuntime.project?.({x:p.x,z:p.z,y:g.terrainHeight(p.x,p.z)+.2});if(screen)out.push({...screen,index:i,label:String(i+1)});}
+    for(let i=0;i<points.length-1;i++){const p={x:(points[i].x+points[i+1].x)/2,z:(points[i].z+points[i+1].z)/2},screen=this.gameRuntime.project?.({...p,y:g.terrainHeight(p.x,p.z)+.2});if(screen&&!out.some(q=>Math.hypot(q.x-screen.x,q.y-screen.y)<44))out.push({...screen,index:i+.5,label:"+",point:p});}
+    return out;
+  }
+  editRoad() {
+    const o=this.allSelected()[0];if(o?.type!=="road"||!this.ready())return;
+    this.choose({type:"road",kind:o.kind,label:"Road"});this.roadEditingId=o.id;this.roadPoints=roadNodes(o);this.roadSmooth=!!o.smooth;this.previewKey="";this.update();
+  }
+  finishRoad() {
+    if(this.roadPoints.length<2)return;
+    const o=this.roadFromPath(this.roadPoints,this.item.kind,!!this.roadSmooth),before=this.roadEditingId?this.doc.get(this.roadEditingId):null;
+    if(before)Object.assign(o,{id:before.id,d:before.d,groupId:before.groupId});
+    const preview=this.candidate([o],before?[before]:[]);if(!preview.valid){this.toast(preview.reason);return;}
+    this.commands.execute(before?new PatchCommand(this.doc,[before],preview.objects,"Edit road path"):new AddManyCommand(this.doc,preview.objects));
+    this.roadEditingId=null;this.roadPoints=[];this.selected=new Set([o.id]);this.selectTool();
+  }
+  beginBrush(point) {
+    if(this.layerLocked("terrain") || this.brushStroke)return;
+    const doc=new MapDocument(this.doc.serializeInternal());
+    this.brushStroke={doc,runtime:this.runtimeCache,points:[],last:null,paint:this.state.tool==="paint",brush:{...this.brush},material:{...this.materialBrush}};
+    if(this.brush.sampleHeight&&["level","flatten"].includes(this.brush.tool))this.brushStroke.brush.level=Resolver.rawTerrainHeight(doc,point.x,point.z);
+    this.extendBrush(point);
+  }
+  extendBrush(point) {
+    const s=this.brushStroke;if(!s)return;
+    const last=s.last||point,dist=Math.hypot(point.x-last.x,point.z-last.z),step=Math.max(.35,(s.paint?s.material.radius:s.brush.radius)*.16),n=Math.max(1,Math.ceil(dist/step));
+    if(s.last&&dist<step)return;
+    for(let i=1;i<=n;i++)s.points.push({x:last.x+(point.x-last.x)*i/n,z:last.z+(point.z-last.z)*i/n});s.last={...point};
+  }
+  flushBrush(force=false) {
+    const s=this.brushStroke;if(!s)return;
+    const now=performance.now();if(!force&&now-(s.lastDabTime||0)<100)return;if(s.last&&!s.paint&&['raise','lower','smooth'].includes(s.brush.tool)&&now-(s.lastDabTime||0)>120&&!s.points.length)s.points.push({...s.last});
+    if(!s.points.length)return;s.lastDabTime=now;
+    const surface=s.paint?s.doc.materials:s.doc.terrain;
+    for(const {x,z} of s.points.splice(0)){
+      if(s.paint){const code=Math.max(0,MATERIAL_KEYS.indexOf(s.material.material));for(let iz=0;iz<surface.size;iz++)for(let ix=0;ix<surface.size;ix++){const p=surface.world(ix,iz);if(Math.hypot(p.x-x,p.z-z)<=s.material.radius)surface.values[surface.index(ix,iz)]=code;}}
+      else for(const c of safeTerrainBrush({terrain:surface,objects:s.doc.all(),x,z,...s.brush,baseHeight:(a,b)=>presetTerrain(s.doc.theme,a,b)}))surface.values[c.i]=c.after;
+    }
+    Resolver.resolve(s.doc);s.runtime=RuntimeCompiler.compile(s.doc);this.sceneRev++;this.partsCache=null;this.previewKey="";
+  }
+  endBrush(commit=true) {
+    if(!this.brushStroke)return;this.flushBrush(true);const s=this.brushStroke;this.brushStroke=null;
+    this.sceneRev++;this.partsCache=null;this.previewKey="";
+    if(commit)this.commands.replace(s.doc.serializeInternal(),s.paint?"Paint ground":"Shape ground");this.syncUI();
   }
   stroke(x, z) {
     return this.strokePath([{ x, z }]);
@@ -955,7 +993,7 @@ export class EditorSession extends DocumentOperations {
   }
   scale(factor) {
     if (
-      this.allSelected().some((o) => assetResizeMode(o) !== "parametric") ||
+      this.allSelected().some((o) => o.type==="road" || assetResizeMode(o) !== "parametric") ||
       !this.beginTransform()
     )
       return;
@@ -999,7 +1037,7 @@ export class EditorSession extends DocumentOperations {
       return;
     }
     if (this.roadPoints.length) {
-      this.roadPoints = [];
+      this.roadEditingId=null;this.roadNodeDragging=false;this.roadPoints = [];
       this.previewKey = "";
       this.update();
       return;
@@ -1007,6 +1045,14 @@ export class EditorSession extends DocumentOperations {
     this.selectTool();
   }
   action(id) {
+    if(id==='road-edit')return this.editRoad();
+    if(id==='road-finish')return this.finishRoad();
+    if(id==='road-smooth'){this.roadSmooth=!this.roadSmooth;this.previewKey="";this.update();return;}
+    if(id==='road-back'){this.roadPoints.pop();this.previewKey="";this.update();return;}
+    if(id==='road-reverse'){this.roadPoints.reverse();this.previewKey="";this.update();return;}
+
+    if(id === "focus"){const id=this.selected.values().next().value;if(id)this.focusTarget(id);return;}
+    if(this.brushStroke)this.input?.cancel();
     if (id.startsWith("quick:"))
       return this.choose(
         (this.recentItems?.length
@@ -1060,16 +1106,7 @@ export class EditorSession extends DocumentOperations {
       this.previewKey = "";
       return;
     }
-    if (
-      id === "up" ||
-      id === "down" ||
-      id === "fly-step-up" ||
-      id === "fly-step-down"
-    ) {
-      this.play.y += id.includes("up") ? 1 : -1;
-      this.gameRuntime.teleport(this.play);
-      return;
-    }
+    if(id==="done"&&this.roadPoints.length){this.roadPoints=[];this.roadEditingId=null;}
     if (id === "select" || id === "done") return this.selectTool();
     if (["move", "rotate-tool", "scale-tool"].includes(id))
       return this.selectTool(
@@ -1112,6 +1149,12 @@ export class EditorSession extends DocumentOperations {
     const s = this.state,
       selected = this.allSelected();
     return {
+      controllerAiming:!!this.controllerAiming,
+      roadHandles:this.roadHandles(),
+      roadSelected:selected.length===1&&selected[0].type==='road',
+      roadMode:s.tool==='place'&&['road','roadcurve'].includes(this.item?.type),
+      roadCount:this.roadPoints.length,
+      roadSmooth:!!this.roadSmooth,
       brush: s.tool === "paint" ? this.materialBrush : this.brush,
       quick: (this.recentItems?.length
         ? this.recentItems
@@ -1127,7 +1170,7 @@ export class EditorSession extends DocumentOperations {
           ? "TEST · Game controls"
           : this.transaction
             ? "PREVIEW · Apply or Cancel"
-            : s.tool.toUpperCase(),
+            : s.tool==="place"&&["road","roadcurve"].includes(this.item?.type)?"ROAD":s.tool.toUpperCase(),
       building: s.phase === "edit",
       overview: s.camera === "top",
       selected: !!selected.length,
@@ -1139,7 +1182,7 @@ export class EditorSession extends DocumentOperations {
         selected.length > 1 || selected.some((o) => "rot" in o || "yaw" in o),
       resizable:
         selected.length > 0 &&
-        selected.every((o) => assetResizeMode(o) === "parametric"),
+        selected.every((o) => o.type!=="road" && assetResizeMode(o) === "parametric"),
       placing: s.tool === "place",
       valid: this.valid,
       primary: this.transaction
