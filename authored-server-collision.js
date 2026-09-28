@@ -1,5 +1,5 @@
-import { CROUCH_HEIGHT } from './game-config.js?v=1.71.1';
-import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT, segmentEllipsoidFirstT } from './collision-primitives.js?v=1.71.1';
+import { CROUCH_HEIGHT } from './game-config.js?v=1.72.0';
+import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT, segmentEllipsoidFirstT } from './collision-primitives.js?v=1.72.0';
 
 export function createAuthoredServerCollision(world){
   const {PLAYER_HEIGHT,ARENA_LIMIT,STATIC_BOXES,STATIC_PROJECTILE_COLLIDERS,BUILDING_PARTS,PYRAMIDS,NATURAL_OBSTACLES,terrainHeight,naturalGroundBase}=world;
