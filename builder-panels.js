@@ -1,10 +1,10 @@
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.0.0";
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.1.0";
 // Canvas panel descriptions and commands. No DOM controls or browser prompts.
-import { APP_VERSION } from "./game-config.js?v=2.0.0";
+import { APP_VERSION } from "./game-config.js?v=2.1.0";
 import {
   assetResizeMode,
   BUILDING_MATERIALS,
-} from "./object-catalog.js?v=2.0.0";
+} from "./object-catalog.js?v=2.1.0";
 import {
   CATALOG,
   MATERIALS,
@@ -18,7 +18,7 @@ import {
   clone,
   uid,
   clamp,
-} from "./builder-model.js?v=2.0.0";
+} from "./builder-model.js?v=2.1.0";
 export function createBuilderPanels({
   editor: e,
   save,
@@ -82,22 +82,11 @@ export function createBuilderPanels({
     return { id, label, ...options };
   }
   function field(label, value, set, { min = -300, max = 300, step = 1 } = {}) {
-    return item(
-      `${label}: ${Number(value).toFixed(step < 1 ? 2 : 0)}`,
-      () =>
-        editText(
-          label,
-          String(value),
-          (v) => {
-            const n = Number(v);
-            if (!v.trim() || !Number.isFinite(n))
-              throw new Error("Enter a number");
-            set(clamp(n, min, max));
-          },
-          true,
-        ),
-      { adjust: (dir) => set(clamp(value + dir * step, min, max)) },
+    const row = item(label, () => {}, { slider: true, value, min, max, step });
+    actions.set("value:" + row.id, (v) =>
+      set(clamp(Math.round(v / step) * step, min, max)),
     );
+    return row;
   }
   function choice(title, values, current, set) {
     show("choice", { title, values, current, set });
@@ -389,29 +378,50 @@ export function createBuilderPanels({
               );
         }
       }
-    } else if (name === "library") {
-      title = "Place objects";
-      items = [
-        ...["Buildings", "Pieces", "Cover", "Nature"].map((group) =>
-          item(group, () => show("objects", { group })),
-        ),
-        item("Roads", () => show("roads")),
-        item("Starts & ladders", () => show("setup")),
-        item("Saved groups", () => show("prefabs")),
+    } else if (name === "library" || name === "objects") {
+      title = "Objects";
+      const group = data.group || "Buildings";
+      const groups = [
+        "Buildings",
+        "Pieces",
+        "Cover",
+        "Nature",
+        "Roads",
+        "Starts",
+        "Groups",
       ];
-    } else if (name === "objects") {
-      title = "Place · " + data.group;
-      items = EDITOR_ITEMS.filter((o) => o.group === data.group).map((o) =>
-        item(o.label, () => e.choose(o), {
-          thumbnail: e.gameRuntime.thumbnail?.(o),
+      const tabs = groups.map((g) =>
+        item(g, () => show("library", { group: g }, false), {
+          selected: g === group,
         }),
       );
-      if (data.group === "Pieces")
-        items.push(
-          ...CATALOG.build
-            .filter((o) => o.type === "mound" || o.kind === "platform")
-            .map((o) => item(o.label, () => e.choose(o))),
+      let objects = EDITOR_ITEMS.filter((o) => o.group === group);
+      if (group === "Pieces")
+        objects = [
+          ...objects,
+          ...CATALOG.build.filter((o) => o.type === "mound"),
+          ...CATALOG.gameplay.filter((o) => o.type === "ladder"),
+        ];
+      if (group === "Roads") objects = CATALOG.roads;
+      if (group === "Starts")
+        objects = CATALOG.gameplay.filter((o) => o.type !== "ladder");
+      items = objects.map((o) =>
+        item(o.label, () => e.choose(o), {
+          thumbnail: e.gameRuntime.thumbnail?.(o),
+          tile: true,
+        }),
+      );
+      if (group === "Groups")
+        items = e.prefabs.map((p) =>
+          item(
+            p.name,
+            () => e.choose({ type: "prefab", label: p.name, prefabId: p.id }),
+            { tile: true },
+          ),
         );
+      if (group === "Groups")
+        items.push(item("Manage groups", () => show("prefabs")));
+      return { title, kind: "library", tabs, items, back: false };
     } else if (name === "tools") {
       title = "Build tools";
       items = [
@@ -838,7 +848,7 @@ export function createBuilderPanels({
     } else if (name === "help") {
       title = "Controls";
       description =
-        "Walk view uses game movement/look. Space/C or RB/LB fly. E/RT performs the highlighted action. Q/Y opens Objects. V selects. Top view: tap to select/place, two fingers or right drag to pan, pinch/wheel to zoom. Move/Rotate/Resize preview changes; Apply commits, Cancel restores. Ctrl/Cmd+Z undoes. Menu opens map actions.";
+        "Walk view uses game movement/look. Space/C or RB/LB fly. E/RT performs the highlighted action. Q/Y opens Objects. LT focuses the toolbar; D-pad chooses controls and adjusts sliders; A activates, B returns to building. V selects. Top view: tap to select/place, two fingers or right drag to pan, pinch/wheel to zoom. Move/Rotate/Resize preview changes; Apply commits, Cancel restores. Ctrl/Cmd+Z undoes. Menu opens map actions.";
       items = [
         item("Objects", () => {
           dismiss();
@@ -860,28 +870,11 @@ export function createBuilderPanels({
         ),
         item("Discard & exit", exit),
       ];
-    } else {
-      title = "Map · " + APP_VERSION;
+    } else if (name === "files") {
+      title = "Files";
       items = [
-        item("Save", () => task(save)),
-        item("Publish", () => task(publish)),
-        item("Map Check", () => show("check")),
-        item("Build tools", () => show("tools")),
-        item("Map settings", () => show("settings")),
-        item("Controls", () => show("help")),
-        item("Back to maps", () => {
-          dismiss();
-          e.onUI("exit");
-        }),
-        item("Map name", () =>
-          editText("Map name", e.doc.meta.name, (v) =>
-            changeSetting((a) => {
-              a.meta.name = v.trim().slice(0, 64) || "NEW MAP";
-            }),
-          ),
-        ),
-        item("Import file", () => importFile()),
-        item("Export file", () => exportFile()),
+        item("Import map", importFile),
+        item("Export map", exportFile),
         item("Restore autosave", () =>
           confirm(
             "Restore autosave",
@@ -890,12 +883,33 @@ export function createBuilderPanels({
           ),
         ),
       ];
+    } else {
+      title = "Map · " + APP_VERSION;
+      items = [
+        item("Save", () => task(save), { accent: true }),
+        item("Publish", () => task(publish)),
+        item("Map settings", () => show("settings")),
+        item("Map Check", () => show("check")),
+        item("Files", () => show("files")),
+        item("Controls", () => show("help")),
+        item("Back to maps", () => {
+          dismiss();
+          e.onUI("exit");
+        }),
+      ];
     }
     if (busy) {
       title = "Working…";
       items = items.map((i) => ({ ...i, disabled: true }));
     }
-    return { title, description, items, back: history.length > 0 };
+    return {
+      title,
+      description,
+      items,
+      kind: "list",
+      primaryPair: name === "map",
+      back: history.length > 0,
+    };
   }
   function saveGroup(name) {
     const objects = selection();
@@ -918,6 +932,20 @@ export function createBuilderPanels({
     e.toast("Group saved");
   }
   function action(id) {
+    if (id.startsWith("value:")) {
+      const split = id.lastIndexOf(":"),
+        value = Number(id.slice(split + 1));
+      const run = actions.get(id.slice(0, split));
+      if (run && Number.isFinite(value) && !busy) {
+        try {
+          run(value);
+        } catch (error) {
+          show("error", { message: error.message });
+        }
+        e.syncUI();
+      }
+      return true;
+    }
     if (id === "close") {
       if (keyboard) {
         keyboard = null;

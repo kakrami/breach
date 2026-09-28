@@ -1,6 +1,12 @@
-# Breach 2.0.0 — verification and release status
+# Breach 2.1.0 — verification and release status
 
 This package is a release candidate. It has not been deployed to the public site. Client and server must be updated together (protocol 97).
+
+## UI revision 2.1.0
+
+Replaced the tool rail and oversized generic grids with a compact bottom hotbar, recent-object thumbnails, contextual object actions and a tabbed visual library. The map menu fits in one page at the tested landscape sizes. Terrain uses a surface-following brush ring and inline size/strength sliders. Numeric property fields also use sliders rather than a modal numeric keyboard. Cancelled slider drags never change document state. Settings drawers size to their contents. Controller LT offers focus access to all visible toolbar actions. Thumbnail caching waits for texture readiness and uses the correct output color space. The shared game HUD requests CPU-backed Canvas2D rasterization before each WebGL texture upload. Browser comparisons reproduced retained joystick pixels with GPU-backed drawing surfaces; the CPU-backed source cleared them in a normal screenshot run without diagnostic pixel reads or forced repainting. The existing canvas and renderer ownership are retained.
+
+Desktop and emulated-touch browser passes include the new library, brush sliders, single-page map menu and the full placement/edit/test/save/publish/reopen workflow. These checks use a local server-sanitizer harness, not a production deployment.
 
 ## Rebuilt
 
@@ -13,7 +19,7 @@ Canvas controls provide Place, Select, Move, Rotate, supported Resize, object he
 - 2,489 geometry/lifecycle assertions, including 2,436 wall checks; four official/custom fixtures and shared client/server contracts.
 - 48 movement sweeps covering standing, crouch/slide heights, floor seams, ceilings and doorway/window projectile openings, plus rotated/scaled pieces.
 - All 34 library presets, detached previews, cancellation, history, import, terrain, roads/curves, starts, generation and attached ladder rotation/deletion.
-- 3,296 layout checks for bounds, minimum 44-pixel targets and button overlap across narrow and desktop sizes.
+- 3,760 main-workspace layout checks and 3,804 panel/keyboard/library checks for bounds, minimum 44-pixel targets and button overlap across narrow and desktop sizes.
 - Input adapter checks for pointer cancellation, blur, held flight, multitouch, controller menu actions and teardown.
 - Terrain drag commits once; interrupted strokes and two-finger camera gestures leave document/history unchanged.
 - Spatial-index optimization preserves exact geometry/collision/terrain signatures against the previous compiler in ten fixtures.

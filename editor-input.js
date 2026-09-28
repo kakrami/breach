@@ -1,5 +1,5 @@
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.0.0";
-import { clamp } from "./builder-model.js?v=2.0.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.1.0";
+import { clamp } from "./builder-model.js?v=2.1.0";
 // Screen navigation is independent of document tools. Editing actions share one dispatcher.
 export function createEditorInput(e, active, panels) {
   const pointers = new Map();
@@ -183,7 +183,10 @@ export function createEditorInput(e, active, panels) {
   }
   function controller(frame, dt) {
     if (!active() || !frame?.connected) return false;
-    if (e.hud.controller(frame)) return true;
+    if (e.hud.controller(frame)) {
+      e.state.controllerLift = 0;
+      return true;
+    }
     const p = frame.pressed || [],
       s = e.state;
     s.controllerLift =

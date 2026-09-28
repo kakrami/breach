@@ -16,7 +16,7 @@ Create opens a flat map with explicit team starts. Library choice enters Place w
 
 ## Layout and input
 
-Map menu/history at top left; Test and camera at top right. Editing tool rail at left; context actions at bottom; properties/library in a single right panel. Up/down retain game flight. Game touch movement/look is reused. Camera changes never choose tools. Place and Select are separately named and visibly marked. Keyboard, touch and controller actions use identical command entry points.
+Map menu/history at top left; Test and camera at top right. A compact bottom hotbar holds Select, Objects, Ground, recent assets and More. Context actions sit above the hotbar. The object library opens directly to thumbnail categories. Brush controls remain on the left with inline size/strength sliders; other settings use compact content-sized drawers. Up/down retain game flight. Game touch movement/look is reused. Camera changes never choose tools. Place and Select are separately named and visibly marked. Keyboard, touch and controller actions use identical command entry points.
 
 ## Research / reuse
 
@@ -27,3 +27,5 @@ The matching Three.js r185 addon is MIT licensed; its notice is included under v
 ## Acceptance
 
 No tool choice changes camera. No cancelled preview changes document/signature/history. Undo/redo covers object edits, terrain, settings and replacement/import. Committed geometry is compiled before publication to the game. Selection and placement use canonical parts. Test/export/publish do not silently repair maps. Client/server and lifecycle signatures must match. Canvas targets stay within safe areas and do not overlap. Actual-device and live-server verification must be reported separately from local tests.
+
+Numeric adjustments use canvas sliders: drag previews a value, release commits once, cancellation/blur discards the draft. Controller LT focuses the toolbar, D-pad navigates or adjusts a focused slider, and B returns to world control. World movement pauses during toolbar focus.

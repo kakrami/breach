@@ -1,143 +1,144 @@
 // Presentation and hit testing only. All edits go through the builder's command stack.
 // Layout is shared by painting, pointer input, keyboard focus and controller focus.
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.0.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.1.0";
 const inside = (p, r) =>
   p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 export function hudLayout(w, h, model, insets = {}) {
   const left = insets.left || 0,
     right = insets.right || 0,
-    topInset = insets.top || 0,
+    top = insets.top || 0,
     bottom = insets.bottom || 0;
-  if (left || right || topInset || bottom) {
-    const l = hudLayout(w - left - right, h - topInset - bottom, model);
+  if (left || right || top || bottom) {
+    const l = hudLayout(w - left - right, h - top - bottom, model);
     for (const list of [l.buttons, l.panels, l.labels])
       for (const r of list) {
         r.x += left;
-        r.y += topInset;
+        r.y += top;
       }
     return l;
   }
-  const m = 12,
-    gap = 5,
-    small = w < 620,
-    top = 12,
-    buttons = [],
+  const buttons = [],
     panels = [],
-    labels = [];
+    labels = [],
+    m = 10,
+    gap = 4,
+    narrow = w < 600;
   const add = (id, label, x, y, bw = 44, bh = 44, extra = {}) =>
     buttons.push({ id, label, x, y, w: bw, h: bh, ...extra });
-  add("menu", "☰", m, top, 44, 44, { aria: "Map menu" });
-  add("undo", "↶", 61, top, 44, 44, { aria: "Undo", disabled: !model.undo });
-  add("redo", "↷", 110, top, 44, 44, { aria: "Redo", disabled: !model.redo });
-  add("playtest", model.building ? "Test" : "Edit", w - m - 64, top, 64, 44, {
+  const label = (text, x, y, maxWidth, align = "center") =>
+    labels.push({ text, x, y, maxWidth, align });
+  const row = (items, y, max = 76) => {
+    const bw = Math.min(
+        max,
+        (w - 20 - (items.length - 1) * gap) / items.length,
+      ),
+      total = items.length * bw + (items.length - 1) * gap;
+    items.forEach((it, i) =>
+      add(
+        it[0],
+        it[1],
+        (w - total) / 2 + i * (bw + gap),
+        y,
+        bw,
+        44,
+        it[2] || {},
+      ),
+    );
+  };
+  const slider = (id, title, value, min, max, step, x, y, bw) =>
+    add(id, title, x, y, bw, 48, { slider: true, value, min, max, step });
+  add("menu", "☰", m, m, 44, 44, { aria: "Map menu" });
+  add("undo", "↶", 58, m, 44, 44, { aria: "Undo", disabled: !model.undo });
+  add("redo", "↷", 106, m, 44, 44, { aria: "Redo", disabled: !model.redo });
+  add("overview", model.overview ? "Walk" : "Top", w - 126, m, 56, 44, {
+    aria: "Change camera",
+    disabled: !model.building,
+  });
+  add("playtest", model.building ? "Test" : "Edit", w - 66, m, 56, 44, {
     accent: !model.building,
     disabled: !!model.pending,
   });
-  const viewY = small ? 66 : top;
-  add(
-    "overview",
-    model.overview ? "Walk view" : "Top view",
-    small ? w - m - 89 : w - m - 158,
-    viewY,
-    89,
-    44,
-    { disabled: !model.building },
-  );
+  if (w >= 600) label(model.modeLabel || "SELECT", w / 2, 32, w - 300);
   if (model.building) {
-    const compact = h < 450,
-      railY = small ? 118 : 74;
-    [
-      ["select", "Select"],
-      ["pick", "Objects"],
-      ["terrain", "Ground"],
-      ["tools", "Tools"],
-    ].forEach(([id, label], i) =>
-      add(
-        id,
-        label,
-        compact ? m + i * 73 : m,
-        railY + (compact ? 0 : i * 49),
-        68,
-        44,
-        {
-          disabled: !!model.pending,
-          selected:
-            id === "select"
-              ? ["select", "move", "rotate", "scale"].includes(model.tool)
-              : id === "pick"
-                ? model.placing
-                : id === "terrain"
-                  ? ["terrain", "paint"].includes(model.mode)
-                  : false,
-        },
-      ),
-    );
     if (!model.overview) {
-      const y = small ? 122 : 76;
-      add("up", "↑", w - m - (compact ? 101 : 48), y, 48, 48, {
-        hold: 1,
-        aria: "Fly up",
-      });
-      add("down", "↓", w - m - 48, y + (compact ? 0 : 53), 48, 48, {
-        hold: -1,
-        aria: "Fly down",
-      });
+      add("up", "↑", w - 54, 72, 44, 44, { hold: 1, aria: "Fly up" });
+      add("down", "↓", w - 54, 120, 44, 44, { hold: -1, aria: "Fly down" });
     }
-    const options = model.pending
-      ? [
-          ["apply", "Apply"],
-          ["cancel", "Cancel"],
-        ]
-      : model.selected
-        ? [
-            ["move", "Move"],
-            ...(model.rotatable ? [["rotate-tool", "Rotate"]] : []),
-            ...(model.resizable ? [["scale-tool", "Resize"]] : []),
-            ["edit", "Properties"],
-          ]
-        : model.placing
-          ? [
-              ["place", "Place"],
-              ["rotate", "Rotate"],
-              ["done", "Done"],
-            ]
-          : ["terrain", "paint"].includes(model.mode)
-            ? [
-                ["place", model.primary],
-                ["terrain", "Brush"],
-                ["done", "Done"],
-              ]
-            : [
-                ["place", "Select"],
-                ["multi", "Multi"],
-                ["snap-toggle", "Snap"],
-              ];
-    const bw = Math.min(
-        94,
-        (w - 24 - (options.length - 1) * gap) / options.length,
-      ),
-      total = options.length * bw + (options.length - 1) * gap,
-      y = h - 60;
-    options.forEach(([id, label], i) =>
-      add(id, label, (w - total) / 2 + i * (bw + gap), y, bw, 44, {
-        accent: id === "apply" || id === "place",
-        disabled: (id === "place" || id === "apply") && !model.valid,
-        selected:
-          id === "multi"
-            ? model.multi
-            : id === "snap-toggle"
-              ? model.snap
-              : id === "move"
-                ? model.tool === "move"
-                : id === "rotate-tool"
-                  ? model.tool === "rotate"
-                  : id === "scale-tool"
-                    ? model.tool === "scale"
-                    : false,
-      }),
+    const isBrush = ["terrain", "paint"].includes(model.mode),
+      barY = h - 56;
+    const base = [
+      [
+        "select",
+        "Select",
+        {
+          selected: ["select", "move", "rotate", "scale"].includes(model.tool),
+        },
+      ],
+      ["pick", "Objects", { selected: model.placing }],
+      ["terrain", "Ground", { selected: isBrush }],
+    ];
+    const recent = (model.quick || []).slice(
+      0,
+      Math.max(0, Math.min(4, Math.floor((w - 20) / 60) - 4)),
     );
+    const hotbar = [
+      ...base,
+      ...recent.map((o, i) => [
+        "quick:" + i,
+        o.label,
+        { thumbnail: o.thumbnail, quick: true },
+      ]),
+      ["tools", "More"],
+    ];
+    row(hotbar, barY, 64);
+    if (model.pending) {
+      row(
+        [
+          ["apply", "Apply", { accent: true, disabled: !model.valid }],
+          ["cancel", "Cancel"],
+        ],
+        h - 106,
+        88,
+      );
+    } else if (model.selected) {
+      row(
+        [
+          ["move", "Move", { selected: model.tool === "move" }],
+          ...(model.rotatable
+            ? [["rotate-tool", "Rotate", { selected: model.tool === "rotate" }]]
+            : []),
+          ...(model.resizable
+            ? [["scale-tool", "Size", { selected: model.tool === "scale" }]]
+            : []),
+          ["copy", "Copy"],
+          ["erase", "Delete"],
+          ["edit", "More"],
+        ],
+        h - 106,
+        64,
+      );
+    } else if (model.placing) {
+      row(
+        [
+          ["rotate", "Rotate"],
+          ["place", "Place", { accent: true, disabled: !model.valid }],
+          ["done", "Cancel"],
+        ],
+        h - 106,
+        80,
+      );
+    } else if (!isBrush) {
+      row(
+        [
+          ["multi", "Multi", { selected: model.multi }],
+          ["snap-toggle", "Snap", { selected: model.snap }],
+        ],
+        h - 106,
+        64,
+      );
+    }
     if (model.selected || model.pending) {
-      let extra =
+      const controls =
         model.tool === "rotate"
           ? [
               ["turn-left", "−15°"],
@@ -149,193 +150,236 @@ export function hudLayout(w, h, model, insets = {}) {
                 ["scale-up", "Larger"],
               ]
             : [
-                ["raise-object", "Object ↑"],
-                ["lower-object", "Object ↓"],
+                ["nudge:x:-1", "←"],
+                ["nudge:z:-1", "↑"],
+                ["nudge:z:1", "↓"],
+                ["nudge:x:1", "→"],
+                ...(model.vertical
+                  ? [
+                      ["raise-object", "Lift"],
+                      ["lower-object", "Lower"],
+                    ]
+                  : []),
               ];
-      if (model.tool === "move")
-        extra = [
-          ["nudge:x:-1", "← X"],
-          ["nudge:x:1", "X →"],
-          ["nudge:z:-1", "− Z"],
-          ["nudge:z:1", "+ Z"],
-          ...extra,
-        ];
-      if (!model.vertical)
-        extra = extra.filter(([id]) => !id.includes("object"));
-      const bw2 = Math.min(
-          72,
-          (w - 24 - (extra.length - 1) * 5) / Math.max(1, extra.length),
-        ),
-        tw = extra.length * bw2 + (extra.length - 1) * 5;
-      extra.forEach(([id, label], i) =>
-        add(id, label, (w - tw) / 2 + i * (bw2 + 5), h - 109, bw2, 44),
+      row(controls, h - 156, 52);
+    } else if (isBrush) {
+      const brush = model.brush || { radius: 6, power: 0.35, tool: "raise" };
+      const bx = 10,
+        bw = 212,
+        by = 64;
+      panels.push({
+        x: bx - 4,
+        y: by - 4,
+        w: bw + 8,
+        h: model.mode === "terrain" ? 154 : 102,
+      });
+      if (model.mode === "terrain")
+        ["raise", "lower", "smooth", "level"].forEach((t, i) =>
+          add(
+            "brush-tool:" + t,
+            t === "level" ? "Flatten" : t[0].toUpperCase() + t.slice(1),
+            bx + i * 54,
+            by,
+            50,
+            44,
+            { selected: brush.tool === t },
+          ),
+        );
+      else add("brush-settings", "Ground material", bx, by, bw, 44);
+      slider("brush-radius", "Size", brush.radius, 2, 30, 2, bx, by + 48, bw);
+      if (model.mode === "terrain")
+        slider(
+          "brush-power",
+          "Strength",
+          brush.power || 0.35,
+          0.1,
+          1,
+          0.1,
+          bx,
+          by + 100,
+          bw,
+        );
+      row(
+        [
+          ["place", model.primary || "Paint", { accent: true }],
+          ["brush-settings", "Options"],
+          ["done", "Done"],
+        ],
+        h - 106,
+        80,
       );
     }
-    if (model.tip)
-      labels.push({
-        text: model.tip,
-        x: w / 2,
-        y: h - (model.selected || model.pending ? 125 : 78),
-        maxWidth: w - 32,
-      });
-  }
-  if (!model.building) {
-    add("place", "Fire test", w - 112, h - 150, 100, 48, { accent: true });
-    if (model.tip)
-      labels.push({ text: model.tip, x: w / 2, y: h - 70, maxWidth: w - 40 });
-  }
-  const badge = {
-    x: 12,
-    y: small ? 66 : 12,
-    w: small ? Math.max(110, w - 137) : Math.max(110, Math.min(270, w - 355)),
-    h: 32,
-  };
-  if (!small) badge.x = 168;
-  panels.push({ ...badge, mode: true });
-  labels.push({
-    text: model.modeLabel || "SELECT",
-    x: badge.x + 8,
-    y: badge.y + 16,
-    align: "left",
-    maxWidth: badge.w - 16,
-  });
-  if (!model.overview && !model.panel) {
-    labels.push({ text: "+", x: w / 2, y: h / 2, maxWidth: 20 });
-  }
+    if (model.tip && !isBrush && h >= 450)
+      label(
+        model.tip,
+        w / 2,
+        h - (model.selected || model.pending ? 174 : 122),
+        w - 40,
+      );
+  } else add("place", "Fire test", w - 100, h - 104, 90, 44, { accent: true });
+  if (!model.overview && !model.panel) label("+", w / 2, h / 2, 20);
   if (model.panel) {
-    buttons.length = 0;
-    labels.length = 0;
-    panels.length = 0;
-    const keyboard = model.panel.kind === "keyboard",
-      pw = keyboard ? Math.min(640, w - 24) : Math.min(380, w - 24),
-      px = keyboard ? (w - pw) / 2 : w - m - pw,
-      py = 12,
-      ph = h - 24;
-    panels.push({ x: px, y: py, w: pw, h: ph });
-    labels.push({
-      text: model.panel.title,
-      x: px + 16,
-      y: py + 25,
-      align: "left",
-      maxWidth: pw - 80,
-    });
+    buttons.length = panels.length = labels.length = 0;
+    const p = model.panel,
+      keyboard = p.kind === "keyboard",
+      library = p.kind === "library";
+    const pw = keyboard
+      ? Math.min(600, w - 20)
+      : library
+        ? Math.min(650, w - 20)
+        : Math.min(320, w - 20);
+    const px = library || keyboard ? (w - pw) / 2 : w - 10 - pw;
     if (keyboard) {
-      labels.push({
-        text: (model.panel.value || "") + "│",
-        x: px + 16,
-        y: py + 62,
-        align: "left",
-        maxWidth: pw - 32,
-      });
-      const numeric = model.panel.numeric,
-        digits = numeric || model.panel.digits,
-        chars = digits ? "1234567890.-_" : "qwertyuiopasdfghjklzxcvbnm";
-      const keys = [...chars].map((ch) => ({
-        id: "text:" + (model.panel.caps ? ch.toUpperCase() : ch),
-        label: model.panel.caps ? ch.toUpperCase() : ch,
-      }));
-      if (!numeric)
+      const chars = p.numeric
+        ? "1234567890.-"
+        : p.digits
+          ? "1234567890.-_"
+          : "qwertyuiopasdfghjklzxcvbnm";
+      const keys = [...chars].map((ch) => [
+        "text:" + (p.caps ? ch.toUpperCase() : ch),
+        p.caps ? ch.toUpperCase() : ch,
+      ]);
+      if (!p.numeric)
         keys.push(
-          { id: "text:digits", label: digits ? "ABC" : "123" },
-          { id: "text:caps", label: "Shift" },
-          { id: "text:space", label: "Space" },
+          ["text:digits", p.digits ? "ABC" : "123"],
+          ["text:caps", "Shift"],
+          ["text:space", "Space"],
         );
       keys.push(
-        { id: "text:back", label: "Back", aria: "Backspace" },
-        { id: "text:clear", label: "Clear" },
-        { id: "text:cancel", label: "Cancel" },
-        { id: "text:done", label: "Done", accent: true },
+        ["text:back", "⌫"],
+        ["text:cancel", "Cancel"],
+        ["text:done", "Done"],
       );
-      const cols = Math.max(1, Math.floor((pw - 19) / 49)),
-        bw = (pw - 24 - (cols - 1) * 5) / cols;
-      keys.forEach((it, i) =>
+      const cols = Math.max(1, Math.floor((pw - 16) / 48)),
+        rows = Math.ceil(keys.length / cols),
+        ph = 80 + rows * 48,
+        py = Math.max(10, (h - ph) / 2),
+        kw = (pw - 16 - (cols - 1) * 4) / cols;
+      panels.push({ x: px, y: py, w: pw, h: ph });
+      label(p.title, px + 12, py + 22, pw - 24, "left");
+      label((p.value || "") + "│", px + 12, py + 55, pw - 24, "left");
+      keys.forEach(([id, text], i) =>
         add(
-          it.id,
-          it.label,
-          px + 12 + (i % cols) * (bw + 5),
-          py + 78 + Math.floor(i / cols) * 49,
-          bw,
+          id,
+          text,
+          px + 8 + (i % cols) * (kw + 4),
+          py + 76 + Math.floor(i / cols) * 48,
+          kw,
           44,
-          it,
+          { accent: id === "text:done" },
         ),
       );
     } else {
-      add(
-        "close",
-        model.panel.back ? "Back" : "×",
-        px + pw - 52,
-        py + 4,
-        44,
-        44,
-        { aria: "Close panel", disabled: model.panel.title === "Working…" },
-      );
-      const lines = [],
-        words = (model.panel.description || "").split(/\s+/),
-        limit = Math.max(12, Math.floor((pw - 32) / 7));
+      const tabs = p.tabs || [],
+        primaryItems = p.primaryPair ? (p.items || []).slice(0, 2) : [],
+        primaryH = primaryItems.length ? 48 : 0,
+        items = p.primaryPair ? (p.items || []).slice(2) : p.items || [],
+        cols = library ? Math.max(2, Math.floor((pw - 20) / 104)) : 1,
+        rowH = library ? 98 : 48;
+      const tabRows = library
+        ? Math.ceil(tabs.length / Math.max(3, Math.floor((pw - 16) / 80)))
+        : 0;
+      const lines = [];
       let line = "";
-      for (const word of words) {
-        if ((line + " " + word).length > limit && line) {
+      for (const word of (p.description || "").split(/\s+/)) {
+        if ((line + " " + word).length > Math.floor((pw - 24) / 7) && line) {
           lines.push(line);
           line = word;
         } else line += (line ? " " : "") + word;
       }
       if (line) lines.push(line);
-      const maxLines = Math.max(1, Math.floor((ph - 160) / 18)),
+      const maxLines = Math.max(1, Math.floor((h - 180) / 18)),
         textPages = Math.max(1, Math.ceil(lines.length / maxLines));
-      const lastLines = lines.slice((textPages - 1) * maxLines),
-        offsetLast = lastLines.length ? 74 + lastLines.length * 18 : 56;
-      const items = model.panel.items || [],
-        row = items.some((i) => i.thumbnail) ? 106 : 54,
-        rows = Math.max(1, Math.floor((ph - offsetLast - 56) / row)),
-        pageSize = rows * 2;
-      const pages =
-          textPages - 1 + Math.max(1, Math.ceil(items.length / pageSize)),
-        page = Math.min(model.page || 0, pages - 1),
-        textPage = Math.min(page, textPages - 1),
-        shown = lines.slice(textPage * maxLines, (textPage + 1) * maxLines);
-      shown.forEach((text, i) =>
-        labels.push({
-          text,
-          x: px + 16,
-          y: py + 63 + i * 18,
-          align: "left",
-          maxWidth: pw - 32,
-        }),
+      const offset =
+        56 + primaryH + tabRows * 48 + Math.min(lines.length, maxLines) * 18;
+      const reserve =
+        items.length >
+          Math.max(1, Math.floor((h - 24 - offset - 8) / rowH)) * cols ||
+        textPages > 1
+          ? 48
+          : 8;
+      const rows = Math.max(1, Math.floor((h - 24 - offset - reserve) / rowH)),
+        perPage = rows * cols,
+        pages = textPages - 1 + Math.max(1, Math.ceil(items.length / perPage)),
+        page = Math.min(model.page || 0, pages - 1);
+      const shown =
+        page < textPages - 1
+          ? []
+          : items.slice(
+              (page - textPages + 1) * perPage,
+              (page - textPages + 2) * perPage,
+            );
+      const shownLines = lines.slice(
+        Math.min(page, textPages - 1) * maxLines,
+        (Math.min(page, textPages - 1) + 1) * maxLines,
       );
-      if (page >= textPages - 1) {
-        const offset = shown.length ? 74 + shown.length * 18 : 56,
-          itemPage = page - (textPages - 1);
-        items
-          .slice(itemPage * pageSize, (itemPage + 1) * pageSize)
-          .forEach((it, i) =>
-            add(
-              it.id,
-              it.label,
-              px + 12 + ((i % 2) * (pw - 19)) / 2,
-              py + offset + Math.floor(i / 2) * row,
-              (pw - 29) / 2,
-              row - 5,
-              it,
-            ),
-          );
-      }
+      const ph = Math.min(
+        h - 20,
+        56 +
+          primaryH +
+          tabRows * 48 +
+          shownLines.length * 18 +
+          Math.ceil(shown.length / cols) * rowH +
+          (pages > 1 ? 48 : 8),
+      );
+      const py = library ? Math.max(10, h - ph - 10) : 10;
+      panels.push({ x: px, y: py, w: pw, h: ph });
+      label(p.title, px + 12, py + 26, pw - 68, "left");
+      add("close", p.back ? "‹" : "×", px + pw - 48, py + 4, 44, 44, {
+        aria: p.back ? "Back" : "Close",
+        disabled: p.title === "Working…",
+      });
+      const tc = Math.max(3, Math.floor((pw - 16) / 80)),
+        tw = (pw - 16 - (tc - 1) * 4) / tc;
+      tabs.forEach((it, i) =>
+        add(
+          it.id,
+          it.label,
+          px + 8 + (i % tc) * (tw + 4),
+          py + 52 + Math.floor(i / tc) * 48,
+          tw,
+          44,
+          it,
+        ),
+      );
+      shownLines.forEach((text, i) =>
+        label(text, px + 12, py + 64 + tabRows * 48 + i * 18, pw - 24, "left"),
+      );
+      primaryItems.forEach((it, i) =>
+        add(
+          it.id,
+          it.label,
+          px + 8 + (i * (pw - 12)) / 2,
+          py + 56,
+          (pw - 20) / 2,
+          44,
+          it,
+        ),
+      );
+      const sy = py + 56 + primaryH + tabRows * 48 + shownLines.length * 18,
+        cw = (pw - 16 - (cols - 1) * 4) / cols;
+      shown.forEach((it, i) =>
+        add(
+          it.id,
+          it.label,
+          px + 8 + (i % cols) * (cw + 4),
+          sy + Math.floor(i / cols) * rowH,
+          cw,
+          rowH - 4,
+          it,
+        ),
+      );
       if (pages > 1) {
-        add("previous", "‹", px + 12, py + ph - 51, 44, 44, {
+        add("previous", "‹", px + 8, py + ph - 48, 44, 44, {
           disabled: page === 0,
         });
-        add("next", "›", px + pw - 56, py + ph - 51, 44, 44, {
+        add("next", "›", px + pw - 52, py + ph - 48, 44, 44, {
           disabled: page === pages - 1,
         });
-        labels.push({
-          text: `${page + 1} / ${pages}`,
-          x: px + pw / 2,
-          y: py + ph - 28,
-          maxWidth: 120,
-        });
+        label(`${page + 1} / ${pages}`, px + pw / 2, py + ph - 26, 100);
       }
     }
   }
-
   return { buttons, panels, labels };
 }
 function box(c, r, fill, stroke) {
@@ -348,6 +392,97 @@ function box(c, r, fill, stroke) {
     c.lineWidth = 1;
     c.stroke();
   }
+}
+function toolIcon(c, id, x, y) {
+  if (
+    ![
+      "select",
+      "pick",
+      "terrain",
+      "tools",
+      "move",
+      "rotate-tool",
+      "scale-tool",
+      "copy",
+      "erase",
+      "edit",
+    ].includes(id)
+  )
+    return false;
+  c.save();
+  c.translate(x, y);
+  c.lineWidth = 1.6;
+  c.strokeStyle = c.fillStyle;
+  c.lineJoin = "round";
+  c.beginPath();
+  if (id === "select") {
+    c.moveTo(-6, -8);
+    c.lineTo(-6, 8);
+    c.lineTo(-1, 3);
+    c.lineTo(4, 8);
+    c.lineTo(7, 5);
+    c.lineTo(2, 0);
+    c.lineTo(9, 0);
+    c.closePath();
+  } else if (id === "pick") {
+    for (const [x, y] of [
+      [-8, -8],
+      [2, -8],
+      [-8, 2],
+      [2, 2],
+    ])
+      c.rect(x, y, 6, 6);
+  } else if (id === "terrain") {
+    c.moveTo(-10, 7);
+    c.lineTo(-3, -6);
+    c.lineTo(2, 2);
+    c.lineTo(6, -3);
+    c.lineTo(11, 7);
+    c.closePath();
+  } else if (id === "tools" || id === "edit") {
+    for (const x of [-7, 0, 7]) {
+      c.moveTo(x + 1.5, 0);
+      c.arc(x, 0, 1.5, 0, Math.PI * 2);
+    }
+  } else if (id === "copy") {
+    c.rect(-7, -7, 11, 11);
+    c.rect(-3, -3, 11, 11);
+  } else if (id === "erase") {
+    c.moveTo(-8, -5);
+    c.lineTo(8, -5);
+    c.moveTo(-5, -5);
+    c.lineTo(-4, 8);
+    c.lineTo(4, 8);
+    c.lineTo(5, -5);
+    c.moveTo(-3, -8);
+    c.lineTo(3, -8);
+  } else if (id === "rotate-tool") {
+    c.arc(0, 0, 8, 0.2, Math.PI * 1.65);
+    c.moveTo(1, -10);
+    c.lineTo(4, -7);
+    c.lineTo(0, -5);
+  } else if (id === "scale-tool") {
+    c.moveTo(-8, 8);
+    c.lineTo(8, -8);
+    c.moveTo(2, -8);
+    c.lineTo(8, -8);
+    c.lineTo(8, -2);
+    c.moveTo(-8, 2);
+    c.lineTo(-8, 8);
+    c.lineTo(-2, 8);
+  } else {
+    for (let i = 0; i < 4; i++) {
+      c.rotate(Math.PI / 2);
+      c.moveTo(0, 0);
+      c.lineTo(0, -9);
+      c.moveTo(-3, -6);
+      c.lineTo(0, -9);
+      c.lineTo(3, -6);
+    }
+  }
+  c.stroke();
+  c.restore();
+  return true;
 }
 function icon(c, id, x, y) {
   if (
@@ -436,6 +571,30 @@ export function paintHUD(
       c.lineWidth = 2;
       c.stroke();
     }
+    if (b.slider) {
+      const value = Number(b.value) || 0,
+        t = Math.max(0, Math.min(1, (value - b.min) / (b.max - b.min)));
+      c.fillStyle = "#edf1f2";
+      c.font = "600 12px system-ui";
+      c.textAlign = "left";
+      c.fillText(b.label, b.x + 10, b.y + 12, b.w - 65);
+      c.textAlign = "right";
+      c.fillText(
+        b.id === "brush-power" ? `${Math.round(value*100)}%` : String(Number(value.toFixed(2))),
+        b.x + b.w - 10,
+        b.y + 12,
+        60,
+      );
+      c.fillStyle = "#455159";
+      c.fillRect(b.x + 14, b.y + 32, b.w - 28, 3);
+      c.fillStyle = "#d7ff58";
+      c.fillRect(b.x + 14, b.y + 32, (b.w - 28) * t, 3);
+      c.beginPath();
+      c.arc(b.x + 14 + (b.w - 28) * t, b.y + 33, 7, 0, Math.PI * 2);
+      c.fill();
+      c.textAlign = "center";
+      continue;
+    }
     const img = b.thumbnail && images.get(b.thumbnail);
     if (img) {
       const scale = Math.min(
@@ -448,6 +607,11 @@ export function paintHUD(
     }
     c.fillStyle = active ? "#11170d" : "#edf1f2";
     c.font = `600 ${b.label.length > 12 ? 12 : 14}px system-ui, sans-serif`;
+    if (toolIcon(c, b.id, b.x + b.w / 2, b.y + 14)) {
+      c.font = "600 10px system-ui";
+      c.fillText(b.label, b.x + b.w / 2, b.y + 35, b.w - 6);
+      continue;
+    }
     if (
       !(b.id === "close" && b.label === "Back") &&
       icon(c, b.id, b.x + b.w / 2, b.y + b.h / 2)
@@ -503,6 +667,7 @@ export function createBuilderHUD({
     focus = "",
     pressed = null,
     visible = true,
+    toolbarFocus = false,
     w = 0,
     h = 0;
   function render() {
@@ -530,6 +695,10 @@ export function createBuilderHUD({
         ]),
       );
     layout = hudLayout(w, h, m, insets);
+    if (pressed?.slider) {
+      const b = layout.buttons.find((b) => b.id === pressed.id);
+      if (b) b.value = pressed.value;
+    }
     if (m.gizmo && !m.panel) {
       layout.lines = [];
       const { origin, axes } = m.gizmo;
@@ -617,6 +786,8 @@ export function createBuilderHUD({
           el.setAttribute("aria-pressed", String(!!b.selected));
           el.onclick = () => {
             if (b.hold) action(b.hold > 0 ? "fly-step-up" : "fly-step-down");
+            else if (b.slider)
+              commitSlider(b, Math.min(b.max, b.value + b.step));
             else action(b.id);
             render();
           };
@@ -665,11 +836,14 @@ export function createBuilderHUD({
       hold: b?.hold || 0,
       start: p,
       handle: b?.axis ? b : null,
+      slider: b?.slider ? { ...b } : null,
+      value: b?.value,
     };
     stage.setPointerCapture(ev.pointerId);
     if (b?.hold) lift(b.hold);
     else pause?.();
     if (b?.axis) transform?.("start", b.axis, 0);
+    if (b?.slider) pressed.value = sliderValue(b, p);
     render();
   }
   function release(ev, cancel = false) {
@@ -680,16 +854,37 @@ export function createBuilderHUD({
     lift(0);
     if (stage.hasPointerCapture?.(ev.pointerId))
       stage.releasePointerCapture(ev.pointerId);
-    if (p.handle) transform?.(cancel ? "cancel" : "end", p.handle.axis, 0);
+    if (p.slider) {
+      if (!cancel) commitSlider(p.slider, p.value);
+    } else if (p.handle)
+      transform?.(cancel ? "cancel" : "end", p.handle.axis, 0);
     else if (!cancel && !p.hold) {
       const b = layout.buttons.find((b) => b.id === p.id);
       if (b && !b.disabled && inside(point(ev), b)) action(p.id);
     }
     render();
   }
+  function sliderValue(b, p) {
+    const t = Math.max(0, Math.min(1, (p.x - b.x - 14) / (b.w - 28)));
+    return Math.max(
+      b.min,
+      Math.min(
+        b.max,
+        Math.round((b.min + t * (b.max - b.min)) / b.step) * b.step,
+      ),
+    );
+  }
+  function commitSlider(b, value) {
+    action((b.id.startsWith("ui:") ? "value:" : "") + b.id + ":" + value);
+  }
   function move(ev) {
     if (pressed?.pointer !== ev.pointerId) return;
     stop(ev);
+    if (pressed.slider) {
+      pressed.value = sliderValue(pressed.slider, point(ev));
+      render();
+      return;
+    }
     const b = pressed.handle;
     if (!b) return;
     const p = point(ev),
@@ -713,6 +908,7 @@ export function createBuilderHUD({
   const reset = () => {
     if (pressed?.handle) transform?.("cancel", pressed.handle.axis, 0);
     pressed = null;
+    toolbarFocus = false;
     lift(0);
     render();
   };
@@ -721,13 +917,33 @@ export function createBuilderHUD({
   observer.observe(stage);
   function controller(frame) {
     const p = frame.pressed || [];
-    if (!model().panel) return false;
+    if (!model().panel && model().building && p[B.LT]) {
+      toolbarFocus = !toolbarFocus;
+      focus = "";
+      pause?.();
+    }
+    if (!model().panel && !toolbarFocus) return false;
+    if (!model().panel && (p[B.B] || !model().building)) {
+      toolbarFocus = false;
+      focus = "";
+      render();
+      return true;
+    }
     render();
     const list = layout.buttons.filter((b) => !b.disabled);
     let i = list.findIndex((b) => b.id === focus);
     if (i < 0) i = list[0]?.id === "close" && list.length > 1 ? 1 : 0;
     if (p[B.B] || p[B.MENU]) action("close");
-    else if (p[B.A]) action(list[i]?.id);
+    else if (list[i]?.slider && (p[B.DPAD_LEFT] || p[B.DPAD_RIGHT] || p[B.A])) {
+      const b = list[i];
+      commitSlider(
+        b,
+        Math.max(
+          b.min,
+          Math.min(b.max, b.value + (p[B.DPAD_LEFT] ? -1 : 1) * b.step),
+        ),
+      );
+    } else if (p[B.A]) action(list[i]?.id);
     else {
       const dx = p[B.DPAD_RIGHT] ? 1 : p[B.DPAD_LEFT] ? -1 : 0,
         dy = p[B.DPAD_DOWN] ? 1 : p[B.DPAD_UP] ? -1 : 0;
@@ -774,6 +990,9 @@ export function createBuilderHUD({
     controller,
     key,
     reset,
+    get focusActive() {
+      return toolbarFocus;
+    },
     get layout() {
       return layout;
     },

@@ -1,3 +1,4 @@
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.1.0";
 import {
   DocumentOperations,
   MapDocument,
@@ -21,10 +22,10 @@ import {
   ELEVATION,
   templateToDoc,
   MATERIAL_KEYS,
-} from "./builder-model.js?v=2.0.0";
-import { assetResizeMode } from "./object-catalog.js?v=2.0.0";
-import { safeTerrainBrush } from "./safe-terrain.js?v=2.0.0";
-import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.0.0";
+} from "./builder-model.js?v=2.1.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.1.0";
+import { safeTerrainBrush } from "./safe-terrain.js?v=2.1.0";
+import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.1.0";
 const box = (p) => (p.type === "round" ? { ...p, w: p.r * 2, d: p.r * 2 } : p);
 const pose = (p) => ({ x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch });
 
@@ -274,7 +275,7 @@ export class EditorSession extends DocumentOperations {
           : new Promise((resolve, reject) => {
               const worker = new Worker(
                 new URL(
-                  "./editor-validation-worker.js?v=2.0.0",
+                  "./editor-validation-worker.js?v=2.1.0",
                   import.meta.url,
                 ),
                 { type: "module" },
@@ -348,6 +349,12 @@ export class EditorSession extends DocumentOperations {
             ? ELEVATION[item.kind]
             : {};
     this.item = { ...defaults, ...item };
+    this.recentItems = [
+      item,
+      ...(this.recentItems || []).filter(
+        (o) => (o.key || o.label) !== (item.key || item.label),
+      ),
+    ].slice(0, 5);
     this.state.tool = "place";
     this.rotation = 0;
     this.placementHeight = 0;
@@ -1000,9 +1007,39 @@ export class EditorSession extends DocumentOperations {
     this.selectTool();
   }
   action(id) {
+    if (id.startsWith("quick:"))
+      return this.choose(
+        (this.recentItems?.length
+          ? this.recentItems
+          : EDITOR_ITEMS.slice(0, 3))[Number(id.slice(6))],
+      );
+    if (id === "terrain") return this.terrain();
+    if (id.startsWith("brush-tool:")) {
+      this.brush.tool = id.slice(11);
+      this.previewKey = "";
+      this.syncUI();
+      return;
+    }
+    if (id.startsWith("brush-radius:")) {
+      const b = this.state.tool === "paint" ? this.materialBrush : this.brush;
+      b.radius = Math.max(2, Math.min(30, Number(id.split(":")[1])));
+      this.previewKey = "";
+      this.syncUI();
+      return;
+    }
+    if (id.startsWith("brush-power:")) {
+      this.brush.power = Math.max(0.1, Math.min(1, Number(id.split(":")[1])));
+      this.syncUI();
+      return;
+    }
+    if (id === "brush-settings")
+      return this.onUI(this.state.tool === "paint" ? "paint" : "terrain");
     if (
       this.panel &&
-      (id === "close" || id.startsWith("ui:") || id.startsWith("text:"))
+      (id === "close" ||
+        id.startsWith("ui:") ||
+        id.startsWith("text:") ||
+        id.startsWith("value:"))
     )
       return this.onUIAction(id);
     if (id === "previous" || id === "next") {
@@ -1075,6 +1112,14 @@ export class EditorSession extends DocumentOperations {
     const s = this.state,
       selected = this.allSelected();
     return {
+      brush: s.tool === "paint" ? this.materialBrush : this.brush,
+      quick: (this.recentItems?.length
+        ? this.recentItems
+        : EDITOR_ITEMS.slice(0, 3)
+      ).map((o) => ({
+        label: o.label,
+        thumbnail: this.gameRuntime.thumbnail?.(o),
+      })),
       mode: s.tool,
       tool: s.tool,
       modeLabel:
@@ -1102,7 +1147,7 @@ export class EditorSession extends DocumentOperations {
         : s.tool === "place"
           ? "Place"
           : s.tool === "terrain"
-            ? { level: "Flatten" }[this.brush.tool] || this.brush.tool
+            ? { level: "Flatten", raise:"Raise", lower:"Lower", smooth:"Smooth" }[this.brush.tool] || "Paint"
             : s.tool === "paint"
               ? "Paint"
               : "Select",
