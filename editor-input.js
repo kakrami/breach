@@ -1,5 +1,5 @@
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.2.0";
-import { clamp } from "./builder-model.js?v=2.2.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.3.0";
+import { clamp } from "./builder-model.js?v=2.3.0";
 // Screen navigation is independent of document tools. Editing actions share one dispatcher.
 export function createEditorInput(e, active, panels) {
   const pointers = new Map();
@@ -160,6 +160,9 @@ export function createEditorInput(e, active, panels) {
     e.stage.addEventListener(n, f, { capture: true, passive: false });
   window.addEventListener("keydown", key, true);
   window.addEventListener("blur", cancel);
+  window.addEventListener("pagehide", cancel);
+  const visibility=()=>{if(globalThis.document?.hidden)cancel();};
+  globalThis.document?.addEventListener?.("visibilitychange",visibility);
   return {
     cancel,
     controller,
@@ -168,6 +171,8 @@ export function createEditorInput(e, active, panels) {
       for (const [n, f] of listeners) e.stage.removeEventListener(n, f, true);
       window.removeEventListener("keydown", key, true);
       window.removeEventListener("blur", cancel);
+      window.removeEventListener("pagehide", cancel);
+      globalThis.document?.removeEventListener?.("visibilitychange",visibility);
     },
   };
 }

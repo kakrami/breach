@@ -1,5 +1,5 @@
-import { roadNodes, roadSegments } from './road-path.js?v=2.2.0';
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.2.0";
+import { roadNodes, roadSegments } from './road-path.js?v=2.3.0';
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.3.0";
 import {
   DocumentOperations,
   MapDocument,
@@ -23,10 +23,10 @@ import {
   ELEVATION,
   templateToDoc,
   MATERIAL_KEYS,
-} from "./builder-model.js?v=2.2.0";
-import { assetResizeMode } from "./object-catalog.js?v=2.2.0";
-import { safeTerrainBrush } from "./safe-terrain.js?v=2.2.0";
-import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.2.0";
+} from "./builder-model.js?v=2.3.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.3.0";
+import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.3.0";
+import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.3.0";
 const box = (p) => (p.type === "round" ? { ...p, w: p.r * 2, d: p.r * 2 } : p);
 const pose = (p) => ({ x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch });
 
@@ -135,7 +135,7 @@ export class EditorSession extends DocumentOperations {
     this.brush = {
       tool: "raise",
       radius: 6,
-      power: 0.35,
+      rate: 2,
       level: 0,
       sampleHeight: true,
     };
@@ -276,7 +276,7 @@ export class EditorSession extends DocumentOperations {
           : new Promise((resolve, reject) => {
               const worker = new Worker(
                 new URL(
-                  "./editor-validation-worker.js?v=2.2.0",
+                  "./editor-validation-worker.js?v=2.3.0",
                   import.meta.url,
                 ),
                 { type: "module" },
@@ -495,7 +495,7 @@ export class EditorSession extends DocumentOperations {
     let best = null;
     const omitted = new Set(this.transaction?.before.map((o) => o.id) || []);
     for (const { o, parts, bounds } of this.sceneObjects()) {
-      if(o.type==="road")continue;
+      if(o.type==="road"||["terrain","paint"].includes(this.state.tool))continue;
       if (bounds) {
         const inside =
           Math.abs(origin.x - bounds.x) <= bounds.w / 2 &&
@@ -613,6 +613,9 @@ export class EditorSession extends DocumentOperations {
     const skip = new Set(before.map((o) => o.id));
     for (const o of objects) {
       if(o.type==='road'&&o.path){if(roadNodes(o).some(p=>Math.abs(p.x)+o.d/2>this.doc.arenaLimit-1||Math.abs(p.z)+o.d/2>this.doc.arenaLimit-1))reason="Keep the road inside the map";continue;}
+      if(['building','prop'].includes(o.type)&&Resolver.supportProfile(d,o).relief>(o.type==='building'?4:2))reason='Ground too steep · flatten this spot or move the object';
+      if(o.type==='elevation'&&['ramp','stairs'].includes(o.kind)){const lo=Resolver.worldPoint(o,0,-o.d/2),base=runtime.geometry.terrainHeight(lo.x,lo.z)+(o.yOffset||0);for(let i=0;i<=12;i++){const p=Resolver.worldPoint(o,0,o.d*(i/12-.5));if(runtime.geometry.terrainHeight(p.x,p.z)>base+o.rise*i/12+.2)reason='Ground cuts through this slope · reshape it or move the piece';}}
+      if(o.type==='spawn'&&(runtime.collision.worldBlockedAt(o.x,o.z,runtime.geometry.terrainHeight(o.x,o.z)+(o.yOffset||0),runtime.geometry.PLAYER_HEIGHT,runtime.geometry.PLAYER_RADIUS)||Validator.slope(d,o.x,o.z,runtime)>.45))reason='Choose clear, walkable ground for this start';
       const size = Math.hypot(o.w || o.r * 2 || 1, o.d || o.r * 2 || 1) / 2;
       if (
         Math.abs(o.x) + size > this.doc.arenaLimit - 1 ||
@@ -622,6 +625,7 @@ export class EditorSession extends DocumentOperations {
       if ((o.yOffset || 0) > 30 || (o.yOffset || 0) < -8)
         reason = "Choose a lower height";
     }
+    for(const spawn of d.spawns)if(runtime.collision.worldBlockedAt(spawn.x,spawn.z,runtime.geometry.terrainHeight(spawn.x,spawn.z)+(spawn.yOffset||0),runtime.geometry.PLAYER_HEIGHT,runtime.geometry.PLAYER_RADIUS)){reason='Keep starting points clear of geometry';break;}
     const others = d
       .all()
       .filter(
@@ -767,9 +771,10 @@ export class EditorSession extends DocumentOperations {
             },
           ],
           brush: true,
+          protected:tool==="terrain"?terrainProtection(this.doc.terrain,this.doc.all()).filter(o=>Math.hypot(o.x-t.x,o.z-t.z)<r+Math.hypot(o.w,o.d)/2+o.pad):[],
         };
       this.tip = this.valid
-        ? "Drag to shape · two fingers navigate"
+        ? (this.brushFeedback||(tool==="terrain"&&protectedTerrainPoint(terrainProtection(this.doc.terrain,this.doc.all()),t.x,t.z)?"Protected support · brush outside the orange boundary":"Drag or hold · two fingers navigate"))
         : "Drag on open ground";
     }
     this.syncUI();
@@ -825,34 +830,39 @@ export class EditorSession extends DocumentOperations {
     this.commands.execute(before?new PatchCommand(this.doc,[before],preview.objects,"Edit road path"):new AddManyCommand(this.doc,preview.objects));
     this.roadEditingId=null;this.roadPoints=[];this.selected=new Set([o.id]);this.selectTool();
   }
-  beginBrush(point) {
-    if(this.layerLocked("terrain") || this.brushStroke)return;
-    const doc=new MapDocument(this.doc.serializeInternal());
-    this.brushStroke={doc,runtime:this.runtimeCache,points:[],last:null,paint:this.state.tool==="paint",brush:{...this.brush},material:{...this.materialBrush}};
-    if(this.brush.sampleHeight&&["level","flatten"].includes(this.brush.tool))this.brushStroke.brush.level=Resolver.rawTerrainHeight(doc,point.x,point.z);
-    this.extendBrush(point);
+  minimumBrushRadius(){if(!this.doc)return 2;const s=this.state.tool==='paint'?this.doc.materials:this.doc.terrain;return Math.max(2,Math.ceil(s.extent/(s.size-1))*2);}
+  beginBrush(point,now=performance.now()) {
+    if(this.layerLocked("terrain")||this.brushStroke)return;
+    const activeBrush=this.state.tool==='paint'?this.materialBrush:this.brush;activeBrush.radius=Math.max(activeBrush.radius,this.minimumBrushRadius());
+    this.brushFeedback=null;
+    const doc=new MapDocument(this.doc.serializeInternal()),paint=this.state.tool==='paint';
+    this.brushStroke={doc,runtime:this.runtimeCache,paint,brush:{...this.brush},material:{...this.materialBrush},last:{...point},samples:[{...point,time:now}],time:now,lastFlush:now,changed:false};
+    if(this.brush.sampleHeight&&['level','flatten'].includes(this.brush.tool))this.brushStroke.brush.level=this.runtimePhysical().geometry.terrainHeight(point.x,point.z);
+    this.applyBrushDab(point,.12);this.compileBrush();
   }
-  extendBrush(point) {
+  extendBrush(point,now=performance.now()) {
+    const s=this.brushStroke;if(!s)return;s.samples.push({...point,time:now});s.last={...point};
+  }
+  applyBrushDab(point,seconds){
+    const s=this.brushStroke;if(!s)return;const surface=s.paint?s.doc.materials:s.doc.terrain;
+    if(s.paint){const code=Math.max(0,MATERIAL_KEYS.indexOf(s.material.material));for(let iz=0;iz<surface.size;iz++)for(let ix=0;ix<surface.size;ix++){const p=surface.world(ix,iz),i=surface.index(ix,iz);if(Math.hypot(p.x-point.x,p.z-point.z)<=s.material.radius&&surface.values[i]!==code){surface.values[i]=code;s.changed=true;}}}
+    else {const changes=safeTerrainBrush({terrain:surface,objects:s.doc.all(),x:point.x,z:point.z,...s.brush,seconds,baseHeight:(x,z)=>presetTerrain(s.doc.theme,x,z)});for(const c of changes)surface.values[c.i]=c.after;s.changed ||= changes.length>0;}
+  }
+  compileBrush(){const s=this.brushStroke;if(!s?.changed)return;Resolver.resolve(s.doc);s.runtime=RuntimeCompiler.compile(s.doc);this.sceneRev++;this.partsCache=null;this.previewKey='';}
+  flushBrush(force=false,now=performance.now()) {
     const s=this.brushStroke;if(!s)return;
-    const last=s.last||point,dist=Math.hypot(point.x-last.x,point.z-last.z),step=Math.max(.35,(s.paint?s.material.radius:s.brush.radius)*.16),n=Math.max(1,Math.ceil(dist/step));
-    if(s.last&&dist<step)return;
-    for(let i=1;i<=n;i++)s.points.push({x:last.x+(point.x-last.x)*i/n,z:last.z+(point.z-last.z)*i/n});s.last={...point};
+    // Integrate the timestamped pointer trajectory at a fixed simulation step.
+    // Rendering frequency never controls the amount of terrain modification.
+    const step=1000/60;s.samples.push({...s.last,time:now});let advanced=false;
+    while(s.time+step<=now){const at=s.time+step;while(s.samples.length>1&&s.samples[1].time<=at)s.samples.shift();const a=s.samples[0],b=s.samples[1]||a,t=b.time>a.time?Math.max(0,Math.min(1,(at-a.time)/(b.time-a.time))):0;
+      this.applyBrushDab({x:a.x+(b.x-a.x)*t,z:a.z+(b.z-a.z)*t},step/1000);s.time=at;advanced=true;}
+    if(force&&now>s.time){this.applyBrushDab(s.last,(now-s.time)/1000);s.time=now;advanced=true;}
+    if(advanced&&(force||now-s.lastFlush>=100)){this.compileBrush();s.lastFlush=now;}
   }
-  flushBrush(force=false) {
-    const s=this.brushStroke;if(!s)return;
-    const now=performance.now();if(!force&&now-(s.lastDabTime||0)<100)return;if(s.last&&!s.paint&&['raise','lower','smooth'].includes(s.brush.tool)&&now-(s.lastDabTime||0)>120&&!s.points.length)s.points.push({...s.last});
-    if(!s.points.length)return;s.lastDabTime=now;
-    const surface=s.paint?s.doc.materials:s.doc.terrain;
-    for(const {x,z} of s.points.splice(0)){
-      if(s.paint){const code=Math.max(0,MATERIAL_KEYS.indexOf(s.material.material));for(let iz=0;iz<surface.size;iz++)for(let ix=0;ix<surface.size;ix++){const p=surface.world(ix,iz);if(Math.hypot(p.x-x,p.z-z)<=s.material.radius)surface.values[surface.index(ix,iz)]=code;}}
-      else for(const c of safeTerrainBrush({terrain:surface,objects:s.doc.all(),x,z,...s.brush,baseHeight:(a,b)=>presetTerrain(s.doc.theme,a,b)}))surface.values[c.i]=c.after;
-    }
-    Resolver.resolve(s.doc);s.runtime=RuntimeCompiler.compile(s.doc);this.sceneRev++;this.partsCache=null;this.previewKey="";
-  }
-  endBrush(commit=true) {
-    if(!this.brushStroke)return;this.flushBrush(true);const s=this.brushStroke;this.brushStroke=null;
-    this.sceneRev++;this.partsCache=null;this.previewKey="";
-    if(commit)this.commands.replace(s.doc.serializeInternal(),s.paint?"Paint ground":"Shape ground");this.syncUI();
+  endBrush(commit=true,now=performance.now()) {
+    if(!this.brushStroke)return;if(commit)this.flushBrush(true,now);const s=this.brushStroke;this.brushStroke=null;this.sceneRev++;this.partsCache=null;this.previewKey='';
+    if(commit&&s.changed)this.commands.replace(s.doc.serializeInternal(),s.paint?'Paint ground':'Shape ground');
+    else if(commit){this.brushFeedback=['level','flatten','smooth'].includes(s.brush.tool)?'No change here · ground is already shaped or protected':'No change here · protected support or terrain limit';this.toast(this.brushFeedback);}this.syncUI();
   }
   stroke(x, z) {
     return this.strokePath([{ x, z }]);
@@ -1068,13 +1078,13 @@ export class EditorSession extends DocumentOperations {
     }
     if (id.startsWith("brush-radius:")) {
       const b = this.state.tool === "paint" ? this.materialBrush : this.brush;
-      b.radius = Math.max(2, Math.min(30, Number(id.split(":")[1])));
+      b.radius = Math.max(this.minimumBrushRadius(), Math.min(30, Number(id.split(":")[1])));
       this.previewKey = "";
       this.syncUI();
       return;
     }
-    if (id.startsWith("brush-power:")) {
-      this.brush.power = Math.max(0.1, Math.min(1, Number(id.split(":")[1])));
+    if (id.startsWith("brush-rate:")) {
+      this.brush.rate = Math.max(0.25, Math.min(8, Number(id.split(":")[1])));
       this.syncUI();
       return;
     }
@@ -1148,7 +1158,9 @@ export class EditorSession extends DocumentOperations {
   hudModel() {
     const s = this.state,
       selected = this.allSelected();
+    const activeBrush=s.tool==='paint'?this.materialBrush:this.brush;activeBrush.radius=Math.max(activeBrush.radius,this.minimumBrushRadius());
     return {
+      brushMinRadius:this.minimumBrushRadius(),
       controllerAiming:!!this.controllerAiming,
       roadHandles:this.roadHandles(),
       roadSelected:selected.length===1&&selected[0].type==='road',

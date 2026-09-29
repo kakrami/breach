@@ -1,6 +1,6 @@
 // Presentation and hit testing only. All edits go through the builder's command stack.
 // Layout is shared by painting, pointer input, keyboard focus and controller focus.
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.2.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.3.0";
 const inside = (p, r) =>
   p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 export function hudLayout(w, h, model, insets = {}) {
@@ -187,15 +187,15 @@ export function hudLayout(w, h, model, insets = {}) {
           ),
         );
       else add("brush-settings", "Ground material", bx, by, bw, 44);
-      slider("brush-radius", "Size", brush.radius, 2, 30, 2, bx, by + 48, bw);
+      slider("brush-radius", "Size", brush.radius, model.brushMinRadius||2, 30, 2, bx, by + 48, bw);
       if (model.mode === "terrain")
         slider(
-          "brush-power",
-          "Strength",
-          brush.power || 0.35,
-          0.1,
-          1,
-          0.1,
+          "brush-rate",
+          "Rate",
+          brush.rate || 2,
+          0.25,
+          8,
+          0.25,
           bx,
           by + 100,
           bw,
@@ -582,7 +582,7 @@ export function paintHUD(
       c.fillText(b.label, b.x + 10, b.y + 12, b.w - 65);
       c.textAlign = "right";
       c.fillText(
-        b.id === "brush-power" ? `${Math.round(value*100)}%` : String(Number(value.toFixed(2))),
+        b.id === "brush-rate" ? `${Number(value.toFixed(2))}×` : String(Number(value.toFixed(2))),
         b.x + b.w - 10,
         b.y + 12,
         60,

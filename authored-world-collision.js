@@ -1,4 +1,4 @@
-import { createTraversalResolver } from './traversal-resolver.js?v=2.2.0';
+import { createTraversalResolver } from './traversal-resolver.js?v=2.3.0';
 export function createAuthoredWorldCollision(world){
   const {ARENA_LIMIT,PLAYER_HEIGHT,PLAYER_RADIUS,WORLD_PLAYER_COLLIDERS,BUILDING_WINDOW_PORTALS,worldSupportHeight,terrainHeight}=world;
   

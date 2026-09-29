@@ -1,6 +1,18 @@
-# Breach 2.2.0 — verification and release status
+# Breach 2.3.0 — verification and release status
 
-This is a release candidate, not a public deployment. Update both supplied folders together: protocol 98 preserves the new road path contract.
+This is a release candidate, not a public deployment. Update both supplied folders together: protocol 99 preserves the new road path contract.
+
+## Terrain and support revision
+
+The brush engine now integrates elapsed time at a fixed simulation step. Raise, Lower, Flatten and Smooth have a Rate control, an immediate tap application and continuous stationary holds. Flatten retains the stroke's starting height. Per-sample slope limits replace the global multiplier that could stop an entire stroke. Structures protect only their required terrain interpolation footprint, outlined in orange. Brush size is bounded by the terrain grid resolution so a small brush cannot miss all editable samples. No-op strokes report why ground did not change and do not add undo entries. Backgrounding or hiding the page cancels an active stroke.
+
+Shared `terrain-support.js` selects a level building base from the uphill footprint samples, blends a supported pad into surrounding terrain and generates a solid foundation extending to the lowest sampled ground. The rendered terrain triangles remain flat throughout the interior, including rotated footprints. Spawns follow a compact level pad. Grounded props follow their support surface; stairs/ramps use their low endpoint consistently in editor and runtime. Roads conform to sculpted ground without locking or flattening the entire road footprint. Steep building/prop placement, buried ramps and obstructed starts receive invalid previews.
+
+Save and Publish operations are sequenced so a Publish requested during an in-progress Save is not silently discarded. A map replacement cancels the queued operation through the document epoch check.
+
+Additional checks passed: all four stationary holds in actual Chromium mouse and emulated-touch input; equal-duration strokes at 15 and 60 simulation/render schedules; independent local slope constraints; spawn height/walkability; both sculpt/place orders; rotated interior flatness and foundation stability; export/import and delete/undo collider identity; steep-placement rejection. Save/publish/reopen passed in the local server-sanitizer harness. Real game movement at a sloped building site passed doorway traversal, wall sprint collision and jumping-wall collision. Forty-eight additional sloped-site movement checks supplement the original 48 flat-ground checks.
+
+The full physical-device and all-object collision-laboratory release gates below remain open. These tests establish the listed cases, not exhaustive certification of every possible map.
 
 ## Changes
 

@@ -31,8 +31,15 @@ No tool choice changes camera. No cancelled preview changes document/signature/h
 Numeric adjustments use canvas sliders: drag previews a value, release commits once, cancellation/blur discards the draft. Controller LT focuses the toolbar, D-pad navigates or adjusts a focused slider, and B returns to world control. World movement pauses during toolbar focus.
 
 
-## Navigation and paths, 2.2.0
+## Navigation and paths, 2.3.0
 
 The edit camera is independent of player position and every editing tool. Input arbitration owns complete gestures: pointer cancellation, blur, toolbar activation and a second finger roll back an interrupted stroke. Disconnected controllers cancel their pending stroke; idle connected controllers do not steal pointer input. Brush changes compile into a detached runtime for live preview, limited to ten refreshes per second, then commit as one history command on release. This still rebuilds world geometry during preview; lower-end device performance remains a release gate.
 
 `road-path.js` is shared by client and server. Maps retain local path nodes, a smooth flag, width and transform. Paths expand into the same canonical road segments in both runtimes. The client clips surface and marking polygons against each underlying terrain triangle before generating vertices, avoiding interpolation across an unrelated ground triangle. Roads remain surface treatments on the canonical terrain collider. Markings are clipped at other road footprints. Legacy rectangles remain valid and become editable paths when Path is chosen. Move and Rotate preserve local path nodes; arbitrary length scaling is replaced by editing endpoints. Map Check samples the expanded road segments.
+
+
+## Terrain application and supports, 2.3.0
+
+Brush application integrates timestamped positions at 60 simulation steps per second; rendering is separately throttled. The initial tap adds one small application, and every mode continues during a hold. Rate controls terrain change per unit time. The detached document and runtime compile before replacing the visible revision; release commits one snapshot and cancellation restores the prior runtime.
+
+`safe-terrain.js` applies independent local derivative bounds and exposes its exact protected footprints to the canvas overlay. Buildings, stairs/ramps/platforms and ladders retain required supporting samples. Roads, spawns and grounded props are no longer blanket exclusions. `terrain-support.js` is the common placement profile and blending implementation used by the document resolver and the client/server geometry compiler. Buildings use a level uphill base and a solid foundation down to the lowest footprint sample. Spawns have compact flat pads. Roads are terrain-conforming surface geometry, not terrain-flattening stamps. Existing map object identities and path definitions are retained.

@@ -1,10 +1,10 @@
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.2.0";
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.3.0";
 // Canvas panel descriptions and commands. No DOM controls or browser prompts.
-import { APP_VERSION } from "./game-config.js?v=2.2.0";
+import { APP_VERSION } from "./game-config.js?v=2.3.0";
 import {
   assetResizeMode,
   BUILDING_MATERIALS,
-} from "./object-catalog.js?v=2.2.0";
+} from "./object-catalog.js?v=2.3.0";
 import {
   CATALOG,
   MATERIALS,
@@ -18,7 +18,7 @@ import {
   clone,
   uid,
   clamp,
-} from "./builder-model.js?v=2.2.0";
+} from "./builder-model.js?v=2.3.0";
 export function createBuilderPanels({
   editor: e,
   save,
@@ -476,7 +476,7 @@ export function createBuilderPanels({
           (v) => {
             e.materialBrush.radius = v;
           },
-          { min: 2, max: 30, step: 2 },
+          { min: e.minimumBrushRadius(), max: 30, step: 2 },
         ),
       );
     } else if (name === "terrain") {
@@ -498,15 +498,15 @@ export function createBuilderPanels({
           (v) => {
             e.brush.radius = v;
           },
-          { min: 2, max: 30, step: 2 },
+          { min: e.minimumBrushRadius(), max: 30, step: 2 },
         ),
         field(
-          "Strength",
-          e.brush.power,
+          "Rate",
+          e.brush.rate,
           (v) => {
-            e.brush.power = v;
+            e.brush.rate = v;
           },
-          { min: 0.1, max: 1, step: 0.1 },
+          { min: 0.25, max: 8, step: 0.25 },
         ),
         item(
           "Sample flatten height: " + (e.brush.sampleHeight ? "On" : "Off"),

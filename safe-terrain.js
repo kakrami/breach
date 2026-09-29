@@ -1,21 +1,29 @@
-// One bounded brush transaction. Existing structures retain their terrain samples.
+// A brush changes local samples. Constraints restrict individual samples, never the whole stroke.
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-export function safeTerrainBrush({terrain,objects=[],x,z,tool='raise',radius=12,power=.35,level=0,baseHeight=()=>0}){
- const n=terrain.size,cell=terrain.extent*2/(n-1),before=terrain.values,next=new Float64Array(before),absolute=new Float64Array(before.length),mutable=new Set();
- const pads=objects.filter(o=>o.type!=='natural'&&o.type!=='flow').map(o=>({...o,w:o.w||o.width||o.base||o.radius*2||2,d:o.d||o.width||o.base||o.radius*2||2}));
- const locked=(wx,wz)=>pads.some(o=>{const a=(o.rot||0)*Math.PI/180,c=Math.cos(a),s=Math.sin(a),dx=wx-o.x,dz=wz-o.z,pad=6+cell*1.5;return Math.abs(dx*c+dz*s)<=o.w/2+pad&&Math.abs(-dx*s+dz*c)<=o.d/2+pad;});
- for(let iz=0;iz<n;iz++)for(let ix=0;ix<n;ix++){const i=iz*n+ix,wx=-terrain.extent+ix*cell,wz=-terrain.extent+iz*cell;absolute[i]=before[i]+baseHeight(wx,wz);const dist=Math.hypot(wx-x,wz-z);if(dist<radius&&!locked(wx,wz))mutable.add(i);}
- for(const i of mutable){const ix=i%n,iz=Math.floor(i/n),wx=-terrain.extent+ix*cell,wz=-terrain.extent+iz*cell,q=1-Math.hypot(wx-x,wz-z)/radius,weight=q*q*(3-2*q),h=absolute[i];let delta=0;
-  if(tool==='raise'||tool==='lower')delta=(tool==='raise'?1:-1)*Math.min(.5,power)*weight;
-  else if(tool==='level'||tool==='flatten')delta=(level-h)*.25*weight;
-  else if(tool==='smooth'){let sum=0,count=0;for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++){sum+=absolute[clamp(iz+dz,0,n-1)*n+clamp(ix+dx,0,n-1)];count++;}delta=(sum/count-h)*.35*weight;}
-  // Imported terrain outside the range can be smoothed toward it, never made worse.
+export function terrainProtection(terrain,objects=[]){
+ const cell=terrain.extent*2/(terrain.size-1);
+ return objects.filter(o=>['building','elevation','ladder'].includes(o.type)||(o.type==='prop'&&Math.abs(o.yOffset||0)>.05)).map(o=>({...o,w:o.w||o.width||1,d:o.d||o.width||1,pad:cell*Math.SQRT2}));
+}
+export function protectedTerrainPoint(pads,x,z){return pads.some(o=>{const a=(o.rot||0)*Math.PI/180,c=Math.cos(a),s=Math.sin(a),dx=x-o.x,dz=z-o.z;return Math.abs(dx*c+dz*s)<=o.w/2+o.pad&&Math.abs(-dx*s+dz*c)<=o.d/2+o.pad;});}
+export function safeTerrainBrush({terrain,objects=[],x,z,tool='raise',radius=12,rate=2,seconds=.12,level=0,baseHeight=()=>0}){
+ const n=terrain.size,cell=terrain.extent*2/(n-1),before=terrain.values,next=new Float64Array(before),absolute=new Float64Array(before.length),mutable=[],pads=terrainProtection(terrain,objects),amount=Math.max(0,rate)*Math.max(0,seconds);
+ for(let iz=0;iz<n;iz++)for(let ix=0;ix<n;ix++){
+  const i=iz*n+ix,wx=-terrain.extent+ix*cell,wz=-terrain.extent+iz*cell;absolute[i]=before[i]+baseHeight(wx,wz);
+  if(Math.hypot(wx-x,wz-z)<radius&&!protectedTerrainPoint(pads,wx,wz))mutable.push(i);
+ }
+ for(const i of mutable){
+  const ix=i%n,iz=Math.floor(i/n),wx=-terrain.extent+ix*cell,wz=-terrain.extent+iz*cell,q=1-Math.hypot(wx-x,wz-z)/radius,weight=q*q*(3-2*q),h=absolute[i];let delta=0;
+  if(tool==='raise'||tool==='lower')delta=(tool==='raise'?1:-1)*amount*weight;
+  else if(tool==='level'||tool==='flatten')delta=(level-h)*(1-Math.exp(-amount*weight));
+  else if(tool==='smooth'){let sum=0,count=0;for(let dz=-1;dz<=1;dz++)for(let dx=-1;dx<=1;dx++){sum+=absolute[clamp(iz+dz,0,n-1)*n+clamp(ix+dx,0,n-1)];count++;}delta=(sum/count-h)*(1-Math.exp(-amount*weight));}
   next[i]=before[i]+clamp(h+delta,Math.min(-6,h),Math.max(6,h))-h;
  }
- // Bound both grid derivatives, so diagonal slopes also stay walkable. Use
- // original neighbours as bounds: changing two adjacent samples cannot widen
- // their old difference. Final global interpolation guarantees all edge bounds.
- let fraction=1;const allowed=cell*.30;
- for(let iz=0;iz<n;iz++)for(let ix=0;ix<n;ix++){const i=iz*n+ix;for(const j of [ix+1<n?i+1:-1,iz+1<n?i+n:-1]){if(j<0)continue;const old=absolute[i]-absolute[j],delta=(next[i]-before[i])-(next[j]-before[j]),limit=Math.max(allowed,Math.abs(old));if(delta>0)fraction=Math.min(fraction,(limit-old)/delta);if(delta<0)fraction=Math.min(fraction,(-limit-old)/delta);}}
- fraction=clamp(fraction,0,1);const changes=[];for(const i of mutable){const after=Math.fround(before[i]+(next[i]-before[i])*fraction);if(Math.abs(after-before[i])>.00001)changes.push({i,before:before[i],after});}return changes;
+ // Original neighbours supply independent local bounds. The half allowance
+ // guarantees adjacent samples moving in opposite directions cannot exceed the edge limit.
+ const changes=[];
+ for(const i of mutable){const ix=i%n,iz=Math.floor(i/n),h=absolute[i];let lo=-Infinity,hi=Infinity;
+  for(const j of [ix?i-1:-1,ix<n-1?i+1:-1,iz?i-n:-1,iz<n-1?i+n:-1])if(j>=0){const d=h-absolute[j],limit=Math.max(cell*.30,Math.abs(d));lo=Math.max(lo,(-limit-d)/2);hi=Math.min(hi,(limit-d)/2);}
+  const after=Math.fround(before[i]+clamp(next[i]-before[i],lo,hi));if(Math.abs(after-before[i])>1e-7)changes.push({i,before:before[i],after});
+ }
+ return changes;
 }
