@@ -1,6 +1,10 @@
-# Breach 2.4.0 — verification and release status
+# Breach 2.5.0 — verification and release status
 
 This is a release candidate, not a public deployment. Update both supplied folders together: protocol 99 preserves the new road path contract.
+
+## Construction revision
+
+Road drawing now follows the terrain point under the pointer. Its magnetism targets existing road ends or centerlines only, and the Snap switch disables those magnets. Authored road paths receive terrain-conforming caps and joins. Draw Building uses two ground corners to create a resizable canonical `building/custom` asset, with selectable floor count; its roof, walls, openings, floors, stairs and collision compile through the same shared geometry as other buildings. Mouse and touch placement, save, publish and reopen were exercised against the client and server sanitizers. A separate construction test checks exact road coordinates, road-end snapping, building geometry and published signatures.
 
 ## Terrain and support revision
 

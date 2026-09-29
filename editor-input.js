@@ -1,5 +1,5 @@
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.4.0";
-import { clamp } from "./builder-model.js?v=2.4.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.5.0";
+import { clamp } from "./builder-model.js?v=2.5.0";
 // Screen navigation is independent of document tools. Editing actions share one dispatcher.
 export function createEditorInput(e, active, panels) {
   const pointers = new Map();
@@ -37,7 +37,10 @@ export function createEditorInput(e, active, panels) {
     if(ev.button===0 && ['terrain','paint'].includes(e.state.tool)){
       const hit=e.pick(e.gameRuntime.ray(p));if(hit&&!hit.object){e.beginBrush(hit);gesture.brush=true;}
       else gesture.blocked=true;
-    }else if(ev.button===0&&e.state.tool==='place'){gesture.placing=true;e.placementHit=e.pick(e.gameRuntime.ray(p));e.update();}
+    }else if(ev.button===0&&e.state.tool==='place'){
+      gesture.placing=true;e.placementHit=e.pick(e.gameRuntime.ray(p));e.update();
+      if(e.item?.type==='buildingFootprint'&&!e.footprintStart&&e.valid){e.primary();gesture.footprintStarted=true;}
+    }
   }
   function move(ev) {
     if(!active()||e.panel||e.state.phase!=='edit')return;
@@ -67,9 +70,9 @@ export function createEditorInput(e, active, panels) {
       if(g.roadIndex!=null){e.roadNodeDragging=false;e.previewKey='';e.update();}
       else if(g.handle)e.gameRuntime.transformPointer?.('up',ev);
       else if(g.brush)e.endBrush(true);
-      else if(!pinch&&!g.moved&&!g.pan&&!g.blocked){
+      else if(!pinch&&!g.pan&&!g.blocked&&!(g.footprintStarted&&!g.moved)&&(!g.moved||g.placing&&e.item?.type==='buildingFootprint'&&e.footprintStart)){
         e.pointer=point(ev);
-        if(!g.placing||['road','roadcurve'].includes(e.item?.type)){const multi=e.multiSelect;e.multiSelect=multi||!!ev.shiftKey;e.primary();e.multiSelect=multi;}
+        if(!g.placing||['road','roadcurve','buildingFootprint'].includes(e.item?.type)){const multi=e.multiSelect;e.multiSelect=multi||!!ev.shiftKey;e.primary();e.multiSelect=multi;}
       }
     }
     gesture=null;if(!pointers.size)pinch=null;

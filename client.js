@@ -1,40 +1,40 @@
-import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.4.0';
+import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.5.0';
 let EditorScene;
-import { BUILDING_MATERIALS } from './object-catalog.js?v=2.4.0';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.4.0';
-import { createMoonSky } from './mod-environment.js?v=2.4.0';
+import { BUILDING_MATERIALS } from './object-catalog.js?v=2.5.0';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.5.0';
+import { createMoonSky } from './mod-environment.js?v=2.5.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=2.4.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=2.4.0';
-import * as YardGeometry from './world-geometry-yard.js?v=2.4.0';
-import * as RigGeometry from './world-geometry-rig.js?v=2.4.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=2.4.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=2.4.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=2.4.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=2.4.0';
+import * as HighlandsGeometry from './world-geometry.js?v=2.5.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=2.5.0';
+import * as YardGeometry from './world-geometry-yard.js?v=2.5.0';
+import * as RigGeometry from './world-geometry-rig.js?v=2.5.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=2.5.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=2.5.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=2.5.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=2.5.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=2.4.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.4.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=2.4.0';
-import { createAudioEngine } from './audio-engine.js?v=2.4.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.4.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.4.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.4.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.4.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.4.0';
-import { createControllerRecording } from './controller-recording.js?v=2.4.0';
-import { createPointerSessions } from './pointer-sessions.js?v=2.4.0';
-import { createSafeStorage } from './browser-storage.js?v=2.4.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=2.4.0';
-import { createUiFocusScope } from './ui-focus.js?v=2.4.0';
-import { createUiGestures } from './ui-gestures.js?v=2.4.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.4.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.4.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.4.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=2.4.0';
+} from './game-config.js?v=2.5.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.5.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=2.5.0';
+import { createAudioEngine } from './audio-engine.js?v=2.5.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.5.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.5.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.5.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.5.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.5.0';
+import { createControllerRecording } from './controller-recording.js?v=2.5.0';
+import { createPointerSessions } from './pointer-sessions.js?v=2.5.0';
+import { createSafeStorage } from './browser-storage.js?v=2.5.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=2.5.0';
+import { createUiFocusScope } from './ui-focus.js?v=2.5.0';
+import { createUiGestures } from './ui-gestures.js?v=2.5.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.5.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.5.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.5.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=2.5.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -937,7 +937,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.4.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.5.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -945,7 +945,7 @@ async function ensureThreeEngine(){
   if(engineLoadPromise)return engineLoadPromise;
   engineLoadPromise=(async()=>{
     try{
-      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.4.0')).EditorScene;
+      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.5.0')).EditorScene;
       if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
       THREE=mod;
       position=new THREE.Vector3(0,0,0);
@@ -2218,8 +2218,13 @@ function appendRoadSurface(data,road,{width=road.d,offset=.018,patches=null}={})
  const terrain={TERRAIN_SIZE,TERRAIN_SEGMENTS,terrainHeight};
  if(patches){const angle=(road.rot||0)*Math.PI/180;for(const q of patches){const x=q.x||0,z=q.z||0,r={...road,x:road.x+x*Math.cos(angle)-z*Math.sin(angle),z:road.z+x*Math.sin(angle)+z*Math.cos(angle),w:q.w,d:q.d};let polygons=[roadPolygon(r)];if(road.kind!=='crosswalk')for(const other of ROADS){if(other===road||road.sourceRoad!=null&&other.sourceRoad===road.sourceRoad)continue;if(Math.hypot(other.x-r.x,other.z-r.z)>(Math.hypot(other.w,other.d)+Math.hypot(r.w,r.d))/2)continue;polygons=polygons.flatMap(p=>subtractRoadPolygon(p,roadPolygon(other)));if(!polygons.length)break;}for(const polygon of polygons)appendTerrainRoad(data,polygon,terrain,offset);}return;}
  appendTerrainRoad(data,roadPolygon(road,width),terrain,offset);
- // Rounded joins close corners without stretching across terrain triangles.
- if(road.pathIndex!=null&&road.pathIndex>0){const a=(road.rot||0)*Math.PI/180,x=road.x-Math.cos(a)*road.w/2,z=road.z-Math.sin(a)*road.w/2,poly=Array.from({length:16},(_,i)=>({x:x+Math.cos(i*Math.PI/8)*width/2,z:z+Math.sin(i*Math.PI/8)*width/2}));appendTerrainRoad(data,poly,terrain,offset);}
+ // Cap authored paths at both ends, and bridge every bend on the same terrain surface.
+ if(road.pathIndex!=null){
+   const a=(road.rot||0)*Math.PI/180,dx=Math.cos(a)*road.w/2,dz=Math.sin(a)*road.w/2;
+   const final=!ROADS.some(other=>other.sourceRoad===road.sourceRoad&&other.pathIndex>road.pathIndex);
+   const centers=[{x:road.x-dx,z:road.z-dz},...(final?[{x:road.x+dx,z:road.z+dz}]:[])];
+   for(const center of centers){const poly=Array.from({length:20},(_,i)=>({x:center.x+Math.cos(i*Math.PI/10)*width/2,z:center.z+Math.sin(i*Math.PI/10)*width/2}));appendTerrainRoad(data,poly,terrain,offset);}
+ }
 }
 function roadGeometryFromData(data){const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(data.positions,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(data.uvs,2));geo.setIndex(data.indices);geo.computeVertexNormals();return geo;}
 function addRoadsBatch(){

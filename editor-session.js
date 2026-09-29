@@ -1,4 +1,4 @@
-import { roadNodes, roadSegments } from './road-path.js?v=2.4.0';
+import { roadNodes, roadSegments } from './road-path.js?v=2.5.0';
 import {
   DocumentOperations,
   MapDocument,
@@ -24,10 +24,10 @@ import {
   ELEVATION,
   templateToDoc,
   MATERIAL_KEYS,
-} from "./builder-model.js?v=2.4.0";
-import { assetResizeMode } from "./object-catalog.js?v=2.4.0";
-import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.4.0";
-import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.4.0";
+} from "./builder-model.js?v=2.5.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.5.0";
+import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.5.0";
+import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.5.0";
 const box = (p) => (p.type === "round" ? { ...p, w: p.r * 2, d: p.r * 2 } : p);
 const pose = (p) => ({ x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch });
 
@@ -124,6 +124,8 @@ export class EditorSession extends DocumentOperations {
     this.placementHeight = 0;
     this.transaction = null;
     this.roadPoints = [];
+    this.footprintStart = null;
+    this.buildingLevels = 2;
     this.pointer = null;
     this.target = null;
     this.ghost = null;
@@ -228,6 +230,7 @@ export class EditorSession extends DocumentOperations {
     this.transaction = null;
     this.item = null;
     this.roadPoints = [];
+    this.footprintStart = null;
     this.state = {
       phase: "edit",
       tool: "select",
@@ -277,7 +280,7 @@ export class EditorSession extends DocumentOperations {
           : new Promise((resolve, reject) => {
               const worker = new Worker(
                 new URL(
-                  "./editor-validation-worker.js?v=2.4.0",
+                  "./editor-validation-worker.js?v=2.5.0",
                   import.meta.url,
                 ),
                 { type: "module" },
@@ -354,6 +357,7 @@ export class EditorSession extends DocumentOperations {
     this.roadEditingId=null;this.roadSmooth=item.type==="roadcurve";
     this.placementHit=null;
     this.item = { ...defaults, ...item };
+    if(item.type==='buildingFootprint')this.buildingLevels=item.levels||this.buildingLevels;
     this.recentItems = [
       item,
       ...(this.recentItems || []).filter(
@@ -364,6 +368,7 @@ export class EditorSession extends DocumentOperations {
     this.rotation = 0;
     this.placementHeight = 0;
     this.roadPoints = [];
+    this.footprintStart = null;
     this.selected.clear();
     this.closeDrawers();
     this.previewKey = "";
@@ -382,6 +387,7 @@ export class EditorSession extends DocumentOperations {
     this.state.tool = tool;
     this.roadEditingId=null;this.roadNodeDragging=false;
     this.roadPoints = [];
+    this.footprintStart = null;
     this.ghost = null;
     this.previewKey = "";
     this.closeDrawers();
@@ -393,6 +399,7 @@ export class EditorSession extends DocumentOperations {
     this.state.tool = paint ? "paint" : "terrain";
     this.selected.clear();
     this.roadPoints = [];
+    this.footprintStart = null;
     this.closeDrawers();
     this.previewKey = "";
     this.update();
@@ -496,7 +503,7 @@ export class EditorSession extends DocumentOperations {
     let best = null;
     const omitted = new Set(this.transaction?.before.map((o) => o.id) || []);
     for (const { o, parts, bounds } of this.sceneObjects()) {
-      if(o.type==="road"||["terrain","paint"].includes(this.state.tool))continue;
+      if(o.type==="road"||["terrain","paint"].includes(this.state.tool)||this.state.tool==='place'&&['road','roadcurve','buildingFootprint'].includes(this.item?.type))continue;
       if (bounds) {
         const inside =
           Math.abs(origin.x - bounds.x) <= bounds.w / 2 &&
@@ -560,15 +567,26 @@ export class EditorSession extends DocumentOperations {
   selectionParts() {
     return this.allSelected().flatMap((o) => this.placementParts([o], true));
   }
+  buildingFromFootprint(end) {
+    const start=this.footprintStart;
+    if(!start||!end)return null;
+    const w=Math.abs(start.x-end.x),d=Math.abs(start.z-end.z);
+    if(w<12||d<10||w>80||d>80)return null;
+    return this.doc.normBuilding({type:'building',assetId:'building/custom',archetype:'custom',x:(start.x+end.x)/2,z:(start.z+end.z)/2,w,d,rot:0,levels:this.buildingLevels,floorH:3.1,style:'brick',balcony:0,yOffset:0});
+  }
   plan(hit) {
     if (!hit) return [];
     const item = {
         ...this.item,
         rot: this.rotation,
         yOffset: this.placementHeight,
-      },
-      p = this.snapRoadPoint(hit);
+      };
+    if(item.type==='buildingFootprint'){
+      const end={x:this.snap(hit.x),z:this.snap(hit.z)},building=this.buildingFromFootprint(end);
+      return building?[building]:[];
+    }
     if (["road","roadcurve"].includes(item.type)) {
+      const p=this.snapRoadPoint(hit);
       const points=[...this.roadPoints];
       if(!this.roadNodeDragging && !this.roadEditingId && (!points.length||Math.hypot(p.x-points.at(-1).x,p.z-points.at(-1).z)>.1))points.push(p);
       if(points.length<2)return [];
@@ -701,6 +719,8 @@ export class EditorSession extends DocumentOperations {
       this.placementHeight,
       this.item?.key || this.item?.label,
       JSON.stringify(this.roadPoints),
+      JSON.stringify(this.footprintStart),
+      this.buildingLevels,
       [...this.selected].join(","),
       placementKey || t?.x?.toFixed(2),
       placementKey ? null : t?.y?.toFixed(2),
@@ -748,10 +768,14 @@ export class EditorSession extends DocumentOperations {
               objects: [],
               valid: true,
             };
-        this.valid = this.ghost.valid;
+        this.valid = this.ghost.valid && (this.item.type!=='buildingFootprint'||!this.footprintStart||objects.length>0);
         this.tip =
           this.ghost.reason ||
-          (["road", "roadcurve"].includes(this.item.type)
+          (this.item.type==='buildingFootprint'
+            ? this.footprintStart
+              ? objects.length ? 'Tap to create this building' : 'Draw at least 12 × 10 m; use two corners'
+              : 'Tap the first corner of your building'
+            : ["road", "roadcurve"].includes(this.item.type)
             ? (this.roadPoints.length ? "Tap to extend · drag points to reshape · Finish" : "Tap the road’s starting point")
             : `Place · ${this.item.label || this.item.kind}`);
       }
@@ -802,6 +826,11 @@ export class EditorSession extends DocumentOperations {
     }
     if (!this.valid) return;
     if (this.state.tool === "place") {
+      if(this.item.type==='buildingFootprint'){
+        if(!this.footprintStart){this.footprintStart={x:this.snap(t.x),z:this.snap(t.z)};this.placementHit=null;this.previewKey='';this.update();return;}
+        if(this.ghost?.objects?.length){const objects=this.ghost.objects;this.commands.execute(new AddManyCommand(this.doc,objects));this.selected=new Set(objects.map(o=>o.id));this.footprintStart=null;this.placementHit=null;this.selectTool();}
+        return;
+      }
       if (["road","roadcurve"].includes(this.item.type)) {
         const p=this.snapRoadPoint(t);
         if(this.roadPoints.length>=64){this.toast("Finish this road before starting another");return;}
@@ -1053,9 +1082,14 @@ export class EditorSession extends DocumentOperations {
       this.update();
       return;
     }
+    if(this.footprintStart){this.footprintStart=null;this.placementHit=null;this.previewKey='';this.update();return;}
     this.selectTool();
   }
   action(id) {
+    if(id==='floor-down'||id==='floor-up'){
+      this.buildingLevels=clamp(this.buildingLevels+(id==='floor-up'?1:-1),1,5);
+      this.previewKey='';this.update();return;
+    }
     if(id==='road-edit')return this.editRoad();
     if(id==='road-finish')return this.finishRoad();
     if(id==='road-smooth'){this.roadSmooth=!this.roadSmooth;this.previewKey="";this.update();return;}
@@ -1112,9 +1146,12 @@ export class EditorSession extends DocumentOperations {
       return;
     }
     if (id === "snap-toggle") {
-      this.snapConfig.grid = !this.snapConfig.grid;
+      const enabled=!this.snapConfig.grid;
+      this.snapConfig.grid=enabled;
+      this.snapConfig.objects=enabled;
+      this.snapConfig.roads=enabled;
       this.previewKey = "";
-      this.syncUI();
+      this.update();
       return;
     }
     if(id==="done"&&this.roadPoints.length){this.roadPoints=[];this.roadEditingId=null;}
@@ -1170,6 +1207,9 @@ export class EditorSession extends DocumentOperations {
       roadHandles:this.roadHandles(),
       roadSelected:selected.length===1&&selected[0].type==='road',
       roadMode:s.tool==='place'&&['road','roadcurve'].includes(this.item?.type),
+      footprintMode:s.tool==='place'&&this.item?.type==='buildingFootprint',
+      footprintStarted:!!this.footprintStart,
+      buildingLevels:this.buildingLevels,
       roadCount:this.roadPoints.length,
       roadSmooth:!!this.roadSmooth,
       brush: s.tool === "paint" ? this.materialBrush : this.brush,

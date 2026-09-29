@@ -1,6 +1,6 @@
 // Presentation and hit testing only. All edits go through the builder's command stack.
 // Layout is shared by painting, pointer input, keyboard focus and controller focus.
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.4.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.5.0";
 const inside = (p, r) =>
   p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 export function hudLayout(w, h, model, insets = {}) {
@@ -66,6 +66,10 @@ export function hudLayout(w, h, model, insets = {}) {
         if(model.mode==='terrain')add('brush-rate','Rate',cx,y+96,cw,44,{slider:true,value:brush.rate||2,min:.25,max:8,step:.25});
         else label('Drag on the ground to paint',cx,y+118,cw,'left');
         addRow([['brush-settings','Options'],['done','Done']],cx,y+144,cw);
+      }else if(model.footprintMode){
+        addRow([['floor-down','−',{disabled:model.buildingLevels<=1}],['floor-count',`${model.buildingLevels} floor${model.buildingLevels===1?'':'s'}`,{disabled:true}],['floor-up','+',{disabled:model.buildingLevels>=5}]],cx,y,cw);
+        label(model.footprintStarted?'Tap the opposite corner or drag':'Tap the first corner, then drag',cx,y+72,cw,'left');
+        addRow([['done','Cancel'],['place','Create',{accent:true,disabled:!model.footprintStarted||!model.valid}]],cx,y+96,cw);
       }else if(model.roadMode){
         addRow([['road-smooth',model.roadSmooth?'Curve':'Straight',{selected:model.roadSmooth}],['road-reverse','Other end',{disabled:model.roadCount<2}]],cx,y,cw);
         addRow([['road-back','Remove point',{disabled:!model.roadCount}],['road-finish','Finish',{accent:true,disabled:model.roadCount<2}]],cx,y+48,cw);
@@ -80,7 +84,7 @@ export function hudLayout(w, h, model, insets = {}) {
     const optionX=72,optionY=64;
     if(!portrait||!hasContext)addRow([['multi','Multi',{selected:model.multi,disabled:model.pending||model.placing||brushMode}],['snap-toggle','Snap',{selected:model.snap}]],optionX,optionY,116);
     panels.push({x:0,y:h-26,w,h:26,chrome:true});
-    const status=(model.pending||model.placing)&&!model.valid?(model.tip||'Placement is blocked'):model.pending?'Preview · Apply to keep changes':model.placing?(model.roadMode?'Road · tap points, drag handles, then Finish':'Place · tap a surface, then Place'):brushMode?(model.tip||'Brush · hold or drag to apply · two fingers navigate'):model.selected?(model.tool==='select'?'Selected · choose Move, Rotate or Size':'Selected · drag handles to transform'): 'Select · tap an object · drag to orbit · pinch to zoom';
+    const status=(model.pending||model.placing)&&!model.valid?(model.tip||'Placement is blocked'):model.pending?'Preview · Apply to keep changes':model.placing?(model.footprintMode?model.tip:model.roadMode?'Road · tap points, drag handles, then Finish':'Place · tap a surface, then Place'):brushMode?(model.tip||'Brush · hold or drag to apply · two fingers navigate'):model.selected?(model.tool==='select'?'Selected · choose Move, Rotate or Size':'Selected · drag handles to transform'): 'Select · tap an object · drag to orbit · pinch to zoom';
     label(status,12,h-13,w-24,'left');
   }else add('place','Fire test',w-100,h-104,90,44,{accent:true});
   if ((!model.building || model.controllerAiming) && !model.panel) label("+", w / 2, h / 2, 20);
