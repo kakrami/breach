@@ -31,14 +31,14 @@ No tool choice changes camera. No cancelled preview changes document/signature/h
 Numeric adjustments use canvas sliders: drag previews a value, release commits once, cancellation/blur discards the draft. Controller LT focuses the toolbar, D-pad navigates or adjusts a focused slider, and B returns to world control. World movement pauses during toolbar focus.
 
 
-## Navigation and paths, 2.3.0
+## Navigation and paths, 2.4.0
 
 The edit camera is independent of player position and every editing tool. Input arbitration owns complete gestures: pointer cancellation, blur, toolbar activation and a second finger roll back an interrupted stroke. Disconnected controllers cancel their pending stroke; idle connected controllers do not steal pointer input. Brush changes compile into a detached runtime for live preview, limited to ten refreshes per second, then commit as one history command on release. This still rebuilds world geometry during preview; lower-end device performance remains a release gate.
 
 `road-path.js` is shared by client and server. Maps retain local path nodes, a smooth flag, width and transform. Paths expand into the same canonical road segments in both runtimes. The client clips surface and marking polygons against each underlying terrain triangle before generating vertices, avoiding interpolation across an unrelated ground triangle. Roads remain surface treatments on the canonical terrain collider. Markings are clipped at other road footprints. Legacy rectangles remain valid and become editable paths when Path is chosen. Move and Rotate preserve local path nodes; arbitrary length scaling is replaced by editing endpoints. Map Check samples the expanded road segments.
 
 
-## Terrain application and supports, 2.3.0
+## Terrain application and supports, 2.4.0
 
 Brush application integrates timestamped positions at 60 simulation steps per second; rendering is separately throttled. The initial tap adds one small application, and every mode continues during a hold. Rate controls terrain change per unit time. The detached document and runtime compile before replacing the visible revision; release commits one snapshot and cancellation restores the prior runtime.
 

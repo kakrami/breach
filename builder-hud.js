@@ -1,6 +1,6 @@
 // Presentation and hit testing only. All edits go through the builder's command stack.
 // Layout is shared by painting, pointer input, keyboard focus and controller focus.
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.3.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.4.0";
 const inside = (p, r) =>
   p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 export function hudLayout(w, h, model, insets = {}) {
@@ -19,205 +19,70 @@ export function hudLayout(w, h, model, insets = {}) {
   }
   const buttons = [],
     panels = [],
-    labels = [],
-    m = 10,
-    gap = 4,
-    narrow = w < 600;
+    labels = [];
   const add = (id, label, x, y, bw = 44, bh = 44, extra = {}) =>
     buttons.push({ id, label, x, y, w: bw, h: bh, ...extra });
   const label = (text, x, y, maxWidth, align = "center") =>
     labels.push({ text, x, y, maxWidth, align });
-  const row = (items, y, max = 76) => {
-    const bw = Math.min(
-        max,
-        (w - 20 - (items.length - 1) * gap) / items.length,
-      ),
-      total = items.length * bw + (items.length - 1) * gap;
-    items.forEach((it, i) =>
-      add(
-        it[0],
-        it[1],
-        (w - total) / 2 + i * (bw + gap),
-        y,
-        bw,
-        44,
-        it[2] || {},
-      ),
-    );
-  };
-  const slider = (id, title, value, min, max, step, x, y, bw) =>
-    add(id, title, x, y, bw, 48, { slider: true, value, min, max, step });
-  add("menu", "☰", m, m, 44, 44, { aria: "Map menu" });
-  add("undo", "↶", 58, m, 44, 44, { aria: "Undo", disabled: !model.undo });
-  add("redo", "↷", 106, m, 44, 44, { aria: "Redo", disabled: !model.redo });
-  add("overview", model.overview ? "Orbit" : "Top", w - 126, m, 56, 44, {
-    aria: "Change camera",
-    disabled: !model.building,
-  });
-  add("playtest", model.building ? "Test" : "Edit", w - 66, m, 56, 44, {
-    accent: !model.building,
-    disabled: !!model.pending,
-  });
-  if (w >= 600) label(model.modeLabel || "SELECT", w / 2, 32, w - 300);
-  if (model.building) {
-    const isBrush = ["terrain", "paint"].includes(model.mode),
-      barY = h - 56;
-    const base = [
-      [
-        "select",
-        "Select",
-        {
-          selected: ["select", "move", "rotate", "scale"].includes(model.tool),
-        },
-      ],
-      ["pick", "Objects", { selected: model.placing }],
-      ["terrain", "Ground", { selected: isBrush }],
-    ];
-    const recent = (model.quick || []).slice(
-      0,
-      Math.max(0, Math.min(4, Math.floor((w - 20) / 60) - 4)),
-    );
-    const hotbar = [
-      ...base,
-      ...recent.map((o, i) => [
-        "quick:" + i,
-        o.label,
-        { thumbnail: o.thumbnail, quick: true },
-      ]),
-      ["tools", "More"],
-    ];
-    row(hotbar, barY, 64);
-    if (model.pending) {
-      row(
-        [
-          ["apply", "Apply", { accent: true, disabled: !model.valid }],
-          ["cancel", "Cancel"],
-        ],
-        h - 106,
-        88,
-      );
-    } else if (model.selected) {
-      row(
-        [
-          ["move", "Move", { selected: model.tool === "move" }],
-          ...(model.rotatable
-            ? [["rotate-tool", "Rotate", { selected: model.tool === "rotate" }]]
-            : []),
-          ...(model.resizable
-            ? [["scale-tool", "Size", { selected: model.tool === "scale" }]]
-            : []),
-          ["copy", "Copy"],
-          ["erase", "Delete"],
-          ...(w>=600 ? [["focus", "Focus"]] : []),
-          ...(model.roadSelected?[["road-edit","Path"]]:[]),
-          ["edit","More"],
-        ],
-        h - 106,
-        64,
-      );
-    } else if (model.roadMode) {
-      row([["road-smooth",model.roadSmooth?"Curve":"Straight",{selected:model.roadSmooth}],["road-back","Back",{disabled:!model.roadCount}],["road-finish","Finish",{accent:true,disabled:model.roadCount<2}],["done","Cancel"]],h-106,76);
-      if(model.roadCount>1)row([["road-reverse","Other end"]],h-156,100);
-    } else if (model.placing) {
-      row(
-        [
-          ["rotate", "Rotate"],
-          ["place", "Place", { accent: true, disabled: !model.valid }],
-          ["done", "Cancel"],
-        ],
-        h - 106,
-        80,
-      );
-    } else if (!isBrush) {
-      row(
-        [
-          ["multi", "Multi", { selected: model.multi }],
-          ["snap-toggle", "Snap", { selected: model.snap }],
-        ],
-        h - 106,
-        64,
-      );
+  // Stable workspace regions. Tool changes only replace the contextual inspector.
+  const portrait=w<600&&h>w, railX=8, railY=h<340?60:64, railW=56, railStep=h<340?46:48;
+  const addRow=(items,x,y,width)=>{const bw=(width-(items.length-1)*4)/items.length;items.forEach(([id,text,extra={}],i)=>add(id,text,x+i*(bw+4),y,bw,44,extra));};
+  panels.push({x:0,y:0,w,h:56,chrome:true});
+  add('menu','Map',8,6,44,44,{aria:'Map menu'});
+  add('undo','Undo',56,6,44,44,{aria:'Undo',disabled:!model.undo});
+  add('redo','Redo',104,6,44,44,{aria:'Redo',disabled:!model.redo});
+  if(w>=700){
+    add('save-map','Save',156,6,56,44,{disabled:model.pending||!model.building});
+    add('check','Check',216,6,56,44,{disabled:model.pending||!model.building});
+    label(model.mapName||'Map builder',Math.max(290,w/2),28,Math.max(0,w-580));
+  }
+  add('overview',model.overview?'Orbit':'Top',w-128,6,60,44,{aria:'Change camera',disabled:!model.building});
+  add('playtest',model.building?'Test':'Edit',w-64,6,56,44,{accent:!model.building,disabled:!!model.pending});
+  if(model.building){
+    const brushMode=['terrain','paint'].includes(model.mode);
+    const tools=[['select','Select',{selected:['select','move','rotate','scale'].includes(model.tool)}],['pick','Objects',{selected:model.placing}],['terrain','Terrain',{selected:model.mode==='terrain'}],['paint-tool','Paint',{selected:model.mode==='paint'}],['tools','Tools']];
+    panels.push({x:railX-4,y:railY-4,w:railW+8,h:tools.length*railStep+4,chrome:true});
+    tools.forEach(([id,text,extra={}],i)=>add(id,text,railX,railY+i*railStep,railW,44,{...extra,disabled:!!model.pending,rail:true}));
+    const hasContext=model.selected||model.pending||model.placing||brushMode;
+    const iw=portrait?w-16:232,ix=portrait?8:w-iw-8;
+    const rows=model.selected||model.pending?4:brushMode?4:model.roadMode?3:model.placing?3:1;
+    const ih=36+rows*48,iy=portrait?h-ih-32:64;
+    const cx=ix+8,cw=iw-16;
+    if(hasContext){
+      panels.push({x:ix,y:iy,w:iw,h:ih,chrome:true});
+      label(model.pending?'Transform preview':model.selected?(model.selectionLabel||'Selected object'):model.placing?(model.itemLabel||'Place object'):model.mode==='paint'?'Paint ground':'Shape terrain',cx,iy+18,cw,'left');
+      const y=iy+32;
+      if(model.selected||model.pending){
+        addRow([['move','Move',{selected:model.tool==='move',disabled:model.pending}],['rotate-tool','Rotate',{selected:model.tool==='rotate',disabled:!model.rotatable||model.pending}],['scale-tool','Size',{selected:model.tool==='scale',disabled:!model.resizable||model.pending}]],cx,y,cw);
+        const controls=model.tool==='rotate'?[['turn-left','−15°'],['turn-right','+15°']]:model.tool==='scale'?[['scale-down','Smaller'],['scale-up','Larger']]:[['nudge:x:-1','←',{aria:'Move left'}],['nudge:z:-1','↑',{aria:'Move forward'}],['nudge:z:1','↓',{aria:'Move back'}],['nudge:x:1','→',{aria:'Move right'}]];
+        addRow(controls,cx,y+48,cw);
+        addRow([['raise-object','Lift',{disabled:!model.vertical}],['lower-object','Lower',{disabled:!model.vertical}],['focus','Focus',{disabled:model.pending}]],cx,y+96,cw);
+        addRow(model.pending?[['cancel','Cancel'],['apply','Apply',{accent:true,disabled:!model.valid}]]:[['copy','Copy'],['erase','Delete'],[model.roadSelected?'road-edit':'edit',model.roadSelected?'Path':'Properties']],cx,y+144,cw);
+      }else if(brushMode){
+        const brush=model.brush||{radius:6,rate:2,tool:'raise'};
+        if(model.mode==='terrain')addRow(['raise','lower','smooth','level'].map(t=>['brush-tool:'+t,t==='level'?'Flatten':t[0].toUpperCase()+t.slice(1),{selected:brush.tool===t}]),cx,y,cw);
+        else add('brush-settings',model.materialLabel||'Choose material',cx,y,cw,44);
+        add('brush-radius','Size',cx,y+48,cw,44,{slider:true,value:brush.radius,min:model.brushMinRadius||2,max:30,step:2});
+        if(model.mode==='terrain')add('brush-rate','Rate',cx,y+96,cw,44,{slider:true,value:brush.rate||2,min:.25,max:8,step:.25});
+        else label('Drag on the ground to paint',cx,y+118,cw,'left');
+        addRow([['brush-settings','Options'],['done','Done']],cx,y+144,cw);
+      }else if(model.roadMode){
+        addRow([['road-smooth',model.roadSmooth?'Curve':'Straight',{selected:model.roadSmooth}],['road-reverse','Other end',{disabled:model.roadCount<2}]],cx,y,cw);
+        addRow([['road-back','Remove point',{disabled:!model.roadCount}],['road-finish','Finish',{accent:true,disabled:model.roadCount<2}]],cx,y+48,cw);
+        add('done','Cancel',cx,y+96,cw,44);
+      }else{
+        addRow([['rotate','Rotate'],['placement-lower','Lower'],['placement-raise','Lift']],cx,y,cw);
+        add('pick','Change object',cx,y+48,cw,44);
+        addRow([['done','Done'],['place','Place',{accent:true,disabled:!model.valid}]],cx,y+96,cw);
+      }
     }
-    if (model.selected || model.pending) {
-      const controls =
-        model.tool === "rotate"
-          ? [
-              ["turn-left", "−15°"],
-              ["turn-right", "+15°"],
-            ]
-          : model.tool === "scale"
-            ? [
-                ["scale-down", "Smaller"],
-                ["scale-up", "Larger"],
-              ]
-            : [
-                ["nudge:x:-1", "←"],
-                ["nudge:z:-1", "↑"],
-                ["nudge:z:1", "↓"],
-                ["nudge:x:1", "→"],
-                ...(model.vertical
-                  ? [
-                      ["raise-object", "Lift"],
-                      ["lower-object", "Lower"],
-                    ]
-                  : []),
-              ];
-      row(controls, h - 156, 52);
-    } else if (isBrush) {
-      const brush = model.brush || { radius: 6, power: 0.35, tool: "raise" };
-      const bx = 10,
-        bw = 212,
-        by = 64;
-      panels.push({
-        x: bx - 4,
-        y: by - 4,
-        w: bw + 8,
-        h: model.mode === "terrain" ? 154 : 102,
-      });
-      if (model.mode === "terrain")
-        ["raise", "lower", "smooth", "level"].forEach((t, i) =>
-          add(
-            "brush-tool:" + t,
-            t === "level" ? "Flatten" : t[0].toUpperCase() + t.slice(1),
-            bx + i * 54,
-            by,
-            50,
-            44,
-            { selected: brush.tool === t },
-          ),
-        );
-      else add("brush-settings", "Ground material", bx, by, bw, 44);
-      slider("brush-radius", "Size", brush.radius, model.brushMinRadius||2, 30, 2, bx, by + 48, bw);
-      if (model.mode === "terrain")
-        slider(
-          "brush-rate",
-          "Rate",
-          brush.rate || 2,
-          0.25,
-          8,
-          0.25,
-          bx,
-          by + 100,
-          bw,
-        );
-      row(
-        [
-          
-          ["brush-settings", "Options"],
-          ["done", "Done"],
-        ],
-        h - 106,
-        80,
-      );
-    }
-    if (model.tip && !isBrush && h >= 450)
-      label(
-        model.tip,
-        w / 2,
-        h - (model.selected || model.pending ? 174 : 122),
-        w - 40,
-      );
-  } else add("place", "Fire test", w - 100, h - 104, 90, 44, { accent: true });
+    // Persistent selection options stay in one place and never compete with commits.
+    const optionX=72,optionY=64;
+    if(!portrait||!hasContext)addRow([['multi','Multi',{selected:model.multi,disabled:model.pending||model.placing||brushMode}],['snap-toggle','Snap',{selected:model.snap}]],optionX,optionY,116);
+    panels.push({x:0,y:h-26,w,h:26,chrome:true});
+    const status=(model.pending||model.placing)&&!model.valid?(model.tip||'Placement is blocked'):model.pending?'Preview · Apply to keep changes':model.placing?(model.roadMode?'Road · tap points, drag handles, then Finish':'Place · tap a surface, then Place'):brushMode?(model.tip||'Brush · hold or drag to apply · two fingers navigate'):model.selected?(model.tool==='select'?'Selected · choose Move, Rotate or Size':'Selected · drag handles to transform'): 'Select · tap an object · drag to orbit · pinch to zoom';
+    label(status,12,h-13,w-24,'left');
+  }else add('place','Fire test',w-100,h-104,90,44,{accent:true});
   if ((!model.building || model.controllerAiming) && !model.panel) label("+", w / 2, h / 2, 20);
   if (model.panel) {
     buttons.length = panels.length = labels.length = 0;
@@ -289,7 +154,7 @@ export function hudLayout(w, h, model, insets = {}) {
         } else line += (line ? " " : "") + word;
       }
       if (line) lines.push(line);
-      const maxLines = Math.max(1, Math.floor((h - 180) / 18)),
+      const maxLines = Math.max(1, Math.floor((h - 180 - primaryH) / 18)),
         textPages = Math.max(1, Math.ceil(lines.length / maxLines));
       const offset =
         56 + primaryH + tabRows * 48 + Math.min(lines.length, maxLines) * 18;
@@ -344,7 +209,7 @@ export function hudLayout(w, h, model, insets = {}) {
         ),
       );
       shownLines.forEach((text, i) =>
-        label(text, px + 12, py + 64 + tabRows * 48 + i * 18, pw - 24, "left"),
+        label(text, px + 12, py + 64 + primaryH + tabRows * 48 + i * 18, pw - 24, "left"),
       );
       primaryItems.forEach((it, i) =>
         add(
@@ -381,7 +246,7 @@ export function hudLayout(w, h, model, insets = {}) {
       }
     }
   }
-  if(!model.panel)for(const p of model.roadHandles||[])if(p.x>24&&p.x<w-24&&p.y>72&&p.y<h-170)labels.push({text:p.label,x:p.x,y:p.y,maxWidth:30,align:"center",node:true});
+  if(!model.panel)for(const p of model.roadHandles||[])if(p.x>24&&p.x<w-24&&p.y>72&&p.y<h-32&&!panels.some(r=>inside(p,r)))labels.push({text:p.label,x:p.x,y:p.y,maxWidth:30,align:"center",node:true});
   return { buttons, panels, labels };
 }
 function box(c, r, fill, stroke) {
@@ -401,6 +266,7 @@ function toolIcon(c, id, x, y) {
       "select",
       "pick",
       "terrain",
+      "paint-tool",
       "tools",
       "move",
       "rotate-tool",
@@ -426,6 +292,9 @@ function toolIcon(c, id, x, y) {
     c.lineTo(2, 0);
     c.lineTo(9, 0);
     c.closePath();
+  } else if(id === 'paint-tool') {
+    c.moveTo(-6,5);c.lineTo(4,-7);c.lineTo(8,-3);c.lineTo(-3,8);c.closePath();
+    c.moveTo(-6,5);c.lineTo(-9,10);c.lineTo(-3,8);
   } else if (id === "pick") {
     for (const [x, y] of [
       [-8, -8],
@@ -556,7 +425,7 @@ export function paintHUD(
     c.stroke();
   }
   for (const panel of layout.panels)
-    box(c, panel, "rgba(13,18,21,.97)", panel.mode ? "#8da6b5" : "#4c585e");
+    box(c, panel, "rgba(24,29,34,.97)", panel.mode ? "#8da6b5" : "#4c585e");
   c.textBaseline = "middle";
   c.textAlign = "center";
   for (const b of layout.buttons) {
@@ -565,8 +434,8 @@ export function paintHUD(
     box(
       c,
       b,
-      active ? "#d7ff58" : "rgba(13,18,21,.9)",
-      focus === b.id || pressed === b.id ? "#ffffff" : "#596268",
+      active ? "#d7ff58" : "rgba(34,40,46,.96)",
+      focus === b.id || pressed === b.id ? "#ffffff" : "#45515a",
     );
     if (focus === b.id) {
       c.strokeStyle = "#fff";
@@ -609,6 +478,15 @@ export function paintHUD(
     }
     c.fillStyle = active ? "#11170d" : "#edf1f2";
     c.font = `600 ${b.label.length > 12 ? 12 : 14}px system-ui, sans-serif`;
+    if(b.subtitle){
+      c.textAlign='left';
+      c.fillStyle=b.tone==='bad'?'#ffad9f':'#ffe09a';
+      c.font='600 12px system-ui';
+      c.fillText(b.label,b.x+10,b.y+13,b.w-20);
+      c.fillStyle='#edf1f2';c.font='12px system-ui';
+      c.fillText(b.subtitle,b.x+10,b.y+31,b.w-20);
+      c.textAlign='center';continue;
+    }
     if (toolIcon(c, b.id, b.x + b.w / 2, b.y + 14)) {
       c.font = "600 10px system-ui";
       c.fillText(b.label, b.x + b.w / 2, b.y + 35, b.w - 6);
@@ -724,7 +602,8 @@ export function createBuilderHUD({
           b.x < 80 ||
           b.x + b.w > w - 100 ||
           b.y < 70 ||
-          b.y + b.h > h - 160 ||
+          b.y + b.h > h - 32 ||
+          layout.panels.some(r=>b.x<r.x+r.w&&b.x+b.w>r.x&&b.y<r.y+r.h&&b.y+b.h>r.y) ||
           layout.buttons.some(
             (r) =>
               b.x < r.x + r.w &&
@@ -831,7 +710,7 @@ export function createBuilderHUD({
     render();
     const p = point(ev),
       b = [...layout.buttons].reverse().find((b) => inside(p, b));
-    if (!b && !model().panel) return;
+    if (!b && !model().panel && !layout.panels.some(r=>inside(p,r))) return;
     stop(ev);
     if (pressed || b?.disabled) return;
     pressed = {

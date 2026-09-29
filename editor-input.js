@@ -1,5 +1,5 @@
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.3.0";
-import { clamp } from "./builder-model.js?v=2.3.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.4.0";
+import { clamp } from "./builder-model.js?v=2.4.0";
 // Screen navigation is independent of document tools. Editing actions share one dispatcher.
 export function createEditorInput(e, active, panels) {
   const pointers = new Map();
@@ -13,6 +13,7 @@ export function createEditorInput(e, active, panels) {
     ev.preventDefault();
     ev.stopImmediatePropagation();
   };
+  const overChrome=p=>(e.hud?.layout?.panels||[]).some(r=>p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h)||(e.hud?.layout?.buttons||[]).some(r=>p.x>=r.x&&p.x<=r.x+r.w&&p.y>=r.y&&p.y<=r.y+r.h);
   function pan(v,dx,dy){const u=v.span/e.stage.getBoundingClientRect().height,a=e.state.camera==='top'?0:(v.yaw??.65);e.camera.x=v.x-(dx*Math.cos(a)+dy*Math.sin(a))*u;e.camera.z=v.z+(dx*Math.sin(a)-dy*Math.cos(a))*u;}
   function planeAt(p,y){const r=e.gameRuntime.ray(p);if(!r||Math.abs(r.dir.y)<1e-5)return null;const t=(y-r.origin.y)/r.dir.y;return t>0?{x:r.origin.x+r.dir.x*t,z:r.origin.z+r.dir.z*t}:null;}
   function cancel() {
@@ -22,7 +23,7 @@ export function createEditorInput(e, active, panels) {
   }
   function down(ev) {
     if(!active()||e.panel||e.state.phase!=='edit')return;
-    e.controllerAiming=false;stop(ev);const p=point(ev);pointers.set(ev.pointerId,p);e.stage.setPointerCapture(ev.pointerId);
+    e.controllerAiming=false;stop(ev);const p=point(ev);if(overChrome(p))return;pointers.set(ev.pointerId,p);e.stage.setPointerCapture(ev.pointerId);
     if(pointers.size>=2){
       if(gesture?.roadBefore)e.roadPoints=gesture.roadBefore;e.roadNodeDragging=false;
       e.endBrush(false);if(e.dragging){e.gameRuntime.cancelTransform?.();e.cancel();}
@@ -40,7 +41,7 @@ export function createEditorInput(e, active, panels) {
   }
   function move(ev) {
     if(!active()||e.panel||e.state.phase!=='edit')return;
-    const p=point(ev);e.controllerAiming=false;e.pointer=p;
+    const p=point(ev);if(overChrome(p)&&!pinch){if(gesture?.brush){e.endBrush(true);gesture.brush=false;gesture.blocked=true;}return;}e.controllerAiming=false;e.pointer=p;
     if(pointers.has(ev.pointerId)){stop(ev);pointers.set(ev.pointerId,p);}
     if(pinch&&pointers.size>=2){
       const [a,b]=[...pointers.values()],mid={x:(a.x+b.x)/2,y:(a.y+b.y)/2};
@@ -75,7 +76,7 @@ export function createEditorInput(e, active, panels) {
     if(e.stage.hasPointerCapture?.(ev.pointerId))e.stage.releasePointerCapture(ev.pointerId);
   }
   function cancelled(ev){if(!pointers.has(ev.pointerId))return;stop(ev);cancel();}
-  function wheel(ev){if(!active()||e.panel||e.state.phase!=='edit')return;stop(ev);const p=point(ev),anchor=e.pick(e.gameRuntime.ray(p));e.camera.span=clamp(e.camera.span*Math.exp(ev.deltaY*.001),8,700);if(anchor){const q=planeAt(p,anchor.y);if(q){e.camera.x+=anchor.x-q.x;e.camera.z+=anchor.z-q.z;}}}
+  function wheel(ev){if(!active()||e.panel||e.state.phase!=='edit')return;stop(ev);const p=point(ev);if(overChrome(p))return;const anchor=e.pick(e.gameRuntime.ray(p));e.camera.span=clamp(e.camera.span*Math.exp(ev.deltaY*.001),8,700);if(anchor){const q=planeAt(p,anchor.y);if(q){e.camera.x+=anchor.x-q.x;e.camera.z+=anchor.z-q.z;}}}
   function key(ev) {
     if (!active()) return;
     if (panels.key(ev) || e.hud.key(ev)) {

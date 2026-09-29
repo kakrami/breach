@@ -1,5 +1,4 @@
-import { roadNodes, roadSegments } from './road-path.js?v=2.3.0';
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.3.0";
+import { roadNodes, roadSegments } from './road-path.js?v=2.4.0';
 import {
   DocumentOperations,
   MapDocument,
@@ -8,6 +7,8 @@ import {
   RuntimeCompiler,
   Storage,
   Validator,
+  IssueGuide,
+  Analysis,
   AddManyCommand,
   DeleteCommand,
   PatchCommand,
@@ -23,10 +24,10 @@ import {
   ELEVATION,
   templateToDoc,
   MATERIAL_KEYS,
-} from "./builder-model.js?v=2.3.0";
-import { assetResizeMode } from "./object-catalog.js?v=2.3.0";
-import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.3.0";
-import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.3.0";
+} from "./builder-model.js?v=2.4.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.4.0";
+import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.4.0";
+import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.4.0";
 const box = (p) => (p.type === "round" ? { ...p, w: p.r * 2, d: p.r * 2 } : p);
 const pose = (p) => ({ x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch });
 
@@ -276,7 +277,7 @@ export class EditorSession extends DocumentOperations {
           : new Promise((resolve, reject) => {
               const worker = new Worker(
                 new URL(
-                  "./editor-validation-worker.js?v=2.3.0",
+                  "./editor-validation-worker.js?v=2.4.0",
                   import.meta.url,
                 ),
                 { type: "module" },
@@ -613,7 +614,7 @@ export class EditorSession extends DocumentOperations {
     const skip = new Set(before.map((o) => o.id));
     for (const o of objects) {
       if(o.type==='road'&&o.path){if(roadNodes(o).some(p=>Math.abs(p.x)+o.d/2>this.doc.arenaLimit-1||Math.abs(p.z)+o.d/2>this.doc.arenaLimit-1))reason="Keep the road inside the map";continue;}
-      if(['building','prop'].includes(o.type)&&Resolver.supportProfile(d,o).relief>(o.type==='building'?4:2))reason='Ground too steep · flatten this spot or move the object';
+      if(['building','prop'].includes(o.type)){const issue=Analysis.objectSupport(d,d.get(o.id),runtime).issues.find(i=>i.tone==='bad');if(issue)reason=issue.title;}
       if(o.type==='elevation'&&['ramp','stairs'].includes(o.kind)){const lo=Resolver.worldPoint(o,0,-o.d/2),base=runtime.geometry.terrainHeight(lo.x,lo.z)+(o.yOffset||0);for(let i=0;i<=12;i++){const p=Resolver.worldPoint(o,0,o.d*(i/12-.5));if(runtime.geometry.terrainHeight(p.x,p.z)>base+o.rise*i/12+.2)reason='Ground cuts through this slope · reshape it or move the piece';}}
       if(o.type==='spawn'&&(runtime.collision.worldBlockedAt(o.x,o.z,runtime.geometry.terrainHeight(o.x,o.z)+(o.yOffset||0),runtime.geometry.PLAYER_HEIGHT,runtime.geometry.PLAYER_RADIUS)||Validator.slope(d,o.x,o.z,runtime)>.45))reason='Choose clear, walkable ground for this start';
       const size = Math.hypot(o.w || o.r * 2 || 1, o.d || o.r * 2 || 1) / 2;
@@ -719,7 +720,7 @@ export class EditorSession extends DocumentOperations {
       this.valid = !!t?.object;
       const parts = this.selectionParts();
       this.ghost = parts.length
-        ? { parts, selection: true }
+        ? { parts, selection: true, outlineGroups:this.allSelected().map(o=>this.placementParts([o],true)) }
         : t?.object
           ? { parts: this.placementParts([t.object], true), selection: true }
           : null;
@@ -1063,13 +1064,12 @@ export class EditorSession extends DocumentOperations {
 
     if(id === "focus"){const id=this.selected.values().next().value;if(id)this.focusTarget(id);return;}
     if(this.brushStroke)this.input?.cancel();
-    if (id.startsWith("quick:"))
-      return this.choose(
-        (this.recentItems?.length
-          ? this.recentItems
-          : EDITOR_ITEMS.slice(0, 3))[Number(id.slice(6))],
-      );
     if (id === "terrain") return this.terrain();
+    if (id === "paint-tool") return this.terrain(true);
+    if (id === 'placement-raise' || id === 'placement-lower') {
+      this.placementHeight=clamp(this.placementHeight+(id==='placement-raise'?1:-1),-8,30);
+      this.previewKey='';this.update();return;
+    }
     if (id.startsWith("brush-tool:")) {
       this.brush.tool = id.slice(11);
       this.previewKey = "";
@@ -1114,6 +1114,7 @@ export class EditorSession extends DocumentOperations {
     if (id === "snap-toggle") {
       this.snapConfig.grid = !this.snapConfig.grid;
       this.previewKey = "";
+      this.syncUI();
       return;
     }
     if(id==="done"&&this.roadPoints.length){this.roadPoints=[];this.roadEditingId=null;}
@@ -1160,6 +1161,10 @@ export class EditorSession extends DocumentOperations {
       selected = this.allSelected();
     const activeBrush=s.tool==='paint'?this.materialBrush:this.brush;activeBrush.radius=Math.max(activeBrush.radius,this.minimumBrushRadius());
     return {
+      mapName:this.doc?.meta.name,
+      selectionLabel:selected.length>1?`${selected.length} objects`:IssueGuide.objectLabel(selected[0]),
+      itemLabel:this.item?.label,
+      materialLabel:this.materialBrush.material,
       brushMinRadius:this.minimumBrushRadius(),
       controllerAiming:!!this.controllerAiming,
       roadHandles:this.roadHandles(),
@@ -1168,13 +1173,6 @@ export class EditorSession extends DocumentOperations {
       roadCount:this.roadPoints.length,
       roadSmooth:!!this.roadSmooth,
       brush: s.tool === "paint" ? this.materialBrush : this.brush,
-      quick: (this.recentItems?.length
-        ? this.recentItems
-        : EDITOR_ITEMS.slice(0, 3)
-      ).map((o) => ({
-        label: o.label,
-        thumbnail: this.gameRuntime.thumbnail?.(o),
-      })),
       mode: s.tool,
       tool: s.tool,
       modeLabel:

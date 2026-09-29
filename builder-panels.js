@@ -1,10 +1,10 @@
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.3.0";
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.4.0";
 // Canvas panel descriptions and commands. No DOM controls or browser prompts.
-import { APP_VERSION } from "./game-config.js?v=2.3.0";
+import { APP_VERSION } from "./game-config.js?v=2.4.0";
 import {
   assetResizeMode,
   BUILDING_MATERIALS,
-} from "./object-catalog.js?v=2.3.0";
+} from "./object-catalog.js?v=2.4.0";
 import {
   CATALOG,
   MATERIALS,
@@ -18,7 +18,7 @@ import {
   clone,
   uid,
   clamp,
-} from "./builder-model.js?v=2.3.0";
+} from "./builder-model.js?v=2.4.0";
 export function createBuilderPanels({
   editor: e,
   save,
@@ -37,9 +37,11 @@ export function createBuilderPanels({
     checkDoc = null,
     checkIssues = [],
     checkPending = false,
-    checkError = "";
+    checkError = "",
+    libraryGroup = "Buildings";
   const selection = () => e.allSelected();
   function show(name, data = {}, push = true) {
+    if(name === "save-map"){task(save);return;}
     if (e.transaction && name !== "error") {
       e.toast("Apply or Cancel the current edit");
       return;
@@ -248,52 +250,11 @@ export function createBuilderPanels({
           objects.length > 1
             ? `${objects.length} selected`
             : IssueGuide.objectLabel(o);
-        items = [
-          ...(e.play.active
-            ? [
-                item(
-                  "Move",
-                  () => {
-                    dismiss();
-                    e.action("move");
-                  },
-                  { disabled: o.type === "ladder" && !!o.parentId },
-                ),
-                ...("rot" in o || "yaw" in o
-                  ? [
-                      item("Rotate tool", () => {
-                        dismiss();
-                        e.action("rotate-tool");
-                      }),
-                    ]
-                  : []),
-              ]
-            : []),
-          item("Copy", () => {
-            dismiss();
-            e.duplicateSelected();
-          }),
-          item("Delete", () => {
-            e.deleteSelected();
-            dismiss();
-          }),
-          ...(objects.length > 1 || "rot" in o || "yaw" in o
-            ? [
-                item("Rotate left", () => e.rotateSelected(-15)),
-                item("Rotate right", () => e.rotateSelected(15)),
-              ]
-            : []),
-          item("Raise objects", () => e.elevateSelected(1)),
-          item("Lower objects", () => e.elevateSelected(-1)),
-          item(objects.some((x) => x.groupId) ? "Ungroup" : "Group", () =>
-            objects.some((x) => x.groupId)
-              ? e.ungroupSelected()
-              : e.groupSelected(),
-          ),
-          item("Save group", () =>
-            editText("Group name", `Piece ${e.prefabs.length + 1}`, saveGroup),
-          ),
+        const groupActions = [
+          item(objects.some(x=>x.groupId)?'Ungroup':'Group',()=>objects.some(x=>x.groupId)?e.ungroupSelected():e.groupSelected()),
+          item('Save group',()=>editText('Group name',`Piece ${e.prefabs.length+1}`,saveGroup)),
         ];
+        items = [];
         if (objects.length === 1) {
           for (const [key, label, min, max, step] of [
             ["x", "X", -e.doc.arenaLimit, e.doc.arenaLimit, 0.5],
@@ -378,11 +339,14 @@ export function createBuilderPanels({
                 }),
               );
         }
+        items.push(...groupActions);
       }
     } else if (name === "library" || name === "objects") {
       title = "Objects";
-      const group = data.group || "Buildings";
+      const group = data.group || libraryGroup;
+      libraryGroup = group;
       const groups = [
+        ...(e.recentItems?.length ? ["Recent"] : []),
         "Buildings",
         "Pieces",
         "Cover",
@@ -396,7 +360,7 @@ export function createBuilderPanels({
           selected: g === group,
         }),
       );
-      let objects = EDITOR_ITEMS.filter((o) => o.group === group);
+      let objects = group === "Recent" ? e.recentItems : EDITOR_ITEMS.filter((o) => o.group === group);
       if (group === "Pieces")
         objects = [
           ...objects,
@@ -424,10 +388,9 @@ export function createBuilderPanels({
         items.push(item("Manage groups", () => show("prefabs")));
       return { title, kind: "library", tabs, items, back: false };
     } else if (name === "tools") {
-      title = "Build tools";
+      title = "Map tools";
       items = [
-        item("Terrain", () => show("terrain")),
-        item("Paint ground", () => show("paint")),
+        item("Starts & routes", () => show("setup")),
         item("Light & weather", () => show("weather")),
         item("Snapping", () => show("snap")),
         item("Layers", () => show("layers")),
@@ -803,8 +766,8 @@ export function createBuilderPanels({
         ? "Checking actual runtime collision…"
         : checkError ||
           (status.exportable
-            ? "No blocking problems found"
-            : "Fix the listed problems before publishing");
+            ? (status.warnings ? "Ready to publish · warnings are optional reviews" : "Ready to publish")
+            : "Fix blockers before publishing · warnings are optional reviews");
       items = [
         item(
           "Test map",
@@ -817,21 +780,24 @@ export function createBuilderPanels({
         item("Collision overlay", () => show("analysis")),
         item("Export", () => exportFile()),
       ];
-      for (const issue of issues.filter((i) => i.tone !== "good")) {
+      const checkActions = items;
+      items = [];
+      for (const issue of issues.filter((i) => i.tone !== "good").sort((a,b) => (a.tone === "bad" ? 0 : 1) - (b.tone === "bad" ? 0 : 1))) {
         const guide = IssueGuide.describe(issue, e.doc);
-        items.push(item(guide.title, () => show("issue", { issue, guide })));
+        items.push(item(`${issue.tone === "bad" ? "Fix" : "Review"} · ${IssueGuide.objectLabel(e.doc.get(issue.target))}${e.doc.get(issue.target) ? ` (${Math.round(e.doc.get(issue.target).x)}, ${Math.round(e.doc.get(issue.target).z)})` : ""}`, () => show("issue", { issue, guide }), { subtitle: guide.title, aria: `${issue.tone === "bad" ? "Publishing blocker" : "Warning"}. ${guide.where}. ${guide.title}`, tone: issue.tone }));
       }
+      items.push(...checkActions);
     } else if (name === "issue") {
       title = data.guide.title;
-      description = data.guide.fix;
+      description = `${data.issue.tone === "bad" ? "Publishing blocker" : "Warning · publishing allowed"}. ${data.guide.where}. ${data.guide.reason} ${data.guide.fix}`;
       items = [
-        item("Show location", () => {
+        item(data.issue.target ? "Show object" : "Show map", () => {
           dismiss();
           if (data.issue.target) e.focusTarget(data.issue.target);
           else e.showChecks();
         }),
-        item("Undo last edit", () => e.commands.undo()),
         item("Check again", () => show("check", {}, false)),
+        item("Undo last edit", () => e.commands.undo()),
       ];
     } else if (name === "analysis") {
       title = "Collision & analysis";
@@ -908,7 +874,7 @@ export function createBuilderPanels({
       description,
       items,
       kind: "list",
-      primaryPair: name === "map",
+      primaryPair: name === "map" || name === "issue",
       back: history.length > 0,
     };
   }

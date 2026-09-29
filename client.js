@@ -1,40 +1,40 @@
-import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.3.0';
+import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.4.0';
 let EditorScene;
-import { BUILDING_MATERIALS } from './object-catalog.js?v=2.3.0';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.3.0';
-import { createMoonSky } from './mod-environment.js?v=2.3.0';
+import { BUILDING_MATERIALS } from './object-catalog.js?v=2.4.0';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.4.0';
+import { createMoonSky } from './mod-environment.js?v=2.4.0';
 window.__breachModuleBooted=true;
-import * as HighlandsGeometry from './world-geometry.js?v=2.3.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=2.3.0';
-import * as YardGeometry from './world-geometry-yard.js?v=2.3.0';
-import * as RigGeometry from './world-geometry-rig.js?v=2.3.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=2.3.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=2.3.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=2.3.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=2.3.0';
+import * as HighlandsGeometry from './world-geometry.js?v=2.4.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=2.4.0';
+import * as YardGeometry from './world-geometry-yard.js?v=2.4.0';
+import * as RigGeometry from './world-geometry-rig.js?v=2.4.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=2.4.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=2.4.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=2.4.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=2.4.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=2.3.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.3.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=2.3.0';
-import { createAudioEngine } from './audio-engine.js?v=2.3.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.3.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.3.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.3.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.3.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.3.0';
-import { createControllerRecording } from './controller-recording.js?v=2.3.0';
-import { createPointerSessions } from './pointer-sessions.js?v=2.3.0';
-import { createSafeStorage } from './browser-storage.js?v=2.3.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=2.3.0';
-import { createUiFocusScope } from './ui-focus.js?v=2.3.0';
-import { createUiGestures } from './ui-gestures.js?v=2.3.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.3.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.3.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.3.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=2.3.0';
+} from './game-config.js?v=2.4.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.4.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=2.4.0';
+import { createAudioEngine } from './audio-engine.js?v=2.4.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.4.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.4.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.4.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.4.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.4.0';
+import { createControllerRecording } from './controller-recording.js?v=2.4.0';
+import { createPointerSessions } from './pointer-sessions.js?v=2.4.0';
+import { createSafeStorage } from './browser-storage.js?v=2.4.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=2.4.0';
+import { createUiFocusScope } from './ui-focus.js?v=2.4.0';
+import { createUiGestures } from './ui-gestures.js?v=2.4.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.4.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.4.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.4.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint, MAX_CUSTOM_MAP_BYTES } from './uploaded-map.js?v=2.4.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -937,7 +937,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.3.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.4.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -945,7 +945,7 @@ async function ensureThreeEngine(){
   if(engineLoadPromise)return engineLoadPromise;
   engineLoadPromise=(async()=>{
     try{
-      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.3.0')).EditorScene;
+      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.4.0')).EditorScene;
       if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
       THREE=mod;
       position=new THREE.Vector3(0,0,0);
@@ -5712,6 +5712,17 @@ function builderControlsAvailable(){const e=builderSession?.editor;return !!(e?.
 function playerMovementActive(){return builderSession?builderControlsAvailable():shell.canPlay&&matchAllowsMovement(matchState);}
 function playerPointerLocked(){return (canvas.getRootNode().pointerLockElement||document.pointerLockElement||document.webkitPointerLockElement)===canvas;}
 function resetBuilderMotion(){keys.clear();resetTouchInput();stopSlide();cancelSprint();traversal=null;ladderState=null;moveVelocityX=moveVelocityZ=verticalVelocity=knockX=knockZ=0;onGround=false;crouched=crouchWanted=false;crouchBlend=0;jumpBufferedUntil=traversalIntentUntil=0;correctionViewX=correctionViewY=correctionViewZ=0;adsWanted=false;adsBlend=0;sniperSwayYaw=sniperSwayPitch=0;}
+function addBuilderSelectionOutline(group,parts){
+ const bounds=new THREE.Box3();
+ for(const p of parts){
+  const lo=p.minY??p.bottomY,hi=p.maxY??p.topY,w=p.w||p.r*2,d=p.d||p.r*2,a=(p.rot||0)*Math.PI/180;
+  if(!Number.isFinite(lo+hi+w+d))continue;
+  for(const u of [-1,1])for(const v of [-1,1])for(const y of [lo,hi])bounds.expandByPoint(new THREE.Vector3(p.x+u*w/2*Math.cos(a)-v*d/2*Math.sin(a),y,p.z+u*w/2*Math.sin(a)+v*d/2*Math.cos(a)));
+ }
+ if(bounds.isEmpty())return;
+ const size=bounds.getSize(new THREE.Vector3()),center=bounds.getCenter(new THREE.Vector3()),box=new THREE.BoxGeometry(size.x+.06,size.y+.06,size.z+.06),edges=new THREE.EdgesGeometry(box);box.dispose();
+ const outline=new THREE.LineSegments(edges,new THREE.LineBasicMaterial({color:0x65c6ff,depthTest:false,transparent:true,opacity:.85}));outline.position.copy(center);outline.renderOrder=100;group.add(outline);
+}
 function clearBuilderGhost(){const b=builderSession;if(!b?.ghost)return;scene.remove(b.ghost);b.ghost.traverse(o=>{o.geometry?.dispose();o.material?.dispose();});b.ghost=null;b.ghostSource=null;}
 
 const editorThumbnailCache=new Map();
@@ -5757,7 +5768,7 @@ function frameBuilderRuntime(dt){
  if(builderControlsAvailable()){const steps=Math.max(1,Math.min(CLIENT_MAX_SIM_STEPS,Math.ceil(dt/(CLIENT_FIXED_STEP_SEC*1.35))));for(let i=0;i<steps;i++){updateCrouchState(dt/steps);updateMovement(Math.min(MAX_PLAYER_PHYSICS_STEP_SEC,dt/steps));}}else{keys.clear();resetTouchInput();moveVelocityX=moveVelocityZ=0;}
  updateGameFrame(Math.min(dt,MAX_PLAYER_PHYSICS_STEP_SEC));Object.assign(e.play,{x:camera.position.x,y:camera.position.y,z:camera.position.z,yaw:-camera.rotation.y,pitch:camera.rotation.x,feetY:position.y,bodyHeight:currentPlayerHeight()});e.update();b.adapter.update();
  const src=e.state.phase==='edit'&&!e.panel?e.ghost:null;
- if(src!==b.ghostSource){clearBuilderGhost();b.ghostSource=src;if(src){b.ghost=new THREE.Group();for(const p of src.protected||[]){const a=(p.rot||0)*Math.PI/180,points=[[-1,-1],[1,-1],[1,1],[-1,1],[-1,-1]].map(([u,v])=>{const lx=u*(p.w/2+p.pad),lz=v*(p.d/2+p.pad),x=p.x+lx*Math.cos(a)-lz*Math.sin(a),z=p.z+lx*Math.sin(a)+lz*Math.cos(a);return new THREE.Vector3(x,terrainHeight(x,z)+.12,z);});const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0xffad55,depthTest:false}));line.renderOrder=101;b.ghost.add(line);}const selecting=!!src.selection,color=selecting?0x65c6ff:src.valid!==false?0xd7ff58:0xff5f67;for(const p of src.parts){if(src.brush){const points=[];for(let i=0;i<=64;i++){const a=i/64*Math.PI*2,x=p.x+Math.cos(a)*p.w/2,z=p.z+Math.sin(a)*p.d/2;points.push(new THREE.Vector3(x,terrainHeight(x,z)+.09,z));}const ring=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0xd7ff58,depthTest:false}));ring.renderOrder=100;b.ghost.add(ring);continue;}const lo=p.minY??p.bottomY,hi=p.maxY??p.topY,w=p.w||p.r*2,d=p.d||p.r*2;if(!Number.isFinite(lo+hi+w+d)||hi<=lo)continue;const mesh=new THREE.Mesh((p.type==='round'?new THREE.CylinderGeometry(p.r,p.r,hi-lo,12):new THREE.BoxGeometry(w,hi-lo,d)),new THREE.MeshBasicMaterial({color,wireframe:selecting,transparent:true,opacity:selecting?.8:.28,depthWrite:false}));mesh.position.set(p.x,(lo+hi)/2,p.z);mesh.rotation.y=-(p.rot||0)*Math.PI/180;b.ghost.add(mesh);}scene.add(b.ghost);}}
+ if(src!==b.ghostSource){clearBuilderGhost();b.ghostSource=src;if(src){b.ghost=new THREE.Group();for(const p of src.protected||[]){const a=(p.rot||0)*Math.PI/180,points=[[-1,-1],[1,-1],[1,1],[-1,1],[-1,-1]].map(([u,v])=>{const lx=u*(p.w/2+p.pad),lz=v*(p.d/2+p.pad),x=p.x+lx*Math.cos(a)-lz*Math.sin(a),z=p.z+lx*Math.sin(a)+lz*Math.cos(a);return new THREE.Vector3(x,terrainHeight(x,z)+.12,z);});const line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0xffad55,depthTest:false}));line.renderOrder=101;b.ghost.add(line);}const selecting=!!src.selection,color=selecting?0x65c6ff:src.valid!==false?0xd7ff58:0xff5f67;if(selecting)for(const group of src.outlineGroups||[src.parts])addBuilderSelectionOutline(b.ghost,group);for(const p of selecting?[]:src.parts){if(src.brush){const points=[];for(let i=0;i<=64;i++){const a=i/64*Math.PI*2,x=p.x+Math.cos(a)*p.w/2,z=p.z+Math.sin(a)*p.d/2;points.push(new THREE.Vector3(x,terrainHeight(x,z)+.09,z));}const ring=new THREE.Line(new THREE.BufferGeometry().setFromPoints(points),new THREE.LineBasicMaterial({color:0xd7ff58,depthTest:false}));ring.renderOrder=100;b.ghost.add(ring);continue;}const lo=p.minY??p.bottomY,hi=p.maxY??p.topY,w=p.w||p.r*2,d=p.d||p.r*2;if(!Number.isFinite(lo+hi+w+d)||hi<=lo)continue;const mesh=new THREE.Mesh((p.type==='round'?new THREE.CylinderGeometry(p.r,p.r,hi-lo,12):new THREE.BoxGeometry(w,hi-lo,d)),new THREE.MeshBasicMaterial({color,wireframe:false,transparent:true,opacity:.28,depthWrite:false}));mesh.position.set(p.x,(lo+hi)/2,p.z);mesh.rotation.y=-(p.rot||0)*Math.PI/180;b.ghost.add(mesh);}scene.add(b.ghost);}}
  const c=hudCtx;c.setTransform(hudScale,0,0,hudScale,0,0);c.clearRect(0,0,viewW,viewH);c.textBaseline='middle';if(touchGameplayControlsVisible())drawTouchControls(c,hudLayout||computeHudLayout(),performance.now(),(e.state.phase==='edit')?'fly':true);hudTexture.needsUpdate=true;
  renderer.autoClear=true;const savedFog=scene.fog;if(e.state.camera==='top')scene.fog=null;renderer.render(scene,b.adapter.activeCamera());scene.fog=savedFog;renderer.autoClear=false;renderer.clearDepth();renderer.render(hudScene,hudCamera);renderer.autoClear=true;
 }

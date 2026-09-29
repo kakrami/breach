@@ -1,4 +1,4 @@
-# Breach 2.3.0 — verification and release status
+# Breach 2.4.0 — verification and release status
 
 This is a release candidate, not a public deployment. Update both supplied folders together: protocol 99 preserves the new road path contract.
 
