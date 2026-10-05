@@ -9,7 +9,7 @@
     "standalone",
     "browser"
   ],
-  "orientation": "any",
+  "orientation": "landscape",
   "background_color": "#090b0d",
   "theme_color": "#090b0d"
 }

@@ -1,1 +1,1 @@
-export { OBJECT_LIBRARY as EDITOR_ITEMS } from "./object-catalog.js?v=2.7.1";
+export { OBJECT_LIBRARY as EDITOR_ITEMS } from "./object-catalog.js?v=2.8.0";

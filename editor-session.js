@@ -1,4 +1,4 @@
-import { roadNodes, roadSegments } from './road-path.js?v=2.7.1';
+import { roadNodes, roadSegments } from './road-path.js?v=2.8.0';
 import {
   DocumentOperations,
   MapDocument,
@@ -24,10 +24,10 @@ import {
   ELEVATION,
   templateToDoc,
   MATERIAL_KEYS,
-} from "./builder-model.js?v=2.7.1";
-import { assetResizeMode } from "./object-catalog.js?v=2.7.1";
-import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.7.1";
-import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.7.1";
+} from "./builder-model.js?v=2.8.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.8.0";
+import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.8.0";
+import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.8.0";
 const box = (p) => (p.type === "round" ? { ...p, w: p.r * 2, d: p.r * 2 } : p);
 const pose = (p) => ({ x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch });
 
@@ -280,7 +280,7 @@ export class EditorSession extends DocumentOperations {
           : new Promise((resolve, reject) => {
               const worker = new Worker(
                 new URL(
-                  "./editor-validation-worker.js?v=2.7.1",
+                  "./editor-validation-worker.js?v=2.8.0",
                   import.meta.url,
                 ),
                 { type: "module" },

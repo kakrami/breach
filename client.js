@@ -1,8 +1,8 @@
-import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.7.1';
-import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.7.1';
-import { createNativeScreenTree } from './native-screen-tree.js?v=2.7.1';
-import { createNativeRenderer } from './native-layout.js?v=2.7.1';
-import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.7.1';
+import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.8.0';
+import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.8.0';
+import { createNativeScreenTree } from './native-screen-tree.js?v=2.8.0';
+import { createNativeRenderer } from './native-layout.js?v=2.8.0';
+import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.8.0';
 const browserDocument = globalThis.document;
 const nativeCanvas = browserDocument.getElementById('uiCanvas');
 const document = createNativeUi({canvas:nativeCanvas,tree:createNativeScreenTree(),realElements:{game:browserDocument.getElementById('game'),gameStage:browserDocument.getElementById('game'),uiCanvas:nativeCanvas}});
@@ -10,47 +10,47 @@ const getComputedStyle = el => isWidget(el) ? nativeStyle(el) : globalThis.getCo
 // Native scene-graph construction. Text is never interpreted as markup or browser UI.
 function uiNode(type,text='',classes='',attrs={},children=[]){const node=document.createElement(type);if(classes)node.className=classes;for(const [key,value] of Object.entries(attrs)){if(value!==false&&value!==null&&value!==undefined)node.setAttribute(key,value===true?'':String(value));}if(text!==null&&text!=='')node.textContent=String(text);node.append(...children.filter(Boolean));return node;}
 const uiCopy=(title,detail='')=>[uiNode('strong',title),...(detail?[uiNode('small',detail)]:[])];
-import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.7.1';
-import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.7.1';
-import {INFECTION,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability} from './infection-rules.js?v=2.7.1';
-import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.7.1';
+import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.8.0';
+import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.8.0';
+import {INFECTION,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability} from './infection-rules.js?v=2.8.0';
+import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.8.0';
 let EditorScene;
-import { BUILDING_MATERIALS } from './object-catalog.js?v=2.7.1';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.7.1';
-import { createMoonSky } from './mod-environment.js?v=2.7.1';
-import * as HighlandsGeometry from './world-geometry.js?v=2.7.1';
-import * as DepotGeometry from './world-geometry-depot.js?v=2.7.1';
-import * as YardGeometry from './world-geometry-yard.js?v=2.7.1';
-import * as MoonGeometry from './world-geometry-moon.js?v=2.7.1';
-import * as MoonWorldCollision from './world-collision-moon.js?v=2.7.1';
-import * as RigGeometry from './world-geometry-rig.js?v=2.7.1';
-import * as HighlandsWorldCollision from './world-collision.js?v=2.7.1';
-import * as DepotWorldCollision from './world-collision-depot.js?v=2.7.1';
-import * as YardWorldCollision from './world-collision-yard.js?v=2.7.1';
-import * as RigWorldCollision from './world-collision-rig.js?v=2.7.1';
+import { BUILDING_MATERIALS } from './object-catalog.js?v=2.8.0';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.8.0';
+import { createMoonSky } from './mod-environment.js?v=2.8.0';
+import * as HighlandsGeometry from './world-geometry.js?v=2.8.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=2.8.0';
+import * as YardGeometry from './world-geometry-yard.js?v=2.8.0';
+import * as MoonGeometry from './world-geometry-moon.js?v=2.8.0';
+import * as MoonWorldCollision from './world-collision-moon.js?v=2.8.0';
+import * as RigGeometry from './world-geometry-rig.js?v=2.8.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=2.8.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=2.8.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=2.8.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=2.8.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=2.7.1';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.7.1';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=2.7.1';
-import { createAudioEngine } from './audio-engine.js?v=2.7.1';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.7.1';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.7.1';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.7.1';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.7.1';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.7.1';
-import { createControllerRecording } from './controller-recording.js?v=2.7.1';
-import { createPointerSessions } from './pointer-sessions.js?v=2.7.1';
-import { createSafeStorage } from './browser-storage.js?v=2.7.1';
-import { createIntegratedMapBuilder } from './map-builder.js?v=2.7.1';
-import { createUiFocusScope } from './ui-focus.js?v=2.7.1';
-import { createUiGestures } from './ui-gestures.js?v=2.7.1';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.7.1';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.7.1';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.7.1';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.7.1';
+} from './game-config.js?v=2.8.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.8.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=2.8.0';
+import { createAudioEngine } from './audio-engine.js?v=2.8.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.8.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.8.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.8.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.8.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.8.0';
+import { createControllerRecording } from './controller-recording.js?v=2.8.0';
+import { createPointerSessions } from './pointer-sessions.js?v=2.8.0';
+import { createSafeStorage } from './browser-storage.js?v=2.8.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=2.8.0';
+import { createUiFocusScope } from './ui-focus.js?v=2.8.0';
+import { createUiGestures } from './ui-gestures.js?v=2.8.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.8.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.8.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.8.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.8.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -472,7 +472,7 @@ function attachmentDescriptionForWeapon(item,weapon){if(!item)return'';return at
 function loadoutOverviewAttachmentText(weapon,attachments){return ATTACHMENT_SLOTS.map(slot=>attachments?.[slot]?ATTACHMENTS[attachments[slot]]?.short||ATTACHMENTS[attachments[slot]]?.name:'').filter(Boolean).join(' · ');}
 function renderLoadoutOverview(surface,draft){
   const safe=normalizeLoadoutChoice(draft),classes=surface==='lobby'?normalizeLoadoutClasses(lobbyClassDrafts||loadoutClasses,selectedLoadout()):normalizeLoadoutClasses(matchClassDrafts||loadoutClasses,selectedLoadout()),selected=normalizeLoadoutClassId(loadoutEditClass[surface]||activeClassId),classInfo=loadoutClassById(classes,selected,selectedLoadout()),name=document.querySelector(`[data-loadout-overview-name="${surface}"]`);if(name){const label=document.createElement('span');label.textContent=classInfo.name;const icon=document.createElement('span');icon.className='class-name-edit-icon';icon.setAttribute('aria-hidden','true');icon.textContent='✎';name.replaceChildren(label,icon);}
-  for(const slot of ['primary','secondary']){const key=`${surface}-${slot}`,weapon=loadoutSlotWeapon(safe,slot),attachments=loadoutSlotAttachments(safe,slot),spec=resolveWeaponSpec(weapon,attachments),weaponEl=document.querySelector(`[data-loadout-overview-weapon="${key}"]`),modsEl=document.querySelector(`[data-loadout-overview-mods="${key}"]`);if(weaponEl)weaponEl.textContent=spec.name||weapon;if(modsEl){const text=loadoutOverviewAttachmentText(weapon,attachments);modsEl.textContent=text;modsEl.hidden=!text;}}
+  for(const slot of ['primary','secondary']){const key=`${surface}-${slot}`,weapon=loadoutSlotWeapon(safe,slot),attachments=loadoutSlotAttachments(safe,slot),spec=resolveWeaponSpec(weapon,attachments),weaponEl=document.querySelector(`[data-loadout-overview-weapon="${key}"]`),modsEl=document.querySelector(`[data-loadout-overview-mods="${key}"]`);if(weaponEl){weaponEl.textContent=spec.name||weapon;weaponEl.parentElement.dataset.previewWeapon=weapon;}if(modsEl){const text=loadoutOverviewAttachmentText(weapon,attachments);modsEl.textContent=text;modsEl.hidden=!text;}}
   const tactical=document.querySelector(`[data-loadout-overview-equipment="${surface}-tactical"]`),lethal=document.querySelector(`[data-loadout-overview-equipment="${surface}-lethal"]`);if(tactical)tactical.textContent=EQUIPMENT_SPECS[safe.tactical]?.name||safe.tactical;if(lethal)lethal.textContent=EQUIPMENT_SPECS[safe.lethal]?.name||safe.lethal;
   const focus=loadoutFocusSlot[surface]||'primary',title=document.querySelector(`[data-loadout-item-title="${surface}"]`),kicker=document.querySelector(`[data-loadout-item-kicker="${surface}"]`),swap=document.querySelector(`[data-loadout-item-swap="${surface}"]`),weaponFocus=focus==='primary'||focus==='secondary';if(title){title.textContent=weaponFocus?(resolveWeaponSpec(loadoutSlotWeapon(safe,focus),loadoutSlotAttachments(safe,focus)).name||loadoutSlotWeapon(safe,focus)):(EQUIPMENT_SPECS[safe[focus]]?.name||safe[focus]);}if(kicker)kicker.textContent=focus==='primary'?'PRIMARY WEAPON':focus==='secondary'?'SECONDARY WEAPON':focus==='tactical'?'TACTICAL':'LETHAL';if(swap){swap.hidden=!weaponFocus;if(weaponFocus){const swapKey=`${surface}-${focus}`;swap.dataset.loadoutWeaponPickerToggle=swapKey;swap.dataset.controllerKey=`weapon-toggle:${swapKey}`;}}
   if(name&&'value' in name)name.value=classInfo.name;
@@ -969,7 +969,7 @@ function handleShellState(state){
   if(chatOpen&&(!state.inMatch||state.paused||state.panel||state.connecting))void dismissChat({restorePointer:false});
   if(state.inMatch&&state.paused)syncPauseContext();
   $('resumeBtn').disabled=!graphicsContextAvailable||!!state.resumeOrientationBlocked;
-  const fsBtn=$('settingsFullscreenBtn');if(fsBtn){const on=!!state.standalone||!!state.fullscreen;fsBtn.classList.toggle('active',on);fsBtn.setAttribute('aria-checked',String(on));fsBtn.setAttribute('aria-label',state.standalone?'Fullscreen (app mode)':on?'Exit fullscreen':'Enter fullscreen');fsBtn.disabled=state.standalone||(!state.fullscreen&&!state.fullscreenSupported);}const rotateFsBtn=$('rotateFullscreenBtn');if(rotateFsBtn){const on=!!state.fullscreen;rotateFsBtn.textContent=on?'EXIT FULLSCREEN':'ENTER FULLSCREEN';rotateFsBtn.setAttribute('aria-label',on?'Exit fullscreen':'Enter fullscreen');rotateFsBtn.classList.remove('hide');rotateFsBtn.disabled=false;}const connectionCancel=$('connectionCancelBtn');if(connectionCancel)connectionCancel.classList.toggle('hide',!initialConnectionAttempt||state.inMatch);
+  const fsBtn=$('settingsFullscreenBtn');if(fsBtn){const on=!!state.standalone||!!state.fullscreen;fsBtn.classList.toggle('active',on);fsBtn.setAttribute('aria-checked',String(on));fsBtn.setAttribute('aria-label',state.standalone?'Fullscreen (app mode)':on?'Exit fullscreen':'Enter fullscreen');fsBtn.disabled=state.standalone||(!state.fullscreen&&!state.fullscreenSupported);}const rotateFsBtn=$('rotateFullscreenBtn');if(rotateFsBtn){const on=!!state.fullscreen;rotateFsBtn.textContent='FULLSCREEN / CONTINUE';rotateFsBtn.setAttribute('aria-label','Enter fullscreen and continue in landscape');rotateFsBtn.classList.remove('hide');rotateFsBtn.disabled=false;}const connectionCancel=$('connectionCancelBtn');if(connectionCancel)connectionCancel.classList.toggle('hide',!initialConnectionAttempt||state.inMatch);
   if((state.location==='menu'||state.location==='lobby')&&(!state.touchControls||state.surfaceReady)&&!document.hidden)startIntroMusic();else stopIntroMusic();
   maybeApplyPendingClientUpdate(state);
 }
@@ -1025,7 +1025,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.7.1';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.8.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1033,7 +1033,7 @@ async function ensureThreeEngine(){
   if(engineLoadPromise)return engineLoadPromise;
   engineLoadPromise=(async()=>{
     try{
-      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.7.1')).EditorScene;
+      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.8.0')).EditorScene;
       if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
       THREE=mod;
       position=new THREE.Vector3(0,0,0);
@@ -1380,7 +1380,7 @@ function renderLoadoutClassStrip(surface){
   for(const item of classes){
     const base=loadoutClassById(baseline,item.id,selectedLoadout()),dirty=item.name!==base.name||!loadoutChoiceEqual(item,base),card=document.createElement('div');card.className='loadout-class-card';
     card.classList.toggle('selected',surface!=='lobby'&&item.id===selected);card.classList.toggle('starting',surface==='lobby'&&item.id===starting);card.classList.toggle('equipped',surface!=='lobby'&&item.id===activeClassId);card.classList.toggle('pending',surface!=='lobby'&&item.id===pendingClassId&&!!pendingLoadout);card.classList.toggle('dirty',dirty);card.setAttribute('role','listitem');
-    const main=document.createElement('button');main.type='button';main.className='loadout-class-main';main.dataset.loadoutClass=item.id;main.dataset.controllerKey=`class:${surface}:${item.id}:main`;main.setAttribute('aria-pressed',String(surface==='lobby'?item.id===starting:item.id===selected));main.setAttribute('aria-label',surface==='lobby'?`Use ${item.name} as starting class`:`Select ${item.name}`);
+    const main=document.createElement('button');main.type='button';main.className='loadout-class-main';main.dataset.loadoutClass=item.id;main.dataset.primaryWeapon=item.primaryWeapon;main.dataset.secondaryWeapon=item.secondaryWeapon;main.dataset.controllerKey=`class:${surface}:${item.id}:main`;main.setAttribute('aria-pressed',String(surface==='lobby'?item.id===starting:item.id===selected));main.setAttribute('aria-label',surface==='lobby'?`Use ${item.name} as starting class`:`Select ${item.name}`);
     const head=document.createElement('div');head.className='loadout-class-card-head';const name=document.createElement('strong');name.textContent=item.name;const state=document.createElement('span');state.textContent=surface==='lobby'&&item.id===starting?'STARTING':surface!=='lobby'&&item.id===pendingClassId&&pendingLoadout?'NEXT':surface!=='lobby'&&item.id===activeClassId?'ACTIVE':dirty?'EDITED':'';head.append(name,state);
     const weapons=document.createElement('div');weapons.className='loadout-class-weapons';const pmods=attachmentCount(item.primaryAttachments),smods=attachmentCount(item.secondaryAttachments);weapons.append(uiNode('span',`PRIMARY · ${WEAPON_SPECS[item.primaryWeapon]?.name||item.primaryWeapon}${pmods?` · ${pmods} MOD${pmods===1?'':'S'}`:''}`),uiNode('span',`SECONDARY · ${WEAPON_SPECS[item.secondaryWeapon]?.name||item.secondaryWeapon}${smods?` · ${smods} MOD${smods===1?'':'S'}`:''}`));
     const equipment=document.createElement('small');equipment.textContent=`${EQUIPMENT_SPECS[item.tactical]?.short||item.tactical} · ${EQUIPMENT_SPECS[item.lethal]?.short||item.lethal}`;main.append(head,weapons,equipment);main.addEventListener('click',()=>selectLoadoutClass(surface,item.id));
@@ -1458,7 +1458,7 @@ function renderLobbyRoster(modeOverride=currentGameMode()){
     const role=p.bot?'BOT':p.id===matchOwnerId?'HOST':p.admin?'ADMIN':'PLAYER';
     const color=p.self?RELATIONSHIP_COLORS[RELATIONSHIP.SELF]:relationshipColor(relationshipFor({self:false,bot:p.bot,actorTeam:p.team,viewerTeam:myTeam,teamBased}));
     const row=uiNode('div','','lobby-player'+(p.self?' self':'')+(p.bot?' bot':''),{'data-player-id':p.id,'data-player-role':role,'data-controller-key':`lobby-player:${p.id}`});
-    row.style.color=color;
+    row.style.color=color;row.dataset.primaryWeapon=p.primaryWeapon||'assault';
     row.append(uiNode('div','','lobby-player-copy',{},uiCopy(`${p.name}${p.self?' · YOU':''}`,`${role} · ${WEAPON_SPECS[p.primaryWeapon]?.name||'ASSAULT RIFLE'}`)));
     if(isMatchAdmin&&!p.bot&&p.id!==matchOwnerId&&!p.self){const btn=uiNode('button',p.admin?'REMOVE ADMIN':'MAKE ADMIN','lobby-admin-action'+(p.admin?' danger':''),{'data-lobby-admin-role':p.id,'data-controller-key':`lobby-admin:${p.id}`});btn.addEventListener('click',()=>send({t:'adminPlayer',targetId:p.id,action:'admin',enabled:!p.admin}));row.append(uiNode('div','','lobby-player-actions',{},[btn]));}
     return row;
@@ -1951,7 +1951,7 @@ function updateLoadoutCalloutLines(key,ctx,model,w,h){const host=document.queryS
 }
 function updateLoadoutPreviewFrame(now,dt){
   if(!engineReady||!THREE)return;for(const [key,desired] of loadoutPreviewDesired){const canvas=document.querySelector(`[data-loadout-preview="${key}"]`);if(!canvas||!canvas.getClientRects().length||canvas.closest('[hidden]'))continue;let ctx=loadoutPreviewContexts.get(key);if(!ctx){ctx=createLoadoutPreviewContext(key,canvas);loadoutPreviewContexts.set(key,ctx);}if(ctx.signature!==desired.signature){while(ctx.pivot.children.length)ctx.pivot.remove(ctx.pivot.children[0]);const model=buildLoadoutPreviewModel(desired.weapon,desired.attachments);ctx.pivot.add(model);ctx.signature=desired.signature;}
-    const w=Math.max(2,Math.round(canvas.clientWidth||2)),h=Math.max(2,Math.round(canvas.clientHeight||2));if(canvas.width!==w||canvas.height!==h)ctx.renderer.setSize(w,h,false);ctx.camera.aspect=w/h;ctx.adsPreview=loadoutPreviewAdsKeys.has(key);const model=ctx.pivot.children[0],adsPoint=model?.userData?.adsPoint;if(ctx.adsPreview){ctx.camera.fov=23;ctx.camera.position.set(0,0,3.75);ctx.pivot.rotation.set(0,0,0);ctx.pivot.position.set(-(adsPoint?.x||0),-(adsPoint?.y||0),0);}else{ctx.camera.fov=28;ctx.camera.position.set(0,.18,4.6);ctx.pivot.position.set(0,0,0);if(!ctx.dragging&&!ctx.interacted)ctx.angle+=Math.max(0,Number(dt)||0)*.10;ctx.pivot.rotation.set(-.10,Math.PI/2+ctx.angle,.02);}ctx.camera.updateProjectionMatrix();ctx.renderer.render(ctx.scene,ctx.camera);updateLoadoutCalloutLines(key,ctx,model,w,h);ctx.lastRenderedAt=now;}
+    const w=Math.max(2,Math.round(canvas.clientWidth||2)),h=Math.max(2,Math.round(canvas.clientHeight||2));if(canvas.width!==w||canvas.height!==h)ctx.renderer.setSize(w,h,false);ctx.camera.aspect=w/h;ctx.adsPreview=loadoutPreviewAdsKeys.has(key);const model=ctx.pivot.children[0],adsPoint=model?.userData?.adsPoint;if(ctx.adsPreview){ctx.camera.fov=23;ctx.camera.position.set(0,0,3.75);ctx.pivot.rotation.set(0,0,0);ctx.pivot.position.set(-(adsPoint?.x||0),-(adsPoint?.y||0),0);}else{ctx.camera.fov=28;ctx.camera.position.set(0,.12,Math.max(2.2,5.8/Math.max(.6,ctx.camera.aspect)));ctx.camera.lookAt(0,0,0);ctx.pivot.position.set(0,0,0);if(!ctx.dragging&&!ctx.interacted)ctx.angle+=Math.max(0,Number(dt)||0)*.10;ctx.pivot.rotation.set(-.10,Math.PI/2+ctx.angle,.02);}ctx.camera.updateProjectionMatrix();ctx.renderer.render(ctx.scene,ctx.camera);updateLoadoutCalloutLines(key,ctx,model,w,h);ctx.lastRenderedAt=now;}
 }
 function createFirstPersonHand(side,gloveMat){
   const root=new THREE.Group(),palm=new THREE.Mesh(new THREE.BoxGeometry(.074,.050,.096),gloveMat),knuckles=new THREE.Mesh(new THREE.BoxGeometry(.078,.032,.052),gloveMat),thumb=new THREE.Mesh(new THREE.CapsuleGeometry(.012,.035,3,6),gloveMat);
@@ -2518,7 +2518,7 @@ function bindUI(){
   $('settingsApplyBtn')?.addEventListener('click',commitPlayerSettings);$('settingsCancelBtn')?.addEventListener('click',cancelPlayerSettings);
   $('settingsFullscreenBtn').addEventListener('click',async()=>{ensureAudio();if(shell.fullscreen)await shell.exitFullscreenFromGesture();else await shell.enterFullscreenFromGesture();});
   for(const version of document.querySelectorAll('[data-app-version]'))version.addEventListener('click',registerDeveloperVersionTap);
-  $('rotateFullscreenBtn')?.addEventListener('click',async()=>{ensureAudio();await shell.resumeFromGesture();});
+  $('rotateFullscreenBtn')?.addEventListener('click',async()=>{ensureAudio();if(shell.inMatch)await shell.resumeFromGesture();else await shell.enterFullscreenFromGesture();});
   $('connectionCancelBtn')?.addEventListener('click',()=>cancelInitialConnection('Connection canceled.'));
   $('settingsResetBtn').addEventListener('click',resetPlayerSettings);
   $('playerMasterMute')?.addEventListener('click',()=>{playerMutedDraft=!(playerMutedDraft??masterMuted);syncMusicUI();setSettingsStatus('Unsaved changes · Apply or Cancel');});

@@ -1,3 +1,4 @@
+@font-face{font-family:"Breach Display";src:url("./menu-assets/display.otf") format("opentype");font-weight:700;font-display:swap}
 /* Only the browser shell has CSS. Every game control, label and menu is drawn
    by the canvas scene graph; these rules never define menu layout. */
 :root{color-scheme:dark;--safe-top:env(safe-area-inset-top,0px);--safe-right:env(safe-area-inset-right,0px);--safe-bottom:env(safe-area-inset-bottom,0px);--safe-left:env(safe-area-inset-left,0px);background:#080b0d}

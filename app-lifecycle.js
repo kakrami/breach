@@ -64,7 +64,7 @@ export function createSessionShell({
   const pointerLocked=()=>canvas.getRootNode?.()?.pointerLockElement===canvas||ownerDocument.pointerLockElement===canvas||ownerDocument.webkitPointerLockElement===canvas;
   const alternateReady=()=>{try{return !!alternateInputReady();}catch{return false;}};
   hadPointerLock=pointerLocked();
-  const landscapeReady=()=>!platform.touchControls||viewport.w>=viewport.h;
+  const landscapeReady=()=>viewport.w>=viewport.h;
   // Read raw match state here. A callback must not call shell.canPlay/snapshot.
   const requiresGameplayOrientation=()=>{if(!inMatch())return false;try{return !!gameplayOrientationRequired();}catch{return true;}};
   function pauseForOrientation(){
@@ -77,9 +77,9 @@ export function createSessionShell({
 
   function snapshot(){
     const surfaceReady=entered||immersive(),landscape=landscapeReady(),match=inMatch(),orientationRequired=requiresGameplayOrientation();
-    const resumeOrientationBlocked=match&&platform.touchControls&&orientationRequired&&!landscape,blocked=surfaceReady&&resumeOrientationBlocked&&!panel&&!connecting;
+    const resumeOrientationBlocked=match&&platform.touchControls&&orientationRequired&&!landscape,blocked=(surfaceReady||platform.touchControls)&&!landscape&&!connecting;
     const inputReady=!pointerInputRequired()||pointerLocked()||alternateReady();
-    const playSurfaceReady=platform.touchControls?(surfaceReady&&landscape):true;
+    const playSurfaceReady=landscape&&(!platform.touchControls||surfaceReady);
     return Object.freeze({
       location,inMatch:match,inLobby:inLobby(),inBuilder:inBuilder(),paused:match?paused:false,pauseReason:match?pauseReason:'',panel,connecting,connectionText,
       surfaceReady,immersive:immersive(),fullscreen:fullscreen(),standalone:platform.standalone,touchControls:platform.touchControls,landscapeReady:landscape,orientationBlocked:blocked,resumeOrientationBlocked,gameplayOrientationRequired:orientationRequired,orientationMessage:resumeOrientationBlocked?'Rotate to landscape to resume gameplay.':'',
@@ -91,10 +91,10 @@ export function createSessionShell({
 
   function render(reason='sync'){
     pauseForOrientation();
-    const s=snapshot(),frontUsable=!platform.touchControls||s.surfaceReady;
-    if((!s.inMatch&&!preparingMatch)||(s.inMatch&&!s.gameplayOrientationRequired))unlockLandscape();
-    visible(elements.entry,platform.touchControls&&!s.surfaceReady);
-    visible(elements.rotate,s.orientationBlocked&&!s.panel&&!s.connecting);
+    const s=snapshot(),frontUsable=(!platform.touchControls||s.surfaceReady)&&!s.orientationBlocked;
+    // The entire mobile application is landscape, including lobby and menus.
+    visible(elements.entry,platform.touchControls&&!s.surfaceReady&&!s.orientationBlocked);
+    visible(elements.rotate,s.orientationBlocked&&!s.connecting);
     visible(elements.menu,frontUsable&&s.location==='menu'&&!s.panel&&!s.connecting);
     visible(elements.lobby,frontUsable&&s.location==='lobby'&&!s.panel&&!s.connecting);
     visible(elements.builder,frontUsable&&s.location==='builder'&&!s.panel&&!s.connecting);
@@ -182,7 +182,7 @@ export function createSessionShell({
     syncViewport();render('enter');
     const ok=await request;
     if(destroyed||epoch!==revision)return false;
-    if(ok&&inMatch())await lockLandscape();
+    if(ok||platform.standalone)await lockLandscape();
     syncViewport(true);render(ok?'fullscreen-enter':'browser-enter');return true;
   }
   async function exitFullscreenFromGesture(){
