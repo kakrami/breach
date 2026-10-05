@@ -1,13 +1,13 @@
-import { EditorSession } from "./editor-session.js?v=2.5.0";
+import { EditorSession } from "./editor-session.js?v=2.6.0";
 import {
   MapDocument,
   Storage,
   Validator,
   templateToDoc,
-} from "./builder-model.js?v=2.5.0";
-import { createBuilderPanels } from "./builder-panels.js?v=2.5.0";
-import { createBuilderHUD } from "./builder-hud.js?v=2.5.0";
-import { createEditorInput } from "./editor-input.js?v=2.5.0";
+} from "./builder-model.js?v=2.6.0";
+import { createBuilderPanels } from "./builder-panels.js?v=2.6.0";
+import { createBuilderHUD } from "./builder-hud.js?v=2.6.0";
+import { createEditorInput } from "./editor-input.js?v=2.6.0";
 export function createIntegratedMapBuilder({
   host,
   apiBase,
@@ -20,7 +20,7 @@ export function createIntegratedMapBuilder({
   root.replaceChildren();
   const css = document.createElement("link");
   css.rel = "stylesheet";
-  css.href = new URL("./map-builder.css?v=2.5.0", import.meta.url).href;
+  css.href = new URL("./map-builder.css?v=2.6.0", import.meta.url).href;
   const app = document.createElement("div");
   app.className = "app";
   const stage = document.createElement("main");

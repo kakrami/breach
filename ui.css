@@ -1302,3 +1302,6 @@ body{font-size:var(--ui-md)}
 }
 
 #mapBuilderError:not([hidden]){margin:8px 0;padding:10px 12px;border:1px solid #a95454;border-radius:6px;color:#ffd4d4;background:#391b20;font-size:13px;line-height:1.4;}
+
+/* Six complete modes; two compact rows also fit touch screens. */
+.lobby-mode-picker{grid-template-columns:repeat(3,minmax(0,1fr));}

@@ -1,53 +1,32 @@
-# Breach 2.5.0 — verification and release status
+# Breach 2.6.0 — review candidate
 
-This is a release candidate, not a public deployment. Update both supplied folders together: protocol 99 preserves the new road path contract.
+This package contains updated client and server source. It has not been pushed or deployed. Both folders must be updated together because the protocol changed to 100.
 
-## Construction revision
+## Implemented
 
-Road drawing now follows the terrain point under the pointer. Its magnetism targets existing road ends or centerlines only, and the Snap switch disables those magnets. Authored road paths receive terrain-conforming caps and joins. Draw Building uses two ground corners to create a resizable canonical `building/custom` asset, with selectable floor count; its roof, walls, openings, floors, stairs and collision compile through the same shared geometry as other buildings. Mouse and touch placement, save, publish and reopen were exercised against the client and server sanitizers. A separate construction test checks exact road coordinates, road-end snapping, building geometry and published signatures.
+- Moon Deathmatch is a standalone free-for-all mode. It selects the new shared Lunar Outpost map, low gravity and higher jumps. Craters, cover and perimeter geometry use the same render/collision source. Earth, stars and a small decorative UFO give the arena its lunar setting.
+- Infection is a separate round-based mode. A 15-second preparation/buy phase precedes selection of one random first infected. Survivors win by lasting two minutes or eliminating the infected; infected win by converting/eliminating all survivors. Infected move 20% faster and use server-validated, line-of-sight claws only. The first infected has 300 health; subsequent infected have 220. Rounds reset after seven seconds.
+- Players start with a pistol and $2,000. The server owns purchases, available equipment, cash and round awards. Cash is capped at $16,000. The shop offers primary weapons, armor, medkits and frag grenades. Free loadout changes and killstreaks are disabled in Infection. Players/bots return as survivors for each new round. Mid-round newcomers spectate until the next round.
+- Infection has random supply drops and touch/keyboard/controller shop and healing controls.
+- Zombie Waves remains separate. Every fifth wave adds an enlarged Abomination boss. Bounded tier scaling increases health, speed and reach gradually; later tiers add a telegraphed close-range slam. The larger body has matching projectile and movement collision scaling.
 
-## Terrain and support revision
+## Verified in this workspace
 
-The brush engine now integrates elapsed time at a fixed simulation step. Raise, Lower, Flatten and Smooth have a Rate control, an immediate tap application and continuous stationary holds. Flatten retains the stroke's starting height. Per-sample slope limits replace the global multiplier that could stop an entire stroke. Structures protect only their required terrain interpolation footprint, outlined in orange. Brush size is bounded by the terrain grid resolution so a small brush cannot miss all editable samples. No-op strokes report why ground did not change and do not add undo entries. Backgrounding or hiding the page cancels an active stroke.
+- JavaScript syntax and relative static import closure across client and server modules.
+- In-process Worker startup, GameRoom construction, real HTTP health handler and origin rejection.
+- Shared mode, state serialization, lunar terrain, spawn clearance and free-for-all spawn tests.
+- Focused client-function tests for shop layout bounds on phone dimensions, purchase dispatch, authoritative inventory, infected health, movement multiplier, claw cooldown and phase cleanup.
+- Production WebSocket message handlers exercised with fixture sockets: repeated purchases, armor cap, medkit consumption, phase locks, forged weapon ownership and infected weapon rejection.
+- Production reconnect fetch path exercised with fixture WebSocketPair/101 Response: current-round role/health/cash retention, stale/new arrivals spectating, plus lobby/mode-reset cleanup. These are in-process tests, not live network sessions.
 
-Shared `terrain-support.js` selects a level building base from the uphill footprint samples, blends a supported pad into surrounding terrain and generates a solid foundation extending to the lowest sampled ground. The rendered terrain triangles remain flat throughout the interior, including rotated footprints. Spawns follow a compact level pad. Grounded props follow their support surface; stairs/ramps use their low endpoint consistently in editor and runtime. Roads conform to sculpted ground without locking or flattening the entire road footprint. Steep building/prop placement, buried ramps and obstructed starts receive invalid previews.
+## Not verified
 
-Save and Publish operations are sequenced so a Publish requested during an in-progress Save is not silently discarded. A map replacement cancels the queued operation through the document epoch check.
+- Actual browser rendering or complete rendered gameplay. Chromium could not start because socket creation was restricted; the cloud browser also rejected localhost access.
+- A live network WebSocket session, deployed Cloudflare Durable Object persistence or production multiplayer. Backend tests use in-process fixtures, not a live server.
+- Physical controllers, Safari/iOS, low-end mobile performance, or gameplay balance with real players.
 
-Additional checks passed: all four stationary holds in actual Chromium mouse and emulated-touch input; equal-duration strokes at 15 and 60 simulation/render schedules; independent local slope constraints; spawn height/walkability; both sculpt/place orders; rotated interior flatness and foundation stability; export/import and delete/undo collider identity; steep-placement rejection. Save/publish/reopen passed in the local server-sanitizer harness. Real game movement at a sloped building site passed doorway traversal, wall sprint collision and jumping-wall collision. Forty-eight additional sloped-site movement checks supplement the original 48 flat-ground checks.
+This is an implementation candidate for review, not a claim of production readiness or fully playtested balance. Earlier 2.5.0 editor test results do not certify these new mode changes.
 
-The full physical-device and all-object collision-laboratory release gates below remain open. These tests establish the listed cases, not exhaustive certification of every possible map.
+## Controls
 
-## Changes
-
-- Edit mode uses orbit, pan and anchored pinch/wheel zoom. Player movement is reserved for Test. Touching an object selects it; active placement/terrain tools own their gestures. Camera changes never select a different tool. Move still provides object height controls.
-- Terrain and ground paint follow the dragging finger/pointer. The runtime preview updates before release; a completed stroke produces one undo entry. Cancellation, blur, toolbar activation and a second finger discard the interrupted stroke. Two fingers then navigate. Controller sticks pan/orbit, bumpers zoom and RT holds the brush; disconnect cancels the stroke.
-- Roads are saved paths with editable points, smooth curves, midpoint bend handles, endpoint extension, width and transform. Finish commits the path once. Legacy rectangular roads can also be edited as paths. Move/Rotate preserve path coordinates. Map Check follows expanded paths.
-- Road surfaces and markings are split along the exact terrain triangles. This addresses ground protruding between mismatched surface triangles. Markings are clipped at other road footprints; curved sections share a continuous dash phase.
-- Existing shared catalog, geometry/collision, command history, canvas UI, object selection/transforms, height, undo/redo, import/export, templates, Test, save and publish remain available.
-
-## Verified for this revision
-
-- Actual headless Chromium/WebGL2 mouse and emulated-touch sessions: orbit/zoom without moving the player; live brush preview, one-command undo, interrupted-stroke cancellation; road drawing, handle reshaping, surface selection, save, publish and reopen. No page JavaScript errors occurred in successful runs.
-- Full desktop application regression: library, object placement, selection, transform gizmo/cancellation, nudge, apply, undo/redo, camera toggle, game Test movement, save, publish, reopen and close. Game movement checks exercised doorway traversal, sprinting into a wall, crouching, jumping and a projectile through the doorway.
-- 4,880 generated road triangles checked at multiple interior points on flat and uneven terrain. Their interpolated heights match the underlying canonical terrain plus the surface offset. Path shape, smoothness and width survive client/server sanitization and reopen; undo/redo, move/rotate and cancellation preserve path identity.
-- 2,489 geometry/lifecycle assertions, including 2,436 wall checks and official/custom parity fixtures; 48 movement sweeps.
-- Session regression across 34 presets, detached previews, history, import, terrain, roads, starts, mounds, generation and attached ladders.
-- 3,528 workspace layout checks and 3,804 panel/library/input checks, plus road toolbar cases, for bounds, target sizes and overlap. Pointer/controller adapter checks cover cancellation, idle-controller ownership and disconnect.
-- JavaScript syntax, dependency closure, matching client/server shared modules and version/protocol consistency.
-
-Browser save/publish tests use a local API harness with the shipped server sanitizers. They do not constitute a live authenticated production-server test. Test hooks and QA files are excluded from the two release folders.
-
-## Remaining release gates
-
-- Real Apple/Safari devices: gestures, safe areas, keyboard, graphics recovery and file import/export.
-- Physical controllers, including focus recovery and reconnect behavior.
-- Live server authentication, durable storage, publish permissions and published-map multiplayer loading.
-- Full hands-on collision laboratory course: mantle/climb, repeated slides, upper-floor impacts, seams, corners and escape attempts across every variation.
-- Performance on intended lower-end devices and large maps. Brush previews are throttled, but still rebuild the affected runtime through the existing whole-world rebuild path.
-
-These checks remain unverified; this package is not certified defect-free or production-ready. The collision laboratory remains available under Starting maps and `maps/collision-lab.breachmap.json`.
-
-## Reuse
-
-The editor continues using the game's renderer, assets and collision. Three.js r185 TransformControls is MIT licensed; see `vendor/THREE-LICENSE.txt`. Architecture and research references are in `EDITOR_ARCHITECTURE.md`.
+Infection shop: tap an item, press 1–6, or use controller left/right and X during the buy phase. Heal during active play: H, the onscreen heal button, or controller D-pad down. Infected attack with the normal fire control.
