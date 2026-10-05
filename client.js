@@ -1,8 +1,8 @@
-import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.7.0';
-import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.7.0';
-import { createNativeScreenTree } from './native-screen-tree.js?v=2.7.0';
-import { createNativeRenderer } from './native-layout.js?v=2.7.0';
-import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.7.0';
+import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.7.1';
+import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.7.1';
+import { createNativeScreenTree } from './native-screen-tree.js?v=2.7.1';
+import { createNativeRenderer } from './native-layout.js?v=2.7.1';
+import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.7.1';
 const browserDocument = globalThis.document;
 const nativeCanvas = browserDocument.getElementById('uiCanvas');
 const document = createNativeUi({canvas:nativeCanvas,tree:createNativeScreenTree(),realElements:{game:browserDocument.getElementById('game'),gameStage:browserDocument.getElementById('game'),uiCanvas:nativeCanvas}});
@@ -10,47 +10,47 @@ const getComputedStyle = el => isWidget(el) ? nativeStyle(el) : globalThis.getCo
 // Native scene-graph construction. Text is never interpreted as markup or browser UI.
 function uiNode(type,text='',classes='',attrs={},children=[]){const node=document.createElement(type);if(classes)node.className=classes;for(const [key,value] of Object.entries(attrs)){if(value!==false&&value!==null&&value!==undefined)node.setAttribute(key,value===true?'':String(value));}if(text!==null&&text!=='')node.textContent=String(text);node.append(...children.filter(Boolean));return node;}
 const uiCopy=(title,detail='')=>[uiNode('strong',title),...(detail?[uiNode('small',detail)]:[])];
-import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.7.0';
-import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.7.0';
-import {INFECTION,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability} from './infection-rules.js?v=2.7.0';
-import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.7.0';
+import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.7.1';
+import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.7.1';
+import {INFECTION,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability} from './infection-rules.js?v=2.7.1';
+import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.7.1';
 let EditorScene;
-import { BUILDING_MATERIALS } from './object-catalog.js?v=2.7.0';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.7.0';
-import { createMoonSky } from './mod-environment.js?v=2.7.0';
-import * as HighlandsGeometry from './world-geometry.js?v=2.7.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=2.7.0';
-import * as YardGeometry from './world-geometry-yard.js?v=2.7.0';
-import * as MoonGeometry from './world-geometry-moon.js?v=2.7.0';
-import * as MoonWorldCollision from './world-collision-moon.js?v=2.7.0';
-import * as RigGeometry from './world-geometry-rig.js?v=2.7.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=2.7.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=2.7.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=2.7.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=2.7.0';
+import { BUILDING_MATERIALS } from './object-catalog.js?v=2.7.1';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.7.1';
+import { createMoonSky } from './mod-environment.js?v=2.7.1';
+import * as HighlandsGeometry from './world-geometry.js?v=2.7.1';
+import * as DepotGeometry from './world-geometry-depot.js?v=2.7.1';
+import * as YardGeometry from './world-geometry-yard.js?v=2.7.1';
+import * as MoonGeometry from './world-geometry-moon.js?v=2.7.1';
+import * as MoonWorldCollision from './world-collision-moon.js?v=2.7.1';
+import * as RigGeometry from './world-geometry-rig.js?v=2.7.1';
+import * as HighlandsWorldCollision from './world-collision.js?v=2.7.1';
+import * as DepotWorldCollision from './world-collision-depot.js?v=2.7.1';
+import * as YardWorldCollision from './world-collision-yard.js?v=2.7.1';
+import * as RigWorldCollision from './world-collision-rig.js?v=2.7.1';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=2.7.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.7.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=2.7.0';
-import { createAudioEngine } from './audio-engine.js?v=2.7.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.7.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.7.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.7.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.7.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.7.0';
-import { createControllerRecording } from './controller-recording.js?v=2.7.0';
-import { createPointerSessions } from './pointer-sessions.js?v=2.7.0';
-import { createSafeStorage } from './browser-storage.js?v=2.7.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=2.7.0';
-import { createUiFocusScope } from './ui-focus.js?v=2.7.0';
-import { createUiGestures } from './ui-gestures.js?v=2.7.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.7.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.7.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.7.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.7.0';
+} from './game-config.js?v=2.7.1';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.7.1';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=2.7.1';
+import { createAudioEngine } from './audio-engine.js?v=2.7.1';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.7.1';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.7.1';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.7.1';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.7.1';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.7.1';
+import { createControllerRecording } from './controller-recording.js?v=2.7.1';
+import { createPointerSessions } from './pointer-sessions.js?v=2.7.1';
+import { createSafeStorage } from './browser-storage.js?v=2.7.1';
+import { createIntegratedMapBuilder } from './map-builder.js?v=2.7.1';
+import { createUiFocusScope } from './ui-focus.js?v=2.7.1';
+import { createUiGestures } from './ui-gestures.js?v=2.7.1';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.7.1';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.7.1';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.7.1';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.7.1';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -969,7 +969,7 @@ function handleShellState(state){
   if(chatOpen&&(!state.inMatch||state.paused||state.panel||state.connecting))void dismissChat({restorePointer:false});
   if(state.inMatch&&state.paused)syncPauseContext();
   $('resumeBtn').disabled=!graphicsContextAvailable||!!state.resumeOrientationBlocked;
-  const fsBtn=$('settingsFullscreenBtn');if(fsBtn){const on=!!state.standalone||!!state.fullscreen;fsBtn.classList.toggle('active',on);fsBtn.setAttribute('aria-checked',String(on));fsBtn.setAttribute('aria-label',state.standalone?'Fullscreen (app mode)':on?'Exit fullscreen':'Enter fullscreen');fsBtn.disabled=state.standalone||(!state.fullscreen&&!state.fullscreenSupported);}const rotateFsBtn=$('rotateFullscreenBtn');if(rotateFsBtn){const on=!!state.fullscreen;rotateFsBtn.textContent=on?'EXIT FULLSCREEN':'ENTER FULLSCREEN';rotateFsBtn.setAttribute('aria-label',on?'Exit fullscreen':'Enter fullscreen');rotateFsBtn.classList.toggle('hide',!!state.standalone||(!on&&!state.fullscreenSupported));rotateFsBtn.disabled=!on&&!state.fullscreenSupported;}const connectionCancel=$('connectionCancelBtn');if(connectionCancel)connectionCancel.classList.toggle('hide',!initialConnectionAttempt||state.inMatch);
+  const fsBtn=$('settingsFullscreenBtn');if(fsBtn){const on=!!state.standalone||!!state.fullscreen;fsBtn.classList.toggle('active',on);fsBtn.setAttribute('aria-checked',String(on));fsBtn.setAttribute('aria-label',state.standalone?'Fullscreen (app mode)':on?'Exit fullscreen':'Enter fullscreen');fsBtn.disabled=state.standalone||(!state.fullscreen&&!state.fullscreenSupported);}const rotateFsBtn=$('rotateFullscreenBtn');if(rotateFsBtn){const on=!!state.fullscreen;rotateFsBtn.textContent=on?'EXIT FULLSCREEN':'ENTER FULLSCREEN';rotateFsBtn.setAttribute('aria-label',on?'Exit fullscreen':'Enter fullscreen');rotateFsBtn.classList.remove('hide');rotateFsBtn.disabled=false;}const connectionCancel=$('connectionCancelBtn');if(connectionCancel)connectionCancel.classList.toggle('hide',!initialConnectionAttempt||state.inMatch);
   if((state.location==='menu'||state.location==='lobby')&&(!state.touchControls||state.surfaceReady)&&!document.hidden)startIntroMusic();else stopIntroMusic();
   maybeApplyPendingClientUpdate(state);
 }
@@ -1015,7 +1015,7 @@ const shell=createSessionShell({
   alternateInputReady:()=>controllerInputActive()||chatOpen||!!killstreakTargeting||matchState.status===MATCH_STATUS.ENDED||(currentGameMode()==='infection'&&matchState.infectionPhase==='buy'&&!localInfected),
   pointerInputRequired:()=>activeInputMode===INPUT_MODE.KEYBOARD_MOUSE,
   gameplayAvailable:()=>graphicsContextAvailable,
-  gameplayOrientationRequired:()=>matchAllowsMovement(matchState)&&hp>0&&!(currentGameMode()==='infection'&&matchState.infectionPhase==='buy'&&!localInfected)&&!scoreboardOpen&&!killstreakTargeting&&!chatOpen,
+  gameplayOrientationRequired:()=>true,
 });
 ({w:viewW,h:viewH,dpr:viewDpr}=shell.viewport);
 shell.start();
@@ -1025,7 +1025,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.7.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.7.1';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1033,7 +1033,7 @@ async function ensureThreeEngine(){
   if(engineLoadPromise)return engineLoadPromise;
   engineLoadPromise=(async()=>{
     try{
-      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.7.0')).EditorScene;
+      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.7.1')).EditorScene;
       if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
       THREE=mod;
       position=new THREE.Vector3(0,0,0);
@@ -1614,7 +1614,7 @@ function switchLobbySide(name='players'){
   lobbyScreen.dataset.page=next;
   for(const tab of lobbySideTabs){const active=tab.dataset.lobbySideTab===next;tab.classList.toggle('active',active);tab.setAttribute('aria-selected',String(active));}
   for(const view of lobbySideViews){const active=view.dataset.lobbySideView===next;view.classList.toggle('active',active);view.hidden=!active;view.inert=!active;}
-  if(next==='map'){requestAnimationFrame(renderLobbyMapPreview);scheduleMapBuilderWarmup();}if(next==='loadout'){setLoadoutWorkspaceMode('lobby','classes',{ensurePreview:false});renderAttachmentEditors('lobby',lobbyLoadoutDraft||normalizeLoadoutChoice(selectedLoadout()));}if(next==='killstreaks'){lobbyKillstreakDraft=[...killstreakSelection];renderLobbyKillstreakSetup();}
+  if(next==='map'){requestAnimationFrame(()=>renderLobbyMapPreview());scheduleMapBuilderWarmup();}if(next==='loadout'){setLoadoutWorkspaceMode('lobby','classes',{ensurePreview:false});renderAttachmentEditors('lobby',lobbyLoadoutDraft||normalizeLoadoutChoice(selectedLoadout()));}if(next==='killstreaks'){lobbyKillstreakDraft=[...killstreakSelection];renderLobbyKillstreakSetup();}
 }
 function switchSubTabs(tabSelector,pageSelector,tabAttr,pageAttr,name){
   const tabs=[...document.querySelectorAll(tabSelector)],pages=[...document.querySelectorAll(pageSelector)];if(!tabs.length||!pages.length)return;
@@ -2518,7 +2518,7 @@ function bindUI(){
   $('settingsApplyBtn')?.addEventListener('click',commitPlayerSettings);$('settingsCancelBtn')?.addEventListener('click',cancelPlayerSettings);
   $('settingsFullscreenBtn').addEventListener('click',async()=>{ensureAudio();if(shell.fullscreen)await shell.exitFullscreenFromGesture();else await shell.enterFullscreenFromGesture();});
   for(const version of document.querySelectorAll('[data-app-version]'))version.addEventListener('click',registerDeveloperVersionTap);
-  $('rotateFullscreenBtn')?.addEventListener('click',async()=>{ensureAudio();if(shell.fullscreen)await shell.exitFullscreenFromGesture();else await shell.enterFullscreenFromGesture();});
+  $('rotateFullscreenBtn')?.addEventListener('click',async()=>{ensureAudio();await shell.resumeFromGesture();});
   $('connectionCancelBtn')?.addEventListener('click',()=>cancelInitialConnection('Connection canceled.'));
   $('settingsResetBtn').addEventListener('click',resetPlayerSettings);
   $('playerMasterMute')?.addEventListener('click',()=>{playerMutedDraft=!(playerMutedDraft??masterMuted);syncMusicUI();setSettingsStatus('Unsaved changes · Apply or Cancel');});
@@ -2575,7 +2575,7 @@ function bindUI(){
     const button=$('lobbyStartBtn');button.disabled=true;$('lobbyStatus').textContent='Preparing match…';
     // Validate first. Fullscreen/input capture happens only for a setup that can actually start.
     if(!(await shell.prepareInputFromGesture())){button.disabled=false;$('lobbyStatus').textContent='Fullscreen / game input is required to start.';return;}
-    if(!(await prepareGameRuntime())){shell.releaseInput?.('runtime-failure');(browserDocument.exitPointerLock||browserDocument.webkitExitPointerLock)?.call(browserDocument);suspendGameplayInput('runtime-failure',shell.snapshot());shell.render('runtime-failure');button.disabled=false;$('lobbyStatus').textContent='Game runtime could not be prepared. Your lobby is still available.';return;}
+    if(!(await prepareGameRuntime())){shell.releaseInput?.('runtime-failure');(browserDocument.exitPointerLock||browserDocument.webkitExitPointerLock)?.call(browserDocument);suspendGameplayInput('runtime-failure',shell.snapshot());shell.enterLobby();button.disabled=false;$('lobbyStatus').textContent='Game runtime could not be prepared. Your lobby is still available.';return;}
     loadoutClasses=normalizeLoadoutClasses(setup.loadoutClasses,selectedLoadout());rememberLoadoutClasses(loadoutClasses,setup.classId);send({t:'startMatch',setup});$('lobbyStatus').textContent='Starting match…';
   });
 

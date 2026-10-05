@@ -7,9 +7,9 @@
  * native-layout.js owns all rectangles, clipping, drawing, and hit testing.
  */
 export const THEME = Object.freeze({
-  bg:'#080d10', panel:'#10191e', panelRaised:'#17242b', border:'#32444b',
-  text:'#eef4ed', muted:'#95a7ab', accent:'#dcff4a', accentText:'#101909',
-  danger:'#ef8078', focus:'#dcff4a', radius:4, controlHeight:46,
+  bg:'#0c1113', panel:'#141c1f', panelRaised:'#202a2d', border:'#354044',
+  text:'#eef4ed', muted:'#95a7ab', accent:'#c9ed68', accentText:'#101909',
+  danger:'#ef8078', focus:'#c9ed68', radius:2, controlHeight:46,
   font:'system-ui, -apple-system, sans-serif', spacing:8,
 });
 

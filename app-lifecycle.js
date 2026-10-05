@@ -48,7 +48,7 @@ export function createSessionShell({
   let focused=ownerDocument.hasFocus?.()!==false;
   let destroyed=false,revision=0;
   const pending=new Set();
-  let hadPointerLock=false,orientationLocked=false;
+  let hadPointerLock=false,orientationLocked=false,preparingMatch=false,awaitingLandscape=false;
 
   root.classList.toggle('touch',platform.touchControls);
   root.classList.toggle('desktop',!platform.touchControls);
@@ -68,7 +68,7 @@ export function createSessionShell({
   // Read raw match state here. A callback must not call shell.canPlay/snapshot.
   const requiresGameplayOrientation=()=>{if(!inMatch())return false;try{return !!gameplayOrientationRequired();}catch{return true;}};
   function pauseForOrientation(){
-    if(platform.touchControls&&entered&&!landscapeReady()&&requiresGameplayOrientation()&&!paused&&!panel&&!connecting){
+    if(!awaitingLandscape&&platform.touchControls&&entered&&!landscapeReady()&&requiresGameplayOrientation()&&!paused&&!panel&&!connecting){
       revision++;paused=true;pauseReason='orientation';return true;
     }
     return false;
@@ -77,7 +77,7 @@ export function createSessionShell({
 
   function snapshot(){
     const surfaceReady=entered||immersive(),landscape=landscapeReady(),match=inMatch(),orientationRequired=requiresGameplayOrientation();
-    const resumeOrientationBlocked=match&&platform.touchControls&&orientationRequired&&!landscape,blocked=surfaceReady&&resumeOrientationBlocked&&!paused&&!panel&&!connecting;
+    const resumeOrientationBlocked=match&&platform.touchControls&&orientationRequired&&!landscape,blocked=surfaceReady&&resumeOrientationBlocked&&!panel&&!connecting;
     const inputReady=!pointerInputRequired()||pointerLocked()||alternateReady();
     const playSurfaceReady=platform.touchControls?(surfaceReady&&landscape):true;
     return Object.freeze({
@@ -92,13 +92,13 @@ export function createSessionShell({
   function render(reason='sync'){
     pauseForOrientation();
     const s=snapshot(),frontUsable=!platform.touchControls||s.surfaceReady;
-    if(!s.inMatch||s.paused||s.panel||!s.gameplayOrientationRequired)unlockLandscape();
+    if((!s.inMatch&&!preparingMatch)||(s.inMatch&&!s.gameplayOrientationRequired))unlockLandscape();
     visible(elements.entry,platform.touchControls&&!s.surfaceReady);
     visible(elements.rotate,s.orientationBlocked&&!s.panel&&!s.connecting);
     visible(elements.menu,frontUsable&&s.location==='menu'&&!s.panel&&!s.connecting);
     visible(elements.lobby,frontUsable&&s.location==='lobby'&&!s.panel&&!s.connecting);
     visible(elements.builder,frontUsable&&s.location==='builder'&&!s.panel&&!s.connecting);
-    visible(elements.pause,frontUsable&&s.inMatch&&s.paused&&!s.panel&&!s.connecting);
+    visible(elements.pause,frontUsable&&s.inMatch&&s.paused&&!s.orientationBlocked&&!s.panel&&!s.connecting);
     visible(elements.settings,frontUsable&&s.panel===SHELL_PANEL.SETTINGS);
     visible(elements.admin,frontUsable&&s.panel===SHELL_PANEL.ADMIN);
     visible(elements.loadout,frontUsable&&s.panel===SHELL_PANEL.LOADOUT);
@@ -121,7 +121,7 @@ export function createSessionShell({
     sizeSurface();
     const next=measure(viewportElement,eventTarget),changed=next.w!==viewport.w||next.h!==viewport.h||Math.abs(next.dpr-viewport.dpr)>.001;
     if(!changed&&!force)return false;
-    viewport=next;onViewport({...viewport});
+    viewport=next;if(landscapeReady())awaitingLandscape=false;onViewport({...viewport});
     pauseForOrientation();
     return true;
   }
@@ -197,7 +197,7 @@ export function createSessionShell({
   function endConnection(){connecting=false;connectionText='';return render('connection-end');}
 
   function enterLobby(){
-    location='lobby';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    preparingMatch=false;awaitingLandscape=false;location='lobby';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
     if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);
     return render('lobby');
   }
@@ -213,14 +213,20 @@ export function createSessionShell({
     return render('builder-exit');
   }
   async function prepareInputFromGesture(){
-    if(platform.touchControls){entered=true;syncViewport();render('input-ready');}
+    if(platform.touchControls){
+      // Invoke fullscreen before the first await, while the tap is still active.
+      entered=true;preparingMatch=true;const epoch=revision;
+      await requestFullscreen();if(destroyed||epoch!==revision){preparingMatch=false;return false;}
+      await lockLandscape();if(destroyed||epoch!==revision){preparingMatch=false;unlockLandscape();return false;}
+      syncViewport(true);render('input-ready');
+    }
     return !pointerInputRequired()||alternateReady()?true:requestPointerLock();
   }
   async function capturePointerFromGesture(){return requestPointerLock();}
   async function enterMatch(){
-    location='match';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    preparingMatch=false;location='match';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
     // Network-driven match entry cannot request browser-gated capabilities.
-    if(platform.touchControls&&(!entered||(requiresGameplayOrientation()&&!landscapeReady()))){paused=true;pauseReason=!entered?'entry':'orientation';return render('match-blocked');}
+    if(platform.touchControls&&(!entered||(requiresGameplayOrientation()&&!landscapeReady()))){awaitingLandscape=entered;paused=!entered;pauseReason=!entered?'entry':'';return render('match-blocked');}
     paused=false;pauseReason='';return render('match-enter');
   }
   function showMatchPresentation(){
@@ -236,7 +242,7 @@ export function createSessionShell({
   async function resumeFromGesture(){
     if(!inMatch()||panel||ownerDocument.hidden||!focused||!gameplayAvailable())return false;
     const epoch=revision;
-    if(platform.touchControls){entered=true;syncViewport();if(requiresGameplayOrientation()&&!landscapeReady())return false;}
+    if(platform.touchControls){entered=true;await requestFullscreen();await lockLandscape();syncViewport(true);if(requiresGameplayOrientation()&&!landscapeReady()){render('resume-orientation');return false;}}
     if(pointerInputRequired()&&!alternateReady()&&!(await requestPointerLock()))return false;
     if(destroyed||epoch!==revision||!inMatch()||panel||ownerDocument.hidden||!focused)return false;
     paused=false;pauseReason='';render('resume');return true;
@@ -255,7 +261,7 @@ export function createSessionShell({
   function closePanel(){revision++;panel=SHELL_PANEL.NONE;return render('panel-close');}
   function leaveToMenu(){
     revision++;
-    location='menu';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    preparingMatch=false;awaitingLandscape=false;location='menu';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
     if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);return render('menu');
   }
 

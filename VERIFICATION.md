@@ -1,36 +1,28 @@
-# Breach 2.7.0 — canvas menu rebuild
+# Breach 2.7.1 — menu polish and landscape entry
 
-This is a local review release, not a deployed build. Upload the two repository folders together when deployment is approved. Protocol remains 102; no network message schema changed.
+Local release; not deployed. Preserve the two repository folders. Protocol 102 is unchanged.
 
-## User interface
+## Changes
 
-- The browser entrypoint contains the game canvas and menu canvas. Menus use a semantic widget graph, explicit responsive geometry, Canvas2D painting and shared input/focus. HTML controls, hidden text inputs, DOM/CSS menu measurement, the old canvas mirror and duplicated menu stylesheet are removed.
-- Play combines hosting, room-code entry and room browsing. Front navigation opens saved loadouts, Builder and Settings.
-- Lobby uses Players, Match, Maps and Loadout, with killstreaks nested under preparation. Roster inspection, bot/team actions, map/library selection, host tuning and the primary start action retain their server permissions.
-- Loadout preserves Classes → Class → equipment/weapon → attachments, names, immediate saved selections, stat comparisons and interactive weapon previews. Match changes retain their existing next-spawn/equip-now behavior.
-- Settings use explicit Apply/Cancel, including mute. Reset stages defaults. Fullscreen and developer recording/download/clear are explicitly separate immediate actions. Host gameplay/weapon tuning is staged; player/team actions remain immediate.
-- Pause has Resume, Loadout, Players, Settings, host options and a confirmed Leave/Return action. Guests receive a read-only player roster with their permitted team action. Returning everyone to the lobby is explicitly identified in the host confirmation.
-- Shops, scoreboard, all-player results, death/loadout actions, replay/status notices and strike targeting use shared canvas styling and hit geometry. Results retain all rows and support scroll. The shop owns input while open and buys on release/A instead of leaking input to gameplay.
-- Chat and text entry are canvas-rendered. Physical keyboard input and in-game keys share the same data; no native text-selection surface exists. Menus support portrait and landscape, safe-area insets, bounded scrolling and keyboard/controller focus. Gameplay still requires landscape on touch devices; paused menus remain accessible in portrait.
-- Builder uses the same drawing primitives, independent clipped scrolling and Objects / Ground / Tools / Properties / Map navigation. Its HUD and game renderer are sibling canvases. Selection, transforms, terrain/paint, roads, catalog/groups, generation, validation, save, publish, reopen, autosave recovery and unsaved-exit handling remain.
-- Map file import/export were removed as requested. Existing saved maps and local saved data were not deleted. Draft save, reopen and publish remain. The former standalone Builder URL redirects into the integrated workspace.
+- Shared canvas theme: graphite surfaces, restrained lime accents, sharper cards, subtle backdrop, visible hover/focus and ellipsized overflow.
+- Lobby: compact responsive header and tabs, slim context-aware footer, clipped roster scroll area, aligned bot/team controls. Short landscape layouts put navigation on one line and bot difficulty beside the match summary.
+- Killstreaks: illustrated native canvas cards, three compact equipped slots, responsive grid and a landscape equipped sidebar.
+- Match: compact mode picker and aligned rule controls. Maps: real map overview alongside/before a bounded selection list, contextual editing actions.
+- Classes: responsive class grid and compact equipment cards. Shared styling also reaches Settings, Pause and match overlays.
+- Start Match requests fullscreen immediately from the initiating gesture, then requests landscape. Orientation stays locked through match menus and unlocks on return to the lobby.
+- Unsupported/denied orientation requests show a rotation gate and block local gameplay input. Initial rotation enters gameplay; rotating during gameplay pauses and requires Resume. Guests use the same gate.
+- Corrected map-preview animation callback so a frame timestamp cannot be interpreted as a map ID.
+- Version/cache keys updated together to 2.7.1. Gameplay rules and network message schemas are unchanged.
 
-## Input fixes
+## Verified this release
 
-The rebuild includes pointer-context cancellation, focus restoration, slider/hold rollback, release-only menu activation, suppression of native selection/callout/context-menu behavior, controller-disconnect brush cancellation and failed-WebGL-start input release. Refreshing room browsing clears stale join validation. Canvas-only presentation does not itself establish compatibility with every Apple device; see the verification limits below.
+- Actual client module startup in headless Chromium, with no uncaught JavaScript errors.
+- Actual client menu rendering at 320×568, 393×852, 852×393 and 1440×900; raster screenshots inspected and layouts iterated.
+- Touch event dispatch through the production canvas renderer: bot changes, score limit, map selection, class editor, killstreak selection, Settings opening/canceling.
+- Control bounds and unobstructed Start Match hit target at five viewport sizes, including 667×375.
+- Session-shell tests: synchronous fullscreen request, request/lock ordering, standalone app mode, denied APIs, guest match entry, portrait input blocking, initial rotation, mid-match rotation, pause/resume and return to lobby.
+- Changed JavaScript syntax and release archive integrity.
 
-## Preserved gameplay
+## Limits
 
-Weapons, attachments, recoil, aiming, movement, collision, physics, AI, relationship colors and balance remain outside this redesign. The 2.6.2 Infection damage/conversion/refund behavior, boss telegraphs/recovery/weakpoints, Moon supply flybys/pickups and protocol-102 room behavior remain. UI ownership intentionally prevents movement/fire through a modal menu; it does not change simulation constants.
-
-## Local checks
-
-Verification includes actual production-module startup in a deterministic browser-API fixture, native widget/event/focus tests, renderer hit/scroll and responsive-layout checks, production action tests, all-player results, controller adapters, interrupted pointer gestures and Builder lifecycle tests against fixture APIs. Canvas2D raster previews were generated and inspected for desktop, phone portrait and short landscape layouts.
-
-Existing regressions compare core gameplay with the earlier Git baselines and exercise role/economy preservation, shared geometry, server collision/routing, boss phases and Moon supply behavior. JavaScript parsing, import closure, in-process Worker startup/health/origin checks and extracted-package integrity checks are part of release validation.
-
-## Not verified on hardware
-
-The fixtures are not browser, multiplayer or physical-controller tests. Real WebGL rendering, Safari/iPhone/iPad behavior, physical Xbox controllers, IME, live WebSockets, Durable Object persistence and low-end device performance remain unverified here. Local Chromium could not launch because its socket creation was denied; the available cloud browser reports disabled WebGL.
-
-Before deployment, test long holds and multitouch on Apple devices, keyboard/controller navigation through every menu, rotation and interruption during edits, game start failure/recovery, lobby return/reconnect, Builder Test and transform capture, and live two-client gameplay. Confirm that saved maps reopen and publish correctly against the intended server. No claim of physical-device acceptance is made by this package.
+Browser checks use local simulated multiplayer state; no production multiplayer session or deployment was performed. Browser API fallback paths are covered with deterministic fixtures. Physical Android/iPhone rotation, Safari and hardware controller acceptance still require real-device validation. Browsers that reject fullscreen/orientation locking require the user to rotate manually; a website cannot override that policy.
