@@ -1,5 +1,5 @@
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.6.2";
-import { clamp } from "./builder-model.js?v=2.6.2";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.7.0";
+import { clamp } from "./builder-model.js?v=2.7.0";
 // Screen navigation is independent of document tools. Editing actions share one dispatcher.
 export function createEditorInput(e, active, panels) {
   const pointers = new Map();
@@ -19,7 +19,9 @@ export function createEditorInput(e, active, panels) {
   function cancel() {
     if(gesture?.roadBefore)e.roadPoints=gesture.roadBefore;e.roadNodeDragging=false;
     e.endBrush?.(false);if(e.dragging){e.gameRuntime.cancelTransform?.();e.cancel();}
-    pointers.clear();gesture=null;pinch=null;e.state.lift=e.state.controllerLift=0;e.gameRuntime.pauseInput();
+    const captured=[...pointers.keys()];pointers.clear();gesture=null;pinch=null;
+    for(const id of captured)if(e.stage.hasPointerCapture?.(id))e.stage.releasePointerCapture(id);
+    e.state.lift=e.state.controllerLift=0;e.gameRuntime.pauseInput();
   }
   function down(ev) {
     if(!active()||e.panel||e.state.phase!=='edit')return;
@@ -112,7 +114,7 @@ export function createEditorInput(e, active, panels) {
   }
   function controller(frame, dt) {
     if (!active())return false;
-    if(!frame?.connected){if(e.controllerAiming)e.endBrush(false);e.controllerAiming=false;return false;}
+    if(!frame?.connected){if(e.controllerAiming||e.brushStroke){cancel();e.hud.reset();}e.controllerAiming=false;e.state.controllerLift=0;return false;}
     if(!frame.meaningful&&!frame.pressed?.some(Boolean)&&!frame.released?.some(Boolean)&&!frame.held?.some(Boolean)&&!frame.moveX&&!frame.moveY&&!frame.lookX&&!frame.lookY)return true;
     e.controllerAiming=true;
     if (e.hud.controller(frame)) {
@@ -162,6 +164,11 @@ export function createEditorInput(e, active, panels) {
   ];
   for (const [n, f] of listeners)
     e.stage.addEventListener(n, f, { capture: true, passive: false });
+  const paste=ev=>{if(active()&&panels.paste?.(ev))stop(ev);};
+  const copy=ev=>{if(active()&&panels.copy?.(ev))stop(ev);};
+  window.addEventListener("paste", paste, true);
+  window.addEventListener("copy", copy, true);
+  window.addEventListener("cut", copy, true);
   window.addEventListener("keydown", key, true);
   window.addEventListener("blur", cancel);
   window.addEventListener("pagehide", cancel);
@@ -174,6 +181,9 @@ export function createEditorInput(e, active, panels) {
       cancel();
       for (const [n, f] of listeners) e.stage.removeEventListener(n, f, true);
       window.removeEventListener("keydown", key, true);
+      window.removeEventListener("paste", paste, true);
+      window.removeEventListener("copy", copy, true);
+      window.removeEventListener("cut", copy, true);
       window.removeEventListener("blur", cancel);
       window.removeEventListener("pagehide", cancel);
       globalThis.document?.removeEventListener?.("visibilitychange",visibility);

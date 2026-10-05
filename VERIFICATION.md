@@ -1,36 +1,36 @@
-# Breach 2.6.2 — local review build
+# Breach 2.7.0 — canvas menu rebuild
 
-This package has not been pushed or deployed. Upload the server and client folders together. Protocol 102 intentionally rejects older clients: role/economy, boss-phase and supply messages changed, so a mixed client/server pair must not silently continue.
+This is a local review release, not a deployed build. Upload the two repository folders together when deployment is approved. Protocol remains 102; no network message schema changed.
 
-## Gameplay changes
+## User interface
 
-- Infection claws now deal 40 damage every 650 ms; only a lethal claw hit converts a survivor. Armor absorbs half of incoming claw damage while it lasts, making armor and healing meaningful. A healthy unarmored survivor takes three successful claws; full armor takes five. Reach, line of sight, server cooldown, god mode and spawn protection are enforced. Normal gun damage, recoil, movement and timing values are unchanged.
-- The randomly chosen first infected receives a one-time refund for purchases made during that preparation phase. Later conversions do not refund purchases; the existing cash cap still applies.
-- Conversion and round rewards have separate events. They do not masquerade as respawns or reset position, movement, camera, traversal or prediction. Dead remote players are no longer forced to 100 HP when a snapshot arrives.
-- Client prediction, server actor collision, boss rendering and projectile hit zones use the same actor-size contract. Boss route clearance accounts for the enlarged body. Infected remote extrapolation uses infected movement speed.
-- Role changes update eyes, skin, uniform and weapon visibility consistently. Infected touch controls show claws, movement and jump without invisible weapon controls intercepting look input. Controller shop directions do not also toggle combat actions.
-- The shop uses the same availability rules as the server and shows owned/full/insufficient-cash states. Survivors see health and armor. Attacks have hit/miss feedback, and role/round changes have clear announcements. Infection no longer awards unusable killstreaks.
-- Bosses display a growing-intensity ground range warning and raise their arms during windup; damage and strike animation begin on release rather than the start of the warning. Cancelled attacks clear their warning.
+- The browser entrypoint contains the game canvas and menu canvas. Menus use a semantic widget graph, explicit responsive geometry, Canvas2D painting and shared input/focus. HTML controls, hidden text inputs, DOM/CSS menu measurement, the old canvas mirror and duplicated menu stylesheet are removed.
+- Play combines hosting, room-code entry and room browsing. Front navigation opens saved loadouts, Builder and Settings.
+- Lobby uses Players, Match, Maps and Loadout, with killstreaks nested under preparation. Roster inspection, bot/team actions, map/library selection, host tuning and the primary start action retain their server permissions.
+- Loadout preserves Classes → Class → equipment/weapon → attachments, names, immediate saved selections, stat comparisons and interactive weapon previews. Match changes retain their existing next-spawn/equip-now behavior.
+- Settings use explicit Apply/Cancel, including mute. Reset stages defaults. Fullscreen and developer recording/download/clear are explicitly separate immediate actions. Host gameplay/weapon tuning is staged; player/team actions remain immediate.
+- Pause has Resume, Loadout, Players, Settings, host options and a confirmed Leave/Return action. Guests receive a read-only player roster with their permitted team action. Returning everyone to the lobby is explicitly identified in the host confirmation.
+- Shops, scoreboard, all-player results, death/loadout actions, replay/status notices and strike targeting use shared canvas styling and hit geometry. Results retain all rows and support scroll. The shop owns input while open and buys on release/A instead of leaking input to gameplay.
+- Chat and text entry are canvas-rendered. Physical keyboard input and in-game keys share the same data; no native text-selection surface exists. Menus support portrait and landscape, safe-area insets, bounded scrolling and keyboard/controller focus. Gameplay still requires landscape on touch devices; paused menus remain accessible in portrait.
+- Builder uses the same drawing primitives, independent clipped scrolling and Objects / Ground / Tools / Properties / Map navigation. Its HUD and game renderer are sibling canvases. Selection, transforms, terrain/paint, roads, catalog/groups, generation, validation, save, publish, reopen, autosave recovery and unsaved-exit handling remain.
+- Map file import/export were removed as requested. Existing saved maps and local saved data were not deleted. Draft save, reopen and publish remain. The former standalone Builder URL redirects into the integrated workspace.
 
-## Moon and boss gameplay
+## Input fixes
 
-- Moon Deathmatch selects Lunar Outpost with its existing low gravity/higher jumps. A real server-scheduled supply UFO first arrives after 30 seconds, then at most once a minute. It approaches a marked landing point, beams down a field medkit or ammo cache, and departs. Supplies restore up to 45 health or refill the owned weapon magazines; they never change damage, speed or weapon tuning. Pickups expire after 45 seconds and are capped at two. Claims are server-authoritative, useful-only, single-use and line-of-sight checked. Joining players receive the current flyby/pickup snapshot.
-- Moon supplies have world markers, distinct medkit/ammo meshes, minimap markers, distance/countdown information and arrival/beam/claim feedback. Supply state and presentation clear outside active Moon matches.
-- Every fifth Zombie Wave adds an Abomination or Ravager, alternating between archetypes. Both have distinct proportions/armor silhouettes and phase-specific poses.
-- The Abomination warns with a radial ground ring before slamming. The Ravager locks a visible lane, then charges down it. A charge stops at cover or an actor instead of sliding around obstacles; only its physically swept segment deals damage. Targets can evade the locked direction. Warning geometry and server damage geometry share one definition.
-- Both bosses expose the cyan chest core during a limited recovery window. The visible sphere and authoritative projectile sphere share position/radius/scale. Closed cores are ordinary body hits; exposed core hits receive a capped 2× firearm damage multiplier. Recovery boundaries are server-owned; the HUD announces the punish window. Core transforms stay aligned during animations.
-- Tier progression caps at six. Charge range grows from 7 to 11 meters, charge speed stays 11 m/s, warnings stay at least 1.1 seconds, and recovery remains 1.6–1.8 seconds. Health/damage/speed remain bounded and team scaling caps at four players.
+The rebuild includes pointer-context cancellation, focus restoration, slider/hold rollback, release-only menu activation, suppression of native selection/callout/context-menu behavior, controller-disconnect brush cancellation and failed-WebGL-start input release. Refreshing room browsing clears stale join validation. Canvas-only presentation does not itself establish compatibility with every Apple device; see the verification limits below.
 
-## Verification
+## Preserved gameplay
 
-- Deterministic regression comparisons against actual 2.5.0 client/server Git baselines cover core constants, all weapons/attachments, spread/falloff/heat, movement/physics/traversal/ladder traces and unchanged recoil/aim functions.
-- Independent production-entry-point and THREE scene-model tests cover both boss archetypes, five maps, exact weakpoint transforms/damage windows, supply persistence/claim races/expiry, and charge collision against walls and actors. These do not render a browser.
-- Focused executable client-function tests cover role/economy/inventory state preservation, mode speed isolation, real shared shop rules, responsive shop bounds, controls, cooldowns and boss collision.
-- Production server handlers are exercised with fixture sockets for purchases, armor/healing, damaging claws, lethal-only conversion, refunds, role/reward events, boss windup/release/cancellation, mode reset, reconnect and disabled Infection streaks.
-- Syntax, static import closure, shared map/spawn tests and in-process Worker startup/health/origin checks are run against the final package. The ZIP is extracted and checked before delivery.
+Weapons, attachments, recoil, aiming, movement, collision, physics, AI, relationship colors and balance remain outside this redesign. The 2.6.2 Infection damage/conversion/refund behavior, boss telegraphs/recovery/weakpoints, Moon supply flybys/pickups and protocol-102 room behavior remain. UI ownership intentionally prevents movement/fire through a modal menu; it does not change simulation constants.
 
-## Not verified
+## Local checks
 
-Actual rendered gameplay, real network WebSockets, deployed Durable Object persistence, physical controllers, Safari/iOS and low-end mobile performance are not verified. Browser startup/local-preview access was unavailable in this environment. Model/VM/fixture tests are not browser or multiplayer QA.
+Verification includes actual production-module startup in a deterministic browser-API fixture, native widget/event/focus tests, renderer hit/scroll and responsive-layout checks, production action tests, all-player results, controller adapters, interrupted pointer gestures and Builder lifecycle tests against fixture APIs. Canvas2D raster previews were generated and inspected for desktop, phone portrait and short landscape layouts.
 
-Before deployment, playtest normal → Infection → normal, conversion during movement, round-end death/rewards, boss contact, weakpoint timing and charge/slam telegraphs, UFO approaches and pickup visibility, reconnect, controller/touch controls and two-client latency. Balance numbers are a review starting point, not a claim of completed playtesting.
+Existing regressions compare core gameplay with the earlier Git baselines and exercise role/economy preservation, shared geometry, server collision/routing, boss phases and Moon supply behavior. JavaScript parsing, import closure, in-process Worker startup/health/origin checks and extracted-package integrity checks are part of release validation.
+
+## Not verified on hardware
+
+The fixtures are not browser, multiplayer or physical-controller tests. Real WebGL rendering, Safari/iPhone/iPad behavior, physical Xbox controllers, IME, live WebSockets, Durable Object persistence and low-end device performance remain unverified here. Local Chromium could not launch because its socket creation was denied; the available cloud browser reports disabled WebGL.
+
+Before deployment, test long holds and multitouch on Apple devices, keyboard/controller navigation through every menu, rotation and interruption during edits, game start failure/recovery, lobby return/reconnect, Builder Test and transform capture, and live two-client gameplay. Confirm that saved maps reopen and publish correctly against the intended server. No claim of physical-device acceptance is made by this package.
