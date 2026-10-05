@@ -1,6 +1,6 @@
 // Presentation and hit testing only. All edits go through the builder's command stack.
 // Layout is shared by painting, pointer input, keyboard focus and controller focus.
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.6.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.6.2";
 const inside = (p, r) =>
   p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 export function hudLayout(w, h, model, insets = {}) {

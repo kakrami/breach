@@ -3,7 +3,7 @@ import {
   ModelRules,
   Resolver,
   Validator,
-} from "./builder-model.js?v=2.6.0";
+} from "./builder-model.js?v=2.6.2";
 self.onmessage = ({ data }) => {
   try {
     const doc = ModelRules.normalizeDocument(new MapDocument(data));
