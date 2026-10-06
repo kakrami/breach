@@ -1,4 +1,4 @@
-import { BOSS_WEAKPOINT, bossAttackGeometry, bossWeakpointActive } from './moon-boss-rules.js?v=2.8.0';
+import { BOSS_WEAKPOINT, bossAttackGeometry, bossWeakpointActive } from './moon-boss-rules.js?v=2.9.0';
 
 const clamp01=n=>Math.max(0,Math.min(1,n));
 const mix=(a,b,t)=>a+(b-a)*t;

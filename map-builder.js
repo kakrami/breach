@@ -1,13 +1,14 @@
-import { EditorSession } from "./editor-session.js?v=2.5.0";
+import { EditorSession } from "./editor-session.js?v=2.9.0";
 import {
   MapDocument,
   Storage,
   Validator,
   templateToDoc,
-} from "./builder-model.js?v=2.5.0";
-import { createBuilderPanels } from "./builder-panels.js?v=2.5.0";
-import { createBuilderHUD } from "./builder-hud.js?v=2.5.0";
-import { createEditorInput } from "./editor-input.js?v=2.5.0";
+} from "./builder-model.js?v=2.9.0";
+import { createBuilderPanels } from "./builder-panels.js?v=2.9.0";
+import { createBuilderHUD } from "./builder-hud.js?v=2.9.0";
+import { createEditorInput } from "./editor-input.js?v=2.9.0";
+import { installCanvasInteractionGuards } from "./canvas-input.js?v=2.9.0";
 export function createIntegratedMapBuilder({
   host,
   apiBase,
@@ -15,25 +16,14 @@ export function createIntegratedMapBuilder({
   onExit,
   onSaved,
   gameRuntime,
+  inputOwner,
 } = {}) {
-  const root = host.shadowRoot || host.attachShadow({ mode: "open" });
-  root.replaceChildren();
-  const css = document.createElement("link");
-  css.rel = "stylesheet";
-  css.href = new URL("./map-builder.css?v=2.5.0", import.meta.url).href;
-  const app = document.createElement("div");
-  app.className = "app";
-  const stage = document.createElement("main");
-  stage.className = "stage";
-  stage.id = "stage";
-  app.appendChild(stage);
-  root.append(css, app);
-  // OS file transfer only; all editor controls and choices are painted on canvas.
-  const file = document.createElement("input");
-  file.type = "file";
-  file.accept = ".json,.breachmap.json,application/json";
-  file.hidden = true;
-  root.appendChild(file);
+  // The editor owns one real canvas; no mirrored controls or DOM layout tree.
+  const stage = document.createElement("canvas");
+  stage.id = "builderHUD";
+  stage.style.cssText = "position:fixed;inset:0;width:100%;height:100%;z-index:90;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-user-drag:none;--builder-safe-left:env(safe-area-inset-left,0px);--builder-safe-right:env(safe-area-inset-right,0px);--builder-safe-top:env(safe-area-inset-top,0px);--builder-safe-bottom:env(safe-area-inset-bottom,0px)";
+  stage.hidden = true;
+  (host || document.body).appendChild(stage);
   let active = false,
     serverMapId = "",
     dirty = false,
@@ -51,8 +41,6 @@ export function createIntegratedMapBuilder({
     save: () => run(saveServerMap),
     publish: () => run(publishServerMap),
     exit: completeExit,
-    importFile: () => file.click(),
-    exportFile,
     restore,
   });
   editor.clearPanel = () => panels.reset();
@@ -76,6 +64,26 @@ export function createIntegratedMapBuilder({
     pause: () => {editor.input?.cancel();gameRuntime.pauseInput();},
   });
   editor.input = createEditorInput(editor, () => active, panels);
+  // Unconsumed contacts in Test keep using the game's movement/look handlers.
+  // Builder chrome stops them in capture phase, so a tap has exactly one owner.
+  const testPointers = new Set();
+  const playPointer = event => {
+    if (event.type === "pointerdown") {
+      if (!active || editor.state.phase !== "test" || editor.panel || editor.hud.focusActive) return;
+      testPointers.add(event.pointerId);
+    } else if (!testPointers.has(event.pointerId)) return;
+    gameRuntime.pointer?.(event.type, event);
+    if (["pointerup", "pointercancel", "lostpointercapture"].includes(event.type)) testPointers.delete(event.pointerId);
+  };
+  const playPointerTypes = ["pointerdown", "pointermove", "pointerup", "pointercancel", "lostpointercapture"];
+  for (const type of playPointerTypes) stage.addEventListener(type, playPointer);
+  // Game capture changes the event target. Its original handler owns release;
+  // only forget our contact here rather than dispatching it a second time.
+  const capturedPlayEnd = event => { if (event.target !== stage) testPointers.delete(event.pointerId); };
+  for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) document.addEventListener(type, capturedPlayEnd, true);
+  const cancelInput = () => { testPointers.clear(); editor.input.cancel(); editor.hud.reset(); };
+  const releaseInputSubscription = inputOwner?.subscribe(cancelInput);
+  const interactionGuards = installCanvasInteractionGuards({ canvases: [stage], ownerDocument: document, eventTarget: window, inputOwner, onCancel: cancelInput });
   async function api(path, payload = {}) {
     const identity = getIdentity?.();
     if (!identity?.client || !identity?.auth)
@@ -165,8 +173,6 @@ export function createIntegratedMapBuilder({
         .catch(() => {});
       return;
     }
-    if (name === "import") return file.click();
-    if (name === "download") return exportFile();
     panels.show(
       {
         rename: "settings",
@@ -178,48 +184,18 @@ export function createIntegratedMapBuilder({
       data,
     );
   }
-  function exportFile() {
-    const blob = new Blob([JSON.stringify(editor.exportData(), null, 2)], {
-        type: "application/json",
-      }),
-      url = URL.createObjectURL(blob),
-      a = document.createElement("a");
-    a.href = url;
-    a.download =
-      (editor.doc.meta.name || "map").replace(/[^\w-]/g, "_") +
-      ".breachmap.json";
-    a.click();
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
-    editor.toast("Map exported");
-  }
   async function restore() {
     const data = await Storage.load();
     if (!data) throw new Error("No local autosave is available.");
     editor.setDoc(data);
   }
-  file.addEventListener("change", async () => {
-    const selected = file.files?.[0];
-    file.value = "";
-    if (!selected) return;
-    try {
-      if (selected.size > 10 * 1024 * 1024)
-        throw new Error("This map file is too large");
-      const data = JSON.parse(await selected.text());
-      panels.show("confirm", {
-        title: "Import map",
-        message: "Replace this map? Undo can restore it.",
-        run: () => editor.importData(data),
-      });
-    } catch (error) {
-      editor.reportProblem(error);
-    }
-  });
   function completeExit() {
     panels.dismiss();
-    editor.input.cancel();
+    cancelInput();
     editor.stopPlay();
     gameRuntime.close();
     active = false;
+    stage.hidden = true;
     editor.syncUI();
     onExit?.({ mapId: serverMapId });
   }
@@ -247,11 +223,13 @@ export function createIntegratedMapBuilder({
     gameRuntime.close();
     serverMapId = String(mapId || "");
     active = true;
+    stage.hidden = false;
     try {
       editor.openDocument(doc);
       dirty = !mapId;
     } catch (error) {
       active = false;
+      stage.hidden = true;
       gameRuntime.close();
       throw error;
     }
@@ -282,13 +260,16 @@ export function createIntegratedMapBuilder({
     },
     suspend() {
       active = false;
+      stage.hidden = true;
       panels.dismiss();
-      editor.input.cancel();
+      cancelInput();
       editor.stopPlay();
       gameRuntime.close();
       editor.syncUI();
     },
     requestExit,
+    cancelInput,
+    destroy() { completeExit(); releaseInputSubscription?.(); for (const type of playPointerTypes) stage.removeEventListener(type, playPointer); for (const type of ["pointerup", "pointercancel", "lostpointercapture"]) document.removeEventListener(type, capturedPlayEnd, true); interactionGuards.destroy(); editor.input.destroy(); editor.hud.destroy(); },
     handleControllerFrame: (f, dt) => editor.input.controller(f, dt),
     get active() {
       return active;

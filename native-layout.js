@@ -7,8 +7,8 @@
  * once at the output boundary. Keep the same graph for touch, mouse, keyboard,
  * controller and accessibility rather than introducing parallel UI layouts.
  */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.8.0';
-import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.8.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.9.0';
+import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.9.0';
 
 const C = Object.freeze({
   bg:THEME.bg, surface:THEME.panel, raised:THEME.panelRaised, line:THEME.border,
@@ -48,12 +48,12 @@ export function computeNativeViewport(width,height,safeArea={}) {
   return {width:w,height:h,portrait,landscape,compact,safe,content:rect(safe.left+(w-safe.left-safe.right-contentWidth)/2,safe.top,contentWidth,h-safe.top-safe.bottom),target:48,secondaryTarget:44};
 }
 
-export function createNativeRenderer({canvas,ui,onAfterAction=()=>{},inputOwner=null,safeArea={},getNotice=()=>null}={}) {
+export function createNativeRenderer({canvas,ui,onAfterAction=()=>{},inputOwner=null,safeArea={},menuScene=null,getNotice=()=>null}={}) {
   if(!canvas||!ui)throw new TypeError('Native renderer requires canvas and widget graph');
   const ctx=canvas.getContext('2d',{alpha:true});
   if(!ctx)throw new Error('Canvas 2D is unavailable');
   let vp=computeNativeViewport(globalThis.innerWidth||canvas.width||1280,globalThis.innerHeight||canvas.height||800,safeArea);
-  let dpr=1,dirty=true,disposed=false,frame=0,lastRevision=-1,lastScreen='',hover=null,lastNoticeKey='';
+  let dpr=1,dirty=true,disposed=false,frame=0,lastRevision=-1,lastScreen='',hover=null,lastNoticeKey='',lastMenuFrame=0;
   let hits=[],scrolls=[],painted=[],activeScreen=null,pointer=null,clip=null;
   const artwork=new Map(),pages=new WeakMap(),details=new WeakMap();
   globalThis.document?.fonts?.load('700 28px "Breach Display"').then(()=>{dirty=true;}).catch(()=>{});
@@ -235,7 +235,7 @@ export function createNativeRenderer({canvas,ui,onAfterAction=()=>{},inputOwner=
     fade(rect(0,footerY-12,vp.width,vp.height-footerY+12),'rgba(9,13,16,0)','#090d10');line(b.left,footerY-2,b.right,footerY-2,'#39423c');
     const startW=portrait?b.width:250,startX=portrait?b.left:b.right-startW;
     if(host)button(get('lobbyStartBtn'),rect(startX,footerY+8,startW,48),{primary:true,label:'DEPLOY',arrow:true,fontSize:18});else simpleText(get('lobbyStatus'),rect(startX,footerY+8,startW,48),{size:13,color:C.muted,maxLines:2});
-    if(!portrait&&active!=='players'){const wr=rect(b.left,footerY+6,b.width-startW-18,50),n=get('nativeLoadoutEditBtn'),weapon=q('.self',get('lobbyRoster'))?.dataset?.primaryWeapon||'assault';art('weapon-'+weapon+'.png',rect(wr.left,wr.top-8,106,66));txt('LOADOUT  ↗',wr.left+108,wr.top+11,wr.width-108,11,C.text,700);txt('v2.8.0  /  '+code,wr.left+108,wr.top+30,wr.width-108,8,C.muted,600);mark(n,wr);hit(n,wr);focusRing(n,wr);}else if(!portrait){txt('ROOM '+code+'  /  '+(host?'HOST':'SQUAD'),b.left,footerY+20,b.width-startW-24,11,C.muted,600);txt('BREACH  v2.8.0',b.left,footerY+39,b.width-startW-24,8,C.dim,600);}
+    if(!portrait&&active!=='players'){const wr=rect(b.left,footerY+6,b.width-startW-18,50),n=get('nativeLoadoutEditBtn'),weapon=q('.self',get('lobbyRoster'))?.dataset?.primaryWeapon||'assault';art('weapon-'+weapon+'.png',rect(wr.left,wr.top-8,106,66));txt('LOADOUT  ↗',wr.left+108,wr.top+11,wr.width-108,11,C.text,700);txt('v2.9.0  /  '+code,wr.left+108,wr.top+30,wr.width-108,8,C.muted,600);mark(n,wr);hit(n,wr);focusRing(n,wr);}else if(!portrait){txt('ROOM '+code+'  /  '+(host?'HOST':'SQUAD'),b.left,footerY+20,b.width-startW-24,11,C.muted,600);txt('BREACH  v2.9.0',b.left,footerY+39,b.width-startW-24,8,C.dim,600);}
   }
   function drawDeployment(r){
     const side=vp.landscape||r.width>=650,heroW=side?r.width*.44:r.width,heroH=side?r.height:Math.min(250,Math.max(134,r.height*.40));
@@ -395,11 +395,11 @@ const ads=q('[data-loadout-ads-preview]',weaponPage);button(ads,rect(left.right-
 
   function render(){
     if(disposed)return;dirty=false;lastRevision=ui.revision;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,vp.width,vp.height);hits=[];scrolls=[];painted=[];clip=viewRect();for(const n of allNodes)previousRects.set(n,{...n._rect});zero(ui.root);allNodes.clear();
-    const screens=NATIVE_SCREEN_IDS.map(get).filter(shown);const main=screens.filter(n=>!['lobbyQuitConfirm','mapDeleteConfirm','connectionOverlay','chatComposer','gameTextEditor'].includes(n.id));const overlays=screens.filter(n=>['lobbyQuitConfirm','mapDeleteConfirm','connectionOverlay','chatComposer','gameTextEditor'].includes(n.id));const ordered=[...main,...overlays];const fullViewport=vp,notice=ordered.length?getNotice():null,noticeText=String(notice?.text||'').trim();lastNoticeKey=noticeText?`${noticeText}|${notice.until||''}`:'';if(noticeText){const band=52+vp.safe.bottom;vp={...vp,height:vp.height-band,content:rect(vp.content.left,vp.content.top,vp.content.width,Math.max(0,vp.content.height-band))};clip=viewRect();}
+    const screens=NATIVE_SCREEN_IDS.map(get).filter(shown);const main=screens.filter(n=>!['lobbyQuitConfirm','mapDeleteConfirm','connectionOverlay','chatComposer','gameTextEditor'].includes(n.id));const overlays=screens.filter(n=>['lobbyQuitConfirm','mapDeleteConfirm','connectionOverlay','chatComposer','gameTextEditor'].includes(n.id));const ordered=[...main,...overlays];const fullViewport=vp,notice=ordered.length?getNotice():null,noticeText=String(notice?.text||'').trim();lastNoticeKey=noticeText?`${noticeText}|${notice.until||''}`:'';
     // Only the frontmost screen can receive input. Earlier screens can remain
     // visible beneath overlays, but their hit targets never leak through.
     const signature=ordered.map(n=>n.id).join('|');if(signature!==lastScreen){cancelPointer('screen-change');inputOwner?.sync?.('native-screen-change');lastScreen=signature;}
-    ordered.forEach(n=>{activeScreen=n;hits=[];scrolls=[];switch(n.id){case'entryScreen':entryScreen(n);break;case'rotateGate':rotateScreen(n);break;case'menu':menuScreen(n);break;case'lobbyScreen':lobbyScreen(n);break;case'pause':pauseScreen(n);break;case'settingsPanel':case'adminPanel':case'loadoutPanel':modalScreen(n);break;case'lobbyQuitConfirm':case'mapDeleteConfirm':confirmScreen(n);break;case'connectionOverlay':connectionScreen(n);break;case'gameTextEditor':case'chatComposer':keyboardScreen(n);break;}});
+    ordered.forEach(n=>{activeScreen=n;hits=[];scrolls=[];if(menuScene?.draw({context:ctx,viewport:vp,screen:n,mark,hit}))return;switch(n.id){case'entryScreen':entryScreen(n);break;case'rotateGate':rotateScreen(n);break;case'menu':menuScreen(n);break;case'lobbyScreen':lobbyScreen(n);break;case'pause':pauseScreen(n);break;case'settingsPanel':case'adminPanel':case'loadoutPanel':modalScreen(n);break;case'lobbyQuitConfirm':case'mapDeleteConfirm':confirmScreen(n);break;case'connectionOverlay':connectionScreen(n);break;case'gameTextEditor':case'chatComposer':keyboardScreen(n);break;}});
     activeScreen=ordered.at(-1)||null;if(noticeText){vp=fullViewport;clip=viewRect();const w=Math.min(620,vp.content.width),r=rect((vp.width-w)/2,vp.height-vp.safe.bottom-44,w,44);panel(r,C.raised,C.line);txt(noticeText,r.left+14,r.top+8,r.width-28,13,C.text,650,{maxLines:2,lineHeight:15,align:'center'});}mark(ui.root,viewRect());ui.root.layoutStyle={overflow:'hidden',display:'block'};canvas.style.pointerEvents=ordered.length?'auto':'none';return {viewport:vp,screens:ordered.map(n=>n.id),hits:[...hits],scrolls:[...scrolls],painted:[...new Set(painted)]};
   }
   function hitTest(x,y){for(let i=hits.length-1;i>=0;i--)if(inside(hits[i].rect,x,y)&&enabled(hits[i].node))return hits[i];return null;}
@@ -424,12 +424,12 @@ const ads=q('[data-loadout-ads-preview]',weaponPage);button(ads,rect(left.right-
       }
     }finally{try{canvas.releasePointerCapture?.(p.id);}catch{}dirty=true;}
   }
-  function wheel(e){const s=scrollAt(e.clientX,e.clientY);if(!s)return;e.preventDefault();if(s.maxX>0&&(Math.abs(e.deltaX)>Math.abs(e.deltaY)||e.shiftKey))s.node.scrollLeft=clamp(num(s.node.scrollLeft)+num(e.deltaX||e.deltaY),0,s.maxX);else s.node.scrollTop=clamp(num(s.node.scrollTop)+num(e.deltaY),0,s.max);dirty=true;}
+  function wheel(e){const h=hitTest(e.clientX,e.clientY);if(h?.node?.dataset?.menuPreview){e.preventDefault();ui.dispatch?.(h.node,'wheel',{...eventFields(e),deltaY:e.deltaY});dirty=true;return;}const s=scrollAt(e.clientX,e.clientY);if(!s)return;e.preventDefault();if(s.maxX>0&&(Math.abs(e.deltaX)>Math.abs(e.deltaY)||e.shiftKey))s.node.scrollLeft=clamp(num(s.node.scrollLeft)+num(e.deltaX||e.deltaY),0,s.maxX);else s.node.scrollTop=clamp(num(s.node.scrollTop)+num(e.deltaY),0,s.max);dirty=true;}
   function listen(target,type,fn,options){target?.addEventListener?.(type,fn,options);removers.push(()=>target?.removeEventListener?.(type,fn,options));}
   listen(canvas,'pointerdown',down,{passive:false});listen(canvas,'pointermove',move,{passive:false});listen(canvas,'pointerup',up,{passive:false});listen(canvas,'pointercancel',()=>cancelPointer('pointercancel'));listen(canvas,'lostpointercapture',()=>cancelPointer('capture-lost'));listen(canvas,'wheel',wheel,{passive:false});listen(canvas,'contextmenu',e=>e.preventDefault());listen(globalThis,'blur',()=>cancelPointer('blur'));listen(globalThis,'resize',()=>resize());
   const unsubscribe=ui.subscribe?.(()=>{dirty=true;});if(unsubscribe)removers.push(unsubscribe);const unsubOwner=inputOwner?.subscribe?.(()=>{if(pointer&&inputOwner.valid?.(pointer.owner||pointer.id)===false)cancelPointer('owner-change');});if(unsubOwner)removers.push(unsubOwner);
   function resize(width,height,pixelRatio){if(disposed)return;if(typeof width==='object'){const opt=width;width=opt.width;height=opt.height;pixelRatio=opt.dpr;safeArea=opt.safeArea||safeArea;}vp=computeNativeViewport(width||globalThis.innerWidth||canvas.width,height||globalThis.innerHeight||canvas.height,safeArea);dpr=clamp(num(pixelRatio,globalThis.devicePixelRatio||1),1,3);const pw=Math.round(vp.width*dpr),ph=Math.round(vp.height*dpr);if(canvas.width!==pw)canvas.width=pw;if(canvas.height!==ph)canvas.height=ph;canvas.style.width=`${vp.width}px`;canvas.style.height=`${vp.height}px`;cancelPointer('resize');dirty=true;return vp;}
-  function tick(){if(disposed)return;const notice=activeScreen?getNotice():null,noticeKey=notice?.text?`${notice.text}|${notice.until||''}`:'';if(noticeKey!==lastNoticeKey)dirty=true;if(dirty||lastRevision!==ui.revision||activeScreen?.id==='connectionOverlay'||qa('canvas[data-loadout-preview]').some(n=>shown(n)&&n._rect?.width))return render();}
+  function tick(){if(disposed)return;if(menuScene&&['menu','lobbyScreen','loadoutPanel','settingsPanel','adminPanel'].includes(activeScreen?.id)){const now=performance.now();if(now-lastMenuFrame<32)return;lastMenuFrame=now;}const notice=activeScreen?getNotice():null,noticeKey=notice?.text?`${notice.text}|${notice.until||''}`:'';if(noticeKey!==lastNoticeKey)dirty=true;if(menuScene&&['menu','lobbyScreen','loadoutPanel','settingsPanel','adminPanel'].includes(activeScreen?.id)||dirty||lastRevision!==ui.revision||activeScreen?.id==='connectionOverlay'||qa('canvas[data-loadout-preview]').some(n=>shown(n)&&n._rect?.width))return render();}
   function ensureVisible(n){for(const s of scrolls){if(!s.node.contains?.(n))continue;const r=n._rect;if(!r?.height)continue;if(r.top<s.rect.top)s.node.scrollTop=Math.max(0,num(s.node.scrollTop)-(s.rect.top-r.top)-8);else if(r.bottom>s.rect.bottom)s.node.scrollTop=Math.min(s.max,num(s.node.scrollTop)+r.bottom-s.rect.bottom+8);dirty=true;}}
   resize();
   return {render,tick,resize,hitTest,ensureVisible,cancel:cancelPointer,get viewport(){return vp;},get hits(){return hits;},get scrollRegions(){return scrolls;},get visibleScreens(){return lastScreen?lastScreen.split('|'):[];},invalidate(){dirty=true;},destroy(){disposed=true;cancelPointer('destroy');removers.forEach(fn=>fn());if(frame)cancelAnimationFrame(frame);ctx.clearRect(0,0,canvas.width,canvas.height);}};

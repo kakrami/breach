@@ -1,53 +1,33 @@
-# Breach 2.5.0 — verification and release status
+# Breach 2.9.0 — integrated native menus
 
-This is a release candidate, not a public deployment. Update both supplied folders together: protocol 99 preserves the new road path contract.
+This package contains the game with the approved menu integrated. It is not a standalone menu demo. It has not been deployed to GitHub Pages or the production Worker.
 
-## Construction revision
+## Integration
 
-Road drawing now follows the terrain point under the pointer. Its magnetism targets existing road ends or centerlines only, and the Snap switch disables those magnets. Authored road paths receive terrain-conforming caps and joins. Draw Building uses two ground corners to create a resizable canonical `building/custom` asset, with selectable floor count; its roof, walls, openings, floors, stairs and collision compile through the same shared geometry as other buildings. Mouse and touch placement, save, publish and reopen were exercised against the client and server sanitizers. A separate construction test checks exact road coordinates, road-end snapping, building geometry and published signatures.
+- `game-menu.js` draws the landscape interface into the existing UI canvas. Its semantic widgets use the game's input ownership, keyboard, controller and touch infrastructure.
+- The adapter in `client.js` reads live game state and invokes the existing game actions and network messages. It does not create a second player, room or loadout store.
+- `menu-scene.js` uses a single offscreen WebGL renderer. Weapon and attachment previews use the actual game model builders. `menu-equipment.js` supplies the approved equipment and killstreak display models.
+- Players, match rules, maps, five loadout classes, attachment comparisons, equipment, killstreaks, settings and host controls are connected to the game.
+- Alpha and Bravo have inline bot controls and direct team switching. Rosters page at a stable row size when capacity is exceeded.
+- Attachment selection previews the model and stat changes before Equip. Changing a class or weapon clears any stale comparison.
+- Host tuning and player permissions use Apply / Cancel. Leaving with changes presents an explicit apply/discard choice. Settings use the game's real ranges, defaults and preferences; numeric settings support direct slider dragging and precise steps.
+- Portrait remains blocked throughout menus and gameplay. Match start requests fullscreen from the initiating gesture and requests landscape locking where supported. Unsupported orientation APIs retain the rotate gate.
+- Visible version, import cache keys, version.json, shared version exports and Worker package metadata are 2.9.0. Wire protocol remains 102.
 
-## Terrain and support revision
+## Verification
 
-The brush engine now integrates elapsed time at a fixed simulation step. Raise, Lower, Flatten and Smooth have a Rate control, an immediate tap application and continuous stationary holds. Flatten retains the stroke's starting height. Per-sample slope limits replace the global multiplier that could stop an entire stroke. Structures protect only their required terrain interpolation footprint, outlined in orange. Brush size is bounded by the terrain grid resolution so a small brush cannot miss all editable samples. No-op strokes report why ground did not change and do not add undo entries. Backgrounding or hiding the page cancels an active stroke.
+- Production client booted in headless Chromium without uncaught JavaScript errors.
+- Touch/mobile browser emulation confirmed fullscreen=true, landscapeReady=true and canPlay=true immediately after the real server matchReset response.
+- Actual canvas hit testing exercised bot controls, team switching, score limits, attachment preview/equip, equipment, host tuning, settings slider dragging and Apply/Cancel, unsaved-change confirmation and keyboard navigation.
+- All ten weapons and every compatible attachment preview rendered using the game models.
+- Menu layouts checked at 667×375, 844×390, 932×430 and 1440×900: no menu scroll regions or offscreen hit targets.
+- Host and guest controls, maximum bot counts, stable roster pagination, portrait blocking and return to landscape checked.
+- The Start Match control produced a complete startMatch message after input preparation.
+- The real Worker GameRoom handler accepted the generated loadout and start payloads. It preserved class/tuning choices, created the expected bot counts, handled team and God/admin changes, rejected guest start/tuning requests, and accepted live host tuning.
+- The actual Worker matchReset response was delivered to the client, which entered the match and accepted gameplay input.
+- Session-shell checks cover synchronous fullscreen requests, orientation lock ordering, denied APIs, installed app mode, guest entry, mid-match rotation, pause/resume and return to the lobby.
+- JavaScript syntax, shared client/server metadata and archive integrity checked.
 
-Shared `terrain-support.js` selects a level building base from the uphill footprint samples, blends a supported pad into surrounding terrain and generates a solid foundation extending to the lowest sampled ground. The rendered terrain triangles remain flat throughout the interior, including rotated footprints. Spawns follow a compact level pad. Grounded props follow their support surface; stairs/ramps use their low endpoint consistently in editor and runtime. Roads conform to sculpted ground without locking or flattening the entire road footprint. Steep building/prop placement, buried ramps and obstructed starts receive invalid previews.
+## Device and deployment limits
 
-Save and Publish operations are sequenced so a Publish requested during an in-progress Save is not silently discarded. A map replacement cancels the queued operation through the document epoch check.
-
-Additional checks passed: all four stationary holds in actual Chromium mouse and emulated-touch input; equal-duration strokes at 15 and 60 simulation/render schedules; independent local slope constraints; spawn height/walkability; both sculpt/place orders; rotated interior flatness and foundation stability; export/import and delete/undo collider identity; steep-placement rejection. Save/publish/reopen passed in the local server-sanitizer harness. Real game movement at a sloped building site passed doorway traversal, wall sprint collision and jumping-wall collision. Forty-eight additional sloped-site movement checks supplement the original 48 flat-ground checks.
-
-The full physical-device and all-object collision-laboratory release gates below remain open. These tests establish the listed cases, not exhaustive certification of every possible map.
-
-## Changes
-
-- Edit mode uses orbit, pan and anchored pinch/wheel zoom. Player movement is reserved for Test. Touching an object selects it; active placement/terrain tools own their gestures. Camera changes never select a different tool. Move still provides object height controls.
-- Terrain and ground paint follow the dragging finger/pointer. The runtime preview updates before release; a completed stroke produces one undo entry. Cancellation, blur, toolbar activation and a second finger discard the interrupted stroke. Two fingers then navigate. Controller sticks pan/orbit, bumpers zoom and RT holds the brush; disconnect cancels the stroke.
-- Roads are saved paths with editable points, smooth curves, midpoint bend handles, endpoint extension, width and transform. Finish commits the path once. Legacy rectangular roads can also be edited as paths. Move/Rotate preserve path coordinates. Map Check follows expanded paths.
-- Road surfaces and markings are split along the exact terrain triangles. This addresses ground protruding between mismatched surface triangles. Markings are clipped at other road footprints; curved sections share a continuous dash phase.
-- Existing shared catalog, geometry/collision, command history, canvas UI, object selection/transforms, height, undo/redo, import/export, templates, Test, save and publish remain available.
-
-## Verified for this revision
-
-- Actual headless Chromium/WebGL2 mouse and emulated-touch sessions: orbit/zoom without moving the player; live brush preview, one-command undo, interrupted-stroke cancellation; road drawing, handle reshaping, surface selection, save, publish and reopen. No page JavaScript errors occurred in successful runs.
-- Full desktop application regression: library, object placement, selection, transform gizmo/cancellation, nudge, apply, undo/redo, camera toggle, game Test movement, save, publish, reopen and close. Game movement checks exercised doorway traversal, sprinting into a wall, crouching, jumping and a projectile through the doorway.
-- 4,880 generated road triangles checked at multiple interior points on flat and uneven terrain. Their interpolated heights match the underlying canonical terrain plus the surface offset. Path shape, smoothness and width survive client/server sanitization and reopen; undo/redo, move/rotate and cancellation preserve path identity.
-- 2,489 geometry/lifecycle assertions, including 2,436 wall checks and official/custom parity fixtures; 48 movement sweeps.
-- Session regression across 34 presets, detached previews, history, import, terrain, roads, starts, mounds, generation and attached ladders.
-- 3,528 workspace layout checks and 3,804 panel/library/input checks, plus road toolbar cases, for bounds, target sizes and overlap. Pointer/controller adapter checks cover cancellation, idle-controller ownership and disconnect.
-- JavaScript syntax, dependency closure, matching client/server shared modules and version/protocol consistency.
-
-Browser save/publish tests use a local API harness with the shipped server sanitizers. They do not constitute a live authenticated production-server test. Test hooks and QA files are excluded from the two release folders.
-
-## Remaining release gates
-
-- Real Apple/Safari devices: gestures, safe areas, keyboard, graphics recovery and file import/export.
-- Physical controllers, including focus recovery and reconnect behavior.
-- Live server authentication, durable storage, publish permissions and published-map multiplayer loading.
-- Full hands-on collision laboratory course: mantle/climb, repeated slides, upper-floor impacts, seams, corners and escape attempts across every variation.
-- Performance on intended lower-end devices and large maps. Brush previews are throttled, but still rebuild the affected runtime through the existing whole-world rebuild path.
-
-These checks remain unverified; this package is not certified defect-free or production-ready. The collision laboratory remains available under Starting maps and `maps/collision-lab.breachmap.json`.
-
-## Reuse
-
-The editor continues using the game's renderer, assets and collision. Three.js r185 TransformControls is MIT licensed; see `vendor/THREE-LICENSE.txt`. Architecture and research references are in `EDITOR_ARCHITECTURE.md`.
+Automated browser checks do not replace testing on physical iOS/Android devices. Browser fullscreen/orientation support differs by platform. The production GitHub Actions pipeline, GitHub Pages deployment and live Worker connectivity were not exercised by these local checks.
