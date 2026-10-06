@@ -1,11 +1,13 @@
-import {createInfectionVisuals} from './infection-models.js?v=2.10.0';
-import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.10.0';
-import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.10.0';
-import { createNativeScreenTree } from './native-screen-tree.js?v=2.10.0';
-import { createGameMenu } from './game-menu.js?v=2.10.0';
-import { createMenuScene } from './menu-scene.js?v=2.10.0';
-import { createNativeRenderer } from './native-layout.js?v=2.10.0';
-import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.10.0';
+import {resolveWeaponRules} from './game-config.js?v=2.11.0';
+import {armoryStatRows,weaponPerformance} from './armory-stats.js?v=2.11.0';
+import {createInfectionVisuals} from './infection-models.js?v=2.11.0';
+import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.11.0';
+import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.11.0';
+import { createNativeScreenTree } from './native-screen-tree.js?v=2.11.0';
+import { createGameMenu } from './game-menu.js?v=2.11.0';
+import { createMenuScene } from './menu-scene.js?v=2.11.0';
+import { createNativeRenderer } from './native-layout.js?v=2.11.0';
+import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.11.0';
 const browserDocument = globalThis.document;
 const nativeCanvas = browserDocument.getElementById('uiCanvas');
 const document = createNativeUi({canvas:nativeCanvas,tree:createNativeScreenTree(),realElements:{game:browserDocument.getElementById('game'),gameStage:browserDocument.getElementById('game'),uiCanvas:nativeCanvas}});
@@ -13,47 +15,47 @@ const getComputedStyle = el => isWidget(el) ? nativeStyle(el) : globalThis.getCo
 // Native scene-graph construction. Text is never interpreted as markup or browser UI.
 function uiNode(type,text='',classes='',attrs={},children=[]){const node=document.createElement(type);if(classes)node.className=classes;for(const [key,value] of Object.entries(attrs)){if(value!==false&&value!==null&&value!==undefined)node.setAttribute(key,value===true?'':String(value));}if(text!==null&&text!=='')node.textContent=String(text);node.append(...children.filter(Boolean));return node;}
 const uiCopy=(title,detail='')=>[uiNode('strong',title),...(detail?[uiNode('small',detail)]:[])];
-import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.10.0';
-import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.10.0';
-import {INFECTION,INFECTION_ARMS,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability,infectionShopItems,infectionPublicState} from './infection-rules.js?v=2.10.0';
-import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.10.0';
+import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.11.0';
+import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.11.0';
+import {INFECTION,INFECTION_ARMS,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability,infectionShopItems,infectionPublicState} from './infection-rules.js?v=2.11.0';
+import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.11.0';
 let EditorScene;
-import { BUILDING_MATERIALS } from './object-catalog.js?v=2.10.0';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.10.0';
-import { createMoonSky } from './mod-environment.js?v=2.10.0';
-import * as HighlandsGeometry from './world-geometry.js?v=2.10.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=2.10.0';
-import * as YardGeometry from './world-geometry-yard.js?v=2.10.0';
-import * as MoonGeometry from './world-geometry-moon.js?v=2.10.0';
-import * as MoonWorldCollision from './world-collision-moon.js?v=2.10.0';
-import * as RigGeometry from './world-geometry-rig.js?v=2.10.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=2.10.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=2.10.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=2.10.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=2.10.0';
+import { BUILDING_MATERIALS } from './object-catalog.js?v=2.11.0';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.11.0';
+import { createMoonSky } from './mod-environment.js?v=2.11.0';
+import * as HighlandsGeometry from './world-geometry.js?v=2.11.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=2.11.0';
+import * as YardGeometry from './world-geometry-yard.js?v=2.11.0';
+import * as MoonGeometry from './world-geometry-moon.js?v=2.11.0';
+import * as MoonWorldCollision from './world-collision-moon.js?v=2.11.0';
+import * as RigGeometry from './world-geometry-rig.js?v=2.11.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=2.11.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=2.11.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=2.11.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=2.11.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=2.10.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.10.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=2.10.0';
-import { createAudioEngine } from './audio-engine.js?v=2.10.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.10.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.10.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.10.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.10.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.10.0';
-import { createControllerRecording } from './controller-recording.js?v=2.10.0';
-import { createPointerSessions } from './pointer-sessions.js?v=2.10.0';
-import { createSafeStorage } from './browser-storage.js?v=2.10.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=2.10.0';
-import { createUiFocusScope } from './ui-focus.js?v=2.10.0';
-import { createUiGestures } from './ui-gestures.js?v=2.10.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.10.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.10.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.10.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.10.0';
+} from './game-config.js?v=2.11.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.11.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=2.11.0';
+import { createAudioEngine } from './audio-engine.js?v=2.11.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.11.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.11.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.11.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.11.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.11.0';
+import { createControllerRecording } from './controller-recording.js?v=2.11.0';
+import { createPointerSessions } from './pointer-sessions.js?v=2.11.0';
+import { createSafeStorage } from './browser-storage.js?v=2.11.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=2.11.0';
+import { createUiFocusScope } from './ui-focus.js?v=2.11.0';
+import { createUiGestures } from './ui-gestures.js?v=2.11.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.11.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.11.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.11.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.11.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -444,44 +446,25 @@ function renderLoadoutChoiceGrids(){
   }
 }
 renderLoadoutChoiceGrids();
-const loadoutFocusSlot={lobby:'primary',match:'primary'},loadoutWorkspaceMode={lobby:'classes',match:'classes'},loadoutPreviewDesired=new Map(),loadoutPreviewContexts=new Map(),loadoutAttachmentSlot={'lobby-primary':'','lobby-secondary':'','match-primary':'','match-secondary':''},loadoutAttachmentTrayOpen=new Set(),loadoutAttachmentCompareBase=new Map(),loadoutPreviewAdsKeys=new Set(),loadoutWeaponPickerOpen=new Set(),loadoutHintTimers=new Map();
+const loadoutFocusSlot={lobby:'primary',match:'primary'},loadoutWorkspaceMode={lobby:'classes',match:'classes'},loadoutPreviewDesired=new Map(),loadoutPreviewContexts=new Map(),loadoutAttachmentSlot={'lobby-primary':'','lobby-secondary':'','match-primary':'','match-secondary':''},loadoutAttachmentTrayOpen=new Set(),loadoutPreviewAdsKeys=new Set(),loadoutWeaponPickerOpen=new Set(),loadoutHintTimers=new Map();
 function flashLoadoutInputHint(surface,duration=1900){const workspace=document.querySelector(`[data-loadout-workspace="${surface}"]`);if(!workspace||loadoutWorkspaceMode[surface]!=='item'||!['primary','secondary'].includes(loadoutFocusSlot[surface]))return;clearTimeout(loadoutHintTimers.get(surface)||0);workspace.classList.add('show-input-hint');loadoutHintTimers.set(surface,setTimeout(()=>{workspace.classList.remove('show-input-hint');loadoutHintTimers.delete(surface);},duration));}
 function loadoutSlotWeapon(draft,slot){return slot==='primary'?draft.primaryWeapon:draft.secondaryWeapon;}
 function loadoutSlotAttachments(draft,slot){return slot==='primary'?draft.primaryAttachments:draft.secondaryAttachments;}
 function loadoutDraftForSurface(surface){return normalizeLoadoutChoice(surface==='lobby'?(lobbyLoadoutDraft||selectedLoadout()):(loadoutDraft||loadoutBaseDraft||pendingLoadout||selectedLoadout()));}
-function loadoutMetricClamp(v){return Math.max(0,Math.min(100,Number(v)||0));}
-function loadoutAccuracyControlAdjustment(weapon,accuracy){if(!accuracy)return 0;const base=resolveWeaponAccuracy(weapon,{}),fields=[['hipDeg',.26],['adsDeg',.22],['moveDeg',.18],['airborneDeg',.10],['slideDeg',.08],['fireDeg',.08],['fireMaxDeg',.08]];let ratio=0,weight=0;for(const [key,w] of fields){const a=Number(accuracy[key]),b=Number(base[key]);if(!Number.isFinite(a)||!Number.isFinite(b)||b<=0)continue;ratio+=(a/b)*w;weight+=w;}if(!weight)return 0;return Math.max(-18,Math.min(18,(1-ratio/weight)*40));}
-function loadoutControlScore(spec,accuracy=null,pelletWeapon=false,weapon='',attachments={}){if(pelletWeapon&&accuracy){return loadoutMetricClamp(100-(Number(accuracy.hipDeg)||0)*9.5-(Number(accuracy.fireDeg)||0)*7);}const initial=Math.max(.001,Number(spec.recoilPitch)||0)+Math.max(0,Number(spec.recoilYaw)||0)*1.35,sustained=Math.max(.001,Number(spec.recoilMaxPitch)||Number(spec.recoilPitch)||0)+Math.max(0,Number(spec.recoilMaxYaw)||Number(spec.recoilYaw)||0)*1.35,initialScore=loadoutMetricClamp(106-initial*2350),sustainedScore=loadoutMetricClamp(106-sustained*400),recoveryScore=loadoutMetricClamp(((Number(spec.recoilRecovery)||8)-6)/12*100);let score=initialScore*.40+sustainedScore*.50+recoveryScore*.10+loadoutAccuracyControlAdjustment(weapon,accuracy);if(weapon==='machineGun'&&weaponHasAttachment(weapon,attachments,'bipod'))score+=(1-Math.max(.45,Math.min(1,Number(ATTACHMENTS.bipod?.conditionalRecoilScale)||.62)))*16;return loadoutMetricClamp(score);}
-function loadoutMobilityScore(spec){const adsMove=Math.max(.5,Math.min(1.25,Number(spec.adsMoveSpeedScale)||1)),sprint=Math.max(80,Math.min(350,Number(spec.sprintOutMs)||180));return loadoutMetricClamp(adsMove*72+(1-(sprint-80)/270)*28);}
-function loadoutHandlingScore(spec){const ads=Math.max(0,Math.min(420,Number(spec.adsInMs)||0)),reload=Math.max(500,Math.min(4000,Number(spec.reloadMs)||1500));return loadoutMetricClamp((1-ads/420)*68+(1-(reload-500)/3500)*32);}
-function loadoutWeaponStats(weapon,attachments,comparisonAttachments={}){
-  const spec=resolveWeaponSpec(weapon,attachments),compare=resolveWeaponSpec(weapon,comparisonAttachments),pellets=Math.max(1,Number(spec.pellets)||1),accuracy=resolveWeaponAccuracy(weapon,attachments),compareAccuracy=resolveWeaponAccuracy(weapon,comparisonAttachments),pelletWeapon=pellets>1;
-  return[
-    {label:'DAMAGE',value:pellets>1?`${Math.round(spec.damage)}×${pellets}`:`${Math.round(spec.damage)}`,score:loadoutMetricClamp((Number(spec.damage)||0)*(pellets>1?2.1:1.65)),baseScore:loadoutMetricClamp((Number(compare.damage)||0)*(pellets>1?2.1:1.65))},
-    {label:'RANGE',value:`${Math.round(spec.falloffEnd||0)}M`,score:loadoutMetricClamp((Number(spec.falloffEnd)||0)/2.2),baseScore:loadoutMetricClamp((Number(compare.falloffEnd)||0)/2.2)},
-    {label:'CONTROL',value:`${Math.round(loadoutControlScore(spec,accuracy,pelletWeapon,weapon,attachments))}`,score:loadoutControlScore(spec,accuracy,pelletWeapon,weapon,attachments),baseScore:loadoutControlScore(compare,compareAccuracy,pelletWeapon,weapon,comparisonAttachments)},
-    {label:'MOBILITY',value:`${Math.round((Number(spec.adsMoveSpeedScale)||1)*100)}%`,score:loadoutMobilityScore(spec),baseScore:loadoutMobilityScore(compare)},
-    {label:'HANDLING',value:`${Math.round(loadoutHandlingScore(spec))}`,score:loadoutHandlingScore(spec),baseScore:loadoutHandlingScore(compare)},
-    {label:'CAPACITY',value:`${Math.round(spec.mag||0)}`,score:loadoutMetricClamp(Number(spec.mag)||0),baseScore:loadoutMetricClamp(Number(compare.mag)||0)},
-  ];
-}
-function activeLoadoutAttachmentSlot(surface,weaponSlot,weapon){const key=`${surface}-${weaponSlot}`,available=ATTACHMENT_SLOTS.filter(slot=>attachmentOptionsForWeapon(weapon,slot).length),selected=loadoutAttachmentSlot[key];if(!available.includes(selected)){loadoutAttachmentSlot[key]='';loadoutAttachmentTrayOpen.delete(key);loadoutAttachmentCompareBase.delete(key);return'';}return selected;}
-function setLoadoutAttachmentComparisonBase(surface,weaponSlot,weapon,slot,attachments){const key=`${surface}-${weaponSlot}`;loadoutAttachmentCompareBase.set(key,{weapon,slot,attachments:normalizeWeaponAttachments(weapon,attachments)});}
-function clearLoadoutAttachmentComparisonBase(key){loadoutAttachmentCompareBase.delete(key);}
-function loadoutComparisonAttachments(surface,weaponSlot,weapon,attachments){const key=`${surface}-${weaponSlot}`,current=normalizeWeaponAttachments(weapon,attachments);if(!loadoutAttachmentTrayOpen.has(key))return current;const activeSlot=activeLoadoutAttachmentSlot(surface,weaponSlot,weapon),saved=loadoutAttachmentCompareBase.get(key);if(saved&&saved.weapon===weapon&&saved.slot===activeSlot)return normalizeWeaponAttachments(weapon,saved.attachments);return current;}
+function loadoutWeaponStats(weapon,attachments){return armoryStatRows(weapon,attachments,lobbyHostTuningDraft||worldSettings);}
+function activeLoadoutAttachmentSlot(surface,weaponSlot,weapon){const key=`${surface}-${weaponSlot}`,available=ATTACHMENT_SLOTS.filter(slot=>attachmentOptionsForWeapon(weapon,slot).length),selected=loadoutAttachmentSlot[key];if(!available.includes(selected)){loadoutAttachmentSlot[key]='';loadoutAttachmentTrayOpen.delete(key);return'';}return selected;}
 function renderLoadoutStats(surface,slot,weapon,attachments){
-  const host=document.querySelector(`[data-loadout-stats="${surface}-${slot}"]`);if(!host)return;host.replaceChildren();const comparison=loadoutComparisonAttachments(surface,slot,weapon,attachments);
-  for(const row of loadoutWeaponStats(weapon,attachments,comparison)){
-    const target=loadoutMetricClamp(row.score),baseline=loadoutMetricClamp(row.baseScore),delta=target-baseline,card=document.createElement('div');card.className='loadout-stat';if(delta>1.2)card.classList.add('better');else if(delta<-1.2)card.classList.add('worse');
-    const head=document.createElement('div');head.className='loadout-stat-head';const label=document.createElement('span');label.textContent=row.label;const value=document.createElement('strong');value.textContent=row.value;head.append(label,value);
-    const changed=Math.abs(delta)>1.2,change=document.createElement('div');change.className='loadout-stat-delta';change.textContent=changed?`${delta>0?'▲':'▼'} ${Math.abs(Math.round(delta))}`:'';change.setAttribute('aria-hidden','true');
-    const bar=document.createElement('div');bar.className='loadout-stat-bar';bar.setAttribute('aria-label',changed?`${row.label}: ${Math.round(baseline)} to ${Math.round(target)}`:`${row.label}: ${Math.round(target)}`);
-    const solid=document.createElement('i');solid.className='loadout-stat-bar-solid';solid.style.width=`${Math.max(3,Math.min(target,baseline))}%`;bar.append(solid);
-    if(changed){const hatch=document.createElement('b');hatch.className=`loadout-stat-bar-hatch ${delta>0?'gain':'loss'}`;hatch.style.left=`${Math.min(target,baseline)}%`;hatch.style.width=`${Math.abs(delta)}%`;bar.append(hatch);}
-    if(changed){const baselineMark=document.createElement('em');baselineMark.className='loadout-stat-baseline-mark';baselineMark.style.left=`${baseline}%`;bar.append(baselineMark);}
-    card.append(head,change,bar);host.append(card);
+  const host=document.querySelector(`[data-loadout-stats="${surface}-${slot}"]`);if(!host)return;host.replaceChildren();
+  for(const row of loadoutWeaponStats(weapon,attachments)){
+    const card=document.createElement('div');card.className='loadout-stat';
+    const head=document.createElement('div');head.className='loadout-stat-head';head.append(uiNode('span',row.label),uiNode('strong',row.display));
+    const bar=document.createElement('div');bar.className='loadout-stat-bar';
+    const solid=document.createElement('i');solid.className='loadout-stat-bar-solid';solid.style.width=`${row.solid*100}%`;bar.append(solid);
+    if(row.changed){const delta=document.createElement('b');delta.className=`loadout-stat-bar-hatch ${row.better?'gain':'loss'}`;delta.style.left=`${row.changeStart*100}%`;delta.style.width=`${row.changeWidth*100}%`;bar.append(delta);}
+    const marker=document.createElement('em');marker.className='loadout-stat-baseline-mark';marker.style.left=`${row.factoryScore*100}%`;bar.append(marker);card.append(head,bar);host.append(card);
   }
 }
+
 function modifierTag(label,mult,{lowerBetter=false}={}){const n=Number(mult);if(!Number.isFinite(n)||Math.abs(n-1)<.005)return null;const pct=Math.round(Math.abs(n-1)*100),up=n>1,good=lowerBetter?!up:up;return{text:`${label} ${up?'+':'-'}${pct}%`,good};}
 function attachmentEffectTags(item,weapon){if(!item)return[];const tags=[],mods=attachmentModsForWeapon(item,weapon),accuracyMods=attachmentAccuracyModsForWeapon(item,weapon),adsMoveAdd=attachmentAdsMoveAddForWeapon(item,weapon),push=x=>{if(x&&tags.length<8)tags.push(x);};push(modifierTag('DAMAGE',mods.damage));push(modifierTag('VELOCITY',mods.bulletSpeed));push(modifierTag('RANGE',mods.falloffEnd));const recoilVals=[mods.recoilPitch,mods.recoilYaw].map(Number).filter(Number.isFinite);if(recoilVals.length){const avg=recoilVals.reduce((a,b)=>a+b,0)/recoilVals.length;push(modifierTag('RECOIL',avg,{lowerBetter:true}));}push(modifierTag('ADS TIME',mods.adsInMs,{lowerBetter:true}));push(modifierTag('SPRINT-OUT',mods.sprintOutMs,{lowerBetter:true}));push(modifierTag('RELOAD',mods.reloadMs,{lowerBetter:true}));if(adsMoveAdd)push({text:`ADS MOVE ${adsMoveAdd>0?'+':''}${Math.round(adsMoveAdd*100)}%`,good:adsMoveAdd>0});if(item.magAdd?.[weapon]){const add=Number(item.magAdd[weapon])||0,base=Math.max(0,Number(WEAPON_SPECS[weapon]?.mag)||0),next=Math.max(0,base+add);push({text:`MAG ${base}→${next}`,good:add>0});}if(accuracyMods){const fields=[['HIP SPREAD',accuracyMods.hipDeg],['ADS SPREAD',accuracyMods.adsDeg],['MOVE SPREAD',accuracyMods.moveDeg],['AIR SPREAD',accuracyMods.airborneDeg],['SLIDE SPREAD',accuracyMods.slideDeg],['FIRE SPREAD',accuracyMods.fireDeg],['MAX FIRE SPREAD',accuracyMods.fireMaxDeg]].filter(([,value])=>Number.isFinite(Number(value))&&Math.abs(Number(value)-1)>=.005),vals=fields.map(([,value])=>Number(value));if(vals.length){const same=vals.every(value=>Math.abs(value-vals[0])<.005);if(same)push(modifierTag('SPREAD',vals[0],{lowerBetter:true}));else for(const [label,value] of fields)push(modifierTag(label,value,{lowerBetter:true}));}}if(item.soundScale&&item.soundScale<1)push({text:'QUIETER / OFF RADAR',good:true});if(item.conditionalRecoilScale)push({text:`CROUCHED RECOIL -${Math.round((1-item.conditionalRecoilScale)*100)}%`,good:true});if(item.zoomLabel)push({text:`${item.zoomLabel} ZOOM`,good:true});else if(item.adsFov)push({text:`OPTIC ${Math.round(item.adsFov)} FOV`,good:true});if(item.thermalMode)push({text:'THERMAL',good:true});return tags;}
 function attachmentDescriptionForWeapon(item,weapon){if(!item)return'';return attachmentEffectTags(item,weapon).map(tag=>tag.text).join(' · ');}
@@ -503,10 +486,10 @@ function setLoadoutWorkspaceMode(surface,mode='classes',{item=loadoutFocusSlot[s
 function setLoadoutAdsPreview(key,active){if(active)loadoutPreviewAdsKeys.add(key);else loadoutPreviewAdsKeys.delete(key);document.querySelector(`[data-loadout-ads-preview="${key}"]`)?.classList.toggle('active',!!active);const ctx=loadoutPreviewContexts.get(key);if(ctx)ctx.adsPreview=!!active;}
 function bindLoadoutWorkspaceTabs(){
   for(const nameButton of document.querySelectorAll('[data-loadout-class-name-edit]')){const surface=nameButton.dataset.loadoutClassNameEdit;nameButton.dataset.controllerKey=`class-name:${surface}`;nameButton.dataset.textMode='class';nameButton.dataset.maxlength='18';nameButton.dataset.placeholder='CLASS NAME';nameButton.addEventListener('click',()=>{const classes=loadoutClassesForSurface(surface),item=loadoutClassById(classes,loadoutEditClass[surface],selectedLoadout());nameButton.value=item.name;openGameTextEditor(nameButton);});nameButton.addEventListener('change',()=>renameLoadoutClass(surface,loadoutEditClass[surface],nameButton.value));}
-  for(const button of document.querySelectorAll('[data-loadout-edit-item]')){button.dataset.controllerKey=`class-item:${button.dataset.loadoutEditItem}`;button.addEventListener('click',()=>{const [surface,item]=String(button.dataset.loadoutEditItem||'').split('-');loadoutAttachmentTrayOpen.delete(`${surface}-${item}`);clearLoadoutAttachmentComparisonBase(`${surface}-${item}`);loadoutWeaponPickerOpen.delete(`${surface}-${item}`);setLoadoutWorkspaceMode(surface,'item',{item});if(item==='primary'||item==='secondary'){renderAttachmentEditor(surface,item,loadoutDraftForSurface(surface));const weapon=loadoutSlotWeapon(loadoutDraftForSurface(surface),item),first=ATTACHMENT_SLOTS.find(slot=>attachmentOptionsForWeapon(weapon,slot).length);if(first)queueControllerUiFocus(`gunsmith:${surface}-${item}:slot:${first}`);else queueControllerUiFocus(`weapon-toggle:${surface}-${item}`);}else queueControllerUiFocus(`loadout:${surface}:${item}:${loadoutDraftForSurface(surface)[item]}`);});}
+  for(const button of document.querySelectorAll('[data-loadout-edit-item]')){button.dataset.controllerKey=`class-item:${button.dataset.loadoutEditItem}`;button.addEventListener('click',()=>{const [surface,item]=String(button.dataset.loadoutEditItem||'').split('-');loadoutAttachmentTrayOpen.delete(`${surface}-${item}`);loadoutWeaponPickerOpen.delete(`${surface}-${item}`);setLoadoutWorkspaceMode(surface,'item',{item});if(item==='primary'||item==='secondary'){renderAttachmentEditor(surface,item,loadoutDraftForSurface(surface));const weapon=loadoutSlotWeapon(loadoutDraftForSurface(surface),item),first=ATTACHMENT_SLOTS.find(slot=>attachmentOptionsForWeapon(weapon,slot).length);if(first)queueControllerUiFocus(`gunsmith:${surface}-${item}:slot:${first}`);else queueControllerUiFocus(`weapon-toggle:${surface}-${item}`);}else queueControllerUiFocus(`loadout:${surface}:${item}:${loadoutDraftForSurface(surface)[item]}`);});}
   for(const button of document.querySelectorAll('[data-loadout-back-class]')){button.dataset.controllerKey=`back-class:${button.dataset.loadoutBackClass}`;button.addEventListener('click',()=>{const surface=button.dataset.loadoutBackClass,setItem=loadoutFocusSlot[surface]||'primary';setLoadoutWorkspaceMode(surface,'class',{ensurePreview:false});queueControllerUiFocus(`class-item:${surface}-${setItem}`);});}
   for(const button of document.querySelectorAll('[data-loadout-back-classes]')){button.dataset.controllerKey=`back-classes:${button.dataset.loadoutBackClasses}`;button.addEventListener('click',()=>{const surface=button.dataset.loadoutBackClasses;setLoadoutWorkspaceMode(surface,'classes',{ensurePreview:false});queueControllerUiFocus(`class:${surface}:${normalizeLoadoutClassId(loadoutEditClass[surface]||activeClassId)}:main`);});}
-  for(const button of document.querySelectorAll('[data-loadout-weapon-picker-toggle]')){const stableKey=button.dataset.loadoutWeaponPickerToggle;button.dataset.controllerKey=`weapon-toggle:${stableKey}`;button.addEventListener('click',()=>{const key=button.dataset.loadoutWeaponPickerToggle,[surface,slot]=key.split('-');if(loadoutWeaponPickerOpen.has(key)){loadoutWeaponPickerOpen.delete(key);renderAttachmentEditor(surface,slot,loadoutDraftForSurface(surface));queueControllerUiFocus(`weapon-toggle:${key}`);}else{loadoutWeaponPickerOpen.add(key);loadoutAttachmentTrayOpen.delete(key);clearLoadoutAttachmentComparisonBase(key);renderAttachmentEditor(surface,slot,loadoutDraftForSurface(surface));queueControllerUiFocus(`loadout:${surface}:${slot}:${loadoutSlotWeapon(loadoutDraftForSurface(surface),slot)}`);}renderLoadoutStats(surface,slot,loadoutSlotWeapon(loadoutDraftForSurface(surface),slot),loadoutSlotAttachments(loadoutDraftForSurface(surface),slot));});}
+  for(const button of document.querySelectorAll('[data-loadout-weapon-picker-toggle]')){const stableKey=button.dataset.loadoutWeaponPickerToggle;button.dataset.controllerKey=`weapon-toggle:${stableKey}`;button.addEventListener('click',()=>{const key=button.dataset.loadoutWeaponPickerToggle,[surface,slot]=key.split('-');if(loadoutWeaponPickerOpen.has(key)){loadoutWeaponPickerOpen.delete(key);renderAttachmentEditor(surface,slot,loadoutDraftForSurface(surface));queueControllerUiFocus(`weapon-toggle:${key}`);}else{loadoutWeaponPickerOpen.add(key);loadoutAttachmentTrayOpen.delete(key);renderAttachmentEditor(surface,slot,loadoutDraftForSurface(surface));queueControllerUiFocus(`loadout:${surface}:${slot}:${loadoutSlotWeapon(loadoutDraftForSurface(surface),slot)}`);}renderLoadoutStats(surface,slot,loadoutSlotWeapon(loadoutDraftForSurface(surface),slot),loadoutSlotAttachments(loadoutDraftForSurface(surface),slot));});}
   for(const button of document.querySelectorAll('[data-loadout-ads-preview]')){
     const key=button.dataset.loadoutAdsPreview;
     uiGestures.bind(button,{start:()=>setLoadoutAdsPreview(key,true),finish:()=>setLoadoutAdsPreview(key,false),cancel:()=>setLoadoutAdsPreview(key,false)});
@@ -517,11 +500,11 @@ function bindLoadoutWorkspaceTabs(){
   }
 }
 function applyLoadoutAttachmentChoice(surface,weaponSlot,slot,id){const live=loadoutDraftForSurface(surface),key=weaponSlot==='primary'?'primaryAttachments':'secondaryAttachments',next={...loadoutSlotAttachments(live,weaponSlot),[slot]:id};if(surface==='lobby'){setLobbyLoadoutDraft({[key]:next});renderAttachmentEditors('lobby',lobbyLoadoutDraft||loadoutDraftForSurface('lobby'));}else{loadoutDraft=normalizeLoadoutChoice({...live,[key]:next});syncMatchLoadoutEditor();commitMatchLoadoutChange();}}
-function renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups){const key=`${surface}-${weaponSlot}`,host=document.querySelector(`[data-gunsmith-callouts="${key}"]`);if(!host)return;host.replaceChildren();const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('gunsmith-callout-lines');svg.setAttribute('aria-hidden','true');host.append(svg);for(const [slot] of groups){const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.dataset.calloutLine=slot;const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.dataset.calloutDot=slot;dot.setAttribute('r','2.8');svg.append(line,dot);const b=document.createElement('button');b.type='button';b.className=`gunsmith-callout gunsmith-callout-${slot}`;b.dataset.calloutSlot=slot;b.dataset.controllerKey=`gunsmith:${key}:slot:${slot}`;const label=document.createElement('span');label.textContent=slot.toUpperCase();const id=current?.[slot]||'',item=id?ATTACHMENTS[id]:null,value=document.createElement('strong');value.textContent=item?.short||item?.name||'NONE';b.append(label,value);b.classList.toggle('active',loadoutAttachmentTrayOpen.has(key)&&loadoutAttachmentSlot[key]===slot);b.classList.toggle('equipped',!!item);b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();loadoutWeaponPickerOpen.delete(key);if(!loadoutAttachmentTrayOpen.has(key)||loadoutAttachmentSlot[key]!==slot)setLoadoutAttachmentComparisonBase(surface,weaponSlot,weapon,slot,current);loadoutAttachmentSlot[key]=slot;loadoutAttachmentTrayOpen.add(key);renderAttachmentEditor(surface,weaponSlot,loadoutDraftForSurface(surface));renderLoadoutStats(surface,weaponSlot,weapon,loadoutSlotAttachments(loadoutDraftForSurface(surface),weaponSlot));const selected=current?.[slot]||'';queueControllerUiFocus(`attachment:${key}:${slot}:${selected||'none'}`);});host.append(b);} }
+function renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups){const key=`${surface}-${weaponSlot}`,host=document.querySelector(`[data-gunsmith-callouts="${key}"]`);if(!host)return;host.replaceChildren();const svg=document.createElementNS('http://www.w3.org/2000/svg','svg');svg.classList.add('gunsmith-callout-lines');svg.setAttribute('aria-hidden','true');host.append(svg);for(const [slot] of groups){const line=document.createElementNS('http://www.w3.org/2000/svg','line');line.dataset.calloutLine=slot;const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');dot.dataset.calloutDot=slot;dot.setAttribute('r','2.8');svg.append(line,dot);const b=document.createElement('button');b.type='button';b.className=`gunsmith-callout gunsmith-callout-${slot}`;b.dataset.calloutSlot=slot;b.dataset.controllerKey=`gunsmith:${key}:slot:${slot}`;const label=document.createElement('span');label.textContent=slot.toUpperCase();const id=current?.[slot]||'',item=id?ATTACHMENTS[id]:null,value=document.createElement('strong');value.textContent=item?.short||item?.name||'NONE';b.append(label,value);b.classList.toggle('active',loadoutAttachmentTrayOpen.has(key)&&loadoutAttachmentSlot[key]===slot);b.classList.toggle('equipped',!!item);b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();loadoutWeaponPickerOpen.delete(key);if(!loadoutAttachmentTrayOpen.has(key)||loadoutAttachmentSlot[key]!==slot)loadoutAttachmentSlot[key]=slot;loadoutAttachmentTrayOpen.add(key);renderAttachmentEditor(surface,weaponSlot,loadoutDraftForSurface(surface));renderLoadoutStats(surface,weaponSlot,weapon,loadoutSlotAttachments(loadoutDraftForSurface(surface),weaponSlot));const selected=current?.[slot]||'';queueControllerUiFocus(`attachment:${key}:${slot}:${selected||'none'}`);});host.append(b);} }
 function renderAttachmentEditor(surface,weaponSlot,draft){
   const host=document.querySelector(`[data-attachment-editor="${surface}-${weaponSlot}"]`);if(!host)return;const key=`${surface}-${weaponSlot}`,weapon=loadoutSlotWeapon(draft,weaponSlot),current=loadoutSlotAttachments(draft,weaponSlot),groups=ATTACHMENT_SLOTS.map(slot=>[slot,attachmentOptionsForWeapon(weapon,slot)]).filter(([,items])=>items.length),picker=document.querySelector(`[data-gunsmith-weapon-picker="${key}"]`),weaponPicker=loadoutWeaponPickerOpen.has(key),layout=host.closest('.gunsmith-layout');if(layout){layout.classList.toggle('picker-open',weaponPicker);layout.classList.remove('tray-open');}if(picker)picker.hidden=!weaponPicker;host.hidden=weaponPicker;renderGunsmithCallouts(surface,weaponSlot,weapon,current,groups);if(weaponPicker)return;host.replaceChildren();host.classList.toggle('empty',groups.length===0);if(!groups.length){const empty=document.createElement('div');empty.className='gunsmith-inspector-empty';empty.append(uiNode('strong','NO ATTACHMENTS'));host.append(empty);return;}
   const activeSlot=activeLoadoutAttachmentSlot(surface,weaponSlot,weapon),activeItems=activeSlot?(groups.find(([slot])=>slot===activeSlot)?.[1]||[]):[],trayOpen=!!activeSlot&&loadoutAttachmentTrayOpen.has(key);layout?.classList.toggle('tray-open',trayOpen);if(!trayOpen)return;
-  const selectedId=current?.[activeSlot]||'',selectedItem=selectedId?ATTACHMENTS[selectedId]:null,head=document.createElement('header');head.className='gunsmith-attachment-head';const title=document.createElement('div'),strong=document.createElement('strong');strong.textContent=activeSlot.toUpperCase();title.append(strong);const close=document.createElement('button');close.type='button';close.className='gunsmith-tray-close';close.textContent='×';close.setAttribute('aria-label','Close attachment options');close.dataset.controllerKey=`attachment:${key}:close`;close.addEventListener('click',()=>{const slot=loadoutAttachmentSlot[key];loadoutAttachmentTrayOpen.delete(key);clearLoadoutAttachmentComparisonBase(key);loadoutAttachmentSlot[key]='';renderAttachmentEditor(surface,weaponSlot,loadoutDraftForSurface(surface));renderLoadoutStats(surface,weaponSlot,weapon,loadoutSlotAttachments(loadoutDraftForSurface(surface),weaponSlot));queueControllerUiFocus(`gunsmith:${key}:slot:${slot}`);});head.append(title,close);
+  const selectedId=current?.[activeSlot]||'',selectedItem=selectedId?ATTACHMENTS[selectedId]:null,head=document.createElement('header');head.className='gunsmith-attachment-head';const title=document.createElement('div'),strong=document.createElement('strong');strong.textContent=activeSlot.toUpperCase();title.append(strong);const close=document.createElement('button');close.type='button';close.className='gunsmith-tray-close';close.textContent='×';close.setAttribute('aria-label','Close attachment options');close.dataset.controllerKey=`attachment:${key}:close`;close.addEventListener('click',()=>{const slot=loadoutAttachmentSlot[key];loadoutAttachmentTrayOpen.delete(key);loadoutAttachmentSlot[key]='';renderAttachmentEditor(surface,weaponSlot,loadoutDraftForSurface(surface));renderLoadoutStats(surface,weaponSlot,weapon,loadoutSlotAttachments(loadoutDraftForSurface(surface),weaponSlot));queueControllerUiFocus(`gunsmith:${key}:slot:${slot}`);});head.append(title,close);
   const options=document.createElement('div');options.className='gunsmith-attachment-options';for(const item of [null,...activeItems]){const id=item?.id||'',b=document.createElement('button');b.type='button';b.className='gunsmith-attachment-option';b.dataset.controllerKey=`attachment:${key}:${activeSlot}:${id||'none'}`;b.classList.toggle('active',(current?.[activeSlot]||'')===id);const name=document.createElement('strong');name.textContent=item?.name||'NONE';const detailText=item?attachmentDescriptionForWeapon(item,weapon):'';b.append(name);if(detailText){const detail=document.createElement('small');detail.textContent=detailText;b.append(detail);}b.addEventListener('click',()=>{applyLoadoutAttachmentChoice(surface,weaponSlot,activeSlot,id);queueControllerUiFocus(`attachment:${key}:${activeSlot}:${id||'none'}`);});options.append(b);}host.append(head,options);
 }
 function renderAttachmentEditors(surface,draft){syncLoadoutFocusedView(surface,draft);renderAttachmentEditor(surface,'primary',draft);renderAttachmentEditor(surface,'secondary',draft);}
@@ -1043,7 +1026,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.10.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.11.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1051,7 +1034,7 @@ async function ensureThreeEngine(){
   if(engineLoadPromise)return engineLoadPromise;
   engineLoadPromise=(async()=>{
     try{
-      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.10.0')).EditorScene;
+      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.11.0')).EditorScene;
       if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
       THREE=mod;
       position=new THREE.Vector3(0,0,0);
@@ -1098,7 +1081,7 @@ function createIntegratedMenuAdapter(){
   ].map(([id,label,unit,decimals])=>({id,label,unit,decimals})):[['Damage','Damage','',0],['Speed','Projectile speed',' m/s',0],['Reload','Reload time',' s',2],['Cooldown','Fire rate',' RPM',0],['Recoil','Recoil','%',0]].map(([suffix,label,unit,decimals])=>({id:'set'+weapon[0].toUpperCase()+weapon.slice(1)+suffix,label,unit,decimals}));
   return {
     snapshot(){const surface=shell.inLobby?'lobby':'match',classes=loadoutClassesForSurface(surface),id=loadoutEditClass[surface]||activeClassId,item=loadoutClassById(classes,id,selectedLoadout()),rules=lobbyMatchDraft||committedLobbyMatchDraft(),map=lobbyMapDraft||currentMapId;return {
-      inputMode:activeInputMode,name:myName||nameInput.value||'Operator',code:codeInput.value,status:menuStatus.textContent,room:currentRoom,host:isMatchAdmin,inLobby:shell.inLobby,mode:lobbyDisplayMode(),rules,map,mapName:displayMapSpec(map).name,team:myTeam,roster:adminPlayerSnapshot().map(p=>({...p,owner:p.id===matchOwnerId})),spawnProblem:infectionStartProblem,canStart:isMatchAdmin&&!$('lobbyStartBtn').disabled,
+      inputMode:activeInputMode,name:myName||nameInput.value||'Operator',code:codeInput.value,status:menuStatus.textContent,room:currentRoom,host:isMatchAdmin,inLobby:shell.inLobby,mode:lobbyDisplayMode(),rules,map,mapName:displayMapSpec(map).name,team:myTeam,roster:adminPlayerSnapshot().map(p=>({...p,owner:p.id===matchOwnerId})),rolesAssigned:!shell.inLobby,spawnProblem:infectionStartProblem,canStart:isMatchAdmin&&!$('lobbyStartBtn').disabled,
       classes,classId:id,className:item.name,startClass:shell.inLobby?currentLobbyStartingClassId():pendingClassId||activeClassId,loadout:loadoutDraftForSurface(surface),streaks:shell.inLobby?stableKillstreakDraft():outsideStreakDraft||[...killstreakSelection],streakLocked:shell.inMatch||lobbyKillstreakSyncPending,
       settings:{...(playerSettingsDraft||playerSettings),mute:playerMutedDraft??masterMuted},recording:diagnosticsRecordingEnabled(),diagnosticsStatus:$('diagnosticsStatus')?.textContent,
       rosterOnly:adminRosterOnly,canSwitchTeam:currentModeSpec().teamBased&&!currentModeSpec().cooperative&&currentGameMode()!=='infection',teamSwitchLabel:pendingTeam?'Queued for '+teamLabel(pendingTeam):teamLabel(myTeam)+' → '+teamLabel(otherTeam(myTeam)),adminTab:activeAdminTab,maps:mapLibraryMine,mapsLoading:mapLibraryLoading,selectedMap:selectedLibraryMap?.id,custom:!!lobbyHostTuningDraft||matchCustom};},
@@ -1114,7 +1097,8 @@ function createIntegratedMenuAdapter(){
     weaponAttachments,
     equip(next){const {id,loadout}=editContext(),patch={...next};for(const slot of ['primary','secondary']){saveSetup(id,slot,loadout[slot+'Weapon'],loadout[slot+'Attachments']);if(patch[slot+'Weapon']&&!Object.prototype.hasOwnProperty.call(patch,slot+'Attachments'))patch[slot+'Attachments']=weaponAttachments(patch[slot+'Weapon'],slot);const weapon=patch[slot+'Weapon']||loadout[slot+'Weapon'];saveSetup(id,slot,weapon,patch[slot+'Attachments']||loadout[slot+'Attachments']);}try{localStorage.setItem('breach.weaponSetups.v1',JSON.stringify(weaponSetups));}catch{}if(shell.inLobby)setLobbyLoadoutDraft(patch);else setMatchLoadoutDraft(patch);},
     rename(){const surface=shell.inLobby?'lobby':'match';document.querySelector(`[data-loadout-class-name-edit="${surface}"]`)?.click();},
-    stats(weapon,attachments){const spec=resolveWeaponSpec(weapon,attachments),base=WEAPON_SPECS[weapon],tuning=(lobbyHostTuningDraft||worldSettings).weapons[weapon];return {...spec,...resolveWeaponAccuracy(weapon,attachments),damage:Number(tuning.damage)*(spec.damage/base.damage),bulletSpeed:Number(tuning.speed)*(spec.bulletSpeed/base.bulletSpeed),reloadMs:Number(tuning.reloadMs)*(spec.reloadMs/base.reloadMs)};},
+    stats(weapon,attachments){return weaponPerformance(weapon,attachments,lobbyHostTuningDraft||worldSettings);},
+    statRows(weapon,attachments,slot){return armoryStatRows(weapon,attachments,lobbyHostTuningDraft||worldSettings,slot);},
     effect(id,weapon){return attachmentEffectTags(ATTACHMENTS[id],weapon);},
     streak(id){if(shell.inLobby)return toggleLobbyKillstreakChoice(id);if(shell.inMatch)return;const next=[...(outsideStreakDraft||killstreakSelection)],at=next.indexOf(id);if(at>=0)next[at]='';else{const open=next.indexOf('');if(open<0){showToast('3 EQUIPPED · REMOVE ONE FIRST');return;}next[open]=id;}outsideStreakDraft=next;if(next.every(Boolean)){killstreakSelection=normalizeKillstreakSelection(next);rememberKillstreakSelection(killstreakSelection);outsideStreakDraft=null;}},
     streakReplace(index,kind){if(shell.inMatch||lobbyKillstreakSyncPending)return false;const id=normalizeKillstreak(kind),next=[...(shell.inLobby?stableKillstreakDraft():outsideStreakDraft||killstreakSelection)];if(!id||index<0||index>=KILLSTREAK_SELECTION_COUNT||next.includes(id))return false;next[index]=id;if(shell.inLobby){if(!matchAllowsLobbyEdits(matchState))return false;lobbyKillstreakDraft=next;renderLobbyKillstreakSetup();return commitLobbyKillstreakSelection();}killstreakSelection=normalizeKillstreakSelection(next);rememberKillstreakSelection(killstreakSelection);outsideStreakDraft=null;return true;},
@@ -1138,7 +1122,7 @@ function buildMenuPartModel(weapon,attachments,slot){
     if(slot==='optic'&&weapon==='sniper')parts=[...(d.previewScopeParts||[]),...parts];
     else if(slot==='optic'&&!id)parts=d.ironSightParts||[];
     else if(slot==='barrel')parts=[d.attachmentBarrel?.mesh];
-    else if(slot==='magazine')parts=[d.attachmentMagazine,...parts];
+    else if(slot==='magazine')parts=[d.attachmentMagazine];
     else if(slot==='stock'&&!selected)parts=d.attachmentStockBaseParts||[];
     // None means no added hardware. Never invent a placeholder 3D attachment.
     for(const part of [...new Set(parts.filter(Boolean))]){const copy=cloneLoadoutPreviewNode(part);if(copy)root.add(copy);}
@@ -1201,7 +1185,8 @@ function applyWorldSettings(value){
   if(previousMod!==worldSettings.mod)applyWorldEnvironment();
   syncPauseContext();
 }
-function weaponRules(name){const safe=WEAPON_SPECS[name]?name:'pistol',baseRules=worldSettings.weapons[safe]||DEFAULT_WORLD_SETTINGS.weapons[safe],baseSpec=WEAPON_SPECS[safe],resolved=effectiveWeaponSpec(safe);return{...baseRules,mag:resolved.mag,reloadMs:Number(baseRules.reloadMs)*(resolved.reloadMs/baseSpec.reloadMs),cooldownMs:Number(baseRules.cooldownMs)*(resolved.cooldownMs/baseSpec.cooldownMs),speed:Number(baseRules.speed)*(resolved.bulletSpeed/baseSpec.bulletSpeed),resolvedSpec:resolved};}
+function weaponRules(name){const rules=resolveWeaponRules(worldSettings,name,attachmentsForWeapon(name));return {...rules,resolvedSpec:rules.spec};}
+
 function aimSensitivityScale(){if(!adsWanted)return 1;const base=(currentWeapon==='sniper'||thermalOpticMode())?magnifiedScopeSensitivityBase():.62;return base*playerSettings.adsSensitivity;}
 function controllerRadialAxes(rawX,rawY,minDeadzone,outerDeadzone=.98){
   const x=THREE.MathUtils.clamp(Number(rawX)||0,-1,1),y=THREE.MathUtils.clamp(Number(rawY)||0,-1,1),len=Math.hypot(x,y);
@@ -1527,9 +1512,9 @@ function lobbySnapshot(){
 }
 function configuredLobbyBots(mode=currentGameMode()){
   if(!shell.inLobby||!isMatchAdmin||!matchAllowsLobbyEdits(matchState))return null;const draft=lobbyMatchDraft||committedLobbyMatchDraft(),spec=gameModeSpec(mode);if(spec.cooperative)return[];let blue=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(draft.blueBots)||0))),red=Math.max(0,Math.min(MAX_BOTS_PER_TEAM,Math.floor(Number(draft.redBots)||0)));if(!spec.teamBased||draft.mode==='infection'){const total=Math.max(0,Math.min(MAX_MATCH_BOTS,Math.floor(Number(draft.ffaBots)||0)));blue=Math.ceil(total/2);red=Math.floor(total/2);}
-  const rows=[];for(let i=0;i<blue;i++)rows.push({id:`draft-bot-blue-${i+1}`,name:spec.teamBased?`${teamLabel('blue')} Bot ${i+1}`:`Bot ${i+1}`,team:'blue',bot:true,godMode:false,admin:false,primaryWeapon:'assault',secondaryWeapon:'pistol',tactical:'flash',lethal:'frag',kills:0,deaths:0,self:false});for(let i=0;i<red;i++)rows.push({id:`draft-bot-red-${i+1}`,name:spec.teamBased?`${teamLabel('red')} Bot ${i+1}`:`Bot ${blue+i+1}`,team:'red',bot:true,godMode:false,admin:false,primaryWeapon:'assault',secondaryWeapon:'pistol',tactical:'flash',lethal:'frag',kills:0,deaths:0,self:false});return rows;
+  const rows=[];for(let i=0;i<blue;i++)rows.push({id:`draft-bot-blue-${i+1}`,name:spec.teamBased&&mode!=='infection'?`${teamLabel('blue')} Bot ${i+1}`:`Bot ${i+1}`,team:'blue',bot:true,godMode:false,admin:false,primaryWeapon:'assault',secondaryWeapon:'pistol',tactical:'flash',lethal:'frag',kills:0,deaths:0,self:false});for(let i=0;i<red;i++)rows.push({id:`draft-bot-red-${i+1}`,name:spec.teamBased&&mode!=='infection'?`${teamLabel('red')} Bot ${i+1}`:`Bot ${blue+i+1}`,team:'red',bot:true,godMode:false,admin:false,primaryWeapon:'assault',secondaryWeapon:'pistol',tactical:'flash',lethal:'frag',kills:0,deaths:0,self:false});return rows;
 }
-function lobbyRosterSnapshot(mode=currentGameMode()){const rows=lobbySnapshot(),preview=configuredLobbyBots(mode);return preview===null?rows:[...rows.filter(row=>!row.bot),...preview];}
+function lobbyRosterSnapshot(mode=currentGameMode()){const rows=lobbySnapshot(),preview=configuredLobbyBots(mode),result=preview===null?rows:[...rows.filter(row=>!row.bot),...preview];if(mode==='infection'){let index=0;return result.map(row=>row.bot?{...row,name:'Bot '+(++index)}:row);}return result;}
 function adjustLobbyBotDraft(team,delta){
   if(!shell.inLobby||!isMatchAdmin||!matchAllowsLobbyEdits(matchState)||!delta)return;
   refreshLobbyDraftOwnership();const draft={...(lobbyMatchDraft||committedLobbyMatchDraft())},spec=gameModeSpec(draft.mode);if(spec.cooperative)return;
@@ -1888,14 +1873,19 @@ function bakeWeaponGeometry({receivers=[],handguards=[],grips=[],magazines=[],ra
 }
 function registerAttachmentVisual(group,id,object){if(!group||!object)return object;if(!group.userData.attachmentVisuals)group.userData.attachmentVisuals={};group.userData.attachmentVisuals[id]=object;object.visible=false;group.add(object);return object;}
 function makeMuzzleAttachment({radius=.030,length=.22,color=0x171c20,muzzle={x:0,y:0,z:-1},overlap=.018,ported=false}={}){
-  // Devices are built around the authoritative bore position. Added detail is
-  // concentric, so cosmetic upgrades cannot move the shot/muzzle origin.
-  const g=new THREE.Group(),mx=Number(muzzle?.x)||0,my=Number(muzzle?.y)||0,mz=Number(muzzle?.z)||0,seat=Math.max(0,Math.min(length*.35,Number(overlap)||0)),centerZ=mz-length*.5+seat,frontZ=mz-length+seat;
-  const mat=attachmentVisualMaterial(color,.48,.34),dark=attachmentVisualMaterial(0x0d1114,.38,.48),body=new THREE.Mesh(new THREE.CylinderGeometry(radius*.96,radius,length,18),mat);body.rotation.x=Math.PI/2;body.position.set(mx,my,centerZ);g.add(body);
-  const collarLen=Math.min(.040,length*.22),collar=new THREE.Mesh(new THREE.CylinderGeometry(radius*.84,radius*.84,collarLen,16),dark);collar.rotation.x=Math.PI/2;collar.position.set(mx,my,mz+seat*.35);g.add(collar);
-  const frontRing=new THREE.Mesh(new THREE.TorusGeometry(radius*.91,Math.max(.0018,radius*.075),6,18),dark);frontRing.position.set(mx,my,frontZ+.002);g.add(frontRing);
-  if(ported){for(const x of [-1,1])for(const dz of [-.18,.08]){const port=new THREE.Mesh(new THREE.BoxGeometry(Math.max(.006,radius*.30),Math.max(.010,radius*.54),Math.max(.014,length*.17)),dark);port.position.set(mx+x*radius*.78,my+radius*.05,centerZ+length*dz);g.add(port);}}
-  else{for(const dz of [-.22,.10]){const band=new THREE.Mesh(new THREE.TorusGeometry(radius*.985,Math.max(.0015,radius*.055),5,16),dark);band.position.set(mx,my,centerZ+length*dz);g.add(band);}}
+  const g=new THREE.Group(),mx=Number(muzzle.x)||0,my=Number(muzzle.y)||0,mz=Number(muzzle.z)||0,seat=Math.min(length*.35,Math.max(0,overlap)),centerZ=mz-length*.5+seat,frontZ=mz-length+seat;
+  const mat=attachmentVisualMaterial(ported?0x333c40:color,.52,.36),dark=attachmentVisualMaterial(0x0c1012,.12,.74);let body;
+  if(ported){
+    const shape=new THREE.Shape(),points=[[-.65,-1],[.65,-1],[1,-.65],[1,.65],[.65,1],[-.65,1],[-1,.65],[-1,-.65]];points.forEach(([x,y],i)=>i?shape.lineTo(x*radius,y*radius):shape.moveTo(x*radius,y*radius));shape.closePath();const bore=new THREE.Path();bore.absarc(0,0,radius*.40,0,Math.PI*2,true);shape.holes.push(bore);
+    body=new THREE.Mesh(new THREE.ExtrudeGeometry(shape,{depth:length,bevelEnabled:true,bevelThickness:radius*.035,bevelSize:radius*.045,bevelSegments:1,curveSegments:16,steps:1}),mat);body.position.set(mx,my,frontZ);g.add(body);
+    for(const side of [-1,1])for(const offset of [-.20,.16]){const port=new THREE.Mesh(new THREE.BoxGeometry(radius*.045,radius*.95,length*.20),dark);port.position.set(mx+side*(radius+.0007),my,centerZ+length*offset);g.add(port);}
+    for(const offset of [-.18,.16]){const vent=new THREE.Mesh(new THREE.BoxGeometry(radius*.70,radius*.04,length*.18),dark);vent.position.set(mx,my+radius+.0008,centerZ+length*offset);g.add(vent);}
+  }else{
+    body=new THREE.Mesh(new THREE.CylinderGeometry(radius*.96,radius,length,24),mat);body.rotation.x=Math.PI/2;body.position.set(mx,my,centerZ);g.add(body);
+    for(const dz of [-.22,.10]){const band=new THREE.Mesh(new THREE.TorusGeometry(radius*.985,Math.max(.0015,radius*.055),6,24),dark);band.position.set(mx,my,centerZ+length*dz);g.add(band);}
+    const bore=new THREE.Mesh(new THREE.CircleGeometry(radius*.46,20),dark);bore.rotation.y=Math.PI;bore.position.set(mx,my,frontZ-.0008);g.add(bore);
+  }
+  const collar=new THREE.Mesh(new THREE.CylinderGeometry(radius*.84,radius*.84,Math.min(.04,length*.22),20),dark);collar.rotation.x=Math.PI/2;collar.position.set(mx,my,mz+seat*.35);g.add(collar);
   g.userData.muzzleTip=new THREE.Vector3(mx,my,frontZ);g.userData.muzzleSeat=new THREE.Vector3(mx,my,mz);return g;
 }
 function opticReticleMaterials(){return{glow:new THREE.MeshBasicMaterial({color:0xff312c,transparent:true,opacity:.20,depthTest:false,depthWrite:false,toneMapped:false,side:THREE.DoubleSide}),core:new THREE.MeshBasicMaterial({color:0xff5149,transparent:true,opacity:.99,depthTest:false,depthWrite:false,toneMapped:false,side:THREE.DoubleSide})};}
@@ -1974,7 +1964,14 @@ function makeStockAttachment({z=.40,y=-.02,width=.15}={}){const g=new THREE.Grou
 function makeFullStockAttachment({z=.42,y=-.02,width=.16}={}){const g=new THREE.Group(),mat=attachmentVisualMaterial(0x424b50,.14,.66),dark=attachmentVisualMaterial(0x22272a,.10,.82),body=new THREE.Mesh(new THREE.BoxGeometry(width,.15,.18),mat),cheek=new THREE.Mesh(new THREE.BoxGeometry(width*.70,.040,.115),mat),pad=new THREE.Mesh(new THREE.BoxGeometry(width*1.04,.16,.045),dark);body.position.set(0,y,z);body.rotation.x=-.08;cheek.position.set(0,y+.082,z-.010);cheek.rotation.x=-.08;pad.position.set(0,y-.008,z+.105);pad.rotation.x=-.08;addBakedBoxPanels(body,{side:true,top:false,panelScale:.42});g.add(body,cheek,pad);return g;}
 function makeCompactStockAttachment({z=.24,y=.01,width=.10}={}){const g=new THREE.Group(),mat=attachmentVisualMaterial(0x343b40,.18,.58),dark=attachmentVisualMaterial(0x171c20,.12,.78),braceL=new THREE.Mesh(new THREE.BoxGeometry(width*.16,.036,.12),mat),braceR=braceL.clone(),pad=new THREE.Mesh(new THREE.BoxGeometry(width,.095,.035),dark);braceL.position.set(-width*.25,y+.015,z);braceR.position.set(width*.25,y+.015,z);pad.position.set(0,y,z+.075);g.add(braceL,braceR,pad);return g;}
 function makeMagMarker({z=-.12,y=-.21,width=.11}={}){const g=new THREE.Group(),mat=new THREE.MeshStandardMaterial({color:0x808e96,roughness:.62,metalness:.22}),dark=bakedWeaponInsetMaterial(),band=new THREE.Mesh(new THREE.BoxGeometry(width+.012,.026,.14),mat),tab=new THREE.Mesh(new THREE.BoxGeometry(width*.40,.018,.055),dark);band.position.set(0,y,z);tab.position.set(width*.28,y+.020,z+.030);g.add(band,tab);return g;}
-function makeFastMagBand({width=.11,depth=.13,y=.18}={}){const mat=new THREE.MeshStandardMaterial({color:0x87969f,roughness:.58,metalness:.24}),g=new THREE.Group(),bandA=new THREE.Mesh(new THREE.BoxGeometry(width,.026,depth),mat),bandB=new THREE.Mesh(new THREE.BoxGeometry(width*.34,.035,depth*.46),bakedWeaponInsetMaterial());bandA.position.set(0,y,0);bandB.position.set(width*.28,y+.018,0);g.add(bandA,bandB);g.visible=false;return g;}
+function makeFastMagBand(mag){
+  mag.geometry.computeBoundingBox();const bounds=mag.geometry.boundingBox,size=bounds.getSize(new THREE.Vector3()),bottom=bounds.min.y;
+  const rubber=attachmentVisualMaterial(0x232a27,.03,.88),rim=attachmentVisualMaterial(0x5b645c,.20,.55),g=new THREE.Group();
+  const cuff=new THREE.Mesh(new THREE.BoxGeometry(size.x*1.04,.020,size.z*1.04),rubber);cuff.position.y=bottom+.008;g.add(cuff);
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(size.x*1.10,.008,size.z*1.06),rim);plate.position.y=bottom-.005;g.add(plate);
+  const radius=Math.max(.012,size.x*.28),loop=new THREE.Mesh(new THREE.TorusGeometry(radius,Math.max(.003,size.x*.07),6,18),rubber);loop.scale.x=1.22;loop.position.set(0,bottom-radius*.78,0);g.add(loop);
+  g.visible=false;return g;
+}
 function setupWeaponAttachmentVisuals(group,weapon,opts={}){
   if(!group)return;const flash=opts.flash||null,muzzle=opts.muzzle?{x:Number(opts.muzzle.x)||0,y:Number(opts.muzzle.y)||0,z:Number(opts.muzzle.z)||0}:flash?{x:flash.position.x,y:flash.position.y,z:flash.position.z}:null;
   group.userData.attachmentWeapon=weapon;group.userData.attachmentFlash=flash;group.userData.attachmentBaseFlash=flash?flash.position.clone():null;group.userData.attachmentMuzzle=muzzle;group.userData.attachmentMagazine=opts.mag||null;if(opts.mag)group.userData.attachmentMagazineBaseScale=opts.mag.scale.clone();
@@ -1984,7 +1981,7 @@ function setupWeaponAttachmentVisuals(group,weapon,opts={}){
   if(opts.suppressor&&muzzle)registerAttachmentVisual(group,'suppressor',makeMuzzleAttachment({...opts.suppressor,muzzle,ported:false}));if(opts.compensator&&muzzle)registerAttachmentVisual(group,'compensator',makeMuzzleAttachment({...opts.compensator,muzzle,ported:true}));if(opts.shotgunChoke&&muzzle)registerAttachmentVisual(group,'shotgunChoke',makeMuzzleAttachment({...opts.shotgunChoke,muzzle,ported:false}));
   if(opts.verticalGrip)registerAttachmentVisual(group,'verticalGrip',makeVerticalGrip(opts.verticalGrip));if(opts.angledGrip)registerAttachmentVisual(group,'angledGrip',makeAngledGrip(opts.angledGrip));if(opts.bipod&&!group.userData.attachmentBipodBaseParts.length)registerAttachmentVisual(group,'bipod',makeBipodAttachment(opts.bipod));if(opts.laser)registerAttachmentVisual(group,'laser',makeLaserAttachment(opts.laser));
   if(opts.lightweightStock)registerAttachmentVisual(group,'lightweightStock',makeStockAttachment(opts.lightweightStock));if(opts.fullStock)registerAttachmentVisual(group,'fullStock',makeFullStockAttachment(opts.fullStock));if(opts.compactStock)registerAttachmentVisual(group,'compactStock',makeCompactStockAttachment(opts.compactStock));
-  if(opts.fastMag){if(opts.mag){const band=makeFastMagBand(opts.fastMag);group.userData.attachmentVisuals=group.userData.attachmentVisuals||{};group.userData.attachmentVisuals.fastMag=band;opts.mag.add(band);}else registerAttachmentVisual(group,'fastMag',makeMagMarker(opts.fastMag));}if(opts.extendedMag&&!opts.mag)registerAttachmentVisual(group,'extendedMag',makeMagMarker(opts.extendedMag));
+  if(opts.fastMag){if(opts.mag){const band=makeFastMagBand(opts.mag);group.userData.attachmentVisuals=group.userData.attachmentVisuals||{};group.userData.attachmentVisuals.fastMag=band;opts.mag.add(band);}else registerAttachmentVisual(group,'fastMag',makeMagMarker(opts.fastMag));}if(opts.extendedMag&&!opts.mag)registerAttachmentVisual(group,'extendedMag',makeMagMarker(opts.extendedMag));
 }
 function syncWeaponAttachmentVisuals(group,weapon,attachments){
   if(!group)return;const normalized=normalizeWeaponAttachments(weapon,attachments),visuals=group.userData.attachmentVisuals||{};for(const [id,obj] of Object.entries(visuals))obj.visible=weaponHasAttachment(weapon,normalized,id);
@@ -5125,6 +5122,7 @@ function controllerGridMove(current,list,group,dx,dy){
   return null;
 }
 function moveControllerUiFocus(dx,dy){
+  const railTarget=integratedMenu.moveRailFocus(dx,dy);if(railTarget){nativeRenderer.render();setControllerUiFocus(railTarget);return true;}
   const list=controllerFocusableElements();if(!list.length)return false;const current=ensureControllerUiFocus();if(!current)return false;
   const a=current.getBoundingClientRect(),group=controllerNavGroup(current),explicit=group?controllerGridMove(current,list,group,dx,dy):null;if(explicit){setControllerUiFocus(explicit);return true;}
   let sameDirect=null,sameDirectScore=Infinity,direct=null,directScore=Infinity,sameFallback=null,sameFallbackScore=Infinity,fallback=null,fallbackScore=Infinity;
@@ -5211,8 +5209,8 @@ function handleControllerUiNavigation(pressed){
     if(integratedMenu.back())return true;
     if(shell.panel===SHELL_PANEL.SETTINGS){closePlayerSettings();return true;}
     if(shell.panel===SHELL_PANEL.ADMIN){closeAdminPanel();return true;}
-    if(shell.panel===SHELL_PANEL.LOADOUT){if(loadoutWorkspaceMode.match==='item'){const slot=loadoutFocusSlot.match,key=`match-${slot}`;if((slot==='primary'||slot==='secondary')&&loadoutWeaponPickerOpen.has(key)){loadoutWeaponPickerOpen.delete(key);renderAttachmentEditor('match',slot,loadoutDraftForSurface('match'));queueControllerUiFocus(`weapon-toggle:${key}`);return true;}if((slot==='primary'||slot==='secondary')&&loadoutAttachmentTrayOpen.has(key)){const activeSlot=loadoutAttachmentSlot[key];loadoutAttachmentTrayOpen.delete(key);clearLoadoutAttachmentComparisonBase(key);loadoutAttachmentSlot[key]='';renderAttachmentEditor('match',slot,loadoutDraftForSurface('match'));queueControllerUiFocus(`gunsmith:${key}:slot:${activeSlot}`);return true;}setLoadoutWorkspaceMode('match','class',{ensurePreview:false});return true;}if(loadoutWorkspaceMode.match==='class'){setLoadoutWorkspaceMode('match','classes',{ensurePreview:false});return true;}closeMatchLoadout();return true;}
-    if(shell.inLobby&&loadoutWorkspaceMode.lobby!=='classes'&&document.querySelector('[data-lobby-side-tab="loadout"]')?.classList.contains('active')){if(loadoutWorkspaceMode.lobby==='item'){const slot=loadoutFocusSlot.lobby,key=`lobby-${slot}`;if((slot==='primary'||slot==='secondary')&&loadoutWeaponPickerOpen.has(key)){loadoutWeaponPickerOpen.delete(key);renderAttachmentEditor('lobby',slot,loadoutDraftForSurface('lobby'));queueControllerUiFocus(`weapon-toggle:${key}`);return true;}if((slot==='primary'||slot==='secondary')&&loadoutAttachmentTrayOpen.has(key)){const activeSlot=loadoutAttachmentSlot[key];loadoutAttachmentTrayOpen.delete(key);clearLoadoutAttachmentComparisonBase(key);loadoutAttachmentSlot[key]='';renderAttachmentEditor('lobby',slot,loadoutDraftForSurface('lobby'));queueControllerUiFocus(`gunsmith:${key}:slot:${activeSlot}`);return true;}}setLoadoutWorkspaceMode('lobby',loadoutWorkspaceMode.lobby==='item'?'class':'classes',{ensurePreview:false});return true;}
+    if(shell.panel===SHELL_PANEL.LOADOUT){if(loadoutWorkspaceMode.match==='item'){const slot=loadoutFocusSlot.match,key=`match-${slot}`;if((slot==='primary'||slot==='secondary')&&loadoutWeaponPickerOpen.has(key)){loadoutWeaponPickerOpen.delete(key);renderAttachmentEditor('match',slot,loadoutDraftForSurface('match'));queueControllerUiFocus(`weapon-toggle:${key}`);return true;}if((slot==='primary'||slot==='secondary')&&loadoutAttachmentTrayOpen.has(key)){const activeSlot=loadoutAttachmentSlot[key];loadoutAttachmentTrayOpen.delete(key);loadoutAttachmentSlot[key]='';renderAttachmentEditor('match',slot,loadoutDraftForSurface('match'));queueControllerUiFocus(`gunsmith:${key}:slot:${activeSlot}`);return true;}setLoadoutWorkspaceMode('match','class',{ensurePreview:false});return true;}if(loadoutWorkspaceMode.match==='class'){setLoadoutWorkspaceMode('match','classes',{ensurePreview:false});return true;}closeMatchLoadout();return true;}
+    if(shell.inLobby&&loadoutWorkspaceMode.lobby!=='classes'&&document.querySelector('[data-lobby-side-tab="loadout"]')?.classList.contains('active')){if(loadoutWorkspaceMode.lobby==='item'){const slot=loadoutFocusSlot.lobby,key=`lobby-${slot}`;if((slot==='primary'||slot==='secondary')&&loadoutWeaponPickerOpen.has(key)){loadoutWeaponPickerOpen.delete(key);renderAttachmentEditor('lobby',slot,loadoutDraftForSurface('lobby'));queueControllerUiFocus(`weapon-toggle:${key}`);return true;}if((slot==='primary'||slot==='secondary')&&loadoutAttachmentTrayOpen.has(key)){const activeSlot=loadoutAttachmentSlot[key];loadoutAttachmentTrayOpen.delete(key);loadoutAttachmentSlot[key]='';renderAttachmentEditor('lobby',slot,loadoutDraftForSurface('lobby'));queueControllerUiFocus(`gunsmith:${key}:slot:${activeSlot}`);return true;}}setLoadoutWorkspaceMode('lobby',loadoutWorkspaceMode.lobby==='item'?'class':'classes',{ensurePreview:false});return true;}
     if(shell.inLobby){openLobbyQuitConfirm();return true;}
     if(shell.paused){shell.resumeFromAlternateInput();clock?.getDelta();return true;}
   }
