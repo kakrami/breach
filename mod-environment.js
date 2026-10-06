@@ -16,10 +16,5 @@ export function createMoonSky(THREE){
   const positions=[];let seed=731;const random=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/4294967296;};
   for(let i=0;i<210;i++){const yaw=random()*Math.PI*2,y=.18+random()*.82,r=Math.sqrt(1-y*y);positions.push(Math.cos(yaw)*r*290,y*290,Math.sin(yaw)*r*290);}
   const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));const stars=new THREE.PointsMaterial({color:0xbacdf5,size:.65,sizeAttenuation:true,fog:false});stars.userData.modSky=true;root.add(new THREE.Points(geometry,stars));
-  // Small distant saucer: atmosphere only, never blocks a shot or changes combat.
-  const ufo=new THREE.Group();ufo.position.set(95,82,-155);ufo.rotation.z=.18;
-  const saucer=new THREE.Mesh(new THREE.SphereGeometry(7,20,10),material(0x77869e));saucer.scale.y=.17;ufo.add(saucer);
-  const dome=new THREE.Mesh(new THREE.SphereGeometry(2.6,16,10),material(0x8ab0c2));dome.scale.y=.5;dome.position.y=.8;ufo.add(dome);
-  const rim=new THREE.Mesh(new THREE.TorusGeometry(6.1,.12,6,32),material(0x88e7c3));rim.rotation.x=Math.PI/2;ufo.add(rim);root.add(ufo);
   return root;
 }

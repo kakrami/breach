@@ -1,10 +1,10 @@
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.8.0";
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.5.0";
 // Canvas panel descriptions and commands. No DOM controls or browser prompts.
-import { APP_VERSION } from "./game-config.js?v=2.8.0";
+import { APP_VERSION } from "./game-config.js?v=2.5.0";
 import {
   assetResizeMode,
   BUILDING_MATERIALS,
-} from "./object-catalog.js?v=2.8.0";
+} from "./object-catalog.js?v=2.5.0";
 import {
   CATALOG,
   MATERIALS,
@@ -18,12 +18,14 @@ import {
   clone,
   uid,
   clamp,
-} from "./builder-model.js?v=2.8.0";
+} from "./builder-model.js?v=2.5.0";
 export function createBuilderPanels({
   editor: e,
   save,
   publish,
   exit,
+  importFile,
+  exportFile,
   restore,
 }) {
   let screen = null,
@@ -36,8 +38,7 @@ export function createBuilderPanels({
     checkIssues = [],
     checkPending = false,
     checkError = "",
-    libraryGroup = "Buildings",
-    screenSequence = 0;
+    libraryGroup = "Buildings";
   const selection = () => e.allSelected();
   function show(name, data = {}, push = true) {
     if(name === "save-map"){task(save);return;}
@@ -47,7 +48,7 @@ export function createBuilderPanels({
     }
     e.cancelInteraction?.();
     if (push && screen) history.push(screen);
-    screen = { name, data, scope: "builder-panel:" + (++screenSequence) };
+    screen = { name, data };
     keyboard = null;
     e.panel = { model };
     e.state.page = 0;
@@ -61,7 +62,6 @@ export function createBuilderPanels({
     if (history.length) {
       const s = history.pop();
       show(s.name, s.data, false);
-      screen.scope = s.scope;
     } else {
       screen = null;
       keyboard = null;
@@ -101,7 +101,6 @@ export function createBuilderPanels({
       apply,
       numeric,
       caps: false,
-      selectAll: false,
     };
     e.state.page = 0;
     e.syncUI();
@@ -173,7 +172,6 @@ export function createBuilderPanels({
         numeric: keyboard.numeric,
         caps: keyboard.caps,
         digits: keyboard.digits,
-        scope: screen.scope + ":keyboard:" + keyboard.title,
       };
     const { name, data } = screen;
     let title = "",
@@ -362,7 +360,7 @@ export function createBuilderPanels({
           selected: g === group,
         }),
       );
-      let objects = group === "Recent" ? (e.recentItems || []) : EDITOR_ITEMS.filter((o) => o.group === group);
+      let objects = group === "Recent" ? e.recentItems : EDITOR_ITEMS.filter((o) => o.group === group);
       if (group === "Pieces")
         objects = [
           ...objects,
@@ -388,21 +386,10 @@ export function createBuilderPanels({
         );
       if (group === "Groups")
         items.push(item("Manage groups", () => show("prefabs")));
-      return { title, kind: "library", tabs, items, back: history.length > 0, scope: screen.scope };
-    } else if (name === "ground") {
-      title = "Ground";
-      description = "Shape terrain or paint surfaces. Every stroke is undoable.";
-      items = [
-        item("Shape ground", () => { dismiss(); e.terrain(); }),
-        item("Paint ground", () => show("paint")),
-        item("Terrain options", () => show("terrain")),
-        item("Light & weather", () => show("weather")),
-      ];
+      return { title, kind: "library", tabs, items, back: false };
     } else if (name === "tools") {
       title = "Map tools";
       items = [
-        item("Undo", () => e.commands.undo(), { disabled: !e.commands.undoStack.length }),
-        item("Redo", () => e.commands.redo(), { disabled: !e.commands.redoStack.length }),
         item("Starts & routes", () => show("setup")),
         item("Light & weather", () => show("weather")),
         item("Snapping", () => show("snap")),
@@ -719,7 +706,7 @@ export function createBuilderPanels({
         item("Generate", () =>
           confirm(
             "Replace current map",
-            "Save first if you need this draft.",
+            "Save or export first if you need this draft.",
             () => e.generate(d.style, d.size, d.density, d.seed),
           ),
         ),
@@ -730,7 +717,7 @@ export function createBuilderPanels({
         item(k === "blank" ? "Flat map" : k, () =>
           confirm(
             "Replace current map",
-            "Save first if you need this draft.",
+            "Save or export first if you need this draft.",
             () => e.loadTemplate(k),
           ),
         ),
@@ -791,6 +778,7 @@ export function createBuilderPanels({
           { disabled: checkPending },
         ),
         item("Collision overlay", () => show("analysis")),
+        item("Export", () => exportFile()),
       ];
       const checkActions = items;
       items = [];
@@ -827,7 +815,7 @@ export function createBuilderPanels({
     } else if (name === "help") {
       title = "Controls";
       description =
-        "Tap objects to select. Drag to orbit; two fingers or right-drag pan; pinch or wheel zoom. In Ground, drag directly to paint or shape; two fingers navigate without painting. Place previews with a tap, then Place confirms. Roads: tap points, drag numbered handles or + to bend, then Finish. Other end extends the opposite end. Test uses the game’s movement. Controller: left stick pans, right stick orbits, bumpers zoom; LT focuses tools. A selects, B goes back. LB/RB switch panel tabs. Tab focuses tools; arrows navigate; Enter selects. Escape cancels. F focuses selection. Ctrl/Cmd+Z undoes.";
+        "Tap objects to select. Drag to orbit; two fingers or right-drag pan; pinch or wheel zoom. In Ground, drag directly to paint or shape; two fingers navigate without painting. Place previews with a tap, then Place confirms. Roads: tap points, drag numbered handles or + to bend, then Finish. Other end extends the opposite end. Test uses the game’s movement. Controller: left stick pans, right stick orbits, bumpers zoom; LT focuses tools. A activates, B cancels. F focuses selection. Ctrl/Cmd+Z undoes.";
       items = [
         item("Objects", () => {
           dismiss();
@@ -850,9 +838,10 @@ export function createBuilderPanels({
         item("Discard & exit", exit),
       ];
     } else if (name === "files") {
-      title = "Local recovery";
-      description = "Restore your saved local draft without changing maps saved to your account.";
+      title = "Files";
       items = [
+        item("Import map", importFile),
+        item("Export map", exportFile),
         item("Restore autosave", () =>
           confirm(
             "Restore autosave",
@@ -868,7 +857,7 @@ export function createBuilderPanels({
         item("Publish", () => task(publish)),
         item("Map settings", () => show("settings")),
         item("Map Check", () => show("check")),
-        item("Restore autosave", () => show("files")),
+        item("Files", () => show("files")),
         item("Controls", () => show("help")),
         item("Back to maps", () => {
           dismiss();
@@ -887,8 +876,6 @@ export function createBuilderPanels({
       kind: "list",
       primaryPair: name === "map" || name === "issue",
       back: history.length > 0,
-      scope: screen.scope,
-      busy,
     };
   }
   function saveGroup(name) {
@@ -912,7 +899,6 @@ export function createBuilderPanels({
     e.toast("Group saved");
   }
   function action(id) {
-    if (!id) return false;
     if (id.startsWith("value:")) {
       const split = id.lastIndexOf(":"),
         value = Number(id.slice(split + 1));
@@ -945,11 +931,8 @@ export function createBuilderPanels({
       else if (key === "digits") keyboard.digits = !keyboard.digits;
       else if (key === "clear") keyboard.draft = "";
       else if (key === "caps") keyboard.caps = !keyboard.caps;
-      else if (keyboard.draft.length < 64 || keyboard.selectAll) {
-        if (keyboard.selectAll) keyboard.draft = "";
-        keyboard.selectAll = false;
+      else if (keyboard.draft.length < 64)
         keyboard.draft += key === "space" ? " " : key;
-      }
       e.syncUI();
       return true;
     }
@@ -967,12 +950,7 @@ export function createBuilderPanels({
   }
   function key(ev) {
     if (!keyboard) return false;
-    if (ev.ctrlKey || ev.metaKey) {
-      if (ev.key.toLowerCase() === "a") { keyboard.selectAll = true; return true; }
-      // Native clipboard events carry text; no hidden input is necessary.
-      if (["c", "v", "x"].includes(ev.key.toLowerCase())) return false;
-      return true;
-    }
+    if (ev.ctrlKey || ev.metaKey) return true;
     ev.preventDefault();
     if (ev.key === "Enter") commitText();
     else if (ev.key === "Escape") action("text:cancel");
@@ -985,19 +963,6 @@ export function createBuilderPanels({
       action("text:" + ev.key);
     return true;
   }
-  function paste(ev) {
-    if (!keyboard) return false;
-    let value = ev.clipboardData?.getData("text/plain") || "";
-    value = keyboard.numeric ? value.replace(/[^0-9.\-]/g, "") : value.replace(/[\r\n\t]+/g, " ");
-    keyboard.draft = ((keyboard.selectAll ? "" : keyboard.draft) + value).slice(0, 64);
-    keyboard.selectAll = false; keyboard.error = ""; e.syncUI(); return true;
-  }
-  function copy(ev) {
-    if (!keyboard || !ev.clipboardData) return false;
-    ev.clipboardData.setData("text/plain", keyboard.draft);
-    if (ev.type === "cut") { keyboard.draft = ""; keyboard.selectAll = false; e.syncUI(); }
-    return true;
-  }
   return {
     show,
     close,
@@ -1006,8 +971,6 @@ export function createBuilderPanels({
     model,
     action,
     key,
-    paste,
-    copy,
     get active() {
       return !!screen;
     },
