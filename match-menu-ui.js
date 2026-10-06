@@ -1,6 +1,6 @@
 /* Match menus own only canvas presentation and navigation. Gameplay state, timers,
  * network messages and relationship colors are supplied by the client. */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.9.1';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.10.0';
 
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,finite(value)));
@@ -25,7 +25,7 @@ export function layoutMatchScoreboard(options={}){
   const view=matchMenuViewport(options),rows=Array.isArray(options.rows)?options.rows:[],results=options.kind==='results',panel=centered(view,1000,Math.min(view.h,500));
   const teamBased=options.teamBased??rows.some(p=>p.teamLabel),pad=14,gap=16,headerH=78,footerH=38,rowH=26;
   const body={x:panel.x+pad,y:panel.y+headerH,w:panel.w-pad*2,h:Math.max(rowH,panel.h-headerH-footerH)},capacity=Math.max(1,Math.floor(body.h/rowH)),cw=(body.w-gap)/2;
-  const groups=teamBased?[{name:'ALPHA',team:'blue',players:rows.filter(p=>p.team==='blue')},{name:'BRAVO',team:'red',players:rows.filter(p=>p.team==='red')}]:[{name:'STANDINGS',players:rows},{name:'',players:rows}];
+  const groups=teamBased?[{name:options.infection?'SURVIVORS':'ALPHA',team:'blue',players:rows.filter(p=>p.team==='blue')},{name:options.infection?'INFECTED':'BRAVO',team:'red',players:rows.filter(p=>p.team==='red')}]:[{name:'STANDINGS',players:rows},{name:'',players:rows}];
   const pageCount=Math.max(1,teamBased?Math.ceil(Math.max(...groups.map(g=>g.players.length))/capacity):Math.ceil(rows.length/(capacity*2))),page=clamp(Math.floor(options.page||0),0,pageCount-1);
   const layout={kind:results?'results':'scoreboard',view,panel,body,rows:[],groups,capacity,rowH,page,pageCount,scroll:0,maxScroll:0,contentH:body.h,hits:[],focusTargets:[]};
   groups.forEach((group,col)=>{
@@ -44,7 +44,7 @@ export function drawMatchScoreboard(c,options={}){
   for(const group of l.groups){
     const col=group.columns,score=group.team?options.teamScores?.[group.team]:undefined;
     label(c,group.name+(score==null?'':'   '+score),group.x+2,p.y+57,{size:17,weight:800,fill:'#d8eda0',width:group.w-116});
-    for(const [text,x]of [['K',col.kills],['D',col.deaths],['K/D',col.ratio]])label(c,text,x,p.y+57,{size:11,fill:C.muted,align:'right'});
+    for(const [text,x]of (options.infection?[['CONV',col.kills],['AST',col.deaths],['DMG',col.ratio]]:[['K',col.kills],['D',col.deaths],['K/D',col.ratio]]))label(c,text,x,p.y+57,{size:11,fill:C.muted,align:'right'});
     c.fillStyle='#354234';c.fillRect(group.x,p.y+67,group.w,1);
   }
   for(const row of l.rows){
@@ -53,7 +53,7 @@ export function drawMatchScoreboard(c,options={}){
     const prefix=self?'YOU  ':'';
     label(c,prefix+(player.bot?String(player.name||'Bot').replace(/^(ALPHA|BRAVO) /,''):String(player.name||'Player')),col.name,row.y+13,{size:12,weight:self?700:500,fill:tone,width:col.kills-col.name-15});
     const kills=Math.max(0,finite(player.kills)),deaths=Math.max(0,finite(player.deaths)),ratio=(kills/Math.max(1,deaths)).toFixed(2);
-    for(const [value,x]of [[kills,col.kills],[deaths,col.deaths],[ratio,col.ratio]])label(c,String(value),x,row.y+13,{size:12,align:'right',fill:'#edf0e8'});
+    for(const [value,x]of (options.infection?[[player.infectionStats?.conversions||0,col.kills],[player.infectionStats?.assists||0,col.deaths],[Math.round(player.infectionStats?.damage||0),col.ratio]]:[[kills,col.kills],[deaths,col.deaths],[ratio,col.ratio]]))label(c,String(value),x,row.y+13,{size:12,align:'right',fill:'#edf0e8'});
   }
   const footerY=p.y+p.h-18;
   if(options.footer)label(c,options.footer,p.x+14,footerY,{size:11,fill:C.muted,width:p.w-(l.pageCount>1?140:28)});
@@ -63,10 +63,24 @@ export function drawMatchScoreboard(c,options={}){
 }
 
 export function layoutMatchShop(options={}){
-  const view=matchMenuViewport(options),items=Array.isArray(options.items)?options.items:[],cols=view.w>=640?3:view.w>=352?2:1,rowH=72,gap=8,headerH=100,footerH=48,panel=centered(view,768,Math.max(248,headerH+Math.ceil(items.length/cols)*(rowH+gap)-gap+footerH)),body={x:panel.x+16,y:panel.y+headerH,w:Math.max(1,panel.w-32),h:Math.max(1,panel.h-headerH-footerH)},layout=decorateScroll({kind:'shop',view,panel,body,cols,rowH,contentH:Math.max(0,Math.ceil(items.length/cols)*(rowH+gap)-gap),scroll:options.scroll||0,items:[],hits:[],focusTargets:[]}),itemW=(body.w-gap*(cols-1))/cols;
-  items.forEach((item,index)=>{const row=Math.floor(index/cols),r={x:body.x+(index%cols)*(itemW+gap),y:body.y+row*(rowH+gap)-layout.scroll,w:itemW,h:rowH},target=hit(`shop:${item.id??index}`,r,'buy',{index,item,contentY:row*(rowH+gap),scrollItem:true,disabled:item.disabled===true}),visible=intersect(r,body);layout.items.push({...target,visible});layout.focusTargets.push(target);if(visible&&visible.h>=44)layout.hits.push({...target,...visible});});layout.close={x:panel.x+panel.w-104,y:panel.y+12,w:88,h:44};const close=hit('close',layout.close,'back');layout.hits.push(close);layout.focusTargets.push(close);return layout;
+  const view=matchMenuViewport(options),items=(options.items||[]).slice(0,6),cols=3,gap=8,headerH=76,footerH=34,panel=centered(view,900,Math.min(view.h,370)),body={x:panel.x+14,y:panel.y+headerH,w:panel.w-28,h:panel.h-headerH-footerH},rowH=(body.h-gap)/2,itemW=(body.w-gap*2)/3;
+  const l={kind:'shop',view,panel,body,cols,rowH,scroll:0,maxScroll:0,items:[],hits:[],focusTargets:[]};
+  items.forEach((item,index)=>{const r={x:body.x+(index%3)*(itemW+gap),y:body.y+Math.floor(index/3)*(rowH+gap),w:itemW,h:rowH},target=hit(`shop:${item.id}`,r,'buy',{index,item});l.items.push({...target,visible:r});l.hits.push(target);l.focusTargets.push(target);});
+  l.close={x:panel.x+panel.w-100,y:panel.y+12,w:86,h:44};const close=hit('close',l.close,'back');l.hits.push(close);l.focusTargets.push(close);return l;
 }
-export function drawMatchShop(c,options={}){const l=layoutMatchShop(options),p=l.panel;c.save();backdrop(c,l.view,.6);rr(c,p,C.panel,C.line);label(c,'SUPPLY SHOP',p.x+16,p.y+29,{size:20,weight:800,fill:C.accent,width:p.w-128});button(c,l.close,options.controller?'B MENU':'MENU',{active:options.focusId==='close'});label(c,`$${Math.max(0,finite(options.cash))}${options.seconds==null?' AVAILABLE':` · DEPLOY IN ${Math.max(0,Math.ceil(finite(options.seconds)))}s`}`,p.x+16,p.y+60,{size:14,width:p.w-32});label(c,options.subtitle||'Buy supplies for the next round',p.x+16,p.y+83,{size:14,fill:C.muted,width:p.w-32});c.save();c.beginPath();c.rect(l.body.x,l.body.y,l.body.w,l.body.h);c.clip();for(const target of l.items){if(!target.visible)continue;const item=target.item,active=options.focusId?options.focusId===target.id:options.selectedIndex===target.index;rr(c,target,active?'#293820':C.raised,active?C.accent:C.line,8);label(c,`${target.index+1}  ${item.label||item.id}`,target.x+12,target.y+23,{size:15,weight:700,fill:item.disabled?C.muted:C.text,width:target.w-24});const status=item.status||`$${Math.max(0,finite(item.price))}`;label(c,status,target.x+12,target.y+49,{size:14,fill:item.disabled?C.muted:C.accent,width:target.w-24});}c.restore();scrollbar(c,l);label(c,options.controller?'D-PAD SELECT · A BUY':'TAP TO BUY · 1–6 QUICK BUY',p.x+16,p.y+p.h-23,{size:14,fill:C.muted,width:p.w-32});c.restore();return l;}
+export function drawMatchShop(c,options={}){
+ const l=layoutMatchShop(options),p=l.panel;c.save();backdrop(c,l.view,.65);rr(c,p,C.panel,C.line);label(c,options.title||'SURVIVOR SUPPLY',p.x+14,p.y+29,{size:20,weight:800,fill:C.accent,width:p.w-125});
+ button(c,l.close,options.closeLabel||'MENU',{active:options.focusId==='close'});
+ label(c,`$${Math.max(0,finite(options.cash))}  ·  ${options.phaseLabel||'PREPARATION'}`,p.x+14,p.y+55,{size:13,fill:C.muted,width:p.w-125});
+ for(const r of l.items){const item=r.item,active=options.focusId?options.focusId===r.id:options.selectedIndex===r.index;rr(c,r,active?'#293820':C.raised,active?C.accent:C.line,2);if(active){c.fillStyle=C.accent;c.fillRect(r.x,r.y,3,r.h);}
+  const art=options.art?.(item);if(art)c.drawImage(art,r.x+r.w*.28,r.y+4,r.w*.7,Math.max(20,r.h-48));
+  label(c,String(r.index+1).padStart(2,'0'),r.x+10,r.y+20,{size:11,fill:C.muted});
+  label(c,item.label||item.id,r.x+10,r.y+r.h-29,{size:13,weight:800,width:r.w-20});
+  label(c,item.status||`$${item.price}`,r.x+10,r.y+r.h-10,{size:12,fill:item.unavailable?C.muted:C.accent,width:r.w-20});
+ }
+ const selected=l.items.find(t=>t.id===options.focusId)||l.items[options.selectedIndex||0];
+ label(c,selected?.item.detail||'Select to buy and equip',p.x+14,p.y+p.h-13,{size:12,fill:C.muted,width:p.w-28});c.restore();return l;
+}
 
 export function layoutMatchDeath(options={}){const view=matchMenuViewport(options),panel=centered(view,512,options.allowLoadout===false?240:296),loadout=options.allowLoadout===false?null:{x:panel.x+16,y:panel.y+panel.h-60,w:panel.w-32,h:44};return{kind:'death',view,panel,loadout,hits:loadout?[hit('loadout',loadout,'loadout')]:[],focusTargets:loadout?[hit('loadout',loadout,'loadout')]:[]};}
 export function drawMatchDeath(c,options={}){const l=layoutMatchDeath(options),p=l.panel,accent=options.accent||'#ff6973';c.save();if(options.backdrop!==false)backdrop(c,l.view,.64);rr(c,p,C.panel,C.line);label(c,'ELIMINATED',p.x+16,p.y+36,{size:28,weight:800,fill:accent,width:p.w-32});label(c,options.attacker||'Preparing your next spawn',p.x+16,p.y+76,{size:16,weight:700,width:p.w-32});label(c,options.detail||'',p.x+16,p.y+105,{size:14,fill:C.muted,width:p.w-32});label(c,options.nextLoadout?`NEXT SPAWN · ${options.nextLoadout}`:'',p.x+16,p.y+137,{size:14,fill:C.accent,width:p.w-32});const bar={x:p.x+16,y:p.y+164,w:p.w-32,h:4};rr(c,bar,C.line,null,2);if(options.progress>0)rr(c,{...bar,w:bar.w*clamp(options.progress,0,1)},accent,null,2);label(c,options.status||'RESPAWNING',p.x+16,p.y+193,{size:16,weight:700,width:p.w-32});if(l.loadout)button(c,l.loadout,options.controller?'A / Y  CHANGE LOADOUT':'CHANGE LOADOUT',{active:options.focusId==='loadout'});c.restore();return l;}

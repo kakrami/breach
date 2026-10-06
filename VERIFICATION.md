@@ -1,33 +1,47 @@
-# Breach 2.9.1 — menu polish
+# Breach 2.10.0 — Infected mode
 
-The release contains the integrated game, client and server. It has not been deployed to GitHub Pages or the production Worker.
+Integrated client and server, protocol 104. This package has not been deployed.
 
-## Changes
+## Behavior
 
-- Armory: larger, consistently framed weapons; improved preview lighting; complete sniper scopes; correctly framed individual attachments; real magazine/barrel hardware; explicit None states without fabricated models.
-- Attachment cards keep a fixed size. Sparse lists include a part close-up. All attachment effect tags fit, with positive and negative effects distinguished. The selected preview is separate from the equipped checkmark.
-- Weapon callouts use actual mesh positions. Reset and zoom controls occupy a dedicated row. Comparisons always use the equipped configuration; accuracy, recoil and handling bars appear where relevant.
-- Pause: matching game-menu layout with map context, direct loadout, roster, team, invite, settings, Cheats and Diagnostics controls.
-- Players: Alpha/Bravo columns, stable rows, inline host bot controls and team switching. Host permission editing remains in Cheats.
-- Scoreboard: two columns with complete rows, consistent K/D precision, no scrolling. Explicit pages appear only when capacity is exceeded. A nine-player match fits on one page at all tested phone sizes.
-- Relationship colors: self lime, friendly humans green, friendly bots blue, enemies red across player lists, scoreboard, chat and kill feed. Faction uniforms retain their original materials.
-- Chat/text entry: familiar QWERTY layout, large spacebar, Shift and Backspace, a symbol/number switch, compact Send/Close controls and readable message history. All input remains canvas-native.
-- Team/All chat is routed by the authoritative server; Team messages are delivered only to players on the sender's team. Non-team modes use All.
-- Version, cache keys, shared exports and server package metadata are 2.9.1. Protocol is 103 so a new client cannot accidentally send private team messages through an older server that only supports global chat.
+- Three rounds, each with 20 seconds of preparation and a default six-minute survival clock. Hosts can select four, six or eight minutes. Initial infected assignments rotate. Survivors win on time; infected win when everyone is converted. Killing the last living infected does not end a round.
+- Infected return after four seconds, reduced to three in the final minute. They retain purchases and cash through death. A lethal survivor hit queues a safe infected spawn instead of reviving the player beside their attacker.
+- Every deployment checks current opponents, predicted proximity, solid-cover sight lines in both directions, collision, floor support, hazards and recent combat. Enemy separation is at least 24 metres. Candidates require two clear six-metre walking exits; this is local exit validation, not an exhaustive global navigation proof.
+- No unsafe spawn fallback. Blocked respawns stay queued and retry. An opening roster that cannot fit safely returns to the lobby with a clear message to reduce bots or choose another map.
+- Both roles earn money. Rewards cover hostile damage, kills/conversions, assists and survivor supply collection, with limits on repeat farming. Round budgets reset to $2,000. Reconnecting preserves inventory, ammo and health and cannot grant a free refill.
+- Infected equipment: claws, throwable infected bomb with a finite toxic cloud, mutation machine gun with ammo/reload/heat, directional heavy shield with durability, screech reveal and carapace health upgrade. The shield has rear/blast weaknesses; actions have recovery times.
+- Survivors buy weapons, armor, medkits and grenades. Rotating supply points award ammo and cash and allow nearby purchases. Infected can buy during preparation or while dead. Purchases and equipment are server-authoritative.
+- Bots use the same damage, buying, equipment and spawn rules. Solo practice gets an infected bot. A disconnected sole infected is replaced rather than awarding a round.
+- Native canvas shops have six equal-height 3D cards, direct tap/click/A purchases and no scrolling. Focus only previews. Equipment appears in gameplay; role HUD, round results, scoreboards and sound cues are integrated.
+- Existing direct-equip armory, attachment guides, settings, roster controls, relationship colors and landscape lifecycle are retained.
+
+## Controls
+
+| Action | Keyboard | Controller | Touch |
+| --- | --- | --- | --- |
+| Claws / mutation gun | Fire | RT | Fire |
+| Mutation reload | R | X / square | Reload |
+| Claws / gun switch | Weapon switch | Y / triangle | Swap |
+| Infected bomb | G | RB / R1 | Toxic |
+| Heavy shield | Q toggle | Hold LT / L2 | Shield toggle |
+| Screech | F | LB / L1 | Screech |
+| Nearby survivor supply shop | B | D-pad up | Supply button |
+| Survivor medkit | H | D-pad down | Medkit button |
+
+Pausing releases a held shield and gameplay input. Shop cards activate immediately with tap/click/A; there is no second Equip button.
 
 ## Verification performed
 
-- Real production modules rendered in headless Chromium with touch/mobile emulation and desktop mouse input; no uncaught JavaScript errors.
-- Actual canvas hit testing exercised preview/equip, zoom/reset, equipment, pause/resume, roster, settings, bots and team actions.
-- All ten weapons and every compatible attachment preview rendered. Sniper scope composition checked: factory scope plus the selected scope hardware, rather than detached rings/markers.
-- Armory and menu layouts checked at 667×375, 844×390, 932×430 and 1440×900; no menu scroll regions or offscreen hit targets.
-- Pause/chat screenshots reviewed at 667×375, 844×390 and 932×430. Touch typing, spaces, Shift, deletion, numbers, channel changes, Send/Close and room-code entry checked.
-- Scoreboard layouts checked for 0, 1, 9, 18, 24 and 32 participants in team and non-team modes. Every row retained across pages, no clipped rows, no scroll state, keyboard/controller paging works.
-- Real server room logic checked loadout acceptance, team switching, God Mode, admin grant/revoke, guest permission rejection, match setup, bot spawning and live tuning. Team-chat recipient isolation and All-chat delivery verified with three independent socket identities.
-- Touch match start confirmed fullscreen=true, landscapeReady=true and canPlay=true after the server's matchReset. Lifecycle checks cover denied APIs, portrait blocking, rotation, guest entry and pause/resume.
+- Actual server room tests: complete three-round lifecycle, last-infected death, conversion, timer boundary, round budgets, role restrictions, repeat purchases, retained equipment, solo bots, disconnect replacement and reconnect preservation.
+- Combat tests: fire rate, ammo, reload, overheating, recovery times, shield front/rear/break behavior, toxic projectile collision and gradual cloud damage, reveal cooldown, friendly/self reward rejection, maximum-health regeneration and one-time supply rewards.
+- Real map collision tests: safe initial deployment for 24 actors on Highlands, Depot, Yard, Rig and Moon; 12 actors on the bundled custom map. Its 24-actor roster is intentionally rejected for insufficient covered capacity. Runtime tests move survivors into a previously selected spawn and verify reselection; an entirely blocked map waits and recovers when safe space returns.
+- Production browser-to-worker integration: real touch purchase, authoritative ammo/bomb consumption, death shop, safe respawn, retained equipment, next-round role change and active survivor supply purchase. No uncaught browser errors in completed flows.
+- Native six-card shops fit 667×375, 844×390 and 932×430 with no scrolling. Actual 3D thumbnails and phone screenshots inspected. Controller focus is verified not to purchase.
+- Existing menu interaction, landscape/fullscreen lifecycle and scoreboard paging regression checks passed. These cover direct equipment selection, controller navigation, settings, team/bot controls, portrait input blocking, API refusal and complete scoreboard rows.
+- Release checks validate JavaScript syntax, shared rules, version/cache references, ZIP integrity and preservation of existing entry filenames.
 
-These checks use browser emulation and the actual server module in a local socket/storage harness. Physical-device Safari/Android and the live deployment were not exercised.
+Tests use headless Chromium, touch emulation and simulated controller handlers. Physical phones/controllers and live deployment were not tested. Gameplay balance still needs multiplayer playtesting. Browser restrictions can refuse forced fullscreen/orientation lock; the landscape input gate remains in place.
 
 ## Upload
 
-Deploy the contents of `1_SERVER_REPO_UPLOAD` first, then publish `2_CLIENT_REPO_UPLOAD` using the existing repository workflows. Keep the folders separate and preserve entry filenames. Start a new match after updating: protocol 103 intentionally rejects older clients/rooms. Check the in-game version and version.json for 2.9.1.
+Upload the contents of `1_SERVER_REPO_UPLOAD` and `2_CLIENT_REPO_UPLOAD` to their respective repositories. Both must be updated: this release uses protocol 104. Preserve the existing entry filenames. After deployment, check the in-game version and `version.json` for 2.10.0.
