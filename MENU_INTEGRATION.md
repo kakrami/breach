@@ -1,16 +1,17 @@
-# Menu integration map
+# Menu integration map — 2.9.1
 
-The existing canvas UI and gameplay state remain authoritative.
+The canvas widget graph and live gameplay state remain authoritative. There are no HTML menu overlays or separate demo data stores.
 
 | Component | Responsibility |
 | --- | --- |
-| `game-menu.js` | Landscape layout, fixed card sizes, pagination, preview selection, native semantic controls |
-| `client.js:createIntegratedMenuAdapter` | Lobby/class data, game actions, preference updates and host draft handling |
-| `menu-scene.js` | Shared 3D preview renderer and thumbnail cache |
-| `menu-equipment.js` | Equipment and killstreak display models |
-| `native-layout.js` | Screen dispatch, physical hit geometry, input ownership, remaining game overlays |
-| `app-lifecycle.js` | Entry, landscape gate, fullscreen and gameplay input lifecycle |
+| game-menu.js | Main menu, lobby, armory, settings, Cheats, pause and player roster |
+| client.js:createIntegratedMenuAdapter | Live state, existing game actions, preference and host drafts |
+| menu-scene.js | One shared 3D renderer, independent thumbnail framing, borrowed weapon geometry |
+| menu-equipment.js | Equipment and killstreak display models |
+| native-layout.js | Canvas layout, hit testing, text-entry/chat keyboard and message history |
+| match-menu-ui.js | Scoreboard/result layouts and discrete paging with shared input routing |
+| team-model.js | Authoritative presentation rules for self, allies, allied bots and enemies |
+| app-lifecycle.js | Fullscreen entry, landscape gate and gameplay input lifecycle |
+| worker.js | Authoritative Team/All chat recipients and existing match actions |
 
-The integrated menu is used for the main menu, lobby, loadout, settings and host/player panels. The game retains its existing pause, connection, confirmation, text entry, HUD and Map Builder infrastructure.
-
-The client and server folders must be uploaded to their respective existing repositories. Keep the two folders separate. Client entry points and existing gameplay file names are unchanged. Deploy the server using its existing Wrangler configuration, and publish the client with the repository's existing GitHub Pages process. The in-game version and `version.json` should both show 2.9.0 after deployment.
+Deploy the server folder before the client folder. Both use version 2.9.1 and protocol 103. The protocol bump prevents team chat from falling back to global delivery on an old server. Existing entry filenames and repository layout are preserved. No deployment has been performed by this release build.

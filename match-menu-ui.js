@@ -1,6 +1,6 @@
 /* Match menus own only canvas presentation and navigation. Gameplay state, timers,
  * network messages and relationship colors are supplied by the client. */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.9.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.9.1';
 
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,finite(value)));
@@ -20,34 +20,45 @@ function scrollbar(c,layout){if(!layout.maxScroll||!layout.body)return;const b=l
 function decorateScroll(layout){const {body}=layout;layout.maxScroll=Math.max(0,layout.contentH-body.h);layout.scroll=clamp(layout.scroll,0,layout.maxScroll);return layout;}
 function hit(id,r,action,extra={}){return{id,...r,action,...extra};}
 
-/** All participants are retained in rows/focusTargets; only paint/hit geometry is clipped. */
+/** Whole rows in two columns. Paging exists only when a roster exceeds capacity. */
 export function layoutMatchScoreboard(options={}){
-  const view=matchMenuViewport(options),rows=Array.isArray(options.rows)?options.rows:[],results=options.kind==='results',panel=centered(view,800,Math.min(648,Math.max(272,164+rows.length*48))),pad=16,headerH=124,footerH=60;
-  const body={x:panel.x+pad,y:panel.y+headerH,w:Math.max(1,panel.w-pad*2),h:Math.max(1,panel.h-headerH-footerH)},layout=decorateScroll({kind:results?'results':'scoreboard',view,panel,body,rows:[],rowH:48,contentH:rows.length*48,scroll:options.scroll||0});
-  const close=results?null:{x:panel.x+panel.w-104,y:panel.y+12,w:88,h:44},previous={x:panel.x+panel.w-112,y:panel.y+panel.h-52,w:44,h:44},next={x:panel.x+panel.w-60,y:previous.y,w:44,h:44};
-  const columns={name:body.x+12,kills:body.x+body.w-120,deaths:body.x+body.w-72,ratio:body.x+body.w-8};
-  // On compact widths, names keep at least 84 px while statistics remain legible.
-  if(body.w<360){columns.kills=body.x+body.w-102;columns.deaths=body.x+body.w-63;columns.ratio=body.x+body.w-8;}
-  layout.close=close;layout.previous=previous;layout.next=next;layout.columns=columns;layout.hits=[];layout.focusTargets=[];
-  rows.forEach((player,index)=>{const r={x:body.x,y:body.y+index*48-layout.scroll,w:body.w-8,h:48},visible=intersect(r,body),item=hit(`player:${String(player.id??index)}`,r,'inspect',{player,index,contentY:index*48,scrollItem:true});layout.rows.push({...item,visible});layout.focusTargets.push(item);if(visible&&visible.h>=44)layout.hits.push({...item,...visible});});
-  if(close){const target=hit('close',close,'back');layout.hits.push(target);layout.focusTargets.push(target);}
-  for(const [id,r,direction,disabled] of [['previous',previous,-1,layout.scroll<=0],['next',next,1,layout.scroll>=layout.maxScroll]]){const target=hit(id,r,'page',{direction,disabled});layout.hits.push(target);layout.focusTargets.push(target);}
-  layout.visibleRange={first:rows.length?Math.floor(layout.scroll/48)+1:0,last:Math.min(rows.length,Math.ceil((layout.scroll+body.h)/48)),total:rows.length};return layout;
+  const view=matchMenuViewport(options),rows=Array.isArray(options.rows)?options.rows:[],results=options.kind==='results',panel=centered(view,1000,Math.min(view.h,500));
+  const teamBased=options.teamBased??rows.some(p=>p.teamLabel),pad=14,gap=16,headerH=78,footerH=38,rowH=26;
+  const body={x:panel.x+pad,y:panel.y+headerH,w:panel.w-pad*2,h:Math.max(rowH,panel.h-headerH-footerH)},capacity=Math.max(1,Math.floor(body.h/rowH)),cw=(body.w-gap)/2;
+  const groups=teamBased?[{name:'ALPHA',team:'blue',players:rows.filter(p=>p.team==='blue')},{name:'BRAVO',team:'red',players:rows.filter(p=>p.team==='red')}]:[{name:'STANDINGS',players:rows},{name:'',players:rows}];
+  const pageCount=Math.max(1,teamBased?Math.ceil(Math.max(...groups.map(g=>g.players.length))/capacity):Math.ceil(rows.length/(capacity*2))),page=clamp(Math.floor(options.page||0),0,pageCount-1);
+  const layout={kind:results?'results':'scoreboard',view,panel,body,rows:[],groups,capacity,rowH,page,pageCount,scroll:0,maxScroll:0,contentH:body.h,hits:[],focusTargets:[]};
+  groups.forEach((group,col)=>{
+    group.x=body.x+col*(cw+gap);group.w=cw;group.columns={name:group.x+9,kills:group.x+cw-84,deaths:group.x+cw-51,ratio:group.x+cw-7};
+    const start=teamBased?page*capacity:page*capacity*2+col*capacity;
+    group.players.slice(start,start+capacity).forEach((player,index)=>{const r={id:'player:'+player.id,x:group.x,y:body.y+index*rowH,w:cw,h:rowH,player,index,columns:group.columns};layout.rows.push(r);});
+  });
+  if(!results){layout.close={x:panel.x+panel.w-88,y:panel.y+8,w:74,h:38};layout.hits.push(hit('close',layout.close,'back'));}
+  if(pageCount>1){for(const [id,direction,x]of [['previous',-1,panel.x+panel.w-111],['next',1,panel.x+panel.w-57]])layout.hits.push(hit(id,{x,y:panel.y+panel.h-36,w:43,h:32},'page',{direction,disabled:direction<0?page===0:page===pageCount-1}));}
+  layout.focusTargets=[...layout.hits];return layout;
 }
 export function drawMatchScoreboard(c,options={}){
-  const l=layoutMatchScoreboard(options),{panel:p,body:b,columns:col}=l,focusId=options.focusId||'';c.save();backdrop(c,l.view);rr(c,p,C.panel,C.line);
-  label(c,options.title||(l.kind==='results'?'FINAL STANDINGS':'SCOREBOARD'),p.x+16,p.y+30,{size:20,weight:800,fill:options.accent||C.accent,width:p.w-(l.close?136:32)});
-  const subtitle=String(options.subtitle||`${l.rows.length} PLAYERS`),segments=subtitle.split(' · '),twoLines=subtitle.startsWith('FINAL STANDINGS · ');label(c,twoLines?segments[0]:subtitle,p.x+16,p.y+60,{fill:C.muted,width:p.w-32});label(c,twoLines?segments.slice(1).join(' · '):`${l.rows.length} PLAYERS`,p.x+16,p.y+82,{fill:C.muted,width:p.w-32});
-  label(c,'PLAYER',col.name,p.y+110,{size:14,fill:C.muted});for(const [text,x] of [['K',col.kills],['D',col.deaths],['K/D',col.ratio]])label(c,text,x,p.y+110,{fill:C.muted,align:'right'});
-  c.save();c.beginPath();c.rect(b.x,b.y,b.w,b.h);c.clip();
-  for(const row of l.rows){if(!row.visible)continue;const player=row.player,self=String(player.id)===String(options.selfId),selected=row.id===focusId;rr(c,{x:row.x,y:row.y+2,w:row.w,h:44},selected?'#273720':self?'#202a22':row.index%2?'#151f25':'#11191e',selected?C.accent:null,6);const stripe=player.color||(self?C.accent:C.muted);c.fillStyle=stripe;c.fillRect(row.x+2,row.y+10,3,28);
-    const name=`${player.godMode?'◆ ':''}${String(player.name||'Player')}`,nameW=col.kills-col.name-20;label(c,name,col.name,row.y+17,{size:15,weight:self?700:600,width:nameW});const detail=[self?'YOU':'',player.bot?'BOT':'',player.teamLabel||'',player.godMode?'ADMIN':''].filter(Boolean).join(' · ');label(c,detail||'PLAYER',col.name,row.y+35,{size:14,fill:stripe,width:nameW});
-    const kills=Math.max(0,finite(player.kills)),deaths=Math.max(0,finite(player.deaths)),ratio=deaths?(kills/deaths).toFixed(2):kills?String(kills):'0.00';for(const [value,x,fill] of [[kills,col.kills,C.text],[deaths,col.deaths,C.muted],[ratio,col.ratio,C.muted]])label(c,String(value),x,row.y+24,{size:14,align:'right',fill});
-  }c.restore();scrollbar(c,l);
-  if(!l.rows.length)label(c,'No players yet',b.x+b.w/2,b.y+24,{align:'center',fill:C.muted});
+  const l=layoutMatchScoreboard(options),p=l.panel,focusId=options.focusId||'';c.save();backdrop(c,l.view,.86);rr(c,p,'#131d18','#354234',0);
+  label(c,options.title||(l.kind==='results'?'FINAL STANDINGS':'SCOREBOARD'),p.x+14,p.y+25,{size:22,weight:800,fill:options.accent||'#edf0e8',width:p.w-122});
   if(l.close)button(c,l.close,options.controller?'B  BACK':'BACK',{active:focusId==='close'});
-  const {first,last,total}=l.visibleRange;label(c,options.footer||`${first}–${last} OF ${total}`,p.x+16,p.y+p.h-30,{fill:C.muted,width:p.w-144});
-  for(const id of ['previous','next']){const target=l.hits.find(h=>h.id===id);button(c,target,id==='previous'?'↑':'↓',{disabled:target.disabled,active:focusId===id});}
+  for(const group of l.groups){
+    const col=group.columns,score=group.team?options.teamScores?.[group.team]:undefined;
+    label(c,group.name+(score==null?'':'   '+score),group.x+2,p.y+57,{size:17,weight:800,fill:'#d8eda0',width:group.w-116});
+    for(const [text,x]of [['K',col.kills],['D',col.deaths],['K/D',col.ratio]])label(c,text,x,p.y+57,{size:11,fill:C.muted,align:'right'});
+    c.fillStyle='#354234';c.fillRect(group.x,p.y+67,group.w,1);
+  }
+  for(const row of l.rows){
+    const player=row.player,col=row.columns,self=String(player.id)===String(options.selfId),tone=player.color||(self?'#d7ff58':C.muted);
+    rr(c,{x:row.x,y:row.y,w:row.w,h:row.h-2},self?'#293523':row.index%2?'#1e2822':'#18221c',null,0);c.fillStyle=tone;c.fillRect(row.x,row.y+5,2,row.h-12);
+    const prefix=self?'YOU  ':'';
+    label(c,prefix+(player.bot?String(player.name||'Bot').replace(/^(ALPHA|BRAVO) /,''):String(player.name||'Player')),col.name,row.y+13,{size:12,weight:self?700:500,fill:tone,width:col.kills-col.name-15});
+    const kills=Math.max(0,finite(player.kills)),deaths=Math.max(0,finite(player.deaths)),ratio=(kills/Math.max(1,deaths)).toFixed(2);
+    for(const [value,x]of [[kills,col.kills],[deaths,col.deaths],[ratio,col.ratio]])label(c,String(value),x,row.y+13,{size:12,align:'right',fill:'#edf0e8'});
+  }
+  const footerY=p.y+p.h-18;
+  if(options.footer)label(c,options.footer,p.x+14,footerY,{size:11,fill:C.muted,width:p.w-(l.pageCount>1?140:28)});
+  else {let x=p.x+14;for(const [name,tone]of [['YOU','#d7ff58'],['ALLY','#62ef86'],['ALLY BOT','#54a9ff'],['ENEMY','#ff3b45']]){label(c,name,x,footerY,{size:10,fill:tone});x+=name==='ALLY BOT'?76:55;}}
+  if(l.pageCount>1){label(c,(l.page+1)+' / '+l.pageCount,p.x+p.w-145,footerY,{size:11,fill:C.muted,align:'right'});for(const id of ['previous','next']){const target=l.hits.find(h=>h.id===id);button(c,target,id==='previous'?'‹':'›',{disabled:target.disabled,active:focusId===id});}}
   c.restore();return l;
 }
 
@@ -74,13 +85,14 @@ export function drawMatchReplay(c,options={}){const view=matchMenuViewport(optio
 export function createMatchMenuController(callbacks={}){
   let key='',layout=null,focusId='',press=null,epoch=0;
   const notifyFocus=()=>callbacks.onFocus?.(focusId,layout);
-  const scrollTo=value=>{if(!layout?.body)return false;const next=clamp(value,0,layout.maxScroll);if(next===layout.scroll)return false;layout.scroll=next;callbacks.onScroll?.(next,layout);return true;};
+  const scrollTo=value=>{if(!layout?.body||!layout.maxScroll)return false;const next=clamp(value,0,layout.maxScroll);if(next===layout.scroll)return false;layout.scroll=next;callbacks.onScroll?.(next,layout);return true;};
   const ensureVisible=target=>{if(!target?.scrollItem||!layout?.body)return;const top=target.contentY,bottom=top+target.h;if(top<layout.scroll)scrollTo(top);else if(bottom>layout.scroll+layout.body.h)scrollTo(bottom-layout.body.h);};
   const focus=target=>{if(!target)return false;focusId=target.id;ensureVisible(target);notifyFocus();return true;};
   const targets=()=>layout?.focusTargets?.filter(t=>!t.disabled)||[];
-  const activate=target=>{if(!target||target.disabled)return false;if(target.action==='page')return scrollTo(layout.scroll+target.direction*Math.max(layout.rowH||48,layout.body.h-(layout.rowH||48)));if(target.action==='back'){callbacks.onBack?.(layout);return true;}callbacks.onAction?.(target.action,target,layout);return true;};
+  const pageTo=direction=>{if(!layout?.pageCount)return false;const next=clamp(layout.page+direction,0,layout.pageCount-1);if(next===layout.page)return false;layout.page=next;callbacks.onPage?.(next,layout);return true;};
+  const activate=target=>{if(!target||target.disabled)return false;if(target.action==='page'&&layout.pageCount)return pageTo(target.direction);if(target.action==='page')return scrollTo(layout.scroll+target.direction*Math.max(layout.rowH||48,layout.body.h-(layout.rowH||48)));if(target.action==='back'){callbacks.onBack?.(layout);return true;}callbacks.onAction?.(target.action,target,layout);return true;};
   const move=direction=>{const all=targets();if(!all.length)return false;const current=all.find(t=>t.id===focusId);if(!current)return focus(all[0]);const dx=direction==='left'?-1:direction==='right'?1:0,dy=direction==='up'?-1:direction==='down'?1:0,cx=current.x+current.w/2,cy=current.y+current.h/2;let best=null,bestScore=Infinity;for(const t of all){if(t===current)continue;const x=t.x+t.w/2-cx,y=t.y+t.h/2-cy,along=x*dx+y*dy,cross=Math.abs(x*dy-y*dx);if(along<=1)continue;const score=along+cross*3;if(score<bestScore){bestScore=score;best=t;}}return focus(best);};
-  const command=value=>{if(!layout)return false;if(value==='back'){callbacks.onBack?.(layout);return true;}if(value==='accept'){const all=targets();return activate(all.find(t=>t.id===focusId)||all[0]);}if(value==='previousTab'||value==='nextTab'){const direction=value==='previousTab'?-1:1;if(callbacks.onTab){callbacks.onTab(direction,layout);return true;}return scrollTo(layout.scroll+direction*(layout.body?.h||48));}if(value==='home')return focus(targets().find(t=>t.scrollItem)||targets()[0]);if(value==='end'){const list=targets().filter(t=>t.scrollItem);return focus(list[list.length-1]);}if(['up','down','left','right'].includes(value))return move(value);return false;};
+  const command=value=>{if(!layout)return false;if(value==='back'){callbacks.onBack?.(layout);return true;}if(value==='accept'){const all=targets();return activate(all.find(t=>t.id===focusId)||all[0]);}if(value==='previousTab'||value==='nextTab'){const direction=value==='previousTab'?-1:1;if(layout.pageCount)return pageTo(direction);if(callbacks.onTab){callbacks.onTab(direction,layout);return true;}return scrollTo(layout.scroll+direction*(layout.body?.h||48));}if(value==='home')return focus(targets().find(t=>t.scrollItem)||targets()[0]);if(value==='end'){const list=targets().filter(t=>t.scrollItem);return focus(list[list.length-1]);}if(['up','down','left','right'].includes(value))return move(value);return false;};
   return{
     setLayout(nextKey,next){if(nextKey!==key){key=nextKey;epoch++;press=null;focusId='';}layout=next;if(layout&&!layout.focusTargets?.some(t=>t.id===focusId&&!t.disabled)){focusId=targets()[0]?.id||'';notifyFocus();}return layout;},
     getLayout:()=>layout,getHits:()=>layout?.hits||[],getFocus:()=>focusId,

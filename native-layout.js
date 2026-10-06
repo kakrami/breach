@@ -7,8 +7,8 @@
  * once at the output boundary. Keep the same graph for touch, mouse, keyboard,
  * controller and accessibility rather than introducing parallel UI layouts.
  */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.9.0';
-import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.9.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.9.1';
+import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.9.1';
 
 const C = Object.freeze({
   bg:THEME.bg, surface:THEME.panel, raised:THEME.panelRaised, line:THEME.border,
@@ -85,11 +85,11 @@ export function createNativeRenderer({canvas,ui,onAfterAction=()=>{},inputOwner=
   function arrow(r,color=C.text){const x=r.right-24,y=r.top+r.height/2;line(x-10,y,x+4,y,color,2);line(x-2,y-6,x+4,y,color,2);line(x-2,y+6,x+4,y,color,2);}
   function icon(name,r,color=C.text){const x=r.left+r.width/2,y=r.top+r.height/2;ctx.strokeStyle=color;ctx.lineWidth=2;if(/settings/i.test(name)){ctx.beginPath();ctx.arc(x,y,7,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.arc(x,y,2,0,Math.PI*2);ctx.stroke();for(let i=0;i<8;i++){const a=i*Math.PI/4;line(x+Math.cos(a)*9,y+Math.sin(a)*9,x+Math.cos(a)*12,y+Math.sin(a)*12,color,2);}}else if(/mute|sound|audio/i.test(name)){line(x-9,y-4,x-4,y-4,color,2);line(x-4,y-4,x+2,y-9,color,2);line(x+2,y-9,x+2,y+9,color,2);line(x+2,y+9,x-4,y+4,color,2);line(x-4,y+4,x-9,y+4,color,2);line(x-9,y+4,x-9,y-4,color,2);if(/mute/i.test(name)){line(x+6,y-4,x+12,y+4,color,2);line(x+6,y+4,x+12,y-4,color,2);}else{ctx.beginPath();ctx.arc(x+2,y,8,-.7,.7);ctx.stroke();}}else if(/close/i.test(name)){line(x-6,y-6,x+6,y+6,color,2);line(x-6,y+6,x+6,y-6,color,2);}else txt('›',r.left,r.top+7,r.width,25,color,500,{align:'center'});}
   function hit(n,r,{action=null,scroll=null,disabled=false}={}){const clipped=intersect(r,clip||viewRect());if(!n||!clipped||clipped.width<1||clipped.height<1||disabled||!enabled(n))return;hits.push({node:n,rect:clipped,fullRect:r,action,scroll,screen:activeScreen});}
-  function focusRing(n,r){if(n===ui.activeElement)panel(rect(r.left-3,r.top-3,r.width+6,r.height+6),null,C.lime,6);}
+  function focusRing(n,r){if(n===ui.activeElement&&get('appRoot')?.dataset.inputMode!=='touch')panel(rect(r.left-3,r.top-3,r.width+6,r.height+6),null,C.lime,6);}
   function button(n,r,options={}) {
     if(!n||!shown(n))return;mark(n,r);const primary=options.primary??(cls(n,'primary')||n.id==='enterFullscreenBtn'),active=options.active??(cls(n,'active')||attr(n,'aria-pressed')==='true'||attr(n,'aria-selected')==='true');const disabled=!enabled(n);
     const isTab=options.tab||attr(n,'role')==='tab';const fill=primary?C.lime:active?C.selected:C.raised;
-    ctx.save();if(disabled)ctx.globalAlpha=.4;drawButton(ctx,r,{text:'',fill:isTab?'transparent':primary?C.lime:active?'#283326':'rgba(26,34,39,.85)',stroke:isTab||!active?null:C.lime,radius:0});if(!isTab&&active)panel(rect(r.left,r.top,2,r.height),C.lime,null,0);if(n===hover&&!disabled)panel(r,'rgba(255,255,255,.045)',null,2);const color=primary?'#111605':cls(n,'danger')?C.red:active?C.lime:C.text;
+    ctx.save();if(disabled)ctx.globalAlpha=.4;drawButton(ctx,r,{text:'',fill:isTab?'transparent':primary?C.lime:active?'#283326':C.raised,stroke:isTab||!active?null:C.lime,radius:0});if(!isTab&&active)panel(rect(r.left,r.top,2,r.height),C.lime,null,0);if(n===hover&&!disabled)panel(r,'rgba(255,255,255,.045)',null,2);const color=primary?'#111605':cls(n,'danger')?C.red:active?C.lime:C.text;
     const caption=options.label??label(n);const aria=attr(n,'aria-label')||'';
     if(options.iconOnly||(!text(n)&&aria&&r.width<=56))icon(aria,r,color);
     else if(options.compactCard&&q('strong',n)){txt(text(q('strong',n)),r.left+8,r.top+8,r.width-16,11,color,700);txt(text(q('small',n)),r.left+8,r.top+26,r.width-16,8,C.muted,500,{maxLines:3,lineHeight:11});}
@@ -235,7 +235,7 @@ export function createNativeRenderer({canvas,ui,onAfterAction=()=>{},inputOwner=
     fade(rect(0,footerY-12,vp.width,vp.height-footerY+12),'rgba(9,13,16,0)','#090d10');line(b.left,footerY-2,b.right,footerY-2,'#39423c');
     const startW=portrait?b.width:250,startX=portrait?b.left:b.right-startW;
     if(host)button(get('lobbyStartBtn'),rect(startX,footerY+8,startW,48),{primary:true,label:'DEPLOY',arrow:true,fontSize:18});else simpleText(get('lobbyStatus'),rect(startX,footerY+8,startW,48),{size:13,color:C.muted,maxLines:2});
-    if(!portrait&&active!=='players'){const wr=rect(b.left,footerY+6,b.width-startW-18,50),n=get('nativeLoadoutEditBtn'),weapon=q('.self',get('lobbyRoster'))?.dataset?.primaryWeapon||'assault';art('weapon-'+weapon+'.png',rect(wr.left,wr.top-8,106,66));txt('LOADOUT  ↗',wr.left+108,wr.top+11,wr.width-108,11,C.text,700);txt('v2.9.0  /  '+code,wr.left+108,wr.top+30,wr.width-108,8,C.muted,600);mark(n,wr);hit(n,wr);focusRing(n,wr);}else if(!portrait){txt('ROOM '+code+'  /  '+(host?'HOST':'SQUAD'),b.left,footerY+20,b.width-startW-24,11,C.muted,600);txt('BREACH  v2.9.0',b.left,footerY+39,b.width-startW-24,8,C.dim,600);}
+    if(!portrait&&active!=='players'){const wr=rect(b.left,footerY+6,b.width-startW-18,50),n=get('nativeLoadoutEditBtn'),weapon=q('.self',get('lobbyRoster'))?.dataset?.primaryWeapon||'assault';art('weapon-'+weapon+'.png',rect(wr.left,wr.top-8,106,66));txt('LOADOUT  ↗',wr.left+108,wr.top+11,wr.width-108,11,C.text,700);txt('v2.9.1  /  '+code,wr.left+108,wr.top+30,wr.width-108,8,C.muted,600);mark(n,wr);hit(n,wr);focusRing(n,wr);}else if(!portrait){txt('ROOM '+code+'  /  '+(host?'HOST':'SQUAD'),b.left,footerY+20,b.width-startW-24,11,C.muted,600);txt('BREACH  v2.9.1',b.left,footerY+39,b.width-startW-24,8,C.dim,600);}
   }
   function drawDeployment(r){
     const side=vp.landscape||r.width>=650,heroW=side?r.width*.44:r.width,heroH=side?r.height:Math.min(250,Math.max(134,r.height*.40));
@@ -353,35 +353,52 @@ const ads=q('[data-loadout-ads-preview]',weaponPage);button(ads,rect(left.right-
     const footer=q('.modal-foot',n),buttons=visibleChildren(footer).filter(interactive),fy=r.bottom-56;mark(footer,rect(r.left+pad,fy,r.width-pad*2,48));const bw=Math.min(140,(r.width-32-8*(buttons.length-1))/Math.max(1,buttons.length));buttons.forEach((a,i)=>button(a,rect(r.right-pad-(buttons.length-i)*bw-(buttons.length-i-1)*8,fy,bw,44),{center:true,fontSize:11}));
     const body=rect(r.left+pad+rail,r.top+58,r.width-pad*2-rail,Math.max(1,fy-r.top-66));let bodyNode=isSettings?q('.settings-page.active:not([hidden])',n):isAdmin?q('.admin-page:not(.hide):not([hidden])',n):q('[data-loadout-workspace]',n);if(bodyNode){if(isLoadout)drawLoadoutWorkspace(bodyNode,body);else pagedFlow(bodyNode,body);}
   }
-  function pauseScreen(n){
-    background();mark(n,viewRect());const b=vp.content,top=vp.safe.top+16;heading('PAUSED',b.left,top,b.width,46);txt(text(get('pauseRoom')),b.left,top+52,b.width,11,C.muted,600);const body=rect(b.left,top+84,b.width,Math.max(1,vp.height-vp.safe.bottom-top-92)),buttons=qa('button',n).filter(shown),cols=3,rows=Math.max(1,Math.floor(body.height/52)),capacity=buttons.length>rows*cols?Math.max(1,Math.floor((body.height-44)/52))*cols:rows*cols,range=pageRange(n,body,buttons.length,capacity),cw=(body.width-16)/3;buttons.slice(range.start,range.end).forEach((a,i)=>button(a,rect(body.left+i%3*(cw+8),body.top+Math.floor(i/3)*52,cw,44),{fontSize:12}));
-  }
   function confirmScreen(n){ctx.fillStyle='rgba(2,4,5,.78)';ctx.fillRect(0,0,vp.width,vp.height);const w=Math.min(480,vp.content.width),pad=24,title=q('h2',n),copy=q('p',n),buttons=qa('button',n).filter(shown),copyH=copy?Math.max(44,naturalHeight(copy,w-pad*2)):0,h=148+copyH,r=rect((vp.width-w)/2,(vp.height-h)/2,w,h);panel(r,C.raised,C.line);mark(n,r);txt(text(title)||'Confirm',r.left+pad,r.top+24,w-pad*2,24,C.text,750);if(copy)simpleText(copy,rect(r.left+pad,r.top+66,w-pad*2,copyH),{color:C.muted,maxLines:5});const bw=(w-pad*2-8*(buttons.length-1))/Math.max(1,buttons.length);buttons.forEach((a,i)=>button(a,rect(r.left+pad+i*(bw+8),r.bottom-68,bw,48),{center:true}));}
   function entryScreen(n){background();mark(n,viewRect());const w=Math.min(400,vp.content.width),x=(vp.width-w)/2,y=Math.max(vp.safe.top+8,(vp.height-vp.safe.bottom-300)/2);panel(rect((vp.width-56)/2,y,56,56),C.lime,null,4);txt('B',(vp.width-56)/2+10,y-1,40,46,'#111605',850);txt('BREACH',x,y+88,w,44,C.text,850,{align:'center'});const version=q('[data-app-version]',n);if(version)simpleText(version,rect(x,y+145,w,22),{color:C.muted,maxLines:1});button(get('enterFullscreenBtn'),rect(x,y+194,w,52),{primary:true,label:'Enter Breach',center:true});const status=get('entryStatus');if(text(status))simpleText(status,rect(x,y+268,w,80),{color:cls(status,'error')?C.red:C.muted,maxLines:4});}
   function connectionScreen(n){ctx.fillStyle='rgba(3,6,8,.88)';ctx.fillRect(0,0,vp.width,vp.height);const w=Math.min(420,vp.content.width),r=rect((vp.width-w)/2,(vp.height-188)/2,w,188);panel(r,C.raised,C.line);mark(n,r);ctx.beginPath();ctx.arc(r.left+30,r.top+37,9,performanceNow()/650,performanceNow()/650+Math.PI*1.45);ctx.strokeStyle=C.lime;ctx.lineWidth=3;ctx.stroke();simpleText(get('connectionText'),rect(r.left+54,r.top+27,w-78,72),{size:18,color:C.text,weight:650,maxLines:3});button(get('connectionCancelBtn'),rect(r.left+24,r.bottom-72,w-48,48),{center:true});}
   function keyboardScreen(n){
-    ctx.fillStyle='rgba(3,6,8,.96)';ctx.fillRect(0,0,vp.width,vp.height);
-    const editor=n.id==='gameTextEditor',kb=get(editor?'gameTextKeyboard':'chatKeyboard'),keyScroll=get(editor?'nativeTextKeysScroll':'nativeChatKeysScroll')||kb,keyFooter=get(editor?'nativeTextKeysFooter':'nativeChatKeysFooter');
-    const keys=qa('button',kb).filter(shown),characters=keys.filter(k=>k.dataset.editorChar!==undefined||k.dataset.chatChar!==undefined),fixed=keys.filter(k=>['done','cancel'].includes(k.dataset.editorAction||k.dataset.chatAction)),commands=keys.filter(k=>!characters.includes(k)&&!fixed.includes(k));
-    const fullW=Math.min(880,vp.width-vp.safe.left-vp.safe.right-(vp.portrait?8:32)),baseX=(vp.width-fullW)/2,historySide=!editor&&vp.landscape,historyWidth=historySide?Math.min(236,fullW*.31):0,w=fullW-(historySide?historyWidth+16:0),x=baseX+(historySide?historyWidth+16:0),gap=4,keyH=44;
-    const wide=w>=476,columns=wide?10:Math.max(1,Math.min(8,Math.floor((w+gap)/48))),keyW=(w-gap*(columns-1))/columns;
-    const groups=wide?qa('.chat-key-row',keyScroll).map(row=>visibleChildren(row).filter(k=>characters.includes(k))).filter(row=>row.length):Array.from({length:Math.ceil(characters.length/columns)},(_,i)=>characters.slice(i*columns,(i+1)*columns));
-    const commandCols=Math.min(commands.length,Math.max(2,Math.floor(w/88))),commandW=(w-gap*(commandCols-1))/Math.max(1,commandCols),commandRows=Math.ceil(commands.length/Math.max(1,commandCols)),natural=(groups.length+commandRows)*48+8;
-    const top=vp.landscape?12:editor?Math.max(vp.safe.top+24,(vp.height-natural-176)/2):Math.max(vp.safe.top+108,vp.height-vp.safe.bottom-natural-148),title=editor?text(get('gameTextEditorTitle')):'Message';
-    mark(n,viewRect());if(!editor){const history=get('nativeChatHistory'),hr=historySide?rect(baseX,16,historyWidth,vp.height-vp.safe.bottom-32):rect(baseX,vp.safe.top+12,fullW,Math.max(44,top-vp.safe.top-28));drawChatHistory(history,hr);}txt(title,x,top,w-(editor?0:112),vp.landscape?20:24,C.text,750);
-    const display=rect(x,top+36,w,48);panel(display,C.raised,C.line);const value=get(editor?'gameTextEditorValue':'chatInputText'),placeholder=get(editor?'gameTextEditorPlaceholder':'chatPlaceholder');
-    txt(text(value)||text(placeholder),display.left+14,display.top+15,display.width-28,16,text(value)?C.text:C.dim,550,{maxLines:1});mark(value,display);mark(placeholder,display);
-    const ky=display.bottom+12,fy=vp.height-vp.safe.bottom-44,r=rect(x,ky,w,Math.max(44,fy-ky-8));mark(kb,rect(x,ky,w,fy+44-ky));
-    const keyboardRows=qa('.chat-key-row',keyScroll).map(row=>visibleChildren(row).filter(k=>characters.includes(k))).filter(row=>row.length);if(!keyboardRows.length)keyboardRows.push(characters);if(keyboardRows.length>4&&keyboardRows.at(-1).length+keyboardRows.at(-2).length+commands.length<=12){const tail=keyboardRows.pop();keyboardRows.at(-1).push(...tail);}keyboardRows[keyboardRows.length-1].push(...commands);
-    const rowsFit=Math.max(1,Math.floor(r.height/48)),needsPages=keyboardRows.length>rowsFit,keyRange=pageRange(keyScroll,r,keyboardRows.length,Math.max(1,Math.floor((r.height-(needsPages?44:0))/48)));mark(keyScroll,r);
-    keyboardRows.slice(keyRange.start,keyRange.end).forEach((row,j)=>{const kw=(w-gap*(row.length-1))/row.length;row.forEach((key,i)=>button(key,rect(x+i*(kw+gap),r.top+j*48,kw,keyH),{center:true,fontSize:characters.includes(key)?14:9}));});
-    const fw=(w-gap*(fixed.length-1))/Math.max(1,fixed.length);if(keyFooter)mark(keyFooter,rect(x,fy,w,44));fixed.forEach((key,i)=>button(key,rect(x+i*(fw+gap),fy,fw,44),{center:true,primary:key.dataset.editorAction==='done',fontSize:13}));
-    if(!editor)button(get('chatSendBtn'),rect(x+w-100,top-2,100,44),{label:'Send',primary:true,center:true});
+    ctx.fillStyle='#101713';ctx.fillRect(0,0,vp.width,vp.height);mark(n,viewRect());
+    const editor=n.id==='gameTextEditor',kb=get(editor?'gameTextKeyboard':'chatKeyboard'),prefix=editor?'editor':'chat';
+    const keyOf=char=>{let k=qa('button',kb).find(k=>k.dataset[prefix+'Char']===char);if(!k){k=ui.createElement('button');k.dataset[prefix+'Char']=char;k.textContent=char;kb.append(k);}return k;};
+    const action=name=>qa('button',kb).find(k=>k.dataset[prefix+'Action']===name);
+    let mode=kb._modeButton;if(!mode){mode=ui.createElement('button');mode.setAttribute('aria-label','Switch letters and symbols');mode.addEventListener('click',()=>{kb.dataset.symbols=kb.dataset.symbols==='true'?'false':'true';dirty=true;});kb.append(mode);kb._modeButton=mode;}
+    const fullW=Math.min(1030,vp.width-vp.safe.left-vp.safe.right-24),baseX=vp.safe.left+(vp.width-vp.safe.left-vp.safe.right-fullW)/2,top=vp.safe.top+10,bottom=vp.height-vp.safe.bottom-8;
+    const historyWidth=editor?0:Math.min(250,fullW*.26),x=baseX+(editor?0:historyWidth+16),w=fullW-(editor?0:historyWidth+16);
+    const title=editor?text(get('gameTextEditorTitle')):'CHAT';txt(title,x,top+8,editor?w-164:82,20,C.text,750);
+    const close=action('cancel'),done=editor?action('done'):get('chatSendBtn');
+    button(close,rect(x+w-64,top,64,38),{label:'CLOSE',center:true,fontSize:11});
+    if(!editor){button(get('chatChannel-team'),rect(x+82,top,64,38),{label:'TEAM',center:true,fontSize:11});button(get('chatChannel-all'),rect(x+150,top,60,38),{label:'ALL',center:true,fontSize:11});
+      const history=get('nativeChatHistory');txt('COMMS',baseX,top+9,historyWidth,13,C.muted,700);line(baseX,top+42,baseX+historyWidth,top+42,'#354234');drawChatHistory(history,rect(baseX,top+54,historyWidth,bottom-top-54));}
+    const display=rect(x,top+49,w-84,44);panel(display,'#1d2721','#354234',0);
+    const value=get(editor?'gameTextEditorValue':'chatInputText'),placeholder=get(editor?'gameTextEditorPlaceholder':'chatPlaceholder');
+    let draft=text(value);ctx.font='550 15px '+THEME.font;while(draft.length&&ctx.measureText(draft).width>display.width-24)draft=draft.slice(1);
+    txt(draft||text(placeholder),display.left+12,display.top+13,display.width-24,15,text(value)?C.text:C.dim,550,{maxLines:1});mark(value,display);mark(placeholder,display);
+    button(done,rect(x+w-76,display.top,76,44),{label:editor?'DONE':'SEND',primary:true,center:true,fontSize:12});
+    const ky=display.bottom+12,gap=5,keyH=(bottom-ky-gap*3)/4,unit=(w-gap*9)/10,symbols=kb.dataset.symbols==='true';
+    mark(kb,rect(x,ky,w,bottom-ky));
+    const row=(chars,y,offset=0)=>[...chars].forEach((char,i)=>button(keyOf(char),rect(x+offset+i*(unit+gap),y,unit,keyH),{center:true,fontSize:18,maxLines:1}));
+    row(symbols?'1234567890':'qwertyuiop',ky);
+    row(symbols?'@#$%&*()-':'asdfghjkl',ky+keyH+gap,(unit+gap)/2);
+    const third=ky+2*(keyH+gap),wide=unit*1.5+gap*.5;
+    button(action('shift'),rect(x,third,wide,keyH),{label:'⇧',center:true,fontSize:23});
+    [...(symbols?'!?/:;=+':'zxcvbnm')].forEach((char,i)=>button(keyOf(char),rect(x+wide+gap+i*(unit+gap),third,unit,keyH),{center:true,fontSize:18}));
+    button(action('backspace'),rect(x+w-wide,third,wide,keyH),{label:'⌫',center:true,fontSize:22});
+    const last=ky+3*(keyH+gap);button(mode,rect(x,last,wide,keyH),{label:symbols?'ABC':'123',center:true,fontSize:14});
+    button(keyOf(','),rect(x+wide+gap,last,unit,keyH),{center:true,fontSize:18});
+    const spaceX=x+wide+unit+gap*2,spaceW=w-wide*2-unit*2-gap*4;
+    button(action('space'),rect(spaceX,last,spaceW,keyH),{label:'SPACE',center:true,fontSize:13});
+    button(keyOf('.'),rect(spaceX+spaceW+gap,last,unit,keyH),{center:true,fontSize:18});
+    button(keyOf('?'),rect(x+w-wide,last,wide,keyH),{center:true,fontSize:18});
   }
   function drawChatHistory(n,r){
     if(!n)return;mark(n,r);const messages=visibleChildren(n).filter(row=>!cls(row,'native-pager-control')),chunks=[];
-    for(const row of messages){const name=q('.native-chat-name',row)||q('strong',row),body=q('.native-chat-text',row)||q('span',row),lines=splitLines(text(body)||text(row),r.width-20,12,500);for(let i=0;i<lines.length;i+=3)chunks.push({row,name,lines:lines.slice(i,i+3),continued:i>0});}
-    const capacity=Math.max(1,Math.floor((r.height-44)/90)),range=pageRange(n,r,chunks.length,capacity);chunks.slice(range.start,range.end).forEach((item,i)=>{const y=r.top+i*90;txt((text(item.name)||'Player')+(item.continued?' …':''),r.left+10,y+2,r.width-20,12,item.row.dataset?.color||C.lime,700);item.lines.forEach((line,j)=>txt(line,r.left+10,y+24+j*16,r.width-20,12,C.text,500));});if(!chunks.length)txt('No messages yet',r.left+8,r.top+8,r.width-16,12,C.dim,500);
+    for(const row of messages.slice().reverse()){const name=q('.native-chat-name',row),body=q('.native-chat-text',row),lines=splitLines(text(body),r.width-12,12,500);for(let i=0;i<lines.length;i+=3)chunks.push({row,name,lines:lines.slice(i,i+3),continued:i>0});}
+    const capacity=Math.max(1,Math.floor((r.height-44)/79));
+    // Most recent messages are first; paging is explicit and never mixed with scrolling.
+    if(n.dataset.follow==='true'){const saved=pages.get(n);if(saved)saved.page=0;n.dataset.follow='false';}
+    const range=pageRange(n,r,chunks.length,capacity);
+    chunks.slice(range.start,range.end).forEach((item,i)=>{const y=r.top+i*79;txt(text(item.name)+(item.continued?' …':''),r.left,y,r.width,10,item.row.dataset.color,700,{maxLines:1});item.lines.forEach((line,j)=>txt(line,r.left,y+19+j*16,r.width,12,C.text,500));});
+    if(!chunks.length){txt('NO MESSAGES',r.left,r.top+18,r.width,13,C.text,700);txt('Team messages stay with your teammates. All reaches everyone.',r.left,r.top+47,r.width,12,C.muted,500,{maxLines:5,lineHeight:18});}
   }
 
   function rotateScreen(n){
@@ -399,7 +416,7 @@ const ads=q('[data-loadout-ads-preview]',weaponPage);button(ads,rect(left.right-
     // Only the frontmost screen can receive input. Earlier screens can remain
     // visible beneath overlays, but their hit targets never leak through.
     const signature=ordered.map(n=>n.id).join('|');if(signature!==lastScreen){cancelPointer('screen-change');inputOwner?.sync?.('native-screen-change');lastScreen=signature;}
-    ordered.forEach(n=>{activeScreen=n;hits=[];scrolls=[];if(menuScene?.draw({context:ctx,viewport:vp,screen:n,mark,hit}))return;switch(n.id){case'entryScreen':entryScreen(n);break;case'rotateGate':rotateScreen(n);break;case'menu':menuScreen(n);break;case'lobbyScreen':lobbyScreen(n);break;case'pause':pauseScreen(n);break;case'settingsPanel':case'adminPanel':case'loadoutPanel':modalScreen(n);break;case'lobbyQuitConfirm':case'mapDeleteConfirm':confirmScreen(n);break;case'connectionOverlay':connectionScreen(n);break;case'gameTextEditor':case'chatComposer':keyboardScreen(n);break;}});
+    ordered.forEach(n=>{activeScreen=n;hits=[];scrolls=[];if(menuScene?.draw({context:ctx,viewport:vp,screen:n,mark,hit}))return;switch(n.id){case'entryScreen':entryScreen(n);break;case'rotateGate':rotateScreen(n);break;case'menu':menuScreen(n);break;case'lobbyScreen':lobbyScreen(n);break;case'settingsPanel':case'adminPanel':case'loadoutPanel':modalScreen(n);break;case'lobbyQuitConfirm':case'mapDeleteConfirm':confirmScreen(n);break;case'connectionOverlay':connectionScreen(n);break;case'gameTextEditor':case'chatComposer':keyboardScreen(n);break;}});
     activeScreen=ordered.at(-1)||null;if(noticeText){vp=fullViewport;clip=viewRect();const w=Math.min(620,vp.content.width),r=rect((vp.width-w)/2,vp.height-vp.safe.bottom-44,w,44);panel(r,C.raised,C.line);txt(noticeText,r.left+14,r.top+8,r.width-28,13,C.text,650,{maxLines:2,lineHeight:15,align:'center'});}mark(ui.root,viewRect());ui.root.layoutStyle={overflow:'hidden',display:'block'};canvas.style.pointerEvents=ordered.length?'auto':'none';return {viewport:vp,screens:ordered.map(n=>n.id),hits:[...hits],scrolls:[...scrolls],painted:[...new Set(painted)]};
   }
   function hitTest(x,y){for(let i=hits.length-1;i>=0;i--)if(inside(hits[i].rect,x,y)&&enabled(hits[i].node))return hits[i];return null;}

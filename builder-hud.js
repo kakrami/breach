@@ -1,7 +1,7 @@
 // One canvas owns builder painting, hit testing, focus, text keys and scrolling.
 // Document edits still go through EditorSession's command/preview pipeline.
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.9.0";
-import { THEME, drawPanel, drawButton, drawLabel, directionNeighbor } from "./native-ui.js?v=2.9.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.9.1";
+import { THEME, drawPanel, drawButton, drawLabel, directionNeighbor } from "./native-ui.js?v=2.9.1";
 const inside = (p, r) => p.x >= r.x && p.x <= r.x + r.w && p.y >= r.y && p.y <= r.y + r.h;
 const intersect = (a,b) => a.x < b.x+b.w && a.x+a.w>b.x && a.y<b.y+b.h && a.y+a.h>b.y;
 const hit = (p,b) => inside(p,b) && (!b.clip || inside(p,b.clip));
