@@ -1,6 +1,6 @@
 /* Match menus own only canvas presentation and navigation. Gameplay state, timers,
  * network messages and relationship colors are supplied by the client. */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.13.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.14.1';
 
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,finite(value)));
@@ -22,8 +22,8 @@ function hit(id,r,action,extra={}){return{id,...r,action,...extra};}
 
 /** Whole rows in two columns. Paging exists only when a roster exceeds capacity. */
 export function layoutMatchScoreboard(options={}){
-  const view=matchMenuViewport(options),rows=Array.isArray(options.rows)?options.rows:[],results=options.kind==='results',panel=centered(view,1000,Math.min(view.h,500));
-  const teamBased=options.teamBased??rows.some(p=>p.teamLabel),pad=14,gap=16,headerH=78,footerH=38,rowH=26;
+  const view=matchMenuViewport(options),rows=Array.isArray(options.rows)?options.rows:[],results=options.kind==='results';
+  const teamBased=options.teamBased??rows.some(p=>p.teamLabel),pad=14,gap=16,headerH=78,footerH=54,rowH=26,visibleRows=teamBased?Math.max(rows.filter(p=>p.team==='blue').length,rows.filter(p=>p.team==='red').length):Math.ceil(rows.length/2),panel=centered(view,1000,Math.min(view.h,500,headerH+footerH+Math.max(4,visibleRows)*rowH));
   const body={x:panel.x+pad,y:panel.y+headerH,w:panel.w-pad*2,h:Math.max(rowH,panel.h-headerH-footerH)},capacity=Math.max(1,Math.floor(body.h/rowH)),cw=(body.w-gap)/2;
   const groups=teamBased?[{name:options.infection?'SURVIVORS':'ALPHA',team:'blue',players:rows.filter(p=>p.team==='blue')},{name:options.infection?'INFECTED':'BRAVO',team:'red',players:rows.filter(p=>p.team==='red')}]:[{name:'STANDINGS',players:rows},{name:'',players:rows}];
   const pageCount=Math.max(1,teamBased?Math.ceil(Math.max(...groups.map(g=>g.players.length))/capacity):Math.ceil(rows.length/(capacity*2))),page=clamp(Math.floor(options.page||0),0,pageCount-1);
@@ -33,8 +33,8 @@ export function layoutMatchScoreboard(options={}){
     const start=teamBased?page*capacity:page*capacity*2+col*capacity;
     group.players.slice(start,start+capacity).forEach((player,index)=>{const r={id:'player:'+player.id,x:group.x,y:body.y+index*rowH,w:cw,h:rowH,player,index,columns:group.columns};layout.rows.push(r);});
   });
-  if(!results){layout.close={x:panel.x+panel.w-88,y:panel.y+8,w:74,h:38};layout.hits.push(hit('close',layout.close,'back'));}
-  if(pageCount>1){for(const [id,direction,x]of [['previous',-1,panel.x+panel.w-111],['next',1,panel.x+panel.w-57]])layout.hits.push(hit(id,{x,y:panel.y+panel.h-36,w:43,h:32},'page',{direction,disabled:direction<0?page===0:page===pageCount-1}));}
+  if(!results){layout.close={x:panel.x+panel.w-88,y:panel.y+8,w:74,h:44};layout.hits.push(hit('close',layout.close,'back'));}
+  if(pageCount>1){for(const [id,direction,x]of [['previous',-1,panel.x+panel.w-111],['next',1,panel.x+panel.w-57]])layout.hits.push(hit(id,{x,y:panel.y+panel.h-49,w:44,h:44},'page',{direction,disabled:direction<0?page===0:page===pageCount-1}));}
   layout.focusTargets=[...layout.hits];return layout;
 }
 export function drawMatchScoreboard(c,options={}){
@@ -42,7 +42,7 @@ export function drawMatchScoreboard(c,options={}){
   label(c,options.title||(l.kind==='results'?'FINAL STANDINGS':'SCOREBOARD'),p.x+14,p.y+25,{size:22,weight:800,fill:options.accent||'#edf0e8',width:p.w-122});
   if(l.close)button(c,l.close,options.controller?'B  BACK':'BACK',{active:focusId==='close'});
   for(const group of l.groups){
-    const col=group.columns,score=group.team?options.teamScores?.[group.team]:undefined;
+    const col=group.columns,score=group.team?(options.infection?group.players.length:options.teamScores?.[group.team]):undefined;
     label(c,group.name+(score==null?'':'   '+score),group.x+2,p.y+57,{size:17,weight:800,fill:'#d8eda0',width:group.w-116});
     for(const [text,x]of (options.infection?[['CONV',col.kills],['AST',col.deaths],['DMG',col.ratio]]:[['K',col.kills],['D',col.deaths],['K/D',col.ratio]]))label(c,text,x,p.y+57,{size:11,fill:C.muted,align:'right'});
     c.fillStyle='#354234';c.fillRect(group.x,p.y+67,group.w,1);
@@ -63,15 +63,17 @@ export function drawMatchScoreboard(c,options={}){
 }
 
 export function layoutMatchShop(options={}){
-  const view=matchMenuViewport(options),items=(options.items||[]).slice(0,6),cols=3,gap=8,headerH=76,footerH=34,panel=centered(view,900,Math.min(view.h,370)),body={x:panel.x+14,y:panel.y+headerH,w:panel.w-28,h:panel.h-headerH-footerH},rowH=(body.h-gap)/2,itemW=(body.w-gap*2)/3;
+  const view=matchMenuViewport(options),items=(options.items||[]).slice(0,6),cols=3,gap=8,headerH=options.tabs?.length?116:76,footerH=34,rowH=(Math.min(view.h,370)-headerH-footerH-gap)/2,rows=Math.max(1,Math.ceil(items.length/cols)),panel=centered(view,900,headerH+footerH+rows*rowH+(rows-1)*gap),body={x:panel.x+14,y:panel.y+headerH,w:panel.w-28,h:panel.h-headerH-footerH},itemW=(body.w-gap*2)/3;
   const l={kind:'shop',view,panel,body,cols,rowH,scroll:0,maxScroll:0,items:[],hits:[],focusTargets:[]};
   items.forEach((item,index)=>{const r={x:body.x+(index%3)*(itemW+gap),y:body.y+Math.floor(index/3)*(rowH+gap),w:itemW,h:rowH},target=hit(`shop:${item.id}`,r,'buy',{index,item});l.items.push({...target,visible:r});l.hits.push(target);l.focusTargets.push(target);});
+  l.tabs=(options.tabs||[]).map((tab,i)=>hit('shop-tab:'+tab.id,{x:panel.x+14+i*140,y:panel.y+66,w:132,h:44},'shopTab',{tab:tab.id,label:tab.label}));l.hits.push(...l.tabs);l.focusTargets.push(...l.tabs);
   l.close={x:panel.x+panel.w-100,y:panel.y+12,w:86,h:44};const close=hit('close',l.close,'back');l.hits.push(close);l.focusTargets.push(close);return l;
 }
 export function drawMatchShop(c,options={}){
  const l=layoutMatchShop(options),p=l.panel;c.save();backdrop(c,l.view,.65);rr(c,p,C.panel,C.line);label(c,options.title||'SURVIVOR SUPPLY',p.x+14,p.y+29,{size:20,weight:800,fill:C.accent,width:p.w-125});
  button(c,l.close,options.closeLabel||'MENU',{active:options.focusId==='close'});
- label(c,`$${Math.max(0,finite(options.cash))}  ·  ${options.phaseLabel||'PREPARATION'}`,p.x+14,p.y+55,{size:13,fill:C.muted,width:p.w-125});
+ label(c,`${Math.max(0,finite(options.cash))} ${options.currency||'AP'}  ·  ${options.phaseLabel||'PREPARATION'}`,p.x+14,p.y+55,{size:13,fill:C.muted,width:p.w-125});
+ for(const tab of l.tabs||[])button(c,tab,tab.label,{active:options.activeTab===tab.tab||options.focusId===tab.id});
  for(const r of l.items){const item=r.item,active=options.focusId?options.focusId===r.id:options.selectedIndex===r.index;rr(c,r,active?'#293820':C.raised,active?C.accent:C.line,2);if(active){c.fillStyle=C.accent;c.fillRect(r.x,r.y,3,r.h);}
   const art=options.art?.(item);if(art)c.drawImage(art,r.x+r.w*.28,r.y+4,r.w*.7,Math.max(20,r.h-48));
   label(c,String(r.index+1).padStart(2,'0'),r.x+10,r.y+20,{size:11,fill:C.muted});

@@ -1,3 +1,3 @@
-import * as world from './world-geometry-yard.js?v=2.13.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.13.0';
+import * as world from './world-geometry-yard.js?v=2.14.1';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.14.1';
 export const {worldBlockerAt,worldBlockedAt,worldMoveBlockedAt,worldHeightExpansionBlockedAt,findTraversalCandidate,collisionDebugStats}=createAuthoredWorldCollision(world);

@@ -1,14 +1,14 @@
-import { EditorSession } from "./editor-session.js?v=2.13.0";
+import { EditorSession } from "./editor-session.js?v=2.14.1";
 import {
   MapDocument,
   Storage,
   Validator,
   templateToDoc,
-} from "./builder-model.js?v=2.13.0";
-import { createBuilderPanels } from "./builder-panels.js?v=2.13.0";
-import { createBuilderHUD } from "./builder-hud.js?v=2.13.0";
-import { createEditorInput } from "./editor-input.js?v=2.13.0";
-import { installCanvasInteractionGuards } from "./canvas-input.js?v=2.13.0";
+} from "./builder-model.js?v=2.14.1";
+import { createBuilderPanels } from "./builder-panels.js?v=2.14.1";
+import { createBuilderHUD } from "./builder-hud.js?v=2.14.1";
+import { createEditorInput } from "./editor-input.js?v=2.14.1";
+import { installCanvasInteractionGuards } from "./canvas-input.js?v=2.14.1";
 export function createIntegratedMapBuilder({
   host,
   apiBase,

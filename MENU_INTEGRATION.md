@@ -1,4 +1,4 @@
-# Menu, armory and Infected integration — 2.13.0
+# Menu, armory and Infected integration — 2.14.1
 
 The canvas widget graph and live game state remain authoritative. There are no HTML menu overlays or separate demo state stores.
 
@@ -14,7 +14,7 @@ The canvas widget graph and live game state remain authoritative. There are no H
 | match-menu-ui.js | Scoreboard/result layouts, discrete paging and six-card role shops |
 | infection-models.js | Shared procedural 3D infected equipment for shop thumbnails and gameplay |
 | infection-rules.js | Shared round rules, catalog, purchase availability and replicated inventory |
-| infection-mode.js (server) | Authoritative rounds, safe spawn selection, combat, economy, supplies and bot equipment |
+| infection-mode.js (server) | Authoritative single round, safe spawns, combat, ammo packs, grenades and bot equipment |
 | infection-inventory.js (server) | Initial role inventory and reconnect preservation |
 | team-model.js | Self, friendly human, friendly bot and enemy presentation |
 | app-lifecycle.js | Fullscreen entry, landscape gate and gameplay input ownership |
@@ -28,8 +28,8 @@ Attachment choices share a horizontally clipped rail. Only intersecting cards re
 
 Host permissions and batch tuning retain Apply/Cancel. A controller slider enters edit mode with A/cross and adjusts with left/right; B exits editing. Right-stick rotation and trigger zoom are restricted to the visible armory; overlays block underlying menu actions.
 
-Infected mode uses the existing canvas input owner and game lifecycle. Shops appear during preparation and infected respawn waits; survivors can also open a shop near a supply point. Activating a card sends one purchase request. The server validates phase, role, ownership, price and location, then publishes the result. Hover/controller focus never sends a purchase.
+Infected mode uses the canvas input owner and game lifecycle. One movable preparation phase opens the optional armory, followed by the outbreak. The armory remains available throughout play and from Pause. A card activation sends one purchase or class selection request; hover/controller focus never spends packs. Class selection applies on the next infected spawn. Shopping does not hold automatic respawns.
 
-Infected combat uses the room's existing collision/projectile services. Humans and bots share role damage, inventory, recovery and spawn checks. Pending spawns stay dead until a safe position exists. Preparation freezes movement; a roster that lacks safe opening capacity returns to the lobby. Reconnect state cannot replace retained health/ammo with fresh spawn defaults.
+Combat uses the room's existing collision and projectile services. Claw infection requires close range, facing and line of sight. Humans and bots share role damage, inventory, class profiles and safe spawn checks. Pending spawns wait until safe placement exists. Reconnect preserves health, ammo, purchases and class selection. Bot navigation uses the compiled collision geometry.
 
-Both upload folders use version 2.13.0 and protocol 104. Existing filenames and repository layout are preserved. No deployment was performed. See VERIFICATION.md for controls, tested behavior and limits.
+Both upload folders use version 2.14.1 and protocol 108. No deployment was performed. See VERIFICATION.md for the implemented rules, controls, tested behavior and limits.

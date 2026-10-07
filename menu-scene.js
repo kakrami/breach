@@ -1,8 +1,8 @@
-import {attachmentOptionsForWeapon,ATTACHMENT_SLOTS} from './game-config.js?v=2.13.0';
-import { infectionModel } from './infection-models.js?v=2.13.0';
+import {attachmentOptionsForWeapon,ATTACHMENT_SLOTS} from './game-config.js?v=2.14.1';
+import { infectionModel } from './infection-models.js?v=2.14.1';
 // One renderer; cached thumbnails have their own pose and camera framing.
 // Weapon meshes borrow live geometry/materials, which must never be disposed here.
-import { equipmentModel, streakModel } from './menu-equipment.js?v=2.13.0';
+import { equipmentModel, streakModel } from './menu-equipment.js?v=2.14.1';
 export function createMenuScene({ready,weaponModel,partModel}) {
   let G,renderer,scene,camera,pivot,pending=false,failed=false,current=null,key='';
   let yaw=Math.PI/2+.12,pitch=-.10,zoom=1;
@@ -64,7 +64,7 @@ export function createMenuScene({ready,weaponModel,partModel}) {
     init();if(!renderer)return null;const k=JSON.stringify([kind,id,attachments,slot]);if(cache.has(k))return cache.get(k);
     const model=make(kind,id,attachments,slot);if(!model?.children.length)return null;
     const oldChildren=[...pivot.children],rotation=pivot.rotation.clone();pivot.clear();pivot.rotation.set(0,0,0);
-    const pose=new G.Group();pose.add(model);pose.rotation.set(-.16,kind==='infection'?(id==='mutation'?Math.PI/2+.58:Math.PI+.45):kind==='equipment'||kind==='streak'?.5:Math.PI/2+.58,0);pivot.add(pose);
+    const pose=new G.Group();pose.add(model);pose.rotation.set(-.16,kind==='infection'?(Math.PI+.45):kind==='equipment'||kind==='streak'?.5:Math.PI/2+.58,0);pivot.add(pose);
     scene.updateMatrixWorld(true);const bounds=new G.Box3().setFromObject(pose),size=bounds.getSize(new G.Vector3()),center=bounds.getCenter(new G.Vector3());pose.position.sub(center);
     const halfH=Math.max(size.y/2,size.x/4,.01)*1.16,thumbCamera=new G.OrthographicCamera(-halfH*2,halfH*2,halfH,-halfH,.01,40);
     thumbCamera.position.set(0,0,8);thumbCamera.lookAt(0,0,0);renderer.setSize(320,160,false);scene.updateMatrixWorld(true);renderer.render(scene,thumbCamera);

@@ -1,4 +1,4 @@
-import {WEAPON_SPECS,ATTACHMENTS,resolveWeaponRules,resolveWeaponAccuracy,weaponHasAttachment} from './game-config.js?v=2.13.0';
+import {WEAPON_SPECS,ATTACHMENTS,resolveWeaponRules,resolveWeaponAccuracy,weaponHasAttachment} from './game-config.js?v=2.14.1';
 
 // Actual units come from the same resolved rules as firing/reloading. Display
 // scales are constants, never inferred from the hovered or equipped build.
