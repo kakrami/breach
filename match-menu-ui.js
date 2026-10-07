@@ -1,6 +1,6 @@
 /* Match menus own only canvas presentation and navigation. Gameplay state, timers,
  * network messages and relationship colors are supplied by the client. */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.12.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.13.0';
 
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,finite(value)));
@@ -79,11 +79,11 @@ export function drawMatchShop(c,options={}){
   label(c,item.status||`$${item.price}`,r.x+10,r.y+r.h-10,{size:12,fill:item.unavailable?C.muted:C.accent,width:r.w-20});
  }
  const selected=l.items.find(t=>t.id===options.focusId)||l.items[options.selectedIndex||0];
- label(c,selected?.item.detail||'Select to buy and equip',p.x+14,p.y+p.h-13,{size:12,fill:C.muted,width:p.w-28});c.restore();return l;
+ label(c,options.feedback||selected?.item.detail||'Select to buy and equip',p.x+14,p.y+p.h-13,{size:12,fill:C.muted,width:p.w-28});c.restore();return l;
 }
 
 export function layoutMatchDeath(options={}){const view=matchMenuViewport(options),panel=centered(view,512,options.allowLoadout===false?240:296),loadout=options.allowLoadout===false?null:{x:panel.x+16,y:panel.y+panel.h-60,w:panel.w-32,h:44};return{kind:'death',view,panel,loadout,hits:loadout?[hit('loadout',loadout,'loadout')]:[],focusTargets:loadout?[hit('loadout',loadout,'loadout')]:[]};}
-export function drawMatchDeath(c,options={}){const l=layoutMatchDeath(options),p=l.panel,accent=options.accent||'#ff6973';c.save();if(options.backdrop!==false)backdrop(c,l.view,.64);rr(c,p,C.panel,C.line);label(c,'ELIMINATED',p.x+16,p.y+36,{size:28,weight:800,fill:accent,width:p.w-32});label(c,options.attacker||'Preparing your next spawn',p.x+16,p.y+76,{size:16,weight:700,width:p.w-32});label(c,options.detail||'',p.x+16,p.y+105,{size:14,fill:C.muted,width:p.w-32});label(c,options.nextLoadout?`NEXT SPAWN · ${options.nextLoadout}`:'',p.x+16,p.y+137,{size:14,fill:C.accent,width:p.w-32});const bar={x:p.x+16,y:p.y+164,w:p.w-32,h:4};rr(c,bar,C.line,null,2);if(options.progress>0)rr(c,{...bar,w:bar.w*clamp(options.progress,0,1)},accent,null,2);label(c,options.status||'RESPAWNING',p.x+16,p.y+193,{size:16,weight:700,width:p.w-32});if(l.loadout)button(c,l.loadout,options.controller?'A / Y  CHANGE LOADOUT':'CHANGE LOADOUT',{active:options.focusId==='loadout'});c.restore();return l;}
+export function drawMatchDeath(c,options={}){const l=layoutMatchDeath(options),p=l.panel,accent=options.accent||'#ff6973';c.save();if(options.backdrop!==false)backdrop(c,l.view,.64);rr(c,p,C.panel,C.line);label(c,'ELIMINATED',p.x+16,p.y+36,{size:28,weight:800,fill:accent,width:p.w-32});label(c,options.attacker||'Preparing your next spawn',p.x+16,p.y+76,{size:16,weight:700,width:p.w-32});label(c,options.detail||'',p.x+16,p.y+105,{size:14,fill:C.muted,width:p.w-32});label(c,options.nextLoadout?`NEXT SPAWN · ${options.nextLoadout}`:'',p.x+16,p.y+137,{size:14,fill:C.accent,width:p.w-32});const bar={x:p.x+16,y:p.y+164,w:p.w-32,h:4};rr(c,bar,C.line,null,2);if(options.progress>0)rr(c,{...bar,w:bar.w*clamp(options.progress,0,1)},accent,null,2);label(c,options.status||'RESPAWNING',p.x+16,p.y+193,{size:16,weight:700,width:p.w-32});if(l.loadout)button(c,l.loadout,options.loadoutLabel?(options.controller?'A  '+options.loadoutLabel:options.loadoutLabel):(options.controller?'A / Y  CHANGE LOADOUT':'CHANGE LOADOUT'),{active:options.focusId==='loadout'});c.restore();return l;}
 
 export function layoutMatchTarget(options={}){
   const view=matchMenuViewport(options),wide=view.w>=480&&view.w/view.h>1.45,gap=16,sidebar=wide?Math.min(240,Math.max(192,view.w*.32)):0,headerH=wide?0:76,footerH=wide?0:124,size=Math.max(1,Math.min(wide?view.w-sidebar-gap:view.w,view.h-headerH-footerH,640)),panel=wide?centered(view,size+sidebar+gap,Math.max(size,264)):centered(view,Math.min(view.w,Math.max(320,size+32)),headerH+size+footerH),map=wide?{x:panel.x,y:panel.y+(panel.h-size)/2,w:size,h:size}:{x:panel.x+(panel.w-size)/2,y:panel.y+headerH,w:size,h:size},rail=wide?{x:map.x+map.w+gap,y:panel.y,w:sidebar,h:panel.h}:{x:panel.x,y:map.y+map.h,w:panel.w,h:footerH};
