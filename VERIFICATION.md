@@ -1,6 +1,30 @@
-# Breach 2.10.0 — Infected mode
+# Breach 2.11.0 — armory rebuild
 
 Integrated client and server, protocol 104. This package has not been deployed.
+
+## Armory changes in this release
+
+- Landscape canvas layout: classes on the left, one interactive weapon in the center, attachment categories and a horizontal choice strip beneath it, eight actual stats in two columns on the right.
+- Removed the separate enlarged attachment preview, duplicate percentage change list and extra Equip step. Tap/click/A equips and saves. Mouse hover/controller focus only previews; leaving restores the saved build.
+- A white marker always represents the same weapon with factory attachments under current match tuning. It never rebases after equipping. Gains/losses connect directly to it, with correct direction for recoil, spread, aim time and reload time.
+- Stats share the resolved gameplay rules with the live client and authoritative server. Stacked modifiers, rounding, host tuning, per-pellet damage, per-shell reload and conditional bipod recoil are represented accurately. Relevant metrics vary by attachment category, with a fixed order while comparing that category's options.
+- Weapon framing uses one envelope per weapon that includes supported hardware. Comparing attachments never changes camera framing. Rotation, wheel/button/controller zoom and two-finger touch pinch are supported. Preview lighting is separate from gameplay materials.
+- Fast magazines no longer duplicate a detached grip; their pull loop attaches to the magazine. Compensators now have a visible bore and recessed ports.
+- Attachment cards have equal heights; one or two choices fill their row. Overflow is horizontal only. Swiping never equips an item; controller navigation brings offscreen choices into view. No vertical menu scrolling.
+- Infected lobbies show PARTICIPANTS before roles are assigned, unique bot names and an accurate per-round equipment card instead of a disabled loadout destination. Team headings and inline bot controls remain compact.
+
+## This release's verification
+
+- 272 default/tuned build combinations across all ten weapons: unchanged gameplay rules, fixed factory markers, continuous delta segments, correct benefit direction, stacked modifier rounding and special weapon metrics.
+- Production canvas flows: hover/focus without saving, immediate activation, leaving previews, retained per-weapon setups, class activation, equipment, streak replacement, controller sliders, settings cancellation and independent team paging.
+- Actual browser touch events: pinch, drag rotation, attachment swiping without accidental selection, gesture cancellation across overlays, then successful selection. Controller simulation traverses clipped horizontal galleries and equips the focused item.
+- The actual game renderer fits 667×375, 844×390 and 932×430 with no vertical scroll regions or out-of-bounds hit targets. Screenshots are in `menu-review/`; these are captures of the running game, not generated mockups.
+- Infected lifecycle/combat/spawn regression suites passed again, along with landscape/fullscreen lifecycle and scoreboard paging checks.
+- JavaScript syntax, local imports, shared client/server rules, version/cache references, prior filenames and ZIP integrity checked before packaging.
+
+## Version visibility
+
+The loaded client version is visible on the portrait landscape-required screen, the entry screen and the main-menu footer. Labels use the running game configuration, so they identify the code actually loaded. Protocol remains 104.
 
 ## Behavior
 
@@ -13,7 +37,7 @@ Integrated client and server, protocol 104. This package has not been deployed.
 - Survivors buy weapons, armor, medkits and grenades. Rotating supply points award ammo and cash and allow nearby purchases. Infected can buy during preparation or while dead. Purchases and equipment are server-authoritative.
 - Bots use the same damage, buying, equipment and spawn rules. Solo practice gets an infected bot. A disconnected sole infected is replaced rather than awarding a round.
 - Native canvas shops have six equal-height 3D cards, direct tap/click/A purchases and no scrolling. Focus only previews. Equipment appears in gameplay; role HUD, round results, scoreboards and sound cues are integrated.
-- Existing direct-equip armory, attachment guides, settings, roster controls, relationship colors and landscape lifecycle are retained.
+- Settings, roster controls, relationship colors and landscape lifecycle are retained. The armory is rebuilt as described above.
 
 ## Controls
 
@@ -30,7 +54,9 @@ Integrated client and server, protocol 104. This package has not been deployed.
 
 Pausing releases a held shield and gameplay input. Shop cards activate immediately with tap/click/A; there is no second Equip button.
 
-## Verification performed
+## Existing integration coverage
+
+- Version visibility checked in the production canvas on a 393×852 portrait phone, the landscape entry screen and the 844×390 main menu. The previous version-visibility checks covered all three without browser errors; this release updates the same shared version source.
 
 - Actual server room tests: complete three-round lifecycle, last-infected death, conversion, timer boundary, round budgets, role restrictions, repeat purchases, retained equipment, solo bots, disconnect replacement and reconnect preservation.
 - Combat tests: fire rate, ammo, reload, overheating, recovery times, shield front/rear/break behavior, toxic projectile collision and gradual cloud damage, reveal cooldown, friendly/self reward rejection, maximum-health regeneration and one-time supply rewards.
@@ -44,4 +70,4 @@ Tests use headless Chromium, touch emulation and simulated controller handlers. 
 
 ## Upload
 
-Upload the contents of `1_SERVER_REPO_UPLOAD` and `2_CLIENT_REPO_UPLOAD` to their respective repositories. Both must be updated: this release uses protocol 104. Preserve the existing entry filenames. After deployment, check the in-game version and `version.json` for 2.10.0.
+Upload the contents of `1_SERVER_REPO_UPLOAD` and `2_CLIENT_REPO_UPLOAD` to their respective repositories. Update both folders together because the shared weapon resolver is used by both client and server. Protocol remains 104. Preserve the existing entry filenames. After deployment, check the in-game version and `version.json` for 2.11.0.
