@@ -1,73 +1,34 @@
-# Breach 2.11.0 — armory rebuild
+# Breach 2.12.0 — integrated gameplay improvements
 
-Integrated client and server, protocol 104. This package has not been deployed.
+Client and server update, protocol 105. Upload both folders together. This package has not been deployed.
 
-## Armory changes in this release
+## Gameplay changes
 
-- Landscape canvas layout: classes on the left, one interactive weapon in the center, attachment categories and a horizontal choice strip beneath it, eight actual stats in two columns on the right.
-- Removed the separate enlarged attachment preview, duplicate percentage change list and extra Equip step. Tap/click/A equips and saves. Mouse hover/controller focus only previews; leaving restores the saved build.
-- A white marker always represents the same weapon with factory attachments under current match tuning. It never rebases after equipping. Gains/losses connect directly to it, with correct direction for recoil, spread, aim time and reload time.
-- Stats share the resolved gameplay rules with the live client and authoritative server. Stacked modifiers, rounding, host tuning, per-pellet damage, per-shell reload and conditional bipod recoil are represented accurately. Relevant metrics vary by attachment category, with a fixed order while comparing that category's options.
-- Weapon framing uses one envelope per weapon that includes supported hardware. Comparing attachments never changes camera framing. Rotation, wheel/button/controller zoom and two-finger touch pinch are supported. Preview lighting is separate from gameplay materials.
-- Fast magazines no longer duplicate a detached grip; their pull loop attaches to the magazine. Compensators now have a visible bore and recessed ports.
-- Attachment cards have equal heights; one or two choices fill their row. Overflow is horizontal only. Swiping never equips an item; controller navigation brings offscreen choices into view. No vertical menu scrolling.
-- Infected lobbies show PARTICIPANTS before roles are assigned, unique bot names and an accurate per-round equipment card instead of a disabled loadout destination. Team headings and inline bot controls remain compact.
+- Infection is one round: 20 seconds of preparation, then the selected four, six or eight minute clock (six by default). Infected win by converting every survivor; survivors win on time. Dead infected respawn and never trigger a survivor victory. Final standings appear immediately, followed by the normal lobby return.
+- Only lethal damage from infected claws, mutation shots or an infected bomb converts a survivor. Self-inflicted and unattributed deaths keep the survivor role, money, ammunition and equipment through a safe respawn. They award no money. A cloud or projectile retains its source even if the attacker disconnects.
+- Infected bots now share visible-target selection, last-seen memory, patrol, reaction delay and limited aim rotation with other bots. Hidden survivor positions are not used as live chase targets. Difficulty changes reactions, accuracy and burst discipline; bots do not exceed weapon fire-rate or player movement limits. Infected movement uses the same role rules as the player.
+- Both bot and player projectiles use the shared weapon launch contract. Bots resolve configured weapon rules; ladder/traversal transitions block firing. Shared damage entry points reject friendly damage and damage after a match or its timer has ended.
+- Shields use the incoming attack direction, stop bullets from penetrating through the shield bearer, and preserve rear/blast weaknesses. Fully absorbed hits do not cause blood, knockback or a health-regeneration delay. Attackers receive shield-hit feedback.
+- Damage indicators use the actual impact/cloud/explosion source rather than the attacker's current position. Claws and toxic damage now have directional feedback even without physical knockback. Toxic clouds show a move-out warning. The respawn shop shows the weapon that killed you; taking damage closes an open survivor supply shop.
+- Combat damage income renews after a bounded 30-second window instead of permanently exhausting a target's earnings. Repeat kill/assist rewards remain limited; accidental deaths cannot farm rewards. Purchases remain authoritative and reject requests beyond the active phase deadline.
+- Reconnect inventory belongs to the match's start timestamp, preventing a previous match's role, money or equipment from being restored into a new match. Respawns clear stale AI target knowledge and aim state.
+- Existing Infection spawn safety is retained: at least 24m enemy separation, cover in both sight directions, predicted proximity, physical support/collision, hazards and two walking exits. Unsafe respawns wait and retry. An opening roster that cannot fit returns to the lobby with an explanation.
+- Menus/HUD now describe one round consistently. Queued survivors count correctly. Survivor accidental deaths show their actual respawn countdown. Removed a scoreboard button that overlapped the final-results heading.
 
-## This release's verification
+## Verification
 
-- 272 default/tuned build combinations across all ten weapons: unchanged gameplay rules, fixed factory markers, continuous delta segments, correct benefit direction, stacked modifier rounding and special weapon metrics.
-- Production canvas flows: hover/focus without saving, immediate activation, leaving previews, retained per-weapon setups, class activation, equipment, streak replacement, controller sliders, settings cancellation and independent team paging.
-- Actual browser touch events: pinch, drag rotation, attachment swiping without accidental selection, gesture cancellation across overlays, then successful selection. Controller simulation traverses clipped horizontal galleries and equips the focused item.
-- The actual game renderer fits 667×375, 844×390 and 932×430 with no vertical scroll regions or out-of-bounds hit targets. Screenshots are in `menu-review/`; these are captures of the running game, not generated mockups.
-- Infected lifecycle/combat/spawn regression suites passed again, along with landscape/fullscreen lifecycle and scoreboard paging checks.
-- JavaScript syntax, local imports, shared client/server rules, version/cache references, prior filenames and ZIP integrity checked before packaging.
+- New gameplay regressions cover accidental-death recovery without inventory/cash refills, valid persistent infection damage, unknown-source rejection, bounded renewable income, incoming-direction shield absorption, cross-match reconnect isolation, hidden-target rejection and difficulty limits.
+- Server match flows cover all six modes. TDM, FFA and Moon include death/respawn and time-limit results; Waves includes overrun; Sandbox remains open until ended. All verify frozen final results and lobby return. Infection covers both outcomes, last-infected death, single final result and no automatic second round.
+- Two complete simulated Infection matches run bot movement, combat, projectiles, regeneration, purchases, conversions and safe respawns on Yard and Highlands. Health, money and positions are checked throughout. These are correctness simulations, not human balance playtests.
+- Infection combat/spawn regressions cover gun ammo/reload/heat, shield front/rear/break, toxic projectile collision and damage, recovery/cooldowns, sole-infected disconnect, supplies, reconnect state and timer boundaries.
+- Safe opening deployment verified with 24 actors on all five official maps and 12 on the bundled custom map. The custom map's insufficient 24-actor capacity is rejected. Moving-enemy reselection and no-safe-spawn retry are verified.
+- Production browser-to-worker test uses real touch purchases, focus without purchase, mutation fire, bomb use, death shop, safe respawn, final results, explicit next-match start, survivor supply and source/blocked-damage feedback.
+- Native touch/controller armory regression covers pinch, rotation, horizontal swipe without accidental equip, offscreen focus navigation and unchanged factory stat markers. Layouts checked at 667×375, 844×390 and 932×430.
+- All 272 attachment-stat combinations still pass. Landscape/fullscreen refusal, portrait input gating, pause/resume, lobby return and complete scoreboard paging pass.
+- Package checks cover JavaScript syntax, local imports, shared client/server rules, version/cache references, preserved entry filenames and ZIP integrity.
 
-## Version visibility
-
-The loaded client version is visible on the portrait landscape-required screen, the entry screen and the main-menu footer. Labels use the running game configuration, so they identify the code actually loaded. Protocol remains 104.
-
-## Behavior
-
-- Three rounds, each with 20 seconds of preparation and a default six-minute survival clock. Hosts can select four, six or eight minutes. Initial infected assignments rotate. Survivors win on time; infected win when everyone is converted. Killing the last living infected does not end a round.
-- Infected return after four seconds, reduced to three in the final minute. They retain purchases and cash through death. A lethal survivor hit queues a safe infected spawn instead of reviving the player beside their attacker.
-- Every deployment checks current opponents, predicted proximity, solid-cover sight lines in both directions, collision, floor support, hazards and recent combat. Enemy separation is at least 24 metres. Candidates require two clear six-metre walking exits; this is local exit validation, not an exhaustive global navigation proof.
-- No unsafe spawn fallback. Blocked respawns stay queued and retry. An opening roster that cannot fit safely returns to the lobby with a clear message to reduce bots or choose another map.
-- Both roles earn money. Rewards cover hostile damage, kills/conversions, assists and survivor supply collection, with limits on repeat farming. Round budgets reset to $2,000. Reconnecting preserves inventory, ammo and health and cannot grant a free refill.
-- Infected equipment: claws, throwable infected bomb with a finite toxic cloud, mutation machine gun with ammo/reload/heat, directional heavy shield with durability, screech reveal and carapace health upgrade. The shield has rear/blast weaknesses; actions have recovery times.
-- Survivors buy weapons, armor, medkits and grenades. Rotating supply points award ammo and cash and allow nearby purchases. Infected can buy during preparation or while dead. Purchases and equipment are server-authoritative.
-- Bots use the same damage, buying, equipment and spawn rules. Solo practice gets an infected bot. A disconnected sole infected is replaced rather than awarding a round.
-- Native canvas shops have six equal-height 3D cards, direct tap/click/A purchases and no scrolling. Focus only previews. Equipment appears in gameplay; role HUD, round results, scoreboards and sound cues are integrated.
-- Settings, roster controls, relationship colors and landscape lifecycle are retained. The armory is rebuilt as described above.
-
-## Controls
-
-| Action | Keyboard | Controller | Touch |
-| --- | --- | --- | --- |
-| Claws / mutation gun | Fire | RT | Fire |
-| Mutation reload | R | X / square | Reload |
-| Claws / gun switch | Weapon switch | Y / triangle | Swap |
-| Infected bomb | G | RB / R1 | Toxic |
-| Heavy shield | Q toggle | Hold LT / L2 | Shield toggle |
-| Screech | F | LB / L1 | Screech |
-| Nearby survivor supply shop | B | D-pad up | Supply button |
-| Survivor medkit | H | D-pad down | Medkit button |
-
-Pausing releases a held shield and gameplay input. Shop cards activate immediately with tap/click/A; there is no second Equip button.
-
-## Existing integration coverage
-
-- Version visibility checked in the production canvas on a 393×852 portrait phone, the landscape entry screen and the 844×390 main menu. The previous version-visibility checks covered all three without browser errors; this release updates the same shared version source.
-
-- Actual server room tests: complete three-round lifecycle, last-infected death, conversion, timer boundary, round budgets, role restrictions, repeat purchases, retained equipment, solo bots, disconnect replacement and reconnect preservation.
-- Combat tests: fire rate, ammo, reload, overheating, recovery times, shield front/rear/break behavior, toxic projectile collision and gradual cloud damage, reveal cooldown, friendly/self reward rejection, maximum-health regeneration and one-time supply rewards.
-- Real map collision tests: safe initial deployment for 24 actors on Highlands, Depot, Yard, Rig and Moon; 12 actors on the bundled custom map. Its 24-actor roster is intentionally rejected for insufficient covered capacity. Runtime tests move survivors into a previously selected spawn and verify reselection; an entirely blocked map waits and recovers when safe space returns.
-- Production browser-to-worker integration: real touch purchase, authoritative ammo/bomb consumption, death shop, safe respawn, retained equipment, next-round role change and active survivor supply purchase. No uncaught browser errors in completed flows.
-- Native six-card shops fit 667×375, 844×390 and 932×430 with no scrolling. Actual 3D thumbnails and phone screenshots inspected. Controller focus is verified not to purchase.
-- Existing menu interaction, landscape/fullscreen lifecycle and scoreboard paging regression checks passed. These cover direct equipment selection, controller navigation, settings, team/bot controls, portrait input blocking, API refusal and complete scoreboard rows.
-- Release checks validate JavaScript syntax, shared rules, version/cache references, ZIP integrity and preservation of existing entry filenames.
-
-Tests use headless Chromium, touch emulation and simulated controller handlers. Physical phones/controllers and live deployment were not tested. Gameplay balance still needs multiplayer playtesting. Browser restrictions can refuse forced fullscreen/orientation lock; the landscape input gate remains in place.
+Tests run in the actual server code and headless Chromium with touch/controller emulation. Physical phones/controllers, live networking and deployment were not tested. Multiplayer balance still needs human playtesting. Existing damage, health and weapon-stat balance was preserved rather than retuned from these simulations.
 
 ## Upload
 
-Upload the contents of `1_SERVER_REPO_UPLOAD` and `2_CLIENT_REPO_UPLOAD` to their respective repositories. Update both folders together because the shared weapon resolver is used by both client and server. Protocol remains 104. Preserve the existing entry filenames. After deployment, check the in-game version and `version.json` for 2.11.0.
+Upload the contents of `1_SERVER_REPO_UPLOAD` and `2_CLIENT_REPO_UPLOAD` to their respective repositories. Both sides must use protocol 105. Check the visible game version or `version.json` for **2.12.0** after deployment.

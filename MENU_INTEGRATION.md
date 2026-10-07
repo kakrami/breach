@@ -1,4 +1,4 @@
-# Menu, armory and Infected integration — 2.11.0
+# Menu, armory and Infected integration — 2.12.0
 
 The canvas widget graph and live game state remain authoritative. There are no HTML menu overlays or separate demo state stores.
 
@@ -32,4 +32,4 @@ Infected mode uses the existing canvas input owner and game lifecycle. Shops app
 
 Infected combat uses the room's existing collision/projectile services. Humans and bots share role damage, inventory, recovery and spawn checks. Pending spawns stay dead until a safe position exists. Preparation freezes movement; a roster that lacks safe opening capacity returns to the lobby. Reconnect state cannot replace retained health/ammo with fresh spawn defaults.
 
-Both upload folders use version 2.11.0 and protocol 104. Existing filenames and repository layout are preserved. No deployment was performed. See VERIFICATION.md for controls, tested behavior and limits.
+Both upload folders use version 2.12.0 and protocol 104. Existing filenames and repository layout are preserved. No deployment was performed. See VERIFICATION.md for controls, tested behavior and limits.
