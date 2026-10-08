@@ -1,8 +1,8 @@
-import {attachmentOptionsForWeapon,ATTACHMENT_SLOTS} from './game-config.js?v=2.15.0';
-import { infectionModel } from './infection-models.js?v=2.15.0';
+import {attachmentOptionsForWeapon,ATTACHMENT_SLOTS} from './game-config.js?v=2.16.0';
+import { infectionModel } from './infection-models.js?v=2.16.0';
 // One renderer; cached thumbnails have their own pose and camera framing.
 // Weapon meshes borrow live geometry/materials, which must never be disposed here.
-import { equipmentModel, streakModel } from './menu-equipment.js?v=2.15.0';
+import { equipmentModel, streakModel } from './menu-equipment.js?v=2.16.0';
 export function createMenuScene({ready,weaponModel,partModel}) {
   let G,renderer,scene,camera,pivot,pending=false,failed=false,current=null,key='';
   let yaw=Math.PI/2+.12,pitch=-.10,zoom=1;

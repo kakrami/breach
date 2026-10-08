@@ -1,5 +1,5 @@
-import { DEFAULT_MATCH_RULES, gameModeSpec, normalizeGameMode } from './game-config.js?v=2.15.0';
-import { normalizeMatchStatus } from './gameplay-phase.js?v=2.15.0';
+import { DEFAULT_MATCH_RULES, gameModeSpec, normalizeGameMode } from './game-config.js?v=2.16.0';
+import { normalizeMatchStatus } from './gameplay-phase.js?v=2.16.0';
 
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const finiteNumber=(value,fallback=0)=>{const n=Number(value);return Number.isFinite(n)?n:fallback;};

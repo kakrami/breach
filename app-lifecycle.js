@@ -38,6 +38,8 @@ export function createSessionShell({
   let paused=false;
   let pauseReason='';
   let panel=SHELL_PANEL.NONE;
+  const panelHistory=[];
+  function clearPanels(){panel=SHELL_PANEL.NONE;panelHistory.length=0;}
   let connecting=false;
   let connectionText='';
   function sizeSurface(){const vv=eventTarget.visualViewport;root.style?.setProperty('--app-width',`${vv?.width||eventTarget.innerWidth||1}px`);root.style?.setProperty('--app-height',`${vv?.height||eventTarget.innerHeight||1}px`);}
@@ -186,30 +188,30 @@ export function createSessionShell({
     syncViewport(true);render(ok?'fullscreen-enter':'browser-enter');return true;
   }
   async function exitFullscreenFromGesture(){
-    if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}
+    if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';clearPanels();}
     if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);unlockLandscape();
     const exited=await exitFullscreen();if(!exited&&immersive())render('fullscreen-exit-failed');return exited;
   }
 
-  function beginConnection(text='Connecting…'){connecting=true;connectionText=String(text||'Connecting…');panel=SHELL_PANEL.NONE;return render('connection-start');}
+  function beginConnection(text='Connecting…'){connecting=true;connectionText=String(text||'Connecting…');clearPanels();return render('connection-start');}
   function updateConnection(text){connectionText=String(text||'Connecting…');if(elements.connectionText)elements.connectionText.textContent=connectionText;}
   function cancelConnection(){connecting=false;connectionText='';return render('connection-cancel');}
   function endConnection(){connecting=false;connectionText='';return render('connection-end');}
 
   function enterLobby(){
-    preparingMatch=false;awaitingLandscape=false;location='lobby';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    preparingMatch=false;awaitingLandscape=false;location='lobby';paused=false;pauseReason='';clearPanels();connecting=false;connectionText='';
     if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);
     return render('lobby');
   }
   function enterBuilder(){
     revision++;if(!inBuilder())builderOrigin=inLobby()?'lobby':'menu';
-    location='builder';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    location='builder';paused=false;pauseReason='';clearPanels();connecting=false;connectionText='';
     if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);
     return render('builder');
   }
   function exitBuilder(){
     if(!inBuilder())return snapshot();
-    location=builderOrigin;paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    location=builderOrigin;paused=false;pauseReason='';clearPanels();connecting=false;connectionText='';
     return render('builder-exit');
   }
   async function prepareInputFromGesture(){
@@ -224,7 +226,7 @@ export function createSessionShell({
   }
   async function capturePointerFromGesture(){return requestPointerLock();}
   async function enterMatch(){
-    preparingMatch=false;location='match';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    preparingMatch=false;location='match';clearPanels();connecting=false;connectionText='';
     // Network-driven match entry cannot request browser-gated capabilities.
     if(platform.touchControls&&(!entered||(requiresGameplayOrientation()&&!landscapeReady()))){awaitingLandscape=entered;paused=!entered;pauseReason=!entered?'entry':'';return render('match-blocked');}
     paused=false;pauseReason='';return render('match-enter');
@@ -233,10 +235,10 @@ export function createSessionShell({
     if(!inMatch())return snapshot();
     // Match-end presentation is read-only gameplay. Close any modal/pause layer
     // without requesting pointer lock so victory/final standings always own the screen.
-    paused=false;pauseReason='';panel=SHELL_PANEL.NONE;return render('match-presentation');
+    paused=false;pauseReason='';clearPanels();return render('match-presentation');
   }
   function pause(reason='pause'){
-    revision++;if(!inMatch()||paused){onSuspend(reason,snapshot());return snapshot();}paused=true;pauseReason=reason;panel=SHELL_PANEL.NONE;
+    revision++;if(!inMatch()||paused){onSuspend(reason,snapshot());return snapshot();}paused=true;pauseReason=reason;clearPanels();
     if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);return render(reason);
   }
   async function resumeFromGesture(){
@@ -256,17 +258,17 @@ export function createSessionShell({
     revision++;
     if(name!==SHELL_PANEL.SETTINGS&&name!==SHELL_PANEL.ADMIN&&name!==SHELL_PANEL.LOADOUT)return snapshot();
     if(inMatch()&&!paused){paused=true;pauseReason='panel';if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);}
-    panel=name;return render(`panel-open:${name}`);
+    if(panel&&panel!==name)panelHistory.push(panel);panel=name;return render(`panel-open:${name}`);
   }
-  function closePanel(){revision++;panel=SHELL_PANEL.NONE;return render('panel-close');}
+  function closePanel(name=panel){if(name!==panel)return snapshot();revision++;panel=panelHistory.pop()||SHELL_PANEL.NONE;return render('panel-close');}
   function leaveToMenu(){
     revision++;
-    preparingMatch=false;awaitingLandscape=false;location='menu';paused=false;pauseReason='';panel=SHELL_PANEL.NONE;connecting=false;connectionText='';
+    preparingMatch=false;awaitingLandscape=false;location='menu';paused=false;pauseReason='';clearPanels();connecting=false;connectionText='';
     if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);return render('menu');
   }
 
   function fullscreenChanged(){
-    if(!immersive()){if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';panel=SHELL_PANEL.NONE;}if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);unlockLandscape();}
+    if(!immersive()){if(inMatch()&&!paused){paused=true;pauseReason='fullscreen';clearPanels();}if(pointerLocked())(ownerDocument.exitPointerLock||ownerDocument.webkitExitPointerLock)?.call(ownerDocument);unlockLandscape();}
     syncViewport(true);scheduleViewport('fullscreen');render('fullscreen');
   }
   function pointerLockChanged(){

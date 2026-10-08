@@ -1,41 +1,40 @@
-# Menu, armory and Infected integration — 2.15.0
+# Menu and gameplay integration — 2.16.0
 
-The canvas widget graph and live game state remain authoritative. There are no HTML menu overlays or separate demo state stores.
+The canvas widget graph and live game state remain authoritative. Menus use the game's renderer and input ownership.
 
 | Component | Responsibility |
 | --- | --- |
-| game-menu.js | Menu presentation, transient focus previews, direct card activation, stable comparisons and independent roster pages |
-| client.js:createIntegratedMenuAdapter | Existing game actions, per-class weapon preference cache, class activation, explicit streak replacement and settings/host drafts |
-| armory-stats.js | Actual weapon metrics, category-specific rows, immutable factory comparisons and fixed per-metric scales |
+| game-menu.js | Class overview/editor/picker presentation, temporary focus previews, direct activation, menu navigation and slider gestures |
+| client.js:createIntegratedMenuAdapter | Existing loadout commit paths, per-weapon preferences, automatic settings saves, minimal host patches and authoritative acknowledgments |
+| app-lifecycle.js | Fullscreen/landscape gates, gameplay input ownership and nested settings/loadout panel history |
+| armory-stats.js | Actual weapon metrics, fixed factory comparisons and per-metric scales |
 | game-config.js:resolveWeaponRules | Shared client/server tuning and attachment resolution |
-| menu-scene.js | Shared 3D renderer, cached per-weapon framing envelopes, independent thumbnails and borrowed weapon geometry |
-| menu-equipment.js | Equipment and killstreak display models |
-| native-layout.js | Canvas hit testing, two-pointer preview gestures, hover transitions, safe-area layout and shared text/chat keyboard |
-| match-menu-ui.js | Scoreboard/result layouts, discrete paging and six-card role shops |
-| infection-models.js | Shared procedural 3D infected equipment for shop thumbnails and gameplay |
-| infection-rules.js | Shared round rules, catalog, purchase availability and replicated inventory |
-| infection-mode.js (server) | Authoritative single round, safe spawns, combat, ammo packs, grenades and bot equipment |
-| infection-inventory.js (server) | Initial role inventory and reconnect preservation |
-| infection-field.js (server) | Barricade/supply/ping authority and map restoration |
-| infection-world.js | Shared dynamic-object geometry and secondary roof approaches |
-| infection-presentation.js | World meshes generated from authoritative field state |
-| bot-navigation.js (server) | Collision-based ground routes, roof approaches and descent |
-| team-model.js | Self, friendly human, friendly bot and enemy presentation |
-| app-lifecycle.js | Fullscreen entry, landscape gate and gameplay input ownership |
-| worker.js | Authoritative match transport, projectile/collision services and Infected director integration |
+| menu-scene.js | Shared 3D renderer, weapon framing and projected attachment anchors |
+| native-layout.js | Canvas hit testing, preview gestures, hover, safe-area layout and shared text/chat keyboard |
+| match-menu-ui.js | Scoreboard/results, paging and role shops |
+| team-model.js | Self lime, friendly human green, friendly bot blue and enemy red |
+| worker.js | Authoritative loadout/class commits, host permissions and settings acknowledgments |
 
-Focus/hover preview state lives only in `game-menu.js`; the adapter is called only on activation. Weapon, attachment and equipment changes use the existing loadout commit path. The optional local per-weapon cache remembers preferences and is normalized through shared weapon rules before use. It never overrides authoritative match state on receipt.
+## Class editing and play selection
 
-Armory stats compare the full selected build against the same weapon without attachments, using current match tuning on both sides. Marker position does not depend on the currently equipped attachment. Every changed segment spans exactly the interval between the factory and selected scores. Lower-is-better metrics use an inverse monotonic scale; no visual minimum creates a fake change. Values and labels are distinct from synthetic rating scores.
+Class cards always open an overview and reset temporary equipment/attachment state. The class header and editor belong to one panel. Overview equipment cards enter the appropriate editor; the equipment strip switches categories inside that panel. Back returns to overview and then the parent screen.
 
-Attachment choices share a horizontally clipped rail. Only intersecting cards receive hit targets; controller focus scrolls offscreen cards into view. A swipe cancels activation. The weapon preview owns each touch pointer separately, allowing pinch and rotation without leaking input into gameplay.
+Saved class edits use the existing loadout commit path. Outside a match, editing does not activate a class for play. In a match, the class picker exposes selection separately from Edit; selection queues the class through the existing server path. Infected retains its role-specific Armory and authoritative class purchases/selection.
 
-Host permissions and batch tuning retain Apply/Cancel. A controller slider enters edit mode with A/cross and adjusts with left/right; B exits editing. Right-stick rotation and trigger zoom are restricted to the visible armory; overlays block underlying menu actions.
+Killstreaks are shared across classes and have a separate editor entry. Hover/controller focus never commits a weapon, attachment, equipment item or shop purchase. A click/tap/controller activation commits once. Per-weapon attachment preferences are normalized through shared rules and never replace authoritative match state on receipt.
 
-Infected mode uses the canvas input owner and game lifecycle. One movable preparation phase opens the optional armory, followed by the outbreak. The armory remains available throughout play and from Pause. A card activation sends one purchase or class selection request; hover/controller focus never spends packs. Class selection applies on the next infected spawn. Shopping does not hold automatic respawns.
+Attachment leaders use projected 3D anchors from the same model as the preview. They update with rotation and zoom. Stats compare the full selected build with that weapon's factory build under current match tuning; their existing values and fixed comparison scales are retained.
 
-Combat uses the room's existing collision and projectile services. Claw infection requires close range, facing and line of sight. Humans and bots share role damage, inventory, class profiles and safe spawn checks. Pending spawns wait until safe placement exists. Reconnect preserves health, ammo, purchases and class selection. Bot navigation uses the compiled collision geometry.
+## Settings and host tuning
 
-Both upload folders use version 2.15.0 and protocol 109. No deployment was performed. See VERIFICATION.md for the implemented rules, controls, tested behavior and limits.
+Personal discrete settings save immediately. Slider movement has a transient preview; release commits. Keyboard/controller steps commit immediately. Back flushes any remaining personal preview and restores the previous panel. Graphics rebuild only when their setting changes.
 
-Field objects use the existing map geometry compiler and collision services. The field snapshot is sent after match reset so map initialization cannot discard it. Builds and pickups take one contextual action; no extra phase or shop countdown is introduced. Class ability, equipped consumable and timer state are replicated through the shared Infection contract. Final-minute sound uses the existing Music bus.
+Host slider preview is local and sends one minimal field patch on release. Pending values remain visible until their revision is acknowledged. The server validates host permission in lobby and match, normalizes the patch, and broadcasts accepted authoritative settings with the revision. Rejection returns the authoritative state. Reset sends default gameplay and weapon tuning; it does not reset player permissions. Player permissions use their existing authoritative action path.
+
+Menu Apply/Cancel drafts and unsaved-settings prompts are removed. Destructive reset confirmations and map-builder edit transactions retain their distinct purpose.
+
+## Gameplay feedback
+
+Routine combat uses existing sound, impacts, hitmarkers, status and kill feed. Important role/round events and deployed enemy streak warnings use bounded, expiring announcements. Purchase errors remain in the shop; blocked actions use a single short message near the relevant control. Infected world markers preserve projected position, avoid major controls, hide offscreen markers and limit overlapping labels.
+
+Existing Infection mechanics, dynamic geometry, inventories, collision, safe spawns and bot navigation remain in their shared/server modules. This release changes flow and presentation, plus the host-settings acknowledgment contract. Both upload folders use version 2.16.0 and protocol 110. See VERIFICATION.md for the checks and limits.

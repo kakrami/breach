@@ -7,9 +7,9 @@
  * once at the output boundary. Keep the same graph for touch, mouse, keyboard,
  * controller and accessibility rather than introducing parallel UI layouts.
  */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.15.0';
-import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.15.0';
-import { APP_VERSION } from './game-config.js?v=2.15.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.16.0';
+import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.16.0';
+import { APP_VERSION } from './game-config.js?v=2.16.0';
 
 const C = Object.freeze({
   bg:THEME.bg, surface:THEME.panel, raised:THEME.panelRaised, line:THEME.border,
@@ -231,13 +231,12 @@ export function createNativeRenderer({canvas,ui,onAfterAction=()=>{},inputOwner=
       }
       const hostTab=get('lobbyCheatsTab');
       if(shown(hostTab)&&(active==='match'||active==='cheats')){heading(active==='match'?'MATCH CONFIGURATION':'HOST OPTIONS',bodyR.left,bodyR.top+4,bodyR.width-134,24);button(hostTab,rect(bodyR.right-124,bodyR.top,124,44),{label:'Advanced  ›',fontSize:12,active:active==='cheats'});bodyR=rect(bodyR.left,bodyR.top+52,bodyR.width,Math.max(1,bodyR.height-52));}
-      if(active==='cheats'){const fy=bodyR.bottom-60,aw=Math.min(150,(bodyR.width-8)/2);mark(get('nativeLobbyHostActions'),rect(bodyR.left,fy,bodyR.width,60));button(get('lobbyHostApplyBtn'),rect(bodyR.right-aw,fy+8,aw,44),{primary:true,center:true});button(get('lobbyHostCancelBtn'),rect(bodyR.right-aw*2-8,fy+8,aw,44),{center:true});bodyR=rect(bodyR.left,bodyR.top,bodyR.width,Math.max(1,bodyR.height-68));}
       if(active==='killstreaks')drawKillstreakWorkspace(view,bodyR);else if(active==='map')drawMapWorkspace(view,bodyR);else if(active==='match'&&shown(get('lobbyHostSetup')))drawMatchSetup(view,bodyR);else if(active==='loadout')drawLoadoutWorkspace(view,bodyR);else if(view)pagedFlow(view,bodyR);
     }
     fade(rect(0,footerY-12,vp.width,vp.height-footerY+12),'rgba(9,13,16,0)','#090d10');line(b.left,footerY-2,b.right,footerY-2,'#39423c');
     const startW=portrait?b.width:250,startX=portrait?b.left:b.right-startW;
     if(host)button(get('lobbyStartBtn'),rect(startX,footerY+8,startW,48),{primary:true,label:'DEPLOY',arrow:true,fontSize:18});else simpleText(get('lobbyStatus'),rect(startX,footerY+8,startW,48),{size:13,color:C.muted,maxLines:2});
-    if(!portrait&&active!=='players'){const wr=rect(b.left,footerY+6,b.width-startW-18,50),n=get('nativeLoadoutEditBtn'),weapon=q('.self',get('lobbyRoster'))?.dataset?.primaryWeapon||'assault';art('weapon-'+weapon+'.png',rect(wr.left,wr.top-8,106,66));txt('LOADOUT  ↗',wr.left+108,wr.top+11,wr.width-108,11,C.text,700);txt('v2.15.0  /  '+code,wr.left+108,wr.top+30,wr.width-108,8,C.muted,600);mark(n,wr);hit(n,wr);focusRing(n,wr);}else if(!portrait){txt('ROOM '+code+'  /  '+(host?'HOST':'SQUAD'),b.left,footerY+20,b.width-startW-24,11,C.muted,600);txt('BREACH  v2.15.0',b.left,footerY+39,b.width-startW-24,8,C.dim,600);}
+    if(!portrait&&active!=='players'){const wr=rect(b.left,footerY+6,b.width-startW-18,50),n=get('nativeLoadoutEditBtn'),weapon=q('.self',get('lobbyRoster'))?.dataset?.primaryWeapon||'assault';art('weapon-'+weapon+'.png',rect(wr.left,wr.top-8,106,66));txt('LOADOUT  ↗',wr.left+108,wr.top+11,wr.width-108,11,C.text,700);txt('v2.16.0  /  '+code,wr.left+108,wr.top+30,wr.width-108,8,C.muted,600);mark(n,wr);hit(n,wr);focusRing(n,wr);}else if(!portrait){txt('ROOM '+code+'  /  '+(host?'HOST':'SQUAD'),b.left,footerY+20,b.width-startW-24,11,C.muted,600);txt('BREACH  v2.16.0',b.left,footerY+39,b.width-startW-24,8,C.dim,600);}
   }
   function drawDeployment(r){
     const side=vp.landscape||r.width>=650,heroW=side?r.width*.44:r.width,heroH=side?r.height:Math.min(250,Math.max(134,r.height*.40));
