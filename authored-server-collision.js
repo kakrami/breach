@@ -1,7 +1,7 @@
-import { BOSS_WEAKPOINT } from './moon-boss-rules.js?v=2.19.0';
-import { actorScale } from './actor-rules.js?v=2.19.0';
-import { CROUCH_HEIGHT } from './game-config.js?v=2.19.0';
-import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT, segmentEllipsoidFirstT } from './collision-primitives.js?v=2.19.0';
+import { BOSS_WEAKPOINT } from './moon-boss-rules.js?v=2.20.0';
+import { actorScale } from './actor-rules.js?v=2.20.0';
+import { CROUCH_HEIGHT } from './game-config.js?v=2.20.0';
+import { segmentAabbFirstT, segmentCylinderFirstT, segmentPyramidFirstT, segmentEllipsoidFirstT } from './collision-primitives.js?v=2.20.0';
 
 export function createAuthoredServerCollision(world){
   const {PLAYER_HEIGHT,ARENA_LIMIT,STATIC_BOXES,STATIC_PROJECTILE_COLLIDERS,BUILDING_PARTS,PYRAMIDS,NATURAL_OBSTACLES,terrainHeight,naturalGroundBase}=world;

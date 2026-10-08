@@ -2,8 +2,8 @@
  * Authoritative players, classes, settings and host rights come from the adapter.
  * 844 × 390 is the design frame, with one uniform scale and no scroll containers.
  */
-import {APP_VERSION,WEAPON_SPECS,PRIMARY_WEAPONS,SECONDARY_WEAPONS,WEAPON_ORDER,ATTACHMENTS,attachmentOptionsForWeapon,resolveWeaponSpec,EQUIPMENT_SPECS,TACTICAL_EQUIPMENT,LETHAL_EQUIPMENT,KILLSTREAK_ORDER,KILLSTREAK_SPECS,GAME_MODES,gameModeSpec} from './game-config.js?v=2.19.0';
-import {relationshipFor,relationshipColor} from './team-model.js?v=2.19.0';
+import {APP_VERSION,WEAPON_SPECS,PRIMARY_WEAPONS,SECONDARY_WEAPONS,WEAPON_ORDER,ATTACHMENTS,attachmentOptionsForWeapon,resolveWeaponSpec,EQUIPMENT_SPECS,TACTICAL_EQUIPMENT,LETHAL_EQUIPMENT,KILLSTREAK_ORDER,KILLSTREAK_SPECS,GAME_MODES,gameModeSpec} from './game-config.js?v=2.20.0';
+import {relationshipFor,relationshipColor} from './team-model.js?v=2.20.0';
 const T={bg:'#101713',panel:'#1d2721',line:'#354234',accent:'#d8eda0',text:'#edf0e8',muted:'#a2aea0',blue:'#98c9db',red:'#eb927e'};
 const cap=s=>String(s||'').replace(/^./,x=>x.toUpperCase()),clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const r=(x,y,w,h)=>({x,y,left:x,top:y,width:w,height:h,right:x+w,bottom:y+h});
@@ -138,7 +138,7 @@ export function createGameMenu({ui,adapter,preview}) {
     [['reset-view','↺',()=>preview.reset(kind)],['zoom-out','−',()=>preview.zoom(-.1)],['zoom-in','+',()=>preview.zoom(.1)]].forEach(([key,label,action],i)=>link(key,label,x+w-108+i*36,y+h-32,35,32,action,{size:18}));
     return Object.fromEntries(Object.entries(output.anchors||{}).map(([s,p])=>[s,{x:x+p.x/1.7,y:y+p.y/1.7}]));
   }
-  function stockLabel(w,slot){return slot==='optic'?(w==='sniper'?'FACTORY 4X':'IRON SIGHTS'):['muzzle','underbarrel'].includes(slot)?'NONE':'FACTORY';}
+  function stockLabel(w,slot){return slot==='optic'?'IRON SIGHTS':['muzzle','underbarrel'].includes(slot)?'NONE':'FACTORY';}
   function selectionRail(key,items,selected,x,y,w,h,drawItem){
     const gap=7,columns=Math.min(3,Math.max(1,items.length)),cardW=(w-gap*(columns-1))/columns,pitch=cardW+gap,max=Math.max(0,items.length*pitch-gap-w);
     if(state.railOffsets[key]===undefined){const i=Math.max(0,items.findIndex(item=>item.id===selected));state.railOffsets[key]=clamp((i-1)*pitch,0,max);}

@@ -1,17 +1,17 @@
-import {battleRifleCycle} from './battle-rifle.js?v=2.19.0';
-import {createWeaponModel, selectWeaponComponents, poseWeaponModel} from './weapon-models.js?v=2.19.0';
-import {compileInfectionWorld} from './infection-world.js?v=2.19.0';
-import {createInfectionFieldPresentation} from './infection-presentation.js?v=2.19.0';
-import {resolveWeaponRules} from './game-config.js?v=2.19.0';
-import {armoryStatRows,weaponPerformance} from './armory-stats.js?v=2.19.0';
-import {createInfectionVisuals} from './infection-models.js?v=2.19.0';
-import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.19.0';
-import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.19.0';
-import { createNativeScreenTree } from './native-screen-tree.js?v=2.19.0';
-import { createGameMenu } from './game-menu.js?v=2.19.0';
-import { createMenuScene } from './menu-scene.js?v=2.19.0';
-import { createNativeRenderer } from './native-layout.js?v=2.19.0';
-import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.19.0';
+import {battleRifleCycle} from './battle-rifle.js?v=2.20.0';
+import {createWeaponModel, selectWeaponComponents, poseWeaponModel} from './weapon-models.js?v=2.20.0';
+import {compileInfectionWorld} from './infection-world.js?v=2.20.0';
+import {createInfectionFieldPresentation} from './infection-presentation.js?v=2.20.0';
+import {resolveWeaponRules} from './game-config.js?v=2.20.0';
+import {armoryStatRows,weaponPerformance} from './armory-stats.js?v=2.20.0';
+import {createInfectionVisuals} from './infection-models.js?v=2.20.0';
+import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.20.0';
+import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.20.0';
+import { createNativeScreenTree } from './native-screen-tree.js?v=2.20.0';
+import { createGameMenu } from './game-menu.js?v=2.20.0';
+import { createMenuScene } from './menu-scene.js?v=2.20.0';
+import { createNativeRenderer } from './native-layout.js?v=2.20.0';
+import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.20.0';
 // Replay presentation is optional during initial loadout normalization.
 let replayPlayback=null;
 const browserDocument = globalThis.document;
@@ -21,47 +21,47 @@ const getComputedStyle = el => isWidget(el) ? nativeStyle(el) : globalThis.getCo
 // Native scene-graph construction. Text is never interpreted as markup or browser UI.
 function uiNode(type,text='',classes='',attrs={},children=[]){const node=document.createElement(type);if(classes)node.className=classes;for(const [key,value] of Object.entries(attrs)){if(value!==false&&value!==null&&value!==undefined)node.setAttribute(key,value===true?'':String(value));}if(text!==null&&text!=='')node.textContent=String(text);node.append(...children.filter(Boolean));return node;}
 const uiCopy=(title,detail='')=>[uiNode('strong',title),...(detail?[uiNode('small',detail)]:[])];
-import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.19.0';
-import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.19.0';
-import {INFECTION,INFECTION_CLASSES,infectionBuildSite,infectionAbilityActive,isInfectionPrimaryWeapon,infectionClass,infectionPrice,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability,infectionShopItems,infectionPublicState} from './infection-rules.js?v=2.19.0';
-import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.19.0';
+import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.20.0';
+import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.20.0';
+import {INFECTION,INFECTION_CLASSES,infectionBuildSite,infectionAbilityActive,isInfectionPrimaryWeapon,infectionClass,infectionPrice,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability,infectionShopItems,infectionPublicState} from './infection-rules.js?v=2.20.0';
+import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.20.0';
 let EditorScene;
-import { BUILDING_MATERIALS } from './object-catalog.js?v=2.19.0';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.19.0';
-import { createMoonSky } from './mod-environment.js?v=2.19.0';
-import * as HighlandsGeometry from './world-geometry.js?v=2.19.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=2.19.0';
-import * as YardGeometry from './world-geometry-yard.js?v=2.19.0';
-import * as MoonGeometry from './world-geometry-moon.js?v=2.19.0';
-import * as MoonWorldCollision from './world-collision-moon.js?v=2.19.0';
-import * as RigGeometry from './world-geometry-rig.js?v=2.19.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=2.19.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=2.19.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=2.19.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=2.19.0';
+import { BUILDING_MATERIALS } from './object-catalog.js?v=2.20.0';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.20.0';
+import { createMoonSky } from './mod-environment.js?v=2.20.0';
+import * as HighlandsGeometry from './world-geometry.js?v=2.20.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=2.20.0';
+import * as YardGeometry from './world-geometry-yard.js?v=2.20.0';
+import * as MoonGeometry from './world-geometry-moon.js?v=2.20.0';
+import * as MoonWorldCollision from './world-collision-moon.js?v=2.20.0';
+import * as RigGeometry from './world-geometry-rig.js?v=2.20.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=2.20.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=2.20.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=2.20.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=2.20.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=2.19.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.19.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=2.19.0';
-import { createAudioEngine } from './audio-engine.js?v=2.19.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.19.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.19.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.19.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.19.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.19.0';
-import { createControllerRecording } from './controller-recording.js?v=2.19.0';
-import { createPointerSessions } from './pointer-sessions.js?v=2.19.0';
-import { createSafeStorage } from './browser-storage.js?v=2.19.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=2.19.0';
-import { createUiFocusScope } from './ui-focus.js?v=2.19.0';
-import { createUiGestures } from './ui-gestures.js?v=2.19.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.19.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.19.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.19.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.19.0';
+} from './game-config.js?v=2.20.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.20.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=2.20.0';
+import { createAudioEngine } from './audio-engine.js?v=2.20.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.20.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.20.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.20.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.20.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.20.0';
+import { createControllerRecording } from './controller-recording.js?v=2.20.0';
+import { createPointerSessions } from './pointer-sessions.js?v=2.20.0';
+import { createSafeStorage } from './browser-storage.js?v=2.20.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=2.20.0';
+import { createUiFocusScope } from './ui-focus.js?v=2.20.0';
+import { createUiGestures } from './ui-gestures.js?v=2.20.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.20.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.20.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.20.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.20.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -187,7 +187,7 @@ function freshClientAmmo(){return Object.fromEntries(WEAPON_ORDER.map(name=>[nam
 function freshClientEquipment(tactical='flash',lethal='sticky'){return equipmentForLoadout(tactical,lethal);}
 const HUD_ACCENT='#d7ff58', HUD_SURFACE='rgba(9,11,13,.90)', HUD_LINE='rgba(255,255,255,.16)', HUD_MUTED='#8b969f';
 const ZOMBIE_BODY_COLOR='#526044';
-const IRON_SIGHT_WEAPONS = new Set(['battleRifle','pistol','assault','ump','machineGun','shotgun','semiShotgun','rpg']);
+const IRON_SIGHT_WEAPONS = new Set(['battleRifle','pistol','assault','ump','machineGun','shotgun','semiShotgun','sniper','grenadeLauncher','rpg']);
 const CHAT_MAX_LENGTH=120,CHAT_VISIBLE_MS=9000,CHAT_MAX_MESSAGES=28;
 const ACTIVE_STATE_INTERVAL = 33;
 const IDLE_STATE_INTERVAL = 250;
@@ -1069,7 +1069,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.19.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.20.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1077,7 +1077,7 @@ async function ensureThreeEngine(){
   if(engineLoadPromise)return engineLoadPromise;
   engineLoadPromise=(async()=>{
     try{
-      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.19.0')).EditorScene;
+      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.20.0')).EditorScene;
       if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
       THREE=mod;
       position=new THREE.Vector3(0,0,0);
@@ -1170,13 +1170,14 @@ function buildMenuPartModel(weapon,attachments,slot){
   const source=armoryModelSources(weapon)[0],root=new THREE.Group();syncWeaponAttachmentVisuals(source,weapon,attachments);
   const d=source.userData,v=d.componentView,id=attachments[slot],selected=id?d.attachmentVisuals?.[id]:null;
   let parts=selected?[selected]:[];
-  if(slot==='optic'&&weapon==='sniper')parts=id?[selected]:[v.scope];
+  if(slot==='optic'&&weapon==='sniper')parts=id?[selected]:(d.ironSightParts||[]);
   else if(slot==='optic'&&!id)parts=d.ironSightParts||[];
   else if(slot==='barrel')parts=[d.attachmentBarrel?.mesh];
   else if(slot==='magazine')parts=[d.attachmentMagazine||selected];
   else if(slot==='stock')parts=[v.stockSet?.[id]||v.stock];
   else if(slot==='underbarrel'&&id==='bipod')parts=[v.bipod||selected];
-  for(const part of [...new Set(parts.filter(Boolean))]){const copy=cloneLoadoutPreviewNode(part);if(copy)root.add(copy);}
+  source.updateMatrixWorld(true);const inverseRoot=source.matrixWorld.clone().invert();
+  for(const part of [...new Set(parts.filter(Boolean))]){const copy=cloneLoadoutPreviewNode(part);if(copy){new THREE.Matrix4().multiplyMatrices(inverseRoot,part.matrixWorld).decompose(copy.position,copy.quaternion,copy.scale);root.add(copy);}}
   return root;
 }
 
@@ -1413,16 +1414,18 @@ function sniperZoomAmount(){
   return Math.pow(t,1.42);
 }
 function sniperMaskAmount(){
+  if(!weaponOpticSpec('sniper'))return 0;
   const t=sniperAdsMotion();
   return Math.pow(t,2.85);
 }
 function sniperReticleAmount(){
+  if(!weaponOpticSpec('sniper'))return 0;
   const t=sniperAdsMotion();
   return smoothstep01((t-.72)/.24);
 }
-function weaponHiddenForScope(weapon=currentWeapon){if(weapon!==currentWeapon)return false;if(weapon==='sniper')return adsBlend>=SNIPER_WEAPON_HIDE_BLEND;return !!thermalOpticMode()&&thermalOpticScopeAmount()>=.94;}
+function weaponHiddenForScope(weapon=currentWeapon){if(weapon!==currentWeapon)return false;if(weapon==='sniper')return !!weaponOpticSpec('sniper')&&adsBlend>=SNIPER_WEAPON_HIDE_BLEND;return !!thermalOpticMode()&&thermalOpticScopeAmount()>=.94;}
 function sniperWeaponHiddenForScope(){return weaponHiddenForScope('sniper');}
-function sniperAdsPose(){return{x:0,y:-SNIPER_SCOPE_AXIS_Y,z:-.235,rx:0,ry:0,rz:0};}
+function sniperAdsPose(){const id=String(attachmentsForWeapon('sniper')?.optic||'');return (id?sniperGroup?.userData.attachmentVisuals?.[id]?.userData.adsPose:sniperGroup?.userData.adsPose)||{x:0,y:-SNIPER_SCOPE_AXIS_Y,z:-.235,rx:0,ry:0,rz:0};}
 function sniperBreathEligible(){return currentWeapon==='sniper'&&adsWanted&&adsBlend>=SNIPER_BREATH_READY_BLEND&&hp>0&&shell.canPlay&&matchAllowsCombat(matchState)&&!reloadUntil&&!traversal&&!ladderState;}
 function sniperBreathInputHeld(){
   if(!sniperBreathEligible())return false;
@@ -1843,35 +1846,6 @@ function resetPlayerSettings(){setMasterMuted(false);applyPlayerSettings({...DEF
 
 
 
-function sightMarkMaterial(color=0xf4f1df){return new THREE.MeshBasicMaterial({color,transparent:true,opacity:.96,depthWrite:false,side:THREE.DoubleSide,toneMapped:false});}
-function addPistolIronSights(group,material,{rearZ=.08,frontZ=-.31,sightY=.140,rearMountY=.112,frontMountY=.112,eyeZ=-.46}={}){
-  // CoD-style pistol sight picture: a shallow square rear notch and a narrow
-  // front blade with high-contrast three-dot references. Keep the center open.
-  const parts=[],markMat=sightMarkMaterial(),rearBaseH=.010,rearBase=new THREE.Mesh(new THREE.BoxGeometry(.058,rearBaseH,.020),material);rearBase.position.set(0,rearMountY+rearBaseH/2,rearZ);parts.push(rearBase);
-  const earW=.011,earH=Math.max(.014,sightY-rearMountY-.006),gap=.016,rearL=new THREE.Mesh(new THREE.BoxGeometry(earW,earH,.018),material),rearR=rearL.clone();rearL.position.set(-(gap+earW/2),rearMountY+rearBaseH+earH/2,rearZ);rearR.position.set(gap+earW/2,rearMountY+rearBaseH+earH/2,rearZ);parts.push(rearL,rearR);
-  const frontBaseH=.008,frontBase=new THREE.Mesh(new THREE.BoxGeometry(.024,frontBaseH,.018),material);frontBase.position.set(0,frontMountY+frontBaseH/2,frontZ);const postBottom=frontMountY+frontBaseH,postH=Math.max(.008,sightY-postBottom),frontPost=new THREE.Mesh(new THREE.BoxGeometry(.0062,postH,.014),material);frontPost.position.set(0,postBottom+postH/2,frontZ);parts.push(frontBase,frontPost);
-  const rearDotL=new THREE.Mesh(new THREE.CircleGeometry(.0034,12),markMat),rearDotR=rearDotL.clone(),frontDot=new THREE.Mesh(new THREE.CircleGeometry(.0036,12),markMat);rearDotL.position.set(-.020,sightY-.008,rearZ+.010);rearDotR.position.set(.020,sightY-.008,rearZ+.010);frontDot.position.set(0,sightY-.006,frontZ+.008);parts.push(rearDotL,rearDotR,frontDot);
-  group.add(...parts);group.userData.ironSightParts=parts;group.userData.adsSightRear={x:0,y:sightY,z:rearZ};group.userData.adsSightTip={x:0,y:sightY,z:frontZ};group.userData.adsSightY=sightY;group.userData.adsPose={x:0,y:-sightY,z:eyeZ-rearZ,rx:0,ry:0,rz:0};return sightY;
-}
-function addApertureIronSights(group,material,{rearZ=.04,frontZ=-.66,sightY=.165,rearMountY=.132,frontMountY=.132,eyeZ=-.40,rearRadius=.021,rearTube=.0036,postWidth=.0065,frontEarGap=.020}={}){
-  // Rifle/SMG sight picture: thin rear aperture + protected front post. This
-  // keeps the center much less obstructed than the old generic square notch.
-  const parts=[],rearRing=new THREE.Mesh(new THREE.TorusGeometry(rearRadius,rearTube,7,24),material);rearRing.position.set(0,sightY,rearZ);parts.push(rearRing);
-  const rearStemTop=sightY-rearRadius-rearTube*.35,rearStemH=Math.max(.008,rearStemTop-rearMountY),rearStem=new THREE.Mesh(new THREE.BoxGeometry(.012,rearStemH,.018),material);rearStem.position.set(0,rearMountY+rearStemH/2,rearZ);const rearFoot=new THREE.Mesh(new THREE.BoxGeometry(.046,.008,.024),material);rearFoot.position.set(0,rearMountY+.004,rearZ);parts.push(rearStem,rearFoot);
-  const frontBaseH=.008,frontBase=new THREE.Mesh(new THREE.BoxGeometry(.040,frontBaseH,.018),material);frontBase.position.set(0,frontMountY+frontBaseH/2,frontZ);const postBottom=frontMountY+frontBaseH,postH=Math.max(.008,sightY-postBottom),frontPost=new THREE.Mesh(new THREE.BoxGeometry(postWidth,postH,.014),material);frontPost.position.set(0,postBottom+postH/2,frontZ);parts.push(frontBase,frontPost);
-  const earW=.0065,earTop=sightY+.010,earH=Math.max(.010,earTop-postBottom),frontL=new THREE.Mesh(new THREE.BoxGeometry(earW,earH,.014),material),frontR=frontL.clone();frontL.position.set(-(frontEarGap+earW/2),postBottom+earH/2,frontZ);frontR.position.set(frontEarGap+earW/2,postBottom+earH/2,frontZ);parts.push(frontL,frontR);
-  group.add(...parts);group.userData.ironSightParts=parts;group.userData.adsSightRear={x:0,y:sightY,z:rearZ};group.userData.adsSightTip={x:0,y:sightY,z:frontZ};group.userData.adsSightY=sightY;group.userData.adsPose={x:0,y:-sightY,z:eyeZ-rearZ,rx:0,ry:0,rz:0};return sightY;
-}
-function addShotgunBeadSight(group,material,{rearZ=.02,frontZ=-1.04,sightY=.116,rearMountY=.090,frontMountY=.060,eyeZ=-.42}={}){
-  // Pump shotgun: low receiver rib and a bright, simple front bead. The eye is
-  // not boxed in by a fake rear notch.
-  const parts=[],rib=new THREE.Mesh(new THREE.BoxGeometry(.030,.006,.055),material);rib.position.set(0,rearMountY+.003,rearZ-.010);parts.push(rib);
-  const beadStemH=Math.max(.006,sightY-frontMountY-.006),beadStem=new THREE.Mesh(new THREE.BoxGeometry(.010,beadStemH,.014),material);beadStem.position.set(0,frontMountY+beadStemH/2,frontZ);const bead=new THREE.Mesh(new THREE.SphereGeometry(.0055,10,7),sightMarkMaterial(0xfff0b8));bead.position.set(0,sightY,frontZ);parts.push(beadStem,bead);
-  group.add(...parts);group.userData.ironSightParts=parts;group.userData.adsSightRear={x:0,y:sightY,z:rearZ};group.userData.adsSightTip={x:0,y:sightY,z:frontZ};group.userData.adsSightY=sightY;group.userData.adsPose={x:0,y:-sightY,z:eyeZ-rearZ,rx:0,ry:0,rz:0};return sightY;
-}
-function addShotgunGhostRingSight(group,material,opts={}){
-  return addApertureIronSights(group,material,{rearRadius:.017,rearTube:.0032,postWidth:.006,frontEarGap:.017,...opts});
-}
 function weaponUsesIronSights(weapon=currentWeapon){return IRON_SIGHT_WEAPONS.has(weapon);}
 function attachmentVisualMaterial(color=0x171c20,metalness=.34,roughness=.44){return new THREE.MeshStandardMaterial({color,metalness,roughness});}
 function bakedWeaponInsetMaterial(){return bakedWeaponInsetMaterial.material||(bakedWeaponInsetMaterial.material=attachmentVisualMaterial(0x101519,.36,.52));}
@@ -1994,7 +1968,7 @@ function syncWeaponAttachmentVisuals(group,weapon,attachments){
   if(!group)return;const normalized=normalizeWeaponAttachments(weapon,attachments),visuals=group.userData.attachmentVisuals||{};for(const [id,obj] of Object.entries(visuals))obj.visible=weaponHasAttachment(weapon,normalized,id);
   const opticId=String(normalized.optic||'');for(const part of group.userData.ironSightParts||[])part.visible=!opticId;
   const view=group.userData.componentView,muzzleDeltaZ=view?selectWeaponComponents(view,normalized):0;
-  if(view?.scope)view.scope.visible=!opticId;
+  if(view?.scope)view.scope.visible=false;
   for(const part of group.userData.attachmentBipodBaseParts||[]){part.visible=true;part.rotation.x=weaponHasAttachment(weapon,normalized,'bipod')?0:-1.35;}
   if(view?.barrelSet)group.userData.attachmentBarrel={mesh:(view.barrelSet[normalized.barrel]||view.barrelSet.standard).mesh};
   for(const part of group.userData.frontSightParts||[])part.position.z=part.userData.baseSightZ+muzzleDeltaZ;
@@ -2018,10 +1992,6 @@ function registerWeaponHandAnchors(root,{right,left,reloadLeft,reloadRight}={}){
 }
 function buildArsenalWeapon(weapon,scale=1){
   const v=createWeaponModel(THREE,weapon),g=v.group,m=v.mount,options={flash:v.flash,mag:v.mag,barrelMesh:v.barrel,barrelSet:v.barrelSet,stockBaseParts:v.stock?[v.stock]:[],bipodBaseParts:v.bipod?[v.bipod]:[]};
-  if(v.sight&&weapon!=='sniper'){
-    const fn=v.sight.type==='pistol'?addPistolIronSights:v.sight.type==='bead'?addShotgunBeadSight:addApertureIronSights;
-    fn(g,v.sightMaterial,v.sight);g.userData.frontSightParts=(g.userData.ironSightParts||[]).filter(part=>Math.abs(part.position.z-v.sight.frontZ)<.03);for(const part of g.userData.frontSightParts)part.userData.baseSightZ=part.position.z;
-  }
   if(v.scope)g.userData.previewScopeParts=v.scopeParts;
   registerWeaponHandAnchors(g,v.hands);
   const optic={mountY:m.y,z:m.z,eyeZ:weapon==='pistol'?-.46:-.40};
@@ -2042,7 +2012,7 @@ function buildArsenalWeapon(weapon,scale=1){
   setupWeaponAttachmentVisuals(g,weapon,options);g.userData.componentView=v;
   if(weapon==='pistol'){
     // Both sights and the slide-mounted reflex optic reciprocate together.
-    g.updateMatrixWorld(true);for(const part of [...(g.userData.ironSightParts||[]),g.userData.attachmentVisuals?.redDot].filter(Boolean))v.bolt.attach(part);for(const part of g.userData.frontSightParts||[])part.userData.baseSightZ=part.position.z;
+    g.updateMatrixWorld(true);for(const part of [g.userData.attachmentVisuals?.redDot].filter(Boolean))v.bolt.attach(part);for(const part of g.userData.frontSightParts||[])part.userData.baseSightZ=part.position.z;
   }
   g.scale.setScalar(scale);for(const node of [g,...Object.values(g.userData.attachmentVisuals||{})]){const pose=node.userData.adsPose;if(pose){pose.x*=scale;pose.y*=scale;pose.z=(pose.z+.40)*scale-.40;}}
   return v;
@@ -2069,7 +2039,7 @@ function loadoutPreviewNodePoint(source,node){
 }
 function loadoutPreviewCalloutPoints(source,weapon,attachments){
   if(!source)return{};const normalized=normalizeWeaponAttachments(weapon,attachments),visuals=source.userData?.attachmentVisuals||{},points={},opticId=String(normalized.optic||''),optic=opticId?visuals[opticId]:null,opticAim=optic?.userData?.aimPoint;
-  points.optic=loadoutPreviewNodePoint(source,source.userData?.previewScopeParts?.[2]||opticAim||optic)||(()=>{const rear=source.userData?.adsSightRear;return rear?new THREE.Vector3(Number(rear.x)||0,Number(rear.y)||0,Number(rear.z)||0):null;})();
+  points.optic=loadoutPreviewNodePoint(source,opticAim||optic)||(()=>{const rear=source.userData?.adsSightRear;return rear?new THREE.Vector3(Number(rear.x)||0,Number(rear.y)||0,Number(rear.z)||0):null;})();
   points.muzzle=loadoutPreviewNodePoint(source,source.userData?.attachmentFlash)||(()=>{const m=source.userData?.attachmentMuzzle;return m?new THREE.Vector3(Number(m.x)||0,Number(m.y)||0,Number(m.z)||0):null;})();
   points.barrel=loadoutPreviewNodePoint(source,source.userData?.attachmentBarrel?.mesh);
   points.magazine=loadoutPreviewNodePoint(source,source.userData?.attachmentMagazine);
@@ -5411,7 +5381,7 @@ function updateWeaponView(dt){
   semiShotgunGroup.position.set(THREE.MathUtils.lerp(.30,semiShotgunPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,semiShotgunPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.50,semiShotgunPose.z,a)+kickZ+commonZ);semiShotgunGroup.rotation.set(THREE.MathUtils.lerp(-.06,semiShotgunPose.rx,a)+reloadCurve*.14+kickPitch,THREE.MathUtils.lerp(-.05,semiShotgunPose.ry,a)-reloadCurve*.12+kickYaw,THREE.MathUtils.lerp(0,semiShotgunPose.rz,a)-reloadRoll*.8-swapRoll-deathRoll-mobilityRoll+kickRoll);
   const battlePose=sightPose(battleRifleGroup,'battleRifle',{x:0,y:-.232,z:-.28,rx:0,ry:0,rz:0});battleRifleGroup.position.set(THREE.MathUtils.lerp(.28,battlePose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.30,battlePose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.65,battlePose.z,a)+kickZ+commonZ);battleRifleGroup.rotation.set(THREE.MathUtils.lerp(-.045,0,a)+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.035,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
   const sniperPose=sniperAdsPose(),sniperCenter=sniperCenterAmount(),sniperEye=sniperEyeAmount();sniperGroup.position.set(THREE.MathUtils.lerp(.28,sniperPose.x,sniperCenter)+commonX*(1-sniperCenter),THREE.MathUtils.lerp(-.28,sniperPose.y,sniperCenter)+commonY*(1-sniperCenter),THREE.MathUtils.lerp(-.48,sniperPose.z,sniperEye)+kickZ+commonZ*(1-sniperCenter));sniperGroup.rotation.set(THREE.MathUtils.lerp(-.055,sniperPose.rx,sniperCenter)+reloadCurve*.10*(1-sniperCenter)+kickPitch,THREE.MathUtils.lerp(-.05,sniperPose.ry,sniperCenter)-reloadCurve*.12*(1-sniperCenter)+kickYaw,THREE.MathUtils.lerp(0,sniperPose.rz,sniperCenter)-reloadRoll*.65*(1-sniperCenter)-swapRoll*(1-sniperCenter)-deathRoll*(1-sniperCenter)-mobilityRoll*(1-sniperCenter)+kickRoll);
-  grenadeLauncherGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.20,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);grenadeLauncherGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+GRENADE_LAUNCH_PITCH+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
+  const launcherPose=sightPose(grenadeLauncherGroup,'grenadeLauncher',{x:0,y:-.20,z:-.42,rx:GRENADE_LAUNCH_PITCH,ry:0,rz:0});grenadeLauncherGroup.position.set(THREE.MathUtils.lerp(.30,launcherPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.28,launcherPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.48,launcherPose.z,a)+kickZ+commonZ);grenadeLauncherGroup.rotation.set(THREE.MathUtils.lerp(-.06+GRENADE_LAUNCH_PITCH,launcherPose.rx,a)+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.05,launcherPose.ry,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
   rpgGroup.position.set(THREE.MathUtils.lerp(.34,rpgPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.16,rpgPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.46,rpgPose.z,a)+kickZ+commonZ);rpgGroup.rotation.set(THREE.MathUtils.lerp(-.025,rpgPose.rx,a)+reloadCurve*.11+kickPitch,THREE.MathUtils.lerp(-.07,rpgPose.ry,a)-reloadCurve*.10+kickYaw,THREE.MathUtils.lerp(.015,rpgPose.rz,a)-reloadRoll*.6-swapRoll-deathRoll-mobilityRoll+kickRoll);
   const battleReload=reloading&&currentWeapon==='battleRifle',battleCycle=battleReload?battleRifleCycle(1,1+Math.max(0,(reloadP-.60)/.40)*1000,1000):battleRifleCycle(battleRifleCycleStartedAt,now,battleRifleCycleDuration);
   let pump=0;if(shotgunPumpStartedAt){const elapsed=now-shotgunPumpStartedAt,p=THREE.MathUtils.clamp((elapsed-150)/470,0,1);pump=p<.44?THREE.MathUtils.smoothstep(p,0,.44):1-THREE.MathUtils.smoothstep(p,.44,1);if(!replayPlayback&&elapsed>=150&&!shotgunPumpSoundPlayed&&p>=.42){shotgunPumpSoundPlayed=true;soundShotgunPump();}if(p>=1){shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;}}

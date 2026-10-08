@@ -1,15 +1,17 @@
 // Shared physical models. Coordinates, component replacements and action poses
 // are identical in the armory, first person, remote players and replay.
-import {createBattleRifle, battleRifleCycle, poseBattleRifle} from './battle-rifle.js?v=2.19.0';
+import {installWeaponIronSights} from './iron-sights.js?v=2.20.0';
+import {WEAPON_SPECS} from './game-config.js?v=2.20.0';
+import {createBattleRifle, battleRifleCycle, poseBattleRifle} from './battle-rifle.js?v=2.20.0';
 
 const smooth=(p,a,b)=>{const t=Math.max(0,Math.min(1,(p-a)/(b-a)));return t*t*(3-2*t);};
 const pulse=(p,a,b,c,d)=>smooth(p,a,b)*(1-smooth(p,c,d));
 
 export function createWeaponModel(T,id){
   if(id==='battleRifle'){
-    const v=createBattleRifle(T);v.id=id;v.sight={type:'aperture',rearZ:-.12,frontZ:-1.22,sightY:.232,rearMountY:.197,frontMountY:.170,eyeZ:-.40};
+    const v=createBattleRifle(T);v.id=id;v.sight={type:'aperture',rearZ:-.12,frontZ:-1.22,sightY:.232,rearMountY:.197,frontMountY:.160,eyeZ:-.40};
     v.hands={right:{position:[.038,-.090,.17],rotation:[-.28,-.02,.06]},left:{position:[-.038,-.095,-.53],rotation:[-.14,.04,.02]},reloadLeft:{parent:v.mag,position:[-.035,-.025,0],rotation:[-.16,.08,.14]},reloadRight:{parent:v.bolt,position:[.151,-.014,.057],rotation:[-.40,-.10,.28]}};
-    v.mount={y:.202,z:-.20,handZ:-.53,handY:-.095,laserX:.110};v.magBase=v.mag.position.clone();return v;
+    v.mount={y:.202,z:-.20,handZ:-.53,handY:-.095,laserX:.110};v.magBase=v.mag.position.clone();installWeaponIronSights(T,v);return v;
   }
   const group=new T.Group();group.name=id;const v={id,group},m={};
   for(const [key,color,roughness,metalness]of [['steel',0x394147,.38,.68],['dark',0x20272b,.56,.36],['poly',0x343b3b,.84,.06],['rubber',0x151b1d,.92,.02],['wood',0x785037,.76,.02],['tan',0x9a8c68,.67,.18],['olive',0x606a49,.85,.04],['silver',0x879396,.30,.72],['brass',0xb99a55,.36,.66]]){m[key]=new T.MeshStandardMaterial({color,roughness,metalness});m[key].userData.preservePreviewTone=true;}
@@ -78,7 +80,7 @@ export function createWeaponModel(T,id){
     guard(.045);trigger(.018);
     if(lever){v.lever=part('lever',[0,-.060,.07]);profile('lever-loop',[[-.20,-.007],[.025,-.006],[.025,-.075],[-.10,-.104],[-.19,-.068]],.027,m.dark,v.lever,[[[-.172,-.022],[-.165,-.053],[-.096,-.081],[.006,-.060],[.006,-.022]]]);box('hammer',[.035,.045,.028],[0,.08,.094],m.dark);}
     else action([.08,.026,-.13],.135);
-    v.shell=shell('loading-shell');v.shell.visible=false;v.sight={type:'bead',rearZ:.02,frontZ:lever?-.98:-1.08,sightY:.118,rearMountY:.092,frontMountY:.070,eyeZ:-.42};v.mount={y:.099,z:-.13,handZ:-.46,handY:-.04,laserX:.076};
+    v.shell=shell('loading-shell');v.shell.visible=false;v.sight={type:'bead',rearZ:.02,frontZ:lever?-.98:-1.08,sightY:.118,rearMountY:.074,frontMountY:.060,eyeZ:-.42};v.mount={y:.099,z:-.13,handZ:-.46,handY:-.04,laserX:.076};
     v.hands={right:{position:[.025,-.09,.135],rotation:[-.30,-.03,.04]},left:{parent:v.pump,position:[-.025,-.025,0],rotation:[-.12,.04,.02]},reloadLeft:{parent:v.shell,position:[-.023,0,0],rotation:[-.6,.08,.15]}};
     if(lever){v.hands.left={position:[0,-.09,.135],rotation:[-.30,.03,-.04]};v.hands.right={position:[0,-.09,.135],rotation:[-.30,-.03,.04]};v.hands.reloadRight={parent:v.shell,position:[.023,0,0],rotation:[-.6,-.08,-.15]};}
   }else if(id==='assault'||id==='ump'||id==='machineGun'||id==='semiShotgun'||id==='sniper'){
@@ -108,21 +110,20 @@ export function createWeaponModel(T,id){
       const lens=new T.MeshStandardMaterial({color:0x9abbbd,roughness:.12,transparent:true,opacity:.22,side:T.DoubleSide,depthWrite:false});mesh('scope-lens',new T.CircleGeometry(.037,20),lens,optic).position.set(0,.14,-.365);tube('elevation-turret',.015,.025,[0,.195,-.16],m.dark,optic).rotation.x=0;
       v.scope=optic;v.scopeParts=[optic,optic,optic];v.mount={y:.095,z:-.16,handZ:-.53,handY:-.045,laserX:.087};
     }else v.mount={y:mg?.153:.132,z:mg?-.20:-.15,handZ:ump?-.42:mg?-.63:saiga?-.53:-.55,handY:-.064,laserX:w/2+.018};
-    v.sight={type:'aperture',rearZ:.018,frontZ:front+.025,sightY:mg?.194:.172,rearMountY:mg?.152:.133,frontMountY:.065,eyeZ:-.40};
+    v.sight={type:'aperture',rearZ:.018,frontZ:front+.025,sightY:mg?.194:.172,rearMountY:mg?.140:svd?.097:.124,frontMountY:.065,eyeZ:-.40};
     v.hands={right:{position:[.025,-.15,svd?.15:.055],rotation:[-.28,-.03,.05]},left:{position:[-.030,-.060,v.mount.handZ],rotation:[-.14,.04,.02]},reloadRight:{parent:v.bolt,position:[.030,0,.018],rotation:[-.35,-.10,.18]}};
   }else if(id==='grenadeLauncher'){
     conventionalStock();profile('breech-receiver',[[-.21,.094],[.10,.065],[.12,-.065],[-.21,-.07]],.14,m.steel);guard(.04);trigger(.015);
     v.hinge=part('break-action',[0,-.052,-.21]);tube('launcher-barrel',.064,.68,[0,.065,-.34],m.dark,v.hinge,true);ring('launcher-muzzle',.059,.008,[0,.065,-.68],m.steel,v.hinge);profile('wood-fore-end',[[-.35,.0],[-.03,.0],[-.03,-.08],[-.32,-.08]],.137,m.wood,v.hinge);
-    const ladder=profile('folding-leaf-sight',[[-.28,.055],[-.28,.20],[-.21,.20],[-.21,.055]],.026,m.steel,v.hinge,[[[-.263,.09],[-.228,.09],[-.228,.18],[-.263,.18]]]);
     v.round=part('40mm-round',[0,.016,-.32]);tube('round-case',.048,.12,[0,0,0],m.brass,v.round);tube('round-nose',.047,.065,[0,0,-.07],m.olive,v.round);v.round.visible=false;
-    v.muzzle=[0,.013,-.903];v.mount={y:.11,z:-.10,handZ:-.46,handY:-.11};v.hands={right:{position:[.024,-.09,.135],rotation:[-.28,-.03,.04]},left:{parent:v.hinge,position:[-.03,-.06,-.27],rotation:[-.14,.04,.02]},reloadLeft:{parent:v.round,position:[-.028,-.024,.02],rotation:[-.2,.04,.1]}};
+    v.sight={rearZ:-.12,frontZ:-.82,sightY:.195,rearMountY:.094,frontMountY:.080,eyeZ:-.46,pitch:WEAPON_SPECS.grenadeLauncher.launchPitchDeg*Math.PI/180};v.muzzle=[0,.013,-.903];v.mount={y:.11,z:-.10,handZ:-.46,handY:-.11};v.hands={right:{position:[.024,-.09,.135],rotation:[-.28,-.03,.04]},left:{parent:v.hinge,position:[-.03,-.06,-.27],rotation:[-.14,.04,.02]},reloadLeft:{parent:v.round,position:[-.028,-.024,.02],rotation:[-.2,.04,.1]}};
   }else if(id==='rpg'){
     tube('launcher-tube',.060,1.20,[0,.026,-.20],m.olive,group,true);for(const z of [.31,.22,-.42,-.71])ring('tube-band',.062,.009,[0,.026,z],m.steel);
     const bell=mesh('rear-venturi',new T.CylinderGeometry(.088,.060,.18,16,1,true),m.dark);bell.rotation.x=Math.PI/2;bell.position.set(0,.026,.44);
     for(const side of [-1,1])box('heat-shield',[.013,.09,.40],[side*.059,.017,.01],m.wood);
     grip(-.04,m.wood);grip(-.49,m.wood);guard(-.025);trigger(-.04);
     v.round=part('rocket',[0,.026,-.86]);tube('rocket-motor',.033,.25,[0,0,.01],m.dark,v.round);const head=mesh('warhead',new T.CylinderGeometry(.037,.081,.19,12),m.olive,v.round);head.rotation.x=Math.PI/2;head.position.z=-.16;const tip=mesh('warhead-ogive',new T.ConeGeometry(.081,.19,12),m.olive,v.round);tip.rotation.x=-Math.PI/2;tip.position.z=-.35;
-    v.roundBase=v.round.position.clone();v.muzzle=[0,.026,-1.31];v.sight={type:'aperture',rearZ:.07,frontZ:-.63,sightY:.16,rearMountY:.10,frontMountY:.10,eyeZ:-.42};v.mount={y:.105,z:-.12,handZ:-.49,handY:-.17,laserX:.075};v.hands={right:{position:[.026,-.145,-.005],rotation:[-.28,-.03,.05]},left:{position:[-.027,-.145,-.46],rotation:[-.24,.04,.02]},reloadLeft:{parent:v.round,position:[-.045,0,-.12],rotation:[-.14,.05,.06]}};
+    v.roundBase=v.round.position.clone();v.muzzle=[0,.026,-1.31];v.sight={type:'aperture',x:-.084,rearZ:.07,frontZ:-.63,sightY:.16,rearMountY:.09,frontMountY:.09,eyeZ:-.42};v.mount={y:.105,z:-.12,handZ:-.49,handY:-.17,laserX:.075};v.hands={right:{position:[.026,-.145,-.005],rotation:[-.28,-.03,.05]},left:{position:[-.027,-.145,-.46],rotation:[-.24,.04,.02]},reloadLeft:{parent:v.round,position:[-.045,0,-.12],rotation:[-.14,.05,.06]}};
   }else throw new Error('Unknown weapon model: '+id);
   v.sightMaterial=m.dark;
   v.flash=mesh('muzzle-flash',new T.SphereGeometry(id==='rpg'?.10:.07,8,6),new T.MeshBasicMaterial({color:0xffda98,transparent:true,opacity:0}));v.flash.position.set(...v.muzzle);v.flash.userData.previewSkip=true;
@@ -130,7 +131,7 @@ export function createWeaponModel(T,id){
   if(v.bolt){group.userData.cyclePart=v.bolt;group.userData.cycleBaseZ=v.actionBase.z;group.userData.cycleTravel=v.actionTravel;}
   // Reduce fixed details to one mesh per material, while preserving mechanical
   // groups and replacement assemblies as independent objects.
-  batchStaticMeshes(T,group);return v;
+  batchStaticMeshes(T,group);if(id==='sniper'){v.sight.eyeZ=-.85;v.scope.visible=false;}installWeaponIronSights(T,v);return v;
 }
 
 export function batchStaticMeshes(T,root){
