@@ -1,10 +1,10 @@
-import { EDITOR_ITEMS } from "./editor-library.js?v=2.16.0";
+import { EDITOR_ITEMS } from "./editor-library.js?v=2.18.0";
 // Canvas panel descriptions and commands. No DOM controls or browser prompts.
-import { APP_VERSION } from "./game-config.js?v=2.16.0";
+import { APP_VERSION } from "./game-config.js?v=2.18.0";
 import {
   assetResizeMode,
   BUILDING_MATERIALS,
-} from "./object-catalog.js?v=2.16.0";
+} from "./object-catalog.js?v=2.18.0";
 import {
   CATALOG,
   MATERIALS,
@@ -18,7 +18,7 @@ import {
   clone,
   uid,
   clamp,
-} from "./builder-model.js?v=2.16.0";
+} from "./builder-model.js?v=2.18.0";
 export function createBuilderPanels({
   editor: e,
   save,

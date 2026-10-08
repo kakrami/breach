@@ -1,4 +1,4 @@
-import { createSafeStorage } from './browser-storage.js?v=2.16.0';
+import { createSafeStorage } from './browser-storage.js?v=2.18.0';
 
 const STORAGE_KEY='breachControllerRecording';
 const MAX_EVENTS=384;

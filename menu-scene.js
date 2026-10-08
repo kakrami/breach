@@ -1,8 +1,8 @@
-import {attachmentOptionsForWeapon,ATTACHMENT_SLOTS} from './game-config.js?v=2.16.0';
-import { infectionModel } from './infection-models.js?v=2.16.0';
+import {attachmentOptionsForWeapon,ATTACHMENT_SLOTS} from './game-config.js?v=2.18.0';
+import { infectionModel } from './infection-models.js?v=2.18.0';
 // One renderer; cached thumbnails have their own pose and camera framing.
 // Weapon meshes borrow live geometry/materials, which must never be disposed here.
-import { equipmentModel, streakModel } from './menu-equipment.js?v=2.16.0';
+import { equipmentModel, streakModel } from './menu-equipment.js?v=2.18.0';
 export function createMenuScene({ready,weaponModel,partModel}) {
   let G,renderer,scene,camera,pivot,pending=false,failed=false,current=null,key='';
   let yaw=Math.PI/2+.12,pitch=-.10,zoom=1;
@@ -25,7 +25,7 @@ export function createMenuScene({ready,weaponModel,partModel}) {
   function make(kind,id,attachments,slot){
     const model=kind==='infection'?infectionModel(G,id):kind==='weapon'?weaponModel(id,attachments):kind==='part'?partModel(id,attachments,slot):kind==='streak'?streakModel(G,id):equipmentModel(G,id);
     if(kind==='weapon'||kind==='part'){
-      const materials=new Map();const copy=source=>{if(!materials.has(source)){const m=source.clone();if(m.isMeshStandardMaterial){m.metalness=Math.min(.55,m.metalness);m.roughness=Math.max(.32,m.roughness);if(!m.transparent&&m.color.getHSL({}).l<.14)m.color.lerp(new G.Color(0x899b9c),.22);}materials.set(source,m);}return materials.get(source);};
+      const materials=new Map();const copy=source=>{if(!materials.has(source)){const m=source.clone();if(m.isMeshStandardMaterial){m.metalness=Math.min(.55,m.metalness);m.roughness=Math.max(.32,m.roughness);if(!m.userData.preservePreviewTone&&!m.transparent&&m.color.getHSL({}).l<.14)m.color.lerp(new G.Color(0x899b9c),.22);}materials.set(source,m);}return materials.get(source);};
       model.traverse(n=>{if(n.material)n.material=Array.isArray(n.material)?n.material.map(copy):copy(n.material);});model.userData.previewMaterials=[...materials.values()];
     }
     return model;

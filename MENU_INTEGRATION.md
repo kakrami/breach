@@ -1,4 +1,4 @@
-# Menu and gameplay integration — 2.16.0
+# Menu and gameplay integration — 2.18.0
 
 The canvas widget graph and live game state remain authoritative. Menus use the game's renderer and input ownership.
 
@@ -37,4 +37,4 @@ Menu Apply/Cancel drafts and unsaved-settings prompts are removed. Destructive r
 
 Routine combat uses existing sound, impacts, hitmarkers, status and kill feed. Important role/round events and deployed enemy streak warnings use bounded, expiring announcements. Purchase errors remain in the shop; blocked actions use a single short message near the relevant control. Infected world markers preserve projected position, avoid major controls, hide offscreen markers and limit overlapping labels.
 
-Existing Infection mechanics, dynamic geometry, inventories, collision, safe spawns and bot navigation remain in their shared/server modules. This release changes flow and presentation, plus the host-settings acknowledgment contract. Both upload folders use version 2.16.0 and protocol 110. See VERIFICATION.md for the checks and limits.
+Existing Infection mechanics, dynamic geometry, inventories, collision, safe spawns and bot navigation remain in their shared/server modules. The current map release retains this menu flow and the host-settings acknowledgment contract. Both upload folders use version 2.18.0 and protocol 112. See VERIFICATION.md for the checks and limits.

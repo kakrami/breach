@@ -1,4 +1,4 @@
-import { roadNodes, roadSegments } from './road-path.js?v=2.16.0';
+import { roadNodes, roadSegments } from './road-path.js?v=2.18.0';
 import {
   DocumentOperations,
   MapDocument,
@@ -18,16 +18,15 @@ import {
   uid,
   clamp,
   rad,
-  presetTerrain,
   BUILDINGS,
   PROPS,
   ELEVATION,
   templateToDoc,
   MATERIAL_KEYS,
-} from "./builder-model.js?v=2.16.0";
-import { assetResizeMode } from "./object-catalog.js?v=2.16.0";
-import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.16.0";
-import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.16.0";
+} from "./builder-model.js?v=2.18.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.18.0";
+import { safeTerrainBrush, terrainProtection, protectedTerrainPoint } from "./safe-terrain.js?v=2.18.0";
+import { rayBox, boxesOverlap, partsBounds } from "./editor-spatial.js?v=2.18.0";
 const box = (p) => (p.type === "round" ? { ...p, w: p.r * 2, d: p.r * 2 } : p);
 const pose = (p) => ({ x: p.x, y: p.y, z: p.z, yaw: p.yaw, pitch: p.pitch });
 
@@ -280,7 +279,7 @@ export class EditorSession extends DocumentOperations {
           : new Promise((resolve, reject) => {
               const worker = new Worker(
                 new URL(
-                  "./editor-validation-worker.js?v=2.16.0",
+                  "./editor-validation-worker.js?v=2.18.0",
                   import.meta.url,
                 ),
                 { type: "module" },
@@ -876,7 +875,7 @@ export class EditorSession extends DocumentOperations {
   applyBrushDab(point,seconds){
     const s=this.brushStroke;if(!s)return;const surface=s.paint?s.doc.materials:s.doc.terrain;
     if(s.paint){const code=Math.max(0,MATERIAL_KEYS.indexOf(s.material.material));for(let iz=0;iz<surface.size;iz++)for(let ix=0;ix<surface.size;ix++){const p=surface.world(ix,iz),i=surface.index(ix,iz);if(Math.hypot(p.x-point.x,p.z-point.z)<=s.material.radius&&surface.values[i]!==code){surface.values[i]=code;s.changed=true;}}}
-    else {const changes=safeTerrainBrush({terrain:surface,objects:s.doc.all(),x:point.x,z:point.z,...s.brush,seconds,baseHeight:(x,z)=>presetTerrain(s.doc.theme,x,z)});for(const c of changes)surface.values[c.i]=c.after;s.changed ||= changes.length>0;}
+    else {const changes=safeTerrainBrush({terrain:surface,objects:s.doc.all(),x:point.x,z:point.z,...s.brush,seconds,baseHeight:(x,z)=>Resolver.supportData(s.doc).geometry.baseTerrainHeight(x,z)});for(const c of changes)surface.values[c.i]=c.after;s.changed ||= changes.length>0;}
   }
   compileBrush(){const s=this.brushStroke;if(!s?.changed)return;Resolver.resolve(s.doc);s.runtime=RuntimeCompiler.compile(s.doc);this.sceneRev++;this.partsCache=null;this.previewKey='';}
   flushBrush(force=false,now=performance.now()) {
@@ -942,7 +941,7 @@ export class EditorSession extends DocumentOperations {
               x,
               z,
               ...brush,
-              baseHeight: (a, b) => presetTerrain(this.doc.theme, a, b),
+              baseHeight: (a, b) => Resolver.supportData(this.doc).geometry.baseTerrainHeight(a,b),
             });
             for (const c of changes) surface.values[c.i] = c.after;
             changed ||= changes.length > 0;
