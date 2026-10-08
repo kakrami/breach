@@ -1,4 +1,4 @@
-import {WEAPON_SPECS} from './game-config.js?v=2.20.0';
+import {WEAPON_SPECS} from './game-config.js?v=2.21.0';
 // Shared Infection contract: identical authority and presentation rules.
 export const INFECTION = Object.freeze({buyMs:20000,roundMs:360000,rounds:1,respawnMs:4000,spawnRetryMs:500,spawnProtectionMs:1200,reach:1.65,clawMs:1000,clawDamage:100,startCash:8,cashCap:60,minSpawnDistance:24,spawnSightDistance:10000,damagePerPack:500,motherRatio:8,conversionGraceMs:2200,armorRecoveryMs:7000,knockbackCap:4.2,knockbackWindowMs:350,supplyIntervalMs:95000,supplyLifetimeMs:55000,barricadeHp:420,barricadeLimit:3});
 export const INFECTION_ARMS = Object.freeze({bombRadius:4,bombCooldownMs:8000,grenadeFuseMs:1500,fireSeconds:6,fireDps:45,frostMs:1800,frostRecoveryMs:8000,carapaceMs:2800,carapaceCooldownMs:22000,purgeMs:2500});

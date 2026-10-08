@@ -1,5 +1,5 @@
-import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.20.0";
-import { clamp } from "./builder-model.js?v=2.20.0";
+import { GAMEPAD_BUTTON as B } from "./gamepad-input.js?v=2.21.0";
+import { clamp } from "./builder-model.js?v=2.21.0";
 // Screen navigation is independent of document tools. Editing actions share one dispatcher.
 export function createEditorInput(e, active, panels) {
   const pointers = new Map();

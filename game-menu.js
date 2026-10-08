@@ -2,8 +2,8 @@
  * Authoritative players, classes, settings and host rights come from the adapter.
  * 844 × 390 is the design frame, with one uniform scale and no scroll containers.
  */
-import {APP_VERSION,WEAPON_SPECS,PRIMARY_WEAPONS,SECONDARY_WEAPONS,WEAPON_ORDER,ATTACHMENTS,attachmentOptionsForWeapon,resolveWeaponSpec,EQUIPMENT_SPECS,TACTICAL_EQUIPMENT,LETHAL_EQUIPMENT,KILLSTREAK_ORDER,KILLSTREAK_SPECS,GAME_MODES,gameModeSpec} from './game-config.js?v=2.20.0';
-import {relationshipFor,relationshipColor} from './team-model.js?v=2.20.0';
+import {APP_VERSION,WEAPON_SPECS,PRIMARY_WEAPONS,SECONDARY_WEAPONS,WEAPON_ORDER,ATTACHMENTS,attachmentOptionsForWeapon,resolveWeaponSpec,EQUIPMENT_SPECS,TACTICAL_EQUIPMENT,LETHAL_EQUIPMENT,KILLSTREAK_ORDER,KILLSTREAK_SPECS,GAME_MODES,gameModeSpec} from './game-config.js?v=2.21.0';
+import {relationshipFor,relationshipColor} from './team-model.js?v=2.21.0';
 const T={bg:'#101713',panel:'#1d2721',line:'#354234',accent:'#d8eda0',text:'#edf0e8',muted:'#a2aea0',blue:'#98c9db',red:'#eb927e'};
 const cap=s=>String(s||'').replace(/^./,x=>x.toUpperCase()),clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const r=(x,y,w,h)=>({x,y,left:x,top:y,width:w,height:h,right:x+w,bottom:y+h});
