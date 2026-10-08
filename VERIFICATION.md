@@ -1,60 +1,77 @@
-# Breach 2.14.1 — Classic Infection
+# Breach 2.15.0 — Infection gameplay rebuild
 
-Client and server release, protocol 108. Upload both folders to their respective repositories. This package has not been deployed.
+Client and server release, protocol 109. Upload both folders to their respective repositories. This package has not been deployed.
 
-## Completion fixes in 2.14.1
+## Round and combat
 
-- Fixed both shotguns being rejected by ordinary primary-slot validation. All six Infection weapons now equip, swap, reload and survive reconnects through the authoritative inventory path.
-- Reset the whole lobby before checking preparation spawns, preventing old bot teams from blocking a full lobby's start.
-- Resolved authored ladder endpoints against the actual terrain and roof surfaces. Infected bots now route to ladders and pursue rooftop survivors on Highlands, Yard, Depot and Rig.
-- Napalm follows affected infected for its full duration after they leave the blast. Frost, burning and madness have distinct timed visual effects and local status labels.
-- Compacted the scoreboard to its roster, kept paging controls at 44px and replaced obsolete series scores with actual roster counts for this one-round mode.
+One 20-second preparation phase leads into one six-minute round by default. Preparation allows movement and free primary-weapon selection; the selected weapon remains equipped at outbreak. Four/eight-minute host options remain available. Survivors win at time expiry; infected win once everyone is converted. Killing an infected never ends the round.
 
-## Game cycle
+Standard infection requires a server-validated claw hit within 1.65m, facing the target and with clear line of sight. Two contacts consume the starting 100 armor; the next converts. Claws have a one-second cooldown. New conversions happen in place with a visible 2.2-second grace period, without a forced shop or death screen. Guns cannot infect.
 
-1. Start directly in one 20-second preparation phase. Everyone is human, can move to cover, and has a default UMP. Choose one of six primary weapons free during preparation; it equips immediately and survives the outbreak.
-2. The outbreak selects initial infected using rotation history and randomized ties. Larger groups receive additional initial infected. Initial infected relocate to safe covered positions at least 24m from survivors. First infected have doubled class health.
-3. Play one four, six or eight minute round. Survivors shoot and use knockback, armor, napalm, frost and flares to hold out. Unarmored claw contact immediately converts a survivor in place. Two claw contacts consume 100 armor; the next converts. Range, facing and cover are checked by the server.
-4. Infected use claws, six free classes and earned upgrades. Mutation guns, heavy shields and toxic cash pickups are removed. Classes trade health, movement, jumping and knockback; Leech heals on conversion. A living class change queues for the next spawn without healing the current body.
-5. Infected deaths trigger a four-second automatic respawn, subject to a safe location being available. Death alone never awards survivors a win. Conversion has a brief protection/attack grace and never forces a death screen or shop.
-6. All humans infected means infected win. Humans remaining at the time limit means survivors win. One results screen follows. Returning to the lobby and starting again rebuilds the preparation state.
+Infected respawn automatically after four seconds once a safe position is available. Spawns require at least 24m separation, solid cover from survivors, supported ground, clear exits and a navigable route into combat. Authored cover edges supplement the map's spawn/navigation anchors; unsafe fallback placement is never used. Late joiners become infected after outbreak. Reconnect preserves inventory, class, health and currency through a safe spawn queue.
 
-## Economy and equipment
+One first infected is selected up to eight participants, two for 9–16 and three for 17–24. Selection uses rotation history and randomized ties. First-life health scales from 1.2× to 1.8× with roster size. That bonus does not reapply on reconnect or later respawns.
 
-Both sides start with 10 ammo packs (AP), not dollars. Conversion preserves the remaining balance. Humans earn packs for damage and kills; infected earn them through infections and assists. Repeated damage farming is bounded. Primary weapons cost 3 AP after preparation. Purchases validate phase, role, funds and ownership on the server; rejected purchases cannot spend packs.
+## Four free infected classes
 
-Human equipment: medkit, armor, napalm, frost, flare and night vision. Human players begin with one of each grenade type. Infection uses dusk lighting, a human flashlight and infected night vision. Grenades travel and collide with the world before applying their effects.
+| Class | Health | Movement | Ability | Cooldown |
+| --- | ---: | ---: | --- | ---: |
+| Runner | 1000 | 103% | Brief committed-direction dash | 13s |
+| Leaper | 1200 | 100% | Forward pounce with boosted jump | 16s |
+| Brute | 1900 | 88% | Resistant charge that breaks barricades | 20s |
+| Stalker | 950 | 106% | Quiet footsteps with a modest movement boost; remains visible | 18s |
 
-Infected equipment: Zombie Madness (15 AP), antidote (25 AP), optional infection bomb (20 AP). Madness grants five seconds of protection and has an activation cooldown. Antidotes cannot cure a first infected, remove the last infected or be repeatedly reused. Infection bombs are host-controlled, off by default, respect cover and cannot convert the last survivor. Ordinary infected gunfire is rejected.
+Abilities are free and use the existing tactical input. Their movement, cooldowns, windup and status are authoritative. Class changes queue for the next spawn; they cannot heal a living player. Infected bots can change class between lives instead of repeating the same approach indefinitely.
 
-The armory is optional and remains accessible during play, while dead for class selection, and from Pause. Shopping does not pause the match or delay respawn. All cards keep consistent height; three-item equipment panels use one row.
+Sustained knockback has a shared impulse budget and speed cap. The server sends the actual clamped impulse to the client. Repeated frost has a shorter effect. Carapace provides temporary resistance instead of invulnerability; Purge clears fire/frost and briefly resists those statuses.
+
+## Economy and field play
+
+Both roles start with 8 ammo packs, capped at 60. Survivor damage and kills earn packs with repeated-target farming limits. Infected earn packs for armor contacts, conversions and assists. Conversion preserves currency. All purchases validate phase, role, funds and ownership before spending.
+
+Human shop: six primary weapons, armor, napalm, frost, flare and one carried barricade kit. Guns are free during preparation and cost 3 AP afterward. Players start with armor, one of each utility grenade and a barricade kit. Armor cannot be repurchased within seven seconds of a claw hit.
+
+Infected shop: Carapace (9 AP) and Purge (5 AP). An owned item can be selected without buying it again. Paid night vision, medkits, mutation guns and heavy shields are absent from the standard shop. Humans have a flashlight; infected have ambient night vision.
+
+Host-enabled Chaos adds antidote (25 AP) and infection bomb (20 AP). It is off by default. An antidote cannot cure the first or last infected. A bomb respects cover and cannot convert the last survivor. Standard mode has no ranged conversion.
+
+Defense markers sit on supported ground with multiple clear approaches. Construction is contextual, takes one action and refuses occupied space without consuming the kit. A team can have three active barricades. Their rendered wood, player collision and projectile collision come from the same geometry compiler. Four claws or one Brute charge destroy them. Highlands, Yard, Depot and Rig gain a second ladder approach to their authored roof holds, with real attach/climb/dismount endpoints.
+
+Optional field supplies appear periodically during combat, with no added phase or shop timer. Each drop serves two different survivors, restoring up to 50 armor and one napalm/frost grenade, subject to carry limits. Collection is automatic at close range with line of sight. Drops expire; a survivor cannot repeatedly claim the same drop.
+
+Contextual pings mark danger, supplies or regroup locations. Only teammates receive them. Bots use sight, nearby gunfire/footsteps and team reports; hidden silent players are not directly tracked. Infected search defense locations and rooftops, flank with allies and use class abilities. Survivors seek cover, coordinate reload opportunities, face threats while retreating and switch away from a sniper rifle at close range. Terrain-height changes no longer send bots toward unrelated ladders; roof descent can route around ground obstacles.
+
+Conversion grace, class windup, claws, frost, burning and resistance have visible feedback. Stalker footsteps are suppressed during its ability. The final minute adds restrained music, with increased intensity in the final 20 seconds and a last-survivor announcement.
 
 ## Controls
 
-- Touch: Armory, Frost, Napalm, Flare and Heal buttons; infected fire buttons attack with claws. Madness replaces the tactical control. The optional bomb uses the lethal control.
-- Keyboard: B armory; Q frost/madness; G napalm/infection bomb; F flare/madness; H medkit. Standard firing and movement remain unchanged.
-- Controller: D-pad Up armory; LB frost/madness; RB napalm/infection bomb; Left flare; Down heal; LT madness when infected. Shop bumpers change tabs; navigation previews without buying; A activates; B closes.
+| Input | Survivor | Infected |
+| --- | --- | --- |
+| Touch | Armory, Ping, contextual Build, Frost, Napalm, Flare | Claws, free class ability, selected equipment, Armory, Ping |
+| Keyboard | B armory; Q frost; G napalm; F flare; E build; H ping | Fire claws; Q/F ability; G selected equipment; B armory; H ping |
+| Controller | Up armory; LB frost; RB napalm; Left contextual build/flare; Down ping | Fire claws; LT/LB ability; RB selected equipment; Up armory; Down ping |
 
-## Verification performed
+Shop focus/hover never spends packs. Activate once to purchase/equip or queue a class; B/Back closes the shop. Shopping does not stop the match or hold respawn. Cards fit common landscape phones without scrolling.
 
-The tests run the actual worker and game client, with headless Chromium and emulated touch/controller input.
+## Verification
 
-- Actual Start, one preparation phase, all six free weapon choices, touch movement, outbreak, visible rifle and matching client/server ammunition after firing. Every weapon also passes swap, reload acknowledgement and reconnect checks.
-- Equipment purchases, free class choice, controller focus without spending, tab navigation, Pause-to-Armory and Back-to-combat.
-- Immediate claw conversion without a death/shop interruption, queued class selection, authoritative death and automatic respawn into the chosen class.
-- One results screen, both win conditions, post-result purchase rejection, lobby return and clean restart.
-- Reconnect preserving inventory, ammo, health, class and packs; correct late-join roles; replacement infected when the last infected disconnects.
-- Range/cover/armor rules, conversion grace, madness, antidote limits, frost, napalm, flare flight and inventory gates, host bomb setting and final-survivor protection. Napalm continues after leaving its blast and expires correctly; all three status visuals are created and removed with their authoritative timers.
-- All six classes match their shared movement/jump profiles.
-- Mixed 24-actor opening deployment on Highlands, Yard, Depot, Rig and Moon. Safe respawn retries preserve separation rather than using an unsafe fallback.
-- Four complete group simulations with 10–16 actors on Yard, Highlands, Depot and Rig, including combat, conversion, safe respawns and infected victories. Separate clock-expiry cases establish survivor victories. These simulations demonstrate the complete cycle, not human balance.
-- Rooftop pursuit and melee conversion on all four maps with authored ladders. Bots route around cover using actual collision geometry and climb to elevated targets.
-- Other mode smoke checks: TDM, FFA, Moon, Waves and Sandbox retain normal warmup and run bot/projectile simulation without errors.
-- Armory fit at 667×375, 844×390 and 932×430, with no scrolling and touch targets of at least 44px. Final browser cycle has no uncaught runtime errors.
-- Release checks: JavaScript syntax, local imports, shared rules, matching version/protocol, archive contents and ZIP integrity.
+Checks run the actual worker, shared collision/movement code and game client. Browser tests use headless Chromium with emulated touch/controller input.
 
-These checks establish the implemented cycle and input behavior. Physical phones/controllers, production networking, deployment and human multiplayer balance were not tested.
+- Start → preparation → weapon purchase → outbreak → combat → conversion → death → automatic respawn → results → lobby/restart.
+- All six weapons equip, fire, swap, reload and survive reconnect. Both win conditions, late joins, last-infected disconnect replacement and post-result purchase rejection.
+- Four class profiles, ability windup/cooldown restrictions, actual touch pounce, conversion grace, bounded knockback, Purge while frozen and owned-item selection without spending.
+- Standard/Chaos restrictions, armor contact and range rules, napalm persistence, frost, grenade inventory and cover checks.
+- Contextual touch building, authoritative/client geometry synchronization after match reset, occupied-space refusal, barricade destruction and restoration of the original world for other modes.
+- Supply pickup/expiry, team-only ping snapshots, touch ping and bot sound/search behavior.
+- Mixed 24-actor starts on Highlands, Yard, Depot, Rig and Moon. Reachable covered spawn checks and full group simulations with combat, deaths and respawns.
+- Real bot ladder pursuit and conversion on the four roof maps, plus descent and ground pursuit from the added roof routes.
+- Final-minute music state and cleanup; status visuals and their expiry.
+- Armory fit at 667×375, 844×390 and 932×430, with 44px-or-larger controls and no scrolling. Browser cycle has no uncaught errors.
+- TDM, FFA, Moon, Waves and Sandbox retain their existing warmup and run bot/projectile checks.
+- Release JavaScript syntax, local imports, shared-module parity, version/protocol consistency and ZIP integrity.
+
+Six minutes is the default match budget, not a forced minimum. Contested rounds are intended to last 4–6 minutes; earned early wins remain possible. Automated matches check the complete cycle and reveal mechanical problems, but do not establish human multiplayer balance. Physical phones/controllers, production networking and deployment were not tested.
 
 ## Upload
 
-Upload the contents of `1_SERVER_REPO_UPLOAD` and `2_CLIENT_REPO_UPLOAD` to their respective repositories. Both sides must use protocol 108. After deploying, check the visible version or `version.json` for 2.14.1.
+Upload the contents of `1_SERVER_REPO_UPLOAD` and `2_CLIENT_REPO_UPLOAD` to their respective repositories. Both sides must use protocol 109. After deployment, the game and `version.json` should report 2.15.0.

@@ -1,4 +1,4 @@
-import { createCanvasInputOwner } from './canvas-input.js?v=2.14.1';
+import { createCanvasInputOwner } from './canvas-input.js?v=2.15.0';
 
 // Keyboard, controller and pointer focus all point at the graph's activeElement.
 // The owner document may be a native widget graph or a real document.

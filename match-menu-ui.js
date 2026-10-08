@@ -1,6 +1,6 @@
 /* Match menus own only canvas presentation and navigation. Gameplay state, timers,
  * network messages and relationship colors are supplied by the client. */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.14.1';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.15.0';
 
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,finite(value)));
@@ -63,9 +63,9 @@ export function drawMatchScoreboard(c,options={}){
 }
 
 export function layoutMatchShop(options={}){
-  const view=matchMenuViewport(options),items=(options.items||[]).slice(0,6),cols=3,gap=8,headerH=options.tabs?.length?116:76,footerH=34,rowH=(Math.min(view.h,370)-headerH-footerH-gap)/2,rows=Math.max(1,Math.ceil(items.length/cols)),panel=centered(view,900,headerH+footerH+rows*rowH+(rows-1)*gap),body={x:panel.x+14,y:panel.y+headerH,w:panel.w-28,h:panel.h-headerH-footerH},itemW=(body.w-gap*2)/3;
+  const view=matchMenuViewport(options),items=(options.items||[]).slice(0,6),cols=items.length===2||items.length===4?2:3,gap=8,headerH=options.tabs?.length?116:76,footerH=34,rowH=(Math.min(view.h,370)-headerH-footerH-gap)/2,rows=Math.max(1,Math.ceil(items.length/cols)),panel=centered(view,900,headerH+footerH+rows*rowH+(rows-1)*gap),body={x:panel.x+14,y:panel.y+headerH,w:panel.w-28,h:panel.h-headerH-footerH},itemW=(body.w-gap*(cols-1))/cols;
   const l={kind:'shop',view,panel,body,cols,rowH,scroll:0,maxScroll:0,items:[],hits:[],focusTargets:[]};
-  items.forEach((item,index)=>{const r={x:body.x+(index%3)*(itemW+gap),y:body.y+Math.floor(index/3)*(rowH+gap),w:itemW,h:rowH},target=hit(`shop:${item.id}`,r,'buy',{index,item});l.items.push({...target,visible:r});l.hits.push(target);l.focusTargets.push(target);});
+  items.forEach((item,index)=>{const r={x:body.x+(index%cols)*(itemW+gap),y:body.y+Math.floor(index/cols)*(rowH+gap),w:itemW,h:rowH},target=hit(`shop:${item.id}`,r,'buy',{index,item});l.items.push({...target,visible:r});l.hits.push(target);l.focusTargets.push(target);});
   l.tabs=(options.tabs||[]).map((tab,i)=>hit('shop-tab:'+tab.id,{x:panel.x+14+i*140,y:panel.y+66,w:132,h:44},'shopTab',{tab:tab.id,label:tab.label}));l.hits.push(...l.tabs);l.focusTargets.push(...l.tabs);
   l.close={x:panel.x+panel.w-100,y:panel.y+12,w:86,h:44};const close=hit('close',l.close,'back');l.hits.push(close);l.focusTargets.push(close);return l;
 }

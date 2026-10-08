@@ -1,4 +1,4 @@
-# Menu, armory and Infected integration — 2.14.1
+# Menu, armory and Infected integration — 2.15.0
 
 The canvas widget graph and live game state remain authoritative. There are no HTML menu overlays or separate demo state stores.
 
@@ -16,6 +16,10 @@ The canvas widget graph and live game state remain authoritative. There are no H
 | infection-rules.js | Shared round rules, catalog, purchase availability and replicated inventory |
 | infection-mode.js (server) | Authoritative single round, safe spawns, combat, ammo packs, grenades and bot equipment |
 | infection-inventory.js (server) | Initial role inventory and reconnect preservation |
+| infection-field.js (server) | Barricade/supply/ping authority and map restoration |
+| infection-world.js | Shared dynamic-object geometry and secondary roof approaches |
+| infection-presentation.js | World meshes generated from authoritative field state |
+| bot-navigation.js (server) | Collision-based ground routes, roof approaches and descent |
 | team-model.js | Self, friendly human, friendly bot and enemy presentation |
 | app-lifecycle.js | Fullscreen entry, landscape gate and gameplay input ownership |
 | worker.js | Authoritative match transport, projectile/collision services and Infected director integration |
@@ -32,4 +36,6 @@ Infected mode uses the canvas input owner and game lifecycle. One movable prepar
 
 Combat uses the room's existing collision and projectile services. Claw infection requires close range, facing and line of sight. Humans and bots share role damage, inventory, class profiles and safe spawn checks. Pending spawns wait until safe placement exists. Reconnect preserves health, ammo, purchases and class selection. Bot navigation uses the compiled collision geometry.
 
-Both upload folders use version 2.14.1 and protocol 108. No deployment was performed. See VERIFICATION.md for the implemented rules, controls, tested behavior and limits.
+Both upload folders use version 2.15.0 and protocol 109. No deployment was performed. See VERIFICATION.md for the implemented rules, controls, tested behavior and limits.
+
+Field objects use the existing map geometry compiler and collision services. The field snapshot is sent after match reset so map initialization cannot discard it. Builds and pickups take one contextual action; no extra phase or shop countdown is introduced. Class ability, equipped consumable and timer state are replicated through the shared Infection contract. Final-minute sound uses the existing Music bus.
