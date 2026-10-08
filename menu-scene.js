@@ -1,11 +1,11 @@
-import {attachmentOptionsForWeapon,ATTACHMENT_SLOTS} from './game-config.js?v=2.18.0';
-import { infectionModel } from './infection-models.js?v=2.18.0';
+import {attachmentOptionsForWeapon,ATTACHMENT_SLOTS} from './game-config.js?v=2.19.0';
+import { infectionModel } from './infection-models.js?v=2.19.0';
 // One renderer; cached thumbnails have their own pose and camera framing.
-// Weapon meshes borrow live geometry/materials, which must never be disposed here.
-import { equipmentModel, streakModel } from './menu-equipment.js?v=2.18.0';
+// Weapon meshes borrow neutral armory templates, independent of live action.
+import { equipmentModel, streakModel } from './menu-equipment.js?v=2.19.0';
 export function createMenuScene({ready,weaponModel,partModel}) {
   let G,renderer,scene,camera,pivot,pending=false,failed=false,current=null,key='';
-  let yaw=Math.PI/2+.12,pitch=-.10,zoom=1;
+  let yaw=-Math.PI/2+.12,pitch=-.10,zoom=1;
   const cache=new Map(),frames=new Map();
   function init(){
     if(renderer||pending||failed)return;pending=true;
@@ -13,10 +13,10 @@ export function createMenuScene({ready,weaponModel,partModel}) {
       if(!engine)throw Error('Preview unavailable');G=engine;
       renderer=new G.WebGLRenderer({alpha:true,antialias:true,powerPreference:'low-power'});
       renderer.setPixelRatio(1);renderer.outputColorSpace=G.SRGBColorSpace;
-      renderer.toneMapping=G.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
+      renderer.toneMapping=G.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
       scene=new G.Scene();camera=new G.PerspectiveCamera(28,2,.01,40);
-      scene.add(new G.HemisphereLight(0xf3f5ed,0x3c4942,2.2));
-      for(const [color,intensity,pos] of [[0xfff3d8,5.0,[-2,3,4]],[0xb3d7ef,3.7,[3,1,-3]],[0xf0e3b8,1.3,[0,-2,2]]]){
+      scene.add(new G.HemisphereLight(0xf3f5ed,0x3c4942,1.7));
+      for(const [color,intensity,pos] of [[0xfff3d8,2.8,[-2,3,4]],[0xb3d7ef,2.2,[3,1,-3]],[0xf0e3b8,.9,[0,-2,2]]]){
         const light=new G.DirectionalLight(color,intensity);light.position.set(...pos);scene.add(light);
       }
       pivot=new G.Group();scene.add(pivot);
@@ -64,13 +64,13 @@ export function createMenuScene({ready,weaponModel,partModel}) {
     init();if(!renderer)return null;const k=JSON.stringify([kind,id,attachments,slot]);if(cache.has(k))return cache.get(k);
     const model=make(kind,id,attachments,slot);if(!model?.children.length)return null;
     const oldChildren=[...pivot.children],rotation=pivot.rotation.clone();pivot.clear();pivot.rotation.set(0,0,0);
-    const pose=new G.Group();pose.add(model);pose.rotation.set(-.16,kind==='infection'?(Math.PI+.45):kind==='equipment'||kind==='streak'?.5:Math.PI/2+.58,0);pivot.add(pose);
+    const pose=new G.Group();pose.add(model);pose.rotation.set(-.16,kind==='infection'?(Math.PI+.45):kind==='equipment'||kind==='streak'?.5:-Math.PI/2-.58,0);pivot.add(pose);
     scene.updateMatrixWorld(true);const bounds=new G.Box3().setFromObject(pose),size=bounds.getSize(new G.Vector3()),center=bounds.getCenter(new G.Vector3());pose.position.sub(center);
     const halfH=Math.max(size.y/2,size.x/4,.01)*1.16,thumbCamera=new G.OrthographicCamera(-halfH*2,halfH*2,halfH,-halfH,.01,40);
     thumbCamera.position.set(0,0,8);thumbCamera.lookAt(0,0,0);renderer.setSize(320,160,false);scene.updateMatrixWorld(true);renderer.render(scene,thumbCamera);
     const out=globalThis.document.createElement('canvas');out.width=320;out.height=160;out.getContext('2d').drawImage(renderer.domElement,0,0);cache.set(k,out);if(cache.size>160)cache.delete(cache.keys().next().value);
     pivot.clear();if(oldChildren.length)pivot.add(...oldChildren);pivot.rotation.copy(rotation);if(kind==='infection'||kind==='equipment'||kind==='streak')model.userData.menuOwned=true;disposeOwned(model);return out;
   }
-  function reset(kind='weapon'){yaw=kind==='weapon'?Math.PI/2+.12:.45;pitch=-.10;zoom=1;}
+  function reset(kind='weapon'){yaw=kind==='weapon'?-Math.PI/2+.12:.45;pitch=-.10;zoom=1;}
   return {hero,thumb,rotate(dx,dy){yaw+=dx*.012;pitch=Math.max(-.85,Math.min(.85,pitch+dy*.009));},zoom(delta){zoom=Math.max(.75,Math.min(1.5,zoom+delta));},reset,destroy(){disposeOwned(current);renderer?.dispose();cache.clear();}};
 }

@@ -7,9 +7,9 @@
  * once at the output boundary. Keep the same graph for touch, mouse, keyboard,
  * controller and accessibility rather than introducing parallel UI layouts.
  */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.18.0';
-import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.18.0';
-import { APP_VERSION } from './game-config.js?v=2.18.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.19.0';
+import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.19.0';
+import { APP_VERSION } from './game-config.js?v=2.19.0';
 
 const C = Object.freeze({
   bg:THEME.bg, surface:THEME.panel, raised:THEME.panelRaised, line:THEME.border,
@@ -129,7 +129,7 @@ export function createNativeRenderer({canvas,ui,onAfterAction=()=>{},inputOwner=
   function simpleText(n,r,{size=14,color=C.muted,weight=500,maxLines=4}={}){if(!n||!shown(n))return;mark(n,r);txt(text(n),r.left,r.top,r.width,size,color,weight,{maxLines});}
   function brand(x,y,small=false){panel(rect(x,y,32,32),C.lime,null,3);txt('B',x+7,y+1,24,25,'#111605',850);txt('BREACH',x+44,y,220,small?23:24,C.text,800);if(!small)txt('TACTICAL MULTIPLAYER',x+44,y+32,220,10,C.muted,700);}
   function art(name,r,{cover=false,alpha=1}={}){
-    let img=artwork.get(name);if(!img&&typeof Image!=='undefined'){img=new Image();artwork.set(name,img);img.onload=()=>{dirty=true;};img.src=new URL('./menu-assets/'+name,import.meta.url).href;}
+    let img=artwork.get(name);if(!img&&typeof Image!=='undefined'){img=new Image();artwork.set(name,img);img.onload=()=>{dirty=true;};img.src=new URL('./menu-assets/'+name+new URL(import.meta.url).search,import.meta.url).href;}
     if(!img?.complete||!img.naturalWidth)return false;
     const scale=cover?Math.max(r.width/img.width,r.height/img.height):Math.min(r.width/img.width,r.height/img.height),w=img.width*scale,h=img.height*scale;
     ctx.save();ctx.globalAlpha*=alpha;withClip(r,()=>ctx.drawImage(img,r.left+(r.width-w)/2,r.top+(r.height-h)/2,w,h));ctx.restore();return true;
@@ -236,7 +236,7 @@ export function createNativeRenderer({canvas,ui,onAfterAction=()=>{},inputOwner=
     fade(rect(0,footerY-12,vp.width,vp.height-footerY+12),'rgba(9,13,16,0)','#090d10');line(b.left,footerY-2,b.right,footerY-2,'#39423c');
     const startW=portrait?b.width:250,startX=portrait?b.left:b.right-startW;
     if(host)button(get('lobbyStartBtn'),rect(startX,footerY+8,startW,48),{primary:true,label:'DEPLOY',arrow:true,fontSize:18});else simpleText(get('lobbyStatus'),rect(startX,footerY+8,startW,48),{size:13,color:C.muted,maxLines:2});
-    if(!portrait&&active!=='players'){const wr=rect(b.left,footerY+6,b.width-startW-18,50),n=get('nativeLoadoutEditBtn'),weapon=q('.self',get('lobbyRoster'))?.dataset?.primaryWeapon||'assault';art('weapon-'+weapon+'.png',rect(wr.left,wr.top-8,106,66));txt('LOADOUT  ↗',wr.left+108,wr.top+11,wr.width-108,11,C.text,700);txt('v2.18.0  /  '+code,wr.left+108,wr.top+30,wr.width-108,8,C.muted,600);mark(n,wr);hit(n,wr);focusRing(n,wr);}else if(!portrait){txt('ROOM '+code+'  /  '+(host?'HOST':'SQUAD'),b.left,footerY+20,b.width-startW-24,11,C.muted,600);txt('BREACH  v2.18.0',b.left,footerY+39,b.width-startW-24,8,C.dim,600);}
+    if(!portrait&&active!=='players'){const wr=rect(b.left,footerY+6,b.width-startW-18,50),n=get('nativeLoadoutEditBtn'),weapon=q('.self',get('lobbyRoster'))?.dataset?.primaryWeapon||'assault';art('weapon-'+weapon+'.png',rect(wr.left,wr.top-8,106,66));txt('LOADOUT  ↗',wr.left+108,wr.top+11,wr.width-108,11,C.text,700);txt('v2.19.0  /  '+code,wr.left+108,wr.top+30,wr.width-108,8,C.muted,600);mark(n,wr);hit(n,wr);focusRing(n,wr);}else if(!portrait){txt('ROOM '+code+'  /  '+(host?'HOST':'SQUAD'),b.left,footerY+20,b.width-startW-24,11,C.muted,600);txt('BREACH  v2.19.0',b.left,footerY+39,b.width-startW-24,8,C.dim,600);}
   }
   function drawDeployment(r){
     const side=vp.landscape||r.width>=650,heroW=side?r.width*.44:r.width,heroH=side?r.height:Math.min(250,Math.max(134,r.height*.40));

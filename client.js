@@ -1,16 +1,19 @@
-import {createBattleRifle, battleRifleCycle, poseBattleRifle} from './battle-rifle.js?v=2.18.0';
-import {compileInfectionWorld} from './infection-world.js?v=2.18.0';
-import {createInfectionFieldPresentation} from './infection-presentation.js?v=2.18.0';
-import {resolveWeaponRules} from './game-config.js?v=2.18.0';
-import {armoryStatRows,weaponPerformance} from './armory-stats.js?v=2.18.0';
-import {createInfectionVisuals} from './infection-models.js?v=2.18.0';
-import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.18.0';
-import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.18.0';
-import { createNativeScreenTree } from './native-screen-tree.js?v=2.18.0';
-import { createGameMenu } from './game-menu.js?v=2.18.0';
-import { createMenuScene } from './menu-scene.js?v=2.18.0';
-import { createNativeRenderer } from './native-layout.js?v=2.18.0';
-import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.18.0';
+import {battleRifleCycle} from './battle-rifle.js?v=2.19.0';
+import {createWeaponModel, selectWeaponComponents, poseWeaponModel} from './weapon-models.js?v=2.19.0';
+import {compileInfectionWorld} from './infection-world.js?v=2.19.0';
+import {createInfectionFieldPresentation} from './infection-presentation.js?v=2.19.0';
+import {resolveWeaponRules} from './game-config.js?v=2.19.0';
+import {armoryStatRows,weaponPerformance} from './armory-stats.js?v=2.19.0';
+import {createInfectionVisuals} from './infection-models.js?v=2.19.0';
+import { drawMatchScoreboard, drawMatchShop, drawMatchDeath, drawMatchTarget, drawMatchNotice, drawMatchReplay, createMatchMenuController } from './match-menu-ui.js?v=2.19.0';
+import { createNativeUi, nativeStyle, isWidget } from './native-ui.js?v=2.19.0';
+import { createNativeScreenTree } from './native-screen-tree.js?v=2.19.0';
+import { createGameMenu } from './game-menu.js?v=2.19.0';
+import { createMenuScene } from './menu-scene.js?v=2.19.0';
+import { createNativeRenderer } from './native-layout.js?v=2.19.0';
+import { createCanvasInputOwner, installCanvasInteractionGuards } from './canvas-input.js?v=2.19.0';
+// Replay presentation is optional during initial loadout normalization.
+let replayPlayback=null;
 const browserDocument = globalThis.document;
 const nativeCanvas = browserDocument.getElementById('uiCanvas');
 const document = createNativeUi({canvas:nativeCanvas,tree:createNativeScreenTree(),realElements:{game:browserDocument.getElementById('game'),gameStage:browserDocument.getElementById('game'),uiCanvas:nativeCanvas}});
@@ -18,47 +21,47 @@ const getComputedStyle = el => isWidget(el) ? nativeStyle(el) : globalThis.getCo
 // Native scene-graph construction. Text is never interpreted as markup or browser UI.
 function uiNode(type,text='',classes='',attrs={},children=[]){const node=document.createElement(type);if(classes)node.className=classes;for(const [key,value] of Object.entries(attrs)){if(value!==false&&value!==null&&value!==undefined)node.setAttribute(key,value===true?'':String(value));}if(text!==null&&text!=='')node.textContent=String(text);node.append(...children.filter(Boolean));return node;}
 const uiCopy=(title,detail='')=>[uiNode('strong',title),...(detail?[uiNode('small',detail)]:[])];
-import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.18.0';
-import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.18.0';
-import {INFECTION,INFECTION_CLASSES,infectionBuildSite,infectionAbilityActive,isInfectionPrimaryWeapon,infectionClass,infectionPrice,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability,infectionShopItems,infectionPublicState} from './infection-rules.js?v=2.18.0';
-import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.18.0';
+import { createBossPresentation, updateBossPresentation, createMoonSupplyPresentation } from './mode-presentation.js?v=2.19.0';
+import { actorScale, actorDimensions, roleMovement } from './actor-rules.js?v=2.19.0';
+import {INFECTION,INFECTION_CLASSES,infectionBuildSite,infectionAbilityActive,isInfectionPrimaryWeapon,infectionClass,infectionPrice,INFECTION_SHOP as INFECTION_CATALOG,infectionPurchaseAvailability,infectionShopItems,infectionPublicState} from './infection-rules.js?v=2.19.0';
+import { appendTerrainRoad, roadPolygon, subtractRoadPolygon } from './road-path.js?v=2.19.0';
 let EditorScene;
-import { BUILDING_MATERIALS } from './object-catalog.js?v=2.18.0';
-import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.18.0';
-import { createMoonSky } from './mod-environment.js?v=2.18.0';
-import * as HighlandsGeometry from './world-geometry.js?v=2.18.0';
-import * as DepotGeometry from './world-geometry-depot.js?v=2.18.0';
-import * as YardGeometry from './world-geometry-yard.js?v=2.18.0';
-import * as MoonGeometry from './world-geometry-moon.js?v=2.18.0';
-import * as MoonWorldCollision from './world-collision-moon.js?v=2.18.0';
-import * as RigGeometry from './world-geometry-rig.js?v=2.18.0';
-import * as HighlandsWorldCollision from './world-collision.js?v=2.18.0';
-import * as DepotWorldCollision from './world-collision-depot.js?v=2.18.0';
-import * as YardWorldCollision from './world-collision-yard.js?v=2.18.0';
-import * as RigWorldCollision from './world-collision-rig.js?v=2.18.0';
+import { BUILDING_MATERIALS } from './object-catalog.js?v=2.19.0';
+import { authoredYaw, collisionDebugShapes } from './geometry-contract.js?v=2.19.0';
+import { createMoonSky } from './mod-environment.js?v=2.19.0';
+import * as HighlandsGeometry from './world-geometry.js?v=2.19.0';
+import * as DepotGeometry from './world-geometry-depot.js?v=2.19.0';
+import * as YardGeometry from './world-geometry-yard.js?v=2.19.0';
+import * as MoonGeometry from './world-geometry-moon.js?v=2.19.0';
+import * as MoonWorldCollision from './world-collision-moon.js?v=2.19.0';
+import * as RigGeometry from './world-geometry-rig.js?v=2.19.0';
+import * as HighlandsWorldCollision from './world-collision.js?v=2.19.0';
+import * as DepotWorldCollision from './world-collision-depot.js?v=2.19.0';
+import * as YardWorldCollision from './world-collision-yard.js?v=2.19.0';
+import * as RigWorldCollision from './world-collision-rig.js?v=2.19.0';
 import {
   APP_VERSION, BUILD_ID, PROTOCOL_VERSION, ROOM_CODE_LENGTH, MAX_PLAYERS, MAX_BOTS_PER_TEAM, MAX_MATCH_BOTS, REPLAY_PRE_MS, REPLAY_POST_MS, REPLAY_FINAL_SLOW_PRE_MS, REPLAY_FINAL_SLOW_POST_MS, REPLAY_FINAL_SLOW_RATE, WEAPON_ORDER, PRIMARY_WEAPONS, SECONDARY_WEAPONS, WEAPON_SPECS, ATTACHMENT_SLOTS, ATTACHMENTS, normalizeWeaponAttachments, attachmentOptionsForWeapon, attachmentModsForWeapon, attachmentAccuracyModsForWeapon, attachmentAdsMoveAddForWeapon, resolveWeaponSpec, resolveWeaponAccuracy, attachmentSoundScale, weaponHasAttachment, weaponSpreadRadians, weaponHeatAfterDelay, weaponHeatAfterShot, CROUCH_HEIGHT, CROUCH_SPEED_MULTIPLIER, EQUIPMENT_CAPS, EQUIPMENT_SPECS, TACTICAL_EQUIPMENT, LETHAL_EQUIPMENT, normalizeTactical, normalizeLethal, equipmentForLoadout, LOADOUT_CLASS_COUNT, LOADOUT_CLASS_IDS, normalizeLoadoutClassId, normalizeLoadoutClassName, normalizeLoadoutDefinition, defaultLoadoutClasses, normalizeLoadoutClasses, loadoutClassById,
   DEFAULT_WORLD_SETTINGS, DEFAULT_MATCH_RULES, GAME_MODES, DEFAULT_GAME_MODE, normalizeGameMode, gameModeSpec, normalizeWorldSettings, normalizeGameMod, gameModSpec, GAME_MOD_ORDER, modMovement, modGravity, MOVEMENT_FEEL, WEAPON_SWITCH_MS, EQUIPMENT_THROW_COMMIT_MS, EQUIPMENT_WEAPON_RECOVER_MS, TACTICAL_THROW_SPEED, TACTICAL_THROW_LOFT, TACTICAL_GRAVITY, equipmentCollisionRadius, SMOKE_DURATION_MS, SMOKE_LOS_RADIUS_SCALE, SMOKE_GROW_MS, SMOKE_START_SCALE, GROUND_FOLLOW_DROP,
   DEFAULT_MAP_ID, normalizeMapId, mapSpec, KILLSTREAK_ORDER, KILLSTREAK_SPECS, KILLSTREAK_SELECTION_COUNT, DEFAULT_KILLSTREAK_SELECTION, normalizeKillstreak, normalizeKillstreakSelection
-} from './game-config.js?v=2.18.0';
-import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.18.0';
-import { createProjectileCollisionGrid } from './collision-grid.js?v=2.18.0';
-import { createAudioEngine } from './audio-engine.js?v=2.18.0';
-import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.18.0';
-import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.18.0';
-import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.18.0';
-import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.18.0';
-import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.18.0';
-import { createControllerRecording } from './controller-recording.js?v=2.18.0';
-import { createPointerSessions } from './pointer-sessions.js?v=2.18.0';
-import { createSafeStorage } from './browser-storage.js?v=2.18.0';
-import { createIntegratedMapBuilder } from './map-builder.js?v=2.18.0';
-import { createUiFocusScope } from './ui-focus.js?v=2.18.0';
-import { createUiGestures } from './ui-gestures.js?v=2.18.0';
-import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.18.0';
-import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.18.0';
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.18.0';
-import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.18.0';
+} from './game-config.js?v=2.19.0';
+import { RELATIONSHIP, RELATIONSHIP_COLORS, normalizeTeam, otherTeam, teamLabel, teamKey, factionColor, factionUniform, relationshipFor, relationshipColor } from './team-model.js?v=2.19.0';
+import { createProjectileCollisionGrid } from './collision-grid.js?v=2.19.0';
+import { createAudioEngine } from './audio-engine.js?v=2.19.0';
+import { normalizeMatchState as normalizeSharedMatchState } from './match-model.js?v=2.19.0';
+import { MATCH_STATUS, matchAllowsLobbyEdits, matchAllowsMovement, matchAllowsCombat, matchPhaseChanged } from './gameplay-phase.js?v=2.19.0';
+import { MAX_PLAYER_PHYSICS_STEP_SEC, advanceVerticalMotion, advanceKnockback, sweepHorizontalMovement, createTraversalPlan, traversalPose, tacticalThrowVelocity, LADDER_CLIMB_SPEED, ladderById, ladderFrame, ladderClimbPoint, ladderBottomExitPoint, ladderTopExitPoint, findLadderEntry, ladderClimbStep } from './movement-model.js?v=2.19.0';
+import { SHELL_PANEL, createSessionShell, detectInputPlatform } from './app-lifecycle.js?v=2.19.0';
+import { GAMEPAD_BUTTON, createGamepadInput } from './gamepad-input.js?v=2.19.0';
+import { createControllerRecording } from './controller-recording.js?v=2.19.0';
+import { createPointerSessions } from './pointer-sessions.js?v=2.19.0';
+import { createSafeStorage } from './browser-storage.js?v=2.19.0';
+import { createIntegratedMapBuilder } from './map-builder.js?v=2.19.0';
+import { createUiFocusScope } from './ui-focus.js?v=2.19.0';
+import { createUiGestures } from './ui-gestures.js?v=2.19.0';
+import { CUSTOM_MAP_DEFINITION } from './authored-map-custom.js?v=2.19.0';
+import { createAuthoredWorldGeometry, authoredRoadSurfacePolicy, AUTHORED_ROAD_MARKING_POLICY } from './authored-world-geometry.js?v=2.19.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.19.0';
+import { sanitizeUploadedMapDefinition, customMapSummary, customMapFingerprint } from './uploaded-map.js?v=2.19.0';
 
 const preferences=createSafeStorage('localStorage');
 const FALLBACK_CUSTOM_MAP_DEFINITION=sanitizeUploadedMapDefinition(CUSTOM_MAP_DEFINITION);
@@ -211,7 +214,7 @@ const NET_DIAG_URL_ENABLED = new URL(location.href).searchParams.get('netdiag')=
 const NET_DIAG_FRAME_STALL_MS = 100;
 // Entire sound set is generated locally as 16-bit PCM WAV assets.
 // No third-party or runtime-hosted audio is required.
-const AUDIO_ASSET_REV='audio-20260831-hit-feedback-no-metal';
+const AUDIO_ASSET_REV='audio-20261008-arsenal';
 const ATTACHMENT_AUDIO_REV='audio-20260829-1';
 const KILLSTREAK_AUDIO_REV='audio-20260906-killstreaks-1';
 const SOUND_CUES = {
@@ -238,12 +241,13 @@ const SOUND_CUES = {
   reloadPistol:{url:`audio/reload-pistol.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.66},
   reloadAssault:{url:`audio/reload-assault.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.64},
   reloadUmp:{url:`audio/reload-ump.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.62},
-  reloadMachineGun:{url:'audio/reload-machine-gun.wav?rev=audio-20260828-3',group:'Weapon Handling',gain:.72},
+  reloadMachineGun:{url:'audio/reload-machine-gun.wav?rev=audio-20261008-arsenal',group:'Weapon Handling',gain:.72},
   reloadShotgun:{url:`audio/reload-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.68},
   reload1887:{url:`audio/reload-1887.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.70},
   reloadSemiShotgun:{url:`audio/reload-semi-shotgun.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.66},
   shotgunPump:{url:`audio/shotgun-pump.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.78},
   action1887:{url:`audio/action-1887.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.80},
+  reloadBattleRifle:{url:`audio/reload-battle-rifle.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.70},
   reloadSniper:{url:`audio/reload-sniper.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.72},
   reloadGl:{url:`audio/reload-gl.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.72},
   reloadRpg:{url:`audio/reload-rpg.wav?rev=${AUDIO_ASSET_REV}`,group:'Weapon Handling',gain:.76},
@@ -593,6 +597,9 @@ let masterMuted=preferences.getItem('breachMuted')==='1';
 const requestedRoom=new URL(location.href).searchParams.get('room');
 if(requestedRoom)codeInput.value=normalizeCode(requestedRoom);
 
+let weaponViews={};
+const armoryWeaponViews=new Map();
+function armoryModelSources(weapon){if(!armoryWeaponViews.has(weapon))armoryWeaponViews.set(weapon,(weapon==='akimbo1887'?[0,1]:[0]).map(()=>buildArsenalWeapon(weapon).group));return armoryWeaponViews.get(weapon);}
 let scene, camera, renderer, clock, worldRoot, worldHemiLight, worldSunLight, pistolGroup, pistolFlash, pistolMag, akimboLeftGroup, akimboRightGroup, akimboLeftFlash, akimboRightFlash, akimboLeftLever, akimboRightLever, akimboLeftBarrel, akimboRightBarrel, akimboLeftStock, akimboRightStock, assaultGroup, assaultFlash, assaultMag, umpGroup, umpFlash, umpMag, machineGunGroup, machineGunFlash, machineGunBox, machineGunBolt, shotgunGroup, shotgunFlash, shotgunPump, semiShotgunGroup, semiShotgunFlash, semiShotgunMag, battleRifleGroup, battleRifleView, sniperGroup, sniperFlash, sniperBolt, grenadeLauncherGroup, grenadeLauncherFlash, rpgGroup, rpgFlash, mantleHands, firstPersonHands, fpLeftHand, fpRightHand, fpLeftForearm, fpRightForearm, fpEquipmentProp, fpRigScratch;
 let hudScene, hudCamera, hudMaterial, hudTexture, hudCanvas, hudCtx, hudScale = 1, hudLastDraw = 0, hudLastScopeActive = false;
 let socket = null, reconnectTimer = null, reconnectAttempt = 0;
@@ -769,7 +776,7 @@ const teammateDeathMarkers=[];
 let teammateDeathSkullTexture=null;
 const REPLAY_HISTORY_MS=7200,REPLAY_SAMPLE_MS=80,REPLAY_MAX_FRAMES=110,REPLAY_EVENT_HISTORY_MS=7600;
 const replayHistory=[],replayEvents=[];
-let replayLastCaptureAt=0,replayPending=null,replayPlayback=null,replayLocalActor=null;
+let replayLastCaptureAt=0,replayPending=null,replayLocalActor=null;
 const lobbyParticipants = new Map();
 let pendingGameSnapshot = null;
 let lobbyMatchDraft=null,lobbyMatchDirty=false;
@@ -1062,7 +1069,7 @@ startVersionWatcher();
 syncMusicUI();
 syncPlayerSettingsUI();
 
-const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.18.0';
+const ENGINE_MODULE_URL = './vendor/three.module.min.js?v=2.19.0';
 let engineReady=false, engineLoadPromise=null, engineInitialized=false;
 
 async function ensureThreeEngine(){
@@ -1070,7 +1077,7 @@ async function ensureThreeEngine(){
   if(engineLoadPromise)return engineLoadPromise;
   engineLoadPromise=(async()=>{
     try{
-      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.18.0')).EditorScene;
+      const mod=await import(ENGINE_MODULE_URL);EditorScene||=(await import('./editor-scene.js?v=2.19.0')).EditorScene;
       if(!mod?.WebGLRenderer||!mod?.Scene||!mod?.Vector3)throw new Error('Bundled 3D engine is invalid');
       THREE=mod;
       position=new THREE.Vector3(0,0,0);
@@ -1160,20 +1167,17 @@ function createIntegratedMenuAdapter(){
   };
 }
 function buildMenuPartModel(weapon,attachments,slot){
-  const source=weapon==='akimbo1887'?akimboLeftGroup:activeFirstPersonWeaponGroup(weapon),root=new THREE.Group();if(!source)return root;
-  syncWeaponAttachmentVisuals(source,weapon,attachments);
-  try {
-    const d=source.userData,id=attachments[slot],selected=id?d.attachmentVisuals?.[id]:null;
-    let parts=selected?[selected]:[];
-    if(slot==='optic'&&weapon==='sniper')parts=[...(d.previewScopeParts||[]),...parts];
-    else if(slot==='optic'&&!id)parts=d.ironSightParts||[];
-    else if(slot==='barrel')parts=[d.attachmentBarrel?.mesh];
-    else if(slot==='magazine')parts=[d.attachmentMagazine];
-    else if(slot==='stock'&&!selected)parts=d.attachmentStockBaseParts||[];
-    // None means no added hardware. Never invent a placeholder 3D attachment.
-    for(const part of [...new Set(parts.filter(Boolean))]){const copy=cloneLoadoutPreviewNode(part);if(copy)root.add(copy);}
-    return root;
-  } finally {syncLocalAttachmentVisuals();}
+  const source=armoryModelSources(weapon)[0],root=new THREE.Group();syncWeaponAttachmentVisuals(source,weapon,attachments);
+  const d=source.userData,v=d.componentView,id=attachments[slot],selected=id?d.attachmentVisuals?.[id]:null;
+  let parts=selected?[selected]:[];
+  if(slot==='optic'&&weapon==='sniper')parts=id?[selected]:[v.scope];
+  else if(slot==='optic'&&!id)parts=d.ironSightParts||[];
+  else if(slot==='barrel')parts=[d.attachmentBarrel?.mesh];
+  else if(slot==='magazine')parts=[d.attachmentMagazine||selected];
+  else if(slot==='stock')parts=[v.stockSet?.[id]||v.stock];
+  else if(slot==='underbarrel'&&id==='bipod')parts=[v.bipod||selected];
+  for(const part of [...new Set(parts.filter(Boolean))]){const copy=cloneLoadoutPreviewNode(part);if(copy)root.add(copy);}
+  return root;
 }
 
 const integratedMenuAdapter=createIntegratedMenuAdapter();
@@ -1451,7 +1455,7 @@ function rememberTeam(team){preferredTeam=normalizeTeam(team);preferences.setIte
 function rememberPrimary(weapon){preferredPrimary=PRIMARY_WEAPONS.includes(weapon)?weapon:'assault';preferences.setItem('breachPrimary',preferredPrimary);}
 function rememberSecondary(weapon){preferredSecondary=SECONDARY_WEAPONS.includes(weapon)?weapon:'pistol';preferences.setItem('breachSecondary',preferredSecondary);}
 function rememberAttachments(primary=primaryAttachments,secondary=secondaryAttachments,primaryName=primaryWeapon,secondaryName=secondaryWeapon){preferredPrimaryAttachments=normalizeWeaponAttachments(primaryName,primary);preferredSecondaryAttachments=normalizeWeaponAttachments(secondaryName,secondary);preferences.setItem('breachAttachments',JSON.stringify({primary:preferredPrimaryAttachments,secondary:preferredSecondaryAttachments}));}
-function attachmentsForWeapon(weapon=currentWeapon,loadout=null){const l=loadout||selectedLoadout();return weapon===l.primaryWeapon?normalizeWeaponAttachments(weapon,l.primaryAttachments):weapon===l.secondaryWeapon?normalizeWeaponAttachments(weapon,l.secondaryAttachments):normalizeWeaponAttachments(weapon,{});}
+function attachmentsForWeapon(weapon=currentWeapon,loadout=null){const l=loadout||replayPlayback?.actor||selectedLoadout();return weapon===l.primaryWeapon?normalizeWeaponAttachments(weapon,l.primaryAttachments):weapon===l.secondaryWeapon?normalizeWeaponAttachments(weapon,l.secondaryAttachments):normalizeWeaponAttachments(weapon,{});}
 function effectiveWeaponSpec(weapon=currentWeapon,loadout=null){return resolveWeaponSpec(weapon,attachmentsForWeapon(weapon,loadout));}
 function weaponCapacity(weapon=currentWeapon,loadout=null){return Math.max(1,Math.floor(Number(effectiveWeaponSpec(weapon,loadout).mag)||1));}
 function rememberEquipment(tactical,lethal){preferredTactical=normalizeTactical(tactical);preferredLethal=normalizeLethal(lethal);preferences.setItem('breachTactical',preferredTactical);preferences.setItem('breachLethal',preferredLethal);}
@@ -1762,7 +1766,7 @@ function commitMatchLoadoutChange({selectClass=false}={}){
 }
 function setMatchLoadoutDraft(next={}){loadoutDraft=normalizeLoadoutChoice({...loadoutDraftForSurface('match'),...next});syncMatchLoadoutEditor();commitMatchLoadoutChange();}
 
-function weaponSoundCueIds(weapon=currentWeapon){return weapon==='battleRifle'?['shotBattleRifle','shotSniperSuppressed','reloadSniper','battleRifleBolt']:weapon==='akimbo1887'?['shot1887','shot1887Suppressed','reload1887','action1887']:weapon==='assault'?['shotAssault','shotAssaultSuppressed','reloadAssault']:weapon==='ump'?['shotUmp','shotUmpSuppressed','reloadUmp']:weapon==='machineGun'?['shotMachineGun','shotMachineGunSuppressed','reloadMachineGun']:weapon==='shotgun'?['shotShotgun','shotShotgunSuppressed','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotSemiShotgun','reloadSemiShotgun']:weapon==='sniper'?['shotSniper','shotSniperSuppressed','reloadSniper']:weapon==='grenadeLauncher'?['shotGl','reloadGl','glExplosion']:weapon==='rpg'?['shotRpg','reloadRpg','rpgExplosion']:['shotPistol','shotPistolSuppressed','reloadPistol'];}
+function weaponSoundCueIds(weapon=currentWeapon){return weapon==='battleRifle'?['shotBattleRifle','shotSniperSuppressed','reloadBattleRifle','battleRifleBolt']:weapon==='akimbo1887'?['shot1887','shot1887Suppressed','reload1887','action1887']:weapon==='assault'?['shotAssault','shotAssaultSuppressed','reloadAssault']:weapon==='ump'?['shotUmp','shotUmpSuppressed','reloadUmp']:weapon==='machineGun'?['shotMachineGun','shotMachineGunSuppressed','reloadMachineGun']:weapon==='shotgun'?['shotShotgun','shotShotgunSuppressed','reloadShotgun','shotgunPump']:weapon==='semiShotgun'?['shotSemiShotgun','reloadSemiShotgun']:weapon==='sniper'?['shotSniper','shotSniperSuppressed','reloadSniper']:weapon==='grenadeLauncher'?['shotGl','reloadGl','glExplosion']:weapon==='rpg'?['shotRpg','reloadRpg','rpgExplosion']:['shotPistol','shotPistolSuppressed','reloadPistol'];}
 function warmWeaponAudio(weapon=currentWeapon){for(const id of weaponSoundCueIds(weapon))gameAudio.load(id);}
 const CORE_GAMEPLAY_AUDIO_IDS=Object.freeze(['footstepLeft','footstepRight','jump','land','slide','impactWall','hurt','hitmarker','kill','announcer','flashDetonate','grenadeExplosion','glExplosion','rpgExplosion','infectionTension','infectionClaw','infectionScreech','infectionBomb','flashThrow','stickyThrow','flashImpact','stickyImpact','semtexBeep','ksUfoInbound','ksUfoBeam','ksLightning','ksAsteroidIncoming','ksAsteroidImpact','ksEarthquakeRumble','ksSolarCharge','ksSolarBlast']);
 const ALL_WEAPON_AUDIO_IDS=Object.freeze([...new Set(WEAPON_ORDER.flatMap(weapon=>weaponSoundCueIds(weapon)))]);
@@ -1871,41 +1875,13 @@ function addShotgunGhostRingSight(group,material,opts={}){
 function weaponUsesIronSights(weapon=currentWeapon){return IRON_SIGHT_WEAPONS.has(weapon);}
 function attachmentVisualMaterial(color=0x171c20,metalness=.34,roughness=.44){return new THREE.MeshStandardMaterial({color,metalness,roughness});}
 function bakedWeaponInsetMaterial(){return bakedWeaponInsetMaterial.material||(bakedWeaponInsetMaterial.material=attachmentVisualMaterial(0x101519,.36,.52));}
-function addBakedBoxPanels(mesh,{side=true,top=false,panelScale=.62}={}){
-  const p=mesh?.geometry?.parameters,w=Number(p?.width),h=Number(p?.height),d=Number(p?.depth);if(!(w>0&&h>0&&d>0))return mesh;
-  const mat=bakedWeaponInsetMaterial(),t=Math.max(.0016,Math.min(w,h,d)*.028),ph=h*Math.max(.28,Math.min(.82,panelScale)),pd=d*.62;
-  if(side){for(const x of [-1,1]){const panel=new THREE.Mesh(new THREE.BoxGeometry(t,ph,pd),mat);panel.position.set(x*(w*.5+t*.42),h*.015,0);mesh.add(panel);}}
-  if(top){const panel=new THREE.Mesh(new THREE.BoxGeometry(w*.64,t,d*.56),mat);panel.position.set(0,h*.5+t*.42,0);mesh.add(panel);}
-  return mesh;
-}
 function addBakedGripRibs(mesh,{count=4}={}){
   const p=mesh?.geometry?.parameters,w=Number(p?.width),h=Number(p?.height),d=Number(p?.depth);if(!(w>0&&h>0&&d>0))return mesh;const mat=bakedWeaponInsetMaterial(),n=Math.max(2,Math.min(7,Math.round(count))),t=Math.max(.0015,h*.025);
   for(let i=0;i<n;i++){const rib=new THREE.Mesh(new THREE.BoxGeometry(w*1.025,t,d*1.025),mat);rib.position.y=THREE.MathUtils.lerp(-h*.34,h*.30,n===1?.5:i/(n-1));mesh.add(rib);}return mesh;
 }
-function addBakedMagazineRibs(mesh,{count=3}={}){
-  const p=mesh?.geometry?.parameters,w=Number(p?.width),h=Number(p?.height),d=Number(p?.depth);if(!(w>0&&h>0&&d>0))return mesh;const mat=bakedWeaponInsetMaterial(),n=Math.max(2,Math.min(6,Math.round(count))),t=Math.max(.0016,h*.022);
-  for(let i=0;i<n;i++){const rib=new THREE.Mesh(new THREE.BoxGeometry(w*1.03,t,d*1.03),mat);rib.position.y=THREE.MathUtils.lerp(-h*.34,h*.34,n===1?.5:i/(n-1));mesh.add(rib);}return mesh;
-}
 function addBakedRailRibs(mesh,{count=7}={}){
   const p=mesh?.geometry?.parameters,w=Number(p?.width),h=Number(p?.height),d=Number(p?.depth);if(!(w>0&&h>0&&d>0))return mesh;const mat=bakedWeaponInsetMaterial(),n=Math.max(3,Math.min(12,Math.round(count))),ridgeD=Math.max(.002,d/(n*4.2));
   for(let i=0;i<n;i++){const ridge=new THREE.Mesh(new THREE.BoxGeometry(w*1.08,Math.max(.002,h*.28),ridgeD),mat);ridge.position.set(0,h*.5+Math.max(.001,h*.12),THREE.MathUtils.lerp(-d*.42,d*.42,n===1?.5:i/(n-1)));mesh.add(ridge);}return mesh;
-}
-function addBakedTubeBands(mesh,{count=2}={}){
-  const p=mesh?.geometry?.parameters,r=Math.max(Number(p?.radiusTop)||0,Number(p?.radiusBottom)||0),len=Number(p?.height);if(!(r>0&&len>0))return mesh;const mat=bakedWeaponInsetMaterial(),n=Math.max(1,Math.min(5,Math.round(count))),tube=Math.max(.0015,r*.08);
-  for(let i=0;i<n;i++){const ring=new THREE.Mesh(new THREE.TorusGeometry(r*1.035,tube,5,14),mat);ring.rotation.x=Math.PI/2;ring.position.y=THREE.MathUtils.lerp(-len*.30,len*.30,n===1?.5:i/(n-1));mesh.add(ring);}return mesh;
-}
-function addBakedStockPad(mesh){
-  const p=mesh?.geometry?.parameters,w=Number(p?.width),h=Number(p?.height),d=Number(p?.depth);if(!(w>0&&h>0&&d>0))return mesh;const t=Math.max(.002,d*.035),pad=new THREE.Mesh(new THREE.BoxGeometry(w*1.025,h*.90,t),bakedWeaponInsetMaterial());pad.position.z=d*.5+t*.45;mesh.add(pad);return mesh;
-}
-function bakeWeaponGeometry({receivers=[],handguards=[],grips=[],magazines=[],rails=[],stocks=[],tubes=[],detail=1}={}){
-  const high=Number(detail)>=.8;
-  for(const mesh of receivers.filter(Boolean))addBakedBoxPanels(mesh,{side:true,top:false});
-  for(const mesh of handguards.filter(Boolean)){addBakedBoxPanels(mesh,{side:true,top:false,panelScale:.48});if(high)addBakedGripRibs(mesh,{count:3});}
-  for(const mesh of grips.filter(Boolean))addBakedGripRibs(mesh,{count:high?5:3});
-  for(const mesh of magazines.filter(Boolean))addBakedMagazineRibs(mesh,{count:high?3:2});
-  for(const mesh of rails.filter(Boolean))addBakedRailRibs(mesh,{count:high?7:4});
-  for(const mesh of stocks.filter(Boolean))addBakedStockPad(mesh);
-  for(const mesh of tubes.filter(Boolean))addBakedTubeBands(mesh,{count:high?2:1});
 }
 function registerAttachmentVisual(group,id,object){if(!group||!object)return object;if(!group.userData.attachmentVisuals)group.userData.attachmentVisuals={};group.userData.attachmentVisuals[id]=object;object.visible=false;group.add(object);return object;}
 function makeMuzzleAttachment({radius=.030,length=.22,color=0x171c20,muzzle={x:0,y:0,z:-1},overlap=.018,ported=false}={}){
@@ -1960,13 +1936,9 @@ function makeThermalOpticAttachment({sightY=.17,z=-.12,mountY=.12,eyeZ=-.40,leng
   if(long){const rearPack=new THREE.Mesh(new THREE.BoxGeometry(radius*.58,radius*.44,length*.18),mat),cap=new THREE.Mesh(new THREE.BoxGeometry(radius*.42,radius*.28,length*.12),dark);rearPack.position.set(radius*1.06,sightY-radius*.12,z+length*.24);cap.position.set(radius*1.05,sightY-radius*.47,z+length*.24);g.add(rearPack,cap);}
   return g;
 }
-function makeSniperScopeMarker({z=-.16,y=.14,radius=.052,kind='precision'}={}){
-  const thermal=String(kind).startsWith('thermal'),long=String(kind).includes('long'),g=new THREE.Group(),mat=attachmentVisualMaterial(thermal?0x2d3437:0x394147,.28,.48),dark=attachmentVisualMaterial(0x151a1d,.24,.58);
-  const turret=new THREE.Mesh(new THREE.CylinderGeometry(.017,.017,.032,12),mat),turretCap=new THREE.Mesh(new THREE.CylinderGeometry(.019,.019,.006,12),dark),index=new THREE.Mesh(new THREE.BoxGeometry(.010,.020,.026),mat);turret.rotation.z=turretCap.rotation.z=Math.PI/2;turret.position.set(radius+.014,y,z);turretCap.position.set(radius+.031,y,z);index.position.set(radius+.014,y+.024,z);g.add(turret,turretCap,index);
-  const focus=new THREE.Mesh(new THREE.TorusGeometry(radius*.96,Math.max(.0025,radius*.07),6,20),dark);focus.position.set(0,y,z+.068);g.add(focus);
-  if(long){const cap=new THREE.Mesh(new THREE.CylinderGeometry(radius*.80,radius*.75,.052,18),mat),lip=new THREE.Mesh(new THREE.TorusGeometry(radius*.78,Math.max(.0025,radius*.065),6,20),dark);cap.rotation.x=Math.PI/2;cap.position.set(0,y,z-.073);lip.position.set(0,y,z-.100);g.add(cap,lip);}
-  if(thermal){const module=new THREE.Mesh(new THREE.BoxGeometry(radius*.68,radius*.58,.066),attachmentVisualMaterial(0x202629,.16,.64)),battery=new THREE.Mesh(new THREE.BoxGeometry(radius*.34,radius*.30,.040),dark),sensor=new THREE.Mesh(new THREE.CircleGeometry(radius*.14,12),attachmentVisualMaterial(0x5a7378,.08,.30));module.position.set(-radius*.88,y-radius*.12,z+.005);battery.position.set(-radius*.90,y-radius*.43,z+.006);sensor.rotation.y=Math.PI/2;sensor.position.set(-radius*1.23,y-radius*.10,z-.010);g.add(module,battery,sensor);}
-  return g;
+function makeSniperScopeAttachment({z=-.16,y=.14,radius=.042,kind='precision'}={}){
+  const opts={z,sightY:y,mountY:.070,eyeZ:-.40,length:kind.includes('long')?.48:.42,scopeRadius:radius};
+  return kind.startsWith('thermal')?makeThermalOpticAttachment({...opts,radius,long:kind.includes('long')}):makeCombatOptic(opts);
 }
 function makeVerticalGrip({z=-.45,y=-.12}={}){const g=new THREE.Group(),mat=attachmentVisualMaterial(0x1a1f22,.14,.72),dark=attachmentVisualMaterial(0x0f1417,.18,.62),stem=new THREE.Mesh(new THREE.BoxGeometry(.055,.155,.065),mat),mount=new THREE.Mesh(new THREE.BoxGeometry(.074,.022,.094),mat),cap=new THREE.Mesh(new THREE.BoxGeometry(.060,.016,.070),dark);mount.position.set(0,y+.075,z);stem.position.set(0,y,z);stem.rotation.x=-.08;cap.position.set(0,y-.080,z);addBakedGripRibs(stem,{count:4});g.add(mount,stem,cap);return g;}
 function makeAngledGrip({z=-.45,y=-.105}={}){const g=new THREE.Group(),mat=attachmentVisualMaterial(0x20262a,.16,.68),dark=attachmentVisualMaterial(0x111619,.18,.60),mount=new THREE.Mesh(new THREE.BoxGeometry(.086,.020,.118),mat),wedge=new THREE.Mesh(new THREE.BoxGeometry(.072,.075,.108),mat),heel=new THREE.Mesh(new THREE.BoxGeometry(.074,.018,.070),dark);mount.position.set(0,y+.055,z);wedge.position.set(0,y+.005,z-.018);wedge.rotation.x=-.48;heel.position.set(0,y-.030,z+.030);heel.rotation.x=-.48;addBakedGripRibs(wedge,{count:3});g.add(mount,wedge,heel);return g;}
@@ -1996,12 +1968,13 @@ let laserRaycaster=null,laserWorldOrigin=null,laserWorldDirection=null,laserWorl
 function updateLaserAttachmentBeam(visual,now=performance.now(),raycastInterval=0){const data=visual?.userData?.laserBeam;if(!data||!visual.visible||!worldRoot)return;if(now>=data.nextRaycastAt){laserRaycaster=laserRaycaster||new THREE.Raycaster();laserWorldOrigin=laserWorldOrigin||new THREE.Vector3();laserWorldDirection=laserWorldDirection||new THREE.Vector3();laserWorldQuaternion=laserWorldQuaternion||new THREE.Quaternion();visual.localToWorld(laserWorldOrigin.copy(data.emitter));visual.getWorldQuaternion(laserWorldQuaternion);laserWorldDirection.set(0,0,-1).applyQuaternion(laserWorldQuaternion).normalize();laserRaycaster.set(laserWorldOrigin,laserWorldDirection);laserRaycaster.near=.02;laserRaycaster.far=data.maxLength;const hit=laserRaycaster.intersectObject(worldRoot,true)[0],distance=hit?Math.max(.04,hit.distance-.012):data.maxLength;setLaserBeamLength(visual,distance);data.nextRaycastAt=now+Math.max(0,raycastInterval);}}
 function updateGameplayLaserBeams(now=performance.now()){const local=[];for(const group of [pistolGroup,akimboLeftGroup,akimboRightGroup,assaultGroup,umpGroup,machineGunGroup,shotgunGroup,semiShotgunGroup,battleRifleGroup,sniperGroup,rpgGroup]){const laser=group?.userData?.attachmentVisuals?.laser;if(laser?.visible&&group.visible)local.push(laser);}for(const laser of local)updateLaserAttachmentBeam(laser,now,0);for(const r of remotes.values()){if(!r||r.hp<=0)continue;if(r.weapon==='akimbo1887'){for(const gun of [r.akimboLeft,r.akimboRight]){const laser=gun?.userData?.attachmentVisuals?.laser;if(laser?.visible&&gun.visible)updateLaserAttachmentBeam(laser,now,42);}}else{const gun=r[r.weapon],laser=gun?.userData?.attachmentVisuals?.laser;if(laser?.visible&&gun?.visible)updateLaserAttachmentBeam(laser,now,42);}}}
 
-function makeStockAttachment({z=.40,y=-.02,width=.15}={}){const g=new THREE.Group(),mat=attachmentVisualMaterial(0x4c555b,.12,.70),dark=attachmentVisualMaterial(0x202629,.10,.80),plate=new THREE.Mesh(new THREE.BoxGeometry(width,.12,.055),mat),brace=new THREE.Mesh(new THREE.BoxGeometry(width*.55,.045,.11),mat),pad=new THREE.Mesh(new THREE.BoxGeometry(width*1.04,.105,.018),dark);plate.position.set(0,y,z+.055);brace.position.set(0,y+.025,z);pad.position.set(0,y-.004,z+.088);g.add(brace,plate,pad);return g;}
-function makeFullStockAttachment({z=.42,y=-.02,width=.16}={}){const g=new THREE.Group(),mat=attachmentVisualMaterial(0x424b50,.14,.66),dark=attachmentVisualMaterial(0x22272a,.10,.82),body=new THREE.Mesh(new THREE.BoxGeometry(width,.15,.18),mat),cheek=new THREE.Mesh(new THREE.BoxGeometry(width*.70,.040,.115),mat),pad=new THREE.Mesh(new THREE.BoxGeometry(width*1.04,.16,.045),dark);body.position.set(0,y,z);body.rotation.x=-.08;cheek.position.set(0,y+.082,z-.010);cheek.rotation.x=-.08;pad.position.set(0,y-.008,z+.105);pad.rotation.x=-.08;addBakedBoxPanels(body,{side:true,top:false,panelScale:.42});g.add(body,cheek,pad);return g;}
-function makeCompactStockAttachment({z=.24,y=.01,width=.10}={}){const g=new THREE.Group(),mat=attachmentVisualMaterial(0x343b40,.18,.58),dark=attachmentVisualMaterial(0x171c20,.12,.78),braceL=new THREE.Mesh(new THREE.BoxGeometry(width*.16,.036,.12),mat),braceR=braceL.clone(),pad=new THREE.Mesh(new THREE.BoxGeometry(width,.095,.035),dark);braceL.position.set(-width*.25,y+.015,z);braceR.position.set(width*.25,y+.015,z);pad.position.set(0,y,z+.075);g.add(braceL,braceR,pad);return g;}
-function makeMagMarker({z=-.12,y=-.21,width=.11}={}){const g=new THREE.Group(),mat=new THREE.MeshStandardMaterial({color:0x808e96,roughness:.62,metalness:.22}),dark=bakedWeaponInsetMaterial(),band=new THREE.Mesh(new THREE.BoxGeometry(width+.012,.026,.14),mat),tab=new THREE.Mesh(new THREE.BoxGeometry(width*.40,.018,.055),dark);band.position.set(0,y,z);tab.position.set(width*.28,y+.020,z+.030);g.add(band,tab);return g;}
+function makeShellCarrier(){
+  const g=new THREE.Group(),strap=attachmentVisualMaterial(0x202925,.03,.86),hull=attachmentVisualMaterial(0x764533,.12,.65),brass=attachmentVisualMaterial(0xb49a58,.65,.35);
+  const plate=new THREE.Mesh(new THREE.BoxGeometry(.012,.088,.15),strap);plate.position.set(-.069,-.052,.30);g.add(plate);
+  for(let i=0;i<4;i++){const z=.244+i*.036,caseBody=new THREE.Mesh(new THREE.CylinderGeometry(.013,.013,.066,10),hull),base=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.015,10),brass);caseBody.position.set(-.080,-.057,z);base.position.set(-.080,-.016,z);g.add(caseBody,base);}return g;
+}
 function makeFastMagBand(mag){
-  mag.geometry.computeBoundingBox();const bounds=mag.geometry.boundingBox,size=bounds.getSize(new THREE.Vector3()),bottom=bounds.min.y;
+  const size=new THREE.Vector3(...mag.userData.magSize),bottom=-size.y/2;
   const rubber=attachmentVisualMaterial(0x232a27,.03,.88),rim=attachmentVisualMaterial(0x5b645c,.20,.55),g=new THREE.Group();
   const cuff=new THREE.Mesh(new THREE.BoxGeometry(size.x*1.04,.020,size.z*1.04),rubber);cuff.position.y=bottom+.008;g.add(cuff);
   const plate=new THREE.Mesh(new THREE.BoxGeometry(size.x*1.10,.008,size.z*1.06),rim);plate.position.y=bottom-.005;g.add(plate);
@@ -2010,26 +1983,29 @@ function makeFastMagBand(mag){
 }
 function setupWeaponAttachmentVisuals(group,weapon,opts={}){
   if(!group)return;const flash=opts.flash||null,muzzle=opts.muzzle?{x:Number(opts.muzzle.x)||0,y:Number(opts.muzzle.y)||0,z:Number(opts.muzzle.z)||0}:flash?{x:flash.position.x,y:flash.position.y,z:flash.position.z}:null;
-  group.userData.attachmentWeapon=weapon;group.userData.attachmentFlash=flash;group.userData.attachmentBaseFlash=flash?flash.position.clone():null;group.userData.attachmentMuzzle=muzzle;group.userData.attachmentMagazine=opts.mag||null;if(opts.mag)group.userData.attachmentMagazineBaseScale=opts.mag.scale.clone();
-  if(opts.barrelMesh){const mesh=opts.barrelMesh,length=Math.max(.001,Number(mesh.geometry?.parameters?.height)||.1),baseScale=mesh.scale.clone(),basePosition=mesh.position.clone(),worldLength=length*baseScale.y,rearZ=basePosition.z+worldLength*.5;group.userData.attachmentBarrel={mesh,baseScale,basePosition,baseLength:worldLength,rearZ,baseFrontZ:rearZ-worldLength};}
+  group.userData.attachmentWeapon=weapon;group.userData.attachmentFlash=flash;group.userData.attachmentBaseFlash=flash?flash.position.clone():null;group.userData.attachmentMuzzle=muzzle;group.userData.attachmentMagazine=opts.mag||null;
   group.userData.attachmentStockBaseParts=(opts.stockBaseParts||[]).filter(Boolean);group.userData.attachmentBipodBaseParts=(opts.bipodBaseParts||[]).filter(Boolean);
-  if(opts.redDot)registerAttachmentVisual(group,'redDot',makeRedDotAttachment(opts.redDot));if(opts.holoSight)registerAttachmentVisual(group,'holoSight',makeHoloAttachment(opts.holoSight));if(opts.combatOptic)registerAttachmentVisual(group,'combatOptic',makeCombatOptic(opts.combatOptic));for(const id of ['precisionScope6x','longRangeScope8x'])if(opts[id])registerAttachmentVisual(group,id,makeSniperScopeMarker(opts[id]));for(const id of ['thermalScope4x','thermalScope6x'])if(opts[id])registerAttachmentVisual(group,id,weapon==='sniper'?makeSniperScopeMarker(opts[id]):makeThermalOpticAttachment(opts[id]));
+  if(opts.redDot)registerAttachmentVisual(group,'redDot',makeRedDotAttachment(opts.redDot));if(opts.holoSight)registerAttachmentVisual(group,'holoSight',makeHoloAttachment(opts.holoSight));if(opts.combatOptic)registerAttachmentVisual(group,'combatOptic',makeCombatOptic(opts.combatOptic));for(const id of ['precisionScope6x','longRangeScope8x'])if(opts[id])registerAttachmentVisual(group,id,makeSniperScopeAttachment(opts[id]));for(const id of ['thermalScope4x','thermalScope6x'])if(opts[id])registerAttachmentVisual(group,id,weapon==='sniper'?makeSniperScopeAttachment(opts[id]):makeThermalOpticAttachment(opts[id]));
   if(opts.suppressor&&muzzle)registerAttachmentVisual(group,'suppressor',makeMuzzleAttachment({...opts.suppressor,muzzle,ported:false}));if(opts.compensator&&muzzle)registerAttachmentVisual(group,'compensator',makeMuzzleAttachment({...opts.compensator,muzzle,ported:true}));if(opts.shotgunChoke&&muzzle)registerAttachmentVisual(group,'shotgunChoke',makeMuzzleAttachment({...opts.shotgunChoke,muzzle,ported:false}));
   if(opts.verticalGrip)registerAttachmentVisual(group,'verticalGrip',makeVerticalGrip(opts.verticalGrip));if(opts.angledGrip)registerAttachmentVisual(group,'angledGrip',makeAngledGrip(opts.angledGrip));if(opts.bipod&&!group.userData.attachmentBipodBaseParts.length)registerAttachmentVisual(group,'bipod',makeBipodAttachment(opts.bipod));if(opts.laser)registerAttachmentVisual(group,'laser',makeLaserAttachment(opts.laser));
-  if(opts.lightweightStock)registerAttachmentVisual(group,'lightweightStock',makeStockAttachment(opts.lightweightStock));if(opts.fullStock)registerAttachmentVisual(group,'fullStock',makeFullStockAttachment(opts.fullStock));if(opts.compactStock)registerAttachmentVisual(group,'compactStock',makeCompactStockAttachment(opts.compactStock));
-  if(opts.fastMag){if(opts.mag){const band=makeFastMagBand(opts.mag);group.userData.attachmentVisuals=group.userData.attachmentVisuals||{};group.userData.attachmentVisuals.fastMag=band;opts.mag.add(band);}else registerAttachmentVisual(group,'fastMag',makeMagMarker(opts.fastMag));}if(opts.extendedMag&&!opts.mag)registerAttachmentVisual(group,'extendedMag',makeMagMarker(opts.extendedMag));
+  if(opts.fastMag){if(opts.mag){const band=makeFastMagBand(opts.mag);group.userData.attachmentVisuals=group.userData.attachmentVisuals||{};group.userData.attachmentVisuals.fastMag=band;opts.mag.add(band);}else registerAttachmentVisual(group,'fastMag',makeShellCarrier());}
 }
 function syncWeaponAttachmentVisuals(group,weapon,attachments){
   if(!group)return;const normalized=normalizeWeaponAttachments(weapon,attachments),visuals=group.userData.attachmentVisuals||{};for(const [id,obj] of Object.entries(visuals))obj.visible=weaponHasAttachment(weapon,normalized,id);
   const opticId=String(normalized.optic||'');for(const part of group.userData.ironSightParts||[])part.visible=!opticId;
-  const mag=group.userData.attachmentMagazine,baseScale=group.userData.attachmentMagazineBaseScale;if(mag&&baseScale){mag.scale.copy(baseScale);if(weaponHasAttachment(weapon,normalized,'extendedMag'))mag.scale.y*=weapon==='machineGun'?1.14:1.20;}const fast=visuals.fastMag;if(fast)fast.visible=weaponHasAttachment(weapon,normalized,'fastMag');
-  for(const part of group.userData.attachmentStockBaseParts||[])part.visible=!weaponHasAttachment(weapon,normalized,'compactStock');for(const part of group.userData.attachmentBipodBaseParts||[])part.visible=weaponHasAttachment(weapon,normalized,'bipod');
-  let muzzleDeltaZ=0;const barrel=group.userData.attachmentBarrel;if(barrel?.mesh){let lengthScale=1,thickness=1;if(weaponHasAttachment(weapon,normalized,'heavyBarrel')){lengthScale=1.16;thickness=1.16;}else if(weaponHasAttachment(weapon,normalized,'shortBarrel')){lengthScale=.76;thickness=.94;}else if(weaponHasAttachment(weapon,normalized,'shotgunLongBarrel')){lengthScale=1.20;thickness=1.06;}barrel.mesh.scale.copy(barrel.baseScale);barrel.mesh.scale.y*=lengthScale;barrel.mesh.scale.x*=thickness;barrel.mesh.scale.z*=thickness;barrel.mesh.position.copy(barrel.basePosition);const newLength=barrel.baseLength*lengthScale,newFront=barrel.rearZ-newLength;barrel.mesh.position.z=barrel.rearZ-newLength*.5;muzzleDeltaZ=newFront-barrel.baseFrontZ;}
+  const view=group.userData.componentView,muzzleDeltaZ=view?selectWeaponComponents(view,normalized):0;
+  if(view?.scope)view.scope.visible=!opticId;
+  for(const part of group.userData.attachmentBipodBaseParts||[]){part.visible=true;part.rotation.x=weaponHasAttachment(weapon,normalized,'bipod')?0:-1.35;}
+  if(view?.barrelSet)group.userData.attachmentBarrel={mesh:(view.barrelSet[normalized.barrel]||view.barrelSet.standard).mesh};
+  for(const part of group.userData.frontSightParts||[])part.position.z=part.userData.baseSightZ+muzzleDeltaZ;
+  if(view?.sight&&group.userData.adsSightTip)group.userData.adsSightTip.z=view.sight.frontZ+muzzleDeltaZ;
+  // A hand grips the selected foregrip instead of passing through it.
+  const left=group.userData.fpLeftGrip;if(left&&view?.hands?.left&&!view.hands.left.parent){left.position.set(...view.hands.left.position);if(normalized.underbarrel==='verticalGrip')left.position.set(-.018,view.mount.handY-.078,view.mount.handZ);else if(normalized.underbarrel==='angledGrip')left.position.set(-.018,view.mount.handY-.045,view.mount.handZ);}
   for(const id of ['suppressor','compensator','shotgunChoke'])if(visuals[id])visuals[id].position.z=muzzleDeltaZ;
   const flash=group.userData.attachmentFlash,baseFlash=group.userData.attachmentBaseFlash;if(flash&&baseFlash){flash.position.copy(baseFlash);flash.position.z+=muzzleDeltaZ;const activeMuzzleId=weaponHasAttachment(weapon,normalized,'suppressor')?'suppressor':weaponHasAttachment(weapon,normalized,'compensator')?'compensator':weaponHasAttachment(weapon,normalized,'shotgunChoke')?'shotgunChoke':'';const visual=activeMuzzleId?visuals[activeMuzzleId]:null,tip=visual?.userData?.muzzleTip;if(tip){flash.position.copy(tip);flash.position.add(visual.position);}}
 }
 function syncLocalAttachmentVisuals(){
-  const loadout=selectedLoadout();for(const weapon of WEAPON_ORDER){const attachments=attachmentsForWeapon(weapon,loadout);if(weapon==='akimbo1887'){for(const group of [akimboLeftGroup,akimboRightGroup])if(group)syncWeaponAttachmentVisuals(group,weapon,attachments);continue;}const group=activeFirstPersonWeaponGroup(weapon);if(group)syncWeaponAttachmentVisuals(group,weapon,attachments);}
+  const loadout=replayPlayback?.actor||selectedLoadout();for(const weapon of WEAPON_ORDER){const attachments=attachmentsForWeapon(weapon,loadout);if(weapon==='akimbo1887'){for(const group of [akimboLeftGroup,akimboRightGroup])if(group)syncWeaponAttachmentVisuals(group,weapon,attachments);continue;}const group=activeFirstPersonWeaponGroup(weapon);if(group)syncWeaponAttachmentVisuals(group,weapon,attachments);}
 }
 function addViewAnchor(root,key,parent,position,rotation=[0,0,0]){
   const anchor=new THREE.Object3D(),host=parent||root;anchor.position.set(position[0],position[1],position[2]);anchor.rotation.set(rotation[0]||0,rotation[1]||0,rotation[2]||0);host.add(anchor);root.userData[key]=anchor;return anchor;
@@ -2040,13 +2016,36 @@ function registerWeaponHandAnchors(root,{right,left,reloadLeft,reloadRight}={}){
   if(reloadLeft)addViewAnchor(root,'fpReloadLeft',reloadLeft.parent||root,reloadLeft.position,reloadLeft.rotation);
   if(reloadRight)addViewAnchor(root,'fpReloadRight',reloadRight.parent||root,reloadRight.position,reloadRight.rotation);
 }
-function buildBattleRifleView(scale=1){
-  const view=createBattleRifle(THREE),g=view.group;
-  addApertureIronSights(g,view.sightMaterial,{rearZ:-.12,frontZ:-1.22,sightY:.232,rearMountY:.197,frontMountY:.170,eyeZ:-.40,rearRadius:.020,postWidth:.006});
-  registerWeaponHandAnchors(g,{right:{position:[.038,-.090,.17],rotation:[-.28,-.02,.06]},left:{position:[-.038,-.095,-.53],rotation:[-.14,.04,.02]},reloadLeft:{parent:view.mag,position:[-.035,-.025,.0],rotation:[-.16,.08,.14]},reloadRight:{parent:view.bolt,position:[.145,-.014,.057],rotation:[-.40,-.10,.28]}});
-  setupWeaponAttachmentVisuals(g,'battleRifle',{flash:view.flash,mag:view.mag,stockBaseParts:[view.stock],redDot:{sightY:.255,z:-.20,mountY:.202,eyeZ:-.40},holoSight:{sightY:.270,z:-.20,mountY:.202,eyeZ:-.40},combatOptic:{sightY:.278,z:-.22,mountY:.202,eyeZ:-.40,length:.20},suppressor:{radius:.045,length:.25,overlap:.020},laser:{x:.110,z:-.57,y:-.020},fastMag:{width:.105,depth:.13,y:.03}});
+function buildArsenalWeapon(weapon,scale=1){
+  const v=createWeaponModel(THREE,weapon),g=v.group,m=v.mount,options={flash:v.flash,mag:v.mag,barrelMesh:v.barrel,barrelSet:v.barrelSet,stockBaseParts:v.stock?[v.stock]:[],bipodBaseParts:v.bipod?[v.bipod]:[]};
+  if(v.sight&&weapon!=='sniper'){
+    const fn=v.sight.type==='pistol'?addPistolIronSights:v.sight.type==='bead'?addShotgunBeadSight:addApertureIronSights;
+    fn(g,v.sightMaterial,v.sight);g.userData.frontSightParts=(g.userData.ironSightParts||[]).filter(part=>Math.abs(part.position.z-v.sight.frontZ)<.03);for(const part of g.userData.frontSightParts)part.userData.baseSightZ=part.position.z;
+  }
+  if(v.scope)g.userData.previewScopeParts=v.scopeParts;
+  registerWeaponHandAnchors(g,v.hands);
+  const optic={mountY:m.y,z:m.z,eyeZ:weapon==='pistol'?-.46:-.40};
+  for(const item of attachmentOptionsForWeapon(weapon)){
+    const id=item.id;
+    if(id==='redDot')options[id]={...optic,sightY:m.y+.041};
+    else if(id==='holoSight')options[id]={...optic,sightY:m.y+.060};
+    else if(id==='combatOptic')options[id]={...optic,sightY:m.y+.065,length:.22};
+    else if(item.slot==='optic')options[id]=weapon==='sniper'?{z:-.16,y:.14,radius:.042,kind:id.includes('thermal')?(id.endsWith('6x')?'thermal-long':'thermal'):(id.includes('8x')?'long':'precision')}:{...optic,sightY:m.y+.067,length:id.endsWith('6x')?.24:.21,radius:.039,long:id.endsWith('6x')};
+    else if(id==='suppressor')options[id]={radius:weapon==='battleRifle'?.045:weapon==='shotgun'?.035:.031,length:weapon==='pistol'?.20:.27,overlap:.020};
+    else if(id==='compensator'||id==='shotgunChoke')options[id]={radius:.032,length:.10,overlap:.015};
+    else if(id==='laser')options[id]={x:m.laserX??.08,y:m.laserY??-.015,z:m.laserZ??m.handZ,scale:weapon==='pistol'?.78:1};
+    else if(id==='verticalGrip')options[id]={z:m.handZ,y:m.handY-.075};
+    else if(id==='angledGrip')options[id]={z:m.handZ,y:m.handY-.055};
+    else if(id==='bipod')options[id]={z:m.handZ-.16,y:m.handY-.1};
+    else if(id==='fastMag')options[id]={z:.26,y:-.04,width:.10};
+  }
+  setupWeaponAttachmentVisuals(g,weapon,options);g.userData.componentView=v;
+  if(weapon==='pistol'){
+    // Both sights and the slide-mounted reflex optic reciprocate together.
+    g.updateMatrixWorld(true);for(const part of [...(g.userData.ironSightParts||[]),g.userData.attachmentVisuals?.redDot].filter(Boolean))v.bolt.attach(part);for(const part of g.userData.frontSightParts||[])part.userData.baseSightZ=part.position.z;
+  }
   g.scale.setScalar(scale);for(const node of [g,...Object.values(g.userData.attachmentVisuals||{})]){const pose=node.userData.adsPose;if(pose){pose.x*=scale;pose.y*=scale;pose.z=(pose.z+.40)*scale-.40;}}
-  return view;
+  return v;
 }
 function startBattleRifleCycle(now=performance.now(),duration=weaponRules('battleRifle').cooldownMs){battleRifleCycleStartedAt=now;battleRifleCycleDuration=duration;battleRifleBoltSoundPlayed=false;}
 function activeFirstPersonWeaponGroup(weapon=currentWeapon){
@@ -2075,20 +2074,15 @@ function loadoutPreviewCalloutPoints(source,weapon,attachments){
   points.barrel=loadoutPreviewNodePoint(source,source.userData?.attachmentBarrel?.mesh);
   points.magazine=loadoutPreviewNodePoint(source,source.userData?.attachmentMagazine);
   const underId=String(normalized.underbarrel||''),under=underId?visuals[underId]:null;points.underbarrel=loadoutPreviewNodePoint(source,under)||loadoutPreviewNodePoint(source,source.userData?.fpLeftGrip);
-  const stockId=String(normalized.stock||''),stock=stockId?visuals[stockId]:null,stockBase=(source.userData?.attachmentStockBaseParts||[])[0];points.stock=loadoutPreviewNodePoint(source,stock)||loadoutPreviewNodePoint(source,stockBase)||loadoutPreviewNodePoint(source,source.userData?.fpRightGrip);
+  const stockId=String(normalized.stock||''),stock=source.userData.componentView?.stockSet?.[stockId||'standard'],stockBase=(source.userData?.attachmentStockBaseParts||[])[0];points.stock=loadoutPreviewNodePoint(source,stock)||loadoutPreviewNodePoint(source,stockBase)||loadoutPreviewNodePoint(source,source.userData?.fpRightGrip);
   return Object.fromEntries(Object.entries(points).filter(([,v])=>v));
 }
 function buildLoadoutPreviewModel(weapon,attachments){
-  const root=new THREE.Group(),referenceRoot=new THREE.Group(),sources=weapon==='akimbo1887'?[akimboLeftGroup,akimboRightGroup]:[activeFirstPersonWeaponGroup(weapon)].filter(Boolean);if(!sources.length)return root;let sightPoint=null,calloutPoints={};
-  const appendVisibleSource=(target,source)=>{const copy=new THREE.Group();for(const child of source?.children||[]){const node=cloneLoadoutPreviewNode(child);if(node)copy.add(node);}target.add(copy);};
-  const poseAkimbo=target=>{if(weapon==='akimbo1887'&&target.children.length>=2){target.children[0].position.x=-.19;target.children[0].rotation.y=.08;target.children[1].position.x=.19;target.children[1].rotation.y=-.08;}};
-  const changed=[];for(const source of sources){if(source?.userData?.attachmentWeapon){syncWeaponAttachmentVisuals(source,weapon,attachments);changed.push(source);}if(sources.length===1){if(!sightPoint)sightPoint=loadoutPreviewSightPoint(source,weapon,attachments);calloutPoints=loadoutPreviewCalloutPoints(source,weapon,attachments);}appendVisibleSource(root,source);}
-  // Frame every configuration from the weapon's base silhouette. Extended mags,
-  // long/heavy barrels and other dimensional attachments no longer make the
-  // weapon jump in size or recenter when the player compares options.
-  for(const source of changed)syncWeaponAttachmentVisuals(source,weapon,{});for(const source of sources)appendVisibleSource(referenceRoot,source);poseAkimbo(root);poseAkimbo(referenceRoot);
-  // Restore the live viewmodel immediately; draft attachments belong only to the preview until saved.
-  if(changed.length)syncLocalAttachmentVisuals();
+  const root=new THREE.Group(),referenceRoot=new THREE.Group(),sources=armoryModelSources(weapon);let sightPoint=null,calloutPoints={};
+  const appendVisibleSource=(target,source)=>{const copy=new THREE.Group();for(const child of source.children){const node=cloneLoadoutPreviewNode(child);if(node)copy.add(node);}target.add(copy);};
+  const poseAkimbo=target=>{if(weapon==='akimbo1887'){target.children[0].position.x=-.19;target.children[0].rotation.y=.08;target.children[1].position.x=.19;target.children[1].rotation.y=-.08;}};
+  for(const source of sources){syncWeaponAttachmentVisuals(source,weapon,attachments);if(sources.length===1){sightPoint=loadoutPreviewSightPoint(source,weapon,attachments);calloutPoints=loadoutPreviewCalloutPoints(source,weapon,attachments);}appendVisibleSource(root,source);syncWeaponAttachmentVisuals(source,weapon,{});appendVisibleSource(referenceRoot,source);}
+  poseAkimbo(root);poseAkimbo(referenceRoot);
   const frameRoot=referenceRoot.children.length?referenceRoot:root,box=new THREE.Box3().setFromObject(frameRoot),size=box.getSize(new THREE.Vector3()),center=box.getCenter(new THREE.Vector3()),maxDim=Math.max(.01,size.x,size.y,size.z),scale=2.16/maxDim;root.position.sub(center);const wrapper=new THREE.Group();wrapper.add(root);wrapper.scale.setScalar(scale);if(sightPoint)wrapper.userData.adsPoint=sightPoint.sub(center).multiplyScalar(scale);wrapper.userData.calloutPoints={};for(const [slot,point] of Object.entries(calloutPoints))wrapper.userData.calloutPoints[slot]=point.clone().sub(center).multiplyScalar(scale);return wrapper;
 }
 function adjustLoadoutPreviewAngle(ctx,horizontalDelta){
@@ -2141,7 +2135,7 @@ function equipmentHandTarget(now,outPos,outQuat){
 }
 function updateFirstPersonHandRig(now,reloading,reloadP,traversalViewActive){
   if(!firstPersonHands||!fpRigScratch)return;
-  const scopedHidden=sniperWeaponHiddenForScope(),alive=!!shell.inMatch&&hp>0&&!localInfected&&!traversalViewActive&&!scopedHidden;firstPersonHands.visible=alive;if(!alive){if(fpEquipmentProp)fpEquipmentProp.visible=false;return;}
+  const scopedHidden=sniperWeaponHiddenForScope(),alive=!!shell.inMatch&&(replayPlayback?Number(replayPlayback.actor?.hp)>0&&!replayPlayback.actor?.zombie:hp>0&&!localInfected)&&!traversalViewActive&&!scopedHidden;firstPersonHands.visible=alive;if(!alive){if(fpEquipmentProp)fpEquipmentProp.visible=false;return;}
   let leftAnchor=null,rightAnchor=null,reloadLeft=null,reloadRight=null;
   if(currentWeapon==='akimbo1887'){leftAnchor=akimboLeftGroup?.userData.fpLeftGrip||null;rightAnchor=akimboRightGroup?.userData.fpRightGrip||null;reloadLeft=akimboLeftGroup?.userData.fpReloadLeft||null;reloadRight=akimboRightGroup?.userData.fpReloadRight||null;}
   else{const group=activeFirstPersonWeaponGroup(currentWeapon);leftAnchor=group?.userData.fpLeftGrip||null;rightAnchor=group?.userData.fpRightGrip||null;reloadLeft=group?.userData.fpReloadLeft||null;reloadRight=group?.userData.fpReloadRight||null;}
@@ -2149,9 +2143,9 @@ function updateFirstPersonHandRig(now,reloading,reloadP,traversalViewActive){
   camera.updateMatrixWorld(true);camera.getWorldQuaternion(fpRigScratch.camQ);fpRigScratch.camInvQ.copy(fpRigScratch.camQ).invert();fpRigScratch.camInvMatrix.copy(camera.matrixWorld).invert();
   const lp=fpRigScratch.p0,lq=fpRigScratch.q0,rp=fpRigScratch.p1,rq=fpRigScratch.q1,targetP=fpRigScratch.p2,targetQ=fpRigScratch.q2;
   anchorPoseInCamera(leftAnchor,lp,lq);anchorPoseInCamera(rightAnchor,rp,rq);
-  if(reloading&&reloadLeft){let w=currentWeapon==='shotgun'?reloadHandWeight(reloadP,.06,.92,.16):currentWeapon==='machineGun'?reloadHandWeight(reloadP,.10,.84,.18):reloadHandWeight(reloadP,.12,.80,.14);if(w>0&&anchorPoseInCamera(reloadLeft,targetP,targetQ)){lp.lerp(targetP,w);lq.slerp(targetQ,w);}}
-  if(reloading&&reloadRight&&currentWeapon!=='battleRifle'){const w=currentWeapon==='sniper'?reloadHandWeight(reloadP,.24,.64,.10):reloadHandWeight(reloadP,.20,.68,.12);if(w>0&&anchorPoseInCamera(reloadRight,targetP,targetQ)){rp.lerp(targetP,w);rq.slerp(targetQ,w);}}
-  if(currentWeapon==='battleRifle'&&reloadRight){const cycle=reloading?battleRifleCycle(1,1+Math.max(0,(reloadP-.60)/.40)*1000,1000):battleRifleCycle(battleRifleCycleStartedAt,now,battleRifleCycleDuration);if(cycle.hand>0&&anchorPoseInCamera(reloadRight,targetP,targetQ)){rp.lerp(targetP,cycle.hand);rq.slerp(targetQ,cycle.hand);}}
+  if(reloading&&reloadLeft){let w=currentWeapon==='battleRifle'?reloadHandWeight(reloadP,.02,.61,.09):reloadHandWeight(reloadP,.02,.94,.10);if(w>0&&anchorPoseInCamera(reloadLeft,targetP,targetQ)){lp.lerp(targetP,w);lq.slerp(targetQ,w);}}
+  if(reloading&&reloadRight&&currentWeapon!=='battleRifle'){const w=currentWeapon==='akimbo1887'?reloadHandWeight(reloadP,.02,.94,.10):(ammo[currentWeapon]||0)===0?reloadHandWeight(reloadP,.66,.99,.06):0;if(w>0&&anchorPoseInCamera(reloadRight,targetP,targetQ)){rp.lerp(targetP,w);rq.slerp(targetQ,w);}}
+  if(currentWeapon==='battleRifle'&&reloadRight){const cycle=battleRifleView.cycle||{hand:0};if(cycle.hand>0&&anchorPoseInCamera(reloadRight,targetP,targetQ)){rp.lerp(targetP,cycle.hand);rq.slerp(targetQ,cycle.hand);}}
   const equipmentWeight=equipmentWeaponLower(now);if(equipmentWeight>0){equipmentHandTarget(now,targetP,targetQ);lp.lerp(targetP,equipmentWeight);lq.slerp(targetQ,equipmentWeight);}
   fpLeftHand.position.copy(lp);fpLeftHand.quaternion.copy(lq);fpRightHand.position.copy(rp);fpRightHand.quaternion.copy(rq);updateForearmMesh(fpLeftForearm,-1,lp);updateForearmMesh(fpRightForearm,1,rp);
   if(fpEquipmentProp){const show=combatAction.phase===COMBAT_ACTION.EQUIPMENT_AIM||combatAction.phase===COMBAT_ACTION.EQUIPMENT_THROW;fpEquipmentProp.visible=show;const kind=combatAction.kind||'';fpEquipmentProp.material.color.set(kind==='frag'?0x4e5745:kind==='sticky'?0x70757a:kind==='smoke'?0x59636b:0x72787b);const baseScale=kind==='flash'?.64:kind==='sticky'?.68:kind==='smoke'?.84:.80;fpEquipmentProp.scale.set(baseScale,baseScale*(kind==='flash'?1.28:kind==='sticky'?1.10:1),baseScale);}
@@ -2182,178 +2176,23 @@ function init3D(){
   buildWorldVisuals();
 
 
-  pistolGroup = new THREE.Group();
-  const pistolMetal = new THREE.MeshStandardMaterial({color:0x20262c,roughness:.38,metalness:.48});
-  const pistolPoly = new THREE.MeshStandardMaterial({color:0x32383d,roughness:.72,metalness:.12});
-  const gripMat = new THREE.MeshStandardMaterial({color:0x47413a,roughness:.9,metalness:.04});
-  const glockSlide = new THREE.Mesh(new THREE.BoxGeometry(.17,.11,.46),pistolMetal);glockSlide.position.set(0,.055,-.11);
-  const glockFront = new THREE.Mesh(new THREE.BoxGeometry(.145,.095,.10),pistolMetal);glockFront.position.set(0,.047,-.39);
-  const glockFrame = new THREE.Mesh(new THREE.BoxGeometry(.16,.10,.30),pistolPoly);glockFrame.position.set(0,-.005,-.05);
-  const glockDust = new THREE.Mesh(new THREE.BoxGeometry(.14,.07,.15),pistolPoly);glockDust.position.set(0,-.045,-.23);
-  const glockBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,.18,10),pistolMetal);glockBarrel.rotation.x=Math.PI/2;glockBarrel.position.set(0,.047,-.39);
-  const triggerGuard = new THREE.Mesh(new THREE.TorusGeometry(.045,.010,5,18,Math.PI),pistolPoly);triggerGuard.rotation.y=Math.PI/2;triggerGuard.rotation.z=Math.PI;triggerGuard.position.set(0,-.085,-.03);
-  const glockGrip = new THREE.Mesh(new THREE.BoxGeometry(.135,.30,.15),gripMat);glockGrip.position.set(0,-.185,.05);glockGrip.rotation.x=-.32;
-  const glockBackstrap = new THREE.Mesh(new THREE.BoxGeometry(.05,.16,.11),pistolPoly);glockBackstrap.position.set(0,-.125,.13);glockBackstrap.rotation.x=-.32;
-  pistolMag=new THREE.Mesh(new THREE.BoxGeometry(.090,.20,.11),pistolMetal);pistolMag.position.set(0,-.245,.045);pistolMag.rotation.x=-.32;
-  pistolFlash = new THREE.Mesh(new THREE.SphereGeometry(.07,8,6),new THREE.MeshBasicMaterial({color:0xffd27a,transparent:true,opacity:0}));pistolFlash.position.set(0,.047,-.51);
-  bakeWeaponGeometry({receivers:[glockSlide,glockFrame],handguards:[glockDust],grips:[glockGrip],magazines:[pistolMag],tubes:[glockBarrel]});
-  pistolGroup.add(glockSlide,glockFront,glockFrame,glockDust,glockBarrel,triggerGuard,glockGrip,glockBackstrap,pistolMag,pistolFlash);pistolGroup.userData.cyclePart=glockSlide;pistolGroup.userData.cycleBaseZ=-.11;pistolGroup.userData.cycleTravel=.075;addPistolIronSights(pistolGroup,pistolMetal,{rearZ:.08,frontZ:-.31,sightY:.140,rearMountY:.112,frontMountY:.112,eyeZ:-.46});registerWeaponHandAnchors(pistolGroup,{right:{position:[.035,-.16,.055],rotation:[-.30,-.04,.04]},left:{position:[-.045,-.105,-.015],rotation:[-.34,.10,.20]},reloadLeft:{parent:pistolMag,position:[-.035,-.02,.01],rotation:[-.18,.08,.18]}});pistolGroup.position.set(.33,-.25,-.67);pistolGroup.rotation.set(-.08,-.08,0);
-
-  const buildAkimbo1887=(side)=>{
-    const g=new THREE.Group(),metal=new THREE.MeshStandardMaterial({color:0x24282b,roughness:.40,metalness:.46}),wood=new THREE.MeshStandardMaterial({color:0x684933,roughness:.84}),leverMat=new THREE.MeshStandardMaterial({color:0x34383b,roughness:.36,metalness:.44});
-    const receiver=new THREE.Mesh(new THREE.BoxGeometry(.15,.14,.36),metal);receiver.position.set(0,.02,-.16);
-    const tang=new THREE.Mesh(new THREE.BoxGeometry(.06,.05,.16),metal);tang.position.set(0,.06,.05);
-    const barrel=new THREE.Mesh(new THREE.CylinderGeometry(.022,.022,1.02,10),metal);barrel.rotation.x=Math.PI/2;barrel.position.set(0,.04,-.70);
-    const tube=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.88,9),metal);tube.rotation.x=Math.PI/2;tube.position.set(0,-.012,-.66);
-    const forearm=new THREE.Mesh(new THREE.BoxGeometry(.12,.095,.32),wood);forearm.position.set(0,-.005,-.43);forearm.rotation.x=-.03;
-    const grip=new THREE.Mesh(new THREE.BoxGeometry(.12,.22,.12),wood);grip.position.set(0,-.13,.05);grip.rotation.x=-.34;
-    const stock=new THREE.Mesh(new THREE.BoxGeometry(.11,.14,.38),wood);stock.position.set(0,-.005,.22);stock.rotation.x=-.12;
-    const butt=new THREE.Mesh(new THREE.BoxGeometry(.12,.16,.08),wood);butt.position.set(0,-.03,.42);butt.rotation.x=-.12;
-    const lever=new THREE.Mesh(new THREE.TorusGeometry(.072,.011,6,22),leverMat);lever.rotation.x=Math.PI/2;lever.scale.set(1,.68,1);lever.position.set(0,-.11,.00);
-    const hammer=new THREE.Mesh(new THREE.BoxGeometry(.040,.045,.07),metal);hammer.position.set(0,.08,.07);hammer.rotation.x=-.30;
-    const flash=new THREE.Mesh(new THREE.SphereGeometry(.082,8,6),new THREE.MeshBasicMaterial({color:0xffcf79,transparent:true,opacity:0}));flash.position.set(0,.04,-1.24);
-    bakeWeaponGeometry({receivers:[receiver,tang],handguards:[forearm],grips:[grip],stocks:[stock],tubes:[barrel,tube]});
-    g.add(receiver,tang,barrel,tube,forearm,grip,stock,butt,lever,hammer,flash);g.userData.akimboSide=side;return{group:g,flash,lever,barrel,stock};
-  };
-  ({group:akimboLeftGroup,flash:akimboLeftFlash,lever:akimboLeftLever,barrel:akimboLeftBarrel,stock:akimboLeftStock}=buildAkimbo1887('left'));({group:akimboRightGroup,flash:akimboRightFlash,lever:akimboRightLever,barrel:akimboRightBarrel,stock:akimboRightStock}=buildAkimbo1887('right'));
-  registerWeaponHandAnchors(akimboLeftGroup,{left:{position:[0,-.12,.055],rotation:[-.32,.05,-.06]},reloadLeft:{position:[0,-.16,.075],rotation:[-.20,.02,-.08]}});registerWeaponHandAnchors(akimboRightGroup,{right:{position:[0,-.12,.055],rotation:[-.32,-.05,.06]},reloadRight:{position:[0,-.16,.075],rotation:[-.20,-.02,.08]}});akimboLeftGroup.position.set(-.40,-.32,-.72);akimboLeftGroup.rotation.set(-.08,.18,-.035);akimboLeftGroup.visible=false;
-  akimboRightGroup.position.set(.40,-.32,-.72);akimboRightGroup.rotation.set(-.08,-.18,.035);akimboRightGroup.visible=false;
-
-  assaultGroup = new THREE.Group();
-  const arMat = new THREE.MeshStandardMaterial({color:0x23292f,roughness:.40,metalness:.42});
-  const arAccent = new THREE.MeshStandardMaterial({color:0x61574a,roughness:.74,metalness:.08});
-  const scarUpper = new THREE.Mesh(new THREE.BoxGeometry(.18,.11,.40),arMat);scarUpper.position.set(0,.05,-.24);
-  const scarLower = new THREE.Mesh(new THREE.BoxGeometry(.17,.10,.30),arMat);scarLower.position.set(0,-.03,-.10);
-  const scarRail = new THREE.Mesh(new THREE.BoxGeometry(.09,.03,.72),new THREE.MeshStandardMaterial({color:0x4a5158,roughness:.55,metalness:.30}));scarRail.position.set(0,.115,-.34);
-  const scarHandguard = new THREE.Mesh(new THREE.BoxGeometry(.16,.11,.36),new THREE.MeshStandardMaterial({color:0x7a6e5a,roughness:.82,metalness:.05}));scarHandguard.position.set(0,.015,-.56);
-  const arBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.021,.021,.54,10),arMat);arBarrel.rotation.x=Math.PI/2;arBarrel.position.set(0,.02,-.92);
-  const scarStockStem = new THREE.Mesh(new THREE.BoxGeometry(.045,.055,.22),arMat);scarStockStem.position.set(0,-.01,.22);scarStockStem.rotation.x=-.10;
-  const scarStock = new THREE.Mesh(new THREE.BoxGeometry(.15,.14,.18),arAccent);scarStock.position.set(0,-.01,.40);scarStock.rotation.x=-.10;
-  const scarGrip = new THREE.Mesh(new THREE.BoxGeometry(.11,.23,.12),arMat);scarGrip.position.set(0,-.17,.01);scarGrip.rotation.x=-.26;
-  const scarBolt=new THREE.Mesh(new THREE.BoxGeometry(.018,.035,.12),new THREE.MeshStandardMaterial({color:0x11161a,roughness:.28,metalness:.62}));scarBolt.position.set(.095,.055,-.21);addBakedGripRibs(scarBolt,{count:3});
-  assaultMag = new THREE.Mesh(new THREE.BoxGeometry(.11,.29,.16),new THREE.MeshStandardMaterial({color:0x676f75,roughness:.62,metalness:.18}));assaultMag.position.set(0,-.19,-.15);assaultMag.rotation.x=.16;
-  assaultFlash = new THREE.Mesh(new THREE.SphereGeometry(.074,8,6),new THREE.MeshBasicMaterial({color:0xffd98d,transparent:true,opacity:0}));assaultFlash.position.set(0,.02,-1.20);
-  bakeWeaponGeometry({receivers:[scarUpper,scarLower],handguards:[scarHandguard],grips:[scarGrip],magazines:[assaultMag],rails:[scarRail],stocks:[scarStock],tubes:[arBarrel]});
-  assaultGroup.add(scarUpper,scarLower,scarRail,scarHandguard,arBarrel,scarStockStem,scarStock,scarGrip,scarBolt,assaultMag,assaultFlash);assaultGroup.userData.cyclePart=scarBolt;assaultGroup.userData.cycleBaseZ=-.21;assaultGroup.userData.cycleTravel=.055;addApertureIronSights(assaultGroup,scarRail.material,{rearZ:.05,frontZ:-.66,sightY:.165,rearMountY:.132,frontMountY:.132,rearRadius:.021,postWidth:.0065,frontEarGap:.019,eyeZ:-.40});registerWeaponHandAnchors(assaultGroup,{right:{position:[.025,-.145,.025],rotation:[-.28,-.03,.05]},left:{position:[-.025,-.045,-.51],rotation:[-.18,.05,.02]},reloadLeft:{parent:assaultMag,position:[-.04,.02,.015],rotation:[-.12,.06,.16]}});assaultGroup.position.set(.30,-.27,-.52);assaultGroup.rotation.set(-.06,-.055,0);assaultGroup.visible=false;
-
-  umpGroup = new THREE.Group();
-  const umpMat=new THREE.MeshStandardMaterial({color:0x1f252a,roughness:.42,metalness:.34}),umpAccent=new THREE.MeshStandardMaterial({color:0x3f464b,roughness:.68,metalness:.12}),polyBlack=new THREE.MeshStandardMaterial({color:0x22272c,roughness:.84,metalness:.04});
-  const umpReceiver=new THREE.Mesh(new THREE.BoxGeometry(.18,.18,.38),umpMat);umpReceiver.position.set(0,.04,-.12);
-  const umpLower=new THREE.Mesh(new THREE.BoxGeometry(.17,.12,.24),polyBlack);umpLower.position.set(0,-.03,-.02);
-  const umpHandguard=new THREE.Mesh(new THREE.BoxGeometry(.15,.11,.22),polyBlack);umpHandguard.position.set(0,.00,-.42);
-  const umpTop=new THREE.Mesh(new THREE.BoxGeometry(.08,.025,.50),umpAccent);umpTop.position.set(0,.112,-.22);
-  const umpBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.24,9),umpMat);umpBarrel.rotation.x=Math.PI/2;umpBarrel.position.set(0,.02,-.63);
-  const umpGrip=new THREE.Mesh(new THREE.BoxGeometry(.11,.22,.12),polyBlack);umpGrip.position.set(0,-.17,.03);umpGrip.rotation.x=-.28;
-  const umpStockRodL=new THREE.Mesh(new THREE.BoxGeometry(.02,.02,.23),umpAccent);umpStockRodL.position.set(-.035,.045,.12);
-  const umpStockRodR=umpStockRodL.clone();umpStockRodR.position.x=.035;
-  const umpButt=new THREE.Mesh(new THREE.BoxGeometry(.12,.11,.06),umpAccent);umpButt.position.set(0,.03,.26);
-  const umpBolt=new THREE.Mesh(new THREE.BoxGeometry(.016,.032,.10),new THREE.MeshStandardMaterial({color:0x12171b,roughness:.30,metalness:.58}));umpBolt.position.set(.095,.045,-.13);addBakedGripRibs(umpBolt,{count:3});
-  umpMag=new THREE.Mesh(new THREE.BoxGeometry(.10,.31,.12),polyBlack);umpMag.position.set(0,-.20,-.12);umpMag.rotation.x=.08;
-  umpFlash=new THREE.Mesh(new THREE.SphereGeometry(.072,8,6),new THREE.MeshBasicMaterial({color:0xffd994,transparent:true,opacity:0}));umpFlash.position.set(0,.02,-.77);
-  bakeWeaponGeometry({receivers:[umpReceiver,umpLower],handguards:[umpHandguard],grips:[umpGrip],magazines:[umpMag],rails:[umpTop],stocks:[umpButt],tubes:[umpBarrel]});
-  umpGroup.add(umpReceiver,umpLower,umpHandguard,umpTop,umpBarrel,umpGrip,umpStockRodL,umpStockRodR,umpButt,umpBolt,umpMag,umpFlash);umpGroup.userData.cyclePart=umpBolt;umpGroup.userData.cycleBaseZ=-.13;umpGroup.userData.cycleTravel=.050;addApertureIronSights(umpGroup,umpAccent,{rearZ:.00,frontZ:-.46,sightY:.155,rearMountY:.126,frontMountY:.126,rearRadius:.020,postWidth:.0063,frontEarGap:.018,eyeZ:-.46});registerWeaponHandAnchors(umpGroup,{right:{position:[.022,-.145,.035],rotation:[-.30,-.03,.05]},left:{position:[-.025,-.045,-.38],rotation:[-.18,.05,.02]},reloadLeft:{parent:umpMag,position:[-.035,.02,.01],rotation:[-.12,.06,.15]}});umpGroup.position.set(.30,-.27,-.54);umpGroup.rotation.set(-.06,-.05,0);umpGroup.visible=false;
-
-  machineGunGroup = new THREE.Group();
-  const mgMat=new THREE.MeshStandardMaterial({color:0x252b2e,roughness:.44,metalness:.42}),mgAccent=new THREE.MeshStandardMaterial({color:0x596053,roughness:.76,metalness:.08}),mgDark=new THREE.MeshStandardMaterial({color:0x161b1e,roughness:.52,metalness:.34});
-  const mgReceiver=new THREE.Mesh(new THREE.BoxGeometry(.22,.16,.54),mgMat);mgReceiver.position.set(0,.03,-.18);
-  const mgTopCover=new THREE.Mesh(new THREE.BoxGeometry(.18,.035,.42),mgDark);mgTopCover.position.set(0,.128,-.20);
-  const mgFeedTray=new THREE.Mesh(new THREE.BoxGeometry(.12,.024,.18),mgDark);mgFeedTray.position.set(0,.142,-.17);
-  const mgHandguard=new THREE.Mesh(new THREE.BoxGeometry(.18,.12,.42),mgAccent);mgHandguard.position.set(0,.00,-.62);
-  const mgBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.023,.023,.72,10),mgMat);mgBarrel.rotation.x=Math.PI/2;mgBarrel.position.set(0,.025,-1.00);
-  const mgGasTube=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.48,9),mgDark);mgGasTube.rotation.x=Math.PI/2;mgGasTube.position.set(0,.058,-.82);
-  const mgStock=new THREE.Mesh(new THREE.BoxGeometry(.18,.19,.38),mgAccent);mgStock.position.set(0,-.02,.34);mgStock.rotation.x=-.08;
-  const mgGrip=new THREE.Mesh(new THREE.BoxGeometry(.11,.25,.13),mgDark);mgGrip.position.set(0,-.17,.02);mgGrip.rotation.x=-.25;
-  machineGunBox=new THREE.Mesh(new THREE.BoxGeometry(.20,.28,.22),mgAccent);machineGunBox.position.set(-.045,-.19,-.18);machineGunBox.rotation.z=.03;
-  machineGunBolt=new THREE.Mesh(new THREE.BoxGeometry(.020,.040,.14),new THREE.MeshStandardMaterial({color:0x0f1417,roughness:.26,metalness:.66}));machineGunBolt.position.set(.122,.052,-.18);addBakedGripRibs(machineGunBolt,{count:3});
-  const mgBipodMount=new THREE.Mesh(new THREE.BoxGeometry(.050,.024,.050),mgDark);mgBipodMount.position.set(0,-.020,-.71);
-  const mgBipodL=new THREE.Mesh(new THREE.CylinderGeometry(.008,.008,.20,7),mgDark);mgBipodL.position.set(-.050,-.095,-.71);mgBipodL.rotation.z=.18;mgBipodL.rotation.x=.12;
-  const mgBipodR=mgBipodL.clone();mgBipodR.position.x=.050;mgBipodR.rotation.z=-.18;
-  machineGunFlash=new THREE.Mesh(new THREE.SphereGeometry(.080,8,6),new THREE.MeshBasicMaterial({color:0xffd98d,transparent:true,opacity:0}));machineGunFlash.position.set(0,.025,-1.38);
-  bakeWeaponGeometry({receivers:[mgReceiver,mgTopCover],handguards:[mgHandguard],grips:[mgGrip],magazines:[machineGunBox],rails:[mgFeedTray],stocks:[mgStock],tubes:[mgBarrel,mgGasTube]});
-  machineGunGroup.add(mgReceiver,mgTopCover,mgFeedTray,mgHandguard,mgBarrel,mgGasTube,mgStock,mgGrip,machineGunBox,machineGunBolt,mgBipodMount,mgBipodL,mgBipodR,machineGunFlash);machineGunGroup.userData.cyclePart=machineGunBolt;machineGunGroup.userData.cycleBaseZ=-.18;machineGunGroup.userData.cycleTravel=.060;addApertureIronSights(machineGunGroup,mgDark,{rearZ:.02,frontZ:-.80,sightY:.171,rearMountY:.136,frontMountY:.106,rearRadius:.022,postWidth:.007,frontEarGap:.021,eyeZ:-.42});registerWeaponHandAnchors(machineGunGroup,{right:{position:[.028,-.155,.025],rotation:[-.28,-.03,.05]},left:{position:[-.035,-.055,-.58],rotation:[-.16,.04,.02]},reloadLeft:{parent:machineGunBox,position:[-.055,.015,.015],rotation:[-.08,.08,.20]}});machineGunGroup.position.set(.30,-.29,-.55);machineGunGroup.rotation.set(-.06,-.05,0);machineGunGroup.visible=false;
-
-  shotgunGroup = new THREE.Group();
-  const sgMat=new THREE.MeshStandardMaterial({color:0x2b3135,roughness:.48,metalness:.30});
-  const sgWood=new THREE.MeshStandardMaterial({color:0x5a4636,roughness:.82});
-  const sgReceiver=new THREE.Mesh(new THREE.BoxGeometry(.17,.14,.36),sgMat);sgReceiver.position.set(0,.02,-.14);
-  const sgBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.025,.025,1.00,10),sgMat);sgBarrel.rotation.x=Math.PI/2;sgBarrel.position.set(0,.035,-.72);
-  const sgTube=new THREE.Mesh(new THREE.CylinderGeometry(.018,.018,.80,9),sgMat);sgTube.rotation.x=Math.PI/2;sgTube.position.set(0,-.02,-.64);
-  const sgStock=new THREE.Mesh(new THREE.BoxGeometry(.12,.16,.42),sgWood);sgStock.position.set(0,-.01,.22);sgStock.rotation.x=-.12;
-  const sgGrip=new THREE.Mesh(new THREE.BoxGeometry(.12,.21,.12),sgWood);sgGrip.position.set(0,-.13,.05);sgGrip.rotation.x=-.28;
-  shotgunPump=new THREE.Mesh(new THREE.BoxGeometry(.12,.10,.28),sgWood);shotgunPump.position.set(0,-.02,-.42);
-  shotgunFlash=new THREE.Mesh(new THREE.SphereGeometry(.09,8,6),new THREE.MeshBasicMaterial({color:0xffd181,transparent:true,opacity:0}));shotgunFlash.position.set(0,.035,-1.24);
-  bakeWeaponGeometry({receivers:[sgReceiver],handguards:[shotgunPump],grips:[sgGrip],stocks:[sgStock],tubes:[sgBarrel,sgTube]});
-  shotgunGroup.add(sgReceiver,sgBarrel,sgTube,sgStock,sgGrip,shotgunPump,shotgunFlash);addShotgunBeadSight(shotgunGroup,sgMat,{rearZ:.02,frontZ:-1.04,sightY:.116,rearMountY:.090,frontMountY:.060,eyeZ:-.42});registerWeaponHandAnchors(shotgunGroup,{right:{position:[.025,-.125,.055],rotation:[-.26,-.03,.04]},left:{parent:shotgunPump,position:[-.025,-.015,.00],rotation:[-.12,.04,.02]},reloadLeft:{position:[-.035,-.115,-.12],rotation:[-.58,.08,.15]}});shotgunGroup.position.set(.30,-.28,-.50);shotgunGroup.rotation.set(-.06,-.05,0);shotgunGroup.visible=false;
-
-  semiShotgunGroup = new THREE.Group();
-  const sasMat=new THREE.MeshStandardMaterial({color:0x252d31,roughness:.43,metalness:.30}),sasAccent=new THREE.MeshStandardMaterial({color:0x454f45,roughness:.78,metalness:.08});
-  const sasReceiver=new THREE.Mesh(new THREE.BoxGeometry(.18,.14,.42),sasMat);sasReceiver.position.set(0,.03,-.14);
-  const sasHandguard=new THREE.Mesh(new THREE.BoxGeometry(.13,.10,.28),sasAccent);sasHandguard.position.set(0,-.005,-.42);
-  const sasBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.024,.024,.82,10),sasMat);sasBarrel.rotation.x=Math.PI/2;sasBarrel.position.set(0,.03,-.72);
-  const sasTube=new THREE.Mesh(new THREE.CylinderGeometry(.017,.017,.52,9),sasMat);sasTube.rotation.x=Math.PI/2;sasTube.position.set(0,-.015,-.56);
-  const sasStock=new THREE.Mesh(new THREE.BoxGeometry(.13,.16,.34),sasAccent);sasStock.position.set(0,-.01,.20);sasStock.rotation.x=-.12;
-  const sasGrip=new THREE.Mesh(new THREE.BoxGeometry(.11,.22,.12),sasMat);sasGrip.position.set(0,-.15,.00);sasGrip.rotation.x=-.25;
-  const sasBolt=new THREE.Mesh(new THREE.BoxGeometry(.018,.040,.13),new THREE.MeshStandardMaterial({color:0x12171a,roughness:.28,metalness:.62}));sasBolt.position.set(.095,.045,-.16);addBakedGripRibs(sasBolt,{count:3});
-  semiShotgunMag=new THREE.Mesh(new THREE.BoxGeometry(.12,.18,.12),sasMat);semiShotgunMag.position.set(0,-.14,-.10);
-  semiShotgunFlash=new THREE.Mesh(new THREE.SphereGeometry(.088,8,6),new THREE.MeshBasicMaterial({color:0xffd181,transparent:true,opacity:0}));semiShotgunFlash.position.set(0,.03,-1.13);
-  bakeWeaponGeometry({receivers:[sasReceiver],handguards:[sasHandguard],grips:[sasGrip],magazines:[semiShotgunMag],stocks:[sasStock],tubes:[sasBarrel,sasTube]});
-  semiShotgunGroup.add(sasReceiver,sasHandguard,sasBarrel,sasTube,sasStock,sasGrip,sasBolt,semiShotgunMag,semiShotgunFlash);semiShotgunGroup.userData.cyclePart=sasBolt;semiShotgunGroup.userData.cycleBaseZ=-.16;semiShotgunGroup.userData.cycleTravel=.070;addShotgunGhostRingSight(semiShotgunGroup,sasMat,{rearZ:.04,frontZ:-.94,sightY:.118,rearMountY:.090,frontMountY:.060,rearRadius:.017,postWidth:.006,frontEarGap:.017,eyeZ:-.40});registerWeaponHandAnchors(semiShotgunGroup,{right:{position:[.025,-.135,.015],rotation:[-.27,-.03,.04]},left:{position:[-.025,-.040,-.40],rotation:[-.14,.04,.02]},reloadLeft:{parent:semiShotgunMag,position:[-.035,.015,.01],rotation:[-.10,.07,.15]}});semiShotgunGroup.position.set(.30,-.28,-.50);semiShotgunGroup.rotation.set(-.06,-.05,0);semiShotgunGroup.visible=false;
-
-  battleRifleView=buildBattleRifleView(.80);battleRifleGroup=battleRifleView.group;battleRifleGroup.position.set(.28,-.30,-.65);battleRifleGroup.visible=false;
-  sniperGroup = new THREE.Group();
-  const rifleMat = new THREE.MeshStandardMaterial({color:0x2f3438,roughness:.42,metalness:.40});
-  const stockMat = new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06});
-  const lensMat = new THREE.MeshStandardMaterial({color:0xcfe6ef,roughness:.06,metalness:.08,transparent:true,opacity:.18,emissive:0x10252e,emissiveIntensity:.08,depthWrite:false,side:THREE.DoubleSide});
-  const rearLensMat = new THREE.MeshStandardMaterial({color:0x17242b,roughness:.18,metalness:.12,transparent:true,opacity:.58,emissive:0x081218,emissiveIntensity:.10,depthWrite:true,side:THREE.DoubleSide});
-  const dragReceiver = new THREE.Mesh(new THREE.BoxGeometry(.16,.12,.46),rifleMat);dragReceiver.position.set(0,.04,-.18);
-  const dragHandguard = new THREE.Mesh(new THREE.BoxGeometry(.13,.10,.36),stockMat);dragHandguard.position.set(0,-.005,-.52);
-  const rifleBarrel = new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.84,10),rifleMat);rifleBarrel.rotation.x=Math.PI/2;rifleBarrel.position.set(0,.025,-.82);
-  const stock = new THREE.Mesh(new THREE.BoxGeometry(.13,.17,.42),stockMat);stock.position.set(0,-.01,.23);stock.rotation.x=-.12;
-  const stockComb = new THREE.Mesh(new THREE.BoxGeometry(.11,.06,.22),stockMat);stockComb.position.set(0,.06,.20);stockComb.rotation.x=-.12;
-  const sniperMag=new THREE.Mesh(new THREE.BoxGeometry(.095,.16,.12),rifleMat);sniperMag.position.set(0,-.075,-.16);sniperMag.rotation.x=.10;
-  const scope = new THREE.Mesh(new THREE.CylinderGeometry(.048,.048,.42,18,1,true),rifleMat);scope.rotation.x=Math.PI/2;scope.position.set(0,.14,-.16);
-  const scopeInner=new THREE.Mesh(new THREE.CylinderGeometry(.039,.039,.39,18,1,true),new THREE.MeshStandardMaterial({color:0x090c10,roughness:.96,metalness:.02,side:THREE.BackSide}));scopeInner.rotation.x=Math.PI/2;scopeInner.position.copy(scope.position);
-  const scopeFrontRing=new THREE.Mesh(new THREE.TorusGeometry(.043,.0055,8,20),rifleMat);scopeFrontRing.position.set(0,.14,-.37);
-  const scopeRearRing=new THREE.Mesh(new THREE.TorusGeometry(.043,.0055,8,20),rifleMat);scopeRearRing.position.set(0,.14,.05);
-  const scopeFrontLens = new THREE.Mesh(new THREE.CircleGeometry(.0405,24),lensMat);scopeFrontLens.position.set(0,.14,-.366);
-  const scopeRearLens = new THREE.Mesh(new THREE.CircleGeometry(.0405,28),rearLensMat);scopeRearLens.position.set(0,.14,.046);
-  // Low rail feet stay entirely below the optical bore. The old .055-high
-  // blocks rose into the line of sight and were the rectangular obstruction
-  // visible through both the rear and front of the scope.
-  const scopeMountRear=new THREE.Mesh(new THREE.BoxGeometry(.065,.014,.032),rifleMat);scopeMountRear.position.set(0,.085,-.02);
-  const scopeMountFront=new THREE.Mesh(new THREE.BoxGeometry(.065,.014,.032),rifleMat);scopeMountFront.position.set(0,.085,-.27);
-  const scopeShade=new THREE.Mesh(new THREE.CylinderGeometry(.051,.051,.035,18,1,true),rifleMat);scopeShade.rotation.x=Math.PI/2;scopeShade.position.set(0,.14,-.39);
-  sniperBolt=new THREE.Mesh(new THREE.BoxGeometry(.050,.050,.16),rifleMat);sniperBolt.position.set(.10,.065,-.06);addBakedGripRibs(sniperBolt,{count:3});
-  sniperFlash = new THREE.Mesh(new THREE.SphereGeometry(.085,8,6),new THREE.MeshBasicMaterial({color:0xffe6a6,transparent:true,opacity:0}));sniperFlash.position.set(0,.025,-1.24);
-  bakeWeaponGeometry({receivers:[dragReceiver],handguards:[dragHandguard],magazines:[sniperMag],stocks:[stock],tubes:[rifleBarrel,scope]});
-  sniperGroup.userData.previewScopeParts=[scopeMountRear,scopeMountFront,scope,scopeInner,scopeShade,scopeFrontRing,scopeRearRing,scopeFrontLens,scopeRearLens];
-  sniperGroup.add(dragReceiver,dragHandguard,rifleBarrel,stock,stockComb,sniperMag,scopeMountRear,scopeMountFront,scope,scopeInner,scopeShade,scopeFrontRing,scopeRearRing,scopeFrontLens,scopeRearLens,sniperBolt,sniperFlash);sniperGroup.userData.cyclePart=sniperBolt;sniperGroup.userData.cycleBaseZ=-.06;sniperGroup.userData.cycleTravel=.085;registerWeaponHandAnchors(sniperGroup,{right:{position:[.030,-.120,.035],rotation:[-.25,-.03,.05]},left:{position:[-.030,-.045,-.45],rotation:[-.14,.04,.02]},reloadLeft:{position:[-.035,-.125,-.08],rotation:[-.16,.08,.14]},reloadRight:{parent:sniperBolt,position:[.025,.015,.00],rotation:[-.44,-.12,.25]}});sniperGroup.position.set(.28,-.28,-.48);sniperGroup.rotation.set(-.055,-.05,0);sniperGroup.visible=false;
-
-  grenadeLauncherGroup=new THREE.Group();
-  const glMat=new THREE.MeshStandardMaterial({color:0x273126,roughness:.58,metalness:.26}),glTube=new THREE.Mesh(new THREE.CylinderGeometry(.075,.075,.73,12),glMat);glTube.rotation.x=Math.PI/2;glTube.position.set(0,.01,-.40);
-  const glGrip=new THREE.Mesh(new THREE.BoxGeometry(.15,.28,.18),gripMat);glGrip.position.set(0,-.20,-.10);glGrip.rotation.x=-.12;
-  grenadeLauncherFlash=new THREE.Mesh(new THREE.SphereGeometry(.105,8,6),new THREE.MeshBasicMaterial({color:0xffc66f,transparent:true,opacity:0}));grenadeLauncherFlash.position.set(0,.01,-.80);
-  bakeWeaponGeometry({grips:[glGrip],tubes:[glTube]});
-  grenadeLauncherGroup.add(glTube,glGrip,grenadeLauncherFlash);registerWeaponHandAnchors(grenadeLauncherGroup,{right:{position:[.025,-.145,-.08],rotation:[-.25,-.03,.05]},left:{position:[-.030,-.035,-.45],rotation:[-.14,.04,.02]},reloadLeft:{position:[-.035,-.10,-.31],rotation:[-.48,.10,.16]}});grenadeLauncherGroup.position.set(.30,-.28,-.48);grenadeLauncherGroup.rotation.set(-.06+GRENADE_LAUNCH_PITCH,-.05,0);grenadeLauncherGroup.visible=false;
-
-  rpgGroup=new THREE.Group();
-  const rpgMat=new THREE.MeshStandardMaterial({color:0x4a5443,roughness:.64,metalness:.18}),rpgTube=new THREE.Mesh(new THREE.CylinderGeometry(.068,.068,.95,12),rpgMat);rpgTube.rotation.x=Math.PI/2;rpgTube.position.set(0,.02,-.30);
-  const rpgCone=new THREE.Mesh(new THREE.ConeGeometry(.09,.20,10),new THREE.MeshStandardMaterial({color:0x30372f,roughness:.7}));rpgCone.rotation.x=-Math.PI/2;rpgCone.position.set(0,.02,-.88);
-  rpgFlash=new THREE.Mesh(new THREE.SphereGeometry(.12,8,6),new THREE.MeshBasicMaterial({color:0xffc05e,transparent:true,opacity:0}));rpgFlash.position.set(0,.02,-1.00);
-  bakeWeaponGeometry({tubes:[rpgTube]});
-  rpgGroup.add(rpgTube,rpgCone,rpgFlash);addApertureIronSights(rpgGroup,rpgMat,{rearZ:.07,frontZ:-.70,sightY:.145,rearMountY:.092,frontMountY:.092,eyeZ:-.42,rearRadius:.018,rearTube:.0032,postWidth:.006,frontEarGap:.016});registerWeaponHandAnchors(rpgGroup,{right:{position:[.030,-.080,-.04],rotation:[-.18,-.04,.04]},left:{position:[-.030,-.020,-.52],rotation:[-.10,.04,.02]},reloadLeft:{position:[-.040,-.08,-.34],rotation:[-.34,.08,.14]}});rpgGroup.position.set(.34,-.16,-.46);rpgGroup.rotation.set(-.025,-.07,.015);rpgGroup.visible=false;
-  setupWeaponAttachmentVisuals(akimboLeftGroup,'akimbo1887',{flash:akimboLeftFlash,barrelMesh:akimboLeftBarrel,stockBaseParts:[akimboLeftStock],suppressor:{radius:.028,length:.20,overlap:.018},laser:{x:.050,z:-.46,y:-.060},lightweightStock:{z:.31,y:-.01,width:.115},fastMag:{z:-.10,y:-.17,width:.09}});
-  setupWeaponAttachmentVisuals(akimboRightGroup,'akimbo1887',{flash:akimboRightFlash,barrelMesh:akimboRightBarrel,stockBaseParts:[akimboRightStock],suppressor:{radius:.028,length:.20,overlap:.018},laser:{x:.050,z:-.46,y:-.060},lightweightStock:{z:.31,y:-.01,width:.115},fastMag:{z:-.10,y:-.17,width:.09}});
-  setupWeaponAttachmentVisuals(pistolGroup,'pistol',{flash:pistolFlash,mag:pistolMag,redDot:{sightY:.140,z:-.10,mountY:.110,eyeZ:-.46},suppressor:{radius:.030,length:.20,overlap:.020},compensator:{radius:.030,length:.09,overlap:.014},laser:{x:.045,z:-.25,y:-.065,scale:.78},fastMag:{width:.095,depth:.115,y:.07}});
-  setupWeaponAttachmentVisuals(assaultGroup,'assault',{flash:assaultFlash,mag:assaultMag,barrelMesh:arBarrel,stockBaseParts:[scarStockStem,scarStock],redDot:{sightY:.165,z:-.16,mountY:.130,eyeZ:-.39},holoSight:{sightY:.180,z:-.15,mountY:.130,eyeZ:-.39},combatOptic:{sightY:.192,z:-.11,mountY:.130,eyeZ:-.40,length:.20},thermalScope4x:{sightY:.192,z:-.11,mountY:.130,eyeZ:-.40,length:.20,radius:.039},thermalScope6x:{sightY:.198,z:-.10,mountY:.130,eyeZ:-.40,length:.22,radius:.041,long:true},suppressor:{radius:.032,length:.27,overlap:.022},compensator:{radius:.030,length:.11,overlap:.016},verticalGrip:{z:-.55,y:-.105},angledGrip:{z:-.54,y:-.105},laser:{x:.065,z:-.55,y:-.105},lightweightStock:{z:.43,y:-.01,width:.145},fullStock:{z:.41,y:-.01,width:.155},compactStock:{z:.12,y:.01,width:.105},fastMag:{width:.115,depth:.165,y:.08}});
-  setupWeaponAttachmentVisuals(umpGroup,'ump',{flash:umpFlash,mag:umpMag,barrelMesh:umpBarrel,stockBaseParts:[umpStockRodL,umpStockRodR,umpButt],redDot:{sightY:.155,z:-.15,mountY:.124,eyeZ:-.40},holoSight:{sightY:.171,z:-.14,mountY:.124,eyeZ:-.40},thermalScope4x:{sightY:.174,z:-.11,mountY:.124,eyeZ:-.40,length:.19,radius:.038},thermalScope6x:{sightY:.180,z:-.10,mountY:.124,eyeZ:-.40,length:.21,radius:.040,long:true},suppressor:{radius:.032,length:.22,overlap:.020},compensator:{radius:.030,length:.09,overlap:.015},verticalGrip:{z:-.40,y:-.105},angledGrip:{z:-.39,y:-.105},laser:{x:.060,z:-.39,y:-.100},lightweightStock:{z:.27,y:.03,width:.125},fullStock:{z:.27,y:.015,width:.135},compactStock:{z:.12,y:.035,width:.095},fastMag:{width:.105,depth:.125,y:.09}});
-  setupWeaponAttachmentVisuals(machineGunGroup,'machineGun',{flash:machineGunFlash,mag:machineGunBox,barrelMesh:mgBarrel,stockBaseParts:[mgStock],bipodBaseParts:[mgBipodMount,mgBipodL,mgBipodR],redDot:{sightY:.171,z:-.20,mountY:.150,eyeZ:-.405},holoSight:{sightY:.190,z:-.19,mountY:.150,eyeZ:-.405},combatOptic:{sightY:.202,z:-.14,mountY:.150,eyeZ:-.415,length:.21},thermalScope4x:{sightY:.202,z:-.14,mountY:.150,eyeZ:-.415,length:.21,radius:.040},thermalScope6x:{sightY:.208,z:-.13,mountY:.150,eyeZ:-.415,length:.23,radius:.042,long:true},suppressor:{radius:.035,length:.30,overlap:.025},compensator:{radius:.033,length:.12,overlap:.018},verticalGrip:{z:-.61,y:-.12},angledGrip:{z:-.60,y:-.12},laser:{x:.070,z:-.60,y:-.115},lightweightStock:{z:.46,y:-.02,width:.175},fullStock:{z:.45,y:-.025,width:.185},fastMag:{width:.19,depth:.22,y:.08}});
-  setupWeaponAttachmentVisuals(shotgunGroup,'shotgun',{flash:shotgunFlash,barrelMesh:sgBarrel,redDot:{sightY:.116,z:-.12,mountY:.090,eyeZ:-.42},thermalScope4x:{sightY:.128,z:-.10,mountY:.090,eyeZ:-.42,length:.18,radius:.035},thermalScope6x:{sightY:.134,z:-.09,mountY:.090,eyeZ:-.42,length:.20,radius:.037,long:true},suppressor:{radius:.029,length:.22,overlap:.018},shotgunChoke:{radius:.029,length:.10,overlap:.018},laser:{x:.055,z:-.48,y:-.055}});
-  setupWeaponAttachmentVisuals(semiShotgunGroup,'semiShotgun',{flash:semiShotgunFlash,mag:semiShotgunMag,barrelMesh:sasBarrel,redDot:{sightY:.118,z:-.14,mountY:.095,eyeZ:-.39},holoSight:{sightY:.142,z:-.13,mountY:.095,eyeZ:-.39},combatOptic:{sightY:.151,z:-.08,mountY:.095,eyeZ:-.40,length:.19},shotgunChoke:{radius:.028,length:.10,overlap:.018},laser:{x:.055,z:-.43,y:-.075},fastMag:{width:.125,depth:.125,y:.05}});
-  setupWeaponAttachmentVisuals(sniperGroup,'sniper',{flash:sniperFlash,mag:sniperMag,barrelMesh:rifleBarrel,precisionScope6x:{z:-.16,y:.14,radius:.052,kind:'precision'},longRangeScope8x:{z:-.16,y:.14,radius:.052,kind:'long'},thermalScope4x:{z:-.16,y:.14,radius:.052,kind:'thermal'},thermalScope6x:{z:-.16,y:.14,radius:.052,kind:'thermal-long'},laser:{x:.050,z:-.50,y:-.070},suppressor:{radius:.032,length:.30,overlap:.022},fastMag:{width:.10,depth:.125,y:.04}});
-  setupWeaponAttachmentVisuals(rpgGroup,'rpg',{flash:rpgFlash,thermalScope4x:{sightY:.180,z:-.12,mountY:.092,eyeZ:-.42,length:.19,radius:.039},thermalScope6x:{sightY:.188,z:-.11,mountY:.092,eyeZ:-.42,length:.21,radius:.041,long:true},laser:{x:.065,z:-.38,y:-.060,scale:1.05}});
+  weaponViews=Object.fromEntries(WEAPON_ORDER.filter(id=>id!=='akimbo1887').map(id=>[id,buildArsenalWeapon(id,id==='battleRifle'?.80:1)]));
+  pistolGroup=weaponViews.pistol.group;pistolGroup.visible=false;pistolFlash=weaponViews.pistol.flash;pistolMag=weaponViews.pistol.mag;
+  assaultGroup=weaponViews.assault.group;assaultGroup.visible=false;assaultFlash=weaponViews.assault.flash;assaultMag=weaponViews.assault.mag;
+  umpGroup=weaponViews.ump.group;umpGroup.visible=false;umpFlash=weaponViews.ump.flash;umpMag=weaponViews.ump.mag;
+  machineGunGroup=weaponViews.machineGun.group;machineGunGroup.visible=false;machineGunFlash=weaponViews.machineGun.flash;machineGunBox=weaponViews.machineGun.mag;
+  shotgunGroup=weaponViews.shotgun.group;shotgunGroup.visible=false;shotgunFlash=weaponViews.shotgun.flash;
+  semiShotgunGroup=weaponViews.semiShotgun.group;semiShotgunGroup.visible=false;semiShotgunFlash=weaponViews.semiShotgun.flash;semiShotgunMag=weaponViews.semiShotgun.mag;
+  battleRifleGroup=weaponViews.battleRifle.group;battleRifleGroup.visible=false;
+  sniperGroup=weaponViews.sniper.group;sniperGroup.visible=false;sniperFlash=weaponViews.sniper.flash;
+  grenadeLauncherGroup=weaponViews.grenadeLauncher.group;grenadeLauncherGroup.visible=false;grenadeLauncherFlash=weaponViews.grenadeLauncher.flash;
+  rpgGroup=weaponViews.rpg.group;rpgGroup.visible=false;rpgFlash=weaponViews.rpg.flash;
+  battleRifleView=weaponViews.battleRifle;shotgunPump=weaponViews.shotgun.pump;sniperBolt=weaponViews.sniper.bolt;machineGunBolt=weaponViews.machineGun.bolt;
+  weaponViews.akimbo1887=buildArsenalWeapon('akimbo1887');weaponViews.akimboLeft=buildArsenalWeapon('akimbo1887');
+  akimboLeftGroup=weaponViews.akimboLeft.group;akimboRightGroup=weaponViews.akimbo1887.group;akimboLeftFlash=weaponViews.akimboLeft.flash;akimboRightFlash=weaponViews.akimbo1887.flash;akimboLeftLever=weaponViews.akimboLeft.lever;akimboRightLever=weaponViews.akimbo1887.lever;
+  akimboLeftGroup.visible=akimboRightGroup.visible=false;
   syncLocalAttachmentVisuals();
-  camera.add(pistolGroup,akimboLeftGroup,akimboRightGroup,assaultGroup,umpGroup,machineGunGroup,shotgunGroup,semiShotgunGroup,battleRifleGroup,sniperGroup,grenadeLauncherGroup,rpgGroup);initFirstPersonHandRig();
+  camera.add(...Object.values(weaponViews).map(v=>v.group));initFirstPersonHandRig();
   // First-person traversal view model. Keep this geometry entirely in camera
   // space and well in front of the near plane. The old capsule arms extended
   // back toward the eye and could fill the screen during mantle/vault motion,
@@ -3358,8 +3197,8 @@ function handleMessage(m){
   if(m.t==='chat'){receiveChatMessage(m);return;}
   if(m.t==='loadout'){applyAuthoritativeLoadout(m);return;}
   if(m.t==='weapon'){const r=remotes.get(m.id);if(r){r.weapon=m.weapon||'pistol';r.swapStartedAt=performance.now();syncRemoteWeapon(r);}return;}
-  if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=serverNow();r.reloadWeapon=m.weapon||r.weapon;if(r.reloadWeapon!=='shotgun'&&r.reloadUntil)playSpatialCue(reloadSoundId(r.reloadWeapon),r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
-  if(m.t==='reloadShell'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=r.reloadUntil?serverNow():0;r.reloadWeapon=r.reloadUntil?'shotgun':'';playSpatialCue('reloadShotgun',r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
+  if(m.t==='reload'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadWeapon=m.weapon||r.weapon;r.reloadStartedAt=r.reloadUntil?r.reloadUntil-resolveWeaponRules(worldSettings,r.reloadWeapon,remoteAttachmentsForWeapon(r,r.reloadWeapon)).reloadMs:0;if(r.reloadWeapon!=='shotgun'&&r.reloadUntil)playSpatialCue(reloadSoundId(r.reloadWeapon),r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72,{fitDuration:Math.max(.05,(r.reloadUntil-serverNow())/1000),maxDuration:Math.max(.05,(r.reloadUntil-serverNow())/1000)});}return;}
+  if(m.t==='reloadShell'){const r=remotes.get(m.id);if(r){r.reloadUntil=Number(m.reloadAt)||0;r.reloadStartedAt=r.reloadUntil?serverNow():0;r.reloadWeapon=r.reloadUntil?'shotgun':'';if(Number.isFinite(r.ammo.shotgun))r.ammo.shotgun++;playSpatialCue('reloadShotgun',r.group.position.x,r.group.position.y+1,r.group.position.z,34,.72);}return;}
   if(m.t==='god'){if(typeof m.custom==='boolean')matchCustom=m.custom;if(m.id===clientId){godMode=!!m.enabled;diagnosticsVisualEvent('god_mode_changed',{id:String(clientId||''),self:true,enabled:godMode,team:String(myTeam||'')});syncLobby();syncPauseContext();if(shell.panel===SHELL_PANEL.LOADOUT)syncMatchLoadoutEditor();}else{const row=lobbyParticipants.get(String(m.id||''));if(row)row.godMode=!!m.enabled;const r=remotes.get(m.id);if(r){r.godMode=!!m.enabled;if(r.godRing)r.godRing.visible=r.godMode;diagnosticsVisualEvent('god_mode_changed',{id:String(r.id||''),self:false,enabled:r.godMode,team:String(r.team||''),role:gameplayRelation(r.team,r.bot)});}}renderAdminPlayers();syncLobby();return;}
   if(m.t==='adminRole'){if(m.id===clientId){isMatchAdmin=!!m.enabled;syncPauseContext();if(!isMatchAdmin&&shell.panel===SHELL_PANEL.ADMIN)closeAdminPanel();showToast(isMatchAdmin?'ADMIN PRIVILEGES GRANTED':'ADMIN PRIVILEGES REMOVED');}else{const row=lobbyParticipants.get(String(m.id||''));if(row)row.admin=!!m.enabled;const r=remotes.get(m.id);if(r)r.admin=!!m.enabled;}renderAdminPlayers();syncLobby();return;}
   if(m.t==='teamQueued'){if(m.id===clientId){pendingTeam=m.pendingTeam||'';syncPauseContext();showToast(pendingTeam?`TEAM SWITCH QUEUED · ${teamLabel(pendingTeam)}`:'TEAM SWITCH CANCELED');syncLobby();}return;}
@@ -3581,55 +3420,18 @@ function makeRemote(player){
   const armL=new THREE.Mesh(new THREE.CapsuleGeometry(.105,.52,4,7),skin);const armR=armL.clone();armL.position.set(-.44,1.05,0);armR.position.set(.44,1.05,0);armL.rotation.z=-.12;armR.rotation.z=.12;
   const legMat=new THREE.MeshStandardMaterial({color:(player.zombie||player.infected)?0x34332d:player.bot?0x414b52:0x27333d,roughness:.92});
   const legL=new THREE.Mesh(new THREE.CapsuleGeometry(.12,.48,4,7),legMat);const legR=legL.clone();legL.position.set(-.18,.38,0);legR.position.set(.18,.38,0);
-  const gunMat=new THREE.MeshStandardMaterial({color:0x252a30,roughness:.5,metalness:.25}),polyMat=new THREE.MeshStandardMaterial({color:0x31373c,roughness:.76,metalness:.10}),woodMat=new THREE.MeshStandardMaterial({color:0x654832,roughness:.84,metalness:.04}),lensMat=new THREE.MeshStandardMaterial({color:0xcfe6ef,roughness:.06,metalness:.08,transparent:true,opacity:.16,emissive:0x10252e,emissiveIntensity:.07,depthWrite:false,side:THREE.DoubleSide});
-  const pistol=new THREE.Group();
-  const pSlide=new THREE.Mesh(new THREE.BoxGeometry(.12,.075,.30),gunMat);pSlide.position.set(0,.04,.02);
-  const pFrame=new THREE.Mesh(new THREE.BoxGeometry(.11,.065,.18),polyMat);pFrame.position.set(0,0,.06);
-  const pBarrel=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.10,8),gunMat);pBarrel.rotation.x=Math.PI/2;pBarrel.position.set(0,.03,-.13);
-  const pGrip=new THREE.Mesh(new THREE.BoxGeometry(.10,.18,.10),polyMat);pGrip.position.set(0,-.10,.15);pGrip.rotation.x=-.30;const pMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.065,.13,.075),gunMat.clone());pMagRemote.position.set(0,-.145,.15);pMagRemote.rotation.x=-.30;
-  bakeWeaponGeometry({receivers:[pSlide,pFrame],grips:[pGrip],magazines:[pMagRemote],tubes:[pBarrel],detail:.55});pistol.add(pSlide,pFrame,pBarrel,pGrip,pMagRemote);
-  const akimbo1887=new THREE.Group(),akL=new THREE.Group(),akR=new THREE.Group();
-  const buildRemote1887=(gun)=>{const recv=new THREE.Mesh(new THREE.BoxGeometry(.11,.09,.24),gunMat.clone()),brl=new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,.54,8),gunMat.clone()),tube=new THREE.Mesh(new THREE.CylinderGeometry(.011,.011,.42,8),gunMat.clone()),fore=new THREE.Mesh(new THREE.BoxGeometry(.09,.07,.18),woodMat.clone()),grip=new THREE.Mesh(new THREE.BoxGeometry(.09,.15,.09),woodMat.clone()),stock=new THREE.Mesh(new THREE.BoxGeometry(.08,.10,.22),woodMat.clone()),lever=new THREE.Mesh(new THREE.TorusGeometry(.045,.008,5,14),gunMat.clone());recv.position.z=-.10;brl.rotation.x=Math.PI/2;brl.position.set(0,.02,-.43);tube.rotation.x=Math.PI/2;tube.position.set(0,-.01,-.39);fore.position.set(0,-.005,-.26);grip.position.set(0,-.09,.04);grip.rotation.x=-.30;stock.position.set(0,-.005,.16);stock.rotation.x=-.10;lever.rotation.x=Math.PI/2;lever.scale.set(1,.7,1);lever.position.set(0,-.07,.01);bakeWeaponGeometry({receivers:[recv],handguards:[fore],grips:[grip],stocks:[stock],tubes:[brl,tube],detail:.55});gun.add(recv,brl,tube,fore,grip,stock,lever);return{brl,stock};};
-  const akLParts=buildRemote1887(akL),akRParts=buildRemote1887(akR);akL.position.set(-.32,1.08,-.25);akR.position.set(.32,1.08,-.25);akL.rotation.set(-.08,.14,-.03);akR.rotation.set(-.08,-.14,.03);akimbo1887.add(akL,akR);
-  const assault=new THREE.Group();
-  const arRecv=new THREE.Mesh(new THREE.BoxGeometry(.12,.085,.26),gunMat.clone()),arHand=new THREE.Mesh(new THREE.BoxGeometry(.11,.07,.20),new THREE.MeshStandardMaterial({color:0x7a6e5a,roughness:.82,metalness:.05})),arBar=new THREE.Mesh(new THREE.CylinderGeometry(.013,.013,.34,8),gunMat.clone()),arStock=new THREE.Mesh(new THREE.BoxGeometry(.10,.10,.16),new THREE.MeshStandardMaterial({color:0x61574a,roughness:.74,metalness:.08})),arGrip=new THREE.Mesh(new THREE.BoxGeometry(.08,.16,.08),gunMat.clone());arRecv.position.set(0,.01,.16);arHand.position.set(0,-.01,-.04);arBar.rotation.x=Math.PI/2;arBar.position.set(0,-.01,-.22);arStock.position.set(0,-.03,.35);arGrip.position.set(0,-.10,.29);arGrip.rotation.x=-.24;const arMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.08,.18,.10),new THREE.MeshStandardMaterial({color:0x676f75,roughness:.62,metalness:.18}));arMagRemote.position.set(0,-.10,.20);arMagRemote.rotation.x=.18;bakeWeaponGeometry({receivers:[arRecv],handguards:[arHand],grips:[arGrip],magazines:[arMagRemote],stocks:[arStock],tubes:[arBar],detail:.55});assault.add(arRecv,arHand,arBar,arStock,arGrip,arMagRemote);assault.visible=false;
-  const ump=new THREE.Group();
-  const uRecv=new THREE.Mesh(new THREE.BoxGeometry(.12,.10,.24),gunMat.clone()),uFront=new THREE.Mesh(new THREE.BoxGeometry(.10,.07,.14),polyMat.clone()),uBar=new THREE.Mesh(new THREE.CylinderGeometry(.013,.013,.16,8),gunMat.clone()),uGrip=new THREE.Mesh(new THREE.BoxGeometry(.08,.16,.08),polyMat.clone()),uStock=new THREE.Mesh(new THREE.BoxGeometry(.08,.08,.14),new THREE.MeshStandardMaterial({color:0x454b50,roughness:.68,metalness:.12}));uRecv.position.set(0,.01,.16);uFront.position.set(0,-.02,.01);uBar.rotation.x=Math.PI/2;uBar.position.set(0,-.01,-.14);uGrip.position.set(0,-.09,.24);uGrip.rotation.x=-.28;uStock.position.set(0,-.01,.35);const uMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.08,.19,.09),polyMat.clone());uMagRemote.position.set(0,-.10,.17);uMagRemote.rotation.x=.10;bakeWeaponGeometry({receivers:[uRecv],handguards:[uFront],grips:[uGrip],magazines:[uMagRemote],stocks:[uStock],tubes:[uBar],detail:.55});ump.add(uRecv,uFront,uBar,uGrip,uStock,uMagRemote);ump.visible=false;
-
-  const machineGun=new THREE.Group();
-  const mgRecvRemote=new THREE.Mesh(new THREE.BoxGeometry(.14,.10,.30),gunMat.clone()),mgHandRemote=new THREE.Mesh(new THREE.BoxGeometry(.12,.08,.24),new THREE.MeshStandardMaterial({color:0x596053,roughness:.76,metalness:.08})),mgBarRemote=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.42,8),gunMat.clone()),mgGasRemote=new THREE.Mesh(new THREE.CylinderGeometry(.009,.009,.28,8),polyMat.clone()),mgStockRemote=new THREE.Mesh(new THREE.BoxGeometry(.12,.12,.22),new THREE.MeshStandardMaterial({color:0x596053,roughness:.76,metalness:.08})),mgGripRemote=new THREE.Mesh(new THREE.BoxGeometry(.08,.17,.09),polyMat.clone()),mgBoxRemote=new THREE.Mesh(new THREE.BoxGeometry(.14,.18,.14),new THREE.MeshStandardMaterial({color:0x596053,roughness:.76,metalness:.08}));mgRecvRemote.position.set(0,.01,.16);mgHandRemote.position.set(0,-.01,-.08);mgBarRemote.rotation.x=Math.PI/2;mgBarRemote.position.set(0,-.01,-.32);mgGasRemote.rotation.x=Math.PI/2;mgGasRemote.position.set(0,.02,-.24);mgStockRemote.position.set(0,-.03,.39);mgGripRemote.position.set(0,-.10,.27);mgGripRemote.rotation.x=-.24;mgBoxRemote.position.set(-.025,-.10,.15);
-  const mgCarryRearRemoteL=new THREE.Mesh(new THREE.BoxGeometry(.010,.042,.016),polyMat.clone());mgCarryRearRemoteL.position.set(-.030,.080,.08);
-  const mgCarryRearRemoteR=mgCarryRearRemoteL.clone();mgCarryRearRemoteR.position.x=.030;
-  const mgCarryFrontRemoteL=new THREE.Mesh(new THREE.BoxGeometry(.010,.038,.016),polyMat.clone());mgCarryFrontRemoteL.position.set(-.030,.078,-.05);
-  const mgCarryFrontRemoteR=mgCarryFrontRemoteL.clone();mgCarryFrontRemoteR.position.x=.030;
-  const mgCarryBarRemote=new THREE.Mesh(new THREE.BoxGeometry(.090,.012,.16),polyMat.clone());mgCarryBarRemote.position.set(0,.104,.01);
-  bakeWeaponGeometry({receivers:[mgRecvRemote],handguards:[mgHandRemote],grips:[mgGripRemote],magazines:[mgBoxRemote],rails:[mgCarryBarRemote],stocks:[mgStockRemote],tubes:[mgBarRemote,mgGasRemote],detail:.55});machineGun.add(mgRecvRemote,mgHandRemote,mgBarRemote,mgGasRemote,mgStockRemote,mgGripRemote,mgBoxRemote,mgCarryRearRemoteL,mgCarryRearRemoteR,mgCarryFrontRemoteL,mgCarryFrontRemoteR,mgCarryBarRemote);machineGun.visible=false;
-  const shotgun=new THREE.Group();
-  const sgRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.09,.24),gunMat.clone()),sgBar=new THREE.Mesh(new THREE.CylinderGeometry(.015,.015,.58,8),gunMat.clone()),sgTube=new THREE.Mesh(new THREE.CylinderGeometry(.011,.011,.46,8),gunMat.clone()),sgStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.24),woodMat.clone()),sgGrip=new THREE.Mesh(new THREE.BoxGeometry(.09,.15,.09),woodMat.clone());sgRecv.position.set(0,.01,.23);sgBar.rotation.x=Math.PI/2;sgBar.position.set(0,.02,-.09);sgTube.rotation.x=Math.PI/2;sgTube.position.set(0,-.03,-.04);sgStock.position.set(0,-.03,.41);sgGrip.position.set(0,-.11,.33);sgGrip.rotation.x=-.26;const sgPumpRemote=new THREE.Mesh(new THREE.BoxGeometry(.09,.07,.16),woodMat.clone());sgPumpRemote.position.set(0,-.05,.09);bakeWeaponGeometry({receivers:[sgRecv],handguards:[sgPumpRemote],grips:[sgGrip],stocks:[sgStock],tubes:[sgBar,sgTube],detail:.55});shotgun.add(sgRecv,sgBar,sgTube,sgStock,sgGrip,sgPumpRemote);shotgun.visible=false;
-  const semiShotgun=new THREE.Group();
-  const ssRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.09,.24),gunMat.clone()),ssHand=new THREE.Mesh(new THREE.BoxGeometry(.09,.07,.16),new THREE.MeshStandardMaterial({color:0x4d5548,roughness:.78,metalness:.08})),ssBar=new THREE.Mesh(new THREE.CylinderGeometry(.014,.014,.48,8),gunMat.clone()),ssTube=new THREE.Mesh(new THREE.CylinderGeometry(.010,.010,.30,8),gunMat.clone()),ssStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.20),new THREE.MeshStandardMaterial({color:0x4d5548,roughness:.78,metalness:.08})),ssGrip=new THREE.Mesh(new THREE.BoxGeometry(.08,.15,.08),gunMat.clone());ssRecv.position.set(0,.01,.22);ssHand.position.set(0,-.04,.06);ssBar.rotation.x=Math.PI/2;ssBar.position.set(0,.01,-.06);ssTube.rotation.x=Math.PI/2;ssTube.position.set(0,-.03,0);ssStock.position.set(0,-.03,.41);ssGrip.position.set(0,-.11,.33);ssGrip.rotation.x=-.25;const ssMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.08,.12,.09),gunMat.clone());ssMagRemote.position.set(0,-.09,.25);bakeWeaponGeometry({receivers:[ssRecv],handguards:[ssHand],grips:[ssGrip],magazines:[ssMagRemote],stocks:[ssStock],tubes:[ssBar,ssTube],detail:.55});semiShotgun.add(ssRecv,ssHand,ssBar,ssTube,ssStock,ssGrip,ssMagRemote);semiShotgun.visible=false;
-
-  const battleRifleView=buildBattleRifleView(),battleRifle=battleRifleView.group;battleRifle.scale.setScalar(.56);battleRifle.visible=false;
-  const sniper=new THREE.Group();
-  const snRecv=new THREE.Mesh(new THREE.BoxGeometry(.11,.08,.30),gunMat.clone()),snHand=new THREE.Mesh(new THREE.BoxGeometry(.08,.07,.22),new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06})),snBar=new THREE.Mesh(new THREE.CylinderGeometry(.012,.012,.56,8),gunMat.clone()),snStock=new THREE.Mesh(new THREE.BoxGeometry(.09,.12,.24),new THREE.MeshStandardMaterial({color:0x5a5e4a,roughness:.84,metalness:.06})),snScope=new THREE.Mesh(new THREE.CylinderGeometry(.026,.026,.18,14,1,true),gunMat.clone());snRecv.position.set(0,.01,.27);snHand.position.set(0,-.03,.05);snBar.rotation.x=Math.PI/2;snBar.position.set(0,.01,-.11);snStock.position.set(0,-.03,.47);snScope.rotation.x=Math.PI/2;snScope.position.set(0,.08,.27);const snScopeInner=new THREE.Mesh(new THREE.CylinderGeometry(.020,.020,.17,14,1,true),new THREE.MeshStandardMaterial({color:0x090c10,roughness:.96,metalness:.02,side:THREE.BackSide}));snScopeInner.rotation.x=Math.PI/2;snScopeInner.position.copy(snScope.position);const snFrontRing=new THREE.Mesh(new THREE.TorusGeometry(.0225,.0035,8,18),gunMat.clone());snFrontRing.position.set(0,.08,.18);const snRearRing=new THREE.Mesh(new THREE.TorusGeometry(.0225,.0035,8,18),gunMat.clone());snRearRing.position.set(0,.08,.36);const snFrontLens=new THREE.Mesh(new THREE.CircleGeometry(.021,18),lensMat.clone());snFrontLens.position.set(0,.08,.183);const snRearLens=new THREE.Mesh(new THREE.CircleGeometry(.021,18),lensMat.clone());snRearLens.position.set(0,.08,.357);const snScopeMountRear=new THREE.Mesh(new THREE.BoxGeometry(.042,.042,.020),gunMat.clone());snScopeMountRear.position.set(0,.045,.33);const snScopeMountFront=new THREE.Mesh(new THREE.BoxGeometry(.042,.042,.020),gunMat.clone());snScopeMountFront.position.set(0,.045,.22);const sniperBoltRemote=new THREE.Mesh(new THREE.BoxGeometry(.034,.034,.10),gunMat.clone());sniperBoltRemote.position.set(.07,.02,.33);const snMagRemote=new THREE.Mesh(new THREE.BoxGeometry(.07,.11,.085),gunMat.clone());snMagRemote.position.set(0,-.075,.26);snMagRemote.rotation.x=.08;bakeWeaponGeometry({receivers:[snRecv],handguards:[snHand],magazines:[snMagRemote],stocks:[snStock],tubes:[snBar,snScope],detail:.55});sniper.add(snRecv,snHand,snBar,snStock,snScopeMountRear,snScopeMountFront,snScope,snScopeInner,snFrontRing,snRearRing,snFrontLens,snRearLens,sniperBoltRemote,snMagRemote);sniper.visible=false;
-  const grenadeLauncher=new THREE.Mesh(new THREE.CylinderGeometry(.065,.065,.68,12),gunMat.clone());addBakedTubeBands(grenadeLauncher,{count:3});grenadeLauncher.rotation.x=Math.PI/2+GRENADE_LAUNCH_PITCH;grenadeLauncher.position.set(.45,1.08,-.40);grenadeLauncher.visible=false;
-  const rpg=new THREE.Group(),rpgTubeRemote=new THREE.Mesh(new THREE.CylinderGeometry(.06,.06,.88,12),gunMat.clone());addBakedTubeBands(rpgTubeRemote,{count:3});rpgTubeRemote.rotation.x=Math.PI/2;rpg.add(rpgTubeRemote);rpg.position.set(.38,1.42,-.43);rpg.visible=false;
+  // Keep lightweight pose roots for inactive weapons. Build a player's actual
+  // weapon only when equipped; full arsenals per bot waste memory on phones.
+  const views={},roots=Object.fromEntries(WEAPON_ORDER.map(id=>[id,new THREE.Group()]));
+  const {pistol,akimbo1887,assault,ump,machineGun,shotgun,semiShotgun,battleRifle,sniper,grenadeLauncher,rpg}=roots;
+  const akL=new THREE.Group(),akR=new THREE.Group();akimbo1887.add(akL,akR);
+  const battleRifleView=null;
   const godRing=new THREE.Mesh(new THREE.TorusGeometry(.42,.035,6,28),new THREE.MeshBasicMaterial({color:0xffdd67,transparent:true,opacity:.9}));godRing.rotation.x=Math.PI/2;godRing.position.y=2.03;godRing.visible=!!player.godMode;
-  setupWeaponAttachmentVisuals(pistol,'pistol',{muzzle:{x:0,y:.03,z:-.18},mag:pMagRemote,redDot:{sightY:.078,z:.05,mountY:.052,eyeZ:-.09},suppressor:{radius:.019,length:.13,overlap:.012},compensator:{radius:.018,length:.055,overlap:.010},laser:{x:.030,z:-.08,y:-.035,scale:.55},fastMag:{width:.068,depth:.078,y:.035}});
-  setupWeaponAttachmentVisuals(akL,'akimbo1887',{muzzle:{x:0,y:.02,z:-.70},barrelMesh:akLParts.brl,stockBaseParts:[akLParts.stock],suppressor:{radius:.018,length:.12,overlap:.010},laser:{x:.030,z:-.28,y:-.035,scale:.55},lightweightStock:{z:.22,y:-.01,width:.075},fastMag:{z:-.02,y:-.10,width:.065}});
-  setupWeaponAttachmentVisuals(akR,'akimbo1887',{muzzle:{x:0,y:.02,z:-.70},barrelMesh:akRParts.brl,stockBaseParts:[akRParts.stock],suppressor:{radius:.018,length:.12,overlap:.010},laser:{x:.030,z:-.28,y:-.035,scale:.55},lightweightStock:{z:.22,y:-.01,width:.075},fastMag:{z:-.02,y:-.10,width:.065}});
-  setupWeaponAttachmentVisuals(assault,'assault',{muzzle:{x:0,y:-.01,z:-.39},mag:arMagRemote,barrelMesh:arBar,stockBaseParts:[arStock],redDot:{sightY:.080,z:.105,mountY:.052,eyeZ:-.09},holoSight:{sightY:.094,z:.105,mountY:.052,eyeZ:-.09},combatOptic:{sightY:.106,z:.145,mountY:.052,eyeZ:-.09,length:.125},thermalScope4x:{sightY:.106,z:.145,mountY:.052,eyeZ:-.09,length:.125,radius:.025},thermalScope6x:{sightY:.110,z:.150,mountY:.052,eyeZ:-.09,length:.140,radius:.027,long:true},suppressor:{radius:.020,length:.15,overlap:.013},compensator:{radius:.019,length:.065,overlap:.010},verticalGrip:{z:-.07,y:-.10},angledGrip:{z:-.06,y:-.095},laser:{x:.040,z:-.06,y:-.090,scale:.65},lightweightStock:{z:.41,y:-.03,width:.10},fullStock:{z:.39,y:-.03,width:.11},compactStock:{z:.30,y:-.01,width:.075},fastMag:{width:.082,depth:.10,y:.05}});
-  setupWeaponAttachmentVisuals(ump,'ump',{muzzle:{x:0,y:-.01,z:-.22},mag:uMagRemote,barrelMesh:uBar,stockBaseParts:[uStock],redDot:{sightY:.078,z:.095,mountY:.050,eyeZ:-.09},holoSight:{sightY:.092,z:.095,mountY:.050,eyeZ:-.09},thermalScope4x:{sightY:.094,z:.105,mountY:.050,eyeZ:-.09,length:.120,radius:.024},thermalScope6x:{sightY:.098,z:.110,mountY:.050,eyeZ:-.09,length:.135,radius:.026,long:true},suppressor:{radius:.020,length:.13,overlap:.012},compensator:{radius:.019,length:.055,overlap:.010},verticalGrip:{z:-.01,y:-.10},angledGrip:{z:0,y:-.095},laser:{x:.040,z:0,y:-.090,scale:.65},lightweightStock:{z:.39,y:-.01,width:.085},fullStock:{z:.37,y:-.015,width:.095},compactStock:{z:.29,y:0,width:.07},fastMag:{width:.082,depth:.09,y:.05}});
-  setupWeaponAttachmentVisuals(machineGun,'machineGun',{muzzle:{x:0,y:-.01,z:-.53},mag:mgBoxRemote,barrelMesh:mgBarRemote,stockBaseParts:[mgStockRemote],redDot:{sightY:.090,z:.110,mountY:.062,eyeZ:-.10},holoSight:{sightY:.106,z:.110,mountY:.062,eyeZ:-.10},combatOptic:{sightY:.119,z:.150,mountY:.062,eyeZ:-.10,length:.135},thermalScope4x:{sightY:.119,z:.150,mountY:.062,eyeZ:-.10,length:.135,radius:.026},thermalScope6x:{sightY:.123,z:.155,mountY:.062,eyeZ:-.10,length:.150,radius:.028,long:true},suppressor:{radius:.023,length:.18,overlap:.015},compensator:{radius:.021,length:.075,overlap:.011},verticalGrip:{z:-.10,y:-.11},angledGrip:{z:-.09,y:-.105},laser:{x:.045,z:-.09,y:-.100,scale:.70},bipod:{z:-.13,y:-.16,scale:.72},lightweightStock:{z:.47,y:-.03,width:.12},fullStock:{z:.45,y:-.03,width:.13},fastMag:{width:.14,depth:.14,y:.04}});
-  setupWeaponAttachmentVisuals(shotgun,'shotgun',{muzzle:{x:0,y:.02,z:-.38},barrelMesh:sgBar,redDot:{sightY:.075,z:.12,mountY:.050,eyeZ:-.09},thermalScope4x:{sightY:.082,z:.125,mountY:.050,eyeZ:-.09,length:.115,radius:.022},thermalScope6x:{sightY:.086,z:.130,mountY:.050,eyeZ:-.09,length:.130,radius:.024,long:true},suppressor:{radius:.018,length:.13,overlap:.010},shotgunChoke:{radius:.018,length:.065,overlap:.010},laser:{x:.038,z:-.12,y:-.035,scale:.65}});
-  setupWeaponAttachmentVisuals(semiShotgun,'semiShotgun',{muzzle:{x:0,y:.01,z:-.30},mag:ssMagRemote,barrelMesh:ssBar,redDot:{sightY:.080,z:.165,mountY:.050,eyeZ:-.09},holoSight:{sightY:.096,z:.165,mountY:.050,eyeZ:-.09},combatOptic:{sightY:.108,z:.205,mountY:.050,eyeZ:-.09,length:.125},shotgunChoke:{radius:.017,length:.065,overlap:.010},laser:{x:.038,z:-.06,y:-.045,scale:.65},fastMag:{width:.082,depth:.09,y:.035}});
-  setupWeaponAttachmentVisuals(sniper,'sniper',{muzzle:{x:0,y:.01,z:-.39},mag:snMagRemote,barrelMesh:snBar,precisionScope6x:{z:.27,y:.08,radius:.029,kind:'precision'},longRangeScope8x:{z:.27,y:.08,radius:.029,kind:'long'},thermalScope4x:{z:.27,y:.08,radius:.029,kind:'thermal'},thermalScope6x:{z:.27,y:.08,radius:.029,kind:'thermal-long'},laser:{x:.035,z:-.08,y:-.035,scale:.65},suppressor:{radius:.020,length:.17,overlap:.014},fastMag:{width:.072,depth:.088,y:.03}});
-  setupWeaponAttachmentVisuals(rpg,'rpg',{thermalScope4x:{sightY:.095,z:.050,mountY:.060,eyeZ:-.09,length:.125,radius:.025},thermalScope6x:{sightY:.100,z:.055,mountY:.060,eyeZ:-.09,length:.140,radius:.027,long:true},laser:{x:.045,z:-.12,y:-.035,scale:.75}});
   model.add(body,head,armL,armR,legL,legR,pistol,akimbo1887,assault,ump,machineGun,shotgun,semiShotgun,battleRifle,sniper,grenadeLauncher,rpg,godRing);group.position.set(player.x||0,player.y||0,player.z||0);scene.add(group);
   const initialRelation=gameplayRelation(team,!!player.bot),initialRelationColor=relationshipColor(initialRelation),tagLabel=player.bot&&!player.zombie?`[BOT] ${player.name||'Bot'}`:(player.name||'Player'),tag=makeNameTag(tagLabel,initialRelationColor);tag.position.set(0,2.18,0);group.add(tag);
   const now=performance.now();
   model.scale.setScalar(actorScale(player));
-  const remote={bossKind:player.bossKind||'abomination',bossPhase:player.bossPhase||'chase',bossPhaseStartedAt:Number(player.bossPhaseStartedAt)||0,bossPhaseEndsAt:Number(player.bossPhaseEndsAt)||0,bossAttackYaw:Number(player.bossAttackYaw)||0,bossAttackWidth:Number(player.bossAttackWidth)||1.6,bossAttackDistance:Number(player.bossAttackDistance)||0,weakpointUntil:Number(player.weakpointUntil)||0,bossAttackReach:Number(player.bossAttackReach)||2.6,bossWindupMs:Number(player.bossWindupMs)||1100,bossScale:Number(player.bossScale)||1.3+(Number(player.bossTier)||1)*.04,boss:!!player.boss,bossTier:Number(player.bossTier)||0,telegraphUntil:Number(player.telegraphUntil)||0,maxHp:Number(player.maxHp)||100,id:player.id,name:player.name||'Player',team,bot:!!player.bot,zombie:!!(player.zombie||player.infected),factionColor:remoteFactionColor(team,!!(player.zombie||player.infected)),relationship:initialRelation,relationshipColor:initialRelationColor,minimapColor:initialRelationColor,tagColor:initialRelationColor,tagLabel,attackAt:Number(player.attackAt)||0,weapon:player.weapon||'pistol',primaryWeapon:activePrimaryWeaponAllowed(player.primaryWeapon)?player.primaryWeapon:'assault',secondaryWeapon:SECONDARY_WEAPONS.includes(player.secondaryWeapon)?player.secondaryWeapon:'pistol',primaryAttachments:normalizeWeaponAttachments(activePrimaryWeaponAllowed(player.primaryWeapon)?player.primaryWeapon:'assault',player.primaryAttachments),secondaryAttachments:normalizeWeaponAttachments(SECONDARY_WEAPONS.includes(player.secondaryWeapon)?player.secondaryWeapon:'pistol',player.secondaryAttachments),group,model,tag,target:new THREE.Vector3(player.x||0,player.y||0,player.z||0),targetYaw:player.yaw||0,targetPitch:Number(player.pitch)||0,renderPitch:Number(player.pitch)||0,hp:player.hp??100,kills:Number(player.kills)||0,deaths:Number(player.deaths)||0,armL,armR,legL,legR,body,head,pistol,akimbo1887,akimboLeft:akL,akimboRight:akR,battleRifleView,battleRifleCycleStartedAt:0,battleRifleCycleDuration:1000,akimboCycleStartedAt:{left:0,right:0},assault,ump,machineGun,shotgun,semiShotgun,battleRifle,sniper,grenadeLauncher,rpg,godRing,godMode:!!player.godMode,admin:!!player.admin,lastSeen:now,lastNetAt:now,lastNetServerAt:Number.isFinite(Number(player.at))?Number(player.at):serverNow(),lastNetX:player.x||0,lastNetY:player.y||0,lastNetZ:player.z||0,snapshots:[],moveSpeed:0,airborne:false,ads:!!player.ads,crouched:!!player.crouched,sprinting:!!player.sprinting,sliding:!!player.sliding,crouchBlend:player.crouched?1:0,sprintBlend:player.sprinting?1:0,slideBlend:player.sliding?1:0,animPhase:Math.random()*Math.PI*2,deathPose:player.hp<=0?1:0,reloadUntil:Number(player.reloadAt)||0,reloadStartedAt:0,reloadWeapon:player.reloadWeapon||'',swapStartedAt:0,fireKickUntil:0,revealedUntil:0,hitFlashUntil:0,nextFootstepAt:now+300+Math.random()*260,footstepSide:Math.random()<.5?0:1,traversal:player.traversal?traversalPlanFromServer({id:player.id,accepted:true,...player.traversal}):null,ladder:player.ladder?ladderStateFromServer(player.ladder):null};tag.visible=remote.hp>0&&modeFriendly(team);
+  const remote={weaponViews:views,ammo:{...(player.ammo||{})},shotAt:0,bossKind:player.bossKind||'abomination',bossPhase:player.bossPhase||'chase',bossPhaseStartedAt:Number(player.bossPhaseStartedAt)||0,bossPhaseEndsAt:Number(player.bossPhaseEndsAt)||0,bossAttackYaw:Number(player.bossAttackYaw)||0,bossAttackWidth:Number(player.bossAttackWidth)||1.6,bossAttackDistance:Number(player.bossAttackDistance)||0,weakpointUntil:Number(player.weakpointUntil)||0,bossAttackReach:Number(player.bossAttackReach)||2.6,bossWindupMs:Number(player.bossWindupMs)||1100,bossScale:Number(player.bossScale)||1.3+(Number(player.bossTier)||1)*.04,boss:!!player.boss,bossTier:Number(player.bossTier)||0,telegraphUntil:Number(player.telegraphUntil)||0,maxHp:Number(player.maxHp)||100,id:player.id,name:player.name||'Player',team,bot:!!player.bot,zombie:!!(player.zombie||player.infected),factionColor:remoteFactionColor(team,!!(player.zombie||player.infected)),relationship:initialRelation,relationshipColor:initialRelationColor,minimapColor:initialRelationColor,tagColor:initialRelationColor,tagLabel,attackAt:Number(player.attackAt)||0,weapon:player.weapon||'pistol',primaryWeapon:activePrimaryWeaponAllowed(player.primaryWeapon)?player.primaryWeapon:'assault',secondaryWeapon:SECONDARY_WEAPONS.includes(player.secondaryWeapon)?player.secondaryWeapon:'pistol',primaryAttachments:normalizeWeaponAttachments(activePrimaryWeaponAllowed(player.primaryWeapon)?player.primaryWeapon:'assault',player.primaryAttachments),secondaryAttachments:normalizeWeaponAttachments(SECONDARY_WEAPONS.includes(player.secondaryWeapon)?player.secondaryWeapon:'pistol',player.secondaryAttachments),group,model,tag,target:new THREE.Vector3(player.x||0,player.y||0,player.z||0),targetYaw:player.yaw||0,targetPitch:Number(player.pitch)||0,renderPitch:Number(player.pitch)||0,hp:player.hp??100,kills:Number(player.kills)||0,deaths:Number(player.deaths)||0,armL,armR,legL,legR,body,head,pistol,akimbo1887,akimboLeft:akL,akimboRight:akR,battleRifleView,battleRifleCycleStartedAt:0,battleRifleCycleDuration:1000,akimboCycleStartedAt:{left:0,right:0},assault,ump,machineGun,shotgun,semiShotgun,battleRifle,sniper,grenadeLauncher,rpg,godRing,godMode:!!player.godMode,admin:!!player.admin,lastSeen:now,lastNetAt:now,lastNetServerAt:Number.isFinite(Number(player.at))?Number(player.at):serverNow(),lastNetX:player.x||0,lastNetY:player.y||0,lastNetZ:player.z||0,snapshots:[],moveSpeed:0,airborne:false,ads:!!player.ads,crouched:!!player.crouched,sprinting:!!player.sprinting,sliding:!!player.sliding,crouchBlend:player.crouched?1:0,sprintBlend:player.sprinting?1:0,slideBlend:player.sliding?1:0,animPhase:Math.random()*Math.PI*2,deathPose:player.hp<=0?1:0,reloadUntil:Number(player.reloadAt)||0,reloadStartedAt:0,reloadWeapon:player.reloadWeapon||'',swapStartedAt:0,fireKickUntil:0,revealedUntil:0,hitFlashUntil:0,nextFootstepAt:now+300+Math.random()*260,footstepSide:Math.random()<.5?0:1,traversal:player.traversal?traversalPlanFromServer({id:player.id,accepted:true,...player.traversal}):null,ladder:player.ladder?ladderStateFromServer(player.ladder):null};tag.visible=remote.hp>0&&modeFriendly(team);
   if(remote.boss)remote.bossView=createBossPresentation(THREE,remote);
   syncRemoteBodyVisual(remote,now);syncRemoteWeapon(remote);return remote;
 }
@@ -3655,10 +3457,10 @@ function replayEnvironmentSnapshot(){
   return{exposure:Number(renderer?.toneMappingExposure)||1.05,sunIntensity:Number(worldSunLight?.intensity)||2.15,hemiIntensity:Number(worldHemiLight?.intensity)||2.2};
 }
 function replayActorSnapshotLocal(){
-  if(!position)return null;return{id:String(clientId),name:String(myName||'You'),team:normalizeTeam(myTeam),bot:false,zombie:localInfected,x:Number(position.x)||0,y:Number(position.y)||0,z:Number(position.z)||0,yaw:Number(yaw)||0,pitch:Number(pitch)||0,hp:Number(hp)||0,weapon:WEAPON_SPECS[currentWeapon]?currentWeapon:'pistol',ads:!!adsWanted,crouched:!!crouched,sprinting:!!sprinting,sliding:!!sliding};
+  if(!position)return null;return{id:String(clientId),name:String(myName||'You'),team:normalizeTeam(myTeam),bot:false,zombie:localInfected,x:Number(position.x)||0,y:Number(position.y)||0,z:Number(position.z)||0,yaw:Number(yaw)||0,pitch:Number(pitch)||0,hp:Number(hp)||0,weapon:WEAPON_SPECS[currentWeapon]?currentWeapon:'pistol',ads:!!adsWanted,crouched:!!crouched,sprinting:!!sprinting,sliding:!!sliding,...selectedLoadout(),ammoCount:ammo[currentWeapon]||0,reloadAt:reloadUntil,reloadStartedAt,reloadWeapon};
 }
 function replayActorSnapshotRemote(r){
-  if(!r)return null;return{id:String(r.id||''),name:String(r.name||'Player'),team:normalizeTeam(r.team),bot:!!r.bot,zombie:!!r.zombie,x:Number(r.group?.position?.x)||0,y:Number(r.group?.position?.y)||0,z:Number(r.group?.position?.z)||0,yaw:Number(r.group?.rotation?.y)||Number(r.targetYaw)||0,pitch:Number.isFinite(Number(r.renderPitch))?Number(r.renderPitch):(Number(r.targetPitch)||0),hp:Number(r.hp)||0,weapon:WEAPON_SPECS[r.weapon]?r.weapon:'pistol',ads:!!r.ads,crouched:!!r.crouched,sprinting:!!r.sprinting,sliding:!!r.sliding};
+  if(!r)return null;return{id:String(r.id||''),name:String(r.name||'Player'),team:normalizeTeam(r.team),bot:!!r.bot,zombie:!!r.zombie,x:Number(r.group?.position?.x)||0,y:Number(r.group?.position?.y)||0,z:Number(r.group?.position?.z)||0,yaw:Number(r.group?.rotation?.y)||Number(r.targetYaw)||0,pitch:Number.isFinite(Number(r.renderPitch))?Number(r.renderPitch):(Number(r.targetPitch)||0),hp:Number(r.hp)||0,weapon:WEAPON_SPECS[r.weapon]?r.weapon:'pistol',ads:!!r.ads,crouched:!!r.crouched,sprinting:!!r.sprinting,sliding:!!r.sliding,primaryWeapon:r.primaryWeapon,secondaryWeapon:r.secondaryWeapon,primaryAttachments:{...r.primaryAttachments},secondaryAttachments:{...r.secondaryAttachments},ammoCount:Number.isFinite(r.ammo?.[r.weapon])?r.ammo[r.weapon]:null,reloadAt:r.reloadUntil,reloadStartedAt:r.reloadStartedAt,reloadWeapon:r.reloadWeapon};
 }
 function pruneReplayBuffers(now=serverNow()){
   const cutoff=now-REPLAY_HISTORY_MS;while(replayHistory.length&&replayHistory[0].at<cutoff)replayHistory.shift();while(replayHistory.length>REPLAY_MAX_FRAMES)replayHistory.shift();const eventCutoff=now-REPLAY_EVENT_HISTORY_MS;while(replayEvents.length&&replayEvents[0].at<eventCutoff)replayEvents.shift();
@@ -3682,7 +3484,7 @@ function replayFramePairAt(playAt){
   const frames=replayPlayback?.frames||[];if(!frames.length)return{a:null,b:null,t:0};let a=frames[0],b=frames[frames.length-1];if(playAt<=a.at)return{a,b:a,t:0};if(playAt>=b.at)return{a:b,b,t:0};for(let i=1;i<frames.length;i++){if(playAt<=frames[i].at){a=frames[i-1];b=frames[i];break;}}const span=Math.max(1,b.at-a.at),t=THREE.MathUtils.clamp((playAt-a.at)/span,0,1);return{a,b,t};
 }
 function replayActorsAt(playAt){
-  const {a,b,t}=replayFramePairAt(playAt);if(!a)return new Map();const am=replayActorMap(a),bm=replayActorMap(b),out=new Map();for(const id of new Set([...am.keys(),...bm.keys()])){const av=am.get(id),bv=bm.get(id);if(!av){out.set(id,{...bv});continue;}if(!bv){out.set(id,{...av});continue;}const yawDelta=normalizeAngle((Number(bv.yaw)||0)-(Number(av.yaw)||0));out.set(id,{...bv,x:THREE.MathUtils.lerp(Number(av.x)||0,Number(bv.x)||0,t),y:THREE.MathUtils.lerp(Number(av.y)||0,Number(bv.y)||0,t),z:THREE.MathUtils.lerp(Number(av.z)||0,Number(bv.z)||0,t),yaw:(Number(av.yaw)||0)+yawDelta*t,pitch:THREE.MathUtils.lerp(Number(av.pitch)||0,Number(bv.pitch)||0,t),hp:t<.5?av.hp:bv.hp,weapon:t<.5?av.weapon:bv.weapon,ads:t<.5?av.ads:bv.ads,crouched:t<.5?av.crouched:bv.crouched,sprinting:t<.5?av.sprinting:bv.sprinting,sliding:t<.5?av.sliding:bv.sliding});}return out;
+  const {a,b,t}=replayFramePairAt(playAt);if(!a)return new Map();const am=replayActorMap(a),bm=replayActorMap(b),out=new Map();for(const id of new Set([...am.keys(),...bm.keys()])){const av=am.get(id),bv=bm.get(id);if(!av){out.set(id,{...bv});continue;}if(!bv){out.set(id,{...av});continue;}const yawDelta=normalizeAngle((Number(bv.yaw)||0)-(Number(av.yaw)||0));out.set(id,{...(t<.5?av:bv),x:THREE.MathUtils.lerp(Number(av.x)||0,Number(bv.x)||0,t),y:THREE.MathUtils.lerp(Number(av.y)||0,Number(bv.y)||0,t),z:THREE.MathUtils.lerp(Number(av.z)||0,Number(bv.z)||0,t),yaw:(Number(av.yaw)||0)+yawDelta*t,pitch:THREE.MathUtils.lerp(Number(av.pitch)||0,Number(bv.pitch)||0,t),hp:t<.5?av.hp:bv.hp,weapon:t<.5?av.weapon:bv.weapon,ads:t<.5?av.ads:bv.ads,crouched:t<.5?av.crouched:bv.crouched,sprinting:t<.5?av.sprinting:bv.sprinting,sliding:t<.5?av.sliding:bv.sliding});}return out;
 }
 function replayEnvironmentAt(playAt){
   const {a,b,t}=replayFramePairAt(playAt),ae=a?.environment,be=b?.environment;if(!ae&&!be)return null;if(!ae)return{...be};if(!be)return{...ae};return{exposure:THREE.MathUtils.lerp(Number(ae.exposure)||1.05,Number(be.exposure)||1.05,t),sunIntensity:THREE.MathUtils.lerp(Number(ae.sunIntensity)||2.15,Number(be.sunIntensity)||2.15,t),hemiIntensity:THREE.MathUtils.lerp(Number(ae.hemiIntensity)||2.2,Number(be.hemiIntensity)||2.2,t)};
@@ -3695,15 +3497,19 @@ function replayPlayAtFromElapsed(replay,elapsed){
   if(elapsed<=replay.normalBeforeMs)return replay.clipStartAt+elapsed;if(elapsed<=replay.normalBeforeMs+replay.slowWallMs)return replay.slowStartAt+(elapsed-replay.normalBeforeMs)*replay.slowRate;return Math.min(replay.clipEndAt,replay.slowEndAt+(elapsed-replay.normalBeforeMs-replay.slowWallMs));
 }
 function replayPlaybackRateAtElapsed(replay,elapsed){return replay.slowTimelineMs>0&&elapsed>=replay.normalBeforeMs&&elapsed<replay.normalBeforeMs+replay.slowWallMs?replay.slowRate:1;}
-function syncReplayRemoteWeapon(r,weapon){
-  if(!r)return;const liveWeapon=r.weapon;r.weapon=WEAPON_SPECS[weapon]?weapon:'pistol';syncRemoteWeapon(r);r.weapon=liveWeapon;
+function syncReplayRemoteWeapon(r,actor){
+  if(!r)return;const saved={weapon:r.weapon,primaryWeapon:r.primaryWeapon,secondaryWeapon:r.secondaryWeapon,primaryAttachments:r.primaryAttachments,secondaryAttachments:r.secondaryAttachments};
+  r.weapon=WEAPON_SPECS[actor.weapon]?actor.weapon:'pistol';for(const key of ['primaryWeapon','secondaryWeapon','primaryAttachments','secondaryAttachments'])if(actor[key]!=null)r[key]=actor[key];syncRemoteWeapon(r);Object.assign(r,saved);
 }
 function syncReplayActorVisual(r,actor){
   if(!r||!actor)return;const bodyMat=r.thermalBaseMaterials?.body||r.body?.material,legLMat=r.thermalBaseMaterials?.legL||r.legL?.material,legRMat=r.thermalBaseMaterials?.legR||r.legR?.material,team=normalizeTeam(actor.team),zombie=!!actor.zombie;
-  syncFactionUniformMaterial(bodyMat,team,{zombie,leg:false});syncFactionUniformMaterial(legLMat,team,{zombie,leg:true});if(legRMat!==legLMat)syncFactionUniformMaterial(legRMat,team,{zombie,leg:true});for(const material of new Set([bodyMat,legLMat,legRMat]))if(material?.emissive){material.emissive.set(0x000000);material.emissiveIntensity=1;}syncReplayRemoteWeapon(r,actor.weapon);if(r.tag)r.tag.visible=false;if(r.godRing)r.godRing.visible=false;
+  syncFactionUniformMaterial(bodyMat,team,{zombie,leg:false});syncFactionUniformMaterial(legLMat,team,{zombie,leg:true});if(legRMat!==legLMat)syncFactionUniformMaterial(legRMat,team,{zombie,leg:true});for(const material of new Set([bodyMat,legLMat,legRMat]))if(material?.emissive){material.emissive.set(0x000000);material.emissiveIntensity=1;}syncReplayRemoteWeapon(r,actor);if(r.tag)r.tag.visible=false;if(r.godRing)r.godRing.visible=false;
 }
 function replaySetActorPose(r,actor,{cameraActor=false}={}){
   if(!r?.group||!actor)return;r.group.visible=!cameraActor;r.group.position.set(Number(actor.x)||0,Number(actor.y)||0,Number(actor.z)||0);r.group.rotation.y=Number(actor.yaw)||0;syncReplayActorVisual(r,actor);const dead=Number(actor.hp)<=0,dp=dead?1:0;r.model.rotation.z=1.34*dp;r.model.rotation.x=.10*dp;r.model.position.y=-.18*dp;r.model.scale.y=actor.crouched?CROUCH_HEIGHT/PLAYER_HEIGHT:1;
+  const view=r.weaponViews[actor.weapon];if(view){const gun=r[actor.weapon],pose=replayWeaponPose(actor);if(actor.weapon!=='akimbo1887')gun.position.set(.38,actor.weapon==='rpg'?1.42:1.10,-.25);gun.rotation.set(-(Number(actor.pitch)||0),0,0);poseWeaponModel(view,pose);
+    if(actor.weapon==='akimbo1887')for(const hand of ['left','right']){const component=hand==='left'?r.weaponViews.akimboLeft:view,part=hand==='left'?r.akimboLeft:r.akimboRight,event=replayPlayback.shots[String(actor.id)+':'+hand],cycle=akimbo1887CycleState(event?.at||0,replayPlayback.playAt,hand);poseWeaponModel(component,pose);part.rotation.set(-.08+cycle.spin,hand==='left'?.14:-.14,hand==='left'?-.03:.03);component.lever.rotation.x=-cycle.lever;}
+  }
 }
 function restoreRemoteAfterReplay(r){
   if(!r?.group)return;r.group.visible=true;r.group.position.copy(r.target);r.group.rotation.y=Number(r.targetYaw)||0;const dp=Number(r.hp)<=0?1:0;r.deathPose=dp;r.model.rotation.z=1.34*dp;r.model.rotation.x=.10*dp;r.model.position.y=-.18*dp;r.model.scale.y=actorScale(r)*(r.crouched?CROUCH_HEIGHT/PLAYER_HEIGHT:1);syncRemoteBodyVisual(r,performance.now());syncRemoteWeapon(r);syncRemoteRelationshipVisual(r,{forceTag:false,source:'replay_restore'});if(r.godRing)r.godRing.visible=!!r.godMode;
@@ -3719,12 +3525,21 @@ function startReplayPlayback(descriptor,frames){
   if(localFirst){replayLocalActor=makeRemote({...localFirst,id:clientId,name:myName||localFirst.name||'You',bot:false,zombie:!!localFirst.zombie});disposeRemoteTag(replayLocalActor);if(replayLocalActor.godRing)replayLocalActor.godRing.visible=false;}
   const saved={weapon:currentWeapon,adsWanted,adsBlend,cameraFov:camera.fov,cameraPosition:camera.position.clone(),cameraRotation:camera.rotation.clone(),markerVisibility:teammateDeathMarkers.map(marker=>[marker,!!marker.sprite?.visible]),returnPaused,liveEnvironment:replayEnvironmentSnapshot()};for(const [marker] of saved.markerVisibility)if(marker.sprite)marker.sprite.visible=false;suppressLiveTransientPresentation();clearReplayTransientFx();shell.showMatchPresentation?.();if(chatOpen)void dismissChat({restorePointer:false});scoreboardOpen=false;scoreboardPage=0;scoreboardPanel=null;resetTouchInput();clearControllerUiFocus();
   const killerWeapon=WEAPON_SPECS[descriptor.weapon]?descriptor.weapon:'pistol';currentWeapon=killerWeapon;adsWanted=false;adsBlend=0;clearFireInput();cancelEquipmentAction();syncLocalWeaponModel();camera.fov=baseFov;camera.updateProjectionMatrix();
-  const events=replayEvents.filter(event=>event.at>=timing.clipStartAt&&event.at<=timing.clipEndAt).sort((a,b)=>a.at-b.at);replayPlayback={...descriptor,...timing,frames,events,eventIndex:0,startedAt:performance.now(),killerId,currentRate:1,saved};applyReplayEnvironment(replayEnvironmentAt(timing.clipStartAt));diagnosticsVisualEvent('replay_started',{kind:descriptor.kind,killerId,victimId:String(descriptor.victim.id||''),timelineMs:Math.round(timing.clipEndAt-timing.clipStartAt),playbackMs:Math.round(timing.playbackDurationMs),slowPreMs:descriptor.kind==='final'?REPLAY_FINAL_SLOW_PRE_MS:0,slowPostMs:descriptor.kind==='final'?REPLAY_FINAL_SLOW_POST_MS:0,slowRate:timing.slowRate});hudLastDraw=0;return true;
+  const events=replayEvents.filter(event=>event.at>=timing.clipStartAt&&event.at<=timing.clipEndAt).sort((a,b)=>a.at-b.at).map(event=>({...event,actionPlayed:false}));replayPlayback={...descriptor,...timing,frames,events,eventIndex:0,startedAt:performance.now(),killerId,currentRate:1,shots:{},saved};applyReplayEnvironment(replayEnvironmentAt(timing.clipStartAt));diagnosticsVisualEvent('replay_started',{kind:descriptor.kind,killerId,victimId:String(descriptor.victim.id||''),timelineMs:Math.round(timing.clipEndAt-timing.clipStartAt),playbackMs:Math.round(timing.playbackDurationMs),slowPreMs:descriptor.kind==='final'?REPLAY_FINAL_SLOW_PRE_MS:0,slowPostMs:descriptor.kind==='final'?REPLAY_FINAL_SLOW_POST_MS:0,slowRate:timing.slowRate});hudLastDraw=0;return true;
 }
 function replayShotFeedback(event){
-  if(!event)return;if(samePlayerId(event.ownerId,replayPlayback?.killerId)){if(event.weapon==='battleRifle')startBattleRifleCycle(performance.now(),weaponRules('battleRifle').cooldownMs/Math.max(.35,replayPlayback?.currentRate||1));const muzzle=localMuzzleObject(event.weapon,event.hand);if(muzzle?.material)muzzle.material.opacity=1;const v=weaponShotVariation(event.weapon);playSoundCue(weaponShotSoundId(event.weapon,!!event.suppressed),.86*v.volume,{playbackRate:v.playbackRate*Math.max(.72,replayPlayback?.currentRate||1),priority:4});weaponKickVelocity=Math.max(weaponKickVelocity,.40);}
-  else playSpatialCue(weaponShotSoundId(event.weapon,!!event.suppressed),event.x,event.y,event.z,weaponAudibleDistance(event.weapon,!!event.suppressed),.65,{playbackRate:Math.max(.72,replayPlayback?.currentRate||1),priority:1});
+  if(!event||!replayPlayback)return;replayPlayback.shots[String(event.ownerId)]=event;replayPlayback.shots[String(event.ownerId)+':'+(event.hand||'right')]=event;
+  if(samePlayerId(event.ownerId,replayPlayback.killerId)){const muzzle=localMuzzleObject(event.weapon,event.hand);if(muzzle?.material)muzzle.material.opacity=1;const v=weaponShotVariation(event.weapon);playSoundCue(weaponShotSoundId(event.weapon,!!event.suppressed),.86*v.volume,{playbackRate:v.playbackRate*Math.max(.72,replayPlayback.currentRate||1),priority:4});weaponKickVelocity=Math.max(weaponKickVelocity,.40);}
+  else playSpatialCue(weaponShotSoundId(event.weapon,!!event.suppressed),event.x,event.y,event.z,weaponAudibleDistance(event.weapon,!!event.suppressed),.65,{playbackRate:Math.max(.72,replayPlayback.currentRate||1),priority:1});
 }
+function replayWeaponPose(actor){
+  const weapon=actor.weapon,mods=weapon===actor.primaryWeapon?actor.primaryAttachments:actor.secondaryAttachments,rules=resolveWeaponRules(worldSettings,weapon,mods),at=replayPlayback.playAt,event=replayPlayback.shots[String(actor.id)],age=event?.weapon===weapon?at-event.at:Infinity,total=rules.reloadMs,reload=actor.reloadAt>at?THREE.MathUtils.clamp((at-(actor.reloadStartedAt||actor.reloadAt-total))/total,0,1):0;
+  let shot=age>=0&&age<weaponVisualKickProfile(weapon).actionMs?Math.sin(Math.PI*age/weaponVisualKickProfile(weapon).actionMs):0;
+  if(weapon==='shotgun'){const p=THREE.MathUtils.clamp((age-150)/470,0,1);shot=p<.44?THREE.MathUtils.smoothstep(p,0,.44):1-THREE.MathUtils.smoothstep(p,.44,1);}
+  const cycle=weapon==='battleRifle'?(reload?battleRifleCycle(1,1+Math.max(0,(reload-.60)/.40)*1000,1000):battleRifleCycle(Number.isFinite(age)?event.at:0,at,rules.cooldownMs)):null;
+  return {shot,reload,empty:actor.ammoCount===0,loaded:actor.ammoCount!==0,cycle};
+}
+
 function spawnReplayDetonationFx(event){
   const fx=createDetonationFx(event.kind,event);if(!fx)return;scene?.add(fx.root);replayTransientFx.push(fx);
 }
@@ -3734,12 +3549,14 @@ function updateReplayTransientFx(dt){
 }
 function clearReplayTransientFx(){const pending=replayTransientFx.splice(0);for(const fx of pending){try{scene?.remove(fx.root);}catch{}disposeObject3D(fx.root);}}
 function updateReplayPlayback(dt,now=performance.now()){
-  const replay=replayPlayback;if(!replay)return false;const elapsed=Math.max(0,now-replay.startedAt);if(elapsed>=replay.playbackDurationMs){stopReplayPlayback({reason:'complete',sendSkip:replay.kind==='killcam'});return false;}const playAt=replayPlayAtFromElapsed(replay,elapsed),rate=replayPlaybackRateAtElapsed(replay,elapsed);replay.currentRate=rate;while(replay.eventIndex<replay.events.length&&replay.events[replay.eventIndex].at<=playAt){replayEventFeedback(replay.events[replay.eventIndex]);replay.eventIndex++;}
+  const replay=replayPlayback;if(!replay)return false;const elapsed=Math.max(0,now-replay.startedAt);if(elapsed>=replay.playbackDurationMs){stopReplayPlayback({reason:'complete',sendSkip:replay.kind==='killcam'});return false;}const playAt=replayPlayAtFromElapsed(replay,elapsed),rate=replayPlaybackRateAtElapsed(replay,elapsed);replay.currentRate=rate;replay.playAt=playAt;while(replay.eventIndex<replay.events.length&&replay.events[replay.eventIndex].at<=playAt){replayEventFeedback(replay.events[replay.eventIndex]);replay.eventIndex++;}
   const liveDt=Math.min(.10,Math.max(0,Number(dt)||0));updateRocketTrailPuffs(liveDt);updateBulletImpactFx(liveDt);updateTacticalFx(liveDt);updateReplayTransientFx(liveDt*rate);const actors=replayActorsAt(playAt),killer=actors.get(replay.killerId);if(!killer){stopReplayPlayback({reason:'killer-missing',sendSkip:replay.kind==='killcam'});return false;}for(const r of remotes.values()){const key=String(r.id),actor=actors.get(key);if(!actor){r.group.visible=false;continue;}restoreRemoteThermalSignature(r,false);replaySetActorPose(r,actor,{cameraActor:samePlayerId(r.id,replay.killerId)});}if(replayLocalActor){const localActor=actors.get(String(clientId));replayLocalActor.group.visible=!!localActor&&!samePlayerId(clientId,replay.killerId);if(localActor)replaySetActorPose(replayLocalActor,localActor,{cameraActor:samePlayerId(clientId,replay.killerId)});}
+  replay.actor=killer;for(const hand of ['left','right']){const event=replay.shots[replay.killerId+':'+hand];if(!event||event.actionPlayed)continue;const age=playAt-event.at,cue=event.weapon==='battleRifle'?'battleRifleBolt':event.weapon==='shotgun'?'shotgunPump':event.weapon==='akimbo1887'?'action1887':'';const delay=event.weapon==='battleRifle'?resolveWeaponRules(worldSettings,event.weapon,killer.primaryAttachments).cooldownMs*.32:event.weapon==='shotgun'?350:270;if(cue&&age>=delay){event.actionPlayed=true;playSoundCue(cue,.8,{playbackRate:Math.max(.7,rate),pan:event.weapon==='akimbo1887'?(hand==='left'?-.42:.42):0});}}
+  const signature=JSON.stringify([killer.weapon,killer.primaryAttachments,killer.secondaryAttachments]);if(signature!==replay.weaponSignature){currentWeapon=killer.weapon;syncLocalWeaponModel();replay.weaponSignature=signature;}adsWanted=!!killer.ads;adsBlend=expFollow(adsBlend,adsWanted?1:0,14,liveDt);camera.fov=THREE.MathUtils.lerp(baseFov,effectiveWeaponSpec(currentWeapon).adsFov,smoothstep01(adsBlend));camera.updateProjectionMatrix();
   applyReplayEnvironment(replayEnvironmentAt(playAt));const eyeHeight=killer.crouched?CROUCH_HEIGHT:PLAYER_HEIGHT;camera.position.set(Number(killer.x)||0,(Number(killer.y)||0)+eyeHeight,Number(killer.z)||0);camera.rotation.y=Number(killer.yaw)||0;let replayPitch=Number(killer.pitch)||0;if(killer.bot&&Math.abs(replayPitch)<.001){const victim=actors.get(String(replay.victim.id||''));if(victim){const dx=(Number(victim.x)||0)-(Number(killer.x)||0),dz=(Number(victim.z)||0)-(Number(killer.z)||0),dy=(Number(victim.y)||0)+1.1-camera.position.y;replayPitch=Math.atan2(dy,Math.max(.01,Math.hypot(dx,dz)));}}camera.rotation.x=THREE.MathUtils.clamp(replayPitch,-1.40,1.40);camera.rotation.z=0;updateWeaponView(Math.min(.05,liveDt*rate));return true;
 }
 function stopReplayPlayback({reason='stop',sendSkip=false}={}){
-  const replay=replayPlayback;if(!replay)return false;if(sendSkip&&replay.kind==='killcam'&&socket?.readyState===WebSocket.OPEN)send({t:'replaySkip'});for(const r of remotes.values())restoreRemoteAfterReplay(r);if(replayLocalActor){try{scene?.remove(replayLocalActor.group);}catch{}disposeObject3D(replayLocalActor.group);replayLocalActor=null;}for(const [marker,visible] of replay.saved.markerVisibility||[])if(marker?.sprite)marker.sprite.visible=visible;clearReplayTransientFx();restoreLiveTransientPresentation();applyReplayEnvironment(replay.saved.liveEnvironment);for(const fx of killstreakFx){if(fx?.type==='solarnuke'&&fx.deferredReplayBlast){fx.deferredReplayBlast=false;updateSolarBurnProgress(fx,1,performance.now(),true);}}currentWeapon=replay.saved.weapon;adsWanted=!!replay.saved.adsWanted;adsBlend=Number(replay.saved.adsBlend)||0;camera.position.copy(replay.saved.cameraPosition);camera.rotation.copy(replay.saved.cameraRotation);camera.fov=replay.saved.cameraFov;camera.updateProjectionMatrix();syncLocalWeaponModel();replayPlayback=null;updateTeammateDeathMarkers(performance.now());if(replay.kind==='killcam'&&replay.saved.returnPaused&&matchState.status!==MATCH_STATUS.ENDED)shell.pause('replay-return');hudLastDraw=0;diagnosticsVisualEvent('replay_stopped',{kind:replay.kind,reason:String(reason||'stop')});return true;
+  const replay=replayPlayback;if(!replay)return false;if(sendSkip&&replay.kind==='killcam'&&socket?.readyState===WebSocket.OPEN)send({t:'replaySkip'});for(const r of remotes.values())restoreRemoteAfterReplay(r);if(replayLocalActor){try{scene?.remove(replayLocalActor.group);}catch{}disposeObject3D(replayLocalActor.group);replayLocalActor=null;}for(const [marker,visible] of replay.saved.markerVisibility||[])if(marker?.sprite)marker.sprite.visible=visible;clearReplayTransientFx();restoreLiveTransientPresentation();applyReplayEnvironment(replay.saved.liveEnvironment);for(const fx of killstreakFx){if(fx?.type==='solarnuke'&&fx.deferredReplayBlast){fx.deferredReplayBlast=false;updateSolarBurnProgress(fx,1,performance.now(),true);}}currentWeapon=replay.saved.weapon;adsWanted=!!replay.saved.adsWanted;adsBlend=Number(replay.saved.adsBlend)||0;camera.position.copy(replay.saved.cameraPosition);camera.rotation.copy(replay.saved.cameraRotation);camera.fov=replay.saved.cameraFov;camera.updateProjectionMatrix();replayPlayback=null;syncLocalWeaponModel();updateTeammateDeathMarkers(performance.now());if(replay.kind==='killcam'&&replay.saved.returnPaused&&matchState.status!==MATCH_STATUS.ENDED)shell.pause('replay-return');hudLastDraw=0;diagnosticsVisualEvent('replay_stopped',{kind:replay.kind,reason:String(reason||'stop')});return true;
 }
 function skipReplayPlayback(){if(replayPlayback?.kind!=='killcam')return false;return stopReplayPlayback({reason:'skip',sendSkip:true});}
 function clearReplayState(){replayPending=null;if(replayPlayback)stopReplayPlayback({reason:'clear',sendSkip:false});clearReplayTransientFx();replayHistory.length=0;replayEvents.length=0;replayLastCaptureAt=0;}
@@ -3752,7 +3569,7 @@ function updateRemoteTarget(r,player,instant=false){
   const now=performance.now(),x=Number(player.x)||0,y=Number(player.y)||0,z=Number(player.z)||0,serverAt=Number.isFinite(Number(player.at))?Number(player.at):serverNow(),elapsed=Math.max(.016,(serverAt-r.lastNetServerAt)/1000),dist=Math.hypot(x-r.lastNetX,z-r.lastNetZ);
   if(Number.isFinite(Number(player.at)))observeRemoteNetworkTime(player.at);pushRemoteSnapshot(r,{...player,at:serverAt},{reset:instant});
   r.moveSpeed=THREE.MathUtils.lerp(r.moveSpeed,Math.min(16,dist/elapsed),.55);if(Object.prototype.hasOwnProperty.call(player,'ladderId')){if(player.ladderId){if(!r.ladder||String(r.ladder.id)!==String(player.ladderId))r.ladder={id:String(player.ladderId),seq:0,phase:'climb',entry:''};}else r.ladder=null;}r.airborne=!!r.ladder||y>worldSupportHeight(x,z,y)+.08;r.ads=player.ads??r.ads;r.crouched=player.crouched??r.crouched;r.lastNetAt=now;r.lastNetServerAt=serverAt;r.lastNetX=x;r.lastNetY=y;r.lastNetZ=z;r.target.set(x,y,z);r.targetYaw=Number(player.yaw)||0;if(Number.isFinite(Number(player.pitch)))r.targetPitch=Number(player.pitch);r.lastSeen=now;
-  if(Number(player.reloadAt)>0){r.reloadUntil=Number(player.reloadAt);r.reloadWeapon=player.reloadWeapon||r.weapon;if(!r.reloadStartedAt)r.reloadStartedAt=serverNow();}
+  if(Object.hasOwn(player,'reloadAt')){r.reloadUntil=Number(player.reloadAt)||0;r.reloadWeapon=player.reloadWeapon||r.weapon;r.reloadStartedAt=r.reloadUntil?r.reloadUntil-resolveWeaponRules(worldSettings,r.reloadWeapon,remoteAttachmentsForWeapon(r,r.reloadWeapon)).reloadMs:0;}
   if(instant){r.group.position.copy(r.target);r.group.rotation.y=r.targetYaw;}
 }
 function upsertRemote(player,instant=false){
@@ -3766,7 +3583,7 @@ function upsertRemote(player,instant=false){
   r.boss=!!player.boss;r.bossScale=actorScale(player);r.bossAttackReach=Number(player.bossAttackReach)||r.bossAttackReach||2.6;r.bossWindupMs=Number(player.bossWindupMs)||r.bossWindupMs||1100;r.model.scale.set(r.bossScale,r.model.scale.y,r.bossScale);
   r.name=nextName;r.bot=nextBot;r.zombie=nextZombie;r.attackAt=Number(player.attackAt)||r.attackAt||0;r.telegraphUntil=Number(player.telegraphUntil)||0;r.maxHp=Number(player.maxHp)||r.maxHp;r.team=nextTeam;r.admin=player.admin??r.admin;r.weapon=player.weapon||r.weapon;
   if(activePrimaryWeaponAllowed(player.primaryWeapon))r.primaryWeapon=player.primaryWeapon;if(SECONDARY_WEAPONS.includes(player.secondaryWeapon))r.secondaryWeapon=player.secondaryWeapon;if(Object.prototype.hasOwnProperty.call(player,'primaryAttachments'))r.primaryAttachments=normalizeWeaponAttachments(r.primaryWeapon,player.primaryAttachments);if(Object.prototype.hasOwnProperty.call(player,'secondaryAttachments'))r.secondaryAttachments=normalizeWeaponAttachments(r.secondaryWeapon,player.secondaryAttachments);
-  r.hp=nextHp;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;
+  if(player.ammo)r.ammo={...player.ammo};r.hp=nextHp;r.kills=Number(player.kills??r.kills)||0;r.deaths=Number(player.deaths??r.deaths)||0;r.godMode=player.godMode??r.godMode;
   if(player.traversal&&typeof player.traversal==='object'&&Number(player.traversal.seq)!==Number(r.traversal?.seq))r.traversal=traversalPlanFromServer({id:player.id,accepted:true,...player.traversal});else if(player.bot&&player.traversal===null)r.traversal=null;if(player.ladder&&typeof player.ladder==='object')r.ladder=ladderStateFromServer(player.ladder);else if(player.ladder===null)r.ladder=null;
   if(r.godRing)r.godRing.visible=!!r.godMode;const identityChanged=oldTeam!==nextTeam||oldBot!==nextBot||oldZombie!==nextZombie;if(identityChanged)applyRemoteIdentityVisual(r,{team:nextTeam,bot:nextBot,zombie:nextZombie,name:nextName,source:'network_identity'});else if(oldName!==nextName)syncRemoteRelationshipVisual(r,{forceTag:true,source:'name'});
   syncRemoteWeapon(r);updateRemoteTarget(r,player,instant);
@@ -4559,7 +4376,15 @@ function sendSimulationHeartbeat(stateSent=false){
 
 function syncLocalWeaponModel(){if(battleRifleGroup)battleRifleGroup.visible=currentWeapon==='battleRifle';if(pistolGroup)pistolGroup.visible=currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=currentWeapon==='akimbo1887';if(assaultGroup)assaultGroup.visible=currentWeapon==='assault'&&!weaponHiddenForScope('assault');if(umpGroup)umpGroup.visible=currentWeapon==='ump'&&!weaponHiddenForScope('ump');if(machineGunGroup)machineGunGroup.visible=currentWeapon==='machineGun'&&!weaponHiddenForScope('machineGun');if(shotgunGroup)shotgunGroup.visible=currentWeapon==='shotgun'&&!weaponHiddenForScope('shotgun');if(semiShotgunGroup)semiShotgunGroup.visible=currentWeapon==='semiShotgun';if(sniperGroup)sniperGroup.visible=currentWeapon==='sniper'&&!sniperWeaponHiddenForScope();if(grenadeLauncherGroup)grenadeLauncherGroup.visible=currentWeapon==='grenadeLauncher';if(rpgGroup)rpgGroup.visible=currentWeapon==='rpg'&&!weaponHiddenForScope('rpg');syncLocalAttachmentVisuals();syncPauseContext();}
 function remoteAttachmentsForWeapon(r,weapon){return weapon===r.primaryWeapon?normalizeWeaponAttachments(weapon,r.primaryAttachments):weapon===r.secondaryWeapon?normalizeWeaponAttachments(weapon,r.secondaryAttachments):normalizeWeaponAttachments(weapon,{});}
-function syncRemoteWeapon(r){if(!r)return;for(const name of WEAPON_ORDER){if(!r[name])continue;r[name].visible=!r.zombie&&r.weapon===name;const attachments=remoteAttachmentsForWeapon(r,name);if(name==='akimbo1887'){for(const gun of [r.akimboLeft,r.akimboRight])if(gun)syncWeaponAttachmentVisuals(gun,name,attachments);}else syncWeaponAttachmentVisuals(r[name],name,attachments);}}
+function ensureRemoteWeapon(r,weapon){
+  if(r.weaponViews[weapon]||!WEAPON_SPECS[weapon])return;
+  const view=buildArsenalWeapon(weapon,.60),old=r[weapon];r.weaponViews[weapon]=view;r.model.remove(old);
+  if(weapon==='akimbo1887'){
+    const left=buildArsenalWeapon(weapon,.60);r.weaponViews.akimboLeft=left;r.akimboLeft=left.group;r.akimboRight=view.group;r.akimbo1887=new THREE.Group();r.akimboLeft.position.set(-.32,1.08,-.25);r.akimboRight.position.set(.32,1.08,-.25);r.akimbo1887.add(r.akimboLeft,r.akimboRight);r.model.add(r.akimbo1887);
+  }else{r[weapon]=view.group;r.model.add(view.group);if(weapon==='battleRifle')r.battleRifleView=view;}
+}
+function syncRemoteWeapon(r){if(!r)return;ensureRemoteWeapon(r,r.weapon);for(const name of WEAPON_ORDER){if(!r[name])continue;r[name].visible=!r.zombie&&r.weapon===name;const attachments=remoteAttachmentsForWeapon(r,name);if(name==='akimbo1887'){for(const gun of [r.akimboLeft,r.akimboRight])if(gun)syncWeaponAttachmentVisuals(gun,name,attachments);}else syncWeaponAttachmentVisuals(r[name],name,attachments);}}
+
 function tracerMaterial(color){return new THREE.LineBasicMaterial({color,transparent:true,opacity:.82,depthWrite:false});}
 function localMuzzleObject(weapon,hand='right'){if(weapon==='akimbo1887')return hand==='left'?akimboLeftFlash:akimboRightFlash;return weapon==='battleRifle'?battleRifleView?.flash:weapon==='sniper'?sniperFlash:weapon==='semiShotgun'?semiShotgunFlash:weapon==='shotgun'?shotgunFlash:weapon==='machineGun'?machineGunFlash:weapon==='ump'?umpFlash:weapon==='assault'?assaultFlash:weapon==='grenadeLauncher'?grenadeLauncherFlash:weapon==='rpg'?rpgFlash:pistolFlash;}
 function tracerHash(id){let h=0;for(const ch of String(id||''))h=(h*33+ch.charCodeAt(0))>>>0;return h;}
@@ -4628,7 +4453,7 @@ function handleShot(m){
     // projectile/reconciliation data; replaying feedback here caused the
     // noticeable round-trip-time firing delay.
   }else if(shotPacketPrimary(m)&&!replayPlayback){
-    const r=remotes.get(m.ownerId);if(r){const shotNow=performance.now();r.fireKickUntil=shotNow+170;if(m.weapon==='battleRifle'){r.battleRifleCycleStartedAt=shotNow;r.battleRifleCycleDuration=resolveWeaponRules(worldSettings,'battleRifle',remoteAttachmentsForWeapon(r,'battleRifle')).cooldownMs;}if(m.weapon==='akimbo1887'&&r.akimboCycleStartedAt)r.akimboCycleStartedAt[m.hand==='left'?'left':'right']=shotNow;if(!m.suppressed)r.revealedUntil=shotNow+1500;{const v=weaponShotVariation(m.weapon),mods=remoteAttachmentsForWeapon(r,m.weapon),tone=attachmentShotTone(m.weapon,mods),soundScale=m.suppressed?.90:1;playSpatialCue(weaponShotSoundId(m.weapon,!!m.suppressed),m.x,m.y,m.z,weaponAudibleDistance(m.weapon,!!m.suppressed),.95*v.volume*soundScale*tone.volume,{playbackRate:v.playbackRate*(m.suppressed?.99:1)*tone.rate,priority:1});}}
+    const r=remotes.get(m.ownerId);if(r){const shotNow=performance.now();r.shotAt=shotNow;if(!r.godMode){if(Number.isFinite(r.ammo[m.weapon]))r.ammo[m.weapon]=Math.max(0,r.ammo[m.weapon]-1);else if(m.weapon==='rpg'||m.weapon==='grenadeLauncher')r.ammo[m.weapon]=0;}r.fireKickUntil=shotNow+170;if(m.weapon==='battleRifle'){r.battleRifleCycleStartedAt=shotNow;r.battleRifleCycleDuration=resolveWeaponRules(worldSettings,'battleRifle',remoteAttachmentsForWeapon(r,'battleRifle')).cooldownMs;}if(m.weapon==='akimbo1887'&&r.akimboCycleStartedAt)r.akimboCycleStartedAt[m.hand==='left'?'left':'right']=shotNow;if(!m.suppressed)r.revealedUntil=shotNow+1500;{const v=weaponShotVariation(m.weapon),mods=remoteAttachmentsForWeapon(r,m.weapon),tone=attachmentShotTone(m.weapon,mods),soundScale=m.suppressed?.90:1;playSpatialCue(weaponShotSoundId(m.weapon,!!m.suppressed),m.x,m.y,m.z,weaponAudibleDistance(m.weapon,!!m.suppressed),.95*v.volume*soundScale*tone.volume,{playbackRate:v.playbackRate*(m.suppressed?.99:1)*tone.rate,priority:1});}}
   }
 }
 function removeBullet(id){const b=bullets.get(id);if(!b)return;bullets.delete(id);const root=b.root||b.mesh;removeLiveTransient(root);if(b.type==='launcher')disposeObject3D(root);else{try{b.geometry?.dispose?.();}catch{}disposeMaterialResources(b.mesh?.material);}}
@@ -5498,10 +5323,19 @@ function updateRemoteVisuals(dt){
       if(running&&now>=r.nextFootstepAt){if(!(infectionActorStates.get(r.id)?.infectionClass==='stalker'&&infectionAbilityActive(infectionActorStates.get(r.id),serverNow())))playSpatialCue(r.footstepSide?'footstepRight':'footstepLeft',r.group.position.x,r.group.position.y,r.group.position.z,30,.48);r.footstepSide^=1;r.nextFootstepAt=now+THREE.MathUtils.lerp(540,315,move);}else if(!running)r.nextFootstepAt=Math.max(r.nextFootstepAt,now+120);
       r.legL.rotation.x=r.airborne?-.34:swing;r.legR.rotation.x=r.airborne?.34:-swing;r.armL.rotation.x=r.airborne?.28:-swing*.72;r.armR.rotation.x=r.airborne?-.20:swing*.52;r.armL.rotation.z=-.12;r.armR.rotation.z=.12;if(r.weapon==='akimbo1887'){r.armL.rotation.x=-1.05;r.armR.rotation.x=-1.05;r.armL.rotation.z=-.20;r.armR.rotation.z=.20;}
       if(traversing){const p=traversalPoseNow.progress,wave=Math.sin(Math.PI*p);r.armL.rotation.x=-1.55-wave*.35;r.armR.rotation.x=-1.55-wave*.35;r.armL.rotation.z=-.24;r.armR.rotation.z=.24;r.legL.rotation.x=.48*wave;r.legR.rotation.x=-.30*wave;r.body.rotation.x=-.18*wave;r.head.rotation.x=.08*wave;}if(laddering){const phase=(now*.010)% (Math.PI*2),wave=Math.sin(phase);r.armL.rotation.x=-1.35+wave*.34;r.armR.rotation.x=-1.35-wave*.34;r.armL.rotation.z=-.20;r.armR.rotation.z=.20;r.legL.rotation.x=-wave*.42;r.legR.rotation.x=wave*.42;r.body.rotation.x=-.08;r.head.rotation.x=.03;}
-      const reloadActive=r.reloadUntil>srv;if(!reloadActive){r.reloadUntil=0;r.reloadStartedAt=0;}const total=weaponRules(r.reloadWeapon||r.weapon)?.reloadMs||650,reloadP=reloadActive?THREE.MathUtils.clamp((srv-(r.reloadStartedAt||srv))/Math.max(1,total),0,1):0,reloadCurve=Math.sin(Math.PI*reloadP);const swapP=r.swapStartedAt?THREE.MathUtils.clamp((now-r.swapStartedAt)/Math.max(1,WEAPON_SWITCH_MS),0,1):1,swapCurve=swapP<1?Math.sin(Math.PI*swapP):0;if(swapP>=1)r.swapStartedAt=0;const kick=now<r.fireKickUntil?Math.sin(Math.PI*THREE.MathUtils.clamp((r.fireKickUntil-now)/170,0,1))*.31:0;
+      const reloadActive=r.reloadUntil>srv;if(!reloadActive){if(r.reloadUntil){const w=r.reloadWeapon||r.weapon;r.ammo[w]=resolveWeaponRules(worldSettings,w,remoteAttachmentsForWeapon(r,w)).mag;}r.reloadUntil=0;r.reloadStartedAt=0;}const remoteReloadWeapon=r.reloadWeapon||r.weapon,remoteMods=remoteReloadWeapon===r.primaryWeapon?r.primaryAttachments:r.secondaryAttachments,total=resolveWeaponRules(worldSettings,remoteReloadWeapon,remoteMods).reloadMs||650,reloadP=reloadActive?THREE.MathUtils.clamp((srv-(r.reloadStartedAt||srv))/Math.max(1,total),0,1):0,reloadCurve=Math.sin(Math.PI*reloadP);const swapP=r.swapStartedAt?THREE.MathUtils.clamp((now-r.swapStartedAt)/Math.max(1,WEAPON_SWITCH_MS),0,1):1,swapCurve=swapP<1?Math.sin(Math.PI*swapP):0;if(swapP>=1)r.swapStartedAt=0;const kick=now<r.fireKickUntil?Math.sin(Math.PI*THREE.MathUtils.clamp((r.fireKickUntil-now)/170,0,1))*.31:0;
       r.armR.rotation.x+=reloadCurve*.95+kick*1.18;r.armR.rotation.z=.12-reloadCurve*.28+kick*.10;const lower=reloadCurve*.24+swapCurve*.34+(r.sprintBlend||0)*.18+(r.slideBlend||0)*.12+(traversing?Math.sin(Math.PI*traversalPoseNow.progress)*.34:0)+(laddering ? .32 : 0);
-      r.pistol.position.set(.45,1.08-lower+kick*.06,-.25+kick*.31);if(r.akimbo1887){r.akimbo1887.position.y=-lower+kick*.04;r.akimbo1887.position.z=kick*.22;if(r.akimboLeft&&r.akimboRight&&r.akimboCycleStartedAt){const lc=akimbo1887CycleState(r.akimboCycleStartedAt.left,now,'left'),rc=akimbo1887CycleState(r.akimboCycleStartedAt.right,now,'right');r.akimboLeft.rotation.set(-.08+lc.spin,.14,-.03);r.akimboRight.rotation.set(-.08+rc.spin,-.14,.03);}}r.assault.position.set(.45,1.09-lower+kick*.07,-.38+kick*.38);r.ump.position.set(.45,1.08-lower+kick*.06,-.34+kick*.34);r.machineGun.position.set(.45,1.08-lower+kick*.08,-.42+kick*.42);r.shotgun.position.set(.45,1.10-lower+kick*.09,-.41+kick*.42);r.semiShotgun.position.set(.45,1.10-lower+kick*.08,-.40+kick*.39);r.battleRifle.position.set(.45,1.10-lower+kick*.08,-.20+kick*.40);poseBattleRifle(r.battleRifleView,reloadActive&&r.weapon==='battleRifle'?battleRifleCycle(1,1+Math.max(0,(reloadP-.60)/.40)*1000,1000):battleRifleCycle(r.battleRifleCycleStartedAt,now,r.battleRifleCycleDuration),reloadActive&&r.weapon==='battleRifle'?reloadP:0);r.sniper.position.set(.45,1.10-lower+kick*.10,-.45+kick*.45);r.grenadeLauncher.position.set(.45,1.08-lower+kick*.09,-.40+kick*.46);r.rpg.position.set(.38,1.42-lower*.82+kick*.10,-.43+kick*.48);for(const gun of [r.pistol,r.akimbo1887,r.assault,r.ump,r.machineGun,r.shotgun,r.semiShotgun,r.battleRifle,r.sniper,r.grenadeLauncher,r.rpg])gun.rotation.z=-reloadCurve*.35-swapCurve*.35+kick*.08;
+      r.pistol.position.set(.45,1.08-lower+kick*.06,-.25+kick*.31);if(r.akimbo1887){r.akimbo1887.position.y=-lower+kick*.04;r.akimbo1887.position.z=kick*.22;if(r.akimboLeft&&r.akimboRight&&r.akimboCycleStartedAt){const lc=akimbo1887CycleState(r.akimboCycleStartedAt.left,now,'left'),rc=akimbo1887CycleState(r.akimboCycleStartedAt.right,now,'right');r.akimboLeft.rotation.set(-.08+lc.spin,.14,-.03);r.akimboRight.rotation.set(-.08+rc.spin,-.14,.03);}}r.assault.position.set(.45,1.09-lower+kick*.07,-.38+kick*.38);r.ump.position.set(.45,1.08-lower+kick*.06,-.34+kick*.34);r.machineGun.position.set(.45,1.08-lower+kick*.08,-.42+kick*.42);r.shotgun.position.set(.45,1.10-lower+kick*.09,-.41+kick*.42);r.semiShotgun.position.set(.45,1.10-lower+kick*.08,-.40+kick*.39);r.battleRifle.position.set(.45,1.10-lower+kick*.08,-.20+kick*.40);r.sniper.position.set(.45,1.10-lower+kick*.10,-.45+kick*.45);r.grenadeLauncher.position.set(.45,1.08-lower+kick*.09,-.40+kick*.46);r.rpg.position.set(.38,1.42-lower*.82+kick*.10,-.43+kick*.48);for(const gun of [r.pistol,r.akimbo1887,r.assault,r.ump,r.machineGun,r.shotgun,r.semiShotgun,r.battleRifle,r.sniper,r.grenadeLauncher,r.rpg])gun.rotation.z=-reloadCurve*.35-swapCurve*.35+kick*.08;
 
+      for(const view of Object.values(r.weaponViews||{})){
+        const active=view.id===r.weapon,age=now-(r.shotAt||0),actionMs=weaponVisualKickProfile(view.id).actionMs;
+        let shot=active&&age>=0&&age<actionMs?Math.sin(Math.PI*age/actionMs):0;
+        if(view.id==='shotgun'){const p=THREE.MathUtils.clamp((age-150)/470,0,1);shot=active?(p<.44?THREE.MathUtils.smoothstep(p,0,.44):1-THREE.MathUtils.smoothstep(p,.44,1)):0;}
+        const cycle=view.id==='battleRifle'?(reloadActive&&active?battleRifleCycle(1,1+Math.max(0,(reloadP-.60)/.40)*1000,1000):battleRifleCycle(r.battleRifleCycleStartedAt,now,r.battleRifleCycleDuration)):null;
+        poseWeaponModel(view,{shot,reload:reloadActive&&active?reloadP:0,empty:r.ammo[view.id]===0,loaded:r.ammo[view.id]!==0,cycle});
+        if(view.flash)view.flash.material.opacity=active&&age>=0&&age<45?.85*(1-age/45):0;
+        if(view.lever){const hand=view===r.weaponViews.akimboLeft?'left':'right',cycle=akimbo1887CycleState(r.akimboCycleStartedAt?.[hand],now,hand);view.lever.rotation.x=-cycle.lever;}
+      }
       if(r.zombie&&!traversing&&!laddering){const strike=Math.max(0,1-(srv-r.attackAt)/420);r.armL.rotation.x=-1.1-strike*.7;r.armR.rotation.x=-1.25-strike*.6;r.armL.rotation.z=-.16;r.armR.rotation.z=.16;}
       if(!traversing&&!laddering){r.body.rotation.x=r.airborne?-.08:running?Math.sin(r.animPhase*2)*.025:Math.sin(r.animPhase)*.012;r.head.rotation.x=r.ads?-.045:0;}
     }
@@ -5540,6 +5374,7 @@ function akimbo1887CycleState(startedAt,now,side){
 }
 function updateWeaponView(dt){
   const now=performance.now();
+  if(localReloadAudio&&(localReloadAudio.weapon!==currentWeapon||hp<=0||combatActionActive()||(!reloadUntil&&localReloadAudio.weapon!=='shotgun'))){localReloadAudio.handle?.stop();localReloadAudio=null;}
   sprintViewBlend=expFollow(sprintViewBlend,sprinting?1:0,13,Math.max(.001,dt));slideViewBlend=expFollow(slideViewBlend,sliding?1:0,16,Math.max(.001,dt));
   const kickAds=smoothstep01(adsBlend),sightLock=weaponUsesIronSights(currentWeapon)?kickAds:0;updateWeaponKick(dt);
   // Keep the fore/aft recoil the user can feel, but do not throw the iron sight
@@ -5548,26 +5383,26 @@ function updateWeaponView(dt){
   const moving=hp>0&&onGround?THREE.MathUtils.clamp(localMoveAmount,0,1):0;if(moving>.03)moveBobPhase+=dt*THREE.MathUtils.lerp(11.5,7.5,kickAds)*(0.55+moving*.65);else moveBobPhase+=dt*1.8;
   landingKick=Math.max(0,landingKick-dt*4.2);const bobScale=moving*THREE.MathUtils.lerp(1,.015,sightLock),bobX=Math.sin(moveBobPhase)*.018*bobScale,bobY=Math.abs(Math.cos(moveBobPhase))*-.016*bobScale;
   const jumpSpeed=Math.sqrt(2*movementSettings.gravity*movementSettings.jumpHeight),jumpNorm=onGround?0:THREE.MathUtils.clamp(verticalVelocity/Math.max(.1,jumpSpeed),-1,1),sightMotion=1-sightLock*.94,jumpY=(onGround?0:(jumpNorm>0?-.035:.025))*sightMotion,landY=-Math.sin(landingKick*Math.PI)*.055*sightMotion;
-  const reloadW=reloadWeapon||currentWeapon,reloading=!!reloadUntil&&reloadW===currentWeapon;let reloadP=0,reloadCurve=0;
-  if(reloading){const total=weaponRules(reloadW).reloadMs;const start=reloadStartedAt||reloadUntil-total;reloadP=THREE.MathUtils.clamp((serverNow()-start)/Math.max(1,total),0,1);reloadCurve=Math.sin(Math.PI*reloadP);}
+  const recorded=replayPlayback?.actor?replayWeaponPose(replayPlayback.actor):null,reloadW=recorded?currentWeapon:reloadWeapon||currentWeapon,reloading=recorded?recorded.reload>0:!!reloadUntil&&reloadW===currentWeapon;let reloadP=0,reloadCurve=0;
+  if(reloading){const total=weaponRules(reloadW).reloadMs;const start=reloadStartedAt||reloadUntil-total;reloadP=THREE.MathUtils.clamp((serverNow()-start)/Math.max(1,total),0,1);reloadCurve=Math.sin(Math.PI*reloadP);}if(recorded){reloadP=recorded.reload;reloadCurve=Math.sin(Math.PI*reloadP);}
   const swapP=weaponSwapStartedAt?THREE.MathUtils.clamp((now-weaponSwapStartedAt)/Math.max(1,WEAPON_SWITCH_MS),0,1):1,swapCurve=swapP<1?Math.sin(Math.PI*swapP):0;if(swapP>=1)weaponSwapStartedAt=0;
   const deathP=!replayPlayback&&hp<=0?THREE.MathUtils.clamp((now-(deathAnimStartedAt||now))/650,0,1):0,deathEase=deathP*deathP*(3-2*deathP);
-  const traversePoseNow=traversal?traversalPose(traversal,now):null,traverseP=traversePoseNow?traversePoseNow.progress:0,traverseCurve=traversePoseNow?Math.sin(Math.PI*traverseP):0;
+  const traversePoseNow=!replayPlayback&&traversal?traversalPose(traversal,now):null,traverseP=traversePoseNow?traversePoseNow.progress:0,traverseCurve=traversePoseNow?Math.sin(Math.PI*traverseP):0;
   const equipmentLower=equipmentWeaponLower(now),mobilityLower=sprintViewBlend*(1-kickAds),slideLower=slideViewBlend*(1-kickAds*.35),idle=Math.sin(now*.0018)*.0035*THREE.MathUtils.lerp(1,.25,kickAds)*(1-sightLock*.94),commonX=bobX+mobilityLower*.10+slideLower*.035+equipmentLower*.035,commonY=bobY+jumpY+landY+idle+kickLift-reloadCurve*.19-swapCurve*.36-deathEase*.55-traverseCurve*.42-mobilityLower*.19-slideLower*.08-equipmentLower*.30,commonZ=reloadCurve*.08+swapCurve*.10+deathEase*.18+traverseCurve*.16+mobilityLower*.13+slideLower*.055+equipmentLower*.07;
   const reloadRoll=reloadCurve*(currentWeapon==='sniper'?.22:.48),swapRoll=swapCurve*.42,deathRoll=deathEase*.58,mobilityRoll=mobilityLower*.46+slideLower*.16+equipmentLower*.10;
   const a=kickAds,ironCommonX=commonX*(1-sightLock),ironCommonY=commonY*(1-sightLock);
   const sightPose=(group,weapon,fallback)=>{const mods=attachmentsForWeapon(weapon),opticId=String(mods?.optic||''),opticPose=opticId?group?.userData?.attachmentVisuals?.[opticId]?.userData?.adsPose:null;return opticPose?opticPose:(group.userData.adsPose||fallback);},pistolPose=sightPose(pistolGroup,'pistol',{x:0,y:-.14,z:-.54,rx:0,ry:0,rz:0}),assaultPose=sightPose(assaultGroup,'assault',{x:0,y:-.165,z:-.45,rx:0,ry:0,rz:0}),umpPose=sightPose(umpGroup,'ump',{x:0,y:-.155,z:-.46,rx:0,ry:0,rz:0}),machineGunPose=sightPose(machineGunGroup,'machineGun',{x:0,y:-.178,z:-.46,rx:0,ry:0,rz:0}),shotgunPose=sightPose(shotgunGroup,'shotgun',{x:0,y:-.116,z:-.44,rx:0,ry:0,rz:0}),semiShotgunPose=sightPose(semiShotgunGroup,'semiShotgun',{x:0,y:-.118,z:-.44,rx:0,ry:0,rz:0}),rpgPose=sightPose(rpgGroup,'rpg',{x:0,y:-.145,z:-.49,rx:0,ry:0,rz:0});
   pistolGroup.position.set(THREE.MathUtils.lerp(.33,pistolPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.25,pistolPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.67,pistolPose.z,a)+kickZ+commonZ);pistolGroup.rotation.set(THREE.MathUtils.lerp(-.08,pistolPose.rx,a)+reloadCurve*.18+kickPitch,THREE.MathUtils.lerp(-.08,pistolPose.ry,a)-reloadCurve*.18+kickYaw,THREE.MathUtils.lerp(0,pistolPose.rz,a)-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
   if(akimboLeftGroup&&akimboRightGroup){
-    const left=akimbo1887CycleState(akimboLeftCycleStartedAt,now,'left'),right=akimbo1887CycleState(akimboRightCycleStartedAt,now,'right'),akReload=reloading&&currentWeapon==='akimbo1887'?reloadCurve:0;
-    if(left.active&&left.p>=.28&&!akimboCycleSoundPlayed.left){akimboCycleSoundPlayed.left=true;playSoundCue('action1887',.90,{playbackRate:.99+Math.random()*.02,pan:-.42});}
-    if(right.active&&right.p>=.28&&!akimboCycleSoundPlayed.right){akimboCycleSoundPlayed.right=true;playSoundCue('action1887',.90,{playbackRate:.99+Math.random()*.02,pan:.42});}
+    const left=akimbo1887CycleState(replayPlayback?replayPlayback.shots[replayPlayback.killerId+':left']?.at||0:akimboLeftCycleStartedAt,replayPlayback?.playAt||now,'left'),right=akimbo1887CycleState(replayPlayback?replayPlayback.shots[replayPlayback.killerId+':right']?.at||0:akimboRightCycleStartedAt,replayPlayback?.playAt||now,'right'),akReload=reloading&&currentWeapon==='akimbo1887'?reloadCurve:0;
+    if(!replayPlayback&&left.active&&left.p>=.28&&!akimboCycleSoundPlayed.left){akimboCycleSoundPlayed.left=true;playSoundCue('action1887',.90,{playbackRate:.99+Math.random()*.02,pan:-.42});}
+    if(!replayPlayback&&right.active&&right.p>=.28&&!akimboCycleSoundPlayed.right){akimboCycleSoundPlayed.right=true;playSoundCue('action1887',.90,{playbackRate:.99+Math.random()*.02,pan:.42});}
     akimboLeftGroup.position.set(-.40+commonX*.42,-.32+commonY*.50-akReload*.18+left.lift,-.72+commonZ+left.kick*.18);
     akimboRightGroup.position.set(.40+commonX*.42,-.32+commonY*.50-akReload*.18+right.lift,-.72+commonZ+right.kick*.18);
     akimboLeftGroup.rotation.set(-.08+left.spin+akReload*.18,.18,-.035-akReload*.24);
     akimboRightGroup.rotation.set(-.08+right.spin+akReload*.18,-.18,.035+akReload*.24);
-    if(akimboLeftLever)akimboLeftLever.rotation.x=Math.PI/2+left.lever;
-    if(akimboRightLever)akimboRightLever.rotation.x=Math.PI/2+right.lever;
+    if(akimboLeftLever)akimboLeftLever.rotation.x=-left.lever;
+    if(akimboRightLever)akimboRightLever.rotation.x=-right.lever;
   }
   assaultGroup.position.set(THREE.MathUtils.lerp(.30,assaultPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.27,assaultPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.52,assaultPose.z,a)+kickZ+commonZ);assaultGroup.rotation.set(THREE.MathUtils.lerp(-.06,assaultPose.rx,a)+reloadCurve*.16+kickPitch,THREE.MathUtils.lerp(-.055,assaultPose.ry,a)-reloadCurve*.14+kickYaw,THREE.MathUtils.lerp(0,assaultPose.rz,a)-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
   umpGroup.position.set(THREE.MathUtils.lerp(.30,umpPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.27,umpPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.54,umpPose.z,a)+kickZ+commonZ);umpGroup.rotation.set(THREE.MathUtils.lerp(-.06,umpPose.rx,a)+reloadCurve*.16+kickPitch,THREE.MathUtils.lerp(-.05,umpPose.ry,a)-reloadCurve*.14+kickYaw,THREE.MathUtils.lerp(0,umpPose.rz,a)-reloadRoll-swapRoll-deathRoll-mobilityRoll+kickRoll);
@@ -5578,36 +5413,13 @@ function updateWeaponView(dt){
   const sniperPose=sniperAdsPose(),sniperCenter=sniperCenterAmount(),sniperEye=sniperEyeAmount();sniperGroup.position.set(THREE.MathUtils.lerp(.28,sniperPose.x,sniperCenter)+commonX*(1-sniperCenter),THREE.MathUtils.lerp(-.28,sniperPose.y,sniperCenter)+commonY*(1-sniperCenter),THREE.MathUtils.lerp(-.48,sniperPose.z,sniperEye)+kickZ+commonZ*(1-sniperCenter));sniperGroup.rotation.set(THREE.MathUtils.lerp(-.055,sniperPose.rx,sniperCenter)+reloadCurve*.10*(1-sniperCenter)+kickPitch,THREE.MathUtils.lerp(-.05,sniperPose.ry,sniperCenter)-reloadCurve*.12*(1-sniperCenter)+kickYaw,THREE.MathUtils.lerp(0,sniperPose.rz,sniperCenter)-reloadRoll*.65*(1-sniperCenter)-swapRoll*(1-sniperCenter)-deathRoll*(1-sniperCenter)-mobilityRoll*(1-sniperCenter)+kickRoll);
   grenadeLauncherGroup.position.set(THREE.MathUtils.lerp(.30,0,a)+commonX,THREE.MathUtils.lerp(-.28,-.20,a)+commonY,THREE.MathUtils.lerp(-.48,-.42,a)+kickZ+commonZ);grenadeLauncherGroup.rotation.set(THREE.MathUtils.lerp(-.06,0,a)+GRENADE_LAUNCH_PITCH+reloadCurve*.13+kickPitch,THREE.MathUtils.lerp(-.05,0,a)-reloadCurve*.12+kickYaw,-reloadRoll*.75-swapRoll-deathRoll-mobilityRoll+kickRoll);
   rpgGroup.position.set(THREE.MathUtils.lerp(.34,rpgPose.x,a)+ironCommonX,THREE.MathUtils.lerp(-.16,rpgPose.y,a)+ironCommonY,THREE.MathUtils.lerp(-.46,rpgPose.z,a)+kickZ+commonZ);rpgGroup.rotation.set(THREE.MathUtils.lerp(-.025,rpgPose.rx,a)+reloadCurve*.11+kickPitch,THREE.MathUtils.lerp(-.07,rpgPose.ry,a)-reloadCurve*.10+kickYaw,THREE.MathUtils.lerp(.015,rpgPose.rz,a)-reloadRoll*.6-swapRoll-deathRoll-mobilityRoll+kickRoll);
-  // Mechanical cycling is separate from recoil: slide/bolt motion gives the shot
-  // visible life without changing the sight/bullet ray.
-  if(pistolGroup.userData.cyclePart)pistolGroup.userData.cyclePart.position.z=pistolGroup.userData.cycleBaseZ+pistolGroup.userData.cycleTravel*(currentWeapon==='pistol'?actionPulse:0);
-  if(assaultGroup.userData.cyclePart)assaultGroup.userData.cyclePart.position.z=assaultGroup.userData.cycleBaseZ+assaultGroup.userData.cycleTravel*(currentWeapon==='assault'?actionPulse:0);
-  if(umpGroup.userData.cyclePart)umpGroup.userData.cyclePart.position.z=umpGroup.userData.cycleBaseZ+umpGroup.userData.cycleTravel*(currentWeapon==='ump'?actionPulse:0);
-  if(machineGunGroup.userData.cyclePart)machineGunGroup.userData.cyclePart.position.z=machineGunGroup.userData.cycleBaseZ+machineGunGroup.userData.cycleTravel*(currentWeapon==='machineGun'?actionPulse:0);
-  if(semiShotgunGroup.userData.cyclePart)semiShotgunGroup.userData.cyclePart.position.z=semiShotgunGroup.userData.cycleBaseZ+semiShotgunGroup.userData.cycleTravel*(currentWeapon==='semiShotgun'?actionPulse:0);
-  if(sniperGroup.userData.cyclePart)sniperGroup.userData.cyclePart.position.z=sniperGroup.userData.cycleBaseZ+sniperGroup.userData.cycleTravel*(currentWeapon==='sniper'?actionPulse:0);
-  if(pistolMag)pistolMag.position.y=-.245-(reloading&&currentWeapon==='pistol'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.18)/.62,0,1))*.20:0);
-  if(assaultMag)assaultMag.position.y=-.19-(reloading&&currentWeapon==='assault'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.28:0);
-  if(umpMag)umpMag.position.y=-.20-(reloading&&currentWeapon==='ump'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.26:0);
-  if(machineGunBox){const mgReload=reloading&&currentWeapon==='machineGun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.12)/.74,0,1)):0;machineGunBox.position.y=-.19-mgReload*.30;machineGunBox.position.x=-.045-mgReload*.08;}
-  if(semiShotgunMag)semiShotgunMag.position.y=-.14-(reloading&&currentWeapon==='semiShotgun'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.15)/.68,0,1))*.22:0);
-  if(sniperBolt)sniperBolt.position.z=-.06+(currentWeapon==='sniper'?actionPulse*.085:0)+(reloading&&currentWeapon==='sniper'?Math.sin(Math.PI*THREE.MathUtils.clamp((reloadP-.20)/.55,0,1))*.18:0);
-  const battleReload=reloading&&currentWeapon==='battleRifle';
-  const battleCycle=battleReload?battleRifleCycle(1,1+Math.max(0,(reloadP-.60)/.40)*1000,1000):battleRifleCycle(battleRifleCycleStartedAt,now,battleRifleCycleDuration);
-  poseBattleRifle(battleRifleView,battleCycle,battleReload?reloadP:0);
-  if(!battleReload&&currentWeapon==='battleRifle'&&battleCycle.active&&battleCycle.p>=.26&&!battleRifleBoltSoundPlayed){battleRifleBoltSoundPlayed=true;playSoundCue('battleRifleBolt',.80,{playbackRate:1.05});}
+  const battleReload=reloading&&currentWeapon==='battleRifle',battleCycle=battleReload?battleRifleCycle(1,1+Math.max(0,(reloadP-.60)/.40)*1000,1000):battleRifleCycle(battleRifleCycleStartedAt,now,battleRifleCycleDuration);
+  let pump=0;if(shotgunPumpStartedAt){const elapsed=now-shotgunPumpStartedAt,p=THREE.MathUtils.clamp((elapsed-150)/470,0,1);pump=p<.44?THREE.MathUtils.smoothstep(p,0,.44):1-THREE.MathUtils.smoothstep(p,.44,1);if(!replayPlayback&&elapsed>=150&&!shotgunPumpSoundPlayed&&p>=.42){shotgunPumpSoundPlayed=true;soundShotgunPump();}if(p>=1){shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;}}
+  for(const [key,view]of Object.entries(weaponViews)){const weapon=view.id,active=weapon===currentWeapon;poseWeaponModel(view,recorded&&active?recorded:{shot:active?(weapon==='shotgun'?pump:actionPulse):0,reload:active&&reloading?reloadP:0,empty:(ammo[weapon]||0)===0,loaded:(ammo[weapon]||0)>0,cycle:weapon==='battleRifle'?battleCycle:null});}
+  if(!replayPlayback&&!battleReload&&currentWeapon==='battleRifle'&&battleCycle.active&&battleCycle.p>=.32&&!battleRifleBoltSoundPlayed){battleRifleBoltSoundPlayed=true;playSoundCue('battleRifleBolt',.80,{playbackRate:1.05});}
   const traversalViewActive=!!traversePoseNow;battleRifleGroup.visible=!traversalViewActive&&currentWeapon==='battleRifle';sniperGroup.visible=!traversalViewActive&&currentWeapon==='sniper'&&!sniperWeaponHiddenForScope();shotgunGroup.visible=!traversalViewActive&&currentWeapon==='shotgun'&&!weaponHiddenForScope('shotgun');semiShotgunGroup.visible=!traversalViewActive&&currentWeapon==='semiShotgun';assaultGroup.visible=!traversalViewActive&&currentWeapon==='assault'&&!weaponHiddenForScope('assault');umpGroup.visible=!traversalViewActive&&currentWeapon==='ump'&&!weaponHiddenForScope('ump');machineGunGroup.visible=!traversalViewActive&&currentWeapon==='machineGun'&&!weaponHiddenForScope('machineGun');grenadeLauncherGroup.visible=!traversalViewActive&&currentWeapon==='grenadeLauncher';rpgGroup.visible=!traversalViewActive&&currentWeapon==='rpg'&&!weaponHiddenForScope('rpg');pistolGroup.visible=!traversalViewActive&&currentWeapon==='pistol';if(akimboLeftGroup)akimboLeftGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';if(akimboRightGroup)akimboRightGroup.visible=!traversalViewActive&&currentWeapon==='akimbo1887';
-  if(shotgunPump){
-    let pumpOffset=reloading&&currentWeapon==='shotgun'?Math.sin(Math.PI*reloadP)*.10:0;
-    if(shotgunPumpStartedAt){
-      const elapsed=now-shotgunPumpStartedAt,p=Math.max(0,Math.min(1,(elapsed-150)/470));
-      if(elapsed>=150){const travel=p<.44?THREE.MathUtils.smoothstep(p,0,.44):1-THREE.MathUtils.smoothstep(p,.44,1);pumpOffset=Math.max(pumpOffset,travel*.135);if(!shotgunPumpSoundPlayed&&p>=.42){shotgunPumpSoundPlayed=true;soundShotgunPump();}}
-      if(p>=1){shotgunPumpStartedAt=0;shotgunPumpSoundPlayed=false;}
-    }
-    shotgunPump.position.z=-.48-pumpOffset;
-  }
   updateFirstPersonHandRig(now,reloading,reloadP,traversalViewActive);
-  if(localInfected){for(const gun of [pistolGroup,akimboLeftGroup,akimboRightGroup,assaultGroup,umpGroup,machineGunGroup,shotgunGroup,semiShotgunGroup,battleRifleGroup,sniperGroup,grenadeLauncherGroup,rpgGroup])if(gun)gun.visible=false;}
+  if(replayPlayback?replayPlayback.actor?.zombie:localInfected){for(const gun of [pistolGroup,akimboLeftGroup,akimboRightGroup,assaultGroup,umpGroup,machineGunGroup,shotgunGroup,semiShotgunGroup,battleRifleGroup,sniperGroup,grenadeLauncherGroup,rpgGroup])if(gun)gun.visible=false;}
 
   if(mantleHands){
     mantleHands.visible=!!traversePoseNow||(localInfected&&hp>0);mantleHands.children.forEach(limb=>{if(limb.userData.claws)limb.userData.claws.visible=localInfected;});
@@ -6138,9 +5950,10 @@ function weaponShotVariation(weapon='pistol'){
 function attachmentShotTone(weapon,mods){let volume=1,rate=1;if(weaponHasAttachment(weapon,mods,'shortBarrel')){volume*=1.08;rate*=1.035;}if(weaponHasAttachment(weapon,mods,'heavyBarrel')){volume*=.98;rate*=.985;}if(weaponHasAttachment(weapon,mods,'shotgunLongBarrel')){volume*=.98;rate*=.982;}return{volume,rate};}
 function soundShot(weapon='pistol',hand='right'){const v=weaponShotVariation(weapon),mods=attachmentsForWeapon(weapon),soundScale=attachmentSoundScale(weapon,mods),tone=attachmentShotTone(weapon,mods),suppressed=weaponHasAttachment(weapon,mods,'suppressor'),pan=weapon==='akimbo1887'?(hand==='left'?-0.42:.42):0;playSoundCue(weaponShotSoundId(weapon,suppressed),v.volume*soundScale*tone.volume,{playbackRate:v.playbackRate*(weapon==='akimbo1887'?1.04:1)*(suppressed?.99:1)*tone.rate,pan,priority:4});}
 function reloadSoundId(weapon=currentWeapon){
-  return weapon==='battleRifle'?'reloadSniper':weapon==='assault'?'reloadAssault':weapon==='ump'?'reloadUmp':weapon==='machineGun'?'reloadMachineGun':weapon==='akimbo1887'?'reload1887':weapon==='shotgun'?'reloadShotgun':weapon==='semiShotgun'?'reloadSemiShotgun':weapon==='sniper'?'reloadSniper':weapon==='grenadeLauncher'?'reloadGl':weapon==='rpg'?'reloadRpg':'reloadPistol';
+  return weapon==='battleRifle'?'reloadBattleRifle':weapon==='assault'?'reloadAssault':weapon==='ump'?'reloadUmp':weapon==='machineGun'?'reloadMachineGun':weapon==='akimbo1887'?'reload1887':weapon==='shotgun'?'reloadShotgun':weapon==='semiShotgun'?'reloadSemiShotgun':weapon==='sniper'?'reloadSniper':weapon==='grenadeLauncher'?'reloadGl':weapon==='rpg'?'reloadRpg':'reloadPistol';
 }
-function soundReload(weapon=currentWeapon){playSoundCue(reloadSoundId(weapon),1,{playbackRate:.99+Math.random()*.02,priority:3});}
+let localReloadAudio=null;
+function soundReload(weapon=currentWeapon){localReloadAudio?.handle?.stop();const duration=weaponRules(weapon).reloadMs/1000;localReloadAudio={weapon,handle:playSoundCue(reloadSoundId(weapon),1,{fitDuration:duration,maxDuration:duration,priority:3})};}
 function soundHitmarker(){playSoundCue('hitmarker',1,{priority:5});}
 function soundHeadshot(){playSoundCue('hitmarker',1.10,{playbackRate:.88,priority:6});}
 function soundKill(){playSoundCue('kill',1,{priority:6});}

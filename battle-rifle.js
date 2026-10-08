@@ -12,9 +12,16 @@ export function createBattleRifle(T) {
     g.translate(0,0,-(width-2*bevel)/2);g.rotateY(Math.PI/2);return mesh(name,g,mat);
   };
   const tube=(name,radius,length,pos,mat,parent)=>{const m=mesh(name,new T.CylinderGeometry(radius,radius,length,16),mat,parent);m.rotation.x=Math.PI/2;m.position.set(...pos);return m;};
-  const stock=profile('orange-stock',[[.13,.015],[.36,.055],[.52,.022],[.93,.022],[.96,-.285],[.87,-.32],[.54,-.205],[.41,-.26],[.29,-.19],[.19,-.09]],.145,orange,.016);
+  const stock=profile('orange-stock',[[.13,-.021],[.38,-.021],[.52,.022],[.93,.022],[.96,-.285],[.87,-.32],[.54,-.205],[.41,-.26],[.29,-.19],[.19,-.09]],.145,orange,.012);
   profile('rubber-butt-pad',[[.932,.028],[.977,.02],[.995,-.278],[.953,-.301]],.158,rubber,.010);
-  profile('orange-receiver',[[-.27,.105],[-.16,.15],[.05,.13],[.18,.072],[.23,-.025],[.10,-.085],[-.23,-.074]],.165,orange,.014);
+  // An open receiver bed, with a clear right-side ejection/handle channel.
+  // The bore, bolt body and travel all share y=.042; the lowered stock wrist
+  // leaves room for the bolt tail when the action is fully open.
+  profile('orange-receiver-bed',[[-.27,.004],[.20,.004],[.23,-.034],[.10,-.085],[-.23,-.074]],.165,orange,.008);
+  box('receiver-left-wall',[.020,.100,.37],[-.076,.046,-.055],orange);
+  box('receiver-front-ring',[.166,.12,.066],[0,.043,-.24],orange);
+  box('receiver-right-guide',[.020,.028,.30],[.076,-.003,-.044],orange);
+  box('receiver-rear-guide',[.020,.038,.055],[.076,.006,.120],steel);
   // The slim orange trigger guard is a real opening, not a solid block.
   const guard=new T.Shape();guard.moveTo(-.13,-.06);guard.lineTo(.13,-.06);guard.lineTo(.09,-.20);guard.lineTo(-.08,-.20);guard.closePath();
   const hole=new T.Path();hole.moveTo(-.085,-.09);hole.lineTo(-.057,-.167);hole.lineTo(.059,-.167);hole.lineTo(.083,-.09);hole.closePath();guard.holes.push(hole);
@@ -31,18 +38,18 @@ export function createBattleRifle(T) {
     for(let i=0;i<5;i++){const rib=box('fore-end-groove',[.007,.047,.012],[side*.099,-.084,-.37-i*.071],rubber);rib.rotation.x=-.38;}
     for(let i=0;i<3;i++)box('stock-vent',[.004,.010,.12-i*.02],[side*.081,-.063-i*.025,.73],dark);
     const panel=profile('stock-grip-panel',[[.18,-.026],[.31,.005],[.44,-.043],[.37,-.181],[.29,-.166]],.004,orange,.002);panel.position.x=side*.076;
-    for(const [z,y]of [[.86,-.04],[.35,-.027],[-.18,.042],[-.53,-.02]]){const screw=mesh('recessed-screw',new T.CylinderGeometry(.008,.008,.003,8),dark);screw.rotation.z=Math.PI/2;screw.position.set(side*(z>0?.083:.100),y,z);}
+    for(const [z,y]of [[.86,-.04],[.35,-.027],[-.24,.042],[-.53,-.02]]){const screw=mesh('recessed-screw',new T.CylinderGeometry(.008,.008,.003,8),dark);screw.rotation.z=Math.PI/2;screw.position.set(side*(z>0?.083:z<-.28?.100:.085),y,z);}
   }
   for(const [y,r]of [[.042,.066],[-.050,.053]]){
     tube('orange-muzzle-cap',r,.071,[0,y,-1.295],orange);
     const ring=mesh('orange-muzzle-rim',new T.TorusGeometry(r-.012,.010,8,20),orange);ring.position.set(0,y,-1.333);
     const bore=mesh('dark-muzzle-inset',new T.CircleGeometry(r-.020,20),rubber);bore.rotation.y=Math.PI;bore.position.set(0,y,-1.334);
   }
-  const mag=box('compact-magazine',[.100,.073,.125],[0,-.105,-.203],dark);
-  box('orange-magazine-base',[.108,.018,.131],[0,-.043,0],orange,mag);
+  const mag=new T.Group();mag.name='magazine';mag.position.set(0,-.105,-.203);mag.userData.magSize=[.100,.073,.125];group.add(mag);
+  const magSet={};for(const [id,h]of [['standard',.073],['extendedMag',.115]]){const shell=new T.Group();shell.name=id;mag.add(shell);box('compact-magazine',[.100,h,.125],[0,-(h-.073)/2,0],dark,shell);box('orange-magazine-base',[.108,.018,.131],[0,.0365-h-.006,0],orange,shell);shell.visible=id==='standard';magSet[id]=shell;}
   // The bolt rotates about the bore before moving rearwards. Its knob stays on
   // the right, so the player's hand can follow the same moving anchor.
-  const bolt=new T.Group();bolt.name='bolt';bolt.position.set(0,.094,-.035);group.add(bolt);
+  const bolt=new T.Group();bolt.name='bolt';bolt.position.set(0,.042,-.035);group.add(bolt);
   tube('bolt-body',.020,.22,[0,0,0],steel,bolt);
   const stem=mesh('bolt-handle',new T.CylinderGeometry(.010,.012,.125,10),steel,bolt);stem.rotation.z=-Math.PI/2;stem.position.set(.080,-.014,.057);
   const knob=mesh('red-bolt-knob',new T.SphereGeometry(.025,12,8),red,bolt);knob.scale.set(1,.83,1.13);knob.position.set(.151,-.014,.057);
@@ -65,18 +72,21 @@ export function createBattleRifle(T) {
     }
     geometry.computeBoundingSphere();mesh('shell-'+mat.color.getHexString(),geometry,mat);for(const g of parts)g.dispose();
   }
-  return {group,bolt,mag,barrel,stock,trigger,flash,sightMaterial:dark};
+  return {group,bolt,mag,magSet,barrel,stock,trigger,flash,sightMaterial:dark};
 }
 
 const smooth=(p,a,b)=>{const t=Math.max(0,Math.min(1,(p-a)/(b-a)));return t*t*(3-2*t);};
 export function battleRifleCycle(startedAt,now,duration=1000){
   if(!Number.isFinite(startedAt)||startedAt<=0)return {active:false,p:1,lift:0,travel:0,hand:0};
   const p=Math.max(0,Math.min(1,(now-startedAt)/Math.max(1,duration)));
-  return {active:p<1,p,lift:smooth(p,.10,.25)*(1-smooth(p,.76,.91)),travel:smooth(p,.26,.44)*(1-smooth(p,.55,.75)),hand:smooth(p,.05,.18)*(1-smooth(p,.88,1))};
+  // The hand is fully on the handle before unlocking begins, and does not
+  // leave it until the forward stroke and lock have both finished.
+  return {active:p<1,p,lift:smooth(p,.19,.30)*(1-smooth(p,.75,.86)),travel:smooth(p,.32,.49)*(1-smooth(p,.58,.73)),hand:smooth(p,.03,.17)*(1-smooth(p,.88,.99))};
 }
 export function poseBattleRifle(view,cycle,reload=0){
+  view.cycle=cycle;
   view.bolt.rotation.z=cycle.lift*1.12;
   view.bolt.position.z=-.035+cycle.travel*.195;
-  const t=Math.max(0,Math.min(1,(reload-.12)/.60));
-  view.mag.position.y=-.105-Math.sin(Math.PI*t)*.23;
+  const pull=smooth(reload,.13,.27)*(1-smooth(reload,.40,.54));
+  view.mag.position.y=-.105-pull*.23;
 }

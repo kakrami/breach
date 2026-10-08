@@ -2,8 +2,8 @@
  * Authoritative players, classes, settings and host rights come from the adapter.
  * 844 × 390 is the design frame, with one uniform scale and no scroll containers.
  */
-import {APP_VERSION,WEAPON_SPECS,PRIMARY_WEAPONS,SECONDARY_WEAPONS,WEAPON_ORDER,ATTACHMENTS,attachmentOptionsForWeapon,resolveWeaponSpec,EQUIPMENT_SPECS,TACTICAL_EQUIPMENT,LETHAL_EQUIPMENT,KILLSTREAK_ORDER,KILLSTREAK_SPECS,GAME_MODES,gameModeSpec} from './game-config.js?v=2.18.0';
-import {relationshipFor,relationshipColor} from './team-model.js?v=2.18.0';
+import {APP_VERSION,WEAPON_SPECS,PRIMARY_WEAPONS,SECONDARY_WEAPONS,WEAPON_ORDER,ATTACHMENTS,attachmentOptionsForWeapon,resolveWeaponSpec,EQUIPMENT_SPECS,TACTICAL_EQUIPMENT,LETHAL_EQUIPMENT,KILLSTREAK_ORDER,KILLSTREAK_SPECS,GAME_MODES,gameModeSpec} from './game-config.js?v=2.19.0';
+import {relationshipFor,relationshipColor} from './team-model.js?v=2.19.0';
 const T={bg:'#101713',panel:'#1d2721',line:'#354234',accent:'#d8eda0',text:'#edf0e8',muted:'#a2aea0',blue:'#98c9db',red:'#eb927e'};
 const cap=s=>String(s||'').replace(/^./,x=>x.toUpperCase()),clamp=(n,a,b)=>Math.max(a,Math.min(b,n));
 const r=(x,y,w,h)=>({x,y,left:x,top:y,width:w,height:h,right:x+w,bottom:y+h});
@@ -34,7 +34,7 @@ export function createGameMenu({ui,adapter,preview}) {
   }
   function link(id,label,x,y,w,h,action,opts={}){return button(id,label,x,y,w,h,action,{quiet:true,...opts});}
   function click(id){adapter.click(id);}
-  function img(key,x,y,w,h,cover=true,alpha=1){let im=images.get(key);if(!im){im=new Image();im.src=new URL('./menu-assets/'+key,import.meta.url).href;images.set(key,im);}if(!im.complete||!im.naturalWidth)return;const z=cover?Math.max(w/im.width,h/im.height):Math.min(w/im.width,h/im.height);ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.globalAlpha=alpha;ctx.drawImage(im,x+(w-im.width*z)/2,y+(h-im.height*z)/2,im.width*z,im.height*z);ctx.restore();}
+  function img(key,x,y,w,h,cover=true,alpha=1){let im=images.get(key);if(!im){im=new Image();im.src=new URL('./menu-assets/'+key+'?v='+APP_VERSION,import.meta.url).href;images.set(key,im);}if(!im.complete||!im.naturalWidth)return;const z=cover?Math.max(w/im.width,h/im.height):Math.min(w/im.width,h/im.height);ctx.save();ctx.beginPath();ctx.rect(x,y,w,h);ctx.clip();ctx.globalAlpha=alpha;ctx.drawImage(im,x+(w-im.width*z)/2,y+(h-im.height*z)/2,im.width*z,im.height*z);ctx.restore();}
   function thumb(kind,id,atts,x,y,w,h,slot=''){const canvas=preview.thumb(kind,id,atts,slot);if(canvas)ctx.drawImage(canvas,x,y,w,h);else if(kind==='weapon')img('weapon-'+id+'.png',x,y,w,h,false);}
   function go(page){goDirect(page);}
   function goDirect(page){state.pending=null;state.page=page;editSection('overview');adapter.page(page);if(page==='cheats')adapter.hostBegin();}
@@ -167,7 +167,7 @@ export function createGameMenu({ui,adapter,preview}) {
     if(!supported.includes(state.slot))state.slot=supported[0];
     const context=weaponContext+':'+w+':'+state.slot,equipped=atts[state.slot]||'',chosen=state.catalog?equipped:inspect('attachment',context,equipped),visual={...atts,...(state.slot?{[state.slot]:chosen}:{})},diff=chosen!==equipped||w!==actualWeapon;
     const x=151,wid=396,cardH=62+Math.min(12,(menuH-390)*.12),railY=menuH-13-cardH,categoryY=railY-41;
-    text(WEAPON_SPECS[w].name,x,149,20,T.text,284,'display');
+    text(WEAPON_SPECS[w].name,x,143,18,T.text,278,'display');text(WEAPON_SPECS[w].type,x,166,8,T.muted,278);
     button('weapon-picker',state.catalog?'ATTACHMENTS':'CHANGE WEAPON',435,140,112,34,()=>{state.catalog=!state.catalog;state.peek=null;},{active:state.catalog,size:9});
     const anchors=hero('weapon',w,visual,x,178,wid,categoryY-181);
     if(diff)text('PREVIEW',x+7,categoryY-19,8,T.accent,90);

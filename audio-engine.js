@@ -253,7 +253,9 @@ export function createAudioEngine({ cues, getVolumes = () => ({ master: 1, sfx: 
     const base = clamp01(Number(volumes.master ?? 1) * category * Number(cue.gain ?? 1) * Number(volume ?? 1));
     source.buffer = buffer;
     source.loop = !!(options.loop ?? cue.loop);
-    source.playbackRate.value = Math.max(0.5, Math.min(2, Number(options.rate ?? options.playbackRate ?? cue.rate ?? 1)));
+    source.playbackRate.value = Number(options.fitDuration)>0
+      ? buffer.duration/Math.max(.05,Number(options.fitDuration))
+      : Math.max(0.5, Math.min(2, Number(options.rate ?? options.playbackRate ?? cue.rate ?? 1)));
     gain.gain.value = handle.volumeOverride == null ? base : clamp01(handle.volumeOverride);
     if (filter) { filter.type = 'lowpass'; filter.frequency.value = lowpassHz; filter.Q.value = .36; }
     const bus = cue.group === 'Music' ? musicBus : sfxBus;
