@@ -7,9 +7,9 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<link rel="manifest" href="manifest.webmanifest?v=2.21.0">
-<link rel="stylesheet" href="ui.css?v=2.21.0">
-<title>Breach v2.21.0</title>
+<link rel="manifest" href="manifest.webmanifest?v=2.22.0">
+<link rel="stylesheet" href="ui.css?v=2.22.0">
+<title>Breach v2.22.0</title>
 </head>
 <body>
 <canvas id="game" aria-label="Breach gameplay" draggable="false"></canvas>
@@ -25,7 +25,7 @@
   window.addEventListener('error',event=>{if(!window.__breachModuleBooted)paint('Client failed to start. Reload to try again.');});
   window.addEventListener('unhandledrejection',()=>{if(!window.__breachModuleBooted)paint('Client failed to start. Reload to try again.');});
   for(const type of ['contextmenu','selectstart','dragstart'])document.addEventListener(type,event=>{event.preventDefault();},{capture:true,passive:false});
-  import('./client.js?v=2.21.0').catch(error=>{console.error(error);paint('Client failed to start. Reload to try again.');});
+  import('./client.js?v=2.22.0').catch(error=>{console.error(error);paint('Client failed to start. Reload to try again.');});
 })();
 </script>
 </body>

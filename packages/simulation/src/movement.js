@@ -1,4 +1,4 @@
-import { ALPHA_WORLD, PLAYER_CROUCH_HEIGHT, PLAYER_STANDING_HEIGHT, moveWithCollision } from "../../world/src/alphaWorld.js";
+import { ALPHA_WORLD, PLAYER_CROUCH_HEIGHT, PLAYER_STANDING_HEIGHT, moveWithCollision } from "../../world/src/alphaWorld.js?v=2.22.0";
 export const CLIENT_FIXED_STEP = 1 / 60;
 export const SERVER_FIXED_STEP = 1 / 30;
 export const SERVER_SUBSTEPS = 2;

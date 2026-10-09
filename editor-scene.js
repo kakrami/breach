@@ -1,7 +1,7 @@
-import * as THREE from "./vendor/three.module.min.js?v=2.21.0";
-import { TransformControls } from "./vendor/TransformControls.js";
-import { clone, rad, Resolver } from "./builder-model.js?v=2.21.0";
-import { assetResizeMode } from "./object-catalog.js?v=2.21.0";
+import * as THREE from "./vendor/three.module.min.js?v=2.22.0";
+import { TransformControls } from "./vendor/TransformControls.js?v=2.22.0";
+import { clone, rad, Resolver } from "./builder-model.js?v=2.22.0";
+import { assetResizeMode } from "./object-catalog.js?v=2.22.0";
 // Scene adapters own no document state. The game supplies its existing scene/camera.
 export class EditorScene {
   constructor(editor, scene, camera, canvas) {

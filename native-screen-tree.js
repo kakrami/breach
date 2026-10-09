@@ -1,4 +1,4 @@
-import {WEAPON_SPECS} from './game-config.js?v=2.21.0';
+import {WEAPON_SPECS} from './game-config.js?v=2.22.0';
 // Native semantic inventory. No browser DOM, markup parser, or CSS layout is used.
 // Geometry and visual hierarchy are owned by native-layout.js; classes/data are
 // stable behavioral hooks for the game client and are not a styling source.

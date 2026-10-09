@@ -1,5 +1,5 @@
-import { PROTOCOL_VERSION } from "./version.js";
-import { isTeam } from "./team.js";
+import { PROTOCOL_VERSION } from "./version.js?v=2.22.0";
+import { isTeam } from "./team.js?v=2.22.0";
 function isObject(value) {
     return typeof value === "object" && value !== null && !Array.isArray(value);
 }

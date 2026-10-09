@@ -1,6 +1,6 @@
 /* Match menus own only canvas presentation and navigation. Gameplay state, timers,
  * network messages and relationship colors are supplied by the client. */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.21.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.22.0';
 
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,finite(value)));
@@ -63,25 +63,26 @@ export function drawMatchScoreboard(c,options={}){
 }
 
 export function layoutMatchShop(options={}){
-  const view=matchMenuViewport(options),items=options.items||[],cols=items.length>6?Math.ceil(items.length/2):items.length===2||items.length===4?2:3,gap=8,headerH=options.tabs?.length?116:76,footerH=34,rowH=(Math.min(view.h,370)-headerH-footerH-gap)/2,rows=Math.max(1,Math.ceil(items.length/cols)),panel=centered(view,900,headerH+footerH+rows*rowH+(rows-1)*gap),body={x:panel.x+14,y:panel.y+headerH,w:panel.w-28,h:panel.h-headerH-footerH},itemW=(body.w-gap*(cols-1))/cols;
+  const view=matchMenuViewport(options),items=options.items||[],cols=Math.min(Math.max(1,items.length),view.w<500?2:3),gap=8,headerH=options.tabs?.length?138:94,footerH=32,rows=Math.max(1,Math.ceil(items.length/cols)),rowH=Math.max(44,Math.min(112,(view.h-headerH-footerH-gap*(rows-1))/rows)),panel=centered(view,900,headerH+footerH+rows*rowH+(rows-1)*gap),body={x:panel.x+14,y:panel.y+headerH,w:panel.w-28,h:panel.h-headerH-footerH},itemW=(body.w-gap*(cols-1))/cols;
   const l={kind:'shop',view,panel,body,cols,rowH,scroll:0,maxScroll:0,items:[],hits:[],focusTargets:[]};
   items.forEach((item,index)=>{const r={x:body.x+(index%cols)*(itemW+gap),y:body.y+Math.floor(index/cols)*(rowH+gap),w:itemW,h:rowH},target=hit(`shop:${item.id}`,r,'buy',{index,item});l.items.push({...target,visible:r});l.hits.push(target);l.focusTargets.push(target);});
-  l.tabs=(options.tabs||[]).map((tab,i)=>hit('shop-tab:'+tab.id,{x:panel.x+14+i*140,y:panel.y+66,w:132,h:44},'shopTab',{tab:tab.id,label:tab.label}));l.hits.push(...l.tabs);l.focusTargets.push(...l.tabs);
+  l.tabs=(options.tabs||[]).map((tab,i)=>hit('shop-tab:'+tab.id,{x:panel.x+14+i*((panel.w-28)/options.tabs.length),y:panel.y+88,w:(panel.w-28)/options.tabs.length-4,h:44},'shopTab',{tab:tab.id,label:tab.label}));l.hits.push(...l.tabs);l.focusTargets.push(...l.tabs);
   l.close={x:panel.x+panel.w-100,y:panel.y+12,w:86,h:44};const close=hit('close',l.close,'back');l.hits.push(close);l.focusTargets.push(close);return l;
 }
 export function drawMatchShop(c,options={}){
  const l=layoutMatchShop(options),p=l.panel;c.save();backdrop(c,l.view,.65);rr(c,p,C.panel,C.line);label(c,options.title||'SURVIVOR SUPPLY',p.x+14,p.y+29,{size:20,weight:800,fill:C.accent,width:p.w-125});
  button(c,l.close,options.closeLabel||'MENU',{active:options.focusId==='close'});
- label(c,`${Math.max(0,finite(options.cash))} ${options.currency||'AP'}  ·  ${options.phaseLabel||'PREPARATION'}`,p.x+14,p.y+55,{size:13,fill:C.muted,width:p.w-125});
+ label(c,options.balanceLabel||`${Math.max(0,finite(options.cash))} ${options.currency||'CREDITS'}`,p.x+14,p.y+62,{size:11,fill:C.muted,width:p.w-28});
+ label(c,options.phaseLabel||'PREPARATION',p.x+14,p.y+79,{size:11,fill:C.muted,width:p.w-28});
  for(const tab of l.tabs||[])button(c,tab,tab.label,{active:options.activeTab===tab.tab||options.focusId===tab.id});
  for(const r of l.items){const item=r.item,active=options.focusId?options.focusId===r.id:options.selectedIndex===r.index;rr(c,r,active?'#293820':C.raised,active?C.accent:C.line,2);if(active){c.fillStyle=C.accent;c.fillRect(r.x,r.y,3,r.h);}
-  const art=options.art?.(item);if(art)c.drawImage(art,r.x+r.w*.28,r.y+4,r.w*.7,Math.max(20,r.h-48));
-  label(c,String(r.index+1).padStart(2,'0'),r.x+10,r.y+20,{size:11,fill:C.muted});
+  const art=options.art?.(item);if(art&&r.h>=80)c.drawImage(art,r.x+r.w*.28,r.y+4,r.w*.7,Math.max(20,r.h-48));
+  if(r.h>=80)label(c,String(r.index+1).padStart(2,'0'),r.x+10,r.y+20,{size:11,fill:C.muted});
   label(c,item.label||item.id,r.x+10,r.y+r.h-29,{size:13,weight:800,width:r.w-20});
   label(c,item.status||`$${item.price}`,r.x+10,r.y+r.h-10,{size:12,fill:item.unavailable?C.muted:C.accent,width:r.w-20});
  }
  const selected=l.items.find(t=>t.id===options.focusId)||l.items[options.selectedIndex||0];
- label(c,options.feedback||selected?.item.detail||'Select to buy and equip',p.x+14,p.y+p.h-13,{size:12,fill:C.muted,width:p.w-28});c.restore();return l;
+ label(c,options.feedback||selected?.item.detail||'Choose directly · close to move · reservations charged only if human',p.x+14,p.y+p.h-13,{size:12,fill:C.muted,width:p.w-28});c.restore();return l;
 }
 
 export function layoutMatchDeath(options={}){const view=matchMenuViewport(options),panel=centered(view,512,options.allowLoadout===false?240:296),loadout=options.allowLoadout===false?null:{x:panel.x+16,y:panel.y+panel.h-60,w:panel.w-32,h:44};return{kind:'death',view,panel,loadout,hits:loadout?[hit('loadout',loadout,'loadout')]:[],focusTargets:loadout?[hit('loadout',loadout,'loadout')]:[]};}

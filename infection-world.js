@@ -1,7 +1,7 @@
 // Temporary objects use the same catalog/compiler and collision services as the map.
-import {createAuthoredWorldCollision} from './authored-world-collision.js';
-import {createAuthoredServerCollision} from './authored-server-collision.js';
-import {resolveLadderAttachment,ladderPathClear} from './movement-model.js';
+import {createAuthoredWorldCollision} from './authored-world-collision.js?v=2.22.0';
+import {createAuthoredServerCollision} from './authored-server-collision.js?v=2.22.0';
+import {resolveLadderAttachment,ladderPathClear} from './movement-model.js?v=2.22.0';
 export function compileInfectionWorld(base,state={}){
  const props=(state.barricades||[]).filter(p=>p.hp>0).map(p=>({...p,geometry:base.compileProp({assetId:'prop/barricade',kind:'barricade',x:p.x,z:p.z,w:3.2,d:.48,h:1.25,rot:p.rot,yOffset:p.y-base.terrainHeight(p.x,p.z)})}));
  const parts=props.flatMap(p=>p.geometry.parts.map(part=>({...part,infectionId:p.id}))),geometry={...base,LADDERS:[...(base.LADDERS||[]),...(state.ladders||[])],WORLD_PLAYER_COLLIDERS:[...base.WORLD_PLAYER_COLLIDERS,...parts.filter(p=>p.playerSolid)],STATIC_PROJECTILE_COLLIDERS:[...base.STATIC_PROJECTILE_COLLIDERS,...parts.filter(p=>p.projectileSolid)]};
