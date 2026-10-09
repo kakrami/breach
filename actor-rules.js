@@ -1,4 +1,4 @@
-import {infectionClass,infectionAbilityActive} from './infection-rules.js?v=2.22.0';
+import {infectionClass,infectionAbilityActive} from './infection-rules.js?v=2.22.1';
 // Shared actor shape contract. Ordinary actors retain the 2.5 dimensions.
 export function actorScale(actor){
   if(!actor?.boss)return 1;

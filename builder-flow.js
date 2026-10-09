@@ -1,5 +1,5 @@
 // Interaction state belongs here. Renderers consume it; library entries never choose a camera.
-import {BUILDINGS,PROPS,ELEVATION,AddCommand,AddManyCommand,MaterialCommand,clone} from './builder-model.js?v=2.22.0';
+import {BUILDINGS,PROPS,ELEVATION,AddCommand,AddManyCommand,MaterialCommand,clone} from './builder-model.js?v=2.22.1';
 export function createBuilderFlow(e){
  const w=e.walk,s=w.state,state={tool:'select',item:s.item,roadStart:null};
  Object.defineProperty(s,'mode',{get:()=>state.tool==='environment'?'paint':state.tool,set:v=>{state.tool=v==='paint'?'environment':v;},configurable:true});

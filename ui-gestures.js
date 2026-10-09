@@ -1,5 +1,5 @@
-import { createPointerSessions } from './pointer-sessions.js?v=2.22.0';
-import { createCanvasInputOwner } from './canvas-input.js?v=2.22.0';
+import { createPointerSessions } from './pointer-sessions.js?v=2.22.1';
+import { createCanvasInputOwner } from './canvas-input.js?v=2.22.1';
 
 // Holds/drags use the same context barrier as canvas hits and keyboard focus.
 export function createUiGestures({

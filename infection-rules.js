@@ -1,4 +1,4 @@
-import {WEAPON_SPECS} from './game-config.js?v=2.22.0';
+import {WEAPON_SPECS} from './game-config.js?v=2.22.1';
 export const INFECTION_ROUND_INTENTS=Object.freeze(['state','fire','reload','weapon','traverse','ladder']);
 // Shared Infection contract: identical authority and presentation rules.
 export const INFECTION = Object.freeze({buyMs:20000,roundMs:180000,rounds:5,intermissionMs:6000,respawnMs:3000,spawnRetryMs:500,spawnProtectionMs:1200,exposedSpawnProtectionMs:2500,seedReleaseMs:3000,reach:1.65,clawMs:1000,clawWindupMs:200,clawDamage:100,startCash:8,cashCap:30,roundRewardCap:8,minSpawnDistance:24,spawnSightDistance:10000,damagePerPack:500,motherRatio:8,conversionGraceMs:2200,knockbackCap:4.2,knockbackWindowMs:350,barricadeHp:420,barricadeLimit:3});

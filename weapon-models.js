@@ -1,8 +1,8 @@
 // Shared physical models. Coordinates, component replacements and action poses
 // are identical in the armory, first person, remote players and replay.
-import {installWeaponIronSights} from './iron-sights.js?v=2.22.0';
-import {WEAPON_SPECS} from './game-config.js?v=2.22.0';
-import {createBattleRifle, battleRifleCycle, poseBattleRifle} from './battle-rifle.js?v=2.22.0';
+import {installWeaponIronSights} from './iron-sights.js?v=2.22.1';
+import {WEAPON_SPECS} from './game-config.js?v=2.22.1';
+import {createBattleRifle, battleRifleCycle, poseBattleRifle} from './battle-rifle.js?v=2.22.1';
 
 const smooth=(p,a,b)=>{const t=Math.max(0,Math.min(1,(p-a)/(b-a)));return t*t*(3-2*t);};
 const pulse=(p,a,b,c,d)=>smooth(p,a,b)*(1-smooth(p,c,d));

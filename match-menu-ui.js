@@ -1,6 +1,7 @@
 /* Match menus own only canvas presentation and navigation. Gameplay state, timers,
  * network messages and relationship colors are supplied by the client. */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.22.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.22.1';
+import { matchResultStat } from './match-results.js?v=2.22.1';
 
 const finite=(value,fallback=0)=>Number.isFinite(Number(value))?Number(value):fallback;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,finite(value)));
@@ -12,53 +13,61 @@ const intersect=(a,b)=>{const x=Math.max(a.x,b.x),y=Math.max(a.y,b.y),right=Math
 export function matchMenuViewport({w=960,h=640,safe={}}={}){w=Math.max(1,finite(w,960));h=Math.max(1,finite(h,640));const left=clamp(safe.left,0,w),top=clamp(safe.top,0,h),right=clamp(safe.right,0,w-left),bottom=clamp(safe.bottom,0,h-top),margin=Math.min(16,Math.max(4,Math.min(w-left-right,h-top-bottom)/24));return{x:left+margin,y:top+margin,w:Math.max(1,w-left-right-margin*2),h:Math.max(1,h-top-bottom-margin*2),screen:{x:0,y:0,w,h}};}
 function centered(view,w,h){w=Math.min(view.w,w);h=Math.min(view.h,h);return{x:view.x+(view.w-w)/2,y:view.y+(view.h-h)/2,w,h};}
 function rr(c,r,fill,stroke,radius=THEME.radius){drawPanel(c,r,{fill,stroke,radius:Math.min(radius,THEME.radius)});}
-function clipText(c,text,width){text=String(text??'');if(width<=0)return'';if(c.measureText(text).width<=width)return text;let low=0,high=text.length;while(low<high){const mid=Math.ceil((low+high)/2);if(c.measureText(text.slice(0,mid)+'…').width<=width)low=mid;else high=mid-1;}return low?text.slice(0,low)+'…':'';}
-function label(c,text,x,y,{size=14,weight=600,fill=C.text,align='left',width=Infinity}={}){c.save();c.font=`${weight} ${size}px ${THEME.font}`;const available=Number.isFinite(width)?Math.max(0,width):Math.max(1,c.measureText(String(text??'')).width+1),value=clipText(c,text,available),left=align==='center'?x-available/2:align==='right'?x-available:x;drawLabel(c,value,{x:left,y:y-size,w:available,h:size*2},{color:fill,fontSize:size,weight,align});c.restore();}
+function clipText(c,text,width){text=String(text??'');if(width<=0)return'';if(c.measureText(text).width<=width)return text;const characters=Array.from(text);let low=0,high=characters.length;while(low<high){const mid=Math.ceil((low+high)/2);if(c.measureText(characters.slice(0,mid).join('')+'…').width<=width)low=mid;else high=mid-1;}return low?characters.slice(0,low).join('')+'…':'';}
+function label(c,text,x,y,{size=14,minSize=size,weight=600,fill=C.text,align='left',width=Infinity}={}){c.save();c.font=`${weight} ${size}px ${THEME.font}`;while(size>minSize&&Number.isFinite(width)&&width>0&&c.measureText(String(text??'')).width>width){size=Math.max(minSize,size-1);c.font=`${weight} ${size}px ${THEME.font}`;}const available=Number.isFinite(width)?Math.max(0,width):Math.max(1,c.measureText(String(text??'')).width+1),value=clipText(c,text,available),left=align==='center'?x-available/2:align==='right'?x-available:x;drawLabel(c,value,{x:left,y:y-size,w:available,h:size*2},{color:fill,fontSize:size,weight,align});c.restore();}
 function button(c,r,text,{active=false,primary=false,disabled=false}={}){drawButton(c,r,{text,focused:active,primary:primary&&!disabled,disabled,fontSize:14});}
 function backdrop(c,view,opacity=.78){c.fillStyle=`rgba(3,6,8,${opacity})`;c.fillRect(0,0,view.screen.w,view.screen.h);}
 function scrollbar(c,layout){if(!layout.maxScroll||!layout.body)return;const b=layout.body,track={x:b.x+b.w-3,y:b.y,w:3,h:b.h},thumbH=Math.max(24,b.h*b.h/layout.contentH),thumb={x:track.x,y:b.y+(b.h-thumbH)*layout.scroll/layout.maxScroll,w:3,h:thumbH};rr(c,track,C.line,null,2);rr(c,thumb,C.accent,null,2);}
 function decorateScroll(layout){const {body}=layout;layout.maxScroll=Math.max(0,layout.contentH-body.h);layout.scroll=clamp(layout.scroll,0,layout.maxScroll);return layout;}
 function hit(id,r,action,extra={}){return{id,...r,action,...extra};}
 
-/** Whole rows in two columns. Paging exists only when a roster exceeds capacity. */
+/** Whole rows, with teams stacked on narrow screens and paging for long rosters. */
 export function layoutMatchScoreboard(options={}){
   const view=matchMenuViewport(options),rows=Array.isArray(options.rows)?options.rows:[],results=options.kind==='results';
-  const teamBased=options.teamBased??rows.some(p=>p.teamLabel),pad=14,gap=16,headerH=78,footerH=54,rowH=26,visibleRows=teamBased?Math.max(rows.filter(p=>p.team==='blue').length,rows.filter(p=>p.team==='red').length):Math.ceil(rows.length/2),panel=centered(view,1000,Math.min(view.h,500,headerH+footerH+Math.max(4,visibleRows)*rowH));
-  const body={x:panel.x+pad,y:panel.y+headerH,w:panel.w-pad*2,h:Math.max(rowH,panel.h-headerH-footerH)},capacity=Math.max(1,Math.floor(body.h/rowH)),cw=(body.w-gap)/2;
-  const groups=teamBased?[{name:options.infection?'SURVIVORS':'ALPHA',team:'blue',players:rows.filter(p=>p.team==='blue')},{name:options.infection?'INFECTED':'BRAVO',team:'red',players:rows.filter(p=>p.team==='red')}]:[{name:'STANDINGS',players:rows},{name:'',players:rows}];
-  const pageCount=Math.max(1,teamBased?Math.ceil(Math.max(...groups.map(g=>g.players.length))/capacity):Math.ceil(rows.length/(capacity*2))),page=clamp(Math.floor(options.page||0),0,pageCount-1);
-  const layout={kind:results?'results':'scoreboard',view,panel,body,rows:[],groups,capacity,rowH,page,pageCount,scroll:0,maxScroll:0,contentH:body.h,hits:[],focusTargets:[]};
-  groups.forEach((group,col)=>{
-    group.x=body.x+col*(cw+gap);group.w=cw;group.columns={name:group.x+9,kills:group.x+cw-84,deaths:group.x+cw-51,ratio:group.x+cw-7};
-    const start=teamBased?page*capacity:page*capacity*2+col*capacity;
-    group.players.slice(start,start+capacity).forEach((player,index)=>{const r={id:'player:'+player.id,x:group.x,y:body.y+index*rowH,w:cw,h:rowH,player,index,columns:group.columns};layout.rows.push(r);});
+  const teamBased=options.teamBased??rows.some(p=>p.teamLabel),pad=14,gap=16,compactDetails=options.statColumns?.length>3&&view.w<420,closeBottom=results&&!!options.allowClose&&view.w<380,rowH=compactDetails?44:28,groupHeaderH=compactDetails?48:30;
+  const infoLines=[options.contextLine,options.subtitle,options.summary,options.detail].filter(Boolean),headingH=(results&&(!options.allowClose||closeBottom)?42:54)+infoLines.length*20,footerLines=(options.footerLines||[options.footer]).filter(Boolean),footerH=Math.max(54,38+(footerLines.length+(closeBottom?1:0))*20);
+  const columnCount=view.w>=700&&(teamBased||rows.length>8)?2:1,stacked=teamBased&&columnCount===1;
+  const largestTeam=Math.max(rows.filter(p=>p.team==='blue').length,rows.filter(p=>p.team==='red').length),visibleRows=teamBased?largestTeam:Math.ceil(rows.length/columnCount);
+  const desiredBody=(stacked?2:1)*(groupHeaderH+Math.max(2,visibleRows)*rowH)+(stacked?gap:0),panel=centered(view,1000,Math.min(view.h,600,headingH+desiredBody+footerH));
+  const body={x:panel.x+pad,y:panel.y+headingH,w:panel.w-pad*2,h:Math.max(1,panel.h-headingH-footerH)},sectionH=stacked?(body.h-gap)/2:body.h;
+  const capacity=Math.max(1,Math.floor((sectionH-groupHeaderH)/rowH)),cw=(body.w-(columnCount-1)*gap)/columnCount;
+  const groups=teamBased?['blue','red'].map(team=>({name:options.groupLabels?.[team]||(options.infection?(team==='blue'?'SURVIVORS':'INFECTED'):(team==='blue'?'ALPHA':'BRAVO')),team,players:rows.filter(p=>p.team===team)})):Array.from({length:columnCount},(_,col)=>({name:col?'':options.rosterTitle||'PLAYERS',players:rows}));
+  const statColumns=options.statColumns||(options.infection?[{key:'conversions',label:'CONV',width:43},{key:'assists',label:'AST',width:34},{key:'damage',label:'DMG',width:46}]:[{key:'kills',label:'K',width:36},{key:'deaths',label:'D',width:34},{key:'ratio',label:'K/D',width:44}]);
+  const pageCount=Math.max(1,teamBased?Math.ceil(largestTeam/capacity):Math.ceil(rows.length/(capacity*columnCount))),page=clamp(Math.floor(options.page||0),0,pageCount-1);
+  const layout={kind:results?'results':'scoreboard',view,panel,body,rows:[],groups,capacity,rowH,page,pageCount,columnCount,stacked,compactDetails,closeBottom,infoLines,footerLines,scroll:0,maxScroll:0,contentH:body.h,hits:[],focusTargets:[]};
+  groups.forEach((group,index)=>{
+    group.x=body.x+(stacked?0:index)*(cw+gap);group.y=body.y+(stacked?index*(sectionH+gap):0);group.w=cw;
+    let right=group.x+cw-7;group.statColumns=statColumns.slice().reverse().map(stat=>{const column={...stat,x:right};right-=stat.width;return column;}).reverse();
+    group.columns={name:group.x+9,nameWidth:compactDetails?cw-18:Math.max(0,right-group.x-15)};
+    const start=teamBased?page*capacity:page*capacity*columnCount+index*capacity;
+    group.players.slice(start,start+capacity).forEach((player,rowIndex)=>{const r={id:'player:'+player.id,x:group.x,y:group.y+groupHeaderH+rowIndex*rowH,w:cw,h:rowH,player,index:rowIndex,columns:group.columns,statColumns:group.statColumns,compactDetails};layout.rows.push(r);});
   });
-  if(!results){layout.close={x:panel.x+panel.w-88,y:panel.y+8,w:74,h:44};layout.hits.push(hit('close',layout.close,'back'));}
+  if(!results||options.allowClose){layout.close=closeBottom?{x:panel.x+14,y:panel.y+panel.h-49,w:90,h:44}:{x:panel.x+panel.w-88,y:panel.y+8,w:74,h:44};layout.hits.push(hit('close',layout.close,'back'));}
   if(pageCount>1){for(const [id,direction,x]of [['previous',-1,panel.x+panel.w-111],['next',1,panel.x+panel.w-57]])layout.hits.push(hit(id,{x,y:panel.y+panel.h-49,w:44,h:44},'page',{direction,disabled:direction<0?page===0:page===pageCount-1}));}
   layout.focusTargets=[...layout.hits];return layout;
 }
 export function drawMatchScoreboard(c,options={}){
   const l=layoutMatchScoreboard(options),p=l.panel,focusId=options.focusId||'';c.save();backdrop(c,l.view,.86);rr(c,p,'#131d18','#354234',0);
-  label(c,options.title||(l.kind==='results'?'FINAL STANDINGS':'SCOREBOARD'),p.x+14,p.y+25,{size:22,weight:800,fill:options.accent||'#edf0e8',width:p.w-122});
+  label(c,options.title||(l.kind==='results'?'MATCH RESULTS':'SCOREBOARD'),p.x+14,p.y+25,{size:p.w<380?20:22,minSize:16,weight:800,fill:options.accent||'#edf0e8',width:p.w-(l.close&&!l.closeBottom?112:28)});
   if(l.close)button(c,l.close,options.controller?'B  BACK':'BACK',{active:focusId==='close'});
+  l.infoLines.forEach((line,index)=>label(c,line,p.x+14,p.y+(l.kind==='results'&&(!l.close||l.closeBottom)?51:63)+index*20,{size:12,minSize:11,weight:index?700:500,fill:index?'#edf0e8':C.muted,width:p.w-28}));
   for(const group of l.groups){
-    const col=group.columns,score=group.team?(options.infection?group.players.length:options.teamScores?.[group.team]):undefined;
-    label(c,group.name+(score==null?'':'   '+score),group.x+2,p.y+57,{size:17,weight:800,fill:'#d8eda0',width:group.w-116});
-    for(const [text,x]of (options.infection?[['CONV',col.kills],['AST',col.deaths],['DMG',col.ratio]]:[['K',col.kills],['D',col.deaths],['K/D',col.ratio]]))label(c,text,x,p.y+57,{size:11,fill:C.muted,align:'right'});
-    c.fillStyle='#354234';c.fillRect(group.x,p.y+67,group.w,1);
+    const score=group.team?options.teamScores?.[group.team]:undefined;
+    label(c,group.name+(score==null?'':'   '+score),group.x+2,group.y+13,{size:13,minSize:10,weight:800,fill:'#d8eda0',width:Math.max(0,group.columns.nameWidth+7)});
+    for(const stat of group.statColumns)label(c,stat.label,stat.x,group.y+(l.compactDetails?34:13),{size:10,fill:C.muted,align:'right',width:stat.width-4});
+    c.fillStyle='#354234';c.fillRect(group.x,group.y+(l.compactDetails?44:24),group.w,1);
   }
   for(const row of l.rows){
     const player=row.player,col=row.columns,self=String(player.id)===String(options.selfId),tone=player.color||(self?'#d7ff58':C.muted);
     rr(c,{x:row.x,y:row.y,w:row.w,h:row.h-2},self?'#293523':row.index%2?'#1e2822':'#18221c',null,0);c.fillStyle=tone;c.fillRect(row.x,row.y+5,2,row.h-12);
     const prefix=self?'YOU  ':'';
-    label(c,prefix+(player.bot?String(player.name||'Bot').replace(/^(ALPHA|BRAVO) /,''):String(player.name||'Player')),col.name,row.y+13,{size:12,weight:self?700:500,fill:tone,width:col.kills-col.name-15});
-    const kills=Math.max(0,finite(player.kills)),deaths=Math.max(0,finite(player.deaths)),ratio=(kills/Math.max(1,deaths)).toFixed(2);
-    for(const [value,x]of (options.infection?[[player.infectionStats?.conversions||0,col.kills],[player.infectionStats?.assists||0,col.deaths],[Math.round(player.infectionStats?.damage||0),col.ratio]]:[[kills,col.kills],[deaths,col.deaths],[ratio,col.ratio]]))label(c,String(value),x,row.y+13,{size:12,align:'right',fill:'#edf0e8'});
+    label(c,prefix+(player.bot?String(player.name||'Bot').replace(/^(ALPHA|BRAVO) /,''):String(player.name||'Player')),col.name,row.y+13,{size:12,weight:self?700:500,fill:tone,width:col.nameWidth});
+    for(const stat of row.statColumns)label(c,matchResultStat(player,stat.key),stat.x,row.y+(row.compactDetails?34:13),{size:12,align:'right',fill:'#edf0e8',width:stat.width-4});
   }
-  const footerY=p.y+p.h-18;
-  if(options.footer)label(c,options.footer,p.x+14,footerY,{size:11,fill:C.muted,width:p.w-(l.pageCount>1?140:28)});
-  else {let x=p.x+14;for(const [name,tone]of [['YOU','#d7ff58'],['ALLY','#62ef86'],['ALLY BOT','#54a9ff'],['ENEMY','#ff3b45']]){label(c,name,x,footerY,{size:10,fill:tone});x+=name==='ALLY BOT'?76:55;}}
-  if(l.pageCount>1){label(c,(l.page+1)+' / '+l.pageCount,p.x+p.w-145,footerY,{size:11,fill:C.muted,align:'right'});for(const id of ['previous','next']){const target=l.hits.find(h=>h.id===id);button(c,target,id==='previous'?'‹':'›',{disabled:target.disabled,active:focusId===id});}}
+  const footerY=p.y+p.h-18,footerWidth=p.w-(l.pageCount>1?176:28);
+  if(l.footerLines.length)l.footerLines.forEach((line,index)=>{const offset=l.closeBottom?40+(l.footerLines.length-1-index)*20:index===l.footerLines.length-1?0:40+(l.footerLines.length-2-index)*20;label(c,line,p.x+14,footerY-offset,{size:11,fill:C.muted,width:l.closeBottom||index<l.footerLines.length-1?p.w-28:footerWidth});});
+  else label(c,options.mode==='zombies'?'SURVIVORS · COOPERATIVE':options.mode==='sandbox'?'PRACTICE ACTIVITY':options.mode==='infection'?'SURV = HUMAN SURVIVAL TIME':'K = KILLS · D = DEATHS',p.x+14,footerY,{size:10,fill:C.muted,width:footerWidth});
+  if(l.pageCount>1){label(c,(l.page+1)+' / '+l.pageCount,p.x+p.w-120,footerY,{size:11,fill:C.muted,align:'right',width:48});for(const id of ['previous','next']){const target=l.hits.find(h=>h.id===id);button(c,target,id==='previous'?'‹':'›',{disabled:target.disabled,active:focusId===id});}}
   c.restore();return l;
 }
 

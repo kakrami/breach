@@ -8,8 +8,8 @@
  * once at the output boundary. Keep the same graph for touch, mouse, keyboard,
  * controller and accessibility rather than introducing parallel UI layouts.
  */
-import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.22.0';
-import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.22.0';
+import { THEME, drawPanel, drawButton, drawLabel } from './native-ui.js?v=2.22.1';
+import { NATIVE_SCREEN_IDS } from './native-screen-tree.js?v=2.22.1';
 
 const C = Object.freeze({
   bg:THEME.bg, surface:THEME.panel, raised:THEME.panelRaised, line:THEME.border,

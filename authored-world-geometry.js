@@ -1,8 +1,8 @@
-import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.22.0';
-import { resolveLadderAttachment, ladderPathClear, legacyLadderAttachment } from './movement-model.js?v=2.22.0';
-import { supportProfile as canonicalSupportProfile, supportWeight } from './terrain-support.js?v=2.22.0';
-import { roadSegments } from './road-path.js?v=2.22.0';
-import { resolveAsset } from './object-catalog.js?v=2.22.0';
+import { createAuthoredWorldCollision } from './authored-world-collision.js?v=2.22.1';
+import { resolveLadderAttachment, ladderPathClear, legacyLadderAttachment } from './movement-model.js?v=2.22.1';
+import { supportProfile as canonicalSupportProfile, supportWeight } from './terrain-support.js?v=2.22.1';
+import { roadSegments } from './road-path.js?v=2.22.1';
+import { resolveAsset } from './object-catalog.js?v=2.22.1';
 const finite=(v,f=0)=>Number.isFinite(Number(v))?Number(v):f;
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const clampNumber=(v,a,b,f)=>clamp(finite(v,f),a,b);
